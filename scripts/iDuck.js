@@ -1,8 +1,13 @@
+
 import myJson from './conversation.json' assert {type: 'json'};
 
-function phoneticLookup(val) {
+// 👇️ {
+//   name: 'Alice',
+//   country: 'Austria',
+//   tasks: [ 'develop', 'design', 'test' ],
+//   age: 30
+// }
+console.log(myJson.person);
 
-    let result = myJson[val];
-    return result;
-}
-phoneticLookup("bb");
+console.log(myJson.person.name); // 👉️ "Alice"
+console.log(myJson.person.country); // 👉️ "Austria"
