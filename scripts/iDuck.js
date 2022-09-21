@@ -1,5 +1,8 @@
 import myJson from './conversation.json' assert {type: 'json'};
 
+function phoneticLookup(val) {
 
-
-let result = myJson["Who are you"];
+    let result = myJson[val];
+    return result;
+}
+phoneticLookup("bb");
