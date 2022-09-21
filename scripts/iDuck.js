@@ -11,8 +11,10 @@ function checkGuess() {
     const userGuess = Text(guessField.value);
 
     guesses.textContent = `${userGuess} `;
-   
-    document.getElementById("box").innerText = myJson.person[guesses.textContent];
+    console.log(guesses.textContent)
+    console.log(userGuess)
+   //myJson.person[guesses.textContent]
+    document.getElementById("box").innerText = userGuess;
 
   }
 
