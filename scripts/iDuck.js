@@ -2,5 +2,4 @@
 import myJson from './conversation.json' assert {type: 'json'};
 
 
-console.log(myJson.person["qq"]);
-
+document.getElementById("box").innerText = myJson.person["qq"];
