@@ -1,83 +1,12 @@
+const url = `https://rainbostew.s3.us-east-1.amazonaws.com/Book1.json?response-content-disposition=inline&X-Amz-Security-Token=IQoJb3JpZ2luX2VjENb%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJHMEUCIDFB09mw9uwr8wEYdcXkumVuCvH6HYMAHjX8Jqkz5BXEAiEA%2BNlYsDg4qm58Xurzt8OQEVqY1q0t%2BsuFSaYNv0yewvIq5AIIfxAAGgwxODczODI2NTg4NDgiDI%2FRO8ac%2Fr4ICndLhyrBAmmZEDh83hbKFoLb7Se3gWbOYasanPP5g%2BW%2BDzbf3%2Bjc7vKxzpfMP7flawkwTQZFnfoXzLyOShhog%2B%2FmuUiZb4TlRozRJfuOIXnCE%2FyizgSV2%2Fpz4nuhInWVzBBTDMx%2BVXTkmepGKRgtJC5BNIs8r2lF1Qt07FP%2FTBLxld5b%2BirL29mw08NRGvH0lpMUBwnzbOdKuoJPb5Lhl0rD6i5NoepPOLH3EwQNclkAQGYorTC9l5XzkCbtWpprSlUggVCEmZbKExO59pKFpEZaw96Sa1PYmWfzn1g3eeVjU28COtl5U5BS9JmtNwBJ7UCGDm32O9qYIekaVhZ9unctMW4z%2FnyETJ%2BGUbWTMpIc7dFFcI8zPZKgWFIY8iBAKvFrNlwzhseobHRT3fpu4bXrJjy%2FdJNPKF20pmgWpvotQ5cOxNETFTDSgK6ZBjqzAlOeQkcCpwu%2B2D%2BvtEh2T9KNyfqgxOeiaCzgqBgAP1UEfIgfnYWLGgYGgO0CI7CvfZgiNtYTGkaH0d19n0NVOxbbq46Oq1QiALuSQUHyXEU76O26nf5NTaPaM9zrBRBWqX93kAabsV6p24ox8U43H8KcTxaGc%2FkTBOAKEOZV3evFGUafcfKo%2ByMri088g5qyizCdLpb7NODXfyVsaXLLyXbk8P7I8tOeYqOUt7sVmAIoNmY%2Fx5MPXsUNA18PWv1M8ki006JpJvNqNX5SaQyBzp3VCzPGs9DS4qJWSdEibUmJpgU4d2ZOUeiAg9%2BSm65uxvcLvYV4S7%2FmLIHmOBYFtX2AlMmg0N2TsPAHl4tPM7YhglZ%2BqX0UaW3%2B%2FlmpK4Dnwx1txbjnsNKW3Y5bd5N8dLHXHZI%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20220921T213014Z&X-Amz-SignedHeaders=host&X-Amz-Expires=43200&X-Amz-Credential=ASIASXIHAO4QAT4GL76H%2F20220921%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=b29a570defd1c7615a96b71f1ffe443c3b1174859ce71a0d53cd54ab1c2c48ba`;
 
-import data from '../Book1.json' assert { type: 'JSON' };
-console.log(data);
-
-
-
-let randomNumber = Math.floor(Math.random() * 100) + 1;
-
-const guesses = document.querySelector('.guesses');
-const lastResult = document.querySelector('.lastResult');
-const lowOrHi = document.querySelector('.lowOrHi');
-
-const guessSubmit = document.querySelector('.guessSubmit');
-const guessField = document.querySelector('.guessField');
-
-let guessCount = 1;
-let resetButton;
-guessField.focus();
-
-
-function checkGuess() {
-  const userGuess = Number(guessField.value);
-  if (guessCount === 1) {
-    guesses.textContent = 'Previous guesses: ';
+async function downloadObject(url) {
+  try {
+    const fetchResponse = await fetch(url);
+    return await fetchResponse.json();
+  } catch (err) {
+    console.error('Error - ', err);
   }
-  guesses.textContent += `${userGuess} `;
-
-  if (userGuess === randomNumber) {
-    lastResult.textContent = 'Congratulations! You got it right!';
-    lastResult.style.backgroundColor = 'green';
-    lowOrHi.textContent = '';
-    setGameOver();
-  } else if (guessCount === 10) {
-    lastResult.textContent = '!!!GAME OVER!!!';
-    lowOrHi.textContent = '';
-    setGameOver();
-  } else {
-    lastResult.textContent = 'Wrong!';
-    lastResult.style.backgroundColor = 'red';
-    if (userGuess < randomNumber) {
-      lowOrHi.textContent = 'Last guess was too low!';
-    } else if (userGuess > randomNumber) {
-      lowOrHi.textContent = 'Last guess was too high!';
-    }
-  }
-
-  guessCount++;
-  guessField.value = '';
-  guessField.focus();
 }
 
-guessSubmit.addEventListener('click', checkGuess);
-
-function setGameOver() {
-  guessField.disabled = true;
-  guessSubmit.disabled = true;
-  resetButton = document.createElement('button');
-  resetButton.textContent = 'Start new game';
-  document.body.append(resetButton);
-  resetButton.addEventListener('click', resetGame);
-}
-
-
-function resetGame() {
-  guessCount = 1;
-
-  const resetParas = document.querySelectorAll('.resultParas p');
-  for (const resetPara of resetParas) {
-    resetPara.textContent = '';
-  }
-
-  resetButton.parentNode.removeChild(resetButton);
-
-  guessField.disabled = false;
-  guessSubmit.disabled = false;
-  guessField.value = '';
-  guessField.focus();
-
-  lastResult.style.backgroundColor = 'white';
-
-  randomNumber = Math.floor(Math.random() * 100) + 1;
-}
-
+downloadObject(url);

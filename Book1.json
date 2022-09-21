@@ -1,10 +1,8 @@
-[
- {
-   "question": "hello",
-   "answer": "hello there"
- },
- {
-   "question": "how are you ",
-   "answer": "I'm good thank you"
- }
-]
+{
+  "person": {
+    "name": "Alice",
+    "country": "Austria",
+    "tasks": ["develop", "design", "test"],
+    "age": 30
+  }
+}
