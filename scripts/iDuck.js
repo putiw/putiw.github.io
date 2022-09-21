@@ -1,12 +1,7 @@
 import myJson from './example.json' assert {type: 'json'};
 
-// 👇️ {
-//   name: 'Alice',
-//   country: 'Austria',
-//   tasks: [ 'develop', 'design', 'test' ],
-//   age: 30
-// }
-console.log(myJson.person);
+myJson.forEach(function (el, i, arr) {
+    lookup[el.question] = el.answer;
+});
 
-console.log(myJson.person.name); // 👉️ "Alice"
-console.log(myJson.person.country); // 👉️ "Austria"
+console.log(lookup['Who are you']); 
