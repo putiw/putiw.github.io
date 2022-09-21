@@ -1,15 +1,3 @@
-/*[
-  {
-    "question": "What is your name",
-    "answer": "My name is iDuck"
-  },
-  {
-    "question": "Who are you",
-    "answer": "I am iDuck"
-  }
-]
-*/
-
 [
   {
     "What is your name" : "My name is iDuck",
