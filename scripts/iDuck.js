@@ -19,10 +19,9 @@ function duckThinks3() {
     document.getElementById("duckSays").innerText = "...";
 }
 
-let lagTime = 70;
+let lagTime = 150;
 
 function duckSaid() {
-
     setTimeout(duckThinks1, lagTime);
     setTimeout(duckThinks2, lagTime);
     setTimeout(duckThinks3, lagTime);   
