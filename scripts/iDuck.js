@@ -32,20 +32,17 @@ function duckSaid() {
 }
 
 
-input.addEventListener("keypress", function (event) {
-    if (event.key === "Enter") {
-        
-        document.getElementByClass("ask").click();
-    }
-});
-/*
-const node = document.getElementsByClassName("input1")[0];
+
+
+const node = document.getElementsByClassName("ques")[0];
 node.addEventListener("keyup", function(event) {
     if (event.key === "Enter") {
-        document.getElementById("ask").click();
+        document.getElementById("askButton").click();
+        document.getElementByClass("ask").click();
+
     }
 });
-*/
+
 
 
 ask.addEventListener('submit', duckSaid);
