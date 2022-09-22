@@ -1,5 +1,13 @@
 {
   "person": {
+    "How old are you?":"I am 2 days old",
+    "How old are you":"I am 2 days old",
+    "how old are you?":"I am 2 days old",
+    "how old are you":"I am 2 days old",
+    "Are you good at math?":"One day I will!",
+    "Are you good at math":"One day I will!",
+    "are you good at math?":"One day I will!",
+    "are you good at math":"One day I will!",
     "Who are you?": "I am iDuck",
     "Who are you": "I am iDuck",
     "who are you?": "I am iDuck",
