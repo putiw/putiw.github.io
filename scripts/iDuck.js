@@ -8,20 +8,25 @@ const guesses = document.querySelector('.guesses');
 
 var input = document.getElementById("guessField");
 
-function checkGuess() {
+function duckSaid() {
 
-    guessField.value;
+    if (guessField.value === undefined) {
+        document.getElementById("duckSays").innerText = "Quack, quack..";
+     } else {
+        document.getElementById("duckSays").innerText = myJson.person[guessField.value];
+    }
 
-    document.getElementById("duckSays").innerText = myJson.person[guessField.value];
+}
 
-  }
-
-input.addEventListener("keypress", function(event) {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    document.getElementById("ask").click();
-  }
+input.addEventListener("keypress", function (event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        document.getElementById("ask").click();
+    }
 });
 
-ask.addEventListener('click', checkGuess);
+ask.addEventListener('submit', duckSaid);
 
+ask.addEventListener('click',  function(){
+    setTimeout(duckSaid, 3000);
+});

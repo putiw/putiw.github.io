@@ -2,35 +2,40 @@ img {
 
     display: block;
     margin: 0 auto;
-    width: 40%;
-
+    width: 30vw;
+    text-align: left;
   }
 
   body {
-    text-align: center;
+    text-align: left;
 
     width: 600px;
     height: 600px;
     margin: 0 auto;
     background-color: #FFFFFF;
     padding: 20px 20px 20px 20px;
-    border: 5px solid black;
   }
 
-  #box
+  #duckSays
    {
     font-family: "helvetica neue", helvetica, sans-serif;
     letter-spacing: 1px;
-    text-transform: uppercase;
-    text-align: center;
-    font-size: 24px;
+    text-align: left;
+    font-size: 20px;
   }
-  .form
+
+  .ask
    {
     font-family: "helvetica neue", helvetica, sans-serif;
     letter-spacing: 1px;
-    text-transform: uppercase;
-    text-align: center;
-    font-size: 24px;
+    text-align: left;
+    font-size: 20px;
 
   }
+  input[type="text"] {
+    font-size:20px;
+    font-family: "helvetica neue", helvetica, sans-serif;
+    letter-spacing: 1px;
+    text-align: left;
+    font-size: 20px;
+}
