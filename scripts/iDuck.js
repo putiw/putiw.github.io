@@ -24,24 +24,18 @@ let lagTime = 150;
 function duckSaid() {
 
 
-    () => {
-        setTimeout(duckThinks1, lagTime);
-    }
-    () => {
-        setTimeout(duckThinks2, lagTime);
-    }
-    () => {
-        setTimeout(duckThinks3, lagTime);
-    }
-    () => {
-        setTimeout(duckThinks1, lagTime);
-    }
-    () => {
-        setTimeout(duckThinks2, lagTime);
-    }
-    () => {
-        setTimeout(duckThinks3, lagTime);
-    }
+    setTimeout(function () {
+        document.getElementById("duckSays").innerText = ".";
+    }, lagTime);
+    setTimeout(function () {
+        document.getElementById("duckSays").innerText = "..";
+    }, lagTime);
+    setTimeout(function () {
+        document.getElementById("duckSays").innerText = "...";
+    }, lagTime);
+
+
+ 
 /*
     if (guessField.value === undefined) {
         document.getElementById("duckSays").innerText = "Quack, quack..";
