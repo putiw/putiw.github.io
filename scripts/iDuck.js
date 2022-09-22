@@ -6,6 +6,7 @@ const ques = document.querySelector('.ques');
 
 const guesses = document.querySelector('.guesses');
 
+var input = document.getElementById("guessField");
 
 function checkGuess() {
 
@@ -15,6 +16,12 @@ function checkGuess() {
 
   }
 
-  ask.addEventListener('click', checkGuess);
+input.addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    document.getElementById("ask").click();
+  }
+});
 
+ask.addEventListener('click', checkGuess);
 
