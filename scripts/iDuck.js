@@ -19,16 +19,40 @@ function duckThinks3(){
     document.getElementById("duckSays").innerText = "...";
 }
 
+
+function appearChars(str, elem, timeBetween) {
+    var index = -1;
+    (function go() {
+        if (++index < str.length) {
+         	p.innerHTML = p.innerHTML + str.charAt(index);
+            setTimeout(go, timeBetween);
+        }
+    })();
+}
+
+
 let lagTime = 100;
 
 function duckSaid() {
 
     if (guessField.value === undefined) {
+        var str =  "Quack, quack..";
+    } else {
+        var str = myJson.person[guessField.value];
+    }
+
+    var elem = document.getElementById("duckSays");
+    var timeBetween = 42;
+
+    appearChars(str, elem, timeBetween);
+
+/*
+    if (guessField.value === undefined) {
         document.getElementById("duckSays").innerText = "Quack, quack..";
     } else {
         document.getElementById("duckSays").innerText = myJson.person[guessField.value];
     }
-
+*/
 }
 
 
@@ -51,6 +75,6 @@ ask.addEventListener('click', function () {
     setTimeout(duckThinks3,600);
 });
 ask.addEventListener('click', function () {
-    setTimeout(duckSaid, 800);
+    setTimeout(duckSaid, 900);
 });
 
