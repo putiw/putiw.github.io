@@ -2,7 +2,7 @@ img {
 
     display: block;
     margin: 0 auto;
-    width: 50vw;
+    width: 40vw;
 
   }
 
@@ -17,11 +17,12 @@ img {
     border: 5px solid black;
   }
 
-  #box {
+  #box,
+  .form
+   {
     font-family: "helvetica neue", helvetica, sans-serif;
     letter-spacing: 1px;
     text-transform: uppercase;
     text-align: center;
-
 
   }
