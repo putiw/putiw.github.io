@@ -9,9 +9,10 @@ const guesses = document.querySelector('.guesses');
 
 function checkGuess() {
 
-   
-    document.getElementById("box").innerText = guessField.value;
-console.log(myJson.person[guessField.value])
+    guessField.value;
+
+    document.getElementById("box").innerText = myJson.person[guessField.value];
+
   }
 
   ask.addEventListener('click', checkGuess);

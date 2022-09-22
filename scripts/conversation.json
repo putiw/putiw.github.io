@@ -1,8 +1,17 @@
 {
   "person": {
-    "name": "Alice",
-    "qq": "aaaaa",
-
-    "age": 30
+    "Who are you?": "I am iDuck",
+    "What's your name?": "My name is iDuck",
+    "What's your name": "My name is iDuck",
+    "How are you?": "I'm good, thank you",
+    "How are you": "I'm good, thank you",
+    "Hello": "Hello",
+    "Are you a duck": "Yes I am a duck",
+    "Who am I?": "I don't know, but the home page should know that",
+    "Do you like icecream": "Ofc!",
+    "Hi": "Hello",
+    "Do you understant this": "I think so!",
+    "Can you read this?": "Yes!",
+    "Who are you": "I am iDuck"
   }
 }

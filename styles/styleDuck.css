@@ -1,19 +1,27 @@
-html {
-    font-family: sans-serif;
+img { 
+
+    display: block;
+    margin: 0 auto;
+
+    width:80%;
   }
 
   body {
-    width: 50%;
-    max-width: 800px;
-    min-width: 480px;
+    text-align: center;
+
+    width: 600px;
+    height: 600px;
     margin: 0 auto;
-  }
-  
-  .form input[type="number"] {
-    width: 200px;
+    background-color: #FFFFFF;
+    padding: 20px 20px 20px 20px;
+    border: 5px solid black;
   }
 
-  .lastResult {
-    color: white;
-    padding: 3px;
+  #box {
+    font-family: "helvetica neue", helvetica, sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: center;
+
+
   }
