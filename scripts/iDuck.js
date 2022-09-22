@@ -22,12 +22,7 @@ function duckThinks3() {
 let lagTime = 150;
 
 function duckSaid() {
-    setTimeout(duckThinks1, lagTime);
-    setTimeout(duckThinks2, lagTime);
-    setTimeout(duckThinks3, lagTime);   
-    setTimeout(duckThinks1, lagTime);
-    setTimeout(duckThinks2, lagTime);
-    setTimeout(duckThinks3, lagTime);
+
 
     if (guessField.value === undefined) {
         document.getElementById("duckSays").innerText = "Quack, quack..";
@@ -48,5 +43,13 @@ input.addEventListener("keypress", function (event) {
 ask.addEventListener('submit', duckSaid);
 
 ask.addEventListener('click', function () {
+    setTimeout(duckSaid, lagTime);
+    setTimeout(duckThinks1, lagTime);
+    setTimeout(duckThinks2, lagTime);
+    setTimeout(duckThinks3, lagTime);   
+    setTimeout(duckThinks1, lagTime);
+    setTimeout(duckThinks2, lagTime);
+    setTimeout(duckThinks3, lagTime);
+
     setTimeout(duckSaid, lagTime);
 });
