@@ -9,13 +9,13 @@ const guesses = document.querySelector('.guesses');
 var input = document.getElementById("guessField");
 
 
-function duckThinks1 {
+function duckThinks1 () {
     document.getElementById("duckSays").innerText = ".";
 }
-function duckThinks2 {
+function duckThinks2() {
     document.getElementById("duckSays").innerText = "..";
 }
-function duckThinks3 {
+function duckThinks3(){
     document.getElementById("duckSays").innerText = "...";
 }
 
