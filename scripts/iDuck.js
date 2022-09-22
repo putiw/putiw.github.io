@@ -42,12 +42,13 @@ function duckSaid() {
     () => {
         setTimeout(duckThinks3, lagTime);
     }
-
+/*
     if (guessField.value === undefined) {
         document.getElementById("duckSays").innerText = "Quack, quack..";
     } else {
         document.getElementById("duckSays").innerText = myJson.person[guessField.value];
     }
+*/
 
 }
 
