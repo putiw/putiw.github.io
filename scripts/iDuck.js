@@ -37,8 +37,6 @@ const node = document.getElementsByClassName("ques")[0];
 node.addEventListener("keyup", function(event) {
     if (event.key === "Enter") {
         document.getElementById("askButton").click();
-        document.getElementByClass("ask").click();
-
     }
 });
 
