@@ -390,6 +390,10 @@
     "Are you AI?": "Only A, but not very I",
     "are you AI?": "Only A, but not very I",
     "are you AI": "Only A, but not very I",
-    "Are you AI": "Only A, but not very I"
+    "Are you AI": "Only A, but not very I",
+    "Hello can you hear me?":"Yes I can hear you",
+    "Hello can you hear me":"Yes I can hear you",
+    "hello can you hear me?":"Yes I can hear you",
+    "hello can you hear me":"Yes I can hear you"
   }
 }
