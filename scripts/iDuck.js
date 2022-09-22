@@ -23,14 +23,13 @@ function duckThinks3(){
 
 function duckSaid() {
 
-    if (guessField.value === undefined) {
+    if (myJson.person[guessField.value] === undefined) {
         document.getElementById("duckSays").innerText = "Quack, quack..";
     } else {
         document.getElementById("duckSays").innerText = myJson.person[guessField.value];
     }
 
 }
-
 
 
 
@@ -45,7 +44,7 @@ node.addEventListener("keyup", function(event) {
 
 
 
-ask.addEventListener('submit', duckSaid);
+// ask.addEventListener('submit', duckSaid);
 
 ask.addEventListener('click', function () {
     setTimeout(duckThinks1,200);
