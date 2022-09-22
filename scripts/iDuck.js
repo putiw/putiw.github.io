@@ -12,7 +12,7 @@ function checkGuess() {
 
     guessField.value;
 
-    document.getElementById("box").innerText = myJson.person[guessField.value];
+    document.getElementById("duckSays").innerText = myJson.person[guessField.value];
 
   }
 
