@@ -9,31 +9,24 @@ const guesses = document.querySelector('.guesses');
 var input = document.getElementById("guessField");
 
 
-function duckThinks1() {
+function duckThinks1 {
     document.getElementById("duckSays").innerText = ".";
 }
-function duckThinks2() {
+function duckThinks2 {
     document.getElementById("duckSays").innerText = "..";
 }
-function duckThinks3() {
+function duckThinks3 {
     document.getElementById("duckSays").innerText = "...";
 }
 
-let lagTime = 150;
+let lagTime = 250;
 
 function duckSaid() {
 
 
-    setTimeout(function () {
-        document.getElementById("duckSays").innerText = ".";
-    }, lagTime);
-    setTimeout(function () {
-        document.getElementById("duckSays").innerText = "..";
-    }, lagTime);
-    setTimeout(function () {
-        document.getElementById("duckSays").innerText = "...";
-    }, lagTime);
-
+    setTimeout(duckThinks1,lagTime);
+    setTimeout(duckThinks2,lagTime);
+    setTimeout(duckThinks3,lagTime);
 
  
 /*
