@@ -35,15 +35,18 @@ function duckSaid() {
 input.addEventListener("keypress", function (event) {
     if (event.key === "Enter") {
         
-        document.getElementById("ask").click();
+        document.getElementByClass("ask").click();
     }
 });
-guessField.addEventListener("keypress", function (event) {
+/*
+const node = document.getElementsByClassName("input1")[0];
+node.addEventListener("keyup", function(event) {
     if (event.key === "Enter") {
-        
         document.getElementById("ask").click();
     }
 });
+*/
+
 
 ask.addEventListener('submit', duckSaid);
 
