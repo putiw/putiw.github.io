@@ -38,6 +38,12 @@ input.addEventListener("keypress", function (event) {
         document.getElementById("ask").click();
     }
 });
+guessField.addEventListener("keypress", function (event) {
+    if (event.key === "Enter") {
+        
+        document.getElementById("ask").click();
+    }
+});
 
 ask.addEventListener('submit', duckSaid);
 
