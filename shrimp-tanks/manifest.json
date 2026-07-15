@@ -1,0 +1,19 @@
+{
+  "name": "Shrimp",
+  "short_name": "Shrimp",
+  "description": "A calm red cherry shrimp culling game.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#132a2f",
+  "theme_color": "#132a2f",
+  "icons": [
+    {
+      "src": "./assets/icon/shrimp-logo.png?v=v71-shop-assets-r1",
+      "sizes": "170x170",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

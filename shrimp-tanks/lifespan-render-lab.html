@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shrimp Lifespan Render Lab</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #172321;
+        --muted: #536b66;
+        --panel: #f8fcfb;
+        --line: #c7d8d4;
+        --teal: #157f8d;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #dcecea;
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-weight: 700;
+      }
+
+      main {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: 10px;
+        width: 100vw;
+        height: 100vh;
+        padding: 10px;
+      }
+
+      .control-bar,
+      .tank-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 8px 22px rgba(24, 55, 51, 0.08);
+      }
+
+      .control-bar {
+        display: grid;
+        grid-template-columns: minmax(260px, 1fr) auto auto auto;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        color: #36554f;
+        font-size: 14px;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: var(--teal);
+      }
+
+      .stat {
+        min-width: 142px;
+        padding: 8px 10px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: #ffffff;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .stat strong {
+        display: block;
+        margin-top: 2px;
+        color: var(--ink);
+        font-size: 18px;
+      }
+
+      .tank-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        min-height: 0;
+      }
+
+      .tank-card {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        min-width: 0;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      .tank-header,
+      .tank-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 9px 12px;
+        background: #eef8f6;
+      }
+
+      .tank-header {
+        border-bottom: 1px solid var(--line);
+      }
+
+      .tank-footer {
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      h1,
+      h2 {
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        font-size: 19px;
+      }
+
+      h2 {
+        font-size: 17px;
+      }
+
+      .canvas-wrap {
+        min-width: 0;
+        min-height: 0;
+        background: #b8e4e6;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .swatch {
+        width: 32px;
+        height: 22px;
+        border: 1px solid #93aaa5;
+        border-radius: 4px;
+        background: #000000;
+      }
+
+      @media (max-width: 920px) {
+        body {
+          overflow: auto;
+        }
+
+        main {
+          height: auto;
+          min-height: 100vh;
+        }
+
+        .control-bar,
+        .tank-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .canvas-wrap {
+          height: 360px;
+        }
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/lifespanRenderLab-CrmCEB0e.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-B5Qt9EMX.js">
+  </head>
+  <body>
+    <main>
+      <section class="control-bar">
+        <label>
+          Age along lifespan
+          <input id="age-range" type="range" min="0" max="100" step="1" value="0">
+        </label>
+        <div class="stat">Life progress<strong id="age-value">0%</strong></div>
+        <div class="stat">Transparent black alpha<strong id="alpha-value">100%</strong></div>
+        <div class="stat">Gray black color<strong id="gray-value">#000000</strong></div>
+      </section>
+
+      <section class="tank-grid">
+        <article class="tank-card">
+          <div class="tank-header">
+            <h1>Tank A · Transparency Aging</h1>
+            <div id="alpha-swatch" class="swatch"></div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="alpha-canvas"></canvas>
+          </div>
+          <div class="tank-footer">
+            <span>Black line pixels fade to 50% alpha at death.</span>
+            <span>Background affects perceived darkness.</span>
+          </div>
+        </article>
+
+        <article class="tank-card">
+          <div class="tank-header">
+            <h1>Tank B · Gray Aging</h1>
+            <div id="gray-swatch" class="swatch"></div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="gray-canvas"></canvas>
+          </div>
+          <div class="tank-footer">
+            <span>Black line pixels become #808080 at death.</span>
+            <span>Silhouette stays consistent across background.</span>
+          </div>
+        </article>
+      </section>
+    </main>
+
+  </body>
+</html>

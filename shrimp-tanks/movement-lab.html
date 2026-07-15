@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shrimp Movement Lab</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #172321;
+        --muted: #526964;
+        --panel: #f8fcfb;
+        --line: #c8d7d3;
+        --teal: #157f8d;
+        --teal-dark: #0f6470;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow: hidden;
+        background: #dcecea;
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-weight: 700;
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: minmax(680px, 1fr) 340px;
+        gap: 12px;
+        width: 100vw;
+        height: 100vh;
+        padding: 12px;
+      }
+
+      .tank-panel,
+      .control-panel {
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 8px 22px rgba(24, 55, 51, 0.08);
+      }
+
+      .tank-panel {
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+
+      .tank-header,
+      .control-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 48px;
+        padding: 9px 12px;
+        border-bottom: 1px solid var(--line);
+        background: #eef8f6;
+      }
+
+      h1,
+      h2 {
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      h2 {
+        font-size: 16px;
+        text-transform: uppercase;
+        color: #304c47;
+      }
+
+      #game-root {
+        position: relative;
+        min-width: 0;
+        min-height: 0;
+        background: #132a2f;
+      }
+
+      #game-root canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+      }
+
+      .readout {
+        display: flex;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 13px;
+        white-space: nowrap;
+      }
+
+      .control-panel {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        min-height: 0;
+      }
+
+      .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-height: 0;
+        padding: 12px;
+        overflow: auto;
+      }
+
+      .button-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      button {
+        min-height: 42px;
+        border: 1px solid #b9c9c5;
+        border-radius: 7px;
+        background: #ffffff;
+        color: var(--ink);
+        font: inherit;
+        cursor: pointer;
+      }
+
+      button:hover {
+        border-color: var(--teal);
+      }
+
+      button.active {
+        border-color: var(--teal-dark);
+        background: var(--teal);
+        color: #ffffff;
+      }
+
+      .wide {
+        grid-column: 1 / -1;
+      }
+
+      .field {
+        display: grid;
+        gap: 6px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #36554f;
+        font-size: 14px;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: var(--teal);
+      }
+
+      input[type="number"] {
+        width: 100%;
+        min-height: 42px;
+        padding: 0 10px;
+        border: 1px solid #b9c9c5;
+        border-radius: 7px;
+        background: #ffffff;
+        color: var(--ink);
+        font: inherit;
+      }
+
+      .stat-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .stat {
+        min-height: 56px;
+        padding: 8px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .stat strong {
+        display: block;
+        margin-top: 2px;
+        color: var(--ink);
+        font-size: 18px;
+      }
+
+      .notes {
+        padding: 10px 12px;
+        border-top: 1px solid var(--line);
+        background: #eef8f6;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.35;
+      }
+
+      @media (max-width: 980px) {
+        body {
+          overflow: auto;
+        }
+
+        main {
+          grid-template-columns: 1fr;
+          height: auto;
+          min-height: 100vh;
+        }
+
+        #game-root {
+          height: 58vh;
+          min-height: 420px;
+        }
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/movementLab-BOvhRNFg.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="./assets/phaser-DFK5Ua9d.js">
+    <link rel="modulepreload" crossorigin href="./assets/phaser-BFjO2D3v.js">
+    <link rel="modulepreload" crossorigin href="./assets/TankScene-ByjvD2pN.js">
+  </head>
+  <body>
+    <main>
+      <section class="tank-panel">
+        <div class="tank-header">
+          <h1>Actual Tank Movement Lab</h1>
+          <div class="readout">
+            <span id="intent-label">Idle</span>
+            <span id="speed-label">0 px/s</span>
+            <span id="duration-label">0.0 s</span>
+          </div>
+        </div>
+        <div id="game-root" aria-label="Actual shrimp tank preview"></div>
+      </section>
+
+      <aside class="control-panel">
+        <div class="control-header">
+          <h2>Behavior</h2>
+          <button id="reset-button" type="button">Reset</button>
+        </div>
+
+        <div class="controls">
+          <div class="button-grid" id="behavior-buttons">
+            <button type="button" data-intent="idle">Idle</button>
+            <button type="button" data-intent="eat-still">Eat still</button>
+            <button type="button" data-intent="slow-eat">Slow eat</button>
+            <button type="button" data-intent="slow-swim">Slow swim</button>
+            <button type="button" data-intent="fast-swim">Fast swim</button>
+            <button type="button" data-intent="burst-stop">Burst stop</button>
+            <button type="button" data-intent="floater-rest">Floater rest</button>
+            <button type="button" data-intent="mate-scout">Mate scout</button>
+            <button class="wide" type="button" data-intent="random-loop">Random loop</button>
+          </div>
+
+          <div class="field">
+            <label for="speed-input">Mean speed <span id="speed-value">150 px/s</span></label>
+            <input id="speed-input" type="number" min="0" step="10" value="150" inputmode="decimal">
+          </div>
+
+          <div class="field">
+            <label for="jitter-range">Speed jitter <span id="jitter-value">18%</span></label>
+            <input id="jitter-range" type="range" min="0" max="55" step="1" value="18">
+          </div>
+
+          <div class="field">
+            <label for="duration-range">Duration scale <span id="duration-value">100%</span></label>
+            <input id="duration-range" type="range" min="45" max="220" step="5" value="100">
+          </div>
+
+          <div class="field">
+            <label for="wobble-range">Body wobble max <span id="wobble-value">7 deg</span></label>
+            <input id="wobble-range" type="range" min="0" max="45" step="1" value="7">
+          </div>
+
+          <div class="field">
+            <label for="turn-rate-input">Turn rate <span id="turn-rate-value">360 deg/s</span></label>
+            <input id="turn-rate-input" type="number" min="0" step="20" value="360" inputmode="decimal">
+          </div>
+
+          <div class="stat-grid">
+            <div class="stat">Target distance<strong id="distance-stat">0 px</strong></div>
+            <div class="stat">Actual speed<strong id="actual-speed-stat">0 px/s</strong></div>
+            <div class="stat">Jitter factor<strong id="jitter-stat">1.00x</strong></div>
+            <div class="stat">State time<strong id="state-time-stat">0.0 s</strong></div>
+          </div>
+        </div>
+
+        <div class="notes">
+          Turn rate controls how quickly the shrimp can rotate toward its path. Body wobble is the extra head/tail animation layered on top.
+        </div>
+      </aside>
+    </main>
+  </body>
+</html>
