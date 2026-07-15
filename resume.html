@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puti Wen Résumé — Neuroimaging Scientist &amp; Clinical Tool Builder</title>
+  <meta name="description" content="Résumé of Puti Wen, an Abu Dhabi-based neuroimaging scientist and clinical tool builder with expertise in MRI pipelines, XNAT, HPC, Python, Docker, and scientific software.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://putiw.github.io/resume.html">
+  <meta property="og:type" content="profile">
+  <meta property="og:title" content="Puti Wen Résumé — Neuroimaging Scientist &amp; Clinical Tool Builder">
+  <meta property="og:description" content="Experience in MRI pipelines, clinical imaging applications, research infrastructure, and neuroimaging science.">
+  <meta property="og:url" content="https://putiw.github.io/resume.html">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-name">Puti Wen</a>
+    <button class="hamburger" onclick="document.querySelector('.nav-links').classList.toggle('mobile-hidden');document.querySelector('.nav-links').classList.toggle('mobile-show');" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <ul class="nav-links mobile-hidden">
+      <li><a href="index.html#projects">Projects</a></li>
+      <li><a href="resume.html" class="active">Résumé</a></li>
+      <li><a href="index.html#publications">Publications</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="art.html">Art</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="resume-page">
+  <header class="resume-header">
+    <div>
+      <p class="eyebrow">Résumé</p>
+      <h1>Puti Wen <span lang="zh-Hans">温菩提</span></h1>
+      <p class="resume-tagline">Neuroimaging scientist · Clinical tool builder · Scientific infrastructure</p>
+      <p class="resume-location">Abu Dhabi, United Arab Emirates</p>
+    </div>
+    <div class="resume-actions">
+      <a class="button button-primary" href="Puti_Wen_Resume_2026.pdf" target="_blank" rel="noopener">Download PDF</a>
+      <a class="button" href="mailto:pw1246@nyu.edu">Email</a>
+      <a class="button" href="https://www.linkedin.com/in/puti-wen" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </header>
+
+  <section class="resume-section resume-summary" aria-labelledby="summary-heading">
+    <h2 id="summary-heading">Profile</h2>
+    <p>A somewhat unconventional neuroscientist. My PhD was in visual neuroscience, but my recent work has centered on building diagnostic and prognostic reporting tools for multiple sclerosis. I also build processing pipelines and maintain infrastructure for large neuroimaging datasets, working across psychology, radiology, engineering, and clinical neurology.</p>
+  </section>
+
+  <section class="resume-section" aria-labelledby="skills-heading">
+    <h2 id="skills-heading">Technical skills</h2>
+    <dl class="skills-list">
+      <div><dt>Neuroimaging</dt><dd>fMRIPrep, FreeSurfer, TractoFlow, MRIQC, BIDS, dcm2bids, DICOM, HCP, ANTs, Nextflow</dd></div>
+      <div><dt>MRI hardware</dt><dd>Siemens scanners, Psychtoolbox, EyeLink eye-tracking, VPixx/ProPixx</dd></div>
+      <div><dt>Workflow automation</dt><dd>Docker, Singularity, GitHub Actions</dd></div>
+      <div><dt>Infrastructure</dt><dd>XNAT, Slurm HPC, Supabase, Box API</dd></div>
+      <div><dt>Application development</dt><dd>React Native, Godot, TypeScript</dd></div>
+      <div><dt>Analysis and visualization</dt><dd>Python, MATLAB, Adobe Illustrator, Blender</dd></div>
+    </dl>
+  </section>
+
+  <section class="resume-section" aria-labelledby="projects-heading">
+    <h2 id="projects-heading">Key projects</h2>
+
+    <article class="resume-project">
+      <h3>XNAT Platform &amp; Brain Imaging Biobank</h3>
+      <p class="project-context">NYUAD Center for Brain and Health</p>
+      <ul>
+        <li><strong>Processing pipelines:</strong> Built and containerized six pipelines on HPC for functional MRI preprocessing, structural brain segmentation, diffusion tractography, MRI quality control, cortical visual area mapping, and custom validation with edge-case handling and BIDS compliance.</li>
+        <li><strong>Automated QA:</strong> Automated daily biobank workflows, including a nightly per-subject validation dashboard and daily backup of newly processed and validated XNAT data to Box.</li>
+        <li><strong>Cross-site QC:</strong> Compared MRI quality across Siemens CIMA.X, Prisma, NYUAD, and UAEU scanners using SNR, tSNR, CNR, and GSR metrics.</li>
+        <li><strong>Normative dashboard:</strong> Preprocessed more than 9,000 HCP and ADNI subjects and built age- and gender-controlled normative curves for brain structure metrics.</li>
+        <li><strong>Documentation:</strong> Authored technical documentation across 350+ commits and triaged and resolved user-reported GitHub issues.</li>
+      </ul>
+    </article>
+
+    <article class="resume-project">
+      <h3>LesionView &amp; Longitudinal Report</h3>
+      <p class="project-context">Clinical MS lesion tracking and automated reporting</p>
+      <ul>
+        <li>Built a clinical imaging application that tracks MS lesions across timepoints and reports new and enlarging lesions with color-coded and animated visualization.</li>
+        <li>Migrated a MATLAB prototype to a browser-based React Native/Expo application and iterated features weekly with Yas Clinic neurologists.</li>
+        <li>Co-inventor on provisional patent application NYU Ref. ABD01-03, filed May 2026.</li>
+      </ul>
+    </article>
+
+    <article class="resume-project">
+      <h3>CvsView</h3>
+      <p class="project-context">AI-ready central vein sign review for MS diagnosis</p>
+      <ul>
+        <li>Built a browser-based review tool that helps clinicians efficiently verify the central vein sign in MS lesions, with a modular AI component designed for future models.</li>
+        <li>Resolved critical SWI-FLAIR alignment problems, containerized the application with Docker, and deployed it as an on-demand service for Harley Street Medical Centre.</li>
+      </ul>
+    </article>
+
+    <article class="resume-project">
+      <h3>MyPhysio</h3>
+      <p class="project-context">Full-stack physiotherapy practice management</p>
+      <ul>
+        <li>Conceived and led development of a React Native, Expo, Next.js, and Supabase clinical application with admin dashboards, patient portals, exercise prescription, and pain and range-of-motion tracking.</li>
+        <li>Deployed with Hostinger, Supabase, GitHub Actions, and Docker.</li>
+      </ul>
+    </article>
+
+    <article class="resume-project">
+      <h3>afqView</h3>
+      <p class="project-context">Interactive 3D white matter tractography visualization</p>
+      <ul>
+        <li>Built an interactive application for side-by-side tractography QC across 100+ subjects, 20+ tracts, and multiple processing iterations, with per-subject navigation and color-coded availability indicators.</li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="resume-section" aria-labelledby="experience-heading">
+    <h2 id="experience-heading">Research experience</h2>
+
+    <article class="resume-entry">
+      <div class="entry-heading">
+        <div>
+          <h3>Postdoctoral Researcher</h3>
+          <p>NYU Abu Dhabi, Center for Brain and Health</p>
+        </div>
+        <p class="entry-date">Sep 2024 – Present</p>
+      </div>
+      <ul>
+        <li>Lead research on tract-based lesion metrics in multiple sclerosis, combining quantitative MRI with machine learning to predict clinical disability; co-authored four MS neuroimaging papers.</li>
+        <li>Provide technical training to 10+ researchers across BIDS, fMRIPrep, FreeSurfer, XNAT, and HPC workflows, including formal data-validation workshops.</li>
+        <li>Configured MRI stimulus hardware and built template experiments integrating EyeLink eye-tracking, a VPixx button box, and ProPixx projection.</li>
+        <li>Co-investigator on a Department of Health grant for optic nerve myelination characterization with Cleveland Clinic Abu Dhabi and Polytechnique Montréal.</li>
+        <li>Invited speaker and panelist at WHX Arab Health 2026 Total Radiology Conference; presented at ISMRM, OHBM, MENACTRIMS, and other scientific meetings; won first place for a poster at the 2026 Division of Science Annual Conference.</li>
+      </ul>
+    </article>
+
+    <article class="resume-entry">
+      <div class="entry-heading">
+        <div>
+          <h3>Ph.D. Researcher</h3>
+          <p>New York University, Department of Psychology</p>
+        </div>
+        <p class="entry-date">Aug 2019 – Aug 2024</p>
+      </div>
+      <ul>
+        <li>Investigated the neural pathways of human 3D motion perception with fMRI and developed single-trial decoding and multivariate pattern-analysis pipelines.</li>
+        <li>Published three first-author papers in Journal of Neuroscience, Imaging Neuroscience, and NeuroImage.</li>
+        <li>Built Psychtoolbox/MATLAB motion-localizer stimuli and analysis pipelines adopted across the lab.</li>
+        <li>Presented at the Vision Sciences Society for three consecutive years and taught visual neuroscience and advanced MRI methods.</li>
+      </ul>
+    </article>
+
+    <article class="resume-entry">
+      <div class="entry-heading">
+        <div>
+          <h3>Research Assistant</h3>
+          <p>Vanderbilt University, Randolph Blake Lab</p>
+        </div>
+        <p class="entry-date">2016 – 2018</p>
+      </div>
+      <ul>
+        <li>Studied multisensory perception and temporal judgments of audiovisual events; published first-author work in <em>Vision</em>.</li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="resume-section" aria-labelledby="education-heading">
+    <h2 id="education-heading">Education</h2>
+    <div class="education-list">
+      <p><strong>Ph.D., Cognition and Perception</strong><span>New York University · 2019–2024</span></p>
+      <p><strong>B.A., Psychology; minor in Mathematics</strong><span>Belmont University · 2015–2018</span></p>
+      <p><strong>Computational Neuroscience: Vision Workshop</strong><span>Cold Spring Harbor Laboratory · 2022</span></p>
+    </div>
+  </section>
+
+  <section class="resume-section" aria-labelledby="ip-heading">
+    <h2 id="ip-heading">Intellectual property &amp; grants</h2>
+    <ul>
+      <li><strong>Co-inventor:</strong> Provisional patent applications for LesionView (NYU Ref. ABD01-03) and the Automated Cloud-Based MS MRI Pipeline / LAMINATE (ABD01-04), filed May 2026 through NYU Technology Opportunities &amp; Ventures.</li>
+      <li><strong>Co-investigator:</strong> Department of Health grant, “Diagnosis of optic neuritis through biophysically-informed characterization of optic nerve myelination,” submitted January 2026 with Cleveland Clinic Abu Dhabi and Polytechnique Montréal.</li>
+    </ul>
+  </section>
+
+  <section class="resume-section" aria-labelledby="publications-heading">
+    <h2 id="publications-heading">Selected publications</h2>
+    <p class="section-lead">Five peer-reviewed journal articles, including four as first author, plus 10+ published conference abstracts and preprints.</p>
+    <ol class="publication-list">
+      <li><strong>Wen, P.</strong>, Thompson, L. W., Rosenberg, A., Landy, M. S., &amp; Rokers, B. (2025). Single-trial fMRI decoding of 3D motion with stereoscopic and perspective cues. <em>Journal of Neuroscience</em>.</li>
+      <li><strong>Wen, P.</strong>, Ezzo, R., Thompson, L. W., Rosenberg, A., Landy, M. S., &amp; Rokers, B. (2025). Functional localization of visual motion area FST in humans. <em>Imaging Neuroscience</em>.</li>
+      <li><strong>Wen, P.</strong>, Landy, M. S., &amp; Rokers, B. (2023). Identifying cortical areas that underlie the transformation from 2D retinal to 3D head-centric motion signals. <em>NeuroImage</em>.</li>
+      <li><strong>Wen, P.</strong>, Opoku-Baah, C., Park, M., &amp; Blake, R. (2020). Judging relative onsets and offsets of audiovisual events. <em>Vision</em>.</li>
+      <li>Mohamed, A. Z., …, <strong>Wen, P.</strong>, et al. (2026). The ASPIRE Research Institute Dataset: Building a foundation for brain health research in the UAE. <em>Scientific Data</em>.</li>
+      <li>Abdullah, O.*, <strong>Wen, P.*</strong>, et al. (2026). Tract-based lesion metrics for resolving the clinico-radiological paradox in multiple sclerosis. <em>bioRxiv</em>.</li>
+    </ol>
+    <p class="resume-more"><a href="https://scholar.google.com/citations?hl=en&user=tiJZLC4AAAAJ" target="_blank" rel="noopener">View all publications on Google Scholar →</a></p>
+  </section>
+
+  <section class="resume-section resume-personal" aria-labelledby="personal-heading">
+    <h2 id="personal-heading">Additional</h2>
+    <p><strong>Languages:</strong> English, Mandarin Chinese, basic Turkish.</p>
+    <p><strong>Creative work:</strong> Scientific communication, graphic design, illustration, 3D printing, and a science-focused YouTube channel.</p>
+  </section>
+</main>
+
+<footer>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="Puti_Wen_Resume_2026.pdf" target="_blank" rel="noopener">Résumé PDF</a></li>
+    <li><a href="mailto:pw1246@nyu.edu">Email</a></li>
+    <li><a href="https://github.com/putiw" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://www.linkedin.com/in/puti-wen" target="_blank" rel="noopener">LinkedIn</a></li>
+  </ul>
+  <div class="footer-copy">Puti Wen — Abu Dhabi, UAE</div>
+</footer>
+
+</body>
+</html>

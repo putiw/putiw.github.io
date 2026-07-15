@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Art &mdash; Puti Wen</title>
+  <meta name="description" content="Drawings, designs, and creative work by Puti Wen.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://putiw.github.io/art.html">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-name">Puti Wen</a>
+    <button class="hamburger" onclick="document.querySelector('.nav-links').classList.toggle('mobile-hidden');document.querySelector('.nav-links').classList.toggle('mobile-show');" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <ul class="nav-links mobile-hidden">
+      <li><a href="index.html#projects">Projects</a></li>
+      <li><a href="resume.html">Résumé</a></li>
+      <li><a href="index.html#publications">Publications</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="art.html" class="active">Art</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" style="padding-bottom:32px;">
+  <div class="hero-inner">
+    <h1>Art</h1>
+    <p class="blurb">Drawings, logos, graphic design, and things I make when I'm not writing code or scanning brains. Click any image to view full size.</p>
+  </div>
+</section>
+
+<!-- Colorful -->
+<section>
+  <div class="section-inner">
+    <div class="art-section">
+      <h2>Colorful stuff</h2>
+      <p class="art-desc">Nine faces. Four cats. One robot bear. And a honey bee.</p>
+      <img src="images/art/colorful.png" alt="Colorful drawings — faces, cats, robot bear, and a honey bee" loading="lazy" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
+    </div>
+  </div>
+</section>
+
+<!-- Greyscale -->
+<section>
+  <div class="section-inner">
+    <div class="art-section">
+      <h2>Greyscale stuff</h2>
+      <p class="art-desc">Mom and cockatoo. Poopy dog. More cats and dogs. My brothers and I.</p>
+      <img src="images/art/greyscale.png" alt="Greyscale silhouette drawings of people and animals" loading="lazy" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
+    </div>
+  </div>
+</section>
+
+<!-- Stressed -->
+<section>
+  <div class="section-inner">
+    <div class="art-section">
+      <h2>Stressed stuff</h2>
+      <p class="art-desc">I was very sick for a while. My drawings became very stressed.</p>
+      <img src="images/art/stressed.png" alt="Ink drawings from a difficult period" loading="lazy" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
+    </div>
+  </div>
+</section>
+
+<!-- Commissions -->
+<section>
+  <div class="section-inner">
+    <div class="art-section">
+      <h2>Sometimes I draw for others</h2>
+      <p class="art-desc">Logo for edibles. Logo for a skating club. Logo for CSHL course. Cover for a podcast. Cover for a book. Some stuff that went into fashion shows.</p>
+      <img src="images/art/commissions.png" alt="Commissioned work — logos, CSHL t-shirt design, fashion show designs" loading="lazy" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
+    </div>
+  </div>
+</section>
+
+<!-- Future sections -->
+<section>
+  <div class="section-inner">
+    <div class="art-section" style="text-align:center; padding: 40px 0; color: var(--text-secondary);">
+      <h2 style="color: var(--text-secondary); font-size: 18px;">More coming soon</h2>
+      <p class="art-desc" style="max-width:400px; margin:8px auto 0;">Blender 3D renders, sculptures, and whatever else I get into next.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightbox-img" src="" alt="Full size image">
+</div>
+
+<!-- Footer -->
+<footer>
+  <ul class="footer-links">
+    <li><a href="index.html">&larr; Home</a></li>
+    <li><a href="resume.html">Résumé</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="mailto:pw1246@nyu.edu">Email</a></li>
+    <li><a href="https://github.com/putiw" target="_blank">GitHub</a></li>
+  </ul>
+  <div class="footer-copy">Puti Wen &mdash; NYU Abu Dhabi</div>
+</footer>
+
+<script>
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('active');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+</script>
+
+</body>
+</html>
