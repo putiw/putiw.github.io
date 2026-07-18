@@ -840,6 +840,7 @@ let backgroundGalleryLoadsStarted = false;
 let lastDragX = 0;
 let lastDragY = 0;
 let lastFrame = performance.now();
+let deferredSceneLoadsStarted = false;
 let animationFrame = 0;
 let eHoldTimer = 0;
 let eHoldTarget = null;
@@ -2436,6 +2437,18 @@ function startBackgroundGalleryLoads() {
   resumePages.forEach((page) => {
     textureLoader.load(page.image, (texture) => addResumePage(page, texture));
   });
+}
+
+function startDeferredSceneLoads() {
+  if (deferredSceneLoadsStarted) return;
+  deferredSceneLoadsStarted = true;
+  const textureLoader = new THREE.TextureLoader();
+
+  MRI_WALL_SHEETS.forEach((sheet) => {
+    textureLoader.load(sheet.image, (texture) => addMriWallSheet(sheet, texture));
+  });
+  createGameWallSheets(textureLoader);
+  loadBrainSurfaceObject();
 }
 
 function addHouseRenderWall(group, texture) {
@@ -4077,7 +4090,7 @@ function addBrainSurfaceObject(leftBuffer, rightBuffer) {
   needsRender = true;
 }
 
-function loadBrainSurfaceObject(manager) {
+function loadBrainSurfaceObject(manager = null) {
   const loadSurface = (path) => new Promise((resolve, reject) => {
     const loader = new THREE.FileLoader(manager);
     loader.setResponseType('arraybuffer');
@@ -4085,7 +4098,7 @@ function loadBrainSurfaceObject(manager) {
   });
 
   const trackedItem = 'brain-room-surface-object';
-  manager.itemStart(trackedItem);
+  if (manager) manager.itemStart(trackedItem);
   Promise.all([
     loadSurface(BRAIN_SOURCES.left),
     loadSurface(BRAIN_SOURCES.right)
@@ -4093,9 +4106,11 @@ function loadBrainSurfaceObject(manager) {
     .then(([leftBuffer, rightBuffer]) => addBrainSurfaceObject(leftBuffer, rightBuffer))
     .catch((error) => {
       console.warn('Could not load the brain surface object.', error);
-      manager.itemError(trackedItem);
+      if (manager) manager.itemError(trackedItem);
     })
-    .finally(() => manager.itemEnd(trackedItem));
+    .finally(() => {
+      if (manager) manager.itemEnd(trackedItem);
+    });
 }
 
 function addResumePage(page, texture) {
@@ -5160,6 +5175,7 @@ function finishLoading() {
   warmInitialCamera();
   window.setTimeout(createArtGallery, 0);
   window.setTimeout(startBackgroundGalleryLoads, 0);
+  window.setTimeout(startDeferredSceneLoads, 0);
   window.setTimeout(() => {
     warmInitialCamera();
     loadingScreen.hidden = true;
@@ -5340,11 +5356,6 @@ async function initializeGallery() {
   BRAIN_WALL_SHEETS.forEach((sheet) => {
     textureLoader.load(sheet.image, (texture) => addBrainWallSheet(sheet, texture));
   });
-  MRI_WALL_SHEETS.forEach((sheet) => {
-    textureLoader.load(sheet.image, (texture) => addMriWallSheet(sheet, texture));
-  });
-  createGameWallSheets(textureLoader);
-  loadBrainSurfaceObject(manager);
   resize();
   window.addEventListener('resize', resize, { passive: true });
   animationFrame = window.requestAnimationFrame(animate);
