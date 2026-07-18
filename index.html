@@ -235,5 +235,42 @@
       </article>
     </main>
   </div>
+  <script>
+    (() => {
+      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      if (connection?.saveData || /^(slow-2g|2g)$/.test(connection?.effectiveType || '')) return;
+
+      const galleryWarmupAssets = [
+        ['gallery/media/defense-screening-web.mp4?v=20260717-faststart', 'video'],
+        ['gallery/media/mri-afqview-hd.m4v', 'video'],
+        ['gallery/media/mri-fmri-hd.m4v', 'video'],
+        ['gallery/media/cvsview-cvs-prl-review-web-720.mp4', 'video'],
+        ['gallery/brain-room/brain-pdf-1.png', 'image'],
+        ['gallery/brain-room/brain-pdf-2.png', 'image'],
+        ['gallery/brain-room/brain-pdf-3.png', 'image'],
+        ['gallery/mri-room/brain-pdf-4.png?v=20260718-hd', 'image'],
+        ['gallery/mri-room/brain-pdf-5-updated.png?v=20260718-mri-pdf', 'image'],
+        ['gallery/mri-room/brain-pdf-6.png?v=20260718-hd', 'image'],
+        ['gallery/mri-room/brain-pdf-7-updated.png?v=20260718-mri-pdf', 'image']
+      ];
+
+      const warmGallery = () => {
+        galleryWarmupAssets.forEach(([href, as]) => {
+          const link = document.createElement('link');
+          link.rel = 'prefetch';
+          link.as = as;
+          link.href = href;
+          link.fetchPriority = 'low';
+          document.head.appendChild(link);
+        });
+      };
+
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(warmGallery, { timeout: 2500 });
+      } else {
+        window.setTimeout(warmGallery, 1800);
+      }
+    })();
+  </script>
 </body>
 </html>

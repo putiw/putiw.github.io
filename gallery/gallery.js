@@ -2,6 +2,24 @@ import * as THREE from 'three';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { GLTFLoader } from './vendor/loaders/GLTFLoader.js';
 import { artWorks } from './art/works.js';
+import {
+  MAIN_ROOM as ROOM,
+  SCREENING_ROOM,
+  BRAIN_ROOM,
+  BRAIN_HALL_SOUTH_EDGE,
+  BRAIN_HALL_NORTH_EDGE,
+  BRAIN_HALL_WIDTH,
+  BRAIN_HALL_CENTER_Z,
+  APP_ROOM,
+  SIDE_ROOM_DOOR_WIDTH,
+  SIDE_ROOM_DOOR_Z,
+  ROOM_WALL_THICKNESS,
+  GAME_ROOM,
+  GAME_VIDEOS_HALL_DOOR_X,
+  VIDEOS_ROOM,
+  EMPTY_GAME_ROOM,
+  ART_ROOM
+} from './wall-map-layout.js?v=20260718-all-door-headers-labels-contrast1';
 
 const MOTION_POSTER_HEIGHT = 3;
 const POSTER_FRAME_BORDER = 0.075;
@@ -142,46 +160,19 @@ const videoWork = {
   interactionRadius: 7
 };
 
-const SCREENING_ROOM = {
-  centerX: 5.65,
-  doorWidth: 1.55,
-  doorHeight: 3.5,
-  hallStartZ: 6.94,
-  nearZ: 10.45,
-  farZ: 18.45,
-  halfWidth: 4.1,
-  height: 5.6
-};
-
-const BRAIN_HALL_LENGTH = 2.2;
-const BRAIN_ROOM = {
-  centerX: SCREENING_ROOM.centerX + SCREENING_ROOM.halfWidth * 2 + BRAIN_HALL_LENGTH,
-  doorWidth: 1.55,
-  doorHeight: 3.5,
-  doorOffsetZ: -2.55,
-  nearZ: SCREENING_ROOM.nearZ,
-  farZ: SCREENING_ROOM.farZ,
-  halfWidth: SCREENING_ROOM.halfWidth,
-  height: SCREENING_ROOM.height
-};
-const BRAIN_HALL_SOUTH_EDGE = (BRAIN_ROOM.nearZ + BRAIN_ROOM.farZ) / 2 + BRAIN_ROOM.doorOffsetZ + BRAIN_ROOM.doorWidth / 2;
-const BRAIN_HALL_NORTH_EDGE = SCREENING_ROOM.nearZ;
-const BRAIN_HALL_WIDTH = BRAIN_HALL_SOUTH_EDGE - BRAIN_HALL_NORTH_EDGE;
-const BRAIN_HALL_CENTER_Z = (BRAIN_HALL_NORTH_EDGE + BRAIN_HALL_SOUTH_EDGE) / 2;
-
 const BRAIN_WALL_SHEETS = [
-  { image: './brain-room/brain-pdf-1.png', side: 'north' },
+  { image: './brain-room/brain-pdf-3.png', side: 'north' },
   { image: './brain-room/brain-pdf-2.png', side: 'east' },
-  { image: './brain-room/brain-pdf-3.png', side: 'west' }
+  { image: './brain-room/brain-pdf-1.png', side: 'floor', aspect: 1487 / 1051 }
 ];
 
 // The MRI room uses the remaining artboards from the same Illustrator file.
 // Each sheet is rendered at the room height; the west and north sheets are
 // cropped to the usable wall span so neither can cover a doorway.
 const MRI_WALL_SHEETS = [
-  { image: './mri-room/brain-pdf-5-updated.png?v=20260718-mri-pdf', side: 'south', aspect: 4781 / 1744 },
+  { image: './mri-room/brain-pdf-5-updated.png?v=20260718-mri-pdf-clean1', side: 'south', aspect: 4781 / 1744 },
   { image: './mri-room/brain-pdf-4.png?v=20260718-hd', side: 'west', aspect: 4754 / 1744, cropAlign: 'center', contentOnly: true, contentCenterX: 0.607 },
-  { image: './mri-room/brain-pdf-6.png?v=20260718-hd', side: 'east', aspect: 4704 / 1744 },
+  { image: './mri-room/brain-pdf-6-updated.png?v=20260718-mri-pdf-clean1', side: 'east', aspect: 4704 / 1744 },
   // The black artboard is cropped from the PDF page and padded with black only;
   // its title, subtitle, marked video frame, and original typography stay in
   // this single sheet texture, just like the diffusion wall.
@@ -212,64 +203,6 @@ const MRI_VIDEO_WORKS = [
 const BRAIN_SOURCES = {
   left: '../mri/lh.pial',
   right: '../mri/rh.pial'
-};
-
-const APP_ROOM = {
-  centerX: -5.65,
-  doorWidth: 1.55,
-  doorHeight: 3.5,
-  hallStartZ: 6.94,
-  nearZ: 10.45,
-  farZ: 34.25,
-  halfWidth: 6.9,
-  height: 6.2
-};
-
-const SIDE_ROOM_DOOR_WIDTH = APP_ROOM.doorWidth * 1.5;
-const SIDE_ROOM_DOOR_Z = APP_ROOM.farZ - SIDE_ROOM_DOOR_WIDTH / 2 - 0.45;
-// All room-shell walls use the same thickness. Their centers are offset from
-// the room boundary so the walkable/collision coordinates remain unchanged.
-const ROOM_WALL_THICKNESS = 0.18;
-
-const GAME_HALL_LENGTH = 2.2;
-const GAME_ROOM = {
-  // Active game room: west of the App room, opposite the app wall.
-  centerX: APP_ROOM.centerX - APP_ROOM.halfWidth - GAME_HALL_LENGTH - 4.1,
-  doorWidth: SIDE_ROOM_DOOR_WIDTH,
-  doorHeight: 3.5,
-  doorOffsetZ: SIDE_ROOM_DOOR_Z - (APP_ROOM.farZ - 8 + APP_ROOM.farZ) / 2,
-  nearZ: APP_ROOM.farZ - 8,
-  farZ: APP_ROOM.farZ,
-  halfWidth: 4.1,
-  height: 5.6
-};
-const EMPTY_GAME_ROOM = {
-  // Large empty room in the open space between App and Defense/Brain;
-  // its east wall is coplanar with the Brain room's east wall. Keep the same
-  // 2.2-unit connector gap used by the active Game room on the other side of
-  // the App room.
-  centerX: (APP_ROOM.centerX + APP_ROOM.halfWidth + GAME_HALL_LENGTH + BRAIN_ROOM.centerX + BRAIN_ROOM.halfWidth) / 2,
-  northDoorX: BRAIN_ROOM.centerX - BRAIN_ROOM.halfWidth + SIDE_ROOM_DOOR_WIDTH / 2 + 0.35,
-  doorWidth: SIDE_ROOM_DOOR_WIDTH,
-  doorHeight: 3.5,
-  doorOffsetZ: SIDE_ROOM_DOOR_Z - (BRAIN_ROOM.farZ + APP_ROOM.farZ) / 2,
-  nearZ: BRAIN_ROOM.farZ,
-  farZ: APP_ROOM.farZ,
-  halfWidth: (BRAIN_ROOM.centerX + BRAIN_ROOM.halfWidth - APP_ROOM.centerX - APP_ROOM.halfWidth - GAME_HALL_LENGTH) / 2,
-  openNorth: true,
-  height: 5.6
-};
-
-const ART_ROOM = {
-  centerX: APP_ROOM.centerX,
-  doorWidth: 1.71,
-  doorOffsetX: -0.08,
-  doorHeight: 3.5,
-  hallStartZ: APP_ROOM.farZ,
-  nearZ: 36.75,
-  farZ: 65.59,
-  halfWidth: 19.45,
-  height: 7.2
 };
 
 const APP_VIDEO_WIDTH = 2.8;
@@ -459,8 +392,8 @@ const GAME_DISPLAY_WORKS = [
     contentHeight: 1.15,
     frameWidth: 2.7,
     frameHeight: 1.38,
-    x: GAME_ROOM.centerX + 0.7,
-    z: 28.15
+    x: GAME_ROOM.centerX - GAME_ROOM.halfWidth + (GAME_ROOM.halfWidth * 2) / 3,
+    z: 29.05
   },
   {
     title: 'Shrimp',
@@ -471,8 +404,8 @@ const GAME_DISPLAY_WORKS = [
     contentHeight: 1.15,
     frameWidth: 2.7,
     frameHeight: 1.38,
-    x: GAME_ROOM.centerX + 0.7,
-    z: 31.55,
+    x: GAME_ROOM.centerX - GAME_ROOM.halfWidth + (GAME_ROOM.halfWidth * 2) / 3,
+    z: 32.45,
     launchAction: {
       label: 'PLAY',
       url: 'https://putiw.github.io/shrimp-tanks/'
@@ -725,6 +658,9 @@ const figureSalonStatement = {
 };
 
 const defenseStatement = 'I study how humans come to know the direction of a tiny dot moving on a computer screen. While this may not seem like the most thought-provoking question, it shares the same root as questions as old as philosophy itself – how do humans know anything about the external world? One of the most echoed ideas is that perception is the bridge between us and reality. Plato’s Allegory of the Cave suggests that our immediate senses are mere shadows of true reality. Kant distinguished between the noumenal world (things as they are in themselves) and the phenomenal world (things as they appear to us), proposing that our perceptions are shaped by innate structures of the mind: “All our knowledge begins with the senses, proceeds then to the understanding, and ends with reason” (Kant, 1781). Knowing the direction of a tiny moving dot, as unrelated as it may seem, is part of this much grander and ancient conversation. The fundamental question of how our minds reconstruct the external world from sensory information remains central to this inquiry, and studying motion perception is the means to that end.';
+const DEFENSE_WALL_FONT_FAMILY = 'Arial, Helvetica, sans-serif';
+const DEFENSE_WALL_TEXT_COLOR = '#8c969a';
+const MRI_INTRO_FONT_FAMILY = '"Inter", Arial, Helvetica, sans-serif';
 
 const resumePages = [
   {
@@ -804,6 +740,8 @@ let draggingView = false;
 let dragMoved = false;
 let returnToGalleryAfterPoster = false;
 let videoPreloadStarted = false;
+let videoSyncRequested = false;
+let lastCameraInputAt = 0;
 let artGalleryLoadStarted = false;
 let lastDragX = 0;
 let lastDragY = 0;
@@ -816,16 +754,20 @@ let eHoldWasPlaying = false;
 const shrimpRoomMusic = new Audio('./media/shrimp-game-music.mp3?v=20260717');
 shrimpRoomMusic.loop = true;
 shrimpRoomMusic.preload = 'auto';
-shrimpRoomMusic.volume = 0.36;
+shrimpRoomMusic.volume = 0;
 shrimpRoomMusic.setAttribute('aria-hidden', 'true');
 const shrimpRoomWater = new Audio('./media/shrimp-game-water.mp3?v=20260717');
 shrimpRoomWater.loop = true;
 shrimpRoomWater.preload = 'auto';
-shrimpRoomWater.volume = 0.44;
+shrimpRoomWater.volume = 0;
 shrimpRoomWater.setAttribute('aria-hidden', 'true');
 const shrimpRoomTracks = [shrimpRoomMusic, shrimpRoomWater];
+const shrimpRoomTrackVolumes = [0.36, 0.44];
+const SHRIMP_MUSIC_FADE_DISTANCE = 1.1;
+const SHRIMP_MUSIC_FADE_RATE = 8;
 let shrimpMusicPrimed = false;
 let shrimpMusicPlayBlocked = false;
+const shrimpMusicPlayPending = new Set();
 
 const pressedKeys = new Set();
 const posterMeshes = [];
@@ -842,7 +784,6 @@ const videoScreenNormal = new THREE.Vector3();
 const videoScreenQuaternion = new THREE.Quaternion();
 const videoFrustum = new THREE.Frustum();
 const videoFrustumMatrix = new THREE.Matrix4();
-const ROOM = { halfWidth: 9.5, halfDepth: 7, height: 5.6 };
 const STANDING_EYE_HEIGHT = ROOM.height / 2;
 const CROUCH_DROP = 0.86;
 const JUMP_SPEED = 3.9;
@@ -1051,14 +992,7 @@ function createRoom() {
     190
   );
   addRoomHeading(
-    'Stuff I built',
-    [APP_ROOM.centerX, 3.67, ROOM.halfDepth - 0.15],
-    Math.PI,
-    SCREENING_ROOM.doorWidth,
-    190
-  );
-  addRoomHeading(
-    'Science stuff',
+    'Science Room',
     // The App room starts after the short entry hall. Put this on the
     // App-room-facing side of its entrance header so it remains visible
     // from inside the App room (the main Research wall occludes the hall
@@ -1076,8 +1010,39 @@ function createRoom() {
     GAME_ROOM.doorWidth,
     190
   );
+  addRoomHeading(
+    'Video Room',
+    [GAME_VIDEOS_HALL_DOOR_X, 3.67, GAME_ROOM.nearZ + 0.15],
+    0,
+    GAME_ROOM.doorWidth,
+    190,
+    '#303a3e'
+  );
+  addRoomHeading(
+    'Videos',
+    [VIDEOS_ROOM.centerX, 3.67, VIDEOS_ROOM.nearZ + 0.15],
+    0,
+    GAME_ROOM.doorWidth,
+    190
+  );
+  addRoomHeading(
+    'MRI Room',
+    [APP_ROOM.centerX + APP_ROOM.halfWidth - 0.14, 3.67, SIDE_ROOM_DOOR_Z],
+    -Math.PI / 2,
+    SIDE_ROOM_DOOR_WIDTH,
+    190
+  );
+  addRoomHeading(
+    'Stuff I built',
+    [EMPTY_GAME_ROOM.centerX - EMPTY_GAME_ROOM.halfWidth + 0.14, 3.67, SIDE_ROOM_DOOR_Z],
+    Math.PI / 2,
+    SIDE_ROOM_DOOR_WIDTH,
+    190
+  );
   addFigureSalonStatement();
   addDefenseStatement();
+  addDefenseIntroStatement();
+  addMriRoomIntroStatement();
 }
 
 function addGalleryMap() {
@@ -1095,6 +1060,7 @@ function addGalleryMap() {
     { label: 'Brain', left: BRAIN_ROOM.centerX - BRAIN_ROOM.halfWidth, right: BRAIN_ROOM.centerX + BRAIN_ROOM.halfWidth, near: BRAIN_ROOM.nearZ, far: BRAIN_ROOM.farZ },
     { label: 'App', left: APP_ROOM.centerX - APP_ROOM.halfWidth, right: APP_ROOM.centerX + APP_ROOM.halfWidth, near: APP_ROOM.nearZ, far: APP_ROOM.farZ },
     { label: 'Game', left: GAME_ROOM.centerX - GAME_ROOM.halfWidth, right: GAME_ROOM.centerX + GAME_ROOM.halfWidth, near: GAME_ROOM.nearZ, far: GAME_ROOM.farZ },
+    { label: 'Videos', left: VIDEOS_ROOM.centerX - VIDEOS_ROOM.halfWidth, right: VIDEOS_ROOM.centerX + VIDEOS_ROOM.halfWidth, near: VIDEOS_ROOM.nearZ, far: VIDEOS_ROOM.farZ },
     // Empty former game room: included for map scale, intentionally unlabeled.
     { label: '', left: EMPTY_GAME_ROOM.centerX - EMPTY_GAME_ROOM.halfWidth, right: EMPTY_GAME_ROOM.centerX + EMPTY_GAME_ROOM.halfWidth, near: EMPTY_GAME_ROOM.nearZ, far: EMPTY_GAME_ROOM.farZ },
     { label: 'Art', left: ART_ROOM.centerX - ART_ROOM.halfWidth, right: ART_ROOM.centerX + ART_ROOM.halfWidth, near: ART_ROOM.nearZ, far: ART_ROOM.farZ }
@@ -1136,6 +1102,8 @@ function addGalleryMap() {
     { left: GAME_ROOM.centerX + GAME_ROOM.halfWidth, right: APP_ROOM.centerX - APP_ROOM.halfWidth, near: gameDoorCenterZ - GAME_ROOM.doorWidth / 2, far: gameDoorCenterZ + GAME_ROOM.doorWidth / 2 },
     // App → the former (empty) game room
     { left: APP_ROOM.centerX + APP_ROOM.halfWidth, right: EMPTY_GAME_ROOM.centerX - EMPTY_GAME_ROOM.halfWidth, near: oldGameDoorCenterZ - EMPTY_GAME_ROOM.doorWidth / 2, far: oldGameDoorCenterZ + EMPTY_GAME_ROOM.doorWidth / 2 },
+    // Game → Videos
+    { left: GAME_VIDEOS_HALL_DOOR_X - GAME_ROOM.doorWidth / 2, right: GAME_VIDEOS_HALL_DOOR_X + GAME_ROOM.doorWidth / 2, near: VIDEOS_ROOM.farZ, far: GAME_ROOM.nearZ },
     // Defense → Brain
     { left: SCREENING_ROOM.centerX + SCREENING_ROOM.halfWidth, right: BRAIN_ROOM.centerX - BRAIN_ROOM.halfWidth, near: BRAIN_HALL_NORTH_EDGE, far: BRAIN_HALL_SOUTH_EDGE }
   ];
@@ -1382,13 +1350,16 @@ function createGameRoomShell(room, doorSide) {
   const roomEast = room.centerX + room.halfWidth;
   const roomDepth = room.farZ - room.nearZ;
   const roomCenterZ = (room.nearZ + room.farZ) / 2;
-  const doorCenterZ = roomCenterZ + room.doorOffsetZ;
+  const doorCenterZ = roomCenterZ + (room.doorOffsetZ || 0);
   const doorNorthZ = doorCenterZ - room.doorWidth / 2;
   const doorSouthZ = doorCenterZ + room.doorWidth / 2;
-  const northDoorX = room.northDoorX ?? room.centerX;
+  const northDoorX = room.northDoorX
+    ?? (room === GAME_ROOM ? GAME_VIDEOS_HALL_DOOR_X : room.centerX);
+  const southDoorX = room.southDoorX ?? room.centerX;
   const hasWestDoor = doorSide === 'west' || doorSide === 'north-west';
-  const hasEastDoor = doorSide === 'east';
-  const hasNorthDoor = doorSide === 'north' || doorSide === 'north-west';
+  const hasEastDoor = doorSide === 'east' || doorSide === 'east-north';
+  const hasNorthDoor = doorSide === 'north' || doorSide === 'north-west' || doorSide === 'east-north';
+  const hasSouthDoor = doorSide === 'south';
   const appCorridorLength = hasWestDoor
     ? roomWest - appEast
     : hasEastDoor
@@ -1472,8 +1443,9 @@ function createGameRoomShell(room, doorSide) {
     });
   }
   if (hasNorthDoor && !room.openNorth) {
-    const brainCorridorLength = room.nearZ - BRAIN_ROOM.farZ;
-    const brainCorridorCenterZ = BRAIN_ROOM.farZ + brainCorridorLength / 2;
+    const northCorridorEndZ = room.northHallEndZ ?? (room === GAME_ROOM ? VIDEOS_ROOM.farZ : BRAIN_ROOM.farZ);
+    const brainCorridorLength = room.nearZ - northCorridorEndZ;
+    const brainCorridorCenterZ = northCorridorEndZ + brainCorridorLength / 2;
     const corridorFloor = new THREE.Mesh(new THREE.BoxGeometry(room.doorWidth, 0.08, brainCorridorLength), floorMaterial);
     corridorFloor.position.set(northDoorX, -0.04, brainCorridorCenterZ);
     scene.add(corridorFloor);
@@ -1529,6 +1501,22 @@ function createGameRoomShell(room, doorSide) {
     header.position.set(northDoorX, room.doorHeight + headerHeight / 2, room.nearZ - ROOM_WALL_THICKNESS / 2);
     scene.add(header);
   };
+  const addSouthDoorWall = () => {
+    const southDoorLeft = southDoorX - room.doorWidth / 2;
+    const southDoorRight = southDoorX + room.doorWidth / 2;
+    const leftWidth = southDoorLeft - roomWest;
+    const rightWidth = roomEast - southDoorRight;
+    const leftWall = new THREE.Mesh(new THREE.BoxGeometry(leftWidth, room.height, ROOM_WALL_THICKNESS), wallMaterial);
+    leftWall.position.set(roomWest + leftWidth / 2, room.height / 2, room.farZ + ROOM_WALL_THICKNESS / 2);
+    scene.add(leftWall);
+    const rightWall = new THREE.Mesh(new THREE.BoxGeometry(rightWidth, room.height, ROOM_WALL_THICKNESS), wallMaterial);
+    rightWall.position.set(southDoorRight + rightWidth / 2, room.height / 2, room.farZ + ROOM_WALL_THICKNESS / 2);
+    scene.add(rightWall);
+    const headerHeight = room.height - room.doorHeight;
+    const header = new THREE.Mesh(new THREE.BoxGeometry(room.doorWidth, headerHeight, ROOM_WALL_THICKNESS), wallMaterial);
+    header.position.set(southDoorX, room.doorHeight + headerHeight / 2, room.farZ + ROOM_WALL_THICKNESS / 2);
+    scene.add(header);
+  };
   if (hasWestDoor) {
     const thickness = ROOM_WALL_THICKNESS;
     addDoorSideWall(roomWest - thickness / 2, thickness);
@@ -1543,9 +1531,12 @@ function createGameRoomShell(room, doorSide) {
     northWall.position.set(room.centerX, room.height / 2, room.nearZ - ROOM_WALL_THICKNESS / 2);
     scene.add(northWall);
   }
-  const southWall = new THREE.Mesh(new THREE.BoxGeometry(room.halfWidth * 2, room.height, ROOM_WALL_THICKNESS), wallMaterial);
-  southWall.position.set(room.centerX, room.height / 2, room.farZ + ROOM_WALL_THICKNESS / 2);
-  scene.add(southWall);
+  if (hasSouthDoor) addSouthDoorWall();
+  else {
+    const southWall = new THREE.Mesh(new THREE.BoxGeometry(room.halfWidth * 2, room.height, ROOM_WALL_THICKNESS), wallMaterial);
+    southWall.position.set(room.centerX, room.height / 2, room.farZ + ROOM_WALL_THICKNESS / 2);
+    scene.add(southWall);
+  }
 
   // The MRI room is intentionally almost black. A low, continuous black
   // baseboard hides the light seam where its dark walls meet the floor while
@@ -1589,7 +1580,8 @@ function createGameRoom() {
   // Keep the former game-room shell empty; it now has both App and Brain
   // connections, while the active displays remain in the mirrored west room.
   createGameRoomShell(EMPTY_GAME_ROOM, 'north-west');
-  createGameRoomShell(GAME_ROOM, 'east');
+  createGameRoomShell(GAME_ROOM, 'east-north');
+  createGameRoomShell(VIDEOS_ROOM, 'south');
 }
 
 function addArtPortalGraphic(roomLeft, roomRight) {
@@ -1887,8 +1879,24 @@ function refreshFocusCard() {
   focusTitle.textContent = focusedManualVideo.title;
   focusAction.innerHTML = `
     <b class="video-primary"><kbd>E</kbd> ${isPlaying ? 'Pause' : 'Play'} <i>or click</i></b>
-    <em class="video-secondary"><kbd>←</kbd> <kbd>→</kbd> skip 5 sec · hold <kbd>E</kbd> to restart</em>
+    <em class="video-secondary"><em class="video-time">${formatVideoTime(focusedManualVideo.element.currentTime)} / ${formatVideoTime(focusedManualVideo.element.duration)}</em> · <kbd>←</kbd> <kbd>→</kbd> skip 5 sec · hold <kbd>E</kbd> to restart</em>
   `;
+}
+
+function formatVideoTime(seconds) {
+  if (!Number.isFinite(seconds) || seconds < 0) return '--:--';
+  const totalSeconds = Math.floor(seconds);
+  const minutes = Math.floor(totalSeconds / 60);
+  const remainder = String(totalSeconds % 60).padStart(2, '0');
+  return `${minutes}:${remainder}`;
+}
+
+function refreshFocusedVideoTime() {
+  if (!focusedManualVideo) return;
+  const timeLabel = focusCard.querySelector('.video-time');
+  if (!timeLabel) return;
+  const nextLabel = `${formatVideoTime(focusedManualVideo.element.currentTime)} / ${formatVideoTime(focusedManualVideo.element.duration)}`;
+  if (timeLabel.textContent !== nextLabel) timeLabel.textContent = nextLabel;
 }
 
 function launchGameAction(action) {
@@ -2153,7 +2161,7 @@ function createStandingVideoDisplay(work, posterTexture) {
     video.load();
   }
   scene.add(group);
-  if (galleryActive) syncGalleryVideos();
+  if (galleryActive) requestVideoSync();
   needsRender = true;
 }
 
@@ -2569,6 +2577,7 @@ function createBrainRoom() {
   const corridorCenterX = screeningEast + corridorLength / 2;
   const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 1, metalness: 0 });
   const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x020202, roughness: 0.98, metalness: 0 });
+  const roomFloorMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
   const ceilingMaterial = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 1, metalness: 0 });
 
   const corridorFloor = new THREE.Mesh(
@@ -2596,7 +2605,7 @@ function createBrainRoom() {
 
   const floor = new THREE.Mesh(
     new THREE.BoxGeometry(BRAIN_ROOM.halfWidth * 2, 0.1, roomDepth),
-    floorMaterial
+    roomFloorMaterial
   );
   floor.position.set(BRAIN_ROOM.centerX, -0.05, roomCenterZ);
   scene.add(floor);
@@ -3365,6 +3374,121 @@ function addDefenseStatement() {
   scene.add(statement);
 }
 
+function addDefenseIntroStatement() {
+  const statementCanvas = document.createElement('canvas');
+  statementCanvas.width = 3600;
+  statementCanvas.height = 900;
+  const context = statementCanvas.getContext('2d');
+  context.clearRect(0, 0, statementCanvas.width, statementCanvas.height);
+  context.textBaseline = 'top';
+  context.fillStyle = DEFENSE_WALL_TEXT_COLOR;
+  context.font = `700 92px ${DEFENSE_WALL_FONT_FAMILY}`;
+  const statementParagraphs = [
+    'This is my PhD defense presentation. The text to your left is the first paragraph of my dissertation.',
+    'Archilochus said "The fox knows many things, but the hedgehog knows one big thing", doing PhD made me realized that I am not a hedgehog.'
+  ];
+  const lineHeight = 116;
+  const paragraphGap = 30;
+  const paragraphLines = statementParagraphs.map((paragraph) => wrapLabelText(context, paragraph, statementCanvas.width - 220, 23));
+  const totalTextHeight = paragraphLines.reduce((height, lines) => height + lines.length * lineHeight, 0)
+    + paragraphGap * (paragraphLines.length - 1);
+  let textTop = Math.max(70, (statementCanvas.height - totalTextHeight) / 2);
+  paragraphLines.forEach((lines) => {
+    lines.forEach((line) => {
+      context.fillText(line, 110, textTop);
+      textTop += lineHeight;
+    });
+    textTop += paragraphGap;
+  });
+
+  const texture = new THREE.CanvasTexture(statementCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
+
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    alphaTest: 0.02,
+    depthWrite: false,
+    toneMapped: false
+  });
+  const statement = new THREE.Mesh(new THREE.PlaneGeometry(7.2, 1.8), material);
+  statement.position.set(
+    SCREENING_ROOM.centerX,
+    4.6,
+    SCREENING_ROOM.nearZ + 0.071
+  );
+  scene.add(statement);
+}
+
+function addMriRoomIntroStatement() {
+  const statementCanvas = document.createElement('canvas');
+  statementCanvas.width = 2800;
+  statementCanvas.height = 2800;
+  const context = statementCanvas.getContext('2d');
+  context.clearRect(0, 0, statementCanvas.width, statementCanvas.height);
+  context.textBaseline = 'top';
+  context.fillStyle = '#a7a6aa';
+  context.font = `400 78px ${MRI_INTRO_FONT_FAMILY}`;
+  const statementParagraphs = [
+    ['You are standing on my brain.'],
+    [
+      'This room shows briefly the basic things',
+      'that I do with MRI. Most of what I do is for',
+      'research, and recently I started assisting',
+      'neurologists and radiologists as well.',
+      'Research and significance aside, I think',
+      'they just look cool.'
+    ],
+    [
+      'The brain in the middle of the room is also',
+      'my brain.'
+    ]
+  ];
+  const lineHeight = 104;
+  const paragraphGap = 140;
+  const totalTextHeight = statementParagraphs.reduce((height, lines) => height + lines.length * lineHeight, 0)
+    + paragraphGap * (statementParagraphs.length - 1);
+  let textTop = Math.max(80, (statementCanvas.height - totalTextHeight) / 2 - 90);
+  statementParagraphs.forEach((lines) => {
+    lines.forEach((line) => {
+      context.fillText(line, 520, textTop);
+      textTop += lineHeight;
+    });
+    textTop += paragraphGap;
+  });
+
+  const texture = new THREE.CanvasTexture(statementCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
+
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    alphaTest: 0.02,
+    depthWrite: false,
+    toneMapped: false
+  });
+  const wallMargin = 0.28;
+  const wallLeft = BRAIN_ROOM.centerX - BRAIN_ROOM.halfWidth;
+  const wallTopZ = BRAIN_HALL_SOUTH_EDGE;
+  const wallBottomZ = BRAIN_ROOM.farZ;
+  const wallWidth = wallBottomZ - wallTopZ - wallMargin * 2;
+  const wallHeight = BRAIN_ROOM.height - 0.42;
+  const statement = new THREE.Mesh(new THREE.PlaneGeometry(wallWidth, wallHeight), material);
+  statement.position.set(
+    wallLeft + ROOM_WALL_THICKNESS / 2 + 0.021,
+    BRAIN_ROOM.height / 2,
+    wallTopZ + wallMargin + wallWidth / 2
+  );
+  statement.rotation.y = Math.PI / 2;
+  scene.add(statement);
+}
+
 function addBrainWallSheet(sheet, texture) {
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.minFilter = THREE.LinearMipmapLinearFilter;
@@ -3374,12 +3498,24 @@ function addBrainWallSheet(sheet, texture) {
   const height = BRAIN_ROOM.height;
   const roomMiddleZ = (BRAIN_ROOM.nearZ + BRAIN_ROOM.farZ) / 2;
   const westSheetStartZ = BRAIN_HALL_SOUTH_EDGE + 0.03;
+  const material = new THREE.MeshBasicMaterial({ map: texture, toneMapped: false });
+  if (sheet.side === 'floor') {
+    const floorWidth = BRAIN_ROOM.halfWidth * 2 - 0.3;
+    const floorDepth = BRAIN_ROOM.farZ - BRAIN_ROOM.nearZ - 0.3;
+    const width = Math.min(floorWidth, floorDepth * sheet.aspect);
+    const depth = width / sheet.aspect;
+    const sheetMesh = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), material);
+    sheetMesh.position.set(BRAIN_ROOM.centerX, 0.006, roomMiddleZ);
+    sheetMesh.rotation.x = -Math.PI / 2;
+    scene.add(sheetMesh);
+    needsRender = true;
+    return;
+  }
   const width = sheet.side === 'east'
     ? BRAIN_ROOM.farZ - BRAIN_ROOM.nearZ
     : sheet.side === 'west'
       ? BRAIN_ROOM.farZ - westSheetStartZ
     : BRAIN_ROOM.halfWidth * 2;
-  const material = new THREE.MeshBasicMaterial({ map: texture, toneMapped: false });
   const sheetMesh = new THREE.Mesh(new THREE.PlaneGeometry(width, height), material);
 
   if (sheet.side === 'north') {
@@ -3541,6 +3677,8 @@ function addMriVideoWork(work) {
     showFrame: false,
     showLabel: false,
     showFocusOutline: false,
+    blackOutline: true,
+    blackOutlinePadding: 0.1,
     eagerLoad: true,
     preloadPriority: 92,
     playWhenVisible: true,
@@ -3869,19 +4007,11 @@ function preloadGalleryVideos() {
   schedule(loadNext);
 }
 
-function isInsideShrimpGameRoom() {
-  const roomLeft = GAME_ROOM.centerX - GAME_ROOM.halfWidth;
-  const roomRight = GAME_ROOM.centerX + GAME_ROOM.halfWidth;
-  return camera.position.x >= roomLeft + 0.35
-    && camera.position.x <= roomRight - 0.35
-    && camera.position.z >= GAME_ROOM.nearZ + 0.35
-    && camera.position.z <= GAME_ROOM.farZ - 0.35;
-}
-
 function primeShrimpRoomMusic() {
   if (shrimpMusicPrimed || shrimpRoomTracks.some((track) => !track.paused)) return;
   shrimpRoomTracks.forEach((track) => {
     track.muted = true;
+    track.volume = 0;
   });
   const attempts = shrimpRoomTracks.map((track) => Promise.resolve(track.play()));
   Promise.all(attempts).then(() => {
@@ -3901,22 +4031,48 @@ function primeShrimpRoomMusic() {
   });
 }
 
-function syncShrimpRoomMusic() {
-  const insideRoom = galleryActive && isInsideShrimpGameRoom();
-  if (!insideRoom) {
-    shrimpRoomTracks.forEach((track) => {
-      if (!track.paused) track.pause();
-    });
-    return;
-  }
-  if (shrimpMusicPlayBlocked) return;
+function getShrimpRoomAudioBlend() {
+  if (!galleryActive) return 0;
+  const wallClearance = 0.35;
+  const roomLeft = GAME_ROOM.centerX - GAME_ROOM.halfWidth + wallClearance;
+  const roomRight = GAME_ROOM.centerX + GAME_ROOM.halfWidth - wallClearance;
+  const roomNear = GAME_ROOM.nearZ + wallClearance;
+  const roomFar = GAME_ROOM.farZ - wallClearance;
+  const distanceInside = Math.min(
+    camera.position.x - roomLeft,
+    roomRight - camera.position.x,
+    camera.position.z - roomNear,
+    roomFar - camera.position.z
+  );
+  return THREE.MathUtils.clamp(distanceInside / SHRIMP_MUSIC_FADE_DISTANCE, 0, 1);
+}
+
+function playShrimpRoomTrack(track) {
+  if (!track.paused || shrimpMusicPlayPending.has(track) || shrimpMusicPlayBlocked) return;
+  shrimpMusicPlayPending.add(track);
+  track.play().then(() => {
+    shrimpMusicPlayBlocked = false;
+  }).catch(() => {
+    shrimpMusicPlayBlocked = true;
+  }).finally(() => {
+    shrimpMusicPlayPending.delete(track);
+  });
+}
+
+function updateShrimpRoomMusic(delta) {
+  const blend = getShrimpRoomAudioBlend();
+  shrimpRoomTracks.forEach((track, index) => {
+    const targetVolume = shrimpRoomTrackVolumes[index] * blend;
+    track.volume = THREE.MathUtils.damp(track.volume, targetVolume, SHRIMP_MUSIC_FADE_RATE, delta);
+    if (blend > 0 && !shrimpMusicPlayBlocked) playShrimpRoomTrack(track);
+    if (blend === 0 && track.volume < 0.004 && !track.paused) track.pause();
+  });
+}
+
+function pauseShrimpRoomMusic() {
   shrimpRoomTracks.forEach((track) => {
-    if (!track.paused) return;
-    track.play().then(() => {
-      shrimpMusicPlayBlocked = false;
-    }).catch(() => {
-      shrimpMusicPlayBlocked = true;
-    });
+    track.pause();
+    track.volume = 0;
   });
 }
 
@@ -3948,11 +4104,29 @@ function syncGalleryVideos() {
     cancelVideoFrame(entry);
     entry.element.pause();
   });
-  syncShrimpRoomMusic();
+}
+
+function requestVideoSync() {
+  if (!galleryActive) return;
+  videoSyncRequested = true;
+  lastCameraInputAt = performance.now();
+}
+
+function flushVideoSync(now) {
+  if (!videoSyncRequested || now - lastCameraInputAt < 180) return;
+  videoSyncRequested = false;
+  syncGalleryVideos();
 }
 
 function playGalleryVideos() {
+  videoSyncRequested = false;
   syncGalleryVideos();
+}
+
+function playAutoplayOnEntryVideos() {
+  galleryVideos.forEach((entry) => {
+    if (entry.autoplayOnEntry && !entry.userPaused) playVideoEntry(entry);
+  });
 }
 
 function pauseGalleryVideos() {
@@ -3960,7 +4134,7 @@ function pauseGalleryVideos() {
     cancelVideoFrame(entry);
     entry.element.pause();
   });
-  shrimpRoomTracks.forEach((track) => track.pause());
+  pauseShrimpRoomMusic();
 }
 
 function createRoundedPanelGeometry(width, height, radius) {
@@ -4077,6 +4251,17 @@ function addVideoWork(work, posterTexture) {
   const screenMaterial = new THREE.MeshBasicMaterial({ map: posterTexture, toneMapped: false });
   const screen = new THREE.Mesh(new THREE.PlaneGeometry(work.width, height), screenMaterial);
   screen.position.z = work.screenOffset ?? 0.02;
+  if (work.blackOutline) {
+    const blackOutlinePadding = work.blackOutlinePadding ?? 0.1;
+    const blackOutline = new THREE.Mesh(
+      new THREE.PlaneGeometry(work.width + blackOutlinePadding * 2, height + blackOutlinePadding * 2),
+      new THREE.MeshBasicMaterial({ color: 0x000000, toneMapped: false })
+    );
+    blackOutline.position.z = screen.position.z - 0.004;
+    blackOutline.renderOrder = 3;
+    group.add(blackOutline);
+    screen.renderOrder = 4;
+  }
   group.add(screen);
   const focusOutline = work.showFocusOutline === false
     ? new THREE.Group()
@@ -4154,7 +4339,10 @@ function addVideoWork(work, posterTexture) {
   }
   if (work.showLabel !== false) addWallLabel(group, work, height);
   scene.add(group);
-  if (galleryActive) syncGalleryVideos();
+  if (galleryActive) {
+    if (entry.autoplayOnEntry) playVideoEntry(entry);
+    else requestVideoSync();
+  }
   needsRender = true;
 }
 
@@ -4381,6 +4569,11 @@ function isWalkablePosition(x, z) {
     (display) => Math.hypot(x - display.x, z - display.z) >= 0.92
   );
   const gameRoom = insideGameRoom && clearOfGameDisplays;
+  const videosHallway = x >= GAME_VIDEOS_HALL_DOOR_X - GAME_ROOM.doorWidth / 2 + 0.24
+    && x <= GAME_VIDEOS_HALL_DOOR_X + GAME_ROOM.doorWidth / 2 - 0.24
+    && z >= VIDEOS_ROOM.farZ - wallClearance
+    && z <= GAME_ROOM.nearZ + wallClearance;
+  const videosRoom = insideRoom(VIDEOS_ROOM);
   const emptyGameDoorCenterZ = (EMPTY_GAME_ROOM.nearZ + EMPTY_GAME_ROOM.farZ) / 2 + EMPTY_GAME_ROOM.doorOffsetZ;
   const emptyGameHallway = x >= APP_ROOM.centerX + APP_ROOM.halfWidth - 0.5
     && x <= EMPTY_GAME_ROOM.centerX - EMPTY_GAME_ROOM.halfWidth + 0.5
@@ -4413,7 +4606,7 @@ function isWalkablePosition(x, z) {
   );
   const artRoom = insideArtRoom && clearOfMugDisplays && clearOfHouseDisplay && clearOfManualVideoDisplays;
   return mainRoom || screeningHallway || screeningRoom || brainHallway || brainRoom
-    || appHallway || appRoom || gameHallway || gameRoom || emptyGameHallway || brainMriConnection || emptyGameRoom
+    || appHallway || appRoom || gameHallway || gameRoom || videosHallway || videosRoom || emptyGameHallway || brainMriConnection || emptyGameRoom
     || artHallway || artRoom;
 }
 
@@ -4459,7 +4652,7 @@ function updateMovement(delta) {
   camera.position.y = STANDING_EYE_HEIGHT - CROUCH_DROP * crouchAmount + jumpOffset;
 
   const moved = Boolean(forward || sideways || Math.abs(camera.position.y - previousY) > 0.0001);
-  if (moved) syncGalleryVideos();
+  if (moved) requestVideoSync();
   return moved;
 }
 
@@ -4469,7 +4662,10 @@ function animate(now) {
   const delta = Math.min((now - lastFrame) / 1000, 0.05);
   lastFrame = now;
   const moved = updateMovement(delta);
+  updateShrimpRoomMusic(delta);
+  flushVideoSync(now);
   const focusChanged = updateFocusedPoster();
+  refreshFocusedVideoTime();
   const fallbackVideoPlaying = galleryVideos
     .some((entry) => !entry.supportsFrameCallback && !entry.element.paused && entry.element.readyState >= 2);
   if (needsRender || moved || focusChanged || fallbackVideoPlaying) {
@@ -4489,6 +4685,9 @@ function resize() {
 
 function finishLoading() {
   sceneReady = true;
+  // Start the prioritized media queue while the welcome screen is still up,
+  // so the first walk past a display does not also pay its network/buffer cost.
+  preloadGalleryVideos();
   loadingBar.style.width = '100%';
   loadingStatus.textContent = 'Gallery ready.';
   window.setTimeout(createArtGallery, 0);
@@ -4519,7 +4718,8 @@ function enterGallery() {
   galleryActive = true;
   primeShrimpRoomMusic();
   preloadGalleryVideos();
-  playGalleryVideos();
+  playAutoplayOnEntryVideos();
+  requestVideoSync();
   dragLookEnabled = false;
   galleryApp.classList.remove('drag-look', 'dragging-view');
   walkHint.textContent = 'WASD move   Mouse to look   Left/right arrows skip a focused video by 5 sec   Space/up jump   Down crouch';
@@ -4540,7 +4740,10 @@ function enterGallery() {
   }, 420);
 }
 
-function initializeGallery() {
+async function initializeGallery() {
+  if (document.fonts?.load) {
+    await document.fonts.load('400 78px "Inter"').catch(() => {});
+  }
   configureTouchFallback();
 
   try {
@@ -4580,7 +4783,8 @@ function initializeGallery() {
     galleryActive = true;
     primeShrimpRoomMusic();
     preloadGalleryVideos();
-    playGalleryVideos();
+    playAutoplayOnEntryVideos();
+    requestVideoSync();
     dragLookEnabled = false;
     galleryApp.classList.remove('drag-look', 'dragging-view');
     walkHint.textContent = 'WASD move   Mouse to look   Left/right arrows skip a focused video by 5 sec   Space/up jump   Down crouch';
@@ -4591,13 +4795,13 @@ function initializeGallery() {
   });
 
   controls.addEventListener('change', () => {
-    if (galleryActive) syncGalleryVideos();
+    requestVideoSync();
     needsRender = true;
   });
 
   controls.addEventListener('unlock', () => {
     galleryActive = false;
-    shrimpRoomTracks.forEach((track) => track.pause());
+    pauseShrimpRoomMusic();
     dragLookEnabled = false;
     draggingView = false;
     galleryApp.classList.remove('drag-look', 'dragging-view');
@@ -4822,7 +5026,7 @@ canvas.addEventListener('pointermove', (event) => {
   dragEuler.x -= movementY * 0.0024;
   dragEuler.x = THREE.MathUtils.clamp(dragEuler.x, -1.05, 1.05);
   camera.quaternion.setFromEuler(dragEuler);
-  syncGalleryVideos();
+  requestVideoSync();
   needsRender = true;
 });
 
