@@ -3,14 +3,6 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="description" content="A calm shrimp-breeding simulation game designed and developed by Puti Wen.">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://putiw.github.io/shrimp-tanks/">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Shrimp — Simulation Game by Puti Wen">
-    <meta property="og:description" content="Breed, feed, and manage a living cherry shrimp tank in this browser-based simulation.">
-    <meta property="og:url" content="https://putiw.github.io/shrimp-tanks/">
-    <meta property="og:image" content="https://putiw.github.io/shrimp-tanks/assets/icon/shrimp-logo.png">
     <meta name="theme-color" content="#132a2f">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -223,13 +215,13 @@
         }
       })();
     </script>
-    <title>Shrimp — Simulation Game by Puti Wen</title>
-    <script type="module" crossorigin src="./assets/main-C--D42ph.js"></script>
+    <title>Shrimp</title>
+    <script type="module" crossorigin src="./assets/main-D9ecLKQZ.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="./assets/phaser-DFK5Ua9d.js">
     <link rel="modulepreload" crossorigin href="./assets/phaser-BFjO2D3v.js">
-    <link rel="modulepreload" crossorigin href="./assets/TankScene-ByjvD2pN.js">
-    <link rel="stylesheet" crossorigin href="./assets/main-Vh2XWb_B.css">
+    <link rel="modulepreload" crossorigin href="./assets/TankScene-C7EjzzOS.js">
+    <link rel="stylesheet" crossorigin href="./assets/main-DepEhUmY.css">
   </head>
   <body>
     <div id="startup-screen" class="startup-screen" aria-hidden="true">
@@ -265,47 +257,20 @@
       <div class="controls" aria-label="Tank controls">
         <button id="settings-button" class="settings-button" type="button" aria-label="Open settings" title="Open settings"></button>
         <img class="control-art settings-art" src="./assets/icon/settings.png?v=v75-settings-icon-r1" alt="" aria-hidden="true" decoding="sync" fetchpriority="high">
-        <button id="notebook-button" class="notebook-button" type="button" aria-label="Open breeder's notebook" title="Breeder's notebook">
-          <span aria-hidden="true"></span>
+        <button id="notebook-button" class="notebook-button" type="button" aria-label="Open Shrimp Log" title="Shrimp Log">
+          <img class="notebook-button-art" src="./assets/icon/notebook-mark.png?v=v77-notebook-icon-r1" alt="" aria-hidden="true" decoding="sync" fetchpriority="high">
         </button>
         <div id="notebook-panel" class="notebook-panel" aria-hidden="true" inert>
-          <button id="notebook-dismiss" class="notebook-dismiss" type="button" aria-label="Close breeder's notebook"></button>
-          <section class="notebook-card" role="dialog" aria-modal="true" aria-labelledby="notebook-title">
-            <header class="notebook-header">
-              <div>
-                <span class="notebook-kicker">Breeder's</span>
-                <h2 id="notebook-title">Notebook</h2>
-              </div>
-              <button id="notebook-close" class="notebook-close" type="button" aria-label="Close notebook">Done</button>
-            </header>
-            <button id="notebook-inspect-button" class="notebook-inspect-button" type="button">Inspect a shrimp</button>
+          <button id="notebook-dismiss" class="notebook-dismiss" type="button" aria-label="Close Shrimp Log"></button>
+          <section class="notebook-card" role="dialog" aria-modal="true" aria-label="Shrimp Log">
             <div id="notebook-content" class="notebook-content"></div>
           </section>
-        </div>
-        <div id="shrimp-identity-panel" class="shrimp-identity-panel" aria-hidden="true" inert>
-          <button id="shrimp-identity-dismiss" class="shrimp-identity-dismiss" type="button" aria-label="Close shrimp identity card"></button>
-          <section class="shrimp-identity-card" role="dialog" aria-modal="true" aria-labelledby="shrimp-identity-title">
-            <div id="shrimp-identity-portrait" class="shrimp-identity-portrait"></div>
-            <div class="shrimp-identity-copy">
-              <span class="shrimp-identity-kicker">Shrimp record</span>
-              <h2 id="shrimp-identity-title">Shrimp</h2>
-              <div id="shrimp-identity-details" class="shrimp-identity-details"></div>
-              <div class="shrimp-identity-actions">
-                <button id="shrimp-favorite-button" type="button" aria-pressed="false">☆ Favorite</button>
-                <button id="shrimp-identity-done" class="primary" type="button">Done</button>
-              </div>
-            </div>
-          </section>
-        </div>
-        <div id="notebook-inspect-prompt" class="notebook-inspect-prompt" aria-hidden="true">
-          <span>Tap a shrimp to inspect</span>
-          <button id="notebook-inspect-cancel" type="button">Cancel</button>
         </div>
         <div id="settings-panel" class="settings-panel" aria-hidden="true">
           <div class="settings-card" role="dialog" aria-modal="true" aria-label="Settings">
             <div class="settings-head">
               <span>Settings</span>
-              <span class="version-note">v71</span>
+              <span class="version-note">v78</span>
             </div>
             <section class="save-slot" aria-label="Save slot 1">
               <div class="save-slot-summary">
@@ -356,7 +321,7 @@
         <img id="tank-art" class="control-art tank-art" src="./assets/icon/fishtank.png?v=v71-shop-assets-r1" alt="" aria-hidden="true" decoding="async" fetchpriority="low">
         <img class="control-art bucket-art" src="./assets/icon/catch-bucket.png?v=v71-shop-assets-r1" alt="" aria-hidden="true" decoding="async" loading="lazy" fetchpriority="low">
         <div id="selling-wallet" class="selling-wallet" aria-label="Wallet balance">
-          <img class="selling-wallet-label" src="./assets/icon/wallet-label.png?v=v71-shop-assets-r1" alt="" aria-hidden="true" decoding="async" loading="lazy" fetchpriority="low">
+          <img class="selling-wallet-mark" src="./assets/icon/wallet-short-mark.png?v=v76-wallet-short-mark-r1" alt="" aria-hidden="true" decoding="async" loading="eager" fetchpriority="high">
           <div id="selling-money-digits" class="selling-money-digits"></div>
         </div>
         <button id="aquascape-button" class="icon-button aquascape" type="button" aria-label="Open aquascape shop" title="Open aquascape shop"></button>
@@ -381,6 +346,7 @@
               <button id="aquascape-scope-filter" class="aquascape-cycle-button" type="button">All</button>
               <button id="aquascape-type-filter" class="aquascape-cycle-button" type="button">All types</button>
               <button id="aquascape-store-button" class="aquascape-store-button" type="button">Edit</button>
+              <div id="aquascape-wallet-backup" class="aquascape-wallet-backup" aria-label="Wallet balance"></div>
             </header>
             <div id="aquascape-content" class="aquascape-content"></div>
           </section>

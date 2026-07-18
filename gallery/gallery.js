@@ -170,13 +170,13 @@ const BRAIN_WALL_SHEETS = [
 // Each sheet is rendered at the room height; the west and north sheets are
 // cropped to the usable wall span so neither can cover a doorway.
 const MRI_WALL_SHEETS = [
-  { image: './mri-room/brain-pdf-5-updated.png?v=20260718-mri-pdf-clean1', side: 'south', aspect: 4781 / 1744 },
+  { image: './mri-room/brain-pdf-5-updated-v2.png?v=20260718-mri-pdf-black-video-frames', side: 'south', aspect: 4781 / 1744 },
   { image: './mri-room/brain-pdf-4.png?v=20260718-hd', side: 'west', aspect: 4754 / 1744, cropAlign: 'center', contentOnly: true, contentCenterX: 0.607 },
   { image: './mri-room/brain-pdf-6-updated.png?v=20260718-mri-pdf-clean1', side: 'east', aspect: 4704 / 1744 },
   // The black artboard is cropped from the PDF page and padded with black only;
   // its title, subtitle, marked video frame, and original typography stay in
   // this single sheet texture, just like the diffusion wall.
-  { image: './mri-room/brain-pdf-7-updated.png?v=20260718-mri-pdf', side: 'north', aspect: 2299 / 1744 }
+  { image: './mri-room/brain-pdf-7-updated-clean-v2.png?v=20260718-mri-pdf-black-video-frames', side: 'north', aspect: 2299 / 1744 }
 ];
 
 const MRI_VIDEO_WORKS = [
@@ -225,6 +225,7 @@ const ART_PORTAL_COLOR = 0x7f8181;
 const ART_PORTAL_CSS_COLOR = '#7f8181';
 const ART_R_SHIFT_X = 0.22;
 const PDF_ART_PANEL_HEIGHT = ART_ROOM.height;
+const APARTMENT_PANEL_ASPECT = 3230 / 1867;
 const ART_MOSAIC_HEIGHT = 5.75;
 const ART_MOSAIC_CENTER_Y = ART_ROOM.height / 2 - 0.35;
 
@@ -245,7 +246,7 @@ const ART_WALL_SHEETS = [
     side: 'near-left'
   },
   {
-    image: './art/walls/others-apartment.png?v=20260717-1915',
+    image: './art/walls/others-apartment-updated.png?v=20260718-apartment-pdf-transparent',
     aspect: 7478 / 1867,
     side: 'left'
   },
@@ -289,7 +290,7 @@ const ART_SALON_PANELS = [
   },
   {
     category: 'Apartment', side: 'left',
-    centerZ: ART_ROOM.nearZ + (3230 / 1540 * PDF_ART_PANEL_HEIGHT) / 2,
+    centerZ: ART_ROOM.nearZ + (APARTMENT_PANEL_ASPECT * PDF_ART_PANEL_HEIGHT) / 2,
     width: 11.2,
     smallWidth: 2.3, rows: 1, featureSide: 'left'
   },
@@ -308,8 +309,8 @@ const ART_TEMPLATE_PANELS = {
     height: PDF_ART_PANEL_HEIGHT
   },
   Apartment: {
-    image: './art/templates/apartment-panel.png',
-    aspect: 3230 / 1540,
+    image: './art/templates/apartment-panel-updated.png?v=20260718-apartment-pdf-text',
+    aspect: APARTMENT_PANEL_ASPECT,
     height: PDF_ART_PANEL_HEIGHT
   },
   'Stuff I did for others': {
@@ -376,6 +377,7 @@ const HOUSE_RAIN_DISPLAY = {
   rotationY: Math.PI / 2,
   interactionRadius: 4.1,
   playDistance: 5,
+  requireFocusForPlayback: true,
   preloadPriority: 20,
   manualOnly: true,
   requireInteractionRange: true,
@@ -408,7 +410,7 @@ const GAME_DISPLAY_WORKS = [
     z: 32.45,
     launchAction: {
       label: 'PLAY',
-      url: '../shrimp-tanks/'
+      url: '../shrimp-tanks/?v=20260718-latest-shrimp-build'
     }
   }
 ].map((work) => ({
@@ -436,10 +438,21 @@ const GAME_DISPLAY_WORKS = [
   }
 }));
 
+const GAME_WALL_SHEETS = [
+  {
+    image: './game/game-artboard-3-transparent.png?v=20260718-game-artboard-3-transparent-600dpi',
+    side: 'west',
+    aspect: 1087 / 468,
+    width: 1.24
+  }
+];
+
 const VIDEO_ROOM_SCREEN_WIDTH = 3.15;
 const VIDEO_ROOM_SCREEN_Y = 2.8;
-const VIDEO_ROOM_VOLUME = 0.9;
-const VIDEO_ROOM_ASSET_VERSION = '20260718-video-room2';
+// Video Room audio is attenuated in the source files; keep the element at unity gain.
+const VIDEO_ROOM_VOLUME = 1;
+const VIDEO_ROOM_ASSET_VERSION = '20260718-video-room-audio-50';
+const VIDEO_ROOM_POSTER_VERSION = '20260718-video-room3-poster-frames';
 const VIDEO_ROOM_WALL_ZS = [
   VIDEOS_ROOM.nearZ + 4.1,
   VIDEOS_ROOM.nearZ + 9.45
@@ -454,38 +467,38 @@ const VIDEO_ROOM_ACTIVATION_BOUNDS = {
 const VIDEO_ROOM_WORKS = [
   {
     title: 'Cataract',
-    source: `./media/videos/cataract.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
-    posterImage: './media/video-posters/cataract.jpg',
+    source: `./media/videos/cataract-audio-50.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
+    posterImage: './media/video-posters/cataract-poster-00-20.jpg',
     position: [VIDEOS_ROOM.centerX, VIDEO_ROOM_SCREEN_Y, VIDEOS_ROOM.nearZ + 0.14],
     rotationY: 0
   },
   {
     title: 'Lower Back Pain',
-    source: `./media/videos/lower-back-pain.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
-    posterImage: './media/video-posters/lower-back-pain.jpg',
-    position: [VIDEOS_ROOM.centerX - VIDEOS_ROOM.halfWidth + 0.14, VIDEO_ROOM_SCREEN_Y, VIDEO_ROOM_WALL_ZS[0]],
-    rotationY: Math.PI / 2
-  },
-  {
-    title: 'Goosebumps, Hiccups, and Yawns',
-    source: `./media/videos/goosebumps-hiccup-yawn-sub.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
-    posterImage: './media/video-posters/goosebumps-hiccup-yawn-sub.jpg',
-    position: [VIDEOS_ROOM.centerX - VIDEOS_ROOM.halfWidth + 0.14, VIDEO_ROOM_SCREEN_Y, VIDEO_ROOM_WALL_ZS[1]],
-    rotationY: Math.PI / 2
-  },
-  {
-    title: 'Teeth',
-    source: `./media/videos/teeth.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
-    posterImage: './media/video-posters/teeth.jpg',
+    source: `./media/videos/lower-back-pain-audio-50.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
+    posterImage: './media/video-posters/lower-back-pain-poster-00-11.jpg',
     position: [VIDEOS_ROOM.centerX + VIDEOS_ROOM.halfWidth - 0.14, VIDEO_ROOM_SCREEN_Y, VIDEO_ROOM_WALL_ZS[0]],
     rotationY: -Math.PI / 2
   },
   {
-    title: 'How to Kill Spider Mites',
-    source: `./media/videos/spider-mites-sub.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
-    posterImage: './media/video-posters/spider-mites-sub.jpg',
+    title: 'Goosebumps, Hiccups, and Yawns',
+    source: `./media/videos/goosebumps-hiccup-yawn-sub-audio-50.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
+    posterImage: './media/video-posters/goosebumps-hiccup-yawn-sub-poster-00-11.jpg',
     position: [VIDEOS_ROOM.centerX + VIDEOS_ROOM.halfWidth - 0.14, VIDEO_ROOM_SCREEN_Y, VIDEO_ROOM_WALL_ZS[1]],
     rotationY: -Math.PI / 2
+  },
+  {
+    title: 'Teeth',
+    source: `./media/videos/teeth-audio-50.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
+    posterImage: './media/video-posters/teeth-poster-00-47.jpg',
+    position: [VIDEOS_ROOM.centerX - VIDEOS_ROOM.halfWidth + 0.14, VIDEO_ROOM_SCREEN_Y, VIDEO_ROOM_WALL_ZS[0]],
+    rotationY: Math.PI / 2
+  },
+  {
+    title: 'How to Kill Spider Mites',
+    source: `./media/videos/spider-mites-sub-audio-50.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
+    posterImage: './media/video-posters/spider-mites-sub-poster-00-24.jpg',
+    position: [VIDEOS_ROOM.centerX - VIDEOS_ROOM.halfWidth + 0.14, VIDEO_ROOM_SCREEN_Y, VIDEO_ROOM_WALL_ZS[1]],
+    rotationY: Math.PI / 2
   }
 ].map((work) => ({
   ...work,
@@ -823,6 +836,7 @@ const videoRoomEntries = [];
 let videoSyncRequested = false;
 let lastCameraInputAt = 0;
 let artGalleryLoadStarted = false;
+let backgroundGalleryLoadsStarted = false;
 let lastDragX = 0;
 let lastDragY = 0;
 let lastFrame = performance.now();
@@ -1063,22 +1077,10 @@ function createRoom() {
   createScreeningRoom();
   createBrainRoom();
   createArtRoom();
-  addGalleryMap();
   addRoomHeading(
     'PhD Defense',
     [SCREENING_ROOM.centerX, 3.67, ROOM.halfDepth - 0.11],
     Math.PI,
-    SCREENING_ROOM.doorWidth,
-    190
-  );
-  addRoomHeading(
-    'Science Room',
-    // The App room starts after the short entry hall. Put this on the
-    // App-room-facing side of its entrance header so it remains visible
-    // from inside the App room (the main Research wall occludes the hall
-    // face when viewed from farther in).
-    [APP_ROOM.centerX, 3.67, APP_ROOM.nearZ + 0.15],
-    0,
     SCREENING_ROOM.doorWidth,
     190
   );
@@ -1124,6 +1126,7 @@ function createRoom() {
   addDefenseIntroStatement();
   addMriRoomIntroStatement();
   addVideosRoomIntroStatement();
+  addGameRoomIntroStatement();
 }
 
 function addGalleryMap() {
@@ -1665,6 +1668,44 @@ function createGameRoom() {
   createGameRoomShell(VIDEOS_ROOM, 'south');
 }
 
+function addGameWallSheet(sheet, texture) {
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
+
+  const height = sheet.width / sheet.aspect;
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    alphaTest: 0.015,
+    depthWrite: false,
+    toneMapped: false
+  });
+  const artwork = new THREE.Mesh(new THREE.PlaneGeometry(sheet.width, height), material);
+  artwork.position.y = GAME_ROOM.height / 2;
+
+  const roomLeft = GAME_ROOM.centerX - GAME_ROOM.halfWidth;
+  const roomCenterZ = (GAME_ROOM.nearZ + GAME_ROOM.farZ) / 2;
+  const group = new THREE.Group();
+  if (sheet.side === 'south') {
+    group.position.set(GAME_ROOM.centerX, 0, GAME_ROOM.farZ - 0.075);
+    group.rotation.y = Math.PI;
+  } else {
+    group.position.set(roomLeft + 0.075, 0, roomCenterZ);
+    group.rotation.y = Math.PI / 2;
+  }
+  group.add(artwork);
+  scene.add(group);
+  needsRender = true;
+}
+
+function createGameWallSheets(textureLoader) {
+  GAME_WALL_SHEETS.forEach((sheet) => {
+    textureLoader.load(sheet.image, (texture) => addGameWallSheet(sheet, texture));
+  });
+}
+
 function addArtPortalGraphic(roomLeft, roomRight) {
   const wallWidth = roomRight - roomLeft;
   const wallHeight = APP_ROOM.height;
@@ -2198,6 +2239,7 @@ function createStandingVideoDisplay(work, posterTexture) {
     position: new THREE.Vector3(work.x, 0, work.z),
     interactionRadius: work.interactionRadius,
     playDistance: work.playDistance,
+    requireFocusForPlayback: Boolean(work.requireFocusForPlayback),
     element: video,
     frameCallback: 0,
     screen,
@@ -2245,6 +2287,7 @@ function createStandingVideoDisplay(work, posterTexture) {
   scene.add(group);
   if (galleryActive) requestVideoSync();
   needsRender = true;
+  return entry;
 }
 
 function addStandingDisplayLabel(screenAssembly, work, frameHeight) {
@@ -2344,7 +2387,55 @@ function addGameLaunchButton(screenAssembly, work, frameHeight) {
 }
 
 function createHouseRainDisplay(posterTexture) {
-  createStandingVideoDisplay(HOUSE_RAIN_DISPLAY, posterTexture);
+  return createStandingVideoDisplay(HOUSE_RAIN_DISPLAY, posterTexture);
+}
+
+function replaceVideoPosterTexture(entry, texture) {
+  if (!entry?.material) return;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
+  const previousTexture = entry.material.map;
+  entry.material.map = texture;
+  entry.material.needsUpdate = true;
+  if (previousTexture && previousTexture !== texture) previousTexture.dispose();
+  needsRender = true;
+}
+
+function startBackgroundGalleryLoads() {
+  if (backgroundGalleryLoadsStarted) return;
+  backgroundGalleryLoadsStarted = true;
+  const textureLoader = new THREE.TextureLoader();
+
+  createArtWallSheets(textureLoader);
+  MUG_DISPLAYS.forEach((config) => {
+    textureLoader.load(config.texture, (texture) => createMugDisplay(texture, config));
+  });
+
+  const houseRainEntry = createHouseRainDisplay(createVideoPlaceholderTexture());
+  textureLoader.load(
+    HOUSE_RAIN_DISPLAY.posterImage,
+    (texture) => replaceVideoPosterTexture(houseRainEntry, texture)
+  );
+
+  GAME_DISPLAY_WORKS.forEach((work) => {
+    textureLoader.load(
+      work.posterImage,
+      (texture) => createStandingVideoDisplay(work, texture),
+      undefined,
+      () => createStandingVideoDisplay(work, createVideoPlaceholderTexture())
+    );
+  });
+
+  const houseLoader = new GLTFLoader();
+  houseLoader.load(HOUSE_DISPLAY.model, createHouseDisplay, undefined, (error) => {
+    console.warn('Could not load childhood house model.', error);
+  });
+
+  resumePages.forEach((page) => {
+    textureLoader.load(page.image, (texture) => addResumePage(page, texture));
+  });
 }
 
 function addHouseRenderWall(group, texture) {
@@ -3512,6 +3603,7 @@ function addMriRoomIntroStatement() {
   const context = statementCanvas.getContext('2d');
   context.clearRect(0, 0, statementCanvas.width, statementCanvas.height);
   context.textBaseline = 'top';
+  context.textAlign = 'center';
   context.fillStyle = '#a7a6aa';
   context.font = `400 78px ${MRI_INTRO_FONT_FAMILY}`;
   const statementParagraphs = [
@@ -3633,6 +3725,76 @@ function addVideosRoomIntroStatement() {
     VIDEOS_ROOM.farZ - 0.021
   );
   statement.rotation.y = Math.PI;
+  scene.add(statement);
+}
+
+function addGameRoomIntroStatement() {
+  const statementCanvas = document.createElement('canvas');
+  statementCanvas.width = 2600;
+  statementCanvas.height = 1450;
+  const context = statementCanvas.getContext('2d');
+  context.clearRect(0, 0, statementCanvas.width, statementCanvas.height);
+  context.textBaseline = 'top';
+  context.textAlign = 'left';
+  context.fillStyle = '#a7a6aa';
+  context.font = `400 70px ${VIDEOS_INTRO_FONT_FAMILY}`;
+
+  const statementParagraphs = [
+    ['I love video games'],
+    [
+      'In this room you will find two of',
+      'the games that I am currently',
+      'developing. Both games are',
+      'inspired by my real life hobbies'
+    ]
+  ];
+  const lineHeight = 94;
+  const paragraphGap = 88;
+  const textBlockWidth = Math.max(
+    ...statementParagraphs.flat().map((line) => context.measureText(line).width)
+  );
+  const textLeft = (statementCanvas.width - textBlockWidth) / 2;
+  const totalTextHeight = statementParagraphs.reduce((height, lines) => height + lines.length * lineHeight, 0)
+    + paragraphGap * (statementParagraphs.length - 1);
+  let textTop = Math.max(70, (statementCanvas.height - totalTextHeight) / 2);
+  statementParagraphs.forEach((lines) => {
+    lines.forEach((line) => {
+      context.fillText(line, textLeft, textTop);
+      textTop += lineHeight;
+    });
+    textTop += paragraphGap;
+  });
+
+  const texture = new THREE.CanvasTexture(statementCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
+
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    alphaTest: 0.02,
+    depthWrite: false,
+    toneMapped: false
+  });
+  const wallMargin = 0.24;
+  const wallX = GAME_ROOM.centerX + GAME_ROOM.halfWidth;
+  const doorCenterZ = (GAME_ROOM.nearZ + GAME_ROOM.farZ) / 2 + GAME_ROOM.doorOffsetZ;
+  const wallTopZ = GAME_ROOM.nearZ;
+  const wallBottomZ = doorCenterZ - GAME_ROOM.doorWidth / 2;
+  const statementWidth = wallBottomZ - wallTopZ - wallMargin * 2;
+  const statementHeight = statementWidth * statementCanvas.height / statementCanvas.width;
+  const statement = new THREE.Mesh(
+    new THREE.PlaneGeometry(statementWidth, statementHeight),
+    material
+  );
+  statement.position.set(
+    wallX - ROOM_WALL_THICKNESS / 2 - 0.021,
+    3.55,
+    wallTopZ + wallMargin + statementWidth / 2
+  );
+  statement.rotation.y = -Math.PI / 2;
   scene.add(statement);
 }
 
@@ -4104,10 +4266,12 @@ function playVideoEntry(entry) {
     entry.element.src = entry.source;
     entry.element.load();
   }
+  if (!entry.playbackStarted) entry.element.currentTime = 0;
   const enableSoundAfterStart = entry.hasSound && entry.audioEnabled;
   if (enableSoundAfterStart) enableVideoAudio(entry);
   else entry.element.muted = true;
   const finishPlayback = () => {
+    entry.playbackStarted = true;
     if (enableSoundAfterStart) {
       entry.element.muted = false;
       entry.element.defaultMuted = false;
@@ -4248,7 +4412,7 @@ function startVideoRoomLoadIfReady() {
     };
     VIDEO_ROOM_WORKS.forEach((work) => {
       textureLoader.load(
-        `${work.posterImage}?v=20260718-video-room1`,
+        `${work.posterImage}?v=${VIDEO_ROOM_POSTER_VERSION}`,
         (texture) => {
           addVideoWork(work, texture);
           finishDisplay();
@@ -4367,9 +4531,11 @@ function syncGalleryVideos(entries = galleryVideos) {
   });
 }
 
-function syncVideoRoomFocus() {
-  if (!galleryActive || !videoRoomEntries.length) return;
-  syncGalleryVideos(videoRoomEntries);
+function syncFocusLockedVideos() {
+  if (!galleryActive) return;
+  const entries = galleryVideos.filter((entry) => entry.requireFocusForPlayback);
+  if (!entries.length) return;
+  syncGalleryVideos(entries);
 }
 
 function requestVideoSync() {
@@ -4574,6 +4740,7 @@ function addVideoWork(work, posterTexture) {
     supportsFrameCallback: typeof video.requestVideoFrameCallback === 'function',
     texture: videoTexture,
     userPaused: false,
+    playbackStarted: false,
     hasSound: Boolean(work.hasSound),
     videoRoom: Boolean(work.videoRoom),
     audioEnabled: false
@@ -4592,7 +4759,7 @@ function addVideoWork(work, posterTexture) {
     needsRender = true;
   };
 
-  video.addEventListener('loadeddata', activateVideoTexture, { once: true });
+  if (!work.videoRoom) video.addEventListener('loadeddata', activateVideoTexture, { once: true });
   video.addEventListener('playing', () => {
     activateVideoTexture();
     scheduleVideoFrame(entry);
@@ -4937,7 +5104,7 @@ function animate(now) {
   lastFrame = now;
   const moved = updateMovement(delta);
   requestVideoRoomLoad();
-  syncVideoRoomFocus();
+  syncFocusLockedVideos();
   updateShrimpRoomMusic(delta);
   flushVideoSync(now);
   const focusChanged = updateFocusedPoster();
@@ -4959,6 +5126,30 @@ function resize() {
   needsRender = true;
 }
 
+function warmInitialCamera() {
+  if (!renderer || !scene || !camera) return;
+
+  const originalPosition = camera.position.clone();
+  const originalQuaternion = camera.quaternion.clone();
+  const yawAxis = new THREE.Vector3(0, 1, 0);
+  const yawQuaternion = new THREE.Quaternion();
+  const warmupYawOffsets = [-Math.PI, -2.1, -1.05, 0, 1.05, 2.1];
+
+  warmupYawOffsets.forEach((offset) => {
+    yawQuaternion.setFromAxisAngle(yawAxis, offset);
+    camera.position.copy(originalPosition);
+    camera.quaternion.copy(yawQuaternion).multiply(originalQuaternion);
+    camera.updateMatrixWorld();
+    renderer.compile(scene, camera);
+    renderer.render(scene, camera);
+  });
+
+  camera.position.copy(originalPosition);
+  camera.quaternion.copy(originalQuaternion);
+  camera.updateMatrixWorld();
+  needsRender = true;
+}
+
 function finishLoading() {
   sceneReady = true;
   // Start the prioritized media queue while the welcome screen is still up,
@@ -4966,11 +5157,14 @@ function finishLoading() {
   preloadGalleryVideos();
   loadingBar.style.width = '100%';
   loadingStatus.textContent = 'Gallery ready.';
+  warmInitialCamera();
   window.setTimeout(createArtGallery, 0);
+  window.setTimeout(startBackgroundGalleryLoads, 0);
   window.setTimeout(() => {
+    warmInitialCamera();
     loadingScreen.hidden = true;
     showWelcome('initial');
-  }, 260);
+  }, 220);
 }
 
 function configureTouchFallback() {
@@ -5149,31 +5343,8 @@ async function initializeGallery() {
   MRI_WALL_SHEETS.forEach((sheet) => {
     textureLoader.load(sheet.image, (texture) => addMriWallSheet(sheet, texture));
   });
+  createGameWallSheets(textureLoader);
   loadBrainSurfaceObject(manager);
-  createArtWallSheets(textureLoader);
-  MUG_DISPLAYS.forEach((config) => {
-    textureLoader.load(config.texture, (texture) => createMugDisplay(texture, config));
-  });
-  textureLoader.load(
-    HOUSE_RAIN_DISPLAY.posterImage,
-    (texture) => createHouseRainDisplay(texture)
-  );
-  GAME_DISPLAY_WORKS.forEach((work) => {
-    textureLoader.load(
-      work.posterImage,
-      (texture) => createStandingVideoDisplay(work, texture),
-      undefined,
-      () => createStandingVideoDisplay(work, createVideoPlaceholderTexture())
-    );
-  });
-  const houseLoader = new GLTFLoader(manager);
-  houseLoader.load(HOUSE_DISPLAY.model, createHouseDisplay, undefined, (error) => {
-    console.warn('Could not load childhood house model.', error);
-  });
-  resumePages.forEach((page) => {
-    textureLoader.load(page.image, (texture) => addResumePage(page, texture));
-  });
-
   resize();
   window.addEventListener('resize', resize, { passive: true });
   animationFrame = window.requestAnimationFrame(animate);
