@@ -225,7 +225,7 @@
 
         <section class="cv-section personal-section" aria-labelledby="personal-heading">
           <h2 id="personal-heading">Personal</h2>
-            <p><strong>Languages:</strong> English, Chinese, basic Turkish. <strong>Design:</strong> T-shirt design selected for CSHL (2022); designed CBH t-shirt/hoodie (2025); artwork featured in fashion shows in China. <strong>Other:</strong> Developed a <a href="shrimp-tanks/?v=20260718-latest-shrimp-build" target="_blank" rel="noopener">shrimp simulation game</a>; YouTube channel (N.A.R. Things); built self-sustaining aquarium without filter/water changes; former top-ranked US World of Warcraft player.</p>
+            <p><strong>Languages:</strong> English, Chinese, basic Turkish. <strong>Design:</strong> T-shirt design selected for CSHL (2022); designed CBH t-shirt/hoodie (2025); artwork featured in fashion shows in China. <strong>Other:</strong> Developed a <a href="shrimp-tanks/?v=20260718-latest-shrimp-build" target="_blank" rel="noopener">shrimp simulation game</a>; YouTube channel (N.A.R. Things); built self-sustaining aquarium without filter/cleaning/oxegen; got to Grandmaster once in Teamfight Tactics.</p>
         </section>
 
         <footer class="paper-footer">
@@ -240,6 +240,17 @@
       if (connection?.saveData || /^(slow-2g|2g)$/.test(connection?.effectiveType || '')) return;
 
       const galleryWarmupAssets = [
+        ['gallery/', null],
+        ['gallery/gallery.js?v=20260718-resume-update-background-preload', 'script'],
+        ['gallery/wall-map-layout.js?v=20260718-all-door-headers-labels-contrast1-map-path1', 'script'],
+        ['gallery/art/works.js', 'script'],
+        ['gallery/vendor/three.module.min.js', 'script'],
+        ['gallery/vendor/PointerLockControls.js', 'script'],
+        ['gallery/vendor/loaders/GLTFLoader.js', 'script'],
+        ['gallery/style.css?v=20260718-contrast1', 'style'],
+        ['gallery/fonts/inter-regular.ttf', 'font'],
+        ['gallery/resume/resume-page-1.jpg', 'image'],
+        ['gallery/resume/resume-page-2.jpg', 'image'],
         ['gallery/media/defense-screening-web.mp4?v=20260717-faststart', 'video'],
         ['gallery/media/mri-afqview-hd.m4v', 'video'],
         ['gallery/media/mri-fmri-hd.m4v', 'video'],
@@ -257,7 +268,7 @@
         galleryWarmupAssets.forEach(([href, as]) => {
           const link = document.createElement('link');
           link.rel = 'prefetch';
-          link.as = as;
+          if (as) link.as = as;
           link.href = href;
           link.fetchPriority = 'low';
           document.head.appendChild(link);

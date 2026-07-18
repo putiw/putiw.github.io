@@ -853,8 +853,7 @@ let gameRoomLoadsStarted = false;
 let gameRoomKiosksReady = false;
 let researchRoomLoadsStarted = false;
 let mainRoomBackgroundLoadsStarted = false;
-let defenseRoomBackgroundPreloadsQueued = false;
-let appRoomBackgroundPreloadsQueued = false;
+let roomBackgroundPreloadPipelineQueued = false;
 let animationFrame = 0;
 let eHoldTimer = 0;
 let eHoldTarget = null;
@@ -1101,6 +1100,13 @@ function createRoom() {
     [SCREENING_ROOM.centerX, 3.67, ROOM.halfDepth - 0.11],
     Math.PI,
     SCREENING_ROOM.doorWidth,
+    190
+  );
+  addRoomHeading(
+    'Stuff I built',
+    [APP_ROOM.centerX, 3.67, ROOM.halfDepth - 0.11],
+    Math.PI,
+    APP_ROOM.doorWidth,
     190
   );
   const gameDoorCenterZ = (GAME_ROOM.nearZ + GAME_ROOM.farZ) / 2 + GAME_ROOM.doorOffsetZ;
@@ -2575,24 +2581,20 @@ function isCameraInsideRoom(room, margin = 0.35) {
 }
 
 function maybeStartRoomBackgroundPreloads() {
-  if (!galleryActive || !sceneReady) return;
+  if (!galleryActive || !sceneReady || roomBackgroundPreloadPipelineQueued) return;
+  roomBackgroundPreloadPipelineQueued = true;
 
-  if (!defenseRoomBackgroundPreloadsQueued && isCameraInsideRoom(SCREENING_ROOM)) {
-    defenseRoomBackgroundPreloadsQueued = true;
-    // Spread the large Brain/MRI work across separate idle windows so it
-    // cannot compete with movement or a camera turn in one frame.
-    scheduleLowPriorityGalleryWork(() => startBrainWallLoads(), 700);
-    scheduleLowPriorityGalleryWork(() => requestBrainSurfaceLoad(), 2200);
-    scheduleLowPriorityGalleryWork(() => startMriWallLoads(), 3800);
-  }
-
-  if (!appRoomBackgroundPreloadsQueued && isCameraInsideRoom(APP_ROOM)) {
-    appRoomBackgroundPreloadsQueued = true;
-    // Art has the larger scene/model queue; let it begin first, then start
-    // the Game/Video room assets after another idle window.
-    scheduleLowPriorityGalleryWork(() => startArtRoomLoads(), 700);
-    scheduleLowPriorityGalleryWork(() => startGameRoomLoads(), 1800);
-  }
+  // Once the initial, high-priority gallery queue is complete, continue
+  // warming the remaining rooms in the background. This is intentionally
+  // independent of the camera position after entry: walking away or standing
+  // still must not strand the rest of the queue.
+  scheduleLowPriorityGallerySequence([
+    () => startBrainWallLoads(),
+    () => requestBrainSurfaceLoad(),
+    () => startMriWallLoads(),
+    () => startArtRoomLoads(),
+    () => startGameRoomLoads()
+  ], 900, 700);
 }
 
 function maybeLoadNearbyRoomContent() {
@@ -4669,16 +4671,8 @@ function preloadGalleryVideos() {
   schedule(loadNext);
 }
 
-function isCameraInAppRoom() {
-  const wallClearance = 0.35;
-  return camera.position.x >= APP_ROOM.centerX - APP_ROOM.halfWidth + wallClearance
-    && camera.position.x <= APP_ROOM.centerX + APP_ROOM.halfWidth - wallClearance
-    && camera.position.z >= APP_ROOM.nearZ + wallClearance
-    && camera.position.z <= APP_ROOM.farZ - wallClearance;
-}
-
 function requestVideoRoomLoad() {
-  if (videoRoomLoadRequested || !galleryActive || !sceneReady || !isCameraInAppRoom() || !gameRoomKiosksReady) return;
+  if (videoRoomLoadRequested || !galleryActive || !sceneReady || !gameRoomKiosksReady) return;
   videoRoomLoadRequested = true;
   startVideoRoomLoadIfReady();
 }
