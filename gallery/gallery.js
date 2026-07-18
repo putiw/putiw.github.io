@@ -368,18 +368,44 @@ const HOUSE_DISPLAY = {
   plinthHeight: 1.25
 };
 
+const ART_NORTH_WEST_LENGTH = ART_ROOM.halfWidth + ART_ROOM.doorOffsetX - ART_ROOM.doorWidth / 2;
+const HOUSE_FLOOR_PREVIEW = {
+  wallLength: ART_NORTH_WEST_LENGTH,
+  x: -17.34,
+  y: -0.25,
+  z: 44.87,
+  scale: 0.53
+};
+
+const GALLERY_MINIATURE = {
+  scale: 0.06,
+  sourceCenterX: -5.5,
+  sourceCenterZ: 29.3,
+  x: ART_ROOM.centerX - (-5.5 * 0.06),
+  z: 58
+};
+const NESTED_GALLERY_MINIATURE = {
+  scale: GALLERY_MINIATURE.scale,
+  x: GALLERY_MINIATURE.x,
+  y: 0.02,
+  z: GALLERY_MINIATURE.z
+};
+
 const HOUSE_RAIN_DISPLAY = {
   title: 'Home in the rain',
   source: './media/house-in-rain.mp4',
   posterImage: './media/house-in-rain-poster.jpg',
   aspect: 16 / 9,
   width: 2.35,
-  x: HOUSE_DISPLAY.x - HOUSE_DISPLAY.width / 2 - 0.42,
-  z: HOUSE_DISPLAY.z - HOUSE_DISPLAY.depth / 2 - 2.35 / 2 - 0.06,
+  x: -13.38,
+  positionY: -1,
+  z: 44.85,
   screenY: 1.62,
-  tiltX: -Math.PI / 5.5,
+  tiltX: THREE.MathUtils.degToRad(-63),
+  tiltY: 0,
+  tiltZ: 0,
   pedestalHeight: 1.02,
-  rotationY: Math.PI / 2,
+  rotationY: THREE.MathUtils.degToRad(89),
   interactionRadius: 4.1,
   playDistance: 5,
   requireFocusForPlayback: true,
@@ -853,7 +879,16 @@ let gameRoomLoadsStarted = false;
 let gameRoomKiosksReady = false;
 let researchRoomLoadsStarted = false;
 let mainRoomBackgroundLoadsStarted = false;
+const mainRoomLoadedImages = new Set();
 let roomBackgroundPreloadPipelineQueued = false;
+let galleryMiniature = null;
+let galleryMiniatureRefreshesQueued = false;
+const galleryMiniaturePosterTextures = new Map();
+const galleryMiniaturePosterLoads = new Map();
+const GALLERY_MINIATURE_POSTER_OVERRIDES = new Map([
+  ['mri-afqview-hd.m4v', '../gallery-miniature/media/video-posters/mri-afqview-miniature.jpg'],
+  ['mri-fmri-hd.m4v', '../gallery-miniature/media/video-posters/mri-fmri-miniature.jpg']
+]);
 let animationFrame = 0;
 let eHoldTimer = 0;
 let eHoldTarget = null;
@@ -1947,6 +1982,37 @@ function createMugDisplay(texture, config) {
   needsRender = true;
 }
 
+function prepareHouseModel(model, scaleMultiplier = 1, baseY = 0, targetWidth = null) {
+  model.traverse((child) => {
+    if (!child.isMesh) return;
+    child.castShadow = false;
+    child.receiveShadow = false;
+    const materials = Array.isArray(child.material) ? child.material : [child.material];
+    materials.filter(Boolean).forEach((material) => {
+      material.roughness = material.roughness ?? 0.88;
+      material.metalness = 0;
+      material.needsUpdate = true;
+    });
+  });
+
+  model.updateMatrixWorld(true);
+  const originalBox = new THREE.Box3().setFromObject(model);
+  const originalSize = originalBox.getSize(new THREE.Vector3());
+  const horizontalSize = Math.max(originalSize.x, originalSize.z);
+  const modelScale = targetWidth
+    ? targetWidth / originalSize.x
+    : Math.min(3.16 / horizontalSize, 1.5 / originalSize.y) * scaleMultiplier;
+  model.scale.setScalar(modelScale);
+  model.updateMatrixWorld(true);
+
+  const scaledBox = new THREE.Box3().setFromObject(model);
+  const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
+  model.position.x -= scaledCenter.x;
+  model.position.z -= scaledCenter.z;
+  model.position.y += baseY - scaledBox.min.y;
+  return model;
+}
+
 function createHouseDisplay(gltf) {
   const display = new THREE.Group();
   display.position.set(HOUSE_DISPLAY.x, 0, HOUSE_DISPLAY.z);
@@ -1972,37 +2038,172 @@ function createHouseDisplay(gltf) {
 
   const modelPivot = new THREE.Group();
   modelPivot.rotation.y = 0;
-  const model = gltf.scene;
-  model.traverse((child) => {
-    if (!child.isMesh) return;
-    child.castShadow = false;
-    child.receiveShadow = false;
-    const materials = Array.isArray(child.material) ? child.material : [child.material];
-    materials.filter(Boolean).forEach((material) => {
-      material.roughness = material.roughness ?? 0.88;
-      material.metalness = 0;
-      material.needsUpdate = true;
-    });
-  });
-
-  model.updateMatrixWorld(true);
-  const originalBox = new THREE.Box3().setFromObject(model);
-  const originalSize = originalBox.getSize(new THREE.Vector3());
-  const horizontalSize = Math.max(originalSize.x, originalSize.z);
-  const modelScale = Math.min(3.16 / horizontalSize, 1.5 / originalSize.y);
-  model.scale.setScalar(modelScale);
-  model.updateMatrixWorld(true);
-
-  const scaledBox = new THREE.Box3().setFromObject(model);
-  const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
-  model.position.x -= scaledCenter.x;
-  model.position.z -= scaledCenter.z;
-  model.position.y += HOUSE_DISPLAY.plinthHeight + 0.1 - scaledBox.min.y;
+  const model = prepareHouseModel(gltf.scene.clone(true), 1, HOUSE_DISPLAY.plinthHeight + 0.1);
   modelPivot.add(model);
   display.add(modelPivot);
 
   scene.add(display);
   needsRender = true;
+}
+
+function createHouseFloorPreview(gltf) {
+  const display = new THREE.Group();
+  const modelPivot = new THREE.Group();
+  modelPivot.rotation.y = 0;
+  const model = prepareHouseModel(
+    gltf.scene.clone(true),
+    1,
+    0,
+    HOUSE_FLOOR_PREVIEW.wallLength
+  );
+  display.position.set(
+    HOUSE_FLOOR_PREVIEW.x,
+    HOUSE_FLOOR_PREVIEW.y,
+    HOUSE_FLOOR_PREVIEW.z
+  );
+  modelPivot.scale.setScalar(HOUSE_FLOOR_PREVIEW.scale);
+  modelPivot.add(model);
+  display.add(modelPivot);
+  scene.add(display);
+  needsRender = true;
+}
+
+function getMiniatureVideoEntry(source) {
+  if (!source?.isMesh) return null;
+  return galleryVideos.find((entry) => entry.screen === source || entry.material === source.material) || null;
+}
+
+function getMiniaturePosterSource(entry) {
+  if (!entry) return null;
+  const sourceName = entry.source?.split('?')[0].split('/').pop();
+  if (GALLERY_MINIATURE_POSTER_OVERRIDES.has(sourceName)) {
+    return GALLERY_MINIATURE_POSTER_OVERRIDES.get(sourceName);
+  }
+  if (!entry.posterImage) return null;
+  const cleanPath = entry.posterImage.split('?')[0];
+  if (!cleanPath.startsWith('./media/')) return null;
+  return `../gallery-miniature/${cleanPath.slice(2)}`;
+}
+
+function getMiniatureStaticTexture(entry) {
+  if (!entry) return null;
+  if (galleryMiniaturePosterTextures.has(entry)) return galleryMiniaturePosterTextures.get(entry);
+
+  const posterSource = getMiniaturePosterSource(entry);
+  if (!posterSource) {
+    const placeholder = createVideoPlaceholderTexture();
+    galleryMiniaturePosterTextures.set(entry, placeholder);
+    return placeholder;
+  }
+  if (galleryMiniaturePosterLoads.has(entry)) return null;
+
+  const placeholder = createVideoPlaceholderTexture();
+  galleryMiniaturePosterTextures.set(entry, placeholder);
+  galleryMiniaturePosterLoads.set(entry, true);
+  const loader = new THREE.TextureLoader();
+  loader.load(posterSource, (texture) => {
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.generateMipmaps = false;
+    placeholder.dispose();
+    galleryMiniaturePosterTextures.set(entry, texture);
+    if (galleryMiniature) createGalleryMiniature();
+  }, undefined, () => {
+    if (galleryMiniature) createGalleryMiniature();
+  });
+  return placeholder;
+}
+
+function getMiniatureMaterial(material, staticTexture) {
+  if (!staticTexture) return material;
+  const cloneMaterial = (sourceMaterial) => {
+    if (!sourceMaterial) return sourceMaterial;
+    const copy = sourceMaterial.clone();
+    copy.map = staticTexture;
+    copy.needsUpdate = true;
+    return copy;
+  };
+  return Array.isArray(material) ? material.map(cloneMaterial) : cloneMaterial(material);
+}
+
+function copyMiniatureObject(source) {
+  if (source.isLight) return null;
+  const videoEntry = getMiniatureVideoEntry(source);
+  const staticTexture = videoEntry ? getMiniatureStaticTexture(videoEntry) : null;
+  const material = getMiniatureMaterial(source.material, staticTexture);
+  let copy;
+  if (source.isMesh) copy = new THREE.Mesh(source.geometry, material);
+  else if (source.isLineSegments) copy = new THREE.LineSegments(source.geometry, material);
+  else if (source.isLine) copy = new THREE.Line(source.geometry, material);
+  else if (source.isPoints) copy = new THREE.Points(source.geometry, material);
+  else if (source.isGroup) copy = new THREE.Group();
+  else if (source.isObject3D) copy = new THREE.Object3D();
+  else return null;
+
+  copy.position.copy(source.position);
+  copy.quaternion.copy(source.quaternion);
+  copy.scale.copy(source.scale);
+  copy.visible = source.visible;
+  copy.renderOrder = source.renderOrder;
+  copy.frustumCulled = source.frustumCulled;
+  source.children.forEach((child) => {
+    const childCopy = copyMiniatureObject(child);
+    if (childCopy) copy.add(childCopy);
+  });
+  return copy;
+}
+
+function populateMiniature(target) {
+  scene.children.forEach((source) => {
+    if (source === galleryMiniature || source.isLight) return;
+    const copy = copyMiniatureObject(source);
+    if (!copy) return;
+    copy.traverse((object) => {
+      if (!object.isMesh) return;
+      const box = new THREE.Box3().setFromObject(object);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+      if (center.y > 5.15 && size.y < 0.2 && Math.max(size.x, size.z) > 1.5) object.visible = false;
+      object.castShadow = false;
+      object.receiveShadow = false;
+    });
+    target.add(copy);
+  });
+}
+
+function createGalleryMiniature() {
+  if (!scene || !sceneReady) return;
+  if (galleryMiniature) scene.remove(galleryMiniature);
+
+  const miniature = new THREE.Group();
+  miniature.name = 'Full gallery miniature without table';
+  miniature.position.set(GALLERY_MINIATURE.x, 0.02, GALLERY_MINIATURE.z);
+  miniature.scale.setScalar(GALLERY_MINIATURE.scale);
+  populateMiniature(miniature);
+
+  const nestedMiniature = new THREE.Group();
+  nestedMiniature.name = 'Nested full gallery miniature';
+  nestedMiniature.position.set(
+    NESTED_GALLERY_MINIATURE.x,
+    NESTED_GALLERY_MINIATURE.y,
+    NESTED_GALLERY_MINIATURE.z
+  );
+  nestedMiniature.scale.setScalar(NESTED_GALLERY_MINIATURE.scale);
+  populateMiniature(nestedMiniature);
+  miniature.add(nestedMiniature);
+
+  scene.add(miniature);
+  galleryMiniature = miniature;
+  needsRender = true;
+}
+
+function queueGalleryMiniatureRefreshes() {
+  if (galleryMiniatureRefreshesQueued) return;
+  galleryMiniatureRefreshesQueued = true;
+  [1200, 7000, 15000, 26000].forEach((delay) => {
+    window.setTimeout(() => createGalleryMiniature(), delay);
+  });
 }
 
 function refreshFocusCard() {
@@ -2171,7 +2372,7 @@ function createStandingVideoDisplay(work, posterTexture) {
   const frameWidth = work.frameWidth ?? screenWidth + 0.2;
   const frameHeight = work.frameHeight ?? screenHeight + 0.2;
   const group = new THREE.Group();
-  group.position.set(work.x, 0, work.z);
+  group.position.set(work.x, work.positionY ?? 0, work.z);
   group.rotation.y = work.rotationY;
   const holderScale = work.displayScale ?? 1;
 
@@ -2197,7 +2398,7 @@ function createStandingVideoDisplay(work, posterTexture) {
 
   const screenAssembly = new THREE.Group();
   screenAssembly.position.set(0, work.screenY, -0.03);
-  screenAssembly.rotation.x = work.tiltX;
+  screenAssembly.rotation.set(work.tiltX ?? 0, work.tiltY ?? 0, work.tiltZ ?? 0);
   group.add(screenAssembly);
 
   const frame = new THREE.Mesh(
@@ -2272,6 +2473,7 @@ function createStandingVideoDisplay(work, posterTexture) {
   const entry = {
     title: work.title,
     source: work.source,
+    posterImage: work.posterImage,
     activationBounds: work.activationBounds,
     autoplayInBounds: Boolean(work.autoplayInBounds),
     autoplayOnEntry: Boolean(work.autoplayOnEntry),
@@ -2473,7 +2675,9 @@ function startArtRoomLoads() {
     },
     () => {
       const houseLoader = new GLTFLoader();
-      houseLoader.load(HOUSE_DISPLAY.model, createHouseDisplay, undefined, (error) => {
+      houseLoader.load(HOUSE_DISPLAY.model, (gltf) => {
+        createHouseFloorPreview(gltf);
+      }, undefined, (error) => {
         console.warn('Could not load childhood house model.', error);
       });
     }
@@ -2486,9 +2690,13 @@ function startMainRoomBackgroundLoads() {
   mainRoomBackgroundLoadsStarted = true;
   const textureLoader = new THREE.TextureLoader();
   figureClusters.forEach((cluster) => {
+    if (mainRoomLoadedImages.has(cluster.image)) return;
+    mainRoomLoadedImages.add(cluster.image);
     textureLoader.load(cluster.image, (texture) => addFigureCluster(cluster, texture));
   });
   resumePages.forEach((page) => {
+    if (mainRoomLoadedImages.has(page.image)) return;
+    mainRoomLoadedImages.add(page.image);
     textureLoader.load(page.image, (texture) => addResumePage(page, texture));
   });
 }
@@ -2601,6 +2809,7 @@ function maybeStartRoomBackgroundPreloads() {
     () => startArtRoomLoads(),
     () => startGameRoomLoads()
   ], 900, 700);
+  queueGalleryMiniatureRefreshes();
 }
 
 function maybeLoadNearbyRoomContent() {
@@ -5048,6 +5257,7 @@ function addVideoWork(work, posterTexture) {
   const entry = {
     title: work.title || 'Video display',
     activationBounds: work.activationBounds,
+    posterImage: work.posterImage,
     element: video,
     frameCallback: 0,
     interactionRadius: work.interactionRadius || Math.min(work.playDistance || 6, 5.8),
@@ -5377,12 +5587,10 @@ function isWalkablePosition(x, z) {
   const clearOfMugDisplays = MUG_DISPLAYS.every(
     (display) => Math.hypot(x - display.x, z - display.z) >= 0.92
   );
-  const clearOfHouseDisplay = Math.abs(x - HOUSE_DISPLAY.x) > HOUSE_DISPLAY.width / 2 + 0.48
-    || Math.abs(z - HOUSE_DISPLAY.z) > HOUSE_DISPLAY.depth / 2 + 0.48;
   const clearOfManualVideoDisplays = manualVideoEntries.every(
     (entry) => Math.hypot(x - entry.position.x, z - entry.position.z) >= 0.82
   );
-  const artRoom = insideArtRoom && clearOfMugDisplays && clearOfHouseDisplay && clearOfManualVideoDisplays;
+  const artRoom = insideArtRoom && clearOfMugDisplays && clearOfManualVideoDisplays;
   return mainRoom || screeningHallway || screeningRoom || brainHallway || brainRoom
     || appHallway || appRoom || gameHallway || gameRoom || videosHallway || videosRoom || emptyGameHallway || brainMriConnection || emptyGameRoom
     || artHallway || artRoom;
@@ -5706,6 +5914,12 @@ function initializeGallery() {
   });
   posters.forEach((poster) => {
     textureLoader.load(poster.wallImage, (texture) => addPoster(poster, texture));
+  });
+  // The two resume pages are visible in the first Research room. Include them
+  // in the initial gate so visitors do not enter an otherwise empty room.
+  resumePages.forEach((page) => {
+    mainRoomLoadedImages.add(page.image);
+    textureLoader.load(page.image, (texture) => addResumePage(page, texture));
   });
   textureLoader.load(videoWork.posterImage, (texture) => addVideoWork(videoWork, texture));
   resize();
