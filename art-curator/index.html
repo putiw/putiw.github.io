@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Art Room Curator</title>
+  <meta name="description" content="A private local tool for organizing artwork before placing it in the 3D gallery.">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-copy">
+      <p class="eyebrow">Private local workspace</p>
+      <h1>Art room curator</h1>
+      <p>Choose any number of highlights in each category, and mark the works you prefer at eye level. Everything else will fill the upper and lower wall space automatically.</p>
+    </div>
+
+    <div class="header-actions">
+      <button id="save-button" class="button primary" type="button">Save now</button>
+      <button id="export-button" class="button" type="button">Export JSON</button>
+      <span id="save-status" class="save-status" role="status">Loading…</span>
+    </div>
+  </header>
+
+  <section class="toolbar" aria-label="Artwork filters">
+    <div class="progress-block">
+      <strong id="progress-count">0 of 89 described</strong>
+      <span id="star-count">0 key artworks selected</span>
+    </div>
+
+    <label class="filter-field">
+      <span>Search</span>
+      <input id="search-input" type="search" placeholder="Name, note, or filename">
+    </label>
+
+    <label class="filter-field">
+      <span>Show category</span>
+      <select id="category-filter">
+        <option value="all">All artwork</option>
+        <option value="unassigned">No category yet</option>
+        <option value="starred">Highlights only</option>
+        <option value="eye-level">Eye-level works only</option>
+      </select>
+    </label>
+  </section>
+
+  <section class="suggestions" aria-labelledby="suggestions-title">
+    <span id="suggestions-title">Category ideas</span>
+    <div class="suggestion-list">
+      <button type="button" data-filter-category="Colored stuff">Colored stuff</button>
+      <button type="button" data-filter-category="Black and white stuff">Black and white stuff</button>
+      <button type="button" data-filter-category="Stuff I did when I was sick">Stuff I did when I was sick</button>
+      <button type="button" data-filter-category="Stuff I did for others">Stuff I did for others</button>
+      <button type="button" data-filter-category="Random stuff">Random stuff</button>
+      <button type="button" data-filter-category="Cat">Cat</button>
+      <button type="button" data-filter-category="Apartment">Apartment</button>
+    </div>
+  </section>
+
+  <main>
+    <div id="art-grid" class="art-grid" aria-live="polite"></div>
+    <p id="empty-state" class="empty-state" hidden>No artwork matches these filters.</p>
+  </main>
+
+  <datalist id="category-suggestions">
+    <option value="Colored stuff"></option>
+    <option value="Black and white stuff"></option>
+    <option value="Stuff I did when I was sick"></option>
+    <option value="Stuff I did for others"></option>
+    <option value="Random stuff"></option>
+    <option value="Cat"></option>
+    <option value="Apartment"></option>
+  </datalist>
+
+  <dialog id="image-dialog" class="image-dialog">
+    <form method="dialog">
+      <button class="dialog-close" aria-label="Close image preview">Close</button>
+    </form>
+    <img id="dialog-image" alt="">
+    <p id="dialog-filename"></p>
+  </dialog>
+
+  <template id="art-card-template">
+    <article class="art-card">
+      <button class="image-button" type="button" aria-label="Open larger image preview">
+        <img class="art-image" loading="lazy" decoding="async" alt="">
+        <span class="source-type"></span>
+      </button>
+
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="item-number"></span>
+          <span class="original-filename"></span>
+        </div>
+
+        <div class="priority-controls">
+          <button class="feature-toggle" type="button" aria-pressed="false">
+            <span class="star" aria-hidden="true">☆</span>
+            <span>Highlight</span>
+          </button>
+
+          <button class="eye-toggle" type="button" aria-pressed="false">
+            <span class="eye-mark" aria-hidden="true">○</span>
+            <span>Eye level</span>
+          </button>
+        </div>
+
+        <label>
+          <span>Name</span>
+          <input class="name-input" type="text" maxlength="100" placeholder="Name this work">
+        </label>
+
+        <label>
+          <span>Category</span>
+          <input class="category-input" type="text" maxlength="80" list="category-suggestions" placeholder="Choose or type a category">
+        </label>
+
+        <label>
+          <span>Text for highlighted display</span>
+          <textarea class="note-input" maxlength="220" rows="3" placeholder="Optional short text for this work"></textarea>
+        </label>
+      </div>
+    </article>
+  </template>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>

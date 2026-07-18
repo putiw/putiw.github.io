@@ -47,6 +47,7 @@ a:hover {
 .document-actions {
   display: flex;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 11px;
 }
@@ -70,6 +71,18 @@ a:hover {
 .document-actions .play-game-link {
   color: var(--blue);
   border-color: var(--blue);
+}
+
+.document-actions .gallery-link {
+  color: #fff;
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.document-actions .gallery-link:hover {
+  color: #fff;
+  background: #0f536f;
+  border-color: #0f536f;
 }
 
 .document-actions .play-game-link:hover {

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071117">
+  <meta name="description" content="Interactive Three.js render of left and right cortical surfaces.">
+  <title>Cortical Surface Render — Puti Wen</title>
+  <link rel="stylesheet" href="brain-surface.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.177.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.177.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main class="surface-shell">
+    <header class="surface-header">
+      <div>
+        <a class="back-link" href="./">← Puti Wen</a>
+        <h1>Cortical surface</h1>
+        <p class="subtitle">FreeSurfer <code>.pial</code> meshes · interactive Three.js render</p>
+      </div>
+      <div class="load-state" aria-live="polite">
+        <span class="state-dot" aria-hidden="true"></span>
+        <span id="load-state">Loading surfaces…</span>
+      </div>
+    </header>
+
+    <section class="surface-stage" aria-label="Interactive cortical surface viewer">
+      <div id="viewer" class="viewer" role="img" aria-label="Interactive 3D render of the left and right cortical surfaces"></div>
+      <div class="viewer-hint">Drag to orbit&nbsp; · &nbsp;Scroll to zoom&nbsp; · &nbsp;Shift-drag to pan</div>
+      <div class="viewer-error" id="viewer-error" hidden>
+        <strong>Could not load the cortical surfaces.</strong>
+        <span>Run this page from a local web server so the browser can fetch the binary mesh files.</span>
+      </div>
+    </section>
+
+    <section class="surface-controls" aria-label="Viewer controls">
+      <div class="control-group hemisphere-controls">
+        <span class="control-label">Hemisphere</span>
+        <label class="toggle toggle-left"><input id="show-left" type="checkbox" checked><span>Left</span></label>
+        <label class="toggle toggle-right"><input id="show-right" type="checkbox" checked><span>Right</span></label>
+      </div>
+      <div class="control-group">
+        <span class="control-label">Surface</span>
+        <label class="select-wrap">
+          <span class="visually-hidden">Surface style</span>
+          <select id="surface-style">
+            <option value="solid">Solid</option>
+            <option value="wireframe">Wireframe</option>
+          </select>
+        </label>
+      </div>
+      <button id="reset-view" class="reset-button" type="button">Reset view</button>
+    </section>
+
+    <footer class="surface-footer">
+      <div class="legend"><span class="legend-swatch left-swatch"></span>Left hemisphere <span class="legend-swatch right-swatch"></span>Right hemisphere</div>
+      <div id="mesh-stats">Preparing mesh data…</div>
+    </footer>
+  </main>
+
+  <script type="module" src="brain-surface.js"></script>
+</body>
+</html>

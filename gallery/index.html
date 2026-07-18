@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puti Wen - Research Poster Gallery</title>
+  <meta name="description" content="Walk through an interactive 3D gallery of research posters, app demonstrations, selected paper figures, a screening room, and an art gallery.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#f1f0ed">
+  <link rel="canonical" href="https://putiw.github.io/gallery/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Puti Wen - Research Poster Gallery">
+  <meta property="og:description" content="An interactive 3D gallery of research posters, app demonstrations, selected paper figures, a screening room, and an art gallery.">
+  <meta property="og:url" content="https://putiw.github.io/gallery/">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three.module.min.js",
+      "three/addons/controls/PointerLockControls.js": "./vendor/PointerLockControls.js"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Puti Wen - Research Poster Gallery",
+    "url": "https://putiw.github.io/gallery/",
+    "description": "Research posters, a film, and selected paper figures spanning visual neuroscience, multiple sclerosis imaging, research collaboration, and public engagement.",
+    "about": {
+      "@type": "Person",
+      "name": "Puti Wen",
+      "url": "https://putiw.github.io/"
+    },
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": [
+        {
+          "@type": "CreativeWork",
+          "position": 1,
+          "name": "Localizing visual motion area FST in human",
+          "author": ["Puti Wen", "Rania Ezzo", "Michael S. Landy", "Bas Rokers"]
+        },
+        {
+          "@type": "CreativeWork",
+          "position": 2,
+          "name": "Single-trial fMRI decoding of 3D motion with stereoscopic and perspective cues",
+          "author": ["Puti Wen", "Michael S. Landy", "Bas Rokers"]
+        },
+        {
+          "@type": "CreativeWork",
+          "position": 3,
+          "name": "Center for Brain and Health"
+        }
+      ]
+    }
+  }
+  </script>
+</head>
+<body>
+  <main class="gallery-app" id="gallery-app">
+    <canvas id="gallery-canvas" aria-label="Interactive 3D research poster gallery"></canvas>
+
+    <header class="gallery-header">
+      <nav class="header-actions" aria-label="Gallery options">
+        <button type="button" id="help-button">Controls</button>
+      </nav>
+    </header>
+
+    <section class="loading-screen" id="loading-screen" aria-live="polite">
+      <div class="loading-card">
+        <p class="eyebrow">Selected work / Research archive</p>
+        <h1>Preparing the gallery</h1>
+        <div class="loading-track" aria-hidden="true"><i id="loading-bar"></i></div>
+        <p id="loading-status">Loading room and artwork...</p>
+      </div>
+    </section>
+
+    <section class="welcome-screen" id="welcome-screen" hidden>
+      <div class="welcome-card">
+        <p class="eyebrow" id="welcome-eyebrow">Interactive research archive</p>
+        <h1 id="welcome-title">Walk through the work.</h1>
+        <p class="welcome-copy" id="welcome-copy">Eight posters, six app demos, a figure salon, a dark screening room, and an art gallery ready for future work.</p>
+        <div class="welcome-actions">
+          <button class="primary-button" type="button" id="enter-button">Enter gallery</button>
+        </div>
+        <div class="movement-guide" aria-label="Movement controls">
+          <div class="key-cluster" aria-hidden="true">
+            <div class="key-row"><kbd>W</kbd></div>
+            <div class="key-row"><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div>
+          </div>
+          <div class="movement-copy">
+            <strong>Move with WASD</strong>
+            <span>Mouse looks around the room</span>
+          </div>
+        </div>
+        <p class="control-summary" id="control-summary"><kbd>←</kbd> <kbd>→</kbd> skip a focused video by 5 seconds <span>/</span> <kbd>Space</kbd> or <kbd>↑</kbd> jump <span>/</span> <kbd>↓</kbd> crouch</p>
+      </div>
+    </section>
+
+    <div class="reticle" id="reticle" aria-hidden="true" hidden><i></i></div>
+
+    <aside class="focus-card" id="focus-card" aria-live="polite" hidden>
+      <small>Artwork in view</small>
+      <strong id="focus-title"></strong>
+      <span>Press <kbd>E</kbd> or click to examine</span>
+    </aside>
+
+    <p class="walk-hint" id="walk-hint" hidden><kbd>WASD</kbd> move &nbsp; Mouse to look &nbsp; <kbd>←</kbd> <kbd>→</kbd> video ±5 sec &nbsp; <kbd>Space</kbd> / <kbd>↑</kbd> jump &nbsp; <kbd>↓</kbd> crouch</p>
+
+    <section class="poster-index" id="poster-index" hidden aria-label="Poster index">
+      <header>
+        <div>
+          <p class="eyebrow">Selected work</p>
+          <h2>Research poster index</h2>
+          <p>Open any poster for a high-resolution view. The full-size image loads only when requested.</p>
+        </div>
+        <button class="close-button" type="button" id="close-index" aria-label="Close poster index">Close</button>
+      </header>
+      <div class="poster-grid">
+        <button class="poster-card" type="button" data-poster="fst">
+          <img src="posters/fst-wall.webp" alt="Preview of the Localizing visual motion area FST in human poster" width="3072" height="1808" loading="lazy">
+          <span class="poster-card-copy">
+            <small>Visual neuroscience</small>
+            <strong>Localizing visual motion area FST in human</strong>
+            <em>VSS poster - 2024</em>
+          </span>
+        </button>
+        <button class="poster-card" type="button" data-poster="decoding">
+          <img src="posters/decoding-wall.webp" alt="Preview of the single-trial fMRI decoding of 3D motion poster" width="3072" height="1728" loading="lazy">
+          <span class="poster-card-copy">
+            <small>fMRI and computational neuroscience</small>
+            <strong>Single-trial fMRI decoding of 3D motion with stereoscopic and perspective cues</strong>
+            <em>Research poster - 2023</em>
+          </span>
+        </button>
+        <button class="poster-card" type="button" data-poster="cbh">
+          <img src="posters/cbh-wall.webp" alt="Preview of the Center for Brain and Health overview poster" width="3072" height="1690" loading="lazy">
+          <span class="poster-card-copy">
+            <small>Clinical and translational neuroscience</small>
+            <strong>Center for Brain and Health</strong>
+            <em>Center for Brain and Health overview - 2025</em>
+          </span>
+        </button>
+        <button class="poster-card portrait" type="button" data-poster="ms-lesion-metrics">
+          <img src="posters/ms-lesion-metrics-wall.webp" alt="Preview of the tract-specific lesion load and quantitative MRI poster" width="1450" height="2048" loading="lazy">
+          <span class="poster-card-copy">
+            <small>Multiple sclerosis neuroimaging</small>
+            <strong>Enhanced Prediction of Multiple Sclerosis Disabilities Using Tract-Specific Lesion Load and Advanced Quantitative MRI Metrics</strong>
+            <em>Multiple sclerosis research poster - 2025</em>
+          </span>
+        </button>
+        <button class="poster-card portrait" type="button" data-poster="ohbm-pdi">
+          <img src="posters/ohbm-pdi-wall.webp" alt="Preview of the MP2RAGE ventricle distance profiling poster" width="1450" height="2048" loading="lazy">
+          <span class="poster-card-copy">
+            <small>Multiple sclerosis neuroimaging</small>
+            <strong>MP2RAGE Ventricle Distance Profiling Improves Classification of Multiple Sclerosis Subtypes</strong>
+            <em>OHBM poster - 2025</em>
+          </span>
+        </button>
+        <button class="poster-card portrait" type="button" data-poster="ms-research-day">
+          <img src="posters/ms-research-day-wall.webp" alt="Preview of the MS Research Day event banner" width="891" height="2048" loading="lazy">
+          <span class="poster-card-copy">
+            <small>Research engagement and outreach</small>
+            <strong>MS Research Day</strong>
+            <em>Made this banner for an event for the National Multiple Sclerosis Society and NYU Abu Dhabi - 5 November 2025</em>
+          </span>
+        </button>
+        <button class="poster-card portrait" type="button" data-poster="laminate">
+          <img src="posters/laminate-wall.webp" alt="Preview of the NMSS one pager" width="1449" height="2048" loading="lazy">
+          <span class="poster-card-copy">
+            <small>Multiple sclerosis collaboration</small>
+            <strong>NMSS one pager</strong>
+            <em>Made this one pager for the National Multiple Sclerosis Society - 2025</em>
+          </span>
+        </button>
+        <button class="poster-card portrait" type="button" data-poster="menactrims-cvsview">
+          <img src="posters/menactrims-cvsview-wall.webp" alt="Preview of the CVS-View central vein sign identification poster" width="1240" height="2048" loading="lazy">
+          <span class="poster-card-copy">
+            <small>Multiple sclerosis software and AI</small>
+            <strong>CVS-View: AI-powered central vein sign identification</strong>
+            <em>MENACTRIMS poster - 5-6 December 2025</em>
+          </span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="poster-dialog" id="poster-dialog">
+    <form method="dialog" class="dialog-bar">
+      <div>
+        <p class="eyebrow" id="dialog-category"></p>
+        <h2 id="dialog-title"></h2>
+        <p id="dialog-authors"></p>
+      </div>
+      <button class="close-button" value="close" aria-label="Close poster">Close</button>
+    </form>
+    <div class="poster-detail-frame">
+      <div class="detail-loading" id="detail-loading">Loading high-resolution poster...</div>
+      <img id="dialog-image" alt="">
+    </div>
+  </dialog>
+
+  <dialog class="help-dialog" id="help-dialog">
+    <form method="dialog">
+      <p class="eyebrow">Gallery controls</p>
+      <h2>Move like a first-person game.</h2>
+      <dl>
+        <div><dt><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd></dt><dd>Walk and strafe</dd></div>
+        <div><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Skip a focused video backward or forward by 5 seconds</dd></div>
+        <div><dt><kbd>Space</kbd> or <kbd>↑</kbd></dt><dd>Jump</dd></div>
+        <div><dt><kbd>↓</kbd></dt><dd>Hold to crouch</dd></div>
+        <div><dt>Mouse</dt><dd>Change the camera angle</dd></div>
+        <div><dt><kbd>E</kbd> or click</dt><dd>Open a poster; tap E to play or pause a video, and hold E to restart it</dd></div>
+        <div><dt><kbd>Esc</kbd></dt><dd>Release the mouse and pause</dd></div>
+      </dl>
+      <button class="primary-button" value="close">Got it</button>
+    </form>
+  </dialog>
+
+  <noscript>
+    <section class="noscript-message">
+      <h1>Research Poster Gallery</h1>
+      <p>This interactive gallery requires JavaScript. The poster images are still available below.</p>
+      <p><a href="posters/fst-detail.webp">Localizing visual motion area FST in human</a></p>
+      <p><a href="posters/decoding-detail.webp">Single-trial fMRI decoding of 3D motion</a></p>
+      <p><a href="posters/cbh-detail.webp">Center for Brain and Health</a></p>
+      <p><a href="posters/ms-lesion-metrics-detail.webp">Enhanced Prediction of Multiple Sclerosis Disabilities</a></p>
+      <p><a href="posters/ohbm-pdi-detail.webp">MP2RAGE Ventricle Distance Profiling</a></p>
+      <p><a href="posters/ms-research-day-detail.webp">MS Research Day</a></p>
+      <p><a href="posters/laminate-detail.webp">NMSS one pager</a></p>
+      <p><a href="posters/menactrims-cvsview-detail.webp">CVS-View: AI-powered central vein sign identification</a></p>
+    </section>
+  </noscript>
+
+  <script type="module" src="gallery.js?v=20260718-mri-shell22"></script>
+</body>
+</html>
