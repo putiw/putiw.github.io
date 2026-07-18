@@ -5558,9 +5558,13 @@ function enterGallery() {
   }, 420);
 }
 
-async function initializeGallery() {
+function initializeGallery() {
   if (document.fonts?.load) {
-    await Promise.all([
+    // Warm the wall-text font in parallel with renderer and texture setup.
+    // Waiting here made the loading screen sit at its CSS 4% start position
+    // until the font request completed, even though the gallery had not
+    // begun its actual asset queue yet.
+    Promise.all([
       document.fonts.load('400 78px "Inter"'),
       document.fonts.load('italic 400 70px "Inter"')
     ]).catch(() => {});
@@ -5670,6 +5674,11 @@ async function initializeGallery() {
   manager.onError = () => {
     loadingStatus.textContent = 'An artwork preview could not be loaded. The poster index is still available.';
   };
+
+  // Move the visual progress off the static CSS starting point as soon as
+  // the core scene and manager exist, before the first texture finishes.
+  setLoadingProgressTarget(6);
+  loadingStatus.textContent = 'Loading core gallery assets...';
 
   const textureLoader = new THREE.TextureLoader(manager);
   [defenseScreeningWork, ...appDemoWorks, ...myPhysioVideoWorks].forEach((work) => {
