@@ -161,7 +161,7 @@ const videoWork = {
 };
 
 const BRAIN_WALL_SHEETS = [
-  { image: './brain-room/brain-pdf-3.png', side: 'north' },
+  { image: './brain-room/brain-pdf-3.png', side: 'north', aspect: 1076 / 1051 },
   { image: './brain-room/brain-pdf-2.png', side: 'east' },
   { image: './brain-room/brain-pdf-1.png', side: 'floor', aspect: 1487 / 1051 }
 ];
@@ -846,13 +846,23 @@ let backgroundGalleryLoadsStarted = false;
 let lastDragX = 0;
 let lastDragY = 0;
 let lastFrame = performance.now();
-let deferredSceneLoadsStarted = false;
 let brainSurfaceLoadStarted = false;
+let mriWallLoadsStarted = false;
+let brainWallLoadsStarted = false;
+let gameRoomLoadsStarted = false;
+let gameRoomKiosksReady = false;
+let researchRoomLoadsStarted = false;
+let mainRoomBackgroundLoadsStarted = false;
+let defenseRoomBackgroundPreloadsQueued = false;
+let appRoomBackgroundPreloadsQueued = false;
 let animationFrame = 0;
 let eHoldTimer = 0;
 let eHoldTarget = null;
 let eHoldTriggered = false;
 let eHoldWasPlaying = false;
+let loadingDisplayProgress = 0;
+let loadingProgressTarget = 0;
+let loadingProgressAnimation = 0;
 const shrimpRoomMusic = new Audio('./media/shrimp-game-music.mp3?v=20260717');
 shrimpRoomMusic.loop = true;
 shrimpRoomMusic.preload = 'auto';
@@ -2266,6 +2276,7 @@ function createStandingVideoDisplay(work, posterTexture) {
     texture: videoTexture,
     preloadPriority: work.preloadPriority || 0,
     userPaused: false,
+    playbackStarted: false,
     manualOnly: Boolean(work.manualOnly),
     manualActivated: false,
     requireInteractionRange: Boolean(work.requireInteractionRange),
@@ -2420,50 +2431,180 @@ function replaceVideoPosterTexture(entry, texture) {
   needsRender = true;
 }
 
-function startBackgroundGalleryLoads() {
+function startArtRoomLoads() {
   if (backgroundGalleryLoadsStarted) return;
   backgroundGalleryLoadsStarted = true;
   const textureLoader = new THREE.TextureLoader();
+  const tshirtWallSheet = ART_WALL_SHEETS.find((sheet) => sheet.side === 'far');
+  const remainingArtWallSheets = ART_WALL_SHEETS.filter((sheet) => sheet !== tshirtWallSheet);
+  const jobs = [
+    ...MUG_DISPLAYS.map((config) => () => {
+      textureLoader.load(config.texture, (texture) => createMugDisplay(texture, config));
+    }),
+    () => {
+      if (!tshirtWallSheet) return;
+      textureLoader.load(
+        tshirtWallSheet.image,
+        (texture) => addArtWallSheet(tshirtWallSheet, texture)
+      );
+    },
+    () => createArtGallery(),
+    ...remainingArtWallSheets.map((sheet) => () => {
+      textureLoader.load(sheet.image, (texture) => addArtWallSheet(sheet, texture));
+    }),
+    () => {
+      const houseRainEntry = createHouseRainDisplay(createVideoPlaceholderTexture());
+      textureLoader.load(
+        HOUSE_RAIN_DISPLAY.posterImage,
+        (texture) => replaceVideoPosterTexture(houseRainEntry, texture)
+      );
+    },
+    () => {
+      const houseLoader = new GLTFLoader();
+      houseLoader.load(HOUSE_DISPLAY.model, createHouseDisplay, undefined, (error) => {
+        console.warn('Could not load childhood house model.', error);
+      });
+    }
+  ];
+  scheduleLowPriorityGallerySequence(jobs, 0, 360);
+}
 
-  createArtWallSheets(textureLoader);
-  MUG_DISPLAYS.forEach((config) => {
-    textureLoader.load(config.texture, (texture) => createMugDisplay(texture, config));
+function startMainRoomBackgroundLoads() {
+  if (mainRoomBackgroundLoadsStarted) return;
+  mainRoomBackgroundLoadsStarted = true;
+  const textureLoader = new THREE.TextureLoader();
+  figureClusters.forEach((cluster) => {
+    textureLoader.load(cluster.image, (texture) => addFigureCluster(cluster, texture));
   });
-
-  const houseRainEntry = createHouseRainDisplay(createVideoPlaceholderTexture());
-  textureLoader.load(
-    HOUSE_RAIN_DISPLAY.posterImage,
-    (texture) => replaceVideoPosterTexture(houseRainEntry, texture)
-  );
-
-  GAME_DISPLAY_WORKS.forEach((work) => {
-    textureLoader.load(
-      work.posterImage,
-      (texture) => createStandingVideoDisplay(work, texture),
-      undefined,
-      () => createStandingVideoDisplay(work, createVideoPlaceholderTexture())
-    );
-  });
-
-  const houseLoader = new GLTFLoader();
-  houseLoader.load(HOUSE_DISPLAY.model, createHouseDisplay, undefined, (error) => {
-    console.warn('Could not load childhood house model.', error);
-  });
-
   resumePages.forEach((page) => {
     textureLoader.load(page.image, (texture) => addResumePage(page, texture));
   });
 }
 
-function startDeferredSceneLoads() {
-  if (deferredSceneLoadsStarted) return;
-  deferredSceneLoadsStarted = true;
+function startResearchRoomLoads() {
+  if (researchRoomLoadsStarted) return;
+  researchRoomLoadsStarted = true;
   const textureLoader = new THREE.TextureLoader();
-
-  MRI_WALL_SHEETS.forEach((sheet) => {
-    textureLoader.load(sheet.image, (texture) => addMriWallSheet(sheet, texture));
+  // The defense, app-demo, and physiology video posters are part of the
+  // initial manager queue. Re-adding them here would create a second video
+  // at the same wall position and make the first frame appear to reset.
+  const jobs = myPhysioImageWorks.map((work) => () => {
+    textureLoader.load(work.image, (texture) => addImageWork(work, texture));
   });
-  createGameWallSheets(textureLoader);
+  scheduleLowPriorityGallerySequence(jobs, 0, 260);
+}
+
+function startMriWallLoads() {
+  if (mriWallLoadsStarted) return;
+  mriWallLoadsStarted = true;
+  const textureLoader = new THREE.TextureLoader();
+  scheduleLowPriorityGallerySequence(
+    MRI_WALL_SHEETS.map((sheet) => () => {
+      textureLoader.load(sheet.image, (texture) => addMriWallSheet(sheet, texture));
+    }),
+    0,
+    420
+  );
+}
+
+function startBrainWallLoads() {
+  if (brainWallLoadsStarted) return;
+  brainWallLoadsStarted = true;
+  const textureLoader = new THREE.TextureLoader();
+  scheduleLowPriorityGallerySequence(
+    BRAIN_WALL_SHEETS.map((sheet) => () => {
+      textureLoader.load(sheet.image, (texture) => addBrainWallSheet(sheet, texture));
+    }),
+    0,
+    420
+  );
+}
+
+function startGameRoomLoads() {
+  if (gameRoomLoadsStarted) return;
+  gameRoomLoadsStarted = true;
+  const textureLoader = new THREE.TextureLoader();
+  const shrimpKiosk = GAME_DISPLAY_WORKS.find((work) => work.title === 'Shrimp');
+  const otherKiosks = GAME_DISPLAY_WORKS.filter((work) => work !== shrimpKiosk);
+  const kioskWorks = [shrimpKiosk, ...otherKiosks].filter(Boolean);
+  let readyKioskCount = 0;
+  const markKioskReady = () => {
+    readyKioskCount += 1;
+    if (readyKioskCount === kioskWorks.length) gameRoomKiosksReady = true;
+  };
+  const jobs = [
+    ...kioskWorks.map((work) => () => {
+      textureLoader.load(
+        work.posterImage,
+        (texture) => {
+          createStandingVideoDisplay(work, texture);
+          markKioskReady();
+        },
+        undefined,
+        () => {
+          createStandingVideoDisplay(work, createVideoPlaceholderTexture());
+          markKioskReady();
+        }
+      );
+    }),
+    ...GAME_WALL_SHEETS.map((sheet) => () => {
+      textureLoader.load(sheet.image, (texture) => addGameWallSheet(sheet, texture));
+    })
+  ];
+  if (!kioskWorks.length) gameRoomKiosksReady = true;
+  scheduleLowPriorityGallerySequence(jobs, 0, 300);
+}
+
+function isCameraNearRoom(room, margin = 2) {
+  const roomLeft = room.centerX - room.halfWidth;
+  const roomRight = room.centerX + room.halfWidth;
+  const roomNear = room.nearZ;
+  const roomFar = room.farZ;
+  const nearestX = Math.max(roomLeft, Math.min(camera.position.x, roomRight));
+  const nearestZ = Math.max(roomNear, Math.min(camera.position.z, roomFar));
+  return Math.hypot(camera.position.x - nearestX, camera.position.z - nearestZ) <= margin;
+}
+
+function isCameraInsideRoom(room, margin = 0.35) {
+  const roomLeft = room.centerX - room.halfWidth;
+  const roomRight = room.centerX + room.halfWidth;
+  return camera.position.x >= roomLeft + margin
+    && camera.position.x <= roomRight - margin
+    && camera.position.z >= room.nearZ + margin
+    && camera.position.z <= room.farZ - margin;
+}
+
+function maybeStartRoomBackgroundPreloads() {
+  if (!galleryActive || !sceneReady) return;
+
+  if (!defenseRoomBackgroundPreloadsQueued && isCameraInsideRoom(SCREENING_ROOM)) {
+    defenseRoomBackgroundPreloadsQueued = true;
+    // Spread the large Brain/MRI work across separate idle windows so it
+    // cannot compete with movement or a camera turn in one frame.
+    scheduleLowPriorityGalleryWork(() => startBrainWallLoads(), 700);
+    scheduleLowPriorityGalleryWork(() => requestBrainSurfaceLoad(), 2200);
+    scheduleLowPriorityGalleryWork(() => startMriWallLoads(), 3800);
+  }
+
+  if (!appRoomBackgroundPreloadsQueued && isCameraInsideRoom(APP_ROOM)) {
+    appRoomBackgroundPreloadsQueued = true;
+    // Art has the larger scene/model queue; let it begin first, then start
+    // the Game/Video room assets after another idle window.
+    scheduleLowPriorityGalleryWork(() => startArtRoomLoads(), 700);
+    scheduleLowPriorityGalleryWork(() => startGameRoomLoads(), 1800);
+  }
+}
+
+function maybeLoadNearbyRoomContent() {
+  if (!galleryActive || !sceneReady) return;
+
+  if (isCameraNearRoom(ART_ROOM, 2.5)) startArtRoomLoads();
+  if (isCameraNearRoom(GAME_ROOM, 3) || isCameraNearRoom(VIDEOS_ROOM, 3)) startGameRoomLoads();
+  if (isCameraNearRoom(EMPTY_GAME_ROOM, 3)) startMriWallLoads();
+  if (isCameraNearRoom(BRAIN_ROOM, 3)) startBrainWallLoads();
+  if (isCameraNearRoom(APP_ROOM, 3) || isCameraNearRoom(SCREENING_ROOM, 3)) {
+    startResearchRoomLoads();
+  }
 }
 
 function scheduleLowPriorityGalleryWork(callback, delay = 1200) {
@@ -2474,6 +2615,25 @@ function scheduleLowPriorityGalleryWork(callback, delay = 1200) {
     }
     callback();
   }, delay);
+}
+
+function scheduleLowPriorityGallerySequence(jobs, initialDelay = 0, gap = 300) {
+  let cursor = 0;
+  const scheduleNext = (delay) => {
+    if (cursor >= jobs.length) return;
+    const job = jobs[cursor];
+    cursor += 1;
+    scheduleLowPriorityGalleryWork(() => {
+      try {
+        job();
+      } finally {
+        scheduleNext(gap);
+      }
+    }, delay);
+  };
+  // Leave a small gap after the room trigger so the current movement frame
+  // finishes before the first background request is started.
+  scheduleNext(Math.max(180, initialDelay));
 }
 
 function requestBrainSurfaceLoad() {
@@ -3683,7 +3843,7 @@ function addMriRoomIntroStatement() {
   let textTop = Math.max(80, (statementCanvas.height - totalTextHeight) / 2 - 90);
   statementParagraphs.forEach((lines) => {
     lines.forEach((line) => {
-      context.fillText(line, 520, textTop);
+      context.fillText(line, statementCanvas.width / 2, textTop);
       textTop += lineHeight;
     });
     textTop += paragraphGap;
@@ -3866,11 +4026,14 @@ function addBrainWallSheet(sheet, texture) {
   if (sheet.side === 'floor') {
     const floorWidth = BRAIN_ROOM.halfWidth * 2 - 0.3;
     const floorDepth = BRAIN_ROOM.farZ - BRAIN_ROOM.nearZ - 0.3;
-    const width = Math.min(floorWidth, floorDepth * sheet.aspect);
+    // Rotate the artwork on the floor while preserving its original aspect
+    // ratio and keeping the rotated footprint inside the room.
+    const width = Math.min(floorDepth, floorWidth * sheet.aspect);
     const depth = width / sheet.aspect;
     const sheetMesh = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), material);
     sheetMesh.position.set(BRAIN_ROOM.centerX, 0.006, roomMiddleZ);
     sheetMesh.rotation.x = -Math.PI / 2;
+    sheetMesh.rotation.z = -Math.PI / 2;
     scene.add(sheetMesh);
     needsRender = true;
     return;
@@ -3880,10 +4043,16 @@ function addBrainWallSheet(sheet, texture) {
     : sheet.side === 'west'
       ? BRAIN_ROOM.farZ - westSheetStartZ
     : BRAIN_ROOM.halfWidth * 2;
-  const sheetMesh = new THREE.Mesh(new THREE.PlaneGeometry(width, height), material);
+  const northWidth = sheet.side === 'north'
+    ? Math.min(width, height * sheet.aspect)
+    : width;
+  const northHeight = sheet.side === 'north'
+    ? northWidth / sheet.aspect
+    : height;
+  const sheetMesh = new THREE.Mesh(new THREE.PlaneGeometry(northWidth, northHeight), material);
 
   if (sheet.side === 'north') {
-    sheetMesh.position.set(BRAIN_ROOM.centerX, BRAIN_ROOM.height / 2, BRAIN_ROOM.nearZ + 0.071);
+    sheetMesh.position.set(BRAIN_ROOM.centerX, northHeight / 2, BRAIN_ROOM.nearZ + 0.071);
   } else if (sheet.side === 'east') {
     sheetMesh.position.set(BRAIN_ROOM.centerX + BRAIN_ROOM.halfWidth - 0.071, BRAIN_ROOM.height / 2, roomMiddleZ);
     sheetMesh.rotation.y = -Math.PI / 2;
@@ -4412,7 +4581,13 @@ function playVideoEntry(entry) {
     entry.element.src = entry.source;
     entry.element.load();
   }
-  if (!entry.playbackStarted) entry.element.currentTime = 0;
+  const startingPlayback = !entry.playbackStarted;
+  if (startingPlayback) {
+    entry.element.currentTime = 0;
+    // Mark this before calling play(). If visibility changes while the
+    // promise is pending, the retry must resume rather than reset to frame 1.
+    entry.playbackStarted = true;
+  }
   const enableSoundAfterStart = entry.hasSound && entry.audioEnabled;
   if (enableSoundAfterStart) enableVideoAudio(entry);
   else entry.element.muted = true;
@@ -4503,7 +4678,7 @@ function isCameraInAppRoom() {
 }
 
 function requestVideoRoomLoad() {
-  if (videoRoomLoadRequested || !galleryActive || !sceneReady || !isCameraInAppRoom()) return;
+  if (videoRoomLoadRequested || !galleryActive || !sceneReady || !isCameraInAppRoom() || !gameRoomKiosksReady) return;
   videoRoomLoadRequested = true;
   startVideoRoomLoadIfReady();
 }
@@ -5256,6 +5431,8 @@ function animate(now) {
   const delta = Math.min((now - lastFrame) / 1000, 0.05);
   lastFrame = now;
   const moved = updateMovement(delta);
+  maybeStartRoomBackgroundPreloads();
+  maybeLoadNearbyRoomContent();
   maybeLoadBrainSurface();
   requestVideoRoomLoad();
   syncFocusLockedVideos();
@@ -5304,9 +5481,31 @@ function warmInitialCamera() {
   needsRender = true;
 }
 
+function animateLoadingProgress() {
+  if (loadingProgressAnimation) return;
+  const tick = () => {
+    const remaining = loadingProgressTarget - loadingDisplayProgress;
+    if (remaining <= 0.05) {
+      loadingDisplayProgress = loadingProgressTarget;
+      loadingBar.style.width = `${loadingDisplayProgress}%`;
+      loadingProgressAnimation = 0;
+      return;
+    }
+    loadingDisplayProgress += Math.max(0.18, remaining * 0.055);
+    loadingBar.style.width = `${Math.min(100, loadingDisplayProgress)}%`;
+    loadingProgressAnimation = window.requestAnimationFrame(tick);
+  };
+  loadingProgressAnimation = window.requestAnimationFrame(tick);
+}
+
+function setLoadingProgressTarget(target) {
+  loadingProgressTarget = Math.max(loadingProgressTarget, Math.min(100, target));
+  animateLoadingProgress();
+}
+
 function finishLoading() {
   sceneReady = true;
-  loadingBar.style.width = '100%';
+  setLoadingProgressTarget(100);
   loadingStatus.textContent = 'Gallery ready.';
   warmInitialCamera();
   window.setTimeout(() => {
@@ -5315,17 +5514,6 @@ function finishLoading() {
     showWelcome('initial');
   }, 220);
 
-  // Let the first room paint and become interactive before starting the
-  // non-critical art, model, MRI, and video work. The media queue continues
-  // in the background, but no longer competes with the initial WebGL render.
-  scheduleLowPriorityGalleryWork(() => {
-    createArtGallery();
-    startBackgroundGalleryLoads();
-  }, 1400);
-  scheduleLowPriorityGalleryWork(() => {
-    startDeferredSceneLoads();
-    preloadGalleryVideos();
-  }, 3200);
 }
 
 function configureTouchFallback() {
@@ -5355,6 +5543,7 @@ function enterGallery() {
   preloadGalleryVideos();
   playAutoplayOnEntryVideos();
   requestVideoSync();
+  scheduleLowPriorityGalleryWork(() => startMainRoomBackgroundLoads(), 700);
   dragLookEnabled = false;
   galleryApp.classList.remove('drag-look', 'dragging-view');
   walkHint.textContent = 'WASD move   Mouse to look   Left/right arrows skip a focused video by 5 sec   Space/up jump   Down crouch';
@@ -5428,6 +5617,7 @@ async function initializeGallery() {
     preloadGalleryVideos();
     playAutoplayOnEntryVideos();
     requestVideoSync();
+    scheduleLowPriorityGalleryWork(() => startMainRoomBackgroundLoads(), 700);
     dragLookEnabled = false;
     galleryApp.classList.remove('drag-look', 'dragging-view');
     walkHint.textContent = 'WASD move   Mouse to look   Left/right arrows skip a focused video by 5 sec   Space/up jump   Down crouch';
@@ -5475,9 +5665,12 @@ async function initializeGallery() {
 
   const manager = new THREE.LoadingManager();
   manager.onProgress = (_url, loaded, total) => {
-    const percentage = Math.max(5, Math.round((loaded / total) * 100));
-    loadingBar.style.width = `${percentage}%`;
-    loadingStatus.textContent = `Preparing gallery ${loaded} of ${total}...`;
+    // Keep the progress display readable when the first few small assets
+    // finish together. The final stretch is reserved for the actual manager
+    // completion, so it does not jump to 26/28 and then appear frozen.
+    const percentage = 8 + (loaded / Math.max(1, total)) * 82;
+    setLoadingProgressTarget(percentage);
+    loadingStatus.textContent = 'Preparing gallery...';
   };
   manager.onLoad = finishLoading;
   manager.onError = () => {
@@ -5497,15 +5690,6 @@ async function initializeGallery() {
     textureLoader.load(poster.wallImage, (texture) => addPoster(poster, texture));
   });
   textureLoader.load(videoWork.posterImage, (texture) => addVideoWork(videoWork, texture));
-  myPhysioImageWorks.forEach((work) => {
-    textureLoader.load(work.image, (texture) => addImageWork(work, texture));
-  });
-  figureClusters.forEach((cluster) => {
-    textureLoader.load(cluster.image, (texture) => addFigureCluster(cluster, texture));
-  });
-  BRAIN_WALL_SHEETS.forEach((sheet) => {
-    textureLoader.load(sheet.image, (texture) => addBrainWallSheet(sheet, texture));
-  });
   resize();
   window.addEventListener('resize', resize, { passive: true });
   animationFrame = window.requestAnimationFrame(animate);
@@ -5515,7 +5699,7 @@ enterButton.addEventListener('click', enterGallery);
 
 closeIndexButton.addEventListener('click', hideCatalog);
 
-helpButton.addEventListener('click', () => {
+helpButton?.addEventListener('click', () => {
   galleryActive = false;
   pauseGalleryVideos();
   controls?.unlock();
