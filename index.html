@@ -57,14 +57,10 @@
 </head>
 <body>
   <div class="site-shell">
-    <div class="document-actions">
-      <a class="gallery-link" href="gallery/?v=20260719-house-floor-preview-transform12" aria-label="Open the interactive project gallery">Project gallery <span class="gallery-link-arrow" aria-hidden="true">↗</span></a>
-      <a class="play-game-link" href="shrimp-tanks/?v=20260718-latest-shrimp-build" target="_blank" rel="noopener">Play shrimp game <span aria-hidden="true">↗</span></a>
-      <a href="Puti_Wen_Resume_2026.pdf?v=20260718-resume-update" target="_blank" rel="noopener">Download PDF <span aria-hidden="true">↓</span></a>
-    </div>
-
-    <main class="cv-document">
+    <div class="home-layout">
+      <main class="cv-document">
       <article class="paper page-one" aria-label="Résumé page 1">
+        <a class="resume-download-button" href="Puti_Wen_Resume_2026.pdf?v=20260718-resume-update" target="_blank" rel="noopener">Download PDF <span aria-hidden="true">↓</span></a>
         <header class="cv-header">
           <h1>Puti Wen</h1>
           <p class="contact-line">
@@ -232,7 +228,26 @@
           <span>Puti Wen</span><i aria-hidden="true">|</i><a href="mailto:pw1246@nyu.edu">pw1246@nyu.edu</a><i aria-hidden="true">|</i><span>Page 2</span>
         </footer>
       </article>
-    </main>
+      </main>
+
+      <aside class="gallery-home-aside" aria-label="Interactive project gallery">
+        <a class="gallery-home-window" href="gallery/?v=20260719-house-floor-preview-transform14" aria-label="Open the interactive project gallery">
+          <span class="gallery-home-window-bar">
+            <span>Project gallery</span>
+            <span aria-hidden="true">↗</span>
+          </span>
+          <span class="gallery-home-window-body">
+            <span class="gallery-home-window-eyebrow">Interactive project archive</span>
+            <strong>Walk through the work.</strong>
+            <span class="gallery-home-window-copy">Eight posters, three app showcases, a figure salon, a dark screening room, a brain room, a game room, and an art room of drawings, designs, and experiments.</span>
+            <span class="gallery-home-window-progress" aria-hidden="true"><i></i></span>
+            <span class="gallery-home-window-status">Gallery ready — click to enter.</span>
+            <span class="gallery-home-window-button">Enter gallery</span>
+            <span class="gallery-home-window-controls"><kbd>WASD</kbd> move &nbsp; <kbd>Mouse</kbd> look &nbsp; <kbd>E</kbd> examine</span>
+          </span>
+        </a>
+      </aside>
+    </div>
   </div>
   <script>
     (() => {
@@ -240,8 +255,8 @@
       if (connection?.saveData || /^(slow-2g|2g)$/.test(connection?.effectiveType || '')) return;
 
       const galleryWarmupAssets = [
-        ['gallery/?v=20260719-house-floor-preview-transform12', null],
-        ['gallery/gallery.js?v=20260719-house-floor-preview-transform12', 'script'],
+        ['gallery/?v=20260719-house-floor-preview-transform14', null],
+        ['gallery/gallery.js?v=20260719-house-floor-preview-transform14', 'script'],
         ['gallery/wall-map-layout.js?v=20260718-all-door-headers-labels-contrast1-map-path1', 'script'],
         ['gallery/art/works.js', 'script'],
         ['gallery/vendor/three.module.min.js', 'script'],
@@ -251,6 +266,31 @@
         ['gallery/fonts/inter-regular.ttf', 'font'],
         ['gallery/resume/resume-page-1.jpg', 'image'],
         ['gallery/resume/resume-page-2.jpg', 'image'],
+        ['gallery/posters/fst-wall.webp', 'image'],
+        ['gallery/posters/decoding-wall.webp', 'image'],
+        ['gallery/posters/cbh-wall.webp', 'image'],
+        ['gallery/posters/ms-lesion-metrics-wall.webp', 'image'],
+        ['gallery/posters/ohbm-pdi-wall.webp', 'image'],
+        ['gallery/posters/ms-research-day-wall.webp', 'image'],
+        ['gallery/posters/laminate-wall.webp', 'image'],
+        ['gallery/posters/menactrims-cvsview-wall.webp', 'image'],
+        ['gallery/media/cbh-center-film-poster.webp', 'image'],
+        ['gallery/media/video-posters/defense-screening-web.jpg', 'image'],
+        ['gallery/media/video-posters/cvsview-lesion-mask-native.jpg', 'image'],
+        ['gallery/media/video-posters/cvsview-rapid-navigation-native.jpg', 'image'],
+        ['gallery/media/video-posters/cvsview-cvs-prl-review-web-720.jpg', 'image'],
+        ['gallery/media/video-posters/lesionview-lesion-segmentation-native.jpg', 'image'],
+        ['gallery/media/video-posters/lesionview-longitudinal-comparison-native.jpg', 'image'],
+        ['gallery/media/video-posters/lesionview-new-lesion-verification-native.jpg', 'image'],
+        ['gallery/media/video-posters/myphysio-01-app-welcome.jpg', 'image'],
+        ['gallery/media/video-posters/myphysio-02-daily-exercise.jpg', 'image'],
+        ['gallery/media/video-posters/myphysio-03-workout-tracker.jpg', 'image'],
+        ['gallery/media/video-posters/myphysio-04-pain-diary.jpg', 'image'],
+        ['gallery/media/video-posters/myphysio-05-rom-diary.jpg', 'image'],
+        ['gallery/media/video-posters/myphysio-06-manage-program.jpg', 'image'],
+        ['gallery/art/pierre-mug.webp', 'image'],
+        ['gallery/art/hadi-mug.webp', 'image'],
+        ['gallery/art/walls/colored-cats-tshirts.png?v=20260717-1915', 'image'],
         ['gallery/media/defense-screening-web.mp4?v=20260717-faststart', 'video'],
         ['gallery/media/mri-afqview-hd.m4v', 'video'],
         ['gallery/media/mri-fmri-hd.m4v', 'video'],

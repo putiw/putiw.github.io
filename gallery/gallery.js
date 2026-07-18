@@ -880,6 +880,7 @@ let gameRoomKiosksReady = false;
 let researchRoomLoadsStarted = false;
 let mainRoomBackgroundLoadsStarted = false;
 const mainRoomLoadedImages = new Set();
+const artRoomLoadedImages = new Set();
 let roomBackgroundPreloadPipelineQueued = false;
 let galleryMiniature = null;
 let galleryMiniatureRefreshesQueued = false;
@@ -2653,10 +2654,13 @@ function startArtRoomLoads() {
   const remainingArtWallSheets = ART_WALL_SHEETS.filter((sheet) => sheet !== tshirtWallSheet);
   const jobs = [
     ...MUG_DISPLAYS.map((config) => () => {
+      if (artRoomLoadedImages.has(config.texture)) return;
+      artRoomLoadedImages.add(config.texture);
       textureLoader.load(config.texture, (texture) => createMugDisplay(texture, config));
     }),
     () => {
-      if (!tshirtWallSheet) return;
+      if (!tshirtWallSheet || artRoomLoadedImages.has(tshirtWallSheet.image)) return;
+      artRoomLoadedImages.add(tshirtWallSheet.image);
       textureLoader.load(
         tshirtWallSheet.image,
         (texture) => addArtWallSheet(tshirtWallSheet, texture)
@@ -2664,6 +2668,8 @@ function startArtRoomLoads() {
     },
     () => createArtGallery(),
     ...remainingArtWallSheets.map((sheet) => () => {
+      if (artRoomLoadedImages.has(sheet.image)) return;
+      artRoomLoadedImages.add(sheet.image);
       textureLoader.load(sheet.image, (texture) => addArtWallSheet(sheet, texture));
     }),
     () => {
@@ -5921,6 +5927,20 @@ function initializeGallery() {
     mainRoomLoadedImages.add(page.image);
     textureLoader.load(page.image, (texture) => addResumePage(page, texture));
   });
+  // These are the first visible Art-room assets. Gate them with the initial
+  // loading screen, then let the rest of the Art room continue in background.
+  MUG_DISPLAYS.forEach((config) => {
+    artRoomLoadedImages.add(config.texture);
+    textureLoader.load(config.texture, (texture) => createMugDisplay(texture, config));
+  });
+  const initialTshirtWallSheet = ART_WALL_SHEETS.find((sheet) => sheet.side === 'far');
+  if (initialTshirtWallSheet) {
+    artRoomLoadedImages.add(initialTshirtWallSheet.image);
+    textureLoader.load(
+      initialTshirtWallSheet.image,
+      (texture) => addArtWallSheet(initialTshirtWallSheet, texture)
+    );
+  }
   textureLoader.load(videoWork.posterImage, (texture) => addVideoWork(videoWork, texture));
   resize();
   window.addEventListener('resize', resize, { passive: true });
