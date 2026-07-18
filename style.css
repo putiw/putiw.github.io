@@ -74,15 +74,31 @@ a:hover {
 }
 
 .document-actions .gallery-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 13px;
   color: #fff;
   background: var(--blue);
   border-color: var(--blue);
+  box-shadow: 0 3px 0 rgba(15, 83, 111, 0.18);
 }
 
 .document-actions .gallery-link:hover {
   color: #fff;
   background: #0f536f;
   border-color: #0f536f;
+  box-shadow: 0 5px 12px rgba(15, 83, 111, 0.2);
+}
+
+.gallery-link-arrow {
+  font-size: 1.15em;
+  line-height: 1;
+  transition: transform 150ms ease;
+}
+
+.document-actions .gallery-link:hover .gallery-link-arrow {
+  transform: translate(2px, -2px);
 }
 
 .document-actions .play-game-link:hover {
@@ -544,6 +560,6 @@ h2 {
 
 @media (prefers-reduced-motion: no-preference) {
   .document-actions a {
-    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
   }
 }
