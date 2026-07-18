@@ -2240,9 +2240,6 @@ function createStandingVideoDisplay(work, posterTexture) {
   angledNeck.position.set(0, -frameHeight / 2 - 0.28, -0.08);
   screenAssembly.add(angledNeck);
 
-  if (work.description) addStandingDisplayLabel(screenAssembly, work, frameHeight);
-  if (work.launchAction) addGameLaunchButton(screenAssembly, work, frameHeight);
-
   const video = document.createElement('video');
   video.className = 'gallery-video-source';
   video.poster = work.posterImage;
@@ -2262,6 +2259,15 @@ function createStandingVideoDisplay(work, posterTexture) {
   videoTexture.minFilter = THREE.LinearFilter;
   videoTexture.magFilter = THREE.LinearFilter;
   videoTexture.generateMipmaps = false;
+
+  let displayTextAdded = false;
+  const addDisplayTextAfterVideoLoad = () => {
+    if (displayTextAdded) return;
+    displayTextAdded = true;
+    if (work.description) addStandingDisplayLabel(screenAssembly, work, frameHeight);
+    if (work.launchAction) addGameLaunchButton(screenAssembly, work, frameHeight);
+  };
+  video.addEventListener('loadeddata', addDisplayTextAfterVideoLoad, { once: true });
 
   const entry = {
     title: work.title,
@@ -5077,7 +5083,9 @@ function addVideoWork(work, posterTexture) {
     needsRender = true;
   };
 
-  if (!work.videoRoom) video.addEventListener('loadeddata', activateVideoTexture, { once: true });
+  if (!work.videoRoom) {
+    video.addEventListener('loadeddata', activateVideoTexture, { once: true });
+  }
   video.addEventListener('playing', () => {
     activateVideoTexture();
     scheduleVideoFrame(entry);
@@ -5086,6 +5094,14 @@ function addVideoWork(work, posterTexture) {
     cancelVideoFrame(entry);
     needsRender = true;
   });
+
+  let wallLabelAdded = false;
+  const addWallLabelAfterVideoLoad = () => {
+    if (wallLabelAdded || work.showLabel === false) return;
+    wallLabelAdded = true;
+    addWallLabel(group, work, height);
+  };
+  video.addEventListener('loadeddata', addWallLabelAfterVideoLoad, { once: true });
 
   screen.userData.videoEntry = entry;
   videoMeshes.push(screen);
@@ -5096,7 +5112,6 @@ function addVideoWork(work, posterTexture) {
     video.src = entry.source;
     video.load();
   }
-  if (work.showLabel !== false) addWallLabel(group, work, height);
   scene.add(group);
   if (galleryActive) {
     if (entry.autoplayOnEntry) playVideoEntry(entry);
