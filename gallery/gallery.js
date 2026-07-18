@@ -205,6 +205,11 @@ const BRAIN_SOURCES = {
   right: '../mri/rh.pial'
 };
 
+const BRAIN_ANNOTATIONS = {
+  left: '../mri/lh.aparc.DKTatlas.annot',
+  right: '../mri/rh.aparc.DKTatlas.annot'
+};
+
 const APP_VIDEO_WIDTH = 2.8;
 const APP_VIDEO_GAP = 0.35;
 const APP_VIDEO_GROUP_GAP = 1.0;
@@ -410,7 +415,7 @@ const GAME_DISPLAY_WORKS = [
     z: 32.45,
     launchAction: {
       label: 'PLAY',
-      url: '../shrimp-tanks/?v=20260718-latest-shrimp-build'
+      url: '../shrimp-tanks/?v=20260718-shrimp-build-6c9142f1155c06ec'
     }
   }
 ].map((work) => ({
@@ -817,6 +822,7 @@ let controls;
 let focusedPoster = null;
 let focusedManualVideo = null;
 let focusedGameAction = null;
+let focusedBrainRegion = null;
 let enteredOnce = false;
 let sceneReady = false;
 let webglAvailable = true;
@@ -841,6 +847,7 @@ let lastDragX = 0;
 let lastDragY = 0;
 let lastFrame = performance.now();
 let deferredSceneLoadsStarted = false;
+let brainSurfaceLoadStarted = false;
 let animationFrame = 0;
 let eHoldTimer = 0;
 let eHoldTarget = null;
@@ -867,6 +874,7 @@ const shrimpMusicPlayPending = new Set();
 const pressedKeys = new Set();
 const posterMeshes = [];
 const videoMeshes = [];
+const brainMeshes = [];
 const galleryVideos = [];
 const manualVideoEntries = [];
 const raycaster = new THREE.Raycaster();
@@ -1982,6 +1990,14 @@ function createHouseDisplay(gltf) {
 }
 
 function refreshFocusCard() {
+  if (focusedBrainRegion) {
+    focusCard.classList.remove('video-focus');
+    focusCard.classList.remove('is-playing');
+    focusEyebrow.textContent = 'Cortical region · Fixation target';
+    focusTitle.textContent = `${focusedBrainRegion.hemisphere} ${focusedBrainRegion.name}`;
+    focusAction.textContent = 'Move the reticle across the brain to inspect regions.';
+    return;
+  }
   if (focusedGameAction) {
     focusCard.classList.add('video-focus');
     focusCard.classList.remove('is-playing');
@@ -2448,7 +2464,33 @@ function startDeferredSceneLoads() {
     textureLoader.load(sheet.image, (texture) => addMriWallSheet(sheet, texture));
   });
   createGameWallSheets(textureLoader);
+}
+
+function scheduleLowPriorityGalleryWork(callback, delay = 1200) {
+  window.setTimeout(() => {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(callback, { timeout: delay });
+      return;
+    }
+    callback();
+  }, delay);
+}
+
+function requestBrainSurfaceLoad() {
+  if (brainSurfaceLoadStarted) return;
+  brainSurfaceLoadStarted = true;
   loadBrainSurfaceObject();
+}
+
+function maybeLoadBrainSurface() {
+  if (!galleryActive || brainSurfaceLoadStarted) return;
+  const roomLeft = BRAIN_ROOM.centerX - BRAIN_ROOM.halfWidth;
+  const roomRight = BRAIN_ROOM.centerX + BRAIN_ROOM.halfWidth;
+  const nearestX = Math.max(roomLeft, Math.min(camera.position.x, roomRight));
+  const nearestZ = Math.max(BRAIN_ROOM.nearZ, Math.min(camera.position.z, BRAIN_ROOM.farZ));
+  if (Math.hypot(camera.position.x - nearestX, camera.position.z - nearestZ) <= 12) {
+    requestBrainSurfaceLoad();
+  }
 }
 
 function addHouseRenderWall(group, texture) {
@@ -4043,6 +4085,57 @@ function readFreeSurferSurface(buffer) {
   return { positions, indices };
 }
 
+function readFreeSurferAnnotation(buffer) {
+  const data = new DataView(buffer);
+  const decoder = new TextDecoder();
+  let offset = 0;
+  const readInt = () => {
+    const value = data.getInt32(offset, false);
+    offset += 4;
+    return value;
+  };
+  const readString = (length) => {
+    const value = decoder.decode(new Uint8Array(buffer, offset, Math.max(0, length - 1)));
+    offset += length;
+    return value;
+  };
+
+  const vertexCount = readInt();
+  const labels = new Uint32Array(vertexCount);
+  for (let index = 0; index < vertexCount; index += 1) {
+    const vertexIndex = readInt();
+    labels[vertexIndex] = readInt() >>> 0;
+  }
+
+  const names = new Map([[0, 'unknown']]);
+  const hasColorTable = readInt();
+  if (hasColorTable) {
+    const tableVersion = readInt();
+    let entryCount;
+    if (tableVersion < 0) {
+      readInt(); // maximum number of structures
+      readString(readInt()); // original color-table filename
+      entryCount = readInt();
+    } else {
+      entryCount = tableVersion;
+      readString(readInt()); // original color-table filename
+    }
+
+    for (let index = 0; index < entryCount; index += 1) {
+      readInt(); // structure index
+      const name = readString(readInt());
+      const red = readInt();
+      const green = readInt();
+      const blue = readInt();
+      const alpha = readInt();
+      const annotation = (red | (green << 8) | (blue << 16) | (alpha << 24)) >>> 0;
+      names.set(annotation, name);
+    }
+  }
+
+  return { labels, names };
+}
+
 function createBrainSurfaceMesh(surface, color) {
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.BufferAttribute(surface.positions, 3));
@@ -4058,9 +4151,43 @@ function createBrainSurfaceMesh(surface, color) {
   return new THREE.Mesh(geometry, material);
 }
 
-function addBrainSurfaceObject(leftBuffer, rightBuffer) {
+function getBrainRegionAtHit(hit) {
+  const mesh = hit?.object;
+  const annotation = mesh?.userData?.annotation;
+  const index = mesh?.geometry?.index;
+  if (!annotation || !index || hit.faceIndex == null) return null;
+
+  const triangleStart = hit.faceIndex * 3;
+  const vertexIndices = [
+    index.getX(triangleStart),
+    index.getX(triangleStart + 1),
+    index.getX(triangleStart + 2)
+  ];
+  const vertexLabels = vertexIndices.map((vertexIndex) => annotation.labels[vertexIndex] ?? 0);
+  let label = vertexLabels[0];
+  if (vertexLabels[1] === vertexLabels[2]) label = vertexLabels[1];
+  else if (vertexLabels[0] !== vertexLabels[1] && vertexLabels[0] !== vertexLabels[2]) {
+    const localHit = mesh.worldToLocal(hit.point.clone());
+    const distances = vertexIndices.map((vertexIndex) => {
+      const vertex = new THREE.Vector3().fromBufferAttribute(mesh.geometry.attributes.position, vertexIndex);
+      return vertex.distanceToSquared(localHit);
+    });
+    label = vertexLabels[distances.indexOf(Math.min(...distances))];
+  }
+
+  const name = annotation.names.get(label) || `label ${label}`;
+  const hemisphere = mesh.userData.hemisphere === 'right' ? 'Right' : 'Left';
+  return { key: `${hemisphere}:${name}`, hemisphere, name };
+}
+
+function addBrainSurfaceObject(leftBuffer, rightBuffer, leftAnnotationBuffer, rightAnnotationBuffer) {
   const left = createBrainSurfaceMesh(readFreeSurferSurface(leftBuffer), 0xb8d5da);
   const right = createBrainSurfaceMesh(readFreeSurferSurface(rightBuffer), 0xd5b8b0);
+  left.userData.hemisphere = 'left';
+  right.userData.hemisphere = 'right';
+  left.userData.annotation = readFreeSurferAnnotation(leftAnnotationBuffer);
+  right.userData.annotation = readFreeSurferAnnotation(rightAnnotationBuffer);
+  brainMeshes.push(left, right);
   const surfaceGroup = new THREE.Group();
   surfaceGroup.add(left, right);
 
@@ -4092,7 +4219,7 @@ function addBrainSurfaceObject(leftBuffer, rightBuffer) {
 
 function loadBrainSurfaceObject(manager = null) {
   const loadSurface = (path) => new Promise((resolve, reject) => {
-    const loader = new THREE.FileLoader(manager);
+    const loader = manager ? new THREE.FileLoader(manager) : new THREE.FileLoader();
     loader.setResponseType('arraybuffer');
     loader.load(path, resolve, undefined, reject);
   });
@@ -4101,9 +4228,13 @@ function loadBrainSurfaceObject(manager = null) {
   if (manager) manager.itemStart(trackedItem);
   Promise.all([
     loadSurface(BRAIN_SOURCES.left),
-    loadSurface(BRAIN_SOURCES.right)
+    loadSurface(BRAIN_SOURCES.right),
+    loadSurface(BRAIN_ANNOTATIONS.left),
+    loadSurface(BRAIN_ANNOTATIONS.right)
   ])
-    .then(([leftBuffer, rightBuffer]) => addBrainSurfaceObject(leftBuffer, rightBuffer))
+    .then(([leftBuffer, rightBuffer, leftAnnotationBuffer, rightAnnotationBuffer]) => (
+      addBrainSurfaceObject(leftBuffer, rightBuffer, leftAnnotationBuffer, rightAnnotationBuffer)
+    ))
     .catch((error) => {
       console.warn('Could not load the brain surface object.', error);
       if (manager) manager.itemError(trackedItem);
@@ -4322,7 +4453,10 @@ function preloadGalleryVideos() {
     window.setTimeout(callback, 140);
   };
 
-  const maximumConcurrentLoads = 2;
+  // Keep video prefetch from competing with the first room render. These are
+  // intentionally background downloads; one-at-a-time is slower overall but
+  // makes the gallery responsive while the queue is warming up.
+  const maximumConcurrentLoads = 1;
   let activeLoads = 0;
   if (!queue.length) {
     markComplete();
@@ -4947,6 +5081,8 @@ function updateFocusedPoster() {
   const videoHit = nextPoster ? null : raycaster.intersectObjects(videoMeshes, false)[0];
   const gameAction = videoHit?.object?.userData?.gameAction || null;
   const videoEntry = videoHit?.object?.userData?.videoEntry || null;
+  const brainHit = nextPoster || videoHit ? null : raycaster.intersectObjects(brainMeshes, false)[0];
+  const nextBrainRegion = brainHit ? getBrainRegionAtHit(brainHit) : null;
   if (videoEntry) videoEntry.screen.getWorldPosition(videoWorldPosition);
   const videoInRange = videoEntry
     && camera.position.distanceTo(videoWorldPosition) <= videoEntry.interactionRadius;
@@ -4960,7 +5096,8 @@ function updateFocusedPoster() {
 
   if (nextPoster === focusedPoster
     && nextManualVideo === focusedManualVideo
-    && nextGameAction === focusedGameAction) return false;
+    && nextGameAction === focusedGameAction
+    && nextBrainRegion?.key === focusedBrainRegion?.key) return false;
 
   posterMeshes.forEach((mesh) => {
     const active = mesh.userData.poster === nextPoster;
@@ -4974,13 +5111,14 @@ function updateFocusedPoster() {
   focusedPoster = nextPoster;
   focusedManualVideo = nextManualVideo;
   focusedGameAction = nextGameAction;
+  focusedBrainRegion = nextBrainRegion;
   // Static artwork still highlights under the reticle, but only videos and
-  // active buttons get the instructional tooltip card.
-  focusCard.hidden = !nextManualVideo && !nextGameAction;
+  // active buttons and brain regions get the instructional tooltip card.
+  focusCard.hidden = !nextManualVideo && !nextGameAction && !nextBrainRegion;
   focusCard.classList.toggle('video-focus', Boolean(focusedManualVideo));
   if (!focusedManualVideo && !focusedGameAction) focusCard.classList.remove('is-playing');
-  reticle.classList.toggle('active', Boolean(focusedPoster || focusedManualVideo || focusedGameAction));
-  if (focusedManualVideo || focusedGameAction) refreshFocusCard();
+  reticle.classList.toggle('active', Boolean(focusedPoster || focusedManualVideo || focusedGameAction || focusedBrainRegion));
+  if (focusedManualVideo || focusedGameAction || focusedBrainRegion) refreshFocusCard();
   return true;
 }
 
@@ -5118,6 +5256,7 @@ function animate(now) {
   const delta = Math.min((now - lastFrame) / 1000, 0.05);
   lastFrame = now;
   const moved = updateMovement(delta);
+  maybeLoadBrainSurface();
   requestVideoRoomLoad();
   syncFocusLockedVideos();
   updateShrimpRoomMusic(delta);
@@ -5167,20 +5306,26 @@ function warmInitialCamera() {
 
 function finishLoading() {
   sceneReady = true;
-  // Start the prioritized media queue while the welcome screen is still up,
-  // so the first walk past a display does not also pay its network/buffer cost.
-  preloadGalleryVideos();
   loadingBar.style.width = '100%';
   loadingStatus.textContent = 'Gallery ready.';
   warmInitialCamera();
-  window.setTimeout(createArtGallery, 0);
-  window.setTimeout(startBackgroundGalleryLoads, 0);
-  window.setTimeout(startDeferredSceneLoads, 0);
   window.setTimeout(() => {
     warmInitialCamera();
     loadingScreen.hidden = true;
     showWelcome('initial');
   }, 220);
+
+  // Let the first room paint and become interactive before starting the
+  // non-critical art, model, MRI, and video work. The media queue continues
+  // in the background, but no longer competes with the initial WebGL render.
+  scheduleLowPriorityGalleryWork(() => {
+    createArtGallery();
+    startBackgroundGalleryLoads();
+  }, 1400);
+  scheduleLowPriorityGalleryWork(() => {
+    startDeferredSceneLoads();
+    preloadGalleryVideos();
+  }, 3200);
 }
 
 function configureTouchFallback() {
@@ -5265,6 +5410,11 @@ async function initializeGallery() {
   camera = new THREE.PerspectiveCamera(67, window.innerWidth / window.innerHeight, 0.08, 100);
   camera.position.set(0.8, ROOM.height / 2, 1.5);
   camera.lookAt(9.36, ROOM.height / 2, 0.2);
+  if (new URLSearchParams(window.location.search).has('brain-preview')) {
+    const brainCenterZ = (EMPTY_GAME_ROOM.nearZ + EMPTY_GAME_ROOM.farZ) / 2;
+    camera.position.set(EMPTY_GAME_ROOM.centerX, 2.4, EMPTY_GAME_ROOM.nearZ + 2.2);
+    camera.lookAt(EMPTY_GAME_ROOM.centerX, 0.9, brainCenterZ);
+  }
 
   controls = new PointerLockControls(camera, document.body);
   controls.pointerSpeed = 0.82;

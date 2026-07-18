@@ -1,4 +1,4 @@
-const CACHE_NAME = "cherry-tanks-phaser-c1451aba30aa8611";
+const CACHE_NAME = "cherry-tanks-phaser-6c9142f1155c06ec";
 const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest",
@@ -71,14 +71,14 @@ const APP_SHELL = [
   "./assets/tank/generated/panthon.6d8f7c1f06355a24.png",
   "./assets/tank/generated/lion.2c5879d67f607c5c.png",
   "./assets/tank/generated/magic-mushroom.d7ce8349607543c8.png",
-  "./assets/TankScene-C7EjzzOS.js",
+  "./assets/TankScene-DehJbX1m.js",
   "./assets/depthFigure8Lab-DTIJShp-.js",
   "./assets/lifespanRenderLab-CrmCEB0e.js",
-  "./assets/main-D9ecLKQZ.js",
+  "./assets/main-BcsGXhrT.js",
   "./assets/main-DepEhUmY.css",
-  "./assets/matingDanceLab-Cri6_jUk.js",
+  "./assets/matingDanceLab-DGt-KgtO.js",
   "./assets/modulepreload-polyfill-B5Qt9EMX.js",
-  "./assets/movementLab-Cw2yVkSN.js",
+  "./assets/movementLab-CFu8fkrx.js",
   "./assets/phaser-BFjO2D3v.js",
   "./assets/phaser-DFK5Ua9d.js"
 ];
