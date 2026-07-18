@@ -19,7 +19,7 @@ import {
   VIDEOS_ROOM,
   EMPTY_GAME_ROOM,
   ART_ROOM
-} from './wall-map-layout.js?v=20260718-all-door-headers-labels-contrast1';
+} from './wall-map-layout.js?v=20260718-all-door-headers-labels-contrast1-map-path1';
 
 const MOTION_POSTER_HEIGHT = 3;
 const POSTER_FRAME_BORDER = 0.075;
@@ -408,7 +408,7 @@ const GAME_DISPLAY_WORKS = [
     z: 32.45,
     launchAction: {
       label: 'PLAY',
-      url: 'https://putiw.github.io/shrimp-tanks/'
+      url: '../shrimp-tanks/'
     }
   }
 ].map((work) => ({
@@ -434,6 +434,79 @@ const GAME_DISPLAY_WORKS = [
     minZ: GAME_ROOM.nearZ + 0.2,
     maxZ: GAME_ROOM.farZ - 0.2
   }
+}));
+
+const VIDEO_ROOM_SCREEN_WIDTH = 3.15;
+const VIDEO_ROOM_SCREEN_Y = 2.8;
+const VIDEO_ROOM_VOLUME = 0.9;
+const VIDEO_ROOM_ASSET_VERSION = '20260718-video-room2';
+const VIDEO_ROOM_WALL_ZS = [
+  VIDEOS_ROOM.nearZ + 4.1,
+  VIDEOS_ROOM.nearZ + 9.45
+];
+const VIDEO_ROOM_ACTIVATION_BOUNDS = {
+  minX: VIDEOS_ROOM.centerX - VIDEOS_ROOM.halfWidth - 0.5,
+  maxX: VIDEOS_ROOM.centerX + VIDEOS_ROOM.halfWidth + 0.5,
+  minZ: VIDEOS_ROOM.nearZ - 0.5,
+  maxZ: VIDEOS_ROOM.farZ + 0.5
+};
+
+const VIDEO_ROOM_WORKS = [
+  {
+    title: 'Cataract',
+    source: `./media/videos/cataract.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
+    posterImage: './media/video-posters/cataract.jpg',
+    position: [VIDEOS_ROOM.centerX, VIDEO_ROOM_SCREEN_Y, VIDEOS_ROOM.nearZ + 0.14],
+    rotationY: 0
+  },
+  {
+    title: 'Lower Back Pain',
+    source: `./media/videos/lower-back-pain.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
+    posterImage: './media/video-posters/lower-back-pain.jpg',
+    position: [VIDEOS_ROOM.centerX - VIDEOS_ROOM.halfWidth + 0.14, VIDEO_ROOM_SCREEN_Y, VIDEO_ROOM_WALL_ZS[0]],
+    rotationY: Math.PI / 2
+  },
+  {
+    title: 'Goosebumps, Hiccups, and Yawns',
+    source: `./media/videos/goosebumps-hiccup-yawn-sub.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
+    posterImage: './media/video-posters/goosebumps-hiccup-yawn-sub.jpg',
+    position: [VIDEOS_ROOM.centerX - VIDEOS_ROOM.halfWidth + 0.14, VIDEO_ROOM_SCREEN_Y, VIDEO_ROOM_WALL_ZS[1]],
+    rotationY: Math.PI / 2
+  },
+  {
+    title: 'Teeth',
+    source: `./media/videos/teeth.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
+    posterImage: './media/video-posters/teeth.jpg',
+    position: [VIDEOS_ROOM.centerX + VIDEOS_ROOM.halfWidth - 0.14, VIDEO_ROOM_SCREEN_Y, VIDEO_ROOM_WALL_ZS[0]],
+    rotationY: -Math.PI / 2
+  },
+  {
+    title: 'How to Kill Spider Mites',
+    source: `./media/videos/spider-mites-sub.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
+    posterImage: './media/video-posters/spider-mites-sub.jpg',
+    position: [VIDEOS_ROOM.centerX + VIDEOS_ROOM.halfWidth - 0.14, VIDEO_ROOM_SCREEN_Y, VIDEO_ROOM_WALL_ZS[1]],
+    rotationY: -Math.PI / 2
+  }
+].map((work) => ({
+  ...work,
+  aspect: 16 / 9,
+  width: VIDEO_ROOM_SCREEN_WIDTH,
+  labelWidth: 2.5,
+  showCategory: false,
+  showMeta: false,
+  frameColor: 0x111416,
+  blackOutline: true,
+  blackOutlinePadding: 0.08,
+  playWhenVisible: false,
+  playDistance: 5.5,
+  interactionRadius: 5.5,
+  requireInteractionRange: true,
+  requireFocusForPlayback: true,
+  activationBounds: VIDEO_ROOM_ACTIVATION_BOUNDS,
+  videoRoom: true,
+  deferVideoLoad: true,
+  hasSound: true,
+  preloadPriority: 0
 }));
 
 const HOUSE_RENDER_WALL = {
@@ -661,6 +734,7 @@ const defenseStatement = 'I study how humans come to know the direction of a tin
 const DEFENSE_WALL_FONT_FAMILY = 'Arial, Helvetica, sans-serif';
 const DEFENSE_WALL_TEXT_COLOR = '#8c969a';
 const MRI_INTRO_FONT_FAMILY = '"Inter", Arial, Helvetica, sans-serif';
+const VIDEOS_INTRO_FONT_FAMILY = '"Inter", Arial, Helvetica, sans-serif';
 
 const resumePages = [
   {
@@ -740,6 +814,12 @@ let draggingView = false;
 let dragMoved = false;
 let returnToGalleryAfterPoster = false;
 let videoPreloadStarted = false;
+let galleryVideoPreloadComplete = false;
+let videoRoomLoadRequested = false;
+let videoRoomDisplaysLoaded = false;
+let videoRoomVideosPreloadStarted = false;
+let videoRoomAudioUnlocked = false;
+const videoRoomEntries = [];
 let videoSyncRequested = false;
 let lastCameraInputAt = 0;
 let artGalleryLoadStarted = false;
@@ -1043,6 +1123,7 @@ function createRoom() {
   addDefenseStatement();
   addDefenseIntroStatement();
   addMriRoomIntroStatement();
+  addVideosRoomIntroStatement();
 }
 
 function addGalleryMap() {
@@ -1904,6 +1985,15 @@ function launchGameAction(action) {
   window.open(action.url, '_blank', 'noopener,noreferrer');
 }
 
+function enableVideoAudio(entry) {
+  if (!entry?.hasSound) return;
+  entry.audioEnabled = true;
+  entry.element.muted = false;
+  entry.element.defaultMuted = false;
+  entry.element.removeAttribute('muted');
+  entry.element.volume = entry.videoRoom ? VIDEO_ROOM_VOLUME : 1;
+}
+
 function toggleManualVideo(entry) {
   const video = entry.element;
   if (!video.paused) {
@@ -1921,12 +2011,7 @@ function toggleManualVideo(entry) {
     video.src = entry.source;
     video.load();
   }
-  if (entry.hasSound) {
-    entry.audioEnabled = !navigator.userActivation || navigator.userActivation.isActive;
-    video.muted = true;
-    video.defaultMuted = true;
-    video.volume = 1;
-  }
+  enableVideoAudio(entry);
   if (!shouldPlayVideo(entry)) {
     refreshFocusCard();
     return;
@@ -1935,6 +2020,7 @@ function toggleManualVideo(entry) {
     if (entry.hasSound && entry.audioEnabled) {
       video.muted = false;
       video.defaultMuted = false;
+      video.removeAttribute('muted');
     }
     scheduleVideoFrame(entry);
     refreshFocusCard();
@@ -1954,12 +2040,7 @@ function restartVideoEntry(entry) {
     video.src = entry.source;
     video.load();
   }
-  if (entry.hasSound) {
-    if (!navigator.userActivation || navigator.userActivation.isActive) entry.audioEnabled = true;
-    video.muted = true;
-    video.defaultMuted = true;
-    video.volume = 1;
-  }
+  enableVideoAudio(entry);
 
   const restart = () => {
     video.currentTime = 0;
@@ -1969,10 +2050,11 @@ function restartVideoEntry(entry) {
       return;
     }
     video.play().then(() => {
-      if (entry.hasSound && entry.audioEnabled) {
-        video.muted = false;
-        video.defaultMuted = false;
-      }
+    if (entry.hasSound && entry.audioEnabled) {
+      video.muted = false;
+      video.defaultMuted = false;
+      video.removeAttribute('muted');
+    }
       scheduleVideoFrame(entry);
       refreshFocusCard();
     }).catch(() => {
@@ -3489,6 +3571,71 @@ function addMriRoomIntroStatement() {
   scene.add(statement);
 }
 
+function addVideosRoomIntroStatement() {
+  const statementCanvas = document.createElement('canvas');
+  statementCanvas.width = 2600;
+  statementCanvas.height = 1450;
+  const context = statementCanvas.getContext('2d');
+  context.clearRect(0, 0, statementCanvas.width, statementCanvas.height);
+  context.textBaseline = 'top';
+  context.fillStyle = '#a7a6aa';
+  context.font = `italic 400 70px ${VIDEOS_INTRO_FONT_FAMILY}`;
+
+  const statementParagraphs = [
+    [
+      'In this room, you will find five videos I',
+      'made as part of a series called'
+    ],
+    ['Nice, Accurate, and Random Things'],
+    [
+      'I made them because I was procrastinating',
+      'during the last year of my PhD and wanted',
+      'to do something else.'
+    ]
+  ];
+  const lineHeight = 94;
+  const paragraphGap = 88;
+  const totalTextHeight = statementParagraphs.reduce((height, lines) => height + lines.length * lineHeight, 0)
+    + paragraphGap * (statementParagraphs.length - 1);
+  let textTop = Math.max(70, (statementCanvas.height - totalTextHeight) / 2);
+  statementParagraphs.forEach((lines) => {
+    lines.forEach((line) => {
+      context.fillText(line, 120, textTop);
+      textTop += lineHeight;
+    });
+    textTop += paragraphGap;
+  });
+
+  const texture = new THREE.CanvasTexture(statementCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
+
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    alphaTest: 0.02,
+    depthWrite: false,
+    toneMapped: false
+  });
+  const statementWidth = 4.75;
+  const statementHeight = statementWidth * statementCanvas.height / statementCanvas.width;
+  const segmentLeft = VIDEOS_ROOM.centerX - VIDEOS_ROOM.halfWidth;
+  const segmentRight = GAME_VIDEOS_HALL_DOOR_X - VIDEOS_ROOM.doorWidth / 2;
+  const statement = new THREE.Mesh(
+    new THREE.PlaneGeometry(statementWidth, statementHeight),
+    material
+  );
+  statement.position.set(
+    (segmentLeft + segmentRight) / 2,
+    3.55,
+    VIDEOS_ROOM.farZ - 0.021
+  );
+  statement.rotation.y = Math.PI;
+  scene.add(statement);
+}
+
 function addBrainWallSheet(sheet, texture) {
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.minFilter = THREE.LinearMipmapLinearFilter;
@@ -3935,6 +4082,13 @@ function shouldPlayVideo(entry) {
 
   if (!videoFrustum.intersectsObject(entry.screen)) return false;
 
+  if (entry.requireFocusForPlayback) {
+    raycaster.setFromCamera(pointerCenter, camera);
+    raycaster.far = 7;
+    const focusedHit = raycaster.intersectObjects(videoMeshes, false)[0];
+    if (focusedHit?.object?.userData?.videoEntry !== entry) return false;
+  }
+
   cameraToVideo.copy(videoWorldPosition).sub(camera.position);
   const distance = cameraToVideo.length();
   const maximumDistance = entry.requireInteractionRange
@@ -3951,14 +4105,22 @@ function playVideoEntry(entry) {
     entry.element.load();
   }
   const enableSoundAfterStart = entry.hasSound && entry.audioEnabled;
-  entry.element.muted = true;
-  entry.element.play().then(() => {
+  if (enableSoundAfterStart) enableVideoAudio(entry);
+  else entry.element.muted = true;
+  const finishPlayback = () => {
     if (enableSoundAfterStart) {
       entry.element.muted = false;
       entry.element.defaultMuted = false;
+      entry.element.removeAttribute('muted');
     }
     scheduleVideoFrame(entry);
-  }).catch(() => {});
+  };
+  entry.element.play().then(finishPlayback).catch(() => {
+    if (!enableSoundAfterStart) return;
+    entry.element.muted = true;
+    entry.element.defaultMuted = true;
+    entry.element.play().then(finishPlayback).catch(() => {});
+  });
 }
 
 function preloadGalleryVideos() {
@@ -3967,6 +4129,12 @@ function preloadGalleryVideos() {
   const queue = galleryVideos
     .filter((entry) => !entry.element.hasAttribute('src'))
     .sort((a, b) => (b.preloadPriority || 0) - (a.preloadPriority || 0));
+  const markComplete = () => {
+    if (galleryVideoPreloadComplete) return;
+    galleryVideoPreloadComplete = true;
+    startVideoRoomLoadIfReady();
+    if (videoRoomDisplaysLoaded) preloadVideoRoomVideos();
+  };
   const schedule = (callback) => {
     if ('requestIdleCallback' in window) {
       window.requestIdleCallback(callback, { timeout: 1200 });
@@ -3977,6 +4145,11 @@ function preloadGalleryVideos() {
 
   const maximumConcurrentLoads = 2;
   let activeLoads = 0;
+  if (!queue.length) {
+    markComplete();
+    return;
+  }
+
   const loadNext = () => {
     while (activeLoads < maximumConcurrentLoads && queue.length) {
       const entry = queue.shift();
@@ -3992,6 +4165,7 @@ function preloadGalleryVideos() {
         video.removeEventListener('canplay', settle);
         video.removeEventListener('error', settle);
         activeLoads -= 1;
+        if (!queue.length && activeLoads === 0) markComplete();
         window.setTimeout(() => schedule(loadNext), 650);
       };
 
@@ -4005,6 +4179,93 @@ function preloadGalleryVideos() {
   };
 
   schedule(loadNext);
+}
+
+function isCameraInAppRoom() {
+  const wallClearance = 0.35;
+  return camera.position.x >= APP_ROOM.centerX - APP_ROOM.halfWidth + wallClearance
+    && camera.position.x <= APP_ROOM.centerX + APP_ROOM.halfWidth - wallClearance
+    && camera.position.z >= APP_ROOM.nearZ + wallClearance
+    && camera.position.z <= APP_ROOM.farZ - wallClearance;
+}
+
+function requestVideoRoomLoad() {
+  if (videoRoomLoadRequested || !galleryActive || !sceneReady || !isCameraInAppRoom()) return;
+  videoRoomLoadRequested = true;
+  startVideoRoomLoadIfReady();
+}
+
+function preloadVideoRoomVideos() {
+  if (videoRoomVideosPreloadStarted) return;
+  const queue = [...videoRoomEntries];
+  if (!queue.length) return;
+  videoRoomVideosPreloadStarted = true;
+  let index = 0;
+  const schedule = (callback) => {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(callback, { timeout: 2500 });
+      return;
+    }
+    window.setTimeout(callback, 300);
+  };
+  const loadNext = () => {
+    const entry = queue[index++];
+    if (!entry) return;
+    const video = entry.element;
+    if (video.hasAttribute('src')) {
+      schedule(loadNext);
+      return;
+    }
+    let settled = false;
+    let timeoutId = 0;
+    const settle = () => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timeoutId);
+      video.removeEventListener('canplay', settle);
+      video.removeEventListener('error', settle);
+      schedule(loadNext);
+    };
+    video.addEventListener('canplay', settle);
+    video.addEventListener('error', settle);
+    timeoutId = window.setTimeout(settle, 6000);
+    video.preload = 'auto';
+    video.src = entry.source;
+    video.load();
+  };
+  schedule(loadNext);
+}
+
+function startVideoRoomLoadIfReady() {
+  if (!videoRoomLoadRequested || videoRoomDisplaysLoaded) return;
+  videoRoomDisplaysLoaded = true;
+  const start = () => {
+    const textureLoader = new THREE.TextureLoader();
+    let remaining = VIDEO_ROOM_WORKS.length;
+    const finishDisplay = () => {
+      remaining -= 1;
+      if (remaining === 0 && galleryVideoPreloadComplete) preloadVideoRoomVideos();
+    };
+    VIDEO_ROOM_WORKS.forEach((work) => {
+      textureLoader.load(
+        `${work.posterImage}?v=20260718-video-room1`,
+        (texture) => {
+          addVideoWork(work, texture);
+          finishDisplay();
+        },
+        undefined,
+        () => {
+          addVideoWork(work, createVideoPlaceholderTexture());
+          finishDisplay();
+        }
+      );
+    });
+  };
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(start, { timeout: 3000 });
+  } else {
+    window.setTimeout(start, 900);
+  }
 }
 
 function primeShrimpRoomMusic() {
@@ -4076,12 +4337,12 @@ function pauseShrimpRoomMusic() {
   });
 }
 
-function syncGalleryVideos() {
+function syncGalleryVideos(entries = galleryVideos) {
   camera.updateMatrixWorld();
   videoFrustumMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
   videoFrustum.setFromProjectionMatrix(videoFrustumMatrix);
 
-  galleryVideos.forEach((entry) => {
+  entries.forEach((entry) => {
     const eligible = shouldPlayVideo(entry);
     if (entry.manualOnly) {
       if (!eligible) {
@@ -4104,6 +4365,11 @@ function syncGalleryVideos() {
     cancelVideoFrame(entry);
     entry.element.pause();
   });
+}
+
+function syncVideoRoomFocus() {
+  if (!galleryActive || !videoRoomEntries.length) return;
+  syncGalleryVideos(videoRoomEntries);
 }
 
 function requestVideoSync() {
@@ -4299,6 +4565,7 @@ function addVideoWork(work, posterTexture) {
     autoplayOnEntry: Boolean(work.autoplayOnEntry),
     playWhenVisible: Boolean(work.playWhenVisible),
     playDistance: work.playDistance || 6,
+    requireFocusForPlayback: Boolean(work.requireFocusForPlayback),
     preloadPriority: work.preloadPriority || 0,
     position: new THREE.Vector3(...work.position),
     screen,
@@ -4308,8 +4575,14 @@ function addVideoWork(work, posterTexture) {
     texture: videoTexture,
     userPaused: false,
     hasSound: Boolean(work.hasSound),
+    videoRoom: Boolean(work.videoRoom),
     audioEnabled: false
   };
+  if (entry.videoRoom && videoRoomAudioUnlocked) {
+    entry.audioEnabled = true;
+    enableVideoAudio(entry);
+  }
+  video.volume = entry.videoRoom ? VIDEO_ROOM_VOLUME : 1;
 
   const activateVideoTexture = () => {
     if (screenMaterial.map !== videoTexture) {
@@ -4332,7 +4605,8 @@ function addVideoWork(work, posterTexture) {
   screen.userData.videoEntry = entry;
   videoMeshes.push(screen);
   galleryVideos.push(entry);
-  if (work.eagerLoad || videoPreloadStarted) {
+  if (work.videoRoom) videoRoomEntries.push(entry);
+  if (work.eagerLoad || (videoPreloadStarted && !work.deferVideoLoad)) {
     video.preload = 'auto';
     video.src = entry.source;
     video.load();
@@ -4662,6 +4936,8 @@ function animate(now) {
   const delta = Math.min((now - lastFrame) / 1000, 0.05);
   lastFrame = now;
   const moved = updateMovement(delta);
+  requestVideoRoomLoad();
+  syncVideoRoomFocus();
   updateShrimpRoomMusic(delta);
   flushVideoSync(now);
   const focusChanged = updateFocusedPoster();
@@ -4716,6 +4992,10 @@ function enterGallery() {
   if (!sceneReady || !webglAvailable || isCoarsePointer) return;
   enteredOnce = true;
   galleryActive = true;
+  videoRoomAudioUnlocked = true;
+  galleryVideos.forEach((entry) => {
+    if (entry.videoRoom) enableVideoAudio(entry);
+  });
   primeShrimpRoomMusic();
   preloadGalleryVideos();
   playAutoplayOnEntryVideos();
@@ -4742,7 +5022,10 @@ function enterGallery() {
 
 async function initializeGallery() {
   if (document.fonts?.load) {
-    await document.fonts.load('400 78px "Inter"').catch(() => {});
+    await Promise.all([
+      document.fonts.load('400 78px "Inter"'),
+      document.fonts.load('italic 400 70px "Inter"')
+    ]).catch(() => {});
   }
   configureTouchFallback();
 

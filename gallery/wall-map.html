@@ -318,7 +318,7 @@
         currentSignature = signature;
         drawLayout(module.WALL_MAP_LAYOUT);
       } catch (error) {
-        status.textContent = 'Could not load shared layout';
+        status.textContent = `Could not load shared layout: ${error?.message || error}`;
         console.error(error);
       }
     }
