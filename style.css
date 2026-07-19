@@ -385,7 +385,9 @@ h2 {
 }
 
 .role-heading time,
-.education-list time {
+.role-heading .date-range,
+.education-list time,
+.education-list .date-range {
   color: var(--muted);
   font-size: 15px;
   white-space: nowrap;
@@ -561,7 +563,8 @@ h2 {
     margin: 0 5px;
   }
 
-  .role-heading time {
+  .role-heading time,
+  .role-heading .date-range {
     display: block;
     margin: 2px 0 5px;
     font-size: 14px;
@@ -584,7 +587,8 @@ h2 {
     display: none;
   }
 
-  .education-list time {
+  .education-list time,
+  .education-list .date-range {
     display: block;
     margin-top: 1px;
     font-size: 14px;

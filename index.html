@@ -4,17 +4,42 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <base href="./gallery/">
-  <title>Puti Wen - Research Poster Gallery</title>
-  <meta name="description" content="Walk through an interactive 3D gallery of research posters, app demonstrations, selected paper figures, a screening room, and an art gallery.">
+  <title>Puti Wen — Research Software Engineer, Medical Imaging and AI</title>
+  <meta name="description" content="Puti Wen builds AI-powered medical imaging tools, MRI and neuroimaging pipelines, scientific software, research automation, data infrastructure, and interactive visualizations.">
+  <meta name="author" content="Puti Wen">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#f1f0ed">
   <link rel="canonical" href="https://putiw.github.io/">
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="Machine-readable portfolio summary">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml" title="Sitemap">
   <link rel="preload" href="fonts/inter-regular.ttf" as="font" type="font/ttf" crossorigin>
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Puti Wen - Research Poster Gallery">
-  <meta property="og:description" content="An interactive 3D gallery of research posters, app demonstrations, selected paper figures, a screening room, and an art gallery.">
+  <meta property="og:type" content="profile">
+  <meta property="og:title" content="Puti Wen — Research Software Engineer, Medical Imaging and AI">
+  <meta property="og:description" content="AI-assisted clinical tools, MRI pipelines, research automation, data infrastructure, and scientific visualization in an interactive 3D portfolio.">
   <meta property="og:url" content="https://putiw.github.io/">
+  <meta property="og:site_name" content="Puti Wen — Interactive 3D Portfolio">
+  <meta property="profile:first_name" content="Puti">
+  <meta property="profile:last_name" content="Wen">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Puti Wen — Research Software Engineer, Medical Imaging and AI">
+  <meta name="twitter:description" content="AI-assisted clinical tools, MRI pipelines, research automation, data infrastructure, and scientific visualization in an interactive 3D portfolio.">
   <link rel="stylesheet" href="style.css?v=20260720-mobile-gate1">
+  <noscript>
+    <style>
+      html, body { height: auto; overflow: auto; background: #f1f0ed; }
+      .gallery-app, dialog { display: none; }
+      .noscript-message { max-width: 980px; margin: 32px auto; padding: 36px; line-height: 1.55; }
+      .noscript-message header { border-bottom: 3px solid #176789; padding-bottom: 20px; }
+      .noscript-message h1 { margin: 0 0 12px; font-size: clamp(32px, 6vw, 56px); line-height: 1.05; }
+      .noscript-message h2 { margin-top: 32px; }
+      .noscript-message h3 { margin-bottom: 5px; }
+      .noscript-message p, .noscript-message li { max-width: 82ch; }
+      .noscript-message nav ul { display: flex; flex-wrap: wrap; gap: 8px 20px; padding-left: 20px; }
+      .noscript-projects > li { margin-bottom: 24px; }
+      .noscript-message footer { margin-top: 36px; padding-top: 20px; border-top: 1px solid #c8cbca; }
+      @media (max-width: 620px) { .noscript-message { margin: 12px; padding: 24px 20px; } }
+    </style>
+  </noscript>
   <script type="importmap">
   {
     "imports": {
@@ -26,176 +51,206 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    "name": "Puti Wen - Research Poster Gallery",
-    "url": "https://putiw.github.io/",
-    "description": "An interactive 3D gallery of Puti Wen's research posters, clinical and scientific software demonstrations, selected paper figures, films, games, and artwork.",
-    "dateModified": "2026-07-20",
-    "about": {
-      "@type": "Person",
-      "@id": "https://putiw.github.io/#puti-wen",
-      "name": "Puti Wen",
-      "alternateName": "温菩提",
-      "url": "https://putiw.github.io/",
-      "jobTitle": "Postdoctoral Researcher",
-      "worksFor": {
-        "@type": "Organization",
-        "name": "NYU Abu Dhabi"
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://putiw.github.io/#website",
+        "url": "https://putiw.github.io/",
+        "name": "Puti Wen — Research Software, Medical Imaging and AI",
+        "description": "Puti Wen's professional portfolio and immersive 3D gallery of medical imaging software, MRI and neuroimaging work, research infrastructure, scientific visualization, research posters, application demonstrations, figures, films, games, and artwork.",
+        "inLanguage": "en",
+        "publisher": { "@id": "https://putiw.github.io/#puti-wen" }
       },
-      "homeLocation": {
-        "@type": "Place",
-        "name": "Abu Dhabi, UAE"
+      {
+        "@type": ["ProfilePage", "CollectionPage"],
+        "@id": "https://putiw.github.io/#portfolio",
+        "url": "https://putiw.github.io/",
+        "name": "Puti Wen — Interactive 3D Research and Software Portfolio",
+        "description": "An immersive, explorable 3D portfolio containing interactive clinical application demonstrations, neuroimaging projects, research posters, scientific figures, films, games, and artwork.",
+        "dateModified": "2026-07-20",
+        "inLanguage": "en",
+        "isPartOf": { "@id": "https://putiw.github.io/#website" },
+        "mainEntity": { "@id": "https://putiw.github.io/#puti-wen" },
+        "about": { "@id": "https://putiw.github.io/#puti-wen" },
+        "hasPart": [
+          { "@id": "https://putiw.github.io/#xnat-biobank" },
+          { "@id": "https://putiw.github.io/#lesionview" },
+          { "@id": "https://putiw.github.io/#cvsview" },
+          { "@id": "https://putiw.github.io/#myphysio" },
+          { "@id": "https://putiw.github.io/#afqview" },
+          { "@id": "https://putiw.github.io/#shrimp-tanks" },
+          { "@id": "https://putiw.github.io/#paper-motion-decoding" },
+          { "@id": "https://putiw.github.io/#paper-fst" },
+          { "@id": "https://putiw.github.io/#poster-ms-lesion-metrics" },
+          { "@id": "https://putiw.github.io/#poster-ohbm-pdi" }
+        ]
       },
-      "sameAs": [
-        "https://github.com/putiw",
-        "https://www.linkedin.com/in/puti-wen",
-        "https://scholar.google.com/citations?hl=en&user=tiJZLC4AAAAJ"
-      ],
-      "knowsAbout": [
-        "Neuroimaging",
-        "Magnetic resonance imaging",
-        "Multiple sclerosis",
-        "Scientific software",
-        "Clinical software",
-        "XNAT",
-        "High-performance computing",
-        "Python",
-        "Docker"
-      ]
-    },
-    "mainEntity": {
-      "@type": "ItemList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "item": {
-            "@type": "CreativeWork",
-            "name": "XNAT Platform & Brain Imaging Biobank",
-            "description": "Six containerized neuroimaging pipelines on HPC, daily validation and backup workflows, cross-site MRI quality control, and a normative dashboard built from 9,000+ HCP and ADNI subjects.",
-            "contributor": { "@id": "https://putiw.github.io/#puti-wen" }
-          }
+      {
+        "@type": "Person",
+        "@id": "https://putiw.github.io/#puti-wen",
+        "name": "Puti Wen",
+        "alternateName": "温菩提",
+        "url": "https://putiw.github.io/",
+        "email": "pw1246@nyu.edu",
+        "jobTitle": "Postdoctoral Researcher",
+        "description": "Puti Wen is a postdoctoral researcher and research software and medical imaging engineer who builds AI-assisted clinical tools, MRI and neuroimaging pipelines, research automation systems, data infrastructure, and scientific visualizations. She is open to relevant opportunities across research software, medical imaging, imaging informatics, healthcare data, and applied AI.",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "NYU Abu Dhabi"
         },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "item": {
-            "@type": "SoftwareApplication",
-            "name": "LesionView",
-            "applicationCategory": "MedicalApplication",
-            "description": "A browser-based clinical imaging application for tracking multiple sclerosis lesions across timepoints and reporting new and enlarging lesions.",
-            "creator": { "@id": "https://putiw.github.io/#puti-wen" }
-          }
+        "homeLocation": {
+          "@type": "Place",
+          "name": "Abu Dhabi, UAE"
         },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "item": {
-            "@type": "SoftwareApplication",
-            "name": "CvsView",
-            "applicationCategory": "MedicalApplication",
-            "description": "A web-based review tool for clinicians to verify the central vein sign in multiple sclerosis lesions, with a modular AI component and Docker deployment.",
-            "creator": { "@id": "https://putiw.github.io/#puti-wen" }
-          }
+        "alumniOf": {
+          "@type": "CollegeOrUniversity",
+          "name": "New York University"
         },
-        {
-          "@type": "ListItem",
-          "position": 4,
-          "item": {
-            "@type": "SoftwareApplication",
-            "name": "MyPhysio",
-            "applicationCategory": "MedicalApplication",
-            "description": "A full-stack physiotherapy practice-management application with admin dashboards, patient portals, exercise prescription, and pain and range-of-motion tracking.",
-            "creator": { "@id": "https://putiw.github.io/#puti-wen" }
-          }
-        },
-        {
-          "@type": "ListItem",
-          "position": 5,
-          "item": {
-            "@type": "SoftwareApplication",
-            "name": "afqView",
-            "description": "An interactive 3D web application for side-by-side quality control of white matter tractography across 100+ subjects, each with 20+ tracts and 10 iterated versions.",
-            "creator": { "@id": "https://putiw.github.io/#puti-wen" }
-          }
-        },
-        {
-          "@type": "ListItem",
-          "position": 6,
-          "item": {
-            "@type": "ScholarlyArticle",
-            "name": "Single-trial fMRI decoding of 3D motion with stereoscopic and perspective cues",
-            "datePublished": "2025",
-            "isPartOf": {
-              "@type": "Periodical",
-              "name": "Journal of Neuroscience"
-            },
-            "author": { "@id": "https://putiw.github.io/#puti-wen" }
-          }
-        },
-        {
-          "@type": "ListItem",
-          "position": 7,
-          "item": {
-            "@type": "ScholarlyArticle",
-            "name": "Functional localization of visual motion area FST in humans",
-            "datePublished": "2025",
-            "isPartOf": {
-              "@type": "Periodical",
-              "name": "Imaging Neuroscience"
-            },
-            "author": { "@id": "https://putiw.github.io/#puti-wen" }
-          }
-        },
-        {
-          "@type": "ListItem",
-          "position": 8,
-          "item": {
-            "@type": "CreativeWork",
-            "name": "Enhanced Prediction of Multiple Sclerosis Disabilities Using Tract-Specific Lesion Load and Advanced Quantitative MRI Metrics",
-            "description": "A 2025 research poster on tract-specific lesion load and quantitative MRI metrics in multiple sclerosis.",
-            "creator": { "@id": "https://putiw.github.io/#puti-wen" }
-          }
-        },
-        {
-          "@type": "ListItem",
-          "position": 9,
-          "item": {
-            "@type": "VideoObject",
-            "name": "One minute of Center for Brain and Health",
-            "description": "A one-minute introductory video made for the NYU Abu Dhabi Center for Brain and Health.",
-            "creator": { "@id": "https://putiw.github.io/#puti-wen" }
-          }
-        }
-      ]
-    }
+        "sameAs": [
+          "https://github.com/putiw",
+          "https://www.linkedin.com/in/puti-wen",
+          "https://scholar.google.com/citations?hl=en&user=tiJZLC4AAAAJ"
+        ],
+        "knowsAbout": [
+          "AI engineering",
+          "Medical imaging",
+          "Medical AI research",
+          "Imaging informatics",
+          "Healthcare data engineering",
+          "Research software engineering",
+          "Scientific software engineering",
+          "MRI pipeline development",
+          "Medical image analysis",
+          "Neuroimaging",
+          "Scientific visualization",
+          "Research automation",
+          "Multiple sclerosis imaging",
+          "XNAT",
+          "High-performance computing",
+          "Python",
+          "Docker"
+        ]
+      },
+      {
+        "@type": "CreativeWork",
+        "@id": "https://putiw.github.io/#xnat-biobank",
+        "url": "https://putiw.github.io/resume/#project-xnat-biobank",
+        "name": "XNAT Platform and Brain Imaging Biobank",
+        "description": "Puti built and containerized six HPC processing pipelines for functional MRI preprocessing, structural segmentation, diffusion tractography, MRI quality control, cortical visual-area mapping, and BIDS-compliant validation. She automated nightly validation and daily backup workflows, conducted cross-site MRI quality control, and processed 9,000+ HCP and ADNI subjects for a normative dashboard.",
+        "keywords": ["XNAT", "MRI", "HPC", "Docker", "Singularity", "BIDS", "Research automation"],
+        "creator": { "@id": "https://putiw.github.io/#puti-wen" }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://putiw.github.io/#lesionview",
+        "url": "https://putiw.github.io/resume/#project-lesionview",
+        "name": "LesionView and Longitudinal Report",
+        "applicationCategory": "MedicalApplication",
+        "description": "A browser-based clinical imaging application built by Puti to track multiple sclerosis lesions across timepoints and report new and enlarging lesions with color-coded and animated visualization. Puti migrated the tool from a MATLAB prototype to React Native and Expo and iterated with Yas Clinic neurologists.",
+        "keywords": ["Medical imaging", "Multiple sclerosis", "React Native", "Expo", "Longitudinal analysis"],
+        "creator": { "@id": "https://putiw.github.io/#puti-wen" }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://putiw.github.io/#cvsview",
+        "url": "https://putiw.github.io/resume/#project-cvsview",
+        "name": "CvsView",
+        "applicationCategory": "MedicalApplication",
+        "description": "A web-based review tool built by Puti for clinicians to verify the central vein sign in multiple sclerosis lesions. It includes a modular AI component; Puti resolved SWI-FLAIR co-registration artifacts through manual relabeling, containerized the application with Docker, and deployed it for on-demand clinical processing.",
+        "keywords": ["Medical AI", "Central vein sign", "Multiple sclerosis", "Docker", "Clinical imaging"],
+        "creator": { "@id": "https://putiw.github.io/#puti-wen" }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://putiw.github.io/#myphysio",
+        "url": "https://putiw.github.io/resume/#project-myphysio",
+        "name": "MyPhysio",
+        "applicationCategory": "MedicalApplication",
+        "description": "A full-stack physiotherapy practice-management application conceived and led by Puti with two colleagues. It includes admin dashboards, patient portals, exercise prescription, and pain and range-of-motion tracking.",
+        "keywords": ["React Native", "Expo", "Next.js", "Supabase", "Docker", "GitHub Actions"],
+        "creator": { "@id": "https://putiw.github.io/#puti-wen" }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://putiw.github.io/#afqview",
+        "url": "https://putiw.github.io/resume/#project-afqview",
+        "name": "afqView",
+        "applicationCategory": "ScientificApplication",
+        "description": "An interactive 3D web application built by Puti to replace file-by-file tractography quality control with side-by-side comparisons, per-subject navigation, and availability indicators across 100+ subjects, 20+ tracts, and 10 iterated versions per subject.",
+        "keywords": ["Tractography", "Scientific visualization", "Quality control", "Interactive 3D"],
+        "creator": { "@id": "https://putiw.github.io/#puti-wen" }
+      },
+      {
+        "@type": "VideoGame",
+        "@id": "https://putiw.github.io/#shrimp-tanks",
+        "url": "https://putiw.github.io/shrimp-tanks/",
+        "name": "Shrimp Tanks",
+        "description": "A browser-based shrimp simulation game created by Puti and included in the portfolio's game room.",
+        "gamePlatform": "Web browser",
+        "creator": { "@id": "https://putiw.github.io/#puti-wen" }
+      },
+      {
+        "@type": "ScholarlyArticle",
+        "@id": "https://putiw.github.io/#paper-motion-decoding",
+        "url": "https://putiw.github.io/resume/#publication-motion-decoding",
+        "name": "Single-trial fMRI decoding of 3D motion with stereoscopic and perspective cues",
+        "datePublished": "2025",
+        "isPartOf": { "@type": "Periodical", "name": "Journal of Neuroscience" },
+        "author": { "@id": "https://putiw.github.io/#puti-wen" }
+      },
+      {
+        "@type": "ScholarlyArticle",
+        "@id": "https://putiw.github.io/#paper-fst",
+        "url": "https://putiw.github.io/resume/#publication-fst",
+        "name": "Functional localization of visual motion area FST in humans",
+        "datePublished": "2025",
+        "isPartOf": { "@type": "Periodical", "name": "Imaging Neuroscience" },
+        "author": { "@id": "https://putiw.github.io/#puti-wen" }
+      },
+      {
+        "@type": "CreativeWork",
+        "@id": "https://putiw.github.io/#poster-ms-lesion-metrics",
+        "url": "https://putiw.github.io/gallery/posters/ms-lesion-metrics-detail.webp",
+        "name": "Enhanced Prediction of Multiple Sclerosis Disabilities Using Tract-Specific Lesion Load and Advanced Quantitative MRI Metrics",
+        "description": "A 2025 research poster on tract-specific lesion load and quantitative MRI metrics in multiple sclerosis.",
+        "creator": { "@id": "https://putiw.github.io/#puti-wen" }
+      },
+      {
+        "@type": "CreativeWork",
+        "@id": "https://putiw.github.io/#poster-ohbm-pdi",
+        "url": "https://putiw.github.io/gallery/posters/ohbm-pdi-detail.webp",
+        "name": "MP2RAGE Ventricle Distance Profiling Improves Classification of Multiple Sclerosis Subtypes",
+        "description": "A 2025 OHBM research poster on MP2RAGE ventricle-distance profiling and multiple sclerosis subtype classification.",
+        "creator": { "@id": "https://putiw.github.io/#puti-wen" }
+      }
+    ]
   }
   </script>
 </head>
 <body>
-  <main class="gallery-app" id="gallery-app">
-    <canvas id="gallery-canvas" aria-label="Interactive 3D research poster gallery"></canvas>
+  <main class="gallery-app" id="gallery-app" aria-label="Puti Wen's interactive portfolio">
+    <canvas id="gallery-canvas" aria-label="Interactive 3D portfolio of medical imaging software, neuroimaging research, scientific visualization, posters, films, games, and artwork"></canvas>
 
-    <section class="loading-screen" id="loading-screen" aria-live="polite">
+    <section class="loading-screen" id="loading-screen" aria-labelledby="loading-title" aria-live="polite">
       <div class="loading-card">
         <p class="eyebrow">Selected work / Research archive</p>
-        <h1>Preparing the gallery</h1>
+        <h1 id="loading-title">Preparing the gallery</h1>
         <div class="loading-track" aria-hidden="true"><i id="loading-bar"></i></div>
         <p id="loading-status">0%</p>
       </div>
     </section>
 
-    <section class="welcome-screen" id="welcome-screen" hidden>
+    <section class="welcome-screen" id="welcome-screen" aria-labelledby="welcome-title" aria-describedby="welcome-copy" hidden>
       <div class="welcome-card">
         <p class="eyebrow" id="welcome-eyebrow">Interactive research archive</p>
         <h1 id="welcome-title">Walk through the work.</h1>
         <p class="welcome-copy" id="welcome-copy">Eight posters, six app demos, a figure salon, a dark screening room, and an art gallery ready for future work.</p>
         <div class="welcome-actions">
-          <button class="primary-button" type="button" id="enter-button">Enter gallery</button>
+          <button class="primary-button" type="button" id="enter-button" aria-label="Enter Puti Wen's interactive 3D portfolio">Enter gallery</button>
           <button class="secondary-button destination-button" type="button" id="gallery-destination-button" hidden>Gallery</button>
-          <a class="secondary-button resume-button" id="resume-button" href="/resume/" target="puti-resume">View résumé</a>
+          <a class="secondary-button resume-button" id="resume-button" href="/resume/" target="puti-resume" rel="noopener">View résumé</a>
         </div>
-        <div class="movement-guide" aria-label="Movement controls">
+        <div class="movement-guide" role="group" aria-label="Movement controls">
           <div class="key-cluster" aria-hidden="true">
             <div class="key-row"><kbd>W</kbd></div>
             <div class="key-row"><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div>
@@ -223,7 +278,7 @@
       <span id="portal-prompt-copy">Walk into the house photos.</span>
     </aside>
 
-    <aside class="sound-reminder" id="sound-reminder" role="status" aria-live="polite" hidden>
+    <div class="sound-reminder" id="sound-reminder" role="status" aria-live="polite" hidden>
       <span class="sound-reminder-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" focusable="false">
           <path d="M11 5 6.5 8.5h-3v7h3L11 19V5Z"></path>
@@ -233,7 +288,7 @@
       <small>Sound in this room</small>
       <strong>Can you hear it?</strong>
       <span>If not, check whether this browser tab or your device is muted.</span>
-    </aside>
+    </div>
 
     <div class="portal-transition" id="portal-transition" aria-hidden="true">
       <span>Passing through</span>
@@ -331,7 +386,7 @@
     </form>
     <div class="poster-detail-frame">
       <div class="detail-loading" id="detail-loading">Loading high-resolution poster...</div>
-      <img id="dialog-image" alt="">
+      <img id="dialog-image" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="">
     </div>
   </dialog>
 
@@ -353,18 +408,94 @@
   </dialog>
 
   <noscript>
-    <section class="noscript-message">
-      <h1>Research Poster Gallery</h1>
-      <p>This interactive gallery requires JavaScript. The poster images are still available below.</p>
-      <p><a href="posters/fst-detail.webp">Localizing visual motion area FST in human</a></p>
-      <p><a href="posters/decoding-detail.webp">Single-trial fMRI decoding of 3D motion</a></p>
-      <p><a href="posters/cbh-detail.webp">Center for Brain and Health</a></p>
-      <p><a href="posters/ms-lesion-metrics-detail.webp">Enhanced Prediction of Multiple Sclerosis Disabilities</a></p>
-      <p><a href="posters/ohbm-pdi-detail.webp">MP2RAGE Ventricle Distance Profiling</a></p>
-      <p><a href="posters/ms-research-day-detail.webp">MS Research Day</a></p>
-      <p><a href="posters/laminate-detail.webp">NMSS one pager</a></p>
-      <p><a href="posters/menactrims-cvsview-detail.webp">CVS-View: AI-powered central vein sign identification</a></p>
-    </section>
+    <article class="noscript-message">
+      <header>
+        <p>Research software · Medical imaging · AI</p>
+        <h1>Puti Wen</h1>
+        <p>Puti Wen is a postdoctoral researcher at the NYU Abu Dhabi Center for Brain and Health and a research software and medical imaging engineer based in Abu Dhabi, UAE. She builds AI-assisted clinical imaging tools, MRI and neuroimaging pipelines, research automation systems, data infrastructure, and interactive scientific visualizations.</p>
+        <p>The normal version of this site is an immersive, explorable 3D portfolio. JavaScript is unavailable, so the same professional evidence and ordinary project links are provided below.</p>
+      </header>
+
+      <nav aria-label="Portfolio links">
+        <h2>Portfolio links</h2>
+        <ul>
+          <li><a href="/resume/">Semantic HTML résumé</a></li>
+          <li><a href="/Puti_Wen_Resume_2026.pdf">Résumé PDF</a></li>
+          <li><a href="https://github.com/putiw">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/puti-wen">LinkedIn</a></li>
+          <li><a href="https://scholar.google.com/citations?hl=en&amp;user=tiJZLC4AAAAJ">Google Scholar</a></li>
+          <li><a href="mailto:pw1246@nyu.edu">pw1246@nyu.edu</a></li>
+        </ul>
+      </nav>
+
+      <section aria-labelledby="target-roles-heading">
+        <h2 id="target-roles-heading">Relevant opportunities</h2>
+        <p>Puti is open to relevant opportunities in research software engineering, medical imaging and medical AI, imaging informatics, healthcare data engineering, scientific software, MRI pipeline development, medical image analysis, neuroimaging, scientific visualization, and research automation.</p>
+      </section>
+
+      <section aria-labelledby="capabilities-heading">
+        <h2 id="capabilities-heading">Core technical capabilities</h2>
+        <ul>
+          <li><strong>MRI and neuroimaging:</strong> fMRIPrep, FreeSurfer, TractoFlow, MRIQC, BIDS, dcm2bids, DICOM, HCP, ANTs, and Nextflow.</li>
+          <li><strong>Research infrastructure and automation:</strong> XNAT, Slurm/HPC, Docker, Singularity, GitHub Actions, Supabase, and the Box API.</li>
+          <li><strong>Application development and analysis:</strong> React Native, Expo, Next.js, TypeScript, Godot, Python, and MATLAB.</li>
+          <li><strong>MRI research hardware:</strong> Siemens scanners, Psychtoolbox, EyeLink eye-tracking, and VPixx/ProPixx.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="projects-heading-noscript">
+        <h2 id="projects-heading-noscript">Professional and technical projects</h2>
+        <ul class="noscript-projects">
+          <li>
+            <h3><a href="/resume/#project-xnat-biobank">XNAT Platform and Brain Imaging Biobank</a></h3>
+            <p><strong>Problem:</strong> Large neuroimaging datasets required repeatable processing, validation, backup, and cross-site quality control. <strong>Contribution:</strong> Puti built and containerized six HPC pipelines, automated nightly validation and daily backups, conducted scanner comparisons, and processed 9,000+ HCP and ADNI subjects for a normative brain dashboard. <strong>Methods:</strong> XNAT, Slurm/HPC, Docker, Singularity, BIDS, fMRIPrep, FreeSurfer, TractoFlow, MRIQC, and Nextflow. <strong>Impact:</strong> Technical documentation includes 350+ commits, and Puti trained 10+ researchers in the associated workflows.</p>
+          </li>
+          <li>
+            <h3><a href="/resume/#project-lesionview">LesionView and Longitudinal Report</a></h3>
+            <p><strong>Problem:</strong> Clinicians need to compare multiple sclerosis lesions across timepoints and verify new or enlarging lesions. <strong>Contribution:</strong> Puti built the lesion-tracking application and an automated longitudinal report, then migrated the MATLAB prototype to a browser-based React Native and Expo application. <strong>Clinical relevance:</strong> Features were iterated with Yas Clinic neurologists. Puti is a co-inventor on the LesionView provisional patent application filed in May 2026. <a href="/gallery/media/lesionview-longitudinal-comparison-native.mp4">View a longitudinal-comparison demonstration</a>.</p>
+          </li>
+          <li>
+            <h3><a href="/resume/#project-cvsview">CvsView</a></h3>
+            <p><strong>Problem:</strong> Clinicians need an efficient way to verify the central vein sign in multiple sclerosis lesions. <strong>Contribution:</strong> Puti built a web review tool with a modular AI component, identified SWI-FLAIR co-registration artifacts, manually relabeled affected data, containerized the application, and deployed it for on-demand clinical processing at Harley Street Medical Centre. <strong>Methods:</strong> Medical image co-registration, modular AI integration, web application development, and Docker. <a href="/gallery/media/cvsview-cvs-prl-review-web-720.mp4">View the CVS/PRL review demonstration</a>.</p>
+          </li>
+          <li>
+            <h3><a href="/resume/#project-myphysio">MyPhysio</a></h3>
+            <p><strong>Problem:</strong> Physiotherapy practices need connected tools for exercise prescription, patient tracking, and administrative work. <strong>Contribution:</strong> Puti conceived the application, led development with two colleagues, and built admin dashboards, patient portals, exercise prescription, pain diaries, and range-of-motion tracking. <strong>Methods:</strong> React Native, Expo, Next.js, Supabase, Hostinger, GitHub Actions, and Docker. <a href="/gallery/media/myphysio-01-app-welcome.mp4">View an application demonstration</a>.</p>
+          </li>
+          <li>
+            <h3><a href="/resume/#project-afqview">afqView</a></h3>
+            <p><strong>Problem:</strong> Reviewing tractography for 100+ subjects, 20+ tracts, and 10 iterated versions per subject was being done file by file. <strong>Contribution:</strong> Puti built an interactive 3D web application with side-by-side comparisons, subject navigation, and color-coded availability indicators. <strong>Research relevance:</strong> The tool supports scalable white-matter tractography quality control. <a href="/gallery/media/mri-afqview.mp4">View the tractography visualization demonstration</a>.</p>
+          </li>
+          <li>
+            <h3><a href="/">Interactive 3D research and software portfolio</a></h3>
+            <p>Puti created this full-screen, explorable portfolio to present clinical application demonstrations, MRI and neuroimaging work, research posters, scientific figures, films, games, and artwork as a spatial gallery intended for human review.</p>
+          </li>
+          <li>
+            <h3><a href="/shrimp-tanks/">Shrimp Tanks</a></h3>
+            <p>A browser-based shrimp simulation game created by Puti and presented in the portfolio's game room.</p>
+          </li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="research-heading-noscript">
+        <h2 id="research-heading-noscript">Research, publications, and poster work</h2>
+        <ul>
+          <li><a href="/resume/#publication-motion-decoding">Single-trial fMRI decoding of 3D motion with stereoscopic and perspective cues</a> — first-author 2025 <cite>Journal of Neuroscience</cite> article and <a href="/gallery/posters/decoding-detail.webp">research poster</a>.</li>
+          <li><a href="/resume/#publication-fst">Functional localization of visual motion area FST in humans</a> — first-author 2025 <cite>Imaging Neuroscience</cite> article and <a href="/gallery/posters/fst-detail.webp">VSS poster</a>.</li>
+          <li><a href="/gallery/posters/ms-lesion-metrics-detail.webp">Enhanced Prediction of Multiple Sclerosis Disabilities Using Tract-Specific Lesion Load and Advanced Quantitative MRI Metrics</a> — 2025 multiple sclerosis neuroimaging poster.</li>
+          <li><a href="/gallery/posters/ohbm-pdi-detail.webp">MP2RAGE Ventricle Distance Profiling Improves Classification of Multiple Sclerosis Subtypes</a> — OHBM 2025 poster.</li>
+          <li><a href="/gallery/posters/menactrims-cvsview-detail.webp">CVS-View: AI-powered central vein sign identification</a> — MENACTRIMS 2025 poster.</li>
+          <li><a href="/gallery/posters/cbh-detail.webp">Center for Brain and Health</a> — clinical and translational neuroscience overview poster.</li>
+          <li><a href="/gallery/posters/ms-research-day-detail.webp">MS Research Day</a> — event banner made for the National Multiple Sclerosis Society and NYU Abu Dhabi.</li>
+          <li><a href="/gallery/posters/laminate-detail.webp">NMSS one pager</a> — stakeholder communication piece made for the National Multiple Sclerosis Society.</li>
+        </ul>
+        <p>The gallery also contains selected figures from Puti's papers, a PhD defense screening, a Center for Brain and Health film, visual designs, an art archive, and an interactive brain room.</p>
+      </section>
+
+      <footer>
+        <p><strong>Contact:</strong> <a href="mailto:pw1246@nyu.edu">pw1246@nyu.edu</a> · Abu Dhabi, UAE · <a href="/resume/">View the complete résumé</a></p>
+      </footer>
+    </article>
   </noscript>
 
   <script type="module" src="gallery.js?v=20260720-mobile-gate1"></script>
