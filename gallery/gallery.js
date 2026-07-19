@@ -852,6 +852,7 @@ const APP_ROOM_LOADING_ASSETS = new Set([
   ...myPhysioVideoWorks.map((work) => work.source),
   ...myPhysioImageWorks.map((work) => work.image)
 ]);
+const APP_ROOM_PROGRESS_SLICE_SECONDS = 6.5;
 
 const figureSalonStatement = {
   body: 'Not posters, just random figures from my papers, I spent a lot of time on them so they are here as a record of the past even tho they are definitely not my favourite in this room :)'
@@ -981,6 +982,8 @@ let appRoomLoadingIndicator = null;
 let appRoomLoadingFill = null;
 let appRoomLoadingLabelCanvas = null;
 let appRoomLoadingLabelTexture = null;
+let appRoomDisplayProgress = 0;
+let appRoomLoadingDisplayedPercentage = -1;
 let mainRoomBackgroundLoadsStarted = false;
 const mainRoomLoadedImages = new Set();
 const artRoomLoadedImages = new Set();
@@ -1471,46 +1474,76 @@ function addGalleryMap() {
   scene.add(map);
 }
 
-function updateAppRoomLoadingIndicator() {
-  const progress = appRoomReadyAssets.size / Math.max(1, APP_ROOM_LOADING_ASSETS.size);
-  if (progress >= 1) {
-    if (appRoomLoadingIndicator) {
-      appRoomLoadingIndicator.removeFromParent();
-      appRoomLoadingIndicator.traverse((child) => {
-        child.geometry?.dispose?.();
-        const materials = Array.isArray(child.material) ? child.material : [child.material];
-        materials.filter(Boolean).forEach((material) => {
-          material.map?.dispose?.();
-          material.dispose?.();
-        });
+function updateAppRoomLoadingIndicator(delta = 0) {
+  const totalAssets = Math.max(1, APP_ROOM_LOADING_ASSETS.size);
+  const completedProgress = appRoomReadyAssets.size / totalAssets;
+  appRoomDisplayProgress = Math.max(appRoomDisplayProgress, completedProgress);
+
+  if (completedProgress >= 1) {
+    if (!appRoomLoadingIndicator) return false;
+    appRoomLoadingIndicator.removeFromParent();
+    appRoomLoadingIndicator.traverse((child) => {
+      child.geometry?.dispose?.();
+      const materials = Array.isArray(child.material) ? child.material : [child.material];
+      materials.filter(Boolean).forEach((material) => {
+        material.map?.dispose?.();
+        material.dispose?.();
       });
-    }
+    });
     appRoomLoadingIndicator = null;
     appRoomLoadingFill = null;
     appRoomLoadingLabelCanvas = null;
     appRoomLoadingLabelTexture = null;
+    appRoomLoadingDisplayedPercentage = -1;
     needsRender = true;
-    return;
+    return false;
   }
 
-  if (!appRoomLoadingIndicator) return;
-  const trackWidth = appRoomLoadingIndicator.userData.trackWidth;
-  appRoomLoadingFill.scale.x = Math.max(0.001, progress);
-  appRoomLoadingFill.position.x = -trackWidth * (1 - progress) / 2;
+  if (!appRoomLoadingIndicator) return false;
 
-  const context = appRoomLoadingLabelCanvas.getContext('2d');
-  context.clearRect(0, 0, appRoomLoadingLabelCanvas.width, appRoomLoadingLabelCanvas.height);
-  context.fillStyle = '#f4f3ed';
-  context.font = '700 46px Inter, Arial, sans-serif';
-  context.textAlign = 'center';
-  context.textBaseline = 'middle';
-  context.fillText(
-    `APP ROOM LOADING · ${Math.round(progress * 100)}%`,
-    appRoomLoadingLabelCanvas.width / 2,
-    appRoomLoadingLabelCanvas.height / 2
-  );
-  appRoomLoadingLabelTexture.needsUpdate = true;
+  const previousDisplayProgress = appRoomDisplayProgress;
+  if (delta > 0) {
+    const nextCheckpoint = (appRoomReadyAssets.size + 1) / totalAssets;
+    // Creep through the open interval before the next real asset checkpoint.
+    // Keeping the rounded label one point below that checkpoint prevents the
+    // visual progress from claiming an asset has finished before it has.
+    const nextCheckpointPercentage = Math.round(nextCheckpoint * 100);
+    const previewLimit = Math.max(
+      completedProgress,
+      (nextCheckpointPercentage - 0.51) / 100
+    );
+    const sliceRate = (previewLimit - completedProgress) / APP_ROOM_PROGRESS_SLICE_SECONDS;
+    appRoomDisplayProgress = Math.min(
+      previewLimit,
+      appRoomDisplayProgress + Math.max(0, sliceRate) * delta
+    );
+  }
+
+  const progressChanged = Math.abs(appRoomDisplayProgress - previousDisplayProgress) > 0.000001;
+  const displayedPercentage = Math.round(appRoomDisplayProgress * 100);
+  if (!progressChanged && displayedPercentage === appRoomLoadingDisplayedPercentage) return false;
+
+  const trackWidth = appRoomLoadingIndicator.userData.trackWidth;
+  appRoomLoadingFill.scale.x = Math.max(0.001, appRoomDisplayProgress);
+  appRoomLoadingFill.position.x = -trackWidth * (1 - appRoomDisplayProgress) / 2;
+
+  if (displayedPercentage !== appRoomLoadingDisplayedPercentage) {
+    const context = appRoomLoadingLabelCanvas.getContext('2d');
+    context.clearRect(0, 0, appRoomLoadingLabelCanvas.width, appRoomLoadingLabelCanvas.height);
+    context.fillStyle = '#f4f3ed';
+    context.font = '700 46px Inter, Arial, sans-serif';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText(
+      `APP ROOM LOADING · ${displayedPercentage}%`,
+      appRoomLoadingLabelCanvas.width / 2,
+      appRoomLoadingLabelCanvas.height / 2
+    );
+    appRoomLoadingLabelTexture.needsUpdate = true;
+    appRoomLoadingDisplayedPercentage = displayedPercentage;
+  }
   needsRender = true;
+  return true;
 }
 
 function markAppRoomAssetReady(asset) {
@@ -1576,6 +1609,7 @@ function createAppRoomLoadingFloorIndicator() {
   group.position.set(APP_ROOM.centerX, 0, ROOM.halfDepth + 1.2);
   group.rotation.y = Math.PI;
   appRoomLoadingIndicator = group;
+  appRoomLoadingDisplayedPercentage = -1;
   scene.add(group);
   updateAppRoomLoadingIndicator();
 }
@@ -7138,6 +7172,7 @@ function animate(now) {
   const delta = Math.min((now - lastFrame) / 1000, 0.05);
   lastFrame = now;
   const moved = updateMovement(delta);
+  updateAppRoomLoadingIndicator(delta);
   const portalAnimated = updateHomePortalEffects(now);
   maybeStartRoomBackgroundPreloads();
   maybeLoadNearbyRoomContent();
