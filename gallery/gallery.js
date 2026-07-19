@@ -925,6 +925,7 @@ const soundReminder = document.getElementById('sound-reminder');
 const portalTransition = document.getElementById('portal-transition');
 const portalTransitionTitle = document.getElementById('portal-transition-title');
 const walkHint = document.getElementById('walk-hint');
+const movementGuide = document.querySelector('.movement-guide');
 const posterIndex = document.getElementById('poster-index');
 const closeIndexButton = document.getElementById('close-index');
 const posterDialog = document.getElementById('poster-dialog');
@@ -935,6 +936,9 @@ const dialogImage = document.getElementById('dialog-image');
 const detailLoading = document.getElementById('detail-loading');
 const helpDialog = document.getElementById('help-dialog');
 const helpButton = document.getElementById('help-button');
+const isMobileDevice = navigator.userAgentData?.mobile === true
+  || /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
 const previewParams = new URLSearchParams(window.location.search);
 
@@ -7272,11 +7276,21 @@ function finishLoading() {
   completeInitialLoading();
 }
 
-function configureTouchFallback() {
-  if (!isCoarsePointer) return;
+function showMobileFallback() {
+  loadingScreen.hidden = true;
+  welcomeScreen.hidden = false;
+  welcomeScreen.classList.remove('house-paused');
+  welcomeEyebrow.textContent = '3D gallery · Desktop only';
+  welcomeTitle.textContent = 'Please visit from a laptop.';
+  welcomeCopy.textContent = 'This 3D gallery needs a keyboard and mouse. In the meantime, you can view my résumé.';
   enterButton.hidden = true;
-  controlSummary.textContent = 'The walk-through uses a mouse and keyboard. Browse the high-resolution posters on this device.';
-  welcomeCopy.textContent = 'The 3D room is visible here; use the poster index for a touch-friendly, high-resolution view.';
+  galleryDestinationButton.hidden = true;
+  movementGuide.hidden = true;
+  controlSummary.hidden = true;
+  helpButton.hidden = true;
+  resumeButton.textContent = 'View résumé';
+  resumeButton.classList.remove('secondary-button');
+  resumeButton.classList.add('primary-button');
 }
 
 function enableDragLookFallback() {
@@ -7288,7 +7302,7 @@ function enableDragLookFallback() {
 }
 
 function enterGallery() {
-  if (!sceneReady || !webglAvailable || isCoarsePointer) return;
+  if (!sceneReady || !webglAvailable || isMobileDevice) return;
   enteredOnce = true;
   galleryActive = true;
   videoRoomAudioUnlocked = true;
@@ -7326,6 +7340,10 @@ function enterGallery() {
 }
 
 function initializeGallery() {
+  if (isMobileDevice) {
+    showMobileFallback();
+    return;
+  }
   if (document.fonts?.load) {
     // Warm the wall-text font in parallel with renderer and texture setup.
     // Waiting here made the loading screen sit at its CSS 4% start position
@@ -7336,8 +7354,6 @@ function initializeGallery() {
       document.fonts.load('italic 400 70px "Inter"')
     ]).catch(() => {});
   }
-  configureTouchFallback();
-
   try {
     renderer = new THREE.WebGLRenderer({
       canvas,
