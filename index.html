@@ -29,31 +29,143 @@
     "@type": "CollectionPage",
     "name": "Puti Wen - Research Poster Gallery",
     "url": "https://putiw.github.io/",
-    "description": "Research posters, a film, and selected paper figures spanning visual neuroscience, multiple sclerosis imaging, research collaboration, and public engagement.",
+    "description": "An interactive 3D gallery of Puti Wen's research posters, clinical and scientific software demonstrations, selected paper figures, films, games, and artwork.",
+    "dateModified": "2026-07-20",
     "about": {
       "@type": "Person",
+      "@id": "https://putiw.github.io/#puti-wen",
       "name": "Puti Wen",
-      "url": "https://putiw.github.io/"
+      "alternateName": "温菩提",
+      "url": "https://putiw.github.io/",
+      "jobTitle": "Postdoctoral Researcher",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "NYU Abu Dhabi"
+      },
+      "homeLocation": {
+        "@type": "Place",
+        "name": "Abu Dhabi, UAE"
+      },
+      "sameAs": [
+        "https://github.com/putiw",
+        "https://www.linkedin.com/in/puti-wen",
+        "https://scholar.google.com/citations?hl=en&user=tiJZLC4AAAAJ"
+      ],
+      "knowsAbout": [
+        "Neuroimaging",
+        "Magnetic resonance imaging",
+        "Multiple sclerosis",
+        "Scientific software",
+        "Clinical software",
+        "XNAT",
+        "High-performance computing",
+        "Python",
+        "Docker"
+      ]
     },
     "mainEntity": {
       "@type": "ItemList",
       "itemListElement": [
         {
-          "@type": "CreativeWork",
+          "@type": "ListItem",
           "position": 1,
-          "name": "Localizing visual motion area FST in human",
-          "author": ["Puti Wen", "Rania Ezzo", "Michael S. Landy", "Bas Rokers"]
+          "item": {
+            "@type": "CreativeWork",
+            "name": "XNAT Platform & Brain Imaging Biobank",
+            "description": "Six containerized neuroimaging pipelines on HPC, daily validation and backup workflows, cross-site MRI quality control, and a normative dashboard built from 9,000+ HCP and ADNI subjects.",
+            "contributor": { "@id": "https://putiw.github.io/#puti-wen" }
+          }
         },
         {
-          "@type": "CreativeWork",
+          "@type": "ListItem",
           "position": 2,
-          "name": "Single-trial fMRI decoding of 3D motion with stereoscopic and perspective cues",
-          "author": ["Puti Wen", "Michael S. Landy", "Bas Rokers"]
+          "item": {
+            "@type": "SoftwareApplication",
+            "name": "LesionView",
+            "applicationCategory": "MedicalApplication",
+            "description": "A browser-based clinical imaging application for tracking multiple sclerosis lesions across timepoints and reporting new and enlarging lesions.",
+            "creator": { "@id": "https://putiw.github.io/#puti-wen" }
+          }
         },
         {
-          "@type": "CreativeWork",
+          "@type": "ListItem",
           "position": 3,
-          "name": "Center for Brain and Health"
+          "item": {
+            "@type": "SoftwareApplication",
+            "name": "CvsView",
+            "applicationCategory": "MedicalApplication",
+            "description": "A web-based review tool for clinicians to verify the central vein sign in multiple sclerosis lesions, with a modular AI component and Docker deployment.",
+            "creator": { "@id": "https://putiw.github.io/#puti-wen" }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "item": {
+            "@type": "SoftwareApplication",
+            "name": "MyPhysio",
+            "applicationCategory": "MedicalApplication",
+            "description": "A full-stack physiotherapy practice-management application with admin dashboards, patient portals, exercise prescription, and pain and range-of-motion tracking.",
+            "creator": { "@id": "https://putiw.github.io/#puti-wen" }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "item": {
+            "@type": "SoftwareApplication",
+            "name": "afqView",
+            "description": "An interactive 3D web application for side-by-side quality control of white matter tractography across 100+ subjects, each with 20+ tracts and 10 iterated versions.",
+            "creator": { "@id": "https://putiw.github.io/#puti-wen" }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 6,
+          "item": {
+            "@type": "ScholarlyArticle",
+            "name": "Single-trial fMRI decoding of 3D motion with stereoscopic and perspective cues",
+            "datePublished": "2025",
+            "isPartOf": {
+              "@type": "Periodical",
+              "name": "Journal of Neuroscience"
+            },
+            "author": { "@id": "https://putiw.github.io/#puti-wen" }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 7,
+          "item": {
+            "@type": "ScholarlyArticle",
+            "name": "Functional localization of visual motion area FST in humans",
+            "datePublished": "2025",
+            "isPartOf": {
+              "@type": "Periodical",
+              "name": "Imaging Neuroscience"
+            },
+            "author": { "@id": "https://putiw.github.io/#puti-wen" }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 8,
+          "item": {
+            "@type": "CreativeWork",
+            "name": "Enhanced Prediction of Multiple Sclerosis Disabilities Using Tract-Specific Lesion Load and Advanced Quantitative MRI Metrics",
+            "description": "A 2025 research poster on tract-specific lesion load and quantitative MRI metrics in multiple sclerosis.",
+            "creator": { "@id": "https://putiw.github.io/#puti-wen" }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 9,
+          "item": {
+            "@type": "VideoObject",
+            "name": "One minute of Center for Brain and Health",
+            "description": "A one-minute introductory video made for the NYU Abu Dhabi Center for Brain and Health.",
+            "creator": { "@id": "https://putiw.github.io/#puti-wen" }
+          }
         }
       ]
     }
