@@ -136,51 +136,14 @@ a:hover {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
-  padding: 19px 20px 18px;
-}
-
-.gallery-home-window-eyebrow {
-  color: var(--blue);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  gap: 12px;
+  padding: 18px 20px;
 }
 
 .gallery-home-window strong {
   color: #15191b;
   font-size: clamp(23px, 3vw, 32px);
   line-height: 1.04;
-}
-
-.gallery-home-window-copy {
-  max-width: 590px;
-  color: #5d666b;
-  font-size: 14px;
-  line-height: 1.35;
-}
-
-.gallery-home-window-progress {
-  display: block;
-  width: 100%;
-  height: 4px;
-  margin-top: 2px;
-  overflow: hidden;
-  background: #d9dddc;
-}
-
-.gallery-home-window-progress i {
-  display: block;
-  width: 82%;
-  height: 100%;
-  background: var(--blue);
-  animation: gallery-home-progress 5.6s ease-in-out forwards;
-}
-
-.gallery-home-window-status {
-  color: #687278;
-  font-size: 11px;
 }
 
 .gallery-home-window-button {
@@ -196,26 +159,6 @@ a:hover {
   font-weight: 700;
   text-align: center;
   animation: gallery-home-button-shake 5.2s ease-in-out infinite;
-}
-
-.gallery-home-window-controls {
-  color: #697278;
-  font-size: 10px;
-}
-
-.gallery-home-window-controls kbd {
-  padding: 2px 5px;
-  color: #3c474d;
-  background: #e3e6e6;
-  border: 1px solid #c4cbcd;
-  border-radius: 3px;
-  font-size: 10px;
-}
-
-@keyframes gallery-home-progress {
-  0%, 15% { width: 18%; }
-  74% { width: 82%; }
-  100% { width: 100%; }
 }
 
 @keyframes gallery-home-button-shake {
@@ -260,8 +203,7 @@ a:hover {
 
 @media (prefers-reduced-motion: reduce) {
   .gallery-home-window,
-  .gallery-home-window-button,
-  .gallery-home-window-progress i {
+  .gallery-home-window-button {
     animation: none;
     transition: none;
   }

@@ -250,10 +250,14 @@ button {
 
 .primary-button,
 .secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 44px;
   padding: 10px 18px;
   border: 1px solid var(--ink);
   font-weight: 700;
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -281,6 +285,27 @@ button {
 .secondary-button:focus-visible {
   color: var(--blue);
   border-color: var(--blue);
+}
+
+.welcome-actions .resume-button,
+.welcome-actions .destination-button {
+  min-height: 58px;
+  padding-inline: 24px;
+  font-size: 16px;
+}
+
+.welcome-screen.house-paused .welcome-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+}
+
+.welcome-screen.house-paused .welcome-actions .primary-button,
+.welcome-screen.house-paused .welcome-actions .secondary-button {
+  width: 100%;
+  min-height: 58px;
+  padding: 12px 14px;
+  font-size: 18px;
 }
 
 .control-summary {
@@ -501,6 +526,150 @@ kbd {
   color: inherit;
   border-color: rgba(255, 255, 255, 0.35);
   background: rgba(255, 255, 255, 0.08);
+}
+
+.portal-prompt {
+  position: fixed;
+  z-index: 6;
+  display: grid;
+  width: min(calc(100% - 34px), 430px);
+  padding: 13px 16px 14px;
+  color: #f8fbf8;
+  background: rgba(19, 25, 24, 0.84);
+  border: 1px solid rgba(207, 226, 217, 0.42);
+  box-shadow: 0 12px 38px rgba(10, 16, 14, 0.28);
+  pointer-events: none;
+  backdrop-filter: blur(9px);
+}
+
+.portal-prompt {
+  bottom: 58px;
+  left: 50%;
+  border-left: 5px solid #b8d8c9;
+  transform: translateX(-50%);
+}
+
+.portal-prompt small {
+  color: #b8d8c9;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.portal-prompt strong {
+  margin-top: 3px;
+  font-size: 16px;
+}
+
+.portal-prompt span {
+  margin-top: 5px;
+  color: #d1d8d4;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.sound-reminder {
+  position: fixed;
+  z-index: 8;
+  top: 22px;
+  right: 22px;
+  display: grid;
+  width: min(calc(100% - 32px), 360px);
+  padding: 13px 16px 14px;
+  color: #f8fbf8;
+  background: rgba(19, 25, 24, 0.9);
+  border: 1px solid rgba(207, 226, 217, 0.42);
+  border-left: 5px solid #63b7d6;
+  box-shadow: 0 12px 38px rgba(10, 16, 14, 0.3);
+  pointer-events: none;
+  backdrop-filter: blur(9px);
+}
+
+.sound-reminder small {
+  color: #8fd0e7;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.sound-reminder strong {
+  margin-top: 3px;
+  font-size: 16px;
+}
+
+.sound-reminder span {
+  margin-top: 5px;
+  color: #d1d8d4;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.portal-transition {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  color: #f8f7ef;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(202, 223, 211, 0.34), transparent 24%),
+    radial-gradient(circle at 50% 50%, #2b3934 0%, #151b19 52%, #090b0a 100%);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 280ms ease, visibility 0s linear 280ms;
+  pointer-events: none;
+}
+
+.portal-transition::before {
+  content: '';
+  position: absolute;
+  width: min(62vw, 620px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(220, 235, 226, 0.18);
+  border-radius: 50%;
+  box-shadow:
+    0 0 80px rgba(182, 217, 199, 0.12),
+    inset 0 0 90px rgba(182, 217, 199, 0.08);
+  animation: portal-breathe 1.8s ease-in-out infinite;
+}
+
+.portal-transition span,
+.portal-transition strong {
+  position: relative;
+  z-index: 1;
+}
+
+.portal-transition span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.portal-transition strong {
+  margin-top: 9px;
+  font-family: 'Inter', var(--sans);
+  font-size: clamp(38px, 8vw, 84px);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+}
+
+.portal-transition.is-active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 280ms ease;
+}
+
+.portal-transition.is-active.is-revealing {
+  opacity: 0;
+}
+
+@keyframes portal-breathe {
+  0%, 100% { transform: scale(0.96); opacity: 0.56; }
+  50% { transform: scale(1.04); opacity: 1; }
 }
 
 .walk-hint {
@@ -818,11 +987,16 @@ dialog::backdrop {
   .walk-hint {
     display: none;
   }
+
 }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .portal-transition::before {
+    animation: none;
   }
 }

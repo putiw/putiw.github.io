@@ -76,12 +76,15 @@ const HOUSE_BASE_STONE_COMPONENTS = new Set([
   'Plane005', 'Plane012', 'Plane018', 'Plane019', 'Plane020', 'Plane021', 'Plane022',
   'Plane023', 'Plane024', 'Plane043', 'ROOF_TOP_FLOOR', 'Cube', 'Cube003', 'Cube004',
   'Cube005', 'Cube008', 'Cube010', 'Cube011', 'Cube012', 'Cube015', 'Plane081',
-  'Plane083', 'Plane084', 'Plane085', 'cut_long_wall_top_window', 'front_wall_right_side',
+  'Plane085', 'cut_long_wall_top_window', 'front_wall_right_side',
   'leftwall', 'middlefrontwall', 'middlefrontwall001', 'middlefrontwall004', 'midwall1',
   'midwall1002', 'midwall1027', 'midwall1028', 'right_middle_wall', 'roomfloor',
   'midwall1015', 'midwall1016', 'midwall1017', 'midwall1018', 'midwall1019',
   'midwall1020', 'midwall1021', 'midwall1022', 'midwall1023', 'midwall1024',
   'midwall1025', 'midwall1026', 'Plane', 'Plane014', 'Plane015', 'Plane039', 'Plane074', 'Plane126'
+].map((name) => name.toLowerCase().replace(/[^a-z0-9]/g, '')));
+const HOUSE_WOOD_COMPONENTS = new Set([
+  'Plane083', 'Plane084', 'Plane119'
 ].map((name) => name.toLowerCase().replace(/[^a-z0-9]/g, '')));
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xd7d4cd);
@@ -479,8 +482,8 @@ function getSemanticHouseGroupKey(child, material) {
   const hierarchy = houseHierarchyLabel(child);
   const label = `${material.name || ''} ${hierarchy}`.toLowerCase();
   if (/^plane[._]?016$/i.test(child.name || '')) return null;
+  if (HOUSE_WOOD_COMPONENTS.has((child.name || '').toLowerCase().replace(/[^a-z0-9]/g, ''))) return 'wood';
   if (HOUSE_BASE_STONE_COMPONENTS.has((child.name || '').toLowerCase().replace(/[^a-z0-9]/g, ''))) return 'baseStone';
-  if (/^plane[._]?119$/i.test(child.name || '')) return 'wood';
   if (/(cut[ _]long[ _]wall[ _]top[ _]window|middlefrontwall[._]?001)/.test(hierarchy)) return 'baseStone';
   const isGlassHolder = /glass holder/.test(label);
   const isActualGlass = !isGlassHolder && (/(window|missingglass)/.test(label)

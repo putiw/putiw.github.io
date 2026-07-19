@@ -3,324 +3,252 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Puti Wen — Neuroimaging Scientist &amp; Clinical Tool Builder</title>
-  <meta name="description" content="Résumé of Puti Wen, an Abu Dhabi-based neuroimaging scientist and clinical tool builder specializing in MRI pipelines, XNAT, HPC, scientific software, and multiple sclerosis imaging.">
+  <base href="./gallery/">
+  <title>Puti Wen - Research Poster Gallery</title>
+  <meta name="description" content="Walk through an interactive 3D gallery of research posters, app demonstrations, selected paper figures, a screening room, and an art gallery.">
   <meta name="robots" content="index, follow">
-  <meta name="theme-color" content="#e8eaed">
+  <meta name="theme-color" content="#f1f0ed">
   <link rel="canonical" href="https://putiw.github.io/">
-  <meta property="og:type" content="profile">
-  <meta property="og:title" content="Puti Wen — Neuroimaging Scientist &amp; Clinical Tool Builder">
-  <meta property="og:description" content="MRI pipelines, clinical imaging tools, scientific infrastructure, and neuroimaging research in Abu Dhabi.">
+  <link rel="preload" href="fonts/inter-regular.ttf" as="font" type="font/ttf" crossorigin>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Puti Wen - Research Poster Gallery">
+  <meta property="og:description" content="An interactive 3D gallery of research posters, app demonstrations, selected paper figures, a screening room, and an art gallery.">
   <meta property="og:url" content="https://putiw.github.io/">
-  <meta property="profile:first_name" content="Puti">
-  <meta property="profile:last_name" content="Wen">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20260720-sound-reminder1">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three.module.min.js",
+      "three/addons/controls/PointerLockControls.js": "./vendor/PointerLockControls.js"
+    }
+  }
+  </script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "ProfilePage",
+    "@type": "CollectionPage",
+    "name": "Puti Wen - Research Poster Gallery",
     "url": "https://putiw.github.io/",
-    "name": "Puti Wen — Neuroimaging Scientist & Clinical Tool Builder",
-    "mainEntity": {
+    "description": "Research posters, a film, and selected paper figures spanning visual neuroscience, multiple sclerosis imaging, research collaboration, and public engagement.",
+    "about": {
       "@type": "Person",
       "name": "Puti Wen",
-      "alternateName": "温菩提",
-      "url": "https://putiw.github.io/",
-      "jobTitle": "Postdoctoral Researcher",
-      "worksFor": {
-        "@type": "Organization",
-        "name": "NYU Abu Dhabi"
-      },
-      "homeLocation": {
-        "@type": "Place",
-        "name": "Abu Dhabi, UAE"
-      },
-      "sameAs": [
-        "https://github.com/putiw",
-        "https://www.linkedin.com/in/puti-wen",
-        "https://scholar.google.com/citations?hl=en&user=tiJZLC4AAAAJ"
-      ],
-      "knowsAbout": [
-        "Neuroimaging",
-        "Magnetic resonance imaging",
-        "Multiple sclerosis",
-        "Scientific software",
-        "Clinical software",
-        "XNAT",
-        "High-performance computing",
-        "Python",
-        "Docker"
+      "url": "https://putiw.github.io/"
+    },
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": [
+        {
+          "@type": "CreativeWork",
+          "position": 1,
+          "name": "Localizing visual motion area FST in human",
+          "author": ["Puti Wen", "Rania Ezzo", "Michael S. Landy", "Bas Rokers"]
+        },
+        {
+          "@type": "CreativeWork",
+          "position": 2,
+          "name": "Single-trial fMRI decoding of 3D motion with stereoscopic and perspective cues",
+          "author": ["Puti Wen", "Michael S. Landy", "Bas Rokers"]
+        },
+        {
+          "@type": "CreativeWork",
+          "position": 3,
+          "name": "Center for Brain and Health"
+        }
       ]
     }
   }
   </script>
 </head>
 <body>
-  <div class="site-shell">
-    <div class="home-layout">
-      <main class="cv-document">
-      <article class="paper page-one" aria-label="Résumé page 1">
-        <a class="resume-download-button" href="Puti_Wen_Resume_2026.pdf?v=20260718-resume-update" target="_blank" rel="noopener">Download PDF <span aria-hidden="true">↓</span></a>
-        <header class="cv-header">
-          <h1>Puti Wen</h1>
-          <p class="contact-line">
-            <a href="mailto:pw1246@nyu.edu">pw1246@nyu.edu</a>
-            <span aria-hidden="true">|</span>
-            <span>Abu Dhabi, UAE</span>
-            <span aria-hidden="true">|</span>
-            <a href="https://github.com/putiw" target="_blank" rel="noopener">github.com/putiw</a>
-            <span aria-hidden="true">|</span>
-            <a href="https://www.linkedin.com/in/puti-wen" target="_blank" rel="noopener">linkedin.com/in/puti-wen</a>
-          </p>
-          <p class="summary">A somewhat unconventional neuroscientist. My PhD was in visual neuroscience, but my recent work has centered on building diagnostic and prognostic reporting tools for MS. I also spend most of my time building processing pipelines and maintaining infrastructure for large neuroimaging datasets. I work across mixed fields: psychology, radiology, engineering, clinical neurology, or whatever comes up.</p>
-        </header>
+  <main class="gallery-app" id="gallery-app">
+    <canvas id="gallery-canvas" aria-label="Interactive 3D research poster gallery"></canvas>
 
-        <section class="cv-section skills-section" aria-labelledby="skills-heading">
-          <h2 id="skills-heading">Technical Skills</h2>
-          <dl class="skills-list">
-            <div><dt>Neuroimaging</dt><dd>fMRIPrep, FreeSurfer, TractoFlow, MRIQC, BIDS, dcm2bids, DICOM, HCP, ANTs, Nextflow</dd></div>
-            <div><dt>MRI Hardware</dt><dd>Siemens scanners, Psychtoolbox, EyeLink eye-tracking, VPixx/ProPixx</dd></div>
-            <div><dt>Automate Workflow</dt><dd>Docker, Singularity, GitHub Actions</dd></div>
-            <div><dt>Manage Infrastructure</dt><dd>XNAT, Slurm (HPC), Supabase, Box API</dd></div>
-            <div><dt>Build Applications</dt><dd>React Native, Godot, Typescript</dd></div>
-            <div><dt>Analyze &amp; Visualize</dt><dd>Python, MATLAB, Adobe Illustrator, Blender</dd></div>
-          </dl>
-        </section>
+    <section class="loading-screen" id="loading-screen" aria-live="polite">
+      <div class="loading-card">
+        <p class="eyebrow">Selected work / Research archive</p>
+        <h1>Preparing the gallery</h1>
+        <div class="loading-track" aria-hidden="true"><i id="loading-bar"></i></div>
+        <p id="loading-status">0%</p>
+      </div>
+    </section>
 
-        <section class="cv-section" aria-labelledby="projects-heading">
-          <h2 id="projects-heading">Key Projects</h2>
-
-          <article class="project-entry">
-            <h3><span>XNAT Platform &amp; Brain Imaging Biobank</span><i aria-hidden="true">—</i><em>NYUAD Center for Brain and Health</em></h3>
-            <ul>
-              <li><strong><em>Processing pipelines.</em></strong> Built and containerized six processing pipelines (Docker/Singularity) on HPC for functional MRI preprocessing, structural brain segmentation, diffusion tractography, MRI quality control, cortical visual area mapping, and custom data validation with edge-case handling and BIDS compliance.</li>
-              <li><strong><em>Automated QA.</em></strong> Automated daily workflows for the brain imaging biobank: validation dashboard showing per-subject status updated nightly; automated daily backup of newly processed and validated data from XNAT to BOX.</li>
-              <li><strong><em>Cross-site QC.</em></strong> Conducted cross-site MRI quality comparisons (Siemens CIMA.X vs NYUAD, UAEU vs NYUAD) evaluating SNR, tSNR, CNR, and GSR metrics. Currently doing QC between CIMA.X and Prisma.</li>
-              <li><strong><em>Normative dashboard.</em></strong> Preprocessed 9,000+ subjects from HCP and ADNI datasets; built a normative brain dashboard with age/gender-controlled brain structure metrics allowing researchers to compare their data against normative curves.</li>
-              <li><strong><em>Documentation.</em></strong> Authored technical documentation (350+ commits); personally triage and resolve user-reported GitHub issues over the years.</li>
-            </ul>
-          </article>
-
-          <article class="project-entry">
-            <h3><span>LesionView &amp; Longitudinal Report</span><i aria-hidden="true">—</i><em>Clinical MS lesion tracking and automated reporting</em></h3>
-            <ul>
-              <li><strong><em>Lesion tracking app.</em></strong> Built a clinical imaging application for tracking MS lesions across timepoints; designed and implemented an automated longitudinal lesion change report that identifies new and enlarging lesions with color-coded and animated visualization.</li>
-              <li><strong><em>Web migration.</em></strong> Migrated from MATLAB prototype to browser-based React Native/Expo app after two external contractors failed to deliver; iterated features weekly with Yas Clinic neurologists.</li>
-              <li><strong><em>Patent filing.</em></strong> Co-inventor on provisional patent application (NYU Ref: ABD01-03), filed May 2026.</li>
-            </ul>
-          </article>
-
-          <article class="project-entry">
-            <h3><span>CvsView</span><i aria-hidden="true">—</i><em>AI-powered central vein sign detection for MS diagnosis</em></h3>
-            <ul>
-              <li><strong><em>Diagnostic tool.</em></strong> Built a web-based review tool for clinicians to efficiently verify the central vein sign (CVS) in MS lesions, designed to assist current clinical workflow; includes a modular AI component built as plug-and-play for future models.</li>
-              <li><strong><em>Data quality &amp; deployment.</em></strong> Resolved critical SWI-FLAIR alignment issues by manually re-labeling data after discovering co-registration artifacts; Docker-containerized and deployed as a web service; processes clinical data on demand for Harley Street Medical Centre.</li>
-            </ul>
-          </article>
-
-          <article class="project-entry">
-            <h3><span>MyPhysio</span><i aria-hidden="true">—</i><em>Full-stack clinical application for physiotherapy practice management</em></h3>
-            <ul>
-              <li><strong><em>Full-stack app.</em></strong> Conceived and built a full-stack clinical app (React Native, Expo, Next.js, Supabase) in collaboration with two colleagues; led development; features include admin dashboards, patient portals, exercise prescription, and pain and range of motion tracking.</li>
-              <li><strong><em>Deployment.</em></strong> Deployed with Hostinger, Supabase, GitHub Actions, Docker.</li>
-            </ul>
-          </article>
-
-          <article class="project-entry">
-            <h3><span>afqView</span><i aria-hidden="true">—</i><em>Interactive 3D white matter tractography visualization</em></h3>
-            <ul>
-              <li><strong><em>Tractography QC tool.</em></strong> A colleague needed to QC tractography data across 100+ subjects, each with 20+ tracts and 10 iterated versions — all reviewed file-by-file. Built a web application with side-by-side before/after tract comparison, per-subject navigation, color-coded availability indicators, and interactive 3D rendering.</li>
-            </ul>
-          </article>
-
-          <article class="project-entry additional-entry">
-            <h3><span>Additional Contributions</span><i aria-hidden="true">—</i></h3>
-            <ul>
-              <li>Created 8 multi-material 3D printed brain models (gray/white matter, MS lesions) for patient education; collaborated with NYUAD Engineering on fMRI research; designed CBH poster for NYUAD Research Institute Day, one-pagers for NMSS/LAMINATE stakeholder meetings, CBH promotional video, and MS Research Day event banners, etc.</li>
-            </ul>
-          </article>
-        </section>
-
-        <footer class="paper-footer">
-          <span>Puti Wen</span><i aria-hidden="true">|</i><a href="mailto:pw1246@nyu.edu">pw1246@nyu.edu</a><i aria-hidden="true">|</i><span>Page 1</span>
-        </footer>
-      </article>
-
-      <article class="paper page-two" aria-label="Résumé page 2">
-        <section class="cv-section" aria-labelledby="experience-heading">
-          <h2 id="experience-heading">Research Experience</h2>
-
-          <article class="role-entry">
-            <div class="role-heading">
-              <h3><span>Postdoctoral Researcher</span><i aria-hidden="true">|</i><em>NYU Abu Dhabi, Center for Brain and Health</em></h3>
-              <time>Sep 2024 – Present</time>
-            </div>
-            <ul>
-              <li>Led research on tract-based lesion metrics in multiple sclerosis and other MS projects such as longitudinal analysis and CVS assessment; developed and maintained XNAT-based processing and data-management infrastructure; curated and post-processed the NYUAD brain imaging dataset; and conducted cross-site, cross-scanner MRI quality control.</li>
-              <li>Provided technical training to 10+ researchers across BIDS, fMRIPrep, FreeSurfer, XNAT, and HPC workflows; conducted formal workshops for research assistants on data validation procedures</li>
-              <li>Configured MRI stimulus computer hardware, resolving Psychtoolbox compatibility on Apple Silicon; built template experiments with EyeLink eye-tracking, VPixx button box, and ProPixx projector integration</li>
-              <li>Co-investigator on DOH grant for optic nerve myelination characterization (collaborative with CCAD and Polytechnique Montreal, submitted Jan 2026)</li>
-              <li><strong>Science communication:</strong> Invited talk at WHX Arab Health 2026 Total Radiology Conference; panelist on “AI in Neuroradiology”; presented to Siemens Healthineers delegation and NYUAD provost; represented ITH startup at GITEX YouthX and Hub71; lecturer at CBH Brain Health Workshop (fMRI module), MS Workshop, and Brain Imaging Workshop; posters/talks at ISMRM 2025 (Honolulu), OHBM 2025 (Brisbane), MENACTRIMS 2025 (Dubai), Innovations in Neuroimaging 2026; 1st Place poster at Division of Science Annual Conference 2026</li>
-            </ul>
-          </article>
-
-          <article class="role-entry">
-            <div class="role-heading">
-              <h3><span>Ph.D. Researcher</span><i aria-hidden="true">|</i><em>New York University, Dept. of Psychology</em></h3>
-              <time>Aug 2019 – Aug 2024</time>
-            </div>
-            <ul>
-              <li>Investigated neural pathways of 3D motion perception in humans using fMRI; developed novel single-trial decoding methods and multivariate pattern analysis pipelines</li>
-              <li>Published 3 first-author papers in top neuroscience journals (J. Neuroscience, Imaging Neuroscience, NeuroImage)</li>
-              <li>Built motion localizer stimuli and analysis pipelines (Psychtoolbox/MATLAB) adopted across the lab</li>
-              <li><strong>Science communication:</strong> Presented at Vision Sciences Society (VSS) three consecutive years (2022 talk, 2023 and 2024 posters); poster at MENACTRIMS 2024 (Jeddah); lecturer at Brain Imaging Workshop (2023); TA for Lab in Visual Neuroscience; invited speaker for advanced MRI methods in MS (2024).</li>
-              <li>Advisors: Bas Rokers, Michael S. Landy</li>
-            </ul>
-          </article>
-
-          <article class="role-entry">
-            <div class="role-heading">
-              <h3><span>Research Assistant</span><i aria-hidden="true">|</i><em>Vanderbilt University, Randolph Blake Lab</em></h3>
-              <time>2016 – 2018</time>
-            </div>
-            <ul>
-              <li>Conducted research on multisensory perception in the lab of Randolph Blake, investigating temporal judgments of audiovisual events; first-author publication in <em>Vision</em> (2020)</li>
-            </ul>
-          </article>
-        </section>
-
-        <section class="cv-section" aria-labelledby="education-heading">
-          <h2 id="education-heading">Education</h2>
-          <div class="education-list">
-            <div><p><strong>Ph.D., Cognition and Perception</strong><i aria-hidden="true">|</i><span>New York University</span></p><time>2019 – 2024</time></div>
-            <div><p><strong>B.A., Psychology (Major), Mathematics (Minor)</strong><i aria-hidden="true">|</i><span>Belmont University</span></p><time>2015 – 2018</time></div>
-            <div><p><strong>Computational Neuroscience: Vision Workshop</strong><i aria-hidden="true">|</i><span>Cold Spring Harbor Laboratory</span></p><time>2022</time></div>
+    <section class="welcome-screen" id="welcome-screen" hidden>
+      <div class="welcome-card">
+        <p class="eyebrow" id="welcome-eyebrow">Interactive research archive</p>
+        <h1 id="welcome-title">Walk through the work.</h1>
+        <p class="welcome-copy" id="welcome-copy">Eight posters, six app demos, a figure salon, a dark screening room, and an art gallery ready for future work.</p>
+        <div class="welcome-actions">
+          <button class="primary-button" type="button" id="enter-button">Enter gallery</button>
+          <button class="secondary-button destination-button" type="button" id="gallery-destination-button" hidden>Gallery</button>
+          <a class="secondary-button resume-button" id="resume-button" href="/resume/" target="puti-resume">View résumé</a>
+        </div>
+        <div class="movement-guide" aria-label="Movement controls">
+          <div class="key-cluster" aria-hidden="true">
+            <div class="key-row"><kbd>W</kbd></div>
+            <div class="key-row"><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div>
           </div>
-        </section>
-
-        <section class="cv-section" aria-labelledby="ip-heading">
-          <h2 id="ip-heading">Intellectual Property &amp; Grants</h2>
-          <ul>
-            <li><strong>Co-Inventor, Provisional Patent Application:</strong> LesionView (NYU Ref: ABD01-03) and Automated Cloud-Based MS MRI Pipeline / LAMINATE (ABD01-04). Filed May 2026 via NYU Technology Opportunities &amp; Ventures.</li>
-            <li><strong>Co-Investigator, DOH Grant:</strong> “Diagnosis of optic neuritis through biophysically-informed characterization of optic nerve myelination.” Collaborative with CCAD and Polytechnique Montreal. Submitted Jan 2026.</li>
-          </ul>
-        </section>
-
-        <section class="cv-section publications-section" aria-labelledby="publications-heading">
-          <h2 id="publications-heading">Selected Publications</h2>
-          <p class="section-intro">5 peer-reviewed journal articles (4 as first author), plus 10+ total published conference abstracts and preprints (bioRxiv, medRxiv).</p>
-          <div class="publication-list">
-            <p><strong>Wen, P.</strong>, Thompson, L. W., Rosenberg, A., Landy, M. S., &amp; Rokers, B. (2025). Single-trial fMRI decoding of 3D motion with stereoscopic and perspective cues. <em>Journal of Neuroscience</em>.</p>
-            <p><strong>Wen, P.</strong>, Ezzo, R., Thompson, L. W., Rosenberg, A., Landy, M. S., &amp; Rokers, B. (2025). Functional localization of visual motion area FST in humans. <em>Imaging Neuroscience</em>.</p>
-            <p><strong>Wen, P.</strong>, Landy, M. S., &amp; Rokers, B. (2023). Identifying cortical areas that underlie the transformation from 2D retinal to 3D head-centric motion signals. <em>NeuroImage</em>.</p>
-            <p><strong>Wen, P.</strong>, Opoku-Baah, C., Park, M., &amp; Blake, R. (2020). Judging relative onsets and offsets of audiovisual events. <em>Vision</em>.</p>
-            <p><strong>Mohamed, A. Z., ..., Wen, P.</strong>, et al. (2026). The ASPIRE Research Institute Dataset: Building a foundation for brain health research in the UAE. <em>Scientific Data</em>.</p>
-            <p><strong>Abdullah, O.*, Wen, P.*</strong>, et al. (2026). Tract-based lesion metrics for resolving the clinico-radiological paradox in multiple sclerosis. <em>bioRxiv</em>.</p>
+          <div class="movement-copy">
+            <strong>Move with WASD</strong>
+            <span>Mouse looks around the room</span>
           </div>
-        </section>
+        </div>
+        <p class="control-summary" id="control-summary"><kbd>←</kbd> <kbd>→</kbd> skip a focused video by 5 seconds <span>/</span> <kbd>Space</kbd> or <kbd>↑</kbd> jump <span>/</span> <kbd>↓</kbd> crouch</p>
+      </div>
+    </section>
 
-        <section class="cv-section personal-section" aria-labelledby="personal-heading">
-          <h2 id="personal-heading">Personal</h2>
-            <p><strong>Languages:</strong> English, Chinese, basic Turkish. <strong>Design:</strong> T-shirt design selected for CSHL (2022); designed CBH t-shirt/hoodie (2025); artwork featured in fashion shows in China. <strong>Other:</strong> Developed a <a href="shrimp-tanks/?v=20260718-latest-shrimp-build" target="_blank" rel="noopener">shrimp simulation game</a>; YouTube channel (N.A.R. Things); built self-sustaining aquarium without filter/cleaning/oxegen; got to Grandmaster once in Teamfight Tactics.</p>
-        </section>
+    <div class="reticle" id="reticle" aria-hidden="true" hidden><i></i></div>
 
-        <footer class="paper-footer">
-          <span>Puti Wen</span><i aria-hidden="true">|</i><a href="mailto:pw1246@nyu.edu">pw1246@nyu.edu</a><i aria-hidden="true">|</i><span>Page 2</span>
-        </footer>
-      </article>
-      </main>
+    <aside class="focus-card" id="focus-card" aria-live="polite" hidden>
+      <small>Artwork in view</small>
+      <strong id="focus-title"></strong>
+      <span>Press <kbd>E</kbd> or click to examine</span>
+    </aside>
 
-      <aside class="gallery-home-aside" aria-label="Interactive project gallery">
-        <a class="gallery-home-window" href="gallery/?v=20260719-house-floor-preview-transform14" aria-label="Open the interactive project gallery">
-          <span class="gallery-home-window-bar">
-            <span>Project gallery</span>
-            <span aria-hidden="true">↗</span>
-          </span>
-          <span class="gallery-home-window-body">
-            <span class="gallery-home-window-eyebrow">Interactive project archive</span>
-            <strong>Walk through the work.</strong>
-            <span class="gallery-home-window-copy">Eight posters, three app showcases, a figure salon, a dark screening room, a brain room, a game room, and an art room of drawings, designs, and experiments.</span>
-            <span class="gallery-home-window-progress" aria-hidden="true"><i></i></span>
-            <span class="gallery-home-window-status">Gallery ready — click to enter.</span>
-            <span class="gallery-home-window-button">Enter gallery</span>
-            <span class="gallery-home-window-controls"><kbd>WASD</kbd> move &nbsp; <kbd>Mouse</kbd> look &nbsp; <kbd>E</kbd> examine</span>
-          </span>
-        </a>
-      </aside>
+    <aside class="portal-prompt" id="portal-prompt" aria-live="polite" hidden>
+      <small>The wall remembers</small>
+      <strong id="portal-prompt-title">Home is on the other side.</strong>
+      <span id="portal-prompt-copy">Walk into the house photos.</span>
+    </aside>
+
+    <aside class="sound-reminder" id="sound-reminder" role="status" aria-live="polite" hidden>
+      <small>Sound in this room</small>
+      <strong>Can you hear it?</strong>
+      <span>If not, check whether this browser tab or your device is muted.</span>
+    </aside>
+
+    <div class="portal-transition" id="portal-transition" aria-hidden="true">
+      <span>Passing through</span>
+      <strong id="portal-transition-title">Home</strong>
     </div>
-  </div>
-  <script>
-    (() => {
-      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-      if (connection?.saveData || /^(slow-2g|2g)$/.test(connection?.effectiveType || '')) return;
 
-      const galleryWarmupAssets = [
-        ['gallery/?v=20260719-house-floor-preview-transform14', null],
-        ['gallery/gallery.js?v=20260719-loading-numbers6', 'script'],
-        ['gallery/wall-map-layout.js?v=20260718-all-door-headers-labels-contrast1-map-path1', 'script'],
-        ['gallery/art/works.js', 'script'],
-        ['gallery/vendor/three.module.min.js', 'script'],
-        ['gallery/vendor/PointerLockControls.js', 'script'],
-        ['gallery/vendor/loaders/GLTFLoader.js', 'script'],
-        ['gallery/style.css?v=20260718-contrast1', 'style'],
-        ['gallery/fonts/inter-regular.ttf', 'font'],
-        ['gallery/resume/resume-page-1.jpg', 'image'],
-        ['gallery/resume/resume-page-2.jpg', 'image'],
-        ['gallery/posters/fst-wall.webp', 'image'],
-        ['gallery/posters/decoding-wall.webp', 'image'],
-        ['gallery/posters/cbh-wall.webp', 'image'],
-        ['gallery/posters/ms-lesion-metrics-wall.webp', 'image'],
-        ['gallery/posters/ohbm-pdi-wall.webp', 'image'],
-        ['gallery/posters/ms-research-day-wall.webp', 'image'],
-        ['gallery/posters/laminate-wall.webp', 'image'],
-        ['gallery/posters/menactrims-cvsview-wall.webp', 'image'],
-        ['gallery/media/cbh-center-film-poster.webp', 'image'],
-        ['gallery/media/video-posters/defense-screening-web.jpg', 'image'],
-        ['gallery/media/video-posters/cvsview-lesion-mask-native.jpg', 'image'],
-        ['gallery/media/video-posters/cvsview-rapid-navigation-native.jpg', 'image'],
-        ['gallery/media/video-posters/cvsview-cvs-prl-review-web-720.jpg', 'image'],
-        ['gallery/media/video-posters/lesionview-lesion-segmentation-native.jpg', 'image'],
-        ['gallery/media/video-posters/lesionview-longitudinal-comparison-native.jpg', 'image'],
-        ['gallery/media/video-posters/lesionview-new-lesion-verification-native.jpg', 'image'],
-        ['gallery/media/video-posters/myphysio-01-app-welcome.jpg', 'image'],
-        ['gallery/media/video-posters/myphysio-02-daily-exercise.jpg', 'image'],
-        ['gallery/media/video-posters/myphysio-03-workout-tracker.jpg', 'image'],
-        ['gallery/media/video-posters/myphysio-04-pain-diary.jpg', 'image'],
-        ['gallery/media/video-posters/myphysio-05-rom-diary.jpg', 'image'],
-        ['gallery/media/video-posters/myphysio-06-manage-program.jpg', 'image'],
-        ['gallery/art/pierre-mug.webp', 'image'],
-        ['gallery/art/hadi-mug.webp', 'image'],
-        ['gallery/art/walls/art-south-updated.png?v=20260719-art-south-artboard3-transparent6', 'image'],
-        ['gallery/media/defense-screening-web.mp4?v=20260717-faststart', 'video'],
-        ['gallery/media/mri-afqview-hd.m4v', 'video'],
-        ['gallery/media/mri-fmri-hd.m4v', 'video'],
-        ['gallery/media/cvsview-cvs-prl-review-web-720.mp4', 'video'],
-        ['gallery/brain-room/brain-pdf-1.png', 'image'],
-        ['gallery/brain-room/brain-pdf-2.png', 'image'],
-        ['gallery/brain-room/brain-pdf-3.png', 'image'],
-        ['gallery/mri-room/brain-pdf-4.png?v=20260718-hd', 'image'],
-        ['gallery/mri-room/brain-pdf-5-updated.png?v=20260718-mri-pdf', 'image'],
-        ['gallery/mri-room/brain-pdf-6.png?v=20260718-hd', 'image'],
-        ['gallery/mri-room/brain-pdf-7-updated.png?v=20260718-mri-pdf', 'image']
-      ];
+    <p class="walk-hint" id="walk-hint" hidden><kbd>WASD</kbd> move &nbsp; Mouse to look &nbsp; <kbd>←</kbd> <kbd>→</kbd> video ±5 sec &nbsp; <kbd>Space</kbd> / <kbd>↑</kbd> jump &nbsp; <kbd>↓</kbd> crouch</p>
 
-      const warmGallery = () => {
-        galleryWarmupAssets.forEach(([href, as]) => {
-          const link = document.createElement('link');
-          link.rel = 'prefetch';
-          if (as) link.as = as;
-          link.href = href;
-          link.fetchPriority = 'low';
-          document.head.appendChild(link);
-        });
-      };
+    <section class="poster-index" id="poster-index" hidden aria-label="Poster index">
+      <header>
+        <div>
+          <p class="eyebrow">Selected work</p>
+          <h2>Research poster index</h2>
+          <p>Open any poster for a high-resolution view. The full-size image loads only when requested.</p>
+        </div>
+        <button class="close-button" type="button" id="close-index" aria-label="Close poster index">Close</button>
+      </header>
+      <div class="poster-grid">
+        <button class="poster-card" type="button" data-poster="fst">
+          <img src="posters/fst-wall.webp" alt="Preview of the Localizing visual motion area FST in human poster" width="3072" height="1808" loading="lazy">
+          <span class="poster-card-copy">
+            <small>Visual neuroscience</small>
+            <strong>Localizing visual motion area FST in human</strong>
+            <em>VSS poster - 2024</em>
+          </span>
+        </button>
+        <button class="poster-card" type="button" data-poster="decoding">
+          <img src="posters/decoding-wall.webp" alt="Preview of the single-trial fMRI decoding of 3D motion poster" width="3072" height="1728" loading="lazy">
+          <span class="poster-card-copy">
+            <small>fMRI and computational neuroscience</small>
+            <strong>Single-trial fMRI decoding of 3D motion with stereoscopic and perspective cues</strong>
+            <em>Research poster - 2023</em>
+          </span>
+        </button>
+        <button class="poster-card" type="button" data-poster="cbh">
+          <img src="posters/cbh-wall.webp" alt="Preview of the Center for Brain and Health overview poster" width="3072" height="1690" loading="lazy">
+          <span class="poster-card-copy">
+            <small>Clinical and translational neuroscience</small>
+            <strong>Center for Brain and Health</strong>
+            <em>Center for Brain and Health overview - 2025</em>
+          </span>
+        </button>
+        <button class="poster-card portrait" type="button" data-poster="ms-lesion-metrics">
+          <img src="posters/ms-lesion-metrics-wall.webp" alt="Preview of the tract-specific lesion load and quantitative MRI poster" width="1450" height="2048" loading="lazy">
+          <span class="poster-card-copy">
+            <small>Multiple sclerosis neuroimaging</small>
+            <strong>Enhanced Prediction of Multiple Sclerosis Disabilities Using Tract-Specific Lesion Load and Advanced Quantitative MRI Metrics</strong>
+            <em>Multiple sclerosis research poster - 2025</em>
+          </span>
+        </button>
+        <button class="poster-card portrait" type="button" data-poster="ohbm-pdi">
+          <img src="posters/ohbm-pdi-wall.webp" alt="Preview of the MP2RAGE ventricle distance profiling poster" width="1450" height="2048" loading="lazy">
+          <span class="poster-card-copy">
+            <small>Multiple sclerosis neuroimaging</small>
+            <strong>MP2RAGE Ventricle Distance Profiling Improves Classification of Multiple Sclerosis Subtypes</strong>
+            <em>OHBM poster - 2025</em>
+          </span>
+        </button>
+        <button class="poster-card portrait" type="button" data-poster="ms-research-day">
+          <img src="posters/ms-research-day-wall.webp" alt="Preview of the MS Research Day event banner" width="891" height="2048" loading="lazy">
+          <span class="poster-card-copy">
+            <small>Research engagement and outreach</small>
+            <strong>MS Research Day</strong>
+            <em>Made this banner for an event for the National Multiple Sclerosis Society and NYU Abu Dhabi - 5 November 2025</em>
+          </span>
+        </button>
+        <button class="poster-card portrait" type="button" data-poster="laminate">
+          <img src="posters/laminate-wall.webp" alt="Preview of the NMSS one pager" width="1449" height="2048" loading="lazy">
+          <span class="poster-card-copy">
+            <small>Multiple sclerosis collaboration</small>
+            <strong>NMSS one pager</strong>
+            <em>Made this one pager for the National Multiple Sclerosis Society - 2025</em>
+          </span>
+        </button>
+        <button class="poster-card portrait" type="button" data-poster="menactrims-cvsview">
+          <img src="posters/menactrims-cvsview-wall.webp" alt="Preview of the CVS-View central vein sign identification poster" width="1240" height="2048" loading="lazy">
+          <span class="poster-card-copy">
+            <small>Multiple sclerosis software and AI</small>
+            <strong>CVS-View: AI-powered central vein sign identification</strong>
+            <em>MENACTRIMS poster - 5-6 December 2025</em>
+          </span>
+        </button>
+      </div>
+    </section>
+  </main>
 
-      if ('requestIdleCallback' in window) {
-        window.requestIdleCallback(warmGallery, { timeout: 2500 });
-      } else {
-        window.setTimeout(warmGallery, 1800);
-      }
-    })();
-  </script>
+  <dialog class="poster-dialog" id="poster-dialog">
+    <form method="dialog" class="dialog-bar">
+      <div>
+        <p class="eyebrow" id="dialog-category"></p>
+        <h2 id="dialog-title"></h2>
+        <p id="dialog-authors"></p>
+      </div>
+      <button class="close-button" value="close" aria-label="Close poster">Close</button>
+    </form>
+    <div class="poster-detail-frame">
+      <div class="detail-loading" id="detail-loading">Loading high-resolution poster...</div>
+      <img id="dialog-image" alt="">
+    </div>
+  </dialog>
+
+  <dialog class="help-dialog" id="help-dialog">
+    <form method="dialog">
+      <p class="eyebrow">Gallery controls</p>
+      <h2>Move like a first-person game.</h2>
+      <dl>
+        <div><dt><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd></dt><dd>Walk and strafe</dd></div>
+        <div><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Skip a focused video backward or forward by 5 seconds</dd></div>
+        <div><dt><kbd>Space</kbd> or <kbd>↑</kbd></dt><dd>Jump</dd></div>
+        <div><dt><kbd>↓</kbd></dt><dd>Hold to crouch</dd></div>
+        <div><dt>Mouse</dt><dd>Change the camera angle</dd></div>
+        <div><dt><kbd>E</kbd> or click</dt><dd>Open a poster; tap E to play or pause a video, and hold E to restart it</dd></div>
+        <div><dt><kbd>Esc</kbd></dt><dd>Release the mouse and pause</dd></div>
+      </dl>
+      <button class="primary-button" value="close">Got it</button>
+    </form>
+  </dialog>
+
+  <noscript>
+    <section class="noscript-message">
+      <h1>Research Poster Gallery</h1>
+      <p>This interactive gallery requires JavaScript. The poster images are still available below.</p>
+      <p><a href="posters/fst-detail.webp">Localizing visual motion area FST in human</a></p>
+      <p><a href="posters/decoding-detail.webp">Single-trial fMRI decoding of 3D motion</a></p>
+      <p><a href="posters/cbh-detail.webp">Center for Brain and Health</a></p>
+      <p><a href="posters/ms-lesion-metrics-detail.webp">Enhanced Prediction of Multiple Sclerosis Disabilities</a></p>
+      <p><a href="posters/ohbm-pdi-detail.webp">MP2RAGE Ventricle Distance Profiling</a></p>
+      <p><a href="posters/ms-research-day-detail.webp">MS Research Day</a></p>
+      <p><a href="posters/laminate-detail.webp">NMSS one pager</a></p>
+      <p><a href="posters/menactrims-cvsview-detail.webp">CVS-View: AI-powered central vein sign identification</a></p>
+    </section>
+  </noscript>
+
+  <script type="module" src="gallery.js?v=20260720-app-progress-complete1"></script>
 </body>
 </html>

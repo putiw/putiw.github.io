@@ -367,6 +367,64 @@ const HOUSE_DISPLAY = {
   depth: 1.54,
   plinthHeight: 1.25
 };
+const HOUSE_POND = {
+  centerX: 23.79,
+  centerZ: 2.71,
+  waterLevel: -0.004,
+  outline: [
+    [-7.8, -2.2], [-6.4, -7.1], [-2.2, -9.7], [2.5, -9.4],
+    [6.7, -6.2], [8.0, -1.8], [7.3, 3.1], [5.4, 7.6],
+    [1.4, 10.1], [-2.3, 9.5], [-4.1, 6.7], [-3.0, 4.0],
+    [-5.9, 4.2], [-7.7, 1.4]
+  ]
+};
+const HOME_PORTAL = {
+  // Only the lower-left photo section of the Home sheet is permeable. The
+  // Blender renders and model studies to its right remain on a solid wall.
+  x: ART_ROOM.centerX - ART_ROOM.halfWidth + 4.275,
+  z: ART_ROOM.nearZ,
+  width: 6.75,
+  height: 5.85,
+  triggerZ: ART_ROOM.nearZ + 0.37,
+  promptDistance: 5.4,
+  promptSideMargin: 0.45
+};
+const HOME_FLOOR_ARROW = {
+  // Center the cue directly in front of the photo-only portal area so it
+  // points straight at the Home wall rather than sitting by the entrance.
+  x: HOME_PORTAL.x - 1.0,
+  targetX: HOME_PORTAL.x - 1.0,
+  z: ART_ROOM.nearZ + 3.2,
+  length: 3.6,
+  shaftWidth: 0.58,
+  headWidth: 1.75
+};
+const HOUSE_WORLD_LAYER = 1;
+const HOUSE_WORLD_EYE_HEIGHT = 1.68;
+const HOUSE_WORLD = {
+  // The grouped Blender export is already authored in metres. Preserve its
+  // measured 28.27 m width so the exterior reads at human scale.
+  modelWidth: 28.27074351296743,
+  minX: -48,
+  maxX: 48,
+  minZ: -40,
+  maxZ: 32,
+  // Run the portal approach directly into the foot of the main stone stairs,
+  // centered between its two floor lamps. Enter on the house-facing side of
+  // the frame, still well outside the building footprint.
+  portalX: 34.5,
+  portalZ: 5.225,
+  portalRotationY: Math.PI / 2,
+  portalTriggerX: 33.95,
+  arrival: new THREE.Vector3(33.15, HOUSE_WORLD_EYE_HEIGHT, 5.225),
+  stairPathStartX: 14.25,
+  pathWidth: 3.4,
+  maxStepUp: 0.8,
+  // The front platform is about one metre high: it is safe to drop from, but
+  // remains too tall to climb or jump onto from the surrounding ground.
+  maxStepDown: 1.25,
+  playerRadius: 0.29
+};
 const HOUSE_COLOR_PRESET = {
   metal: '#8d949a',
   glass: '#dfded8',
@@ -380,12 +438,15 @@ const HOUSE_BASE_STONE_COMPONENTS = new Set([
   'Plane005', 'Plane012', 'Plane018', 'Plane019', 'Plane020', 'Plane021', 'Plane022',
   'Plane023', 'Plane024', 'Plane043', 'ROOF_TOP_FLOOR', 'Cube', 'Cube003', 'Cube004',
   'Cube005', 'Cube008', 'Cube010', 'Cube011', 'Cube012', 'Cube015', 'Plane081',
-  'Plane083', 'Plane084', 'Plane085', 'cut_long_wall_top_window', 'front_wall_right_side',
+  'Plane085', 'cut_long_wall_top_window', 'front_wall_right_side',
   'leftwall', 'middlefrontwall', 'middlefrontwall001', 'middlefrontwall004', 'midwall1',
   'midwall1002', 'midwall1027', 'midwall1028', 'right_middle_wall', 'roomfloor',
   'midwall1015', 'midwall1016', 'midwall1017', 'midwall1018', 'midwall1019',
   'midwall1020', 'midwall1021', 'midwall1022', 'midwall1023', 'midwall1024',
   'midwall1025', 'midwall1026', 'Plane', 'Plane014', 'Plane015', 'Plane039', 'Plane074', 'Plane126'
+].map((name) => name.toLowerCase().replace(/[^a-z0-9]/g, '')));
+const HOUSE_WOOD_COMPONENTS = new Set([
+  'Plane083', 'Plane084', 'Plane119'
 ].map((name) => name.toLowerCase().replace(/[^a-z0-9]/g, '')));
 
 const ART_NORTH_WEST_LENGTH = ART_ROOM.halfWidth + ART_ROOM.doorOffsetX - ART_ROOM.doorWidth / 2;
@@ -411,7 +472,7 @@ const NESTED_GALLERY_MINIATURE = {
 };
 
 const HOUSE_RAIN_DISPLAY = {
-  title: 'Home in the rain',
+  title: 'House in the Rain, 2020',
   source: './media/house-in-rain.mp4',
   posterImage: './media/house-in-rain-poster.jpg',
   photoImage: './placement-assets/img-0168.jpg',
@@ -786,6 +847,12 @@ const myPhysioImageWorks = [
   }
 ];
 
+const APP_ROOM_LOADING_ASSETS = new Set([
+  ...appDemoWorks.map((work) => work.source),
+  ...myPhysioVideoWorks.map((work) => work.source),
+  ...myPhysioImageWorks.map((work) => work.image)
+]);
+
 const figureSalonStatement = {
   body: 'Not posters, just random figures from my papers, I spent a lot of time on them so they are here as a record of the past even tho they are definitely not my favourite in this room :)'
 };
@@ -798,6 +865,8 @@ const VIDEOS_INTRO_FONT_FAMILY = '"Inter", Arial, Helvetica, sans-serif';
 
 const resumePages = [
   {
+    title: 'Puti Wen — Résumé',
+    url: '/resume/',
     image: './resume/resume-page-1.jpg?v=20260718-resume-update',
     width: 3.28,
     aspect: 1391 / 1800,
@@ -805,6 +874,8 @@ const resumePages = [
     rotationY: Math.PI
   },
   {
+    title: 'Puti Wen — Résumé',
+    url: '/resume/',
     image: './resume/resume-page-2.jpg?v=20260718-resume-update',
     width: 3.28,
     aspect: 1391 / 1800,
@@ -838,12 +909,20 @@ const welcomeEyebrow = document.getElementById('welcome-eyebrow');
 const welcomeTitle = document.getElementById('welcome-title');
 const welcomeCopy = document.getElementById('welcome-copy');
 const enterButton = document.getElementById('enter-button');
+const galleryDestinationButton = document.getElementById('gallery-destination-button');
+const resumeButton = document.getElementById('resume-button');
 const controlSummary = document.getElementById('control-summary');
 const reticle = document.getElementById('reticle');
 const focusCard = document.getElementById('focus-card');
 const focusTitle = document.getElementById('focus-title');
 const focusEyebrow = focusCard.querySelector('small');
 const focusAction = focusCard.querySelector('span');
+const portalPrompt = document.getElementById('portal-prompt');
+const portalPromptTitle = document.getElementById('portal-prompt-title');
+const portalPromptCopy = document.getElementById('portal-prompt-copy');
+const soundReminder = document.getElementById('sound-reminder');
+const portalTransition = document.getElementById('portal-transition');
+const portalTransitionTitle = document.getElementById('portal-transition-title');
 const walkHint = document.getElementById('walk-hint');
 const posterIndex = document.getElementById('poster-index');
 const closeIndexButton = document.getElementById('close-index');
@@ -856,12 +935,15 @@ const detailLoading = document.getElementById('detail-loading');
 const helpDialog = document.getElementById('help-dialog');
 const helpButton = document.getElementById('help-button');
 const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+const previewParams = new URLSearchParams(window.location.search);
 
 let renderer;
 let camera;
 let scene;
 let controls;
 let focusedPoster = null;
+let focusedPhoto = null;
+let focusedResumeLink = null;
 let focusedManualVideo = null;
 let focusedGameAction = null;
 let focusedBrainRegion = null;
@@ -894,12 +976,50 @@ let brainWallLoadsStarted = false;
 let gameRoomLoadsStarted = false;
 let gameRoomKiosksReady = false;
 let researchRoomLoadsStarted = false;
+const appRoomReadyAssets = new Set();
+let appRoomLoadingIndicator = null;
+let appRoomLoadingFill = null;
+let appRoomLoadingLabelCanvas = null;
+let appRoomLoadingLabelTexture = null;
 let mainRoomBackgroundLoadsStarted = false;
 const mainRoomLoadedImages = new Set();
 const artRoomLoadedImages = new Set();
 let roomBackgroundPreloadPipelineQueued = false;
 let galleryMiniature = null;
 let galleryMiniatureRefreshesQueued = false;
+let houseWorldGroup = null;
+let houseWorldReady = false;
+let insideHouseWorld = false;
+let portalTransitioning = false;
+let homePortalVeil = null;
+let homePortalVeilMaterial = null;
+let houseWorldPortalVeil = null;
+let houseWorldPortalMaterial = null;
+let houseWorldGroundY = 0;
+let houseWorldCameraGroundY = 0;
+let houseWorldEdgeDropActive = false;
+let houseWorldDropGroundOverride = false;
+const houseWalkableMeshes = [];
+const houseSolidBoxes = [];
+const houseWalkRaycaster = new THREE.Raycaster();
+const houseWalkRayOrigin = new THREE.Vector3();
+const houseWalkDown = new THREE.Vector3(0, -1, 0);
+const houseWalkNormal = new THREE.Vector3();
+const houseWalkNormalMatrix = new THREE.Matrix3();
+const houseCourtyardWaterMeshes = [];
+const houseCourtyardWaterRaycaster = new THREE.Raycaster();
+const houseCourtyardWaterRayOrigin = new THREE.Vector3();
+const housePondMeshes = [];
+const housePondRaycaster = new THREE.Raycaster();
+const housePondRayOrigin = new THREE.Vector3();
+let housePondWaterTexture = null;
+const HOUSE_POND_COLLISION_OFFSETS = [
+  [0, 0],
+  [HOUSE_WORLD.playerRadius, 0],
+  [-HOUSE_WORLD.playerRadius, 0],
+  [0, HOUSE_WORLD.playerRadius],
+  [0, -HOUSE_WORLD.playerRadius]
+];
 const galleryMiniaturePosterTextures = new Map();
 const galleryMiniaturePosterLoads = new Map();
 const GALLERY_MINIATURE_POSTER_OVERRIDES = new Map([
@@ -931,9 +1051,14 @@ const SHRIMP_MUSIC_FADE_RATE = 8;
 let shrimpMusicPrimed = false;
 let shrimpMusicPlayBlocked = false;
 const shrimpMusicPlayPending = new Set();
+const soundReminderSeenZones = new Set();
+let soundReminderZone = null;
+let soundReminderZoneEnteredAt = 0;
+let soundReminderHideTimer = 0;
 
 const pressedKeys = new Set();
 const posterMeshes = [];
+const photoMeshes = [];
 const videoMeshes = [];
 const brainMeshes = [];
 const galleryVideos = [];
@@ -969,7 +1094,11 @@ function resetPlayerHeight() {
   jumpOffset = 0;
   jumpVelocity = 0;
   crouchAmount = 0;
-  if (camera) camera.position.y = STANDING_EYE_HEIGHT;
+  if (camera) {
+    camera.position.y = insideHouseWorld
+      ? houseWorldCameraGroundY + HOUSE_WORLD_EYE_HEIGHT
+      : STANDING_EYE_HEIGHT;
+  }
 }
 
 function startJump() {
@@ -980,6 +1109,19 @@ function startJump() {
 }
 
 function setWelcomeMode(mode) {
+  const housePaused = mode === 'house-paused';
+  welcomeScreen.classList.toggle('house-paused', housePaused);
+  galleryDestinationButton.hidden = !housePaused;
+  resumeButton.textContent = housePaused ? 'Resume' : 'View résumé';
+
+  if (housePaused) {
+    welcomeEyebrow.textContent = 'House paused';
+    welcomeTitle.textContent = 'Where would you like to go?';
+    welcomeCopy.textContent = 'Continue exploring the house, return to the gallery, or open the résumé.';
+    enterButton.textContent = 'House';
+    return;
+  }
+
   if (mode === 'paused') {
     welcomeEyebrow.textContent = 'Gallery paused';
     welcomeTitle.textContent = 'Take your time.';
@@ -1005,6 +1147,8 @@ function showWelcome(mode = 'initial') {
   reticle.hidden = true;
   walkHint.hidden = true;
   focusCard.hidden = true;
+  portalPrompt.hidden = true;
+  hideSoundReminder();
 }
 
 function hideWelcome() {
@@ -1327,6 +1471,115 @@ function addGalleryMap() {
   scene.add(map);
 }
 
+function updateAppRoomLoadingIndicator() {
+  const progress = appRoomReadyAssets.size / Math.max(1, APP_ROOM_LOADING_ASSETS.size);
+  if (progress >= 1) {
+    if (appRoomLoadingIndicator) {
+      appRoomLoadingIndicator.removeFromParent();
+      appRoomLoadingIndicator.traverse((child) => {
+        child.geometry?.dispose?.();
+        const materials = Array.isArray(child.material) ? child.material : [child.material];
+        materials.filter(Boolean).forEach((material) => {
+          material.map?.dispose?.();
+          material.dispose?.();
+        });
+      });
+    }
+    appRoomLoadingIndicator = null;
+    appRoomLoadingFill = null;
+    appRoomLoadingLabelCanvas = null;
+    appRoomLoadingLabelTexture = null;
+    needsRender = true;
+    return;
+  }
+
+  if (!appRoomLoadingIndicator) return;
+  const trackWidth = appRoomLoadingIndicator.userData.trackWidth;
+  appRoomLoadingFill.scale.x = Math.max(0.001, progress);
+  appRoomLoadingFill.position.x = -trackWidth * (1 - progress) / 2;
+
+  const context = appRoomLoadingLabelCanvas.getContext('2d');
+  context.clearRect(0, 0, appRoomLoadingLabelCanvas.width, appRoomLoadingLabelCanvas.height);
+  context.fillStyle = '#f4f3ed';
+  context.font = '700 46px Inter, Arial, sans-serif';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText(
+    `APP ROOM LOADING · ${Math.round(progress * 100)}%`,
+    appRoomLoadingLabelCanvas.width / 2,
+    appRoomLoadingLabelCanvas.height / 2
+  );
+  appRoomLoadingLabelTexture.needsUpdate = true;
+  needsRender = true;
+}
+
+function markAppRoomAssetReady(asset) {
+  if (!APP_ROOM_LOADING_ASSETS.has(asset) || appRoomReadyAssets.has(asset)) return;
+  appRoomReadyAssets.add(asset);
+  updateAppRoomLoadingIndicator();
+}
+
+function createAppRoomLoadingFloorIndicator() {
+  if (appRoomLoadingIndicator || appRoomReadyAssets.size >= APP_ROOM_LOADING_ASSETS.size) return;
+  const group = new THREE.Group();
+  group.name = 'App Room floor loading progress';
+  const trackWidth = APP_ROOM.doorWidth - 0.28;
+  group.userData.trackWidth = trackWidth;
+
+  const background = new THREE.Mesh(
+    new THREE.PlaneGeometry(APP_ROOM.doorWidth - 0.12, 0.82),
+    new THREE.MeshBasicMaterial({ color: 0x202729, toneMapped: false })
+  );
+  background.rotation.x = -Math.PI / 2;
+  background.position.y = 0.012;
+  group.add(background);
+
+  const track = new THREE.Mesh(
+    new THREE.PlaneGeometry(trackWidth, 0.15),
+    new THREE.MeshBasicMaterial({ color: 0x5f686b, toneMapped: false })
+  );
+  track.rotation.x = -Math.PI / 2;
+  track.position.set(0, 0.016, 0.22);
+  group.add(track);
+
+  appRoomLoadingFill = new THREE.Mesh(
+    new THREE.PlaneGeometry(trackWidth, 0.15),
+    new THREE.MeshBasicMaterial({ color: 0x197293, toneMapped: false })
+  );
+  appRoomLoadingFill.rotation.x = -Math.PI / 2;
+  appRoomLoadingFill.position.set(-trackWidth / 2, 0.02, 0.22);
+  appRoomLoadingFill.scale.x = 0.001;
+  group.add(appRoomLoadingFill);
+
+  appRoomLoadingLabelCanvas = document.createElement('canvas');
+  appRoomLoadingLabelCanvas.width = 768;
+  appRoomLoadingLabelCanvas.height = 112;
+  appRoomLoadingLabelTexture = new THREE.CanvasTexture(appRoomLoadingLabelCanvas);
+  appRoomLoadingLabelTexture.colorSpace = THREE.SRGBColorSpace;
+  appRoomLoadingLabelTexture.minFilter = THREE.LinearFilter;
+  appRoomLoadingLabelTexture.magFilter = THREE.LinearFilter;
+  appRoomLoadingLabelTexture.generateMipmaps = false;
+  const label = new THREE.Mesh(
+    new THREE.PlaneGeometry(trackWidth, 0.2),
+    new THREE.MeshBasicMaterial({
+      map: appRoomLoadingLabelTexture,
+      transparent: true,
+      depthWrite: false,
+      toneMapped: false
+    })
+  );
+  label.rotation.x = -Math.PI / 2;
+  label.position.set(0, 0.022, -0.18);
+  label.renderOrder = 4;
+  group.add(label);
+
+  group.position.set(APP_ROOM.centerX, 0, ROOM.halfDepth + 1.2);
+  group.rotation.y = Math.PI;
+  appRoomLoadingIndicator = group;
+  scene.add(group);
+  updateAppRoomLoadingIndicator();
+}
+
 function createAppRoom() {
   const doorLeft = APP_ROOM.centerX - APP_ROOM.doorWidth / 2;
   const doorRight = APP_ROOM.centerX + APP_ROOM.doorWidth / 2;
@@ -1353,6 +1606,7 @@ function createAppRoom() {
   const hallFloor = new THREE.Mesh(new THREE.BoxGeometry(APP_ROOM.doorWidth, 0.08, floorLength), floorMaterial);
   hallFloor.position.set(APP_ROOM.centerX, -0.04, floorStartZ + floorLength / 2);
   scene.add(hallFloor);
+  createAppRoomLoadingFloorIndicator();
 
   const hallCeiling = new THREE.Mesh(new THREE.BoxGeometry(APP_ROOM.doorWidth + 0.12, 0.08, wallLength), ceilingMaterial);
   hallCeiling.position.set(APP_ROOM.centerX, APP_ROOM.doorHeight, wallStartZ + wallLength / 2);
@@ -1853,6 +2107,41 @@ function addArtPortalGraphic(roomLeft, roomRight) {
 
 }
 
+function createHomeFloorArrow() {
+  const halfLength = HOME_FLOOR_ARROW.length / 2;
+  const halfShaft = HOME_FLOOR_ARROW.shaftWidth / 2;
+  const halfHead = HOME_FLOOR_ARROW.headWidth / 2;
+  const headBaseY = -halfLength * 0.16;
+  const arrowShape = new THREE.Shape();
+  // The shape points toward local -Y. After it is laid flat, that direction
+  // becomes local +Z and can be aimed with a single world-space yaw.
+  arrowShape.moveTo(-halfShaft, halfLength);
+  arrowShape.lineTo(halfShaft, halfLength);
+  arrowShape.lineTo(halfShaft, headBaseY);
+  arrowShape.lineTo(halfHead, headBaseY);
+  arrowShape.lineTo(0, -halfLength);
+  arrowShape.lineTo(-halfHead, headBaseY);
+  arrowShape.lineTo(-halfShaft, headBaseY);
+  arrowShape.closePath();
+
+  const geometry = new THREE.ShapeGeometry(arrowShape);
+  geometry.rotateX(-Math.PI / 2);
+
+  const arrow = new THREE.Group();
+  const fill = new THREE.Mesh(
+    geometry,
+    new THREE.MeshBasicMaterial({ color: 0x176789, toneMapped: false, side: THREE.DoubleSide })
+  );
+  fill.renderOrder = 3;
+  arrow.add(fill);
+
+  const directionX = HOME_FLOOR_ARROW.targetX - HOME_FLOOR_ARROW.x;
+  const directionZ = HOME_PORTAL.z - HOME_FLOOR_ARROW.z;
+  arrow.position.set(HOME_FLOOR_ARROW.x, 0.012, HOME_FLOOR_ARROW.z);
+  arrow.rotation.y = Math.atan2(directionX, directionZ);
+  scene.add(arrow);
+}
+
 function createArtRoom() {
   const doorCenter = ART_ROOM.centerX + ART_ROOM.doorOffsetX;
   const doorLeft = doorCenter - ART_ROOM.doorWidth / 2;
@@ -1890,6 +2179,7 @@ function createArtRoom() {
   const roomFloor = new THREE.Mesh(new THREE.BoxGeometry(ART_ROOM.halfWidth * 2, 0.1, roomDepth), floorMaterial);
   roomFloor.position.set(ART_ROOM.centerX, -0.05, ART_ROOM.nearZ + roomDepth / 2);
   scene.add(roomFloor);
+  createHomeFloorArrow();
 
   const roomCeiling = new THREE.Mesh(new THREE.BoxGeometry(ART_ROOM.halfWidth * 2, 0.1, roomDepth), ceilingMaterial);
   roomCeiling.position.set(ART_ROOM.centerX, ART_ROOM.height, ART_ROOM.nearZ + roomDepth / 2);
@@ -2026,8 +2316,8 @@ function getGalleryHouseColorGroup(child, material) {
   const hierarchy = houseHierarchyLabel(child);
   const label = `${material.name || ''} ${hierarchy}`.toLowerCase();
   if (/^plane[._]?016$/i.test(child.name || '')) return null;
+  if (HOUSE_WOOD_COMPONENTS.has((child.name || '').toLowerCase().replace(/[^a-z0-9]/g, ''))) return 'wood';
   if (isExplicitHouseBaseStone(child)) return 'baseStone';
-  if (/^plane[._]?119$/i.test(child.name || '')) return 'wood';
   if (/(cut[ _]long[ _]wall[ _]top[ _]window|middlefrontwall[._]?001)/.test(hierarchy)) return 'baseStone';
   const isGlassHolder = /glass holder/.test(label);
   const isActualGlass = !isGlassHolder && (/(window|missingglass)/.test(label)
@@ -2155,6 +2445,895 @@ function createHouseFloorPreview(gltf) {
   needsRender = true;
 }
 
+function setObjectLayer(object, layer) {
+  object.traverse((child) => child.layers.set(layer));
+}
+
+const HOUSE_WALKABLE_MESH_NAMES = new Set([
+  'wall_top001',
+  'Plane001',
+  'Plane003',
+  'Plane005',
+  'Plane012',
+  'Plane018',
+  'Plane119',
+  'Plane126'
+]);
+const HOUSE_FLOOR_LAMP_COMPONENT_GROUPS = [
+  ['Cube003', 'Cube004', 'Cube005', 'Cube006', 'Cube007', 'Cube008', 'Cube009'],
+  ['Cube010', 'Cube011', 'Cube012', 'Cube013', 'Cube014', 'Cube015', 'Cube016']
+].map((group) => new Set(
+  group.map((name) => name.toLowerCase().replace(/[^a-z0-9]/g, ''))
+));
+const HOUSE_GROUND_SOLID_AREAS = [
+  { minX: -11.4, maxX: -0.95, minZ: -7.2, maxZ: 10.0 },
+  { minX: -4.7, maxX: 12.25, minZ: -7.35, maxZ: 2.7 },
+  { minX: -12.4, maxX: -4.0, minZ: -10.7, maxZ: -2.3 },
+  { minX: -14.45, maxX: -10.6, minZ: 4.45, maxZ: 9.9 },
+  // The raised front platform is solid underneath; its stone stair remains
+  // open on the east side at x ≈ 12–14 m. End the footprint at the platform
+  // edge so players can drop to the ground without opening a route upward.
+  { minX: -1.15, maxX: 11.75, minZ: 2.2, maxZ: 9.4 }
+];
+const HOUSE_EXTERIOR_WALKABLE_AREAS = [
+  {
+    name: 'main stone stair',
+    // Slightly overlap the platform and portal path so a movement substep can
+    // never land in a support seam at either end of the staircase.
+    minX: 11.76, maxX: 14.32, minZ: 3.32, maxZ: 7.13,
+    height: (x) => THREE.MathUtils.lerp(
+      1.03,
+      0.05,
+      THREE.MathUtils.clamp((x - 11.85) / 2.4, 0, 1)
+    )
+  },
+  {
+    name: 'main platform',
+    minX: -1.55, maxX: 11.8, minZ: -1.95, maxZ: 9.4,
+    height: () => 1.0
+  },
+  {
+    name: 'west deck',
+    minX: -7.45, maxX: -1.55, minZ: -3.55, maxZ: 5.15,
+    height: () => 1.06
+  },
+  {
+    name: 'side stair',
+    minX: 9.7, maxX: 11.3, minZ: -3.35, maxZ: 2.15,
+    height: (_x, z) => THREE.MathUtils.lerp(3.78, 1.55, (z + 3.35) / 5.5)
+  },
+  {
+    name: 'upper stair landing',
+    minX: 9.7, maxX: 11.3, minZ: -6.6, maxZ: -3.35,
+    height: () => 3.66
+  },
+  {
+    name: 'hallway roof connector',
+    minX: 7.75, maxX: 9.7, minZ: -6.6, maxZ: -4.5,
+    height: (x) => THREE.MathUtils.lerp(4.3, 3.66, (x - 7.75) / 1.95)
+  },
+  {
+    name: 'hallway roof',
+    minX: -4.2, maxX: 7.75, minZ: -6.65, maxZ: -4.2,
+    height: () => 4.3
+  }
+];
+const HOUSE_MAIN_PLATFORM_AREA = HOUSE_EXTERIOR_WALKABLE_AREAS.find(
+  (area) => area.name === 'main platform'
+);
+const HOUSE_HALLWAY_ROOF_AREA = HOUSE_EXTERIOR_WALKABLE_AREAS.find(
+  (area) => area.name === 'hallway roof'
+);
+
+function isHouseWalkableMesh(mesh) {
+  const hierarchy = houseHierarchyLabel(mesh);
+  return HOUSE_WALKABLE_MESH_NAMES.has(mesh.name)
+    || /stone_stair|stairs_i_want/.test(hierarchy);
+}
+
+function registerHouseExteriorCollision(model) {
+  houseWalkableMeshes.length = 0;
+  houseSolidBoxes.length = 0;
+  houseCourtyardWaterMeshes.length = 0;
+  model.updateMatrixWorld(true);
+
+  model.traverse((child) => {
+    if (!child.isMesh || !child.visible) return;
+    if (isHouseWalkableMesh(child)) houseWalkableMeshes.push(child);
+    if (/^water$/i.test(child.name || '')) houseCourtyardWaterMeshes.push(child);
+
+    const box = new THREE.Box3().setFromObject(child);
+    const size = box.getSize(new THREE.Vector3());
+    const isWallOrRailing = size.y >= 0.55 && (size.x <= 0.72 || size.z <= 0.72);
+    if (!isWallOrRailing) return;
+    box.expandByVector(new THREE.Vector3(HOUSE_WORLD.playerRadius, 0, HOUSE_WORLD.playerRadius));
+    houseSolidBoxes.push(box);
+  });
+
+  // Each stair-side floor lamp is assembled from several individually short
+  // meshes. Treat the complete assembly as one obstacle so the camera cannot
+  // pass between or through its stacked parts.
+  HOUSE_FLOOR_LAMP_COMPONENT_GROUPS.forEach((componentNames) => {
+    const lampBox = new THREE.Box3();
+    model.traverse((child) => {
+      if (!child.isMesh || !child.visible) return;
+      const normalizedName = (child.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (componentNames.has(normalizedName)) lampBox.expandByObject(child);
+    });
+    if (lampBox.isEmpty()) return;
+    lampBox.expandByVector(new THREE.Vector3(
+      HOUSE_WORLD.playerRadius,
+      0.08,
+      HOUSE_WORLD.playerRadius
+    ));
+    houseSolidBoxes.push(lampBox);
+  });
+
+  houseWalkRaycaster.layers.set(HOUSE_WORLD_LAYER);
+  houseCourtyardWaterRaycaster.layers.set(HOUSE_WORLD_LAYER);
+}
+
+function isHouseExteriorBlocked(x, z, surfaceY) {
+  const bodyMinY = surfaceY + 0.08;
+  const bodyMaxY = surfaceY + HOUSE_WORLD_EYE_HEIGHT * 0.94;
+  return houseSolidBoxes.some((box) => (
+    x >= box.min.x && x <= box.max.x
+    && z >= box.min.z && z <= box.max.z
+    && bodyMaxY >= box.min.y && bodyMinY <= box.max.y
+  ));
+}
+
+function isHousePondBlocked(x, z) {
+  if (!housePondMeshes.length) return false;
+  return HOUSE_POND_COLLISION_OFFSETS.some(([offsetX, offsetZ]) => {
+    housePondRayOrigin.set(x + offsetX, 2.5, z + offsetZ);
+    housePondRaycaster.set(housePondRayOrigin, houseWalkDown);
+    housePondRaycaster.near = 0;
+    housePondRaycaster.far = 4;
+    return housePondRaycaster.intersectObjects(housePondMeshes, false).length > 0;
+  });
+}
+
+function isHouseCourtyardWater(x, z) {
+  if (!houseCourtyardWaterMeshes.length) return false;
+  houseCourtyardWaterRayOrigin.set(x, 3, z);
+  houseCourtyardWaterRaycaster.set(houseCourtyardWaterRayOrigin, houseWalkDown);
+  houseCourtyardWaterRaycaster.near = 0;
+  houseCourtyardWaterRaycaster.far = 4;
+  return houseCourtyardWaterRaycaster.intersectObjects(
+    houseCourtyardWaterMeshes,
+    false
+  ).length > 0;
+}
+
+function isOnHousePortalPath(x, z) {
+  return x >= HOUSE_WORLD.stairPathStartX
+    && x <= HOUSE_WORLD.portalX
+    && Math.abs(z - HOUSE_WORLD.portalZ) <= HOUSE_WORLD.pathWidth / 2;
+}
+
+function getHouseWalkableSurfaceY(x, z, currentY = houseWorldGroundY) {
+  if (x < HOUSE_WORLD.minX || x > HOUSE_WORLD.maxX || z < HOUSE_WORLD.minZ || z > HOUSE_WORLD.maxZ) {
+    return null;
+  }
+  if (!isOnHousePortalPath(x, z) && isHousePondBlocked(x, z)) return null;
+  houseWalkRayOrigin.set(x, 12, z);
+  houseWalkRaycaster.set(houseWalkRayOrigin, houseWalkDown);
+  houseWalkRaycaster.near = 0;
+  houseWalkRaycaster.far = 14;
+  const hits = houseWalkRaycaster.intersectObjects(houseWalkableMeshes, false);
+  const maximumY = currentY + HOUSE_WORLD.maxStepUp;
+  const minimumY = currentY - HOUSE_WORLD.maxStepDown;
+  const candidates = [];
+
+  for (const hit of hits) {
+    if (!hit.face) continue;
+    houseWalkNormalMatrix.getNormalMatrix(hit.object.matrixWorld);
+    houseWalkNormal.copy(hit.face.normal).applyMatrix3(houseWalkNormalMatrix).normalize();
+    if (Math.abs(houseWalkNormal.y) < 0.45) continue;
+    candidates.push(hit.point.y + 0.018);
+  }
+
+  HOUSE_EXTERIOR_WALKABLE_AREAS.forEach((area) => {
+    if (x < area.minX || x > area.maxX || z < area.minZ || z > area.maxZ) return;
+    candidates.push(area.height(x, z) + 0.018);
+  });
+
+  candidates.sort((a, b) => b - a);
+  for (const surfaceY of candidates) {
+    if (surfaceY > maximumY || surfaceY < minimumY) continue;
+    if (!isHouseExteriorBlocked(x, z, surfaceY)) return surfaceY;
+  }
+
+  const insideHouseGroundSolidFootprint = HOUSE_GROUND_SOLID_AREAS.some((area) => (
+    x >= area.minX && x <= area.maxX && z >= area.minZ && z <= area.maxZ
+  ));
+  const insideRaisedWalkableFootprint = HOUSE_EXTERIOR_WALKABLE_AREAS.some((area) => (
+    x >= area.minX && x <= area.maxX && z >= area.minZ && z <= area.maxZ
+  ));
+  const insideHouseFootprint = insideHouseGroundSolidFootprint || insideRaisedWalkableFootprint;
+  // Never substitute ground level while the player is still over a raised
+  // platform or stair. If its surface is rejected by a railing collision,
+  // block that movement and preserve the previous supported position instead.
+  const canReachGround = 0 <= maximumY && 0 >= minimumY;
+  // After an intentional edge drop, keep the shallow courtyard channels at
+  // ground level walkable until the player reaches stairs or another raised
+  // exterior surface. Raised footprints stay solid, and the normal wall boxes
+  // below still prevent walking through the house itself.
+  const canUseDropLandingGround = houseWorldDropGroundOverride
+    && currentY <= 0.22
+    && (!insideRaisedWalkableFootprint || isHouseCourtyardWater(x, z));
+  if ((!insideHouseFootprint || canUseDropLandingGround)
+    && canReachGround
+    && !isHouseExteriorBlocked(x, z, 0)) return 0;
+  return null;
+}
+
+function createHomePortalSurface() {
+  const material = new THREE.MeshBasicMaterial({
+    color: 0xc9e0d4,
+    transparent: true,
+    opacity: 0,
+    depthWrite: false,
+    toneMapped: false,
+    blending: THREE.AdditiveBlending
+  });
+  const veil = new THREE.Mesh(
+    new THREE.PlaneGeometry(HOME_PORTAL.width, HOME_PORTAL.height),
+    material
+  );
+  veil.position.set(HOME_PORTAL.x, HOME_PORTAL.height / 2, HOME_PORTAL.z + 0.102);
+  veil.renderOrder = 12;
+  scene.add(veil);
+  homePortalVeil = veil;
+  homePortalVeilMaterial = material;
+}
+
+function createHouseWorldSky() {
+  const skyCanvas = document.createElement('canvas');
+  skyCanvas.width = 32;
+  skyCanvas.height = 512;
+  const context = skyCanvas.getContext('2d');
+  const gradient = context.createLinearGradient(0, 0, 0, skyCanvas.height);
+  gradient.addColorStop(0, '#6f8581');
+  gradient.addColorStop(0.42, '#aebbb0');
+  gradient.addColorStop(0.67, '#d7c9aa');
+  gradient.addColorStop(1, '#52634f');
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, skyCanvas.width, skyCanvas.height);
+
+  const texture = new THREE.CanvasTexture(skyCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.repeat.x = 4;
+  const sky = new THREE.Mesh(
+    new THREE.SphereGeometry(92, 48, 28),
+    new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide, fog: false, toneMapped: false })
+  );
+  sky.position.y = 15;
+  return sky;
+}
+
+function createHouseWorldPortal() {
+  const portal = new THREE.Group();
+  portal.position.set(HOUSE_WORLD.portalX, 0, HOUSE_WORLD.portalZ);
+  portal.rotation.y = HOUSE_WORLD.portalRotationY;
+
+  const stoneMaterial = new THREE.MeshStandardMaterial({
+    color: 0x5f6760,
+    roughness: 0.96,
+    metalness: 0
+  });
+  const sideGeometry = new THREE.BoxGeometry(0.62, 4.5, 0.58);
+  [-2.55, 2.55].forEach((x) => {
+    const side = new THREE.Mesh(sideGeometry, stoneMaterial);
+    side.position.set(x, 2.25, 0);
+    portal.add(side);
+  });
+  const lintel = new THREE.Mesh(new THREE.BoxGeometry(5.72, 0.62, 0.58), stoneMaterial);
+  lintel.position.set(0, 4.18, 0);
+  portal.add(lintel);
+
+  houseWorldPortalMaterial = new THREE.MeshBasicMaterial({
+    color: 0xcce8dc,
+    transparent: true,
+    opacity: 0.3,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+    toneMapped: false,
+    blending: THREE.AdditiveBlending
+  });
+  houseWorldPortalVeil = new THREE.Mesh(
+    new THREE.PlaneGeometry(4.48, 3.58),
+    houseWorldPortalMaterial
+  );
+  houseWorldPortalVeil.position.y = 2.1;
+  portal.add(houseWorldPortalVeil);
+
+  const labelCanvas = document.createElement('canvas');
+  labelCanvas.width = 1024;
+  labelCanvas.height = 180;
+  const context = labelCanvas.getContext('2d');
+  context.clearRect(0, 0, labelCanvas.width, labelCanvas.height);
+  context.fillStyle = '#f3f2e9';
+  context.font = '600 52px Arial, Helvetica, sans-serif';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  // Visitors approach this double-sided sign from the plane's back face in
+  // the life-size house world. Pre-mirror the texture so it reads normally
+  // from that side instead of appearing backward.
+  context.translate(labelCanvas.width, 0);
+  context.scale(-1, 1);
+  context.fillText('RETURN TO THE GALLERY', labelCanvas.width / 2, labelCanvas.height / 2);
+  const labelTexture = new THREE.CanvasTexture(labelCanvas);
+  labelTexture.colorSpace = THREE.SRGBColorSpace;
+  const label = new THREE.Mesh(
+    new THREE.PlaneGeometry(5.5, 0.97),
+    new THREE.MeshBasicMaterial({
+      map: labelTexture,
+      transparent: true,
+      depthWrite: false,
+      toneMapped: false,
+      side: THREE.DoubleSide
+    })
+  );
+  label.position.set(0, 5.05, 0);
+  portal.add(label);
+
+  const glow = new THREE.PointLight(0xb9dfcf, 18, 11, 2);
+  glow.position.set(0, 2.4, -1.2);
+  portal.add(glow);
+  return portal;
+}
+
+function createHouseWorldShell() {
+  houseWorldGroup = new THREE.Group();
+  houseWorldGroup.name = 'Full-scale childhood home world';
+  houseWorldGroup.userData.excludeFromMiniature = true;
+  houseWorldGroup.visible = false;
+
+  houseWorldGroup.add(createHouseWorldSky());
+
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(112, 96),
+    new THREE.MeshStandardMaterial({ color: 0x68705b, roughness: 1, metalness: 0 })
+  );
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -0.035;
+  houseWorldGroup.add(ground);
+  createFullScaleHousePond();
+
+  const approachLength = HOUSE_WORLD.portalX - HOUSE_WORLD.stairPathStartX;
+  const approach = new THREE.Mesh(
+    new THREE.PlaneGeometry(approachLength, HOUSE_WORLD.pathWidth),
+    new THREE.MeshStandardMaterial({ color: 0x968d72, roughness: 1, metalness: 0 })
+  );
+  approach.rotation.x = -Math.PI / 2;
+  approach.position.set(
+    HOUSE_WORLD.stairPathStartX + approachLength / 2,
+    0.014,
+    HOUSE_WORLD.portalZ
+  );
+  houseWorldGroup.add(approach);
+
+  const mountainMaterial = new THREE.MeshStandardMaterial({
+    color: 0x526158,
+    roughness: 1,
+    metalness: 0,
+    flatShading: true
+  });
+  const mountainSpecs = [
+    [-43, -30, 13, 18], [-30, -42, 16, 22], [-10, -48, 15, 19],
+    [12, -48, 18, 25], [33, -40, 14, 20], [47, -25, 17, 23],
+    [-49, -8, 12, 17], [50, -2, 13, 18], [-48, 18, 15, 20],
+    [48, 22, 12, 16], [-33, 38, 14, 18], [31, 39, 15, 20]
+  ];
+  mountainSpecs.forEach(([x, z, radius, height], index) => {
+    const mountain = new THREE.Mesh(
+      new THREE.ConeGeometry(radius, height, 7, 1),
+      mountainMaterial.clone()
+    );
+    mountain.material.color.offsetHSL(index % 2 ? 0.012 : -0.008, 0, index % 3 ? -0.015 : 0.02);
+    mountain.position.set(x, height / 2 - 1.2, z);
+    mountain.rotation.y = index * 0.47;
+    houseWorldGroup.add(mountain);
+  });
+
+  houseWorldGroup.add(createHouseWorldPortal());
+
+  const hemisphere = new THREE.HemisphereLight(0xe6eee7, 0x59604d, 2.4);
+  houseWorldGroup.add(hemisphere);
+  const sun = new THREE.DirectionalLight(0xffe0aa, 2.7);
+  sun.position.set(-24, 34, 18);
+  houseWorldGroup.add(sun);
+
+  setObjectLayer(houseWorldGroup, HOUSE_WORLD_LAYER);
+  scene.add(houseWorldGroup);
+}
+
+function createFullScaleHouse(gltf) {
+  if (!houseWorldGroup || houseWorldReady) return;
+  const modelPivot = new THREE.Group();
+  const model = prepareHouseModel(
+    gltf.scene.clone(true),
+    1,
+    0,
+    HOUSE_WORLD.modelWidth
+  );
+  modelPivot.add(model);
+
+  const houseShadow = new THREE.Mesh(
+    new THREE.CircleGeometry(16.2, 64),
+    new THREE.MeshBasicMaterial({ color: 0x182019, transparent: true, opacity: 0.18, depthWrite: false })
+  );
+  houseShadow.rotation.x = -Math.PI / 2;
+  houseShadow.scale.z = 0.74;
+  houseShadow.position.y = 0.016;
+  modelPivot.add(houseShadow);
+
+  setObjectLayer(modelPivot, HOUSE_WORLD_LAYER);
+  houseWorldGroup.add(modelPivot);
+  houseWorldGroup.updateMatrixWorld(true);
+  registerHouseExteriorCollision(model);
+  houseWorldReady = true;
+  activateHousePreviewIfRequested();
+  needsRender = true;
+}
+
+function createHousePondGeometry(scale = 1) {
+  const controlPoints = HOUSE_POND.outline.map(([x, z]) => new THREE.Vector3(x * scale, -z * scale, 0));
+  const curve = new THREE.CatmullRomCurve3(controlPoints, true, 'centripetal', 0.35);
+  const outline = curve.getPoints(84).map((point) => new THREE.Vector2(point.x, point.y));
+  const geometry = new THREE.ShapeGeometry(new THREE.Shape(outline), 12);
+  geometry.computeBoundingBox();
+  const { min, max } = geometry.boundingBox;
+  const width = Math.max(0.001, max.x - min.x);
+  const height = Math.max(0.001, max.y - min.y);
+  const positions = geometry.getAttribute('position');
+  const uvs = geometry.getAttribute('uv');
+  for (let index = 0; index < positions.count; index += 1) {
+    uvs.setXY(
+      index,
+      (positions.getX(index) - min.x) / width,
+      (positions.getY(index) - min.y) / height
+    );
+  }
+  uvs.needsUpdate = true;
+  return geometry;
+}
+
+function createHousePondWaterTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const context = canvas.getContext('2d');
+  const depth = context.createRadialGradient(275, 248, 28, 256, 256, 330);
+  depth.addColorStop(0, '#436f70');
+  depth.addColorStop(0.55, '#568985');
+  depth.addColorStop(1, '#79a99d');
+  context.fillStyle = depth;
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  context.lineCap = 'round';
+  for (let row = 0; row < 13; row += 1) {
+    const y = 34 + row * 38;
+    context.beginPath();
+    for (let x = -20; x <= 532; x += 8) {
+      const waveY = y + Math.sin(x * 0.045 + row * 0.85) * 3.2;
+      if (x === -20) context.moveTo(x, waveY);
+      else context.lineTo(x, waveY);
+    }
+    context.strokeStyle = row % 3 === 0 ? 'rgba(225, 244, 235, 0.12)' : 'rgba(202, 232, 225, 0.065)';
+    context.lineWidth = row % 3 === 0 ? 2.2 : 1.2;
+    context.stroke();
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  return texture;
+}
+
+function createFullScaleHousePond() {
+  if (!houseWorldGroup || housePondMeshes.length) return;
+  const pond = new THREE.Group();
+  pond.name = 'Full-scale outdoor childhood pond';
+  pond.position.set(HOUSE_POND.centerX, 0, HOUSE_POND.centerZ);
+
+  const shore = new THREE.Mesh(
+    createHousePondGeometry(1.075),
+    new THREE.MeshStandardMaterial({ color: 0x8b8065, roughness: 1, metalness: 0, side: THREE.DoubleSide })
+  );
+  shore.rotation.x = -Math.PI / 2;
+  shore.position.y = -0.018;
+  pond.add(shore);
+
+  const bed = new THREE.Mesh(
+    createHousePondGeometry(0.985),
+    new THREE.MeshStandardMaterial({ color: 0x315956, roughness: 0.9, metalness: 0, side: THREE.DoubleSide })
+  );
+  bed.rotation.x = -Math.PI / 2;
+  bed.position.y = -0.01;
+  pond.add(bed);
+
+  housePondWaterTexture = createHousePondWaterTexture();
+  const water = new THREE.Mesh(
+    createHousePondGeometry(0.96),
+    new THREE.MeshPhysicalMaterial({
+      color: 0xffffff,
+      map: housePondWaterTexture,
+      roughness: 0.3,
+      metalness: 0,
+      transparent: true,
+      opacity: 0.88,
+      clearcoat: 0.52,
+      clearcoatRoughness: 0.24,
+      side: THREE.DoubleSide
+    })
+  );
+  water.rotation.x = -Math.PI / 2;
+  water.position.y = HOUSE_POND.waterLevel;
+  water.renderOrder = 2;
+  pond.add(water);
+
+  houseWorldGroup.add(pond);
+  housePondMeshes.push(water);
+  housePondRaycaster.layers.set(HOUSE_WORLD_LAYER);
+  needsRender = true;
+}
+
+function activateHousePreviewIfRequested() {
+  if (!galleryActive || !houseWorldReady || insideHouseWorld || portalTransitioning) return;
+  if (previewParams.has('home-world-preview')) {
+    enterHouseWorld();
+  } else if (previewParams.has('home-transition-preview')) {
+    window.setTimeout(() => beginPortalTransition('home'), 80);
+  }
+}
+
+function setGalleryEnvironment() {
+  camera.layers.set(0);
+  camera.far = 100;
+  camera.updateProjectionMatrix();
+  scene.background.set(0xe5e4e0);
+  scene.fog.color.set(0xe5e4e0);
+  scene.fog.near = 22;
+  scene.fog.far = 78;
+}
+
+function setHouseWorldEnvironment() {
+  camera.layers.set(HOUSE_WORLD_LAYER);
+  camera.far = 220;
+  camera.updateProjectionMatrix();
+  scene.background.set(0x83938d);
+  scene.fog.color.set(0x83938d);
+  scene.fog.near = 54;
+  scene.fog.far = 112;
+}
+
+function enterHouseWorld() {
+  insideHouseWorld = true;
+  houseWorldGroup.visible = true;
+  setHouseWorldEnvironment();
+  houseWorldGroundY = 0;
+  houseWorldCameraGroundY = 0;
+  houseWorldEdgeDropActive = false;
+  houseWorldDropGroundOverride = false;
+  camera.position.copy(HOUSE_WORLD.arrival);
+  camera.lookAt(0, 2.7, 0);
+  const worldPreview = previewParams.get('home-world-preview');
+  const previewLocation = worldPreview === 'platform'
+    ? { x: 5.4, z: 7.0, expectedY: 1.0, lookX: 0, lookZ: 1.5 }
+    : worldPreview === 'roof'
+      ? { x: 1.5, z: -5.1, expectedY: 4.3, lookX: -5.5, lookZ: -6.0 }
+      : null;
+  if (previewLocation) {
+    const surfaceY = getHouseWalkableSurfaceY(
+      previewLocation.x,
+      previewLocation.z,
+      previewLocation.expectedY
+    );
+    houseWorldGroundY = surfaceY ?? previewLocation.expectedY;
+    houseWorldCameraGroundY = houseWorldGroundY;
+    camera.position.set(
+      previewLocation.x,
+      houseWorldGroundY + HOUSE_WORLD_EYE_HEIGHT,
+      previewLocation.z
+    );
+    camera.lookAt(
+      previewLocation.lookX,
+      houseWorldGroundY + HOUSE_WORLD_EYE_HEIGHT,
+      previewLocation.lookZ
+    );
+  }
+  resetPlayerHeight();
+  pauseGalleryVideos();
+  pauseShrimpRoomMusic();
+  focusedPoster = null;
+  focusedPhoto = null;
+  focusedResumeLink = null;
+  focusedManualVideo = null;
+  focusedGameAction = null;
+  focusedBrainRegion = null;
+  focusCard.hidden = true;
+  portalPrompt.hidden = true;
+  reticle.classList.remove('active');
+  walkHint.textContent = 'WASD explore   Walk off the main platform   Space + move to jump off the hallway roof   The luminous wall returns to the gallery';
+  needsRender = true;
+}
+
+function exitHouseWorld() {
+  insideHouseWorld = false;
+  houseWorldGroundY = 0;
+  houseWorldCameraGroundY = 0;
+  houseWorldEdgeDropActive = false;
+  houseWorldDropGroundOverride = false;
+  setGalleryEnvironment();
+  camera.position.set(HOME_PORTAL.x, STANDING_EYE_HEIGHT, HOME_PORTAL.z + 1.5);
+  camera.lookAt(HOME_PORTAL.x, STANDING_EYE_HEIGHT, HOME_PORTAL.z + 8);
+  resetPlayerHeight();
+  houseWorldGroup.visible = false;
+  walkHint.textContent = 'WASD move   Mouse to look   Left/right arrows skip a focused video by 5 sec   Space/up jump   Down crouch';
+  playGalleryVideos();
+  requestVideoSync();
+  needsRender = true;
+}
+
+function beginPortalTransition(destination) {
+  if (portalTransitioning) return;
+  if (destination === 'home' && !houseWorldReady) {
+    portalPrompt.hidden = false;
+    portalPromptTitle.textContent = 'The memory is still forming.';
+    portalPromptCopy.textContent = 'Stay close—the house will be ready in a moment.';
+    startArtRoomLoads();
+    return;
+  }
+
+  portalTransitioning = true;
+  pressedKeys.clear();
+  portalTransitionTitle.textContent = destination === 'home' ? 'Home' : 'Gallery';
+  portalTransition.classList.remove('is-revealing');
+  portalTransition.classList.add('is-active');
+
+  window.setTimeout(() => {
+    if (destination === 'home') enterHouseWorld();
+    else exitHouseWorld();
+    portalTransition.classList.add('is-revealing');
+  }, 300);
+
+  window.setTimeout(() => {
+    portalTransition.classList.remove('is-active', 'is-revealing');
+    portalTransitioning = false;
+    needsRender = true;
+  }, 760);
+}
+
+function updateHomePortalEffects(now) {
+  if (!camera || !homePortalVeilMaterial) return false;
+  const pulse = 0.5 + Math.sin(now * 0.0032) * 0.5;
+
+  if (insideHouseWorld) {
+    portalPrompt.hidden = true;
+    if (housePondWaterTexture) {
+      housePondWaterTexture.offset.x = Math.sin(now * 0.00011) * 0.012;
+      housePondWaterTexture.offset.y = (now * 0.000007) % 1;
+    }
+    if (houseWorldPortalMaterial) houseWorldPortalMaterial.opacity = 0.24 + pulse * 0.14;
+    if (houseWorldPortalVeil) {
+      const scale = 1 + pulse * 0.012;
+      houseWorldPortalVeil.scale.set(scale, scale, 1);
+    }
+    return true;
+  }
+
+  const distanceZ = camera.position.z - HOME_PORTAL.z;
+  const distanceX = Math.abs(camera.position.x - HOME_PORTAL.x);
+  const nearPortal = distanceZ >= 0
+    && distanceZ <= HOME_PORTAL.promptDistance
+    && distanceX <= HOME_PORTAL.width / 2 + HOME_PORTAL.promptSideMargin;
+  const proximity = nearPortal
+    ? 1 - THREE.MathUtils.clamp(distanceZ / HOME_PORTAL.promptDistance, 0, 1)
+    : 0;
+  if (nearPortal && !houseWorldReady) startArtRoomLoads();
+  homePortalVeilMaterial.opacity = proximity * (0.055 + pulse * 0.055);
+  if (homePortalVeil) {
+    const scale = 1 + pulse * 0.006 * proximity;
+    homePortalVeil.scale.set(scale, scale, 1);
+  }
+
+  if (galleryActive && nearPortal && !portalTransitioning) {
+    portalPrompt.hidden = false;
+    portalPromptTitle.textContent = houseWorldReady
+      ? 'Home is on the other side.'
+      : 'The memory is forming.';
+    portalPromptCopy.textContent = houseWorldReady
+      ? 'Walk into the house photos.'
+      : 'Stay close—the house will be ready in a moment.';
+  } else {
+    portalPrompt.hidden = true;
+  }
+  return nearPortal;
+}
+
+function isHomePortalCrossing(x, z, previousZ) {
+  return !insideHouseWorld
+    && previousZ > HOME_PORTAL.triggerZ
+    && z <= HOME_PORTAL.triggerZ
+    && Math.abs(x - HOME_PORTAL.x) <= HOME_PORTAL.width / 2;
+}
+
+function isHouseWorldPortalCrossing(x, z, previousX) {
+  return insideHouseWorld
+    && previousX < HOUSE_WORLD.portalTriggerX
+    && x >= HOUSE_WORLD.portalTriggerX
+    && Math.abs(z - HOUSE_WORLD.portalZ) <= 2.4;
+}
+
+function isHouseWorldWalkablePosition(x, z) {
+  return getHouseWalkableSurfaceY(x, z) !== null;
+}
+
+function isInsideHouseWalkArea(area, x, z, margin = 0) {
+  return Boolean(area)
+    && x >= area.minX - margin && x <= area.maxX + margin
+    && z >= area.minZ - margin && z <= area.maxZ + margin;
+}
+
+function getHouseAreaExitPosition(area, targetX, targetZ) {
+  const clearance = HOUSE_WORLD.playerRadius + 0.1;
+  let x = targetX;
+  let z = targetZ;
+  if (targetX < area.minX) x = area.minX - clearance;
+  if (targetX > area.maxX) x = area.maxX + clearance;
+  if (targetZ < area.minZ) z = area.minZ - clearance;
+  if (targetZ > area.maxZ) z = area.maxZ + clearance;
+  return { x, z };
+}
+
+function beginHouseWorldEdgeDrop(fromSurfaceY, landingY = 0) {
+  const visibleFootY = Math.max(
+    fromSurfaceY,
+    houseWorldCameraGroundY + jumpOffset
+  );
+  houseWorldGroundY = landingY;
+  houseWorldCameraGroundY = landingY;
+  jumpOffset = Math.max(0.001, visibleFootY - landingY);
+  houseWorldEdgeDropActive = true;
+  houseWorldDropGroundOverride = true;
+}
+
+function tryLeaveHouseWalkArea(
+  area,
+  stepStartX,
+  stepStartZ,
+  targetX,
+  targetZ,
+  startingSurfaceY,
+  startMargin = 0
+) {
+  if (!isInsideHouseWalkArea(area, stepStartX, stepStartZ, startMargin)) return false;
+  if (isInsideHouseWalkArea(area, targetX, targetZ)) return false;
+  const exit = getHouseAreaExitPosition(area, targetX, targetZ);
+  const airborneFootY = Math.max(startingSurfaceY, houseWorldCameraGroundY + jumpOffset);
+  if (isHouseExteriorBlocked(exit.x, exit.z, airborneFootY)) return false;
+  camera.position.x = exit.x;
+  camera.position.z = exit.z;
+  beginHouseWorldEdgeDrop(startingSurfaceY, 0);
+  return true;
+}
+
+function tryWalkOffMainPlatform(stepStartX, stepStartZ, targetX, targetZ, startingSurfaceY) {
+  if (startingSurfaceY < 0.72 || startingSurfaceY > 1.3) return false;
+  return tryLeaveHouseWalkArea(
+    HOUSE_MAIN_PLATFORM_AREA,
+    stepStartX,
+    stepStartZ,
+    targetX,
+    targetZ,
+    startingSurfaceY
+  );
+}
+
+function tryJumpOffHallwayRoof(stepStartX, stepStartZ, targetX, targetZ, startingSurfaceY) {
+  if (startingSurfaceY < 3.9) return false;
+  if (jumpVelocity <= 0 && jumpOffset <= 0) return false;
+  return tryLeaveHouseWalkArea(
+    HOUSE_HALLWAY_ROOF_AREA,
+    stepStartX,
+    stepStartZ,
+    targetX,
+    targetZ,
+    startingSurfaceY,
+    0.35
+  );
+}
+
+function moveHouseWorldAirborne(stepStartX, stepStartZ, targetX, targetZ) {
+  const airborneFootY = houseWorldGroundY + jumpOffset;
+  const canMoveTo = (x, z) => (
+    x >= HOUSE_WORLD.minX && x <= HOUSE_WORLD.maxX
+    && z >= HOUSE_WORLD.minZ && z <= HOUSE_WORLD.maxZ
+    && !isHouseExteriorBlocked(x, z, airborneFootY)
+  );
+  camera.position.x = stepStartX;
+  camera.position.z = stepStartZ;
+  if (canMoveTo(targetX, targetZ)) {
+    camera.position.x = targetX;
+    camera.position.z = targetZ;
+    return;
+  }
+  if (canMoveTo(targetX, stepStartZ)) camera.position.x = targetX;
+  if (canMoveTo(camera.position.x, targetZ)) camera.position.z = targetZ;
+}
+
+function applyHouseWorldMove(x, z, fromSurfaceY = houseWorldGroundY) {
+  const surfaceY = getHouseWalkableSurfaceY(x, z, fromSurfaceY);
+  if (surfaceY === null) return false;
+  camera.position.x = x;
+  camera.position.z = z;
+  if (surfaceY < fromSurfaceY - 0.45) {
+    beginHouseWorldEdgeDrop(fromSurfaceY, surfaceY);
+  } else {
+    houseWorldGroundY = surfaceY;
+    if (surfaceY > 0.22) houseWorldDropGroundOverride = false;
+  }
+  return true;
+}
+
+function moveHouseWorldPlayer(stepStartX, stepStartZ, targetX, targetZ) {
+  const startingSurfaceY = houseWorldGroundY;
+  if (houseWorldEdgeDropActive && jumpOffset > 0) {
+    moveHouseWorldAirborne(stepStartX, stepStartZ, targetX, targetZ);
+    return;
+  }
+  camera.position.x = stepStartX;
+  camera.position.z = stepStartZ;
+  const leavingMainPlatform = isInsideHouseWalkArea(
+    HOUSE_MAIN_PLATFORM_AREA,
+    stepStartX,
+    stepStartZ
+  ) && !isInsideHouseWalkArea(HOUSE_MAIN_PLATFORM_AREA, targetX, targetZ);
+  if (leavingMainPlatform) {
+    const targetSurfaceY = getHouseWalkableSurfaceY(targetX, targetZ, startingSurfaceY);
+    if ((targetSurfaceY === null || targetSurfaceY < startingSurfaceY - 0.45)
+      && tryWalkOffMainPlatform(
+        stepStartX,
+        stepStartZ,
+        targetX,
+        targetZ,
+        startingSurfaceY
+      )) return;
+  }
+  if (applyHouseWorldMove(targetX, targetZ, startingSurfaceY)) return;
+
+  if (tryWalkOffMainPlatform(
+    stepStartX,
+    stepStartZ,
+    targetX,
+    targetZ,
+    startingSurfaceY
+  )) return;
+  if (tryJumpOffHallwayRoof(
+    stepStartX,
+    stepStartZ,
+    targetX,
+    targetZ,
+    startingSurfaceY
+  )) return;
+
+  houseWorldGroundY = startingSurfaceY;
+  if (!applyHouseWorldMove(targetX, stepStartZ, startingSurfaceY)) {
+    camera.position.x = stepStartX;
+    camera.position.z = stepStartZ;
+    houseWorldGroundY = startingSurfaceY;
+  }
+  if (!applyHouseWorldMove(camera.position.x, targetZ, houseWorldGroundY)) {
+    camera.position.z = stepStartZ;
+  }
+}
+
 function getMiniatureVideoEntry(source) {
   if (!source?.isMesh) return null;
   return galleryVideos.find((entry) => entry.screen === source || entry.material === source.material) || null;
@@ -2243,7 +3422,7 @@ function copyMiniatureObject(source) {
 
 function populateMiniature(target) {
   scene.children.forEach((source) => {
-    if (source === galleryMiniature || source.isLight) return;
+    if (source === galleryMiniature || source.isLight || source.userData.excludeFromMiniature) return;
     const copy = copyMiniatureObject(source);
     if (!copy) return;
     copy.traverse((object) => {
@@ -2294,6 +3473,22 @@ function queueGalleryMiniatureRefreshes() {
 }
 
 function refreshFocusCard() {
+  if (focusedResumeLink) {
+    focusCard.classList.remove('video-focus');
+    focusCard.classList.remove('is-playing');
+    focusEyebrow.textContent = 'Résumé · In view';
+    focusTitle.textContent = focusedResumeLink.title;
+    focusAction.innerHTML = '<b class="video-primary"><kbd>E</kbd> Open résumé</b>';
+    return;
+  }
+  if (focusedPhoto) {
+    focusCard.classList.remove('video-focus');
+    focusCard.classList.remove('is-playing');
+    focusEyebrow.textContent = 'Artwork · In view';
+    focusTitle.textContent = focusedPhoto.title;
+    focusAction.innerHTML = '<b class="video-primary"><kbd>E</kbd> Open high resolution</b>';
+    return;
+  }
   if (focusedBrainRegion) {
     focusCard.classList.remove('video-focus');
     focusCard.classList.remove('is-playing');
@@ -2537,8 +3732,17 @@ function createStandingVideoDisplay(work, posterTexture) {
       new THREE.PlaneGeometry(photoWidth, photoHeight),
       photoMaterial
     );
+    photo.userData.housePhoto = true;
+    photo.userData.poster = {
+      id: 'house-photo-2009',
+      title: '温家堡, 2009',
+      category: 'Art',
+      authors: 'House in the rain',
+      detailImage: work.photoDetailImage || work.photoImage
+    };
     photo.position.set(0, angledNeck.position.y, 0.136);
     screenAssembly.add(photo);
+    photoMeshes.push(photo);
   }
 
   const video = document.createElement('video');
@@ -2801,6 +4005,7 @@ function startArtRoomLoads() {
       const houseLoader = new GLTFLoader();
       houseLoader.load(HOUSE_DISPLAY.model, (gltf) => {
         createHouseFloorPreview(gltf);
+        createFullScaleHouse(gltf);
       }, undefined, (error) => {
         console.warn('Could not load childhood house model.', error);
       });
@@ -2833,7 +4038,15 @@ function startResearchRoomLoads() {
   // initial manager queue. Re-adding them here would create a second video
   // at the same wall position and make the first frame appear to reset.
   const jobs = myPhysioImageWorks.map((work) => () => {
-    textureLoader.load(work.image, (texture) => addImageWork(work, texture));
+    textureLoader.load(
+      work.image,
+      (texture) => {
+        addImageWork(work, texture);
+        markAppRoomAssetReady(work.image);
+      },
+      undefined,
+      () => markAppRoomAssetReady(work.image)
+    );
   });
   scheduleLowPriorityGallerySequence(jobs, 0, 260);
 }
@@ -2946,6 +4159,17 @@ function maybeLoadNearbyRoomContent() {
   if (isCameraNearRoom(APP_ROOM, 3) || isCameraNearRoom(SCREENING_ROOM, 3)) {
     startResearchRoomLoads();
   }
+}
+
+function openResumePage() {
+  const resumeWindow = window.open('/resume/', 'puti-resume');
+  if (resumeWindow) {
+    resumeWindow.focus();
+    return;
+  }
+  // A same-tab fallback keeps the résumé reachable when a browser blocks the
+  // user-initiated secondary tab.
+  window.location.assign('/resume/');
 }
 
 function scheduleLowPriorityGalleryWork(callback, delay = 1200) {
@@ -4778,8 +6002,13 @@ function addResumePage(page, texture) {
     new THREE.PlaneGeometry(page.width, height),
     new THREE.MeshBasicMaterial({ map: texture, toneMapped: false })
   );
+  pageMesh.userData.resumeLink = {
+    title: page.title,
+    url: page.url
+  };
   pageMesh.position.z = 0.02;
   group.add(pageMesh);
+  photoMeshes.push(pageMesh);
 
   scene.add(group);
   needsRender = true;
@@ -4879,7 +6108,7 @@ function cancelVideoFrame(entry) {
 }
 
 function shouldPlayVideo(entry) {
-  if (!galleryActive) return false;
+  if (!galleryActive || insideHouseWorld) return false;
   if (entry.autoplayOnEntry) return true;
   if (entry.autoplayInBounds) {
     if (!entry.activationBounds) return false;
@@ -4954,6 +6183,10 @@ function playVideoEntry(entry) {
 function preloadGalleryVideos() {
   if (videoPreloadStarted) return;
   videoPreloadStarted = true;
+  // The final two App Room assets are static MyPhysio displays. Start them
+  // with the video queue so the hallway progress indicator cannot wait at
+  // 12/14 (86%) for a separate camera-proximity trigger.
+  startResearchRoomLoads();
   const queue = galleryVideos
     .filter((entry) => !entry.element.hasAttribute('src'))
     .sort((a, b) => (b.preloadPriority || 0) - (a.preloadPriority || 0));
@@ -4992,6 +6225,7 @@ function preloadGalleryVideos() {
       const settle = () => {
         if (settled) return;
         settled = true;
+        markAppRoomAssetReady(entry.source);
         window.clearTimeout(timeoutId);
         video.removeEventListener('canplay', settle);
         video.removeEventListener('error', settle);
@@ -5158,6 +6392,43 @@ function pauseShrimpRoomMusic() {
     track.pause();
     track.volume = 0;
   });
+}
+
+function hideSoundReminder() {
+  soundReminder.hidden = true;
+  if (soundReminderHideTimer) window.clearTimeout(soundReminderHideTimer);
+  soundReminderHideTimer = 0;
+}
+
+function getSoundReminderZone() {
+  if (!galleryActive || insideHouseWorld) return null;
+  if (isCameraInsideRoom(GAME_ROOM, 0.15)) return 'game-room';
+  if (isCameraInsideRoom(VIDEOS_ROOM, 0.15)) return 'video-room';
+
+  const nearHouseRainDisplay = isCameraInsideRoom(ART_ROOM, 0.15)
+    && Math.hypot(
+      camera.position.x - HOUSE_RAIN_DISPLAY.x,
+      camera.position.z - HOUSE_RAIN_DISPLAY.z
+    ) <= HOUSE_RAIN_DISPLAY.interactionRadius + 0.8;
+  return nearHouseRainDisplay ? 'house-rain-display' : null;
+}
+
+function updateSoundReminder(now) {
+  const nextZone = getSoundReminderZone();
+  if (nextZone !== soundReminderZone) {
+    hideSoundReminder();
+    soundReminderZone = nextZone;
+    soundReminderZoneEnteredAt = now;
+  }
+  if (!nextZone || soundReminderSeenZones.has(nextZone)) return;
+  if (now - soundReminderZoneEnteredAt < 1400) return;
+
+  soundReminderSeenZones.add(nextZone);
+  soundReminder.hidden = false;
+  soundReminderHideTimer = window.setTimeout(() => {
+    soundReminder.hidden = true;
+    soundReminderHideTimer = 0;
+  }, 8000);
 }
 
 function syncGalleryVideos(entries = galleryVideos) {
@@ -5373,6 +6644,17 @@ function addVideoWork(work, posterTexture) {
   video.setAttribute('aria-hidden', 'true');
   video.setAttribute('playsinline', '');
   document.body.appendChild(video);
+
+  if (APP_ROOM_LOADING_ASSETS.has(work.source)) {
+    let appRoomMediaSettled = false;
+    const markAppRoomMediaReady = () => {
+      if (appRoomMediaSettled) return;
+      appRoomMediaSettled = true;
+      markAppRoomAssetReady(work.source);
+    };
+    video.addEventListener('canplay', markAppRoomMediaReady, { once: true });
+    video.addEventListener('error', markAppRoomMediaReady, { once: true });
+  }
 
   if (INITIAL_WARMUP_VIDEO_SOURCES.has(work.source)) {
     let settled = false;
@@ -5606,11 +6888,25 @@ function addWallLabel(group, poster, posterHeight) {
 
 function updateFocusedPoster() {
   if (!galleryActive) return false;
+  if (insideHouseWorld) {
+    const hadFocus = Boolean(focusedPoster || focusedPhoto || focusedResumeLink || focusedManualVideo || focusedGameAction || focusedBrainRegion);
+    focusedPoster = null;
+    focusedPhoto = null;
+    focusedResumeLink = null;
+    focusedManualVideo = null;
+    focusedGameAction = null;
+    focusedBrainRegion = null;
+    focusCard.hidden = true;
+    reticle.classList.remove('active');
+    return hadFocus;
+  }
   raycaster.setFromCamera(pointerCenter, camera);
   raycaster.far = 7;
-  const hit = raycaster.intersectObjects(posterMeshes, false)[0];
+  const hit = raycaster.intersectObjects(posterMeshes.concat(photoMeshes), false)[0];
   const nextPoster = hit?.object?.userData?.poster || null;
-  const videoHit = nextPoster ? null : raycaster.intersectObjects(videoMeshes, false)[0];
+  const nextPhoto = hit?.object?.userData?.housePhoto ? nextPoster : null;
+  const nextResumeLink = hit?.object?.userData?.resumeLink || null;
+  const videoHit = nextPoster || nextResumeLink ? null : raycaster.intersectObjects(videoMeshes, false)[0];
   const gameAction = videoHit?.object?.userData?.gameAction || null;
   const videoEntry = videoHit?.object?.userData?.videoEntry || null;
   const brainHit = nextPoster || videoHit ? null : raycaster.intersectObjects(brainMeshes, false)[0];
@@ -5627,6 +6923,8 @@ function updateFocusedPoster() {
   const nextGameAction = actionInRange ? gameAction : null;
 
   if (nextPoster === focusedPoster
+    && nextPhoto === focusedPhoto
+    && nextResumeLink === focusedResumeLink
     && nextManualVideo === focusedManualVideo
     && nextGameAction === focusedGameAction
     && nextBrainRegion?.key === focusedBrainRegion?.key) return false;
@@ -5641,20 +6939,23 @@ function updateFocusedPoster() {
   });
 
   focusedPoster = nextPoster;
+  focusedPhoto = nextPhoto;
+  focusedResumeLink = nextResumeLink;
   focusedManualVideo = nextManualVideo;
   focusedGameAction = nextGameAction;
   focusedBrainRegion = nextBrainRegion;
   // Static artwork still highlights under the reticle, but only videos and
   // active buttons and brain regions get the instructional tooltip card.
-  focusCard.hidden = !nextManualVideo && !nextGameAction && !nextBrainRegion;
+  focusCard.hidden = !nextPhoto && !nextResumeLink && !nextManualVideo && !nextGameAction && !nextBrainRegion;
   focusCard.classList.toggle('video-focus', Boolean(focusedManualVideo));
   if (!focusedManualVideo && !focusedGameAction) focusCard.classList.remove('is-playing');
-  reticle.classList.toggle('active', Boolean(focusedPoster || focusedManualVideo || focusedGameAction || focusedBrainRegion));
-  if (focusedManualVideo || focusedGameAction || focusedBrainRegion) refreshFocusCard();
+  reticle.classList.toggle('active', Boolean(focusedPoster || focusedPhoto || focusedResumeLink || focusedManualVideo || focusedGameAction || focusedBrainRegion));
+  if (focusedPhoto || focusedResumeLink || focusedManualVideo || focusedGameAction || focusedBrainRegion) refreshFocusCard();
   return true;
 }
 
 function isWalkablePosition(x, z) {
+  if (insideHouseWorld) return isHouseWorldWalkablePosition(x, z);
   const wallClearance = 0.35;
   const insideHallway = (room, minZ, maxZ) => {
     const doorCenter = room.centerX + (room.doorOffsetX || 0);
@@ -5735,7 +7036,7 @@ function isWalkablePosition(x, z) {
 }
 
 function updateMovement(delta) {
-  if (!galleryActive || posterDialog.open || !posterIndex.hidden) return false;
+  if (!galleryActive || portalTransitioning || posterDialog.open || !posterIndex.hidden) return false;
   const speed = 4.35;
   const forward = Number(pressedKeys.has('KeyW')) - Number(pressedKeys.has('KeyS'));
   const sideways = Number(pressedKeys.has('KeyD')) - Number(pressedKeys.has('KeyA'));
@@ -5756,6 +7057,20 @@ function updateMovement(delta) {
 
     const targetX = camera.position.x;
     const targetZ = camera.position.z;
+    if (isHomePortalCrossing(targetX, targetZ, stepStartZ)) {
+      camera.position.set(stepStartX, camera.position.y, stepStartZ);
+      beginPortalTransition('home');
+      break;
+    }
+    if (isHouseWorldPortalCrossing(targetX, targetZ, stepStartX)) {
+      camera.position.set(stepStartX, camera.position.y, stepStartZ);
+      beginPortalTransition('gallery');
+      break;
+    }
+    if (insideHouseWorld) {
+      moveHouseWorldPlayer(stepStartX, stepStartZ, targetX, targetZ);
+      continue;
+    }
     if (!isWalkablePosition(targetX, targetZ)) {
       camera.position.set(stepStartX, camera.position.y, stepStartZ);
       if (isWalkablePosition(targetX, stepStartZ)) camera.position.x = targetX;
@@ -5764,16 +7079,53 @@ function updateMovement(delta) {
   }
 
   if (jumpVelocity !== 0 || jumpOffset > 0) {
+    const previousJumpOffset = jumpOffset;
     jumpVelocity -= JUMP_GRAVITY * delta;
     jumpOffset += jumpVelocity * delta;
+
+    // An edge drop can cross over the main stairs or another exterior deck.
+    // Catch that surface as the feet pass it instead of continuing through the
+    // mesh to the nominal ground-level landing below.
+    if (insideHouseWorld && houseWorldEdgeDropActive && jumpVelocity <= 0 && jumpOffset > 0) {
+      const previousFootY = houseWorldGroundY + previousJumpOffset;
+      const nextFootY = houseWorldGroundY + jumpOffset;
+      const landingSurfaceY = getHouseWalkableSurfaceY(
+        camera.position.x,
+        camera.position.z,
+        previousFootY
+      );
+      if (landingSurfaceY !== null
+        && landingSurfaceY > houseWorldGroundY + 0.04
+        && previousFootY >= landingSurfaceY
+        && nextFootY <= landingSurfaceY + 0.04) {
+        houseWorldGroundY = landingSurfaceY;
+        houseWorldCameraGroundY = landingSurfaceY;
+        if (landingSurfaceY > 0.22) houseWorldDropGroundOverride = false;
+        jumpOffset = 0;
+        jumpVelocity = 0;
+        houseWorldEdgeDropActive = false;
+      }
+    }
     if (jumpOffset <= 0) {
       jumpOffset = 0;
       jumpVelocity = 0;
+      houseWorldEdgeDropActive = false;
     }
   }
   const crouchTarget = pressedKeys.has('ArrowDown') ? 1 : 0;
   crouchAmount = THREE.MathUtils.damp(crouchAmount, crouchTarget, 14, delta);
-  camera.position.y = STANDING_EYE_HEIGHT - CROUCH_DROP * crouchAmount + jumpOffset;
+  if (insideHouseWorld) {
+    // Snap upward onto each stair immediately so the camera can never lag
+    // below a riser. Keep the gentler interpolation only while descending.
+    houseWorldCameraGroundY = houseWorldGroundY > houseWorldCameraGroundY
+      ? houseWorldGroundY
+      : THREE.MathUtils.damp(houseWorldCameraGroundY, houseWorldGroundY, 18, delta);
+  } else {
+    houseWorldCameraGroundY = 0;
+  }
+  const eyeHeight = insideHouseWorld ? HOUSE_WORLD_EYE_HEIGHT : STANDING_EYE_HEIGHT;
+  const groundY = insideHouseWorld ? houseWorldCameraGroundY : 0;
+  camera.position.y = groundY + eyeHeight - CROUCH_DROP * crouchAmount + jumpOffset;
 
   const moved = Boolean(forward || sideways || Math.abs(camera.position.y - previousY) > 0.0001);
   if (moved) requestVideoSync();
@@ -5786,18 +7138,20 @@ function animate(now) {
   const delta = Math.min((now - lastFrame) / 1000, 0.05);
   lastFrame = now;
   const moved = updateMovement(delta);
+  const portalAnimated = updateHomePortalEffects(now);
   maybeStartRoomBackgroundPreloads();
   maybeLoadNearbyRoomContent();
   maybeLoadBrainSurface();
   requestVideoRoomLoad();
   syncFocusLockedVideos();
   updateShrimpRoomMusic(delta);
+  updateSoundReminder(now);
   flushVideoSync(now);
   const focusChanged = updateFocusedPoster();
   refreshFocusedVideoTime();
   const fallbackVideoPlaying = galleryVideos
     .some((entry) => !entry.supportsFrameCallback && !entry.element.paused && entry.element.readyState >= 2);
-  if (needsRender || moved || focusChanged || fallbackVideoPlaying) {
+  if (needsRender || moved || focusChanged || fallbackVideoPlaying || portalAnimated) {
     renderer.render(scene, camera);
     needsRender = false;
   }
@@ -5911,7 +7265,8 @@ function enterGallery() {
   });
   primeShrimpRoomMusic();
   preloadGalleryVideos();
-  playAutoplayOnEntryVideos();
+  if (insideHouseWorld) pauseGalleryVideos();
+  else playAutoplayOnEntryVideos();
   requestVideoSync();
   scheduleLowPriorityGalleryWork(() => startMainRoomBackgroundLoads(), 700);
   dragLookEnabled = false;
@@ -5920,6 +7275,7 @@ function enterGallery() {
   pressedKeys.clear();
   resetPlayerHeight();
   hideWelcome();
+  activateHousePreviewIfRequested();
   needsRender = true;
 
   try {
@@ -5973,10 +7329,13 @@ function initializeGallery() {
   camera = new THREE.PerspectiveCamera(67, window.innerWidth / window.innerHeight, 0.08, 100);
   camera.position.set(0.8, ROOM.height / 2, 1.5);
   camera.lookAt(9.36, ROOM.height / 2, 0.2);
-  if (new URLSearchParams(window.location.search).has('brain-preview')) {
+  if (previewParams.has('brain-preview')) {
     const brainCenterZ = (EMPTY_GAME_ROOM.nearZ + EMPTY_GAME_ROOM.farZ) / 2;
     camera.position.set(EMPTY_GAME_ROOM.centerX, 2.4, EMPTY_GAME_ROOM.nearZ + 2.2);
     camera.lookAt(EMPTY_GAME_ROOM.centerX, 0.9, brainCenterZ);
+  } else if (previewParams.has('home-preview') || previewParams.has('home-transition-preview')) {
+    camera.position.set(HOME_PORTAL.x, STANDING_EYE_HEIGHT, HOME_PORTAL.z + 4.5);
+    camera.lookAt(HOME_PORTAL.x, STANDING_EYE_HEIGHT, HOME_PORTAL.z);
   }
 
   controls = new PointerLockControls(camera, document.body);
@@ -5989,7 +7348,8 @@ function initializeGallery() {
     galleryActive = true;
     primeShrimpRoomMusic();
     preloadGalleryVideos();
-    playAutoplayOnEntryVideos();
+    if (insideHouseWorld) pauseGalleryVideos();
+    else playAutoplayOnEntryVideos();
     requestVideoSync();
     scheduleLowPriorityGalleryWork(() => startMainRoomBackgroundLoads(), 700);
     dragLookEnabled = false;
@@ -5998,6 +7358,7 @@ function initializeGallery() {
     pressedKeys.clear();
     resetPlayerHeight();
     hideWelcome();
+    activateHousePreviewIfRequested();
     needsRender = true;
   });
 
@@ -6019,6 +7380,8 @@ function initializeGallery() {
     eHoldTriggered = false;
     eHoldWasPlaying = false;
     focusedPoster = null;
+    focusedPhoto = null;
+    focusedResumeLink = null;
     focusedManualVideo = null;
     focusedGameAction = null;
     posterMeshes.forEach((mesh) => {
@@ -6026,12 +7389,19 @@ function initializeGallery() {
       mesh.userData.frame.material.emissive.set(0x000000);
     });
     reticle.classList.remove('active');
-    if (!posterDialog.open && posterIndex.hidden && !helpDialog.open) showWelcome('paused');
+    if (!posterDialog.open && posterIndex.hidden && !helpDialog.open) {
+      showWelcome(insideHouseWorld ? 'house-paused' : 'paused');
+    }
   });
 
   document.addEventListener('pointerlockerror', enableDragLookFallback);
 
   createRoom();
+  createHomePortalSurface();
+  createHouseWorldShell();
+  if (previewParams.has('home-world-preview') || previewParams.has('home-transition-preview')) {
+    startArtRoomLoads();
+  }
   // MRI wall videos use the marked rectangles in the corresponding PDF
   // artboards. They are eager-loaded and follow the normal camera-visible
   // autoplay rule, without requiring interaction range.
@@ -6102,6 +7472,11 @@ function initializeGallery() {
 
 enterButton.addEventListener('click', enterGallery);
 
+galleryDestinationButton.addEventListener('click', () => {
+  if (insideHouseWorld) exitHouseWorld();
+  enterGallery();
+});
+
 closeIndexButton.addEventListener('click', hideCatalog);
 
 helpButton?.addEventListener('click', () => {
@@ -6112,7 +7487,7 @@ helpButton?.addEventListener('click', () => {
 });
 
 helpDialog.addEventListener('close', () => {
-  showWelcome(enteredOnce ? 'paused' : 'initial');
+  showWelcome(insideHouseWorld ? 'house-paused' : (enteredOnce ? 'paused' : 'initial'));
 });
 
 document.querySelectorAll('[data-poster]').forEach((button) => {
@@ -6148,6 +7523,11 @@ window.addEventListener('keydown', (event) => {
     if (galleryActive) event.preventDefault();
     if (!event.repeat) startJump();
   }
+  if (event.code === 'KeyE' && focusedResumeLink && galleryActive) {
+    event.preventDefault();
+    if (!event.repeat) openResumePage();
+    return;
+  }
   if (event.code === 'KeyE' && focusedGameAction && galleryActive) {
     event.preventDefault();
     if (!event.repeat) launchGameAction(focusedGameAction);
@@ -6174,7 +7554,7 @@ window.addEventListener('keydown', (event) => {
   }
   if (event.code === 'Escape' && galleryActive && !controls?.isLocked) {
     event.preventDefault();
-    showWelcome('paused');
+    showWelcome(insideHouseWorld ? 'house-paused' : 'paused');
   }
 });
 
@@ -6247,6 +7627,10 @@ canvas.addEventListener('pointercancel', finishDrag);
 
 canvas.addEventListener('click', () => {
   if (!galleryActive || dragMoved) return;
+  if (focusedResumeLink) {
+    openResumePage();
+    return;
+  }
   if (focusedGameAction) {
     launchGameAction(focusedGameAction);
     return;
