@@ -155,7 +155,7 @@ const videoWork = {
   position: [9.36, 3.15, -2.55],
   rotationY: -Math.PI / 2,
   eagerLoad: true,
-  autoplayOnEntry: true,
+  playWhenVisible: true,
   playDistance: 12,
   interactionRadius: 7
 };
@@ -256,8 +256,8 @@ const ART_WALL_SHEETS = [
     side: 'left'
   },
   {
-    image: './art/walls/colored-cats-tshirts.png?v=20260717-1915',
-    aspect: 10085 / 1867,
+    image: './art/walls/art-south-updated.png?v=20260719-art-south-artboard3-transparent6',
+    aspect: 8068 / 1494,
     side: 'far'
   },
   {
@@ -351,7 +351,7 @@ const MUG_DISPLAYS = [
     rotationY: -0.54
   },
   {
-    texture: './art/hadi-mug.webp',
+    texture: './art/hadi-mug-updated.png?v=20260719-hadi-mug',
     x: ART_ROOM.centerX + 1.25,
     z: 49.15,
     pedestalHeight: 1.7,
@@ -360,29 +360,48 @@ const MUG_DISPLAYS = [
 ];
 
 const HOUSE_DISPLAY = {
-  model: './models/childhood-house-ground.glb',
+  model: './models/childhood-house-new-grouped.glb',
   x: ART_ROOM.centerX - 6.35,
   z: 43.25,
   width: 3.34,
   depth: 1.54,
   plinthHeight: 1.25
 };
+const HOUSE_COLOR_PRESET = {
+  metal: '#8d949a',
+  glass: '#dfded8',
+  wood: '#ffcb8f',
+  roof: '#666d70',
+  stone: '#e8e7de',
+  baseStone: '#d2cec6'
+};
+const HOUSE_BASE_STONE_COMPONENTS = new Set([
+  'circle_wall', 'Cylinder', 'kitchen', 'Plane001', 'Plane002', 'Plane003', 'Plane004',
+  'Plane005', 'Plane012', 'Plane018', 'Plane019', 'Plane020', 'Plane021', 'Plane022',
+  'Plane023', 'Plane024', 'Plane043', 'ROOF_TOP_FLOOR', 'Cube', 'Cube003', 'Cube004',
+  'Cube005', 'Cube008', 'Cube010', 'Cube011', 'Cube012', 'Cube015', 'Plane081',
+  'Plane083', 'Plane084', 'Plane085', 'cut_long_wall_top_window', 'front_wall_right_side',
+  'leftwall', 'middlefrontwall', 'middlefrontwall001', 'middlefrontwall004', 'midwall1',
+  'midwall1002', 'midwall1027', 'midwall1028', 'right_middle_wall', 'roomfloor',
+  'midwall1015', 'midwall1016', 'midwall1017', 'midwall1018', 'midwall1019',
+  'midwall1020', 'midwall1021', 'midwall1022', 'midwall1023', 'midwall1024',
+  'midwall1025', 'midwall1026', 'Plane', 'Plane014', 'Plane015', 'Plane039', 'Plane074', 'Plane126'
+].map((name) => name.toLowerCase().replace(/[^a-z0-9]/g, '')));
 
 const ART_NORTH_WEST_LENGTH = ART_ROOM.halfWidth + ART_ROOM.doorOffsetX - ART_ROOM.doorWidth / 2;
 const HOUSE_FLOOR_PREVIEW = {
   wallLength: ART_NORTH_WEST_LENGTH,
-  x: -17.34,
-  y: -0.25,
-  z: 44.87,
-  scale: 0.53
+  x: -16.81,
+  y: -0.05,
+  z: 41.99,
+  scale: 0.23,
+  rotationY: THREE.MathUtils.degToRad(29)
 };
 
 const GALLERY_MINIATURE = {
-  scale: 0.06,
-  sourceCenterX: -5.5,
-  sourceCenterZ: 29.3,
-  x: ART_ROOM.centerX - (-5.5 * 0.06),
-  z: 58
+  scale: 0.052,
+  x: -15.68,
+  z: 52.14
 };
 const NESTED_GALLERY_MINIATURE = {
   scale: GALLERY_MINIATURE.scale,
@@ -395,11 +414,12 @@ const HOUSE_RAIN_DISPLAY = {
   title: 'Home in the rain',
   source: './media/house-in-rain.mp4',
   posterImage: './media/house-in-rain-poster.jpg',
+  photoImage: './placement-assets/img-0168.jpg',
   aspect: 16 / 9,
   width: 2.35,
-  x: -13.38,
+  x: -11.79,
   positionY: -1,
-  z: 44.85,
+  z: 42.55,
   screenY: 1.62,
   tiltX: THREE.MathUtils.degToRad(-63),
   tiltY: 0,
@@ -410,8 +430,9 @@ const HOUSE_RAIN_DISPLAY = {
   playDistance: 5,
   requireFocusForPlayback: true,
   preloadPriority: 20,
-  manualOnly: true,
+  manualOnly: false,
   requireInteractionRange: true,
+  autoplayWithSound: true,
   hasSound: true
 };
 
@@ -457,16 +478,11 @@ const GAME_DISPLAY_WORKS = [
   interactionRadius: 4.4,
   playDistance: 8,
   preloadPriority: 96,
-  autoplayInBounds: true,
+  playWhenVisible: true,
   manualOnly: false,
   requireInteractionRange: false,
   hasSound: true,
-  activationBounds: {
-    minX: GAME_ROOM.centerX - GAME_ROOM.halfWidth + 0.2,
-    maxX: GAME_ROOM.centerX + GAME_ROOM.halfWidth - 0.2,
-    minZ: GAME_ROOM.nearZ + 0.2,
-    maxZ: GAME_ROOM.farZ - 0.2
-  }
+  activationBounds: null
 }));
 
 const GAME_WALL_SHEETS = [
@@ -922,6 +938,15 @@ const videoMeshes = [];
 const brainMeshes = [];
 const galleryVideos = [];
 const manualVideoEntries = [];
+const INITIAL_WARMUP_VIDEO_SOURCES = new Set([
+  videoWork.source,
+  defenseScreeningWork.source
+]);
+const initialWarmupVideoPending = new Set(INITIAL_WARMUP_VIDEO_SOURCES);
+let initialWarmupVideoResolve;
+const initialWarmupVideosReady = new Promise((resolve) => {
+  initialWarmupVideoResolve = resolve;
+});
 const raycaster = new THREE.Raycaster();
 const pointerCenter = new THREE.Vector2(0, 0);
 const dragEuler = new THREE.Euler(0, 0, 0, 'YXZ');
@@ -1983,13 +2008,73 @@ function createMugDisplay(texture, config) {
   needsRender = true;
 }
 
+function houseHierarchyLabel(child) {
+  const names = [];
+  let current = child;
+  while (current) {
+    if (current.name) names.push(current.name);
+    current = current.parent;
+  }
+  return names.join(' ').toLowerCase();
+}
+
+function isExplicitHouseBaseStone(child) {
+  return HOUSE_BASE_STONE_COMPONENTS.has((child.name || '').toLowerCase().replace(/[^a-z0-9]/g, ''));
+}
+
+function getGalleryHouseColorGroup(child, material) {
+  const hierarchy = houseHierarchyLabel(child);
+  const label = `${material.name || ''} ${hierarchy}`.toLowerCase();
+  if (/^plane[._]?016$/i.test(child.name || '')) return null;
+  if (isExplicitHouseBaseStone(child)) return 'baseStone';
+  if (/^plane[._]?119$/i.test(child.name || '')) return 'wood';
+  if (/(cut[ _]long[ _]wall[ _]top[ _]window|middlefrontwall[._]?001)/.test(hierarchy)) return 'baseStone';
+  const isGlassHolder = /glass holder/.test(label);
+  const isActualGlass = !isGlassHolder && (/(window|missingglass)/.test(label)
+    || material.name === 'gs'
+    || /cylinder[._]?002/.test(hierarchy));
+  if (isActualGlass) return 'glass';
+  if (/(^|[\s_.])(water|pool)([\s_.]|$)/.test(label)
+    && !/wood top of water/.test(label)) return null;
+  if (/(glassss|holding[ _]the[ _]glass|glass[ _]holder|frame|handle|knob|details|stairs[ _]i[ _]want|torus|sphere|right[ _]middle[ _]wall[ _]2)/.test(label)) return 'metal';
+  if (/(^|[ _])top[ _]of[ _]wall([ _]|$)/.test(hierarchy)) return 'roof';
+  if (/(^|[ _])white[ _]roof[ _]line([ _]|$)/.test(hierarchy)) return 'stone';
+  if (/roomfloor/.test(`${material.name || ''} ${child.name || ''}`.toLowerCase())) return 'baseStone';
+  if (/(wood top of water|woodboard|wood|door|platform)/.test(label)) return 'wood';
+  return 'baseStone';
+}
+
 function prepareHouseModel(model, scaleMultiplier = 1, baseY = 0, targetWidth = null) {
   model.traverse((child) => {
     if (!child.isMesh) return;
+    if (/^plane[._]?016$/i.test(child.name || '')) {
+      child.visible = false;
+      return;
+    }
     child.castShadow = false;
     child.receiveShadow = false;
     const materials = Array.isArray(child.material) ? child.material : [child.material];
-    materials.filter(Boolean).forEach((material) => {
+    const clonedMaterials = materials.map((material) => material?.clone ? material.clone() : material);
+    child.material = Array.isArray(child.material) ? clonedMaterials : clonedMaterials[0];
+    clonedMaterials.filter(Boolean).forEach((material) => {
+      const groupKey = getGalleryHouseColorGroup(child, material);
+      if (groupKey) material.color.set(HOUSE_COLOR_PRESET[groupKey]);
+      if (groupKey === 'glass') {
+        material.transparent = true;
+        material.opacity = 0.34;
+        material.depthWrite = false;
+        material.side = THREE.DoubleSide;
+        material.roughness = 0.08;
+        material.metalness = 0;
+        if ('transmission' in material) material.transmission = 0.55;
+        if ('thickness' in material) material.thickness = 0.04;
+        if ('ior' in material) material.ior = 1.45;
+      } else if (/(cut[ _]long[ _]wall[ _]top[ _]window|middlefrontwall[._]?001)/.test(houseHierarchyLabel(child))) {
+        material.transparent = false;
+        material.opacity = 1;
+        material.depthWrite = true;
+        material.side = THREE.FrontSide;
+      }
       material.roughness = material.roughness ?? 0.88;
       material.metalness = 0;
       material.needsUpdate = true;
@@ -2063,6 +2148,7 @@ function createHouseFloorPreview(gltf) {
     HOUSE_FLOOR_PREVIEW.z
   );
   modelPivot.scale.setScalar(HOUSE_FLOOR_PREVIEW.scale);
+  modelPivot.rotation.y = HOUSE_FLOOR_PREVIEW.rotationY;
   modelPivot.add(model);
   display.add(modelPivot);
   scene.add(display);
@@ -2442,6 +2528,19 @@ function createStandingVideoDisplay(work, posterTexture) {
   angledNeck.position.set(0, -frameHeight / 2 - 0.28, -0.08);
   screenAssembly.add(angledNeck);
 
+  let photoMaterial = null;
+  if (work.photoImage) {
+    const photoWidth = work.photoWidth ?? 0.78;
+    const photoHeight = work.photoHeight ?? photoWidth / (4 / 3);
+    photoMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false });
+    const photo = new THREE.Mesh(
+      new THREE.PlaneGeometry(photoWidth, photoHeight),
+      photoMaterial
+    );
+    photo.position.set(0, angledNeck.position.y, 0.136);
+    screenAssembly.add(photo);
+  }
+
   const video = document.createElement('video');
   video.className = 'gallery-video-source';
   video.poster = work.posterImage;
@@ -2478,6 +2577,7 @@ function createStandingVideoDisplay(work, posterTexture) {
     activationBounds: work.activationBounds,
     autoplayInBounds: Boolean(work.autoplayInBounds),
     autoplayOnEntry: Boolean(work.autoplayOnEntry),
+    playWhenVisible: Boolean(work.playWhenVisible),
     position: new THREE.Vector3(work.x, 0, work.z),
     interactionRadius: work.interactionRadius,
     playDistance: work.playDistance,
@@ -2485,6 +2585,7 @@ function createStandingVideoDisplay(work, posterTexture) {
     element: video,
     frameCallback: 0,
     screen,
+    photoMaterial,
     focusOutline,
     material: screenMaterial,
     supportsFrameCallback: typeof video.requestVideoFrameCallback === 'function',
@@ -2496,8 +2597,10 @@ function createStandingVideoDisplay(work, posterTexture) {
     manualActivated: false,
     requireInteractionRange: Boolean(work.requireInteractionRange),
     hasSound: Boolean(work.hasSound),
-    audioEnabled: false
+    autoplayWithSound: Boolean(work.autoplayWithSound),
+    audioEnabled: Boolean(work.autoplayWithSound && galleryActive)
   };
+  if (entry.audioEnabled) enableVideoAudio(entry);
 
   const activateVideoTexture = () => {
     if (screenMaterial.map !== videoTexture) {
@@ -2633,6 +2736,17 @@ function createHouseRainDisplay(posterTexture) {
   return createStandingVideoDisplay(HOUSE_RAIN_DISPLAY, posterTexture);
 }
 
+function replaceHouseRainPhotoTexture(entry, texture) {
+  if (!entry?.photoMaterial) return;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
+  entry.photoMaterial.map = texture;
+  entry.photoMaterial.needsUpdate = true;
+  needsRender = true;
+}
+
 function replaceVideoPosterTexture(entry, texture) {
   if (!entry?.material) return;
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -2677,6 +2791,10 @@ function startArtRoomLoads() {
       textureLoader.load(
         HOUSE_RAIN_DISPLAY.posterImage,
         (texture) => replaceVideoPosterTexture(houseRainEntry, texture)
+      );
+      textureLoader.load(
+        HOUSE_RAIN_DISPLAY.photoImage,
+        (texture) => replaceHouseRainPhotoTexture(houseRainEntry, texture)
       );
     },
     () => {
@@ -4438,7 +4556,9 @@ function addMriVideoWork(work) {
     eagerLoad: true,
     preloadPriority: 92,
     playWhenVisible: true,
-    playDistance: 100
+    playDistance: 100,
+    activationBounds: null,
+    requireFocusForPlayback: false
   }, createVideoPlaceholderTexture());
 }
 
@@ -4767,7 +4887,7 @@ function shouldPlayVideo(entry) {
     return camera.position.x >= minX && camera.position.x <= maxX
       && camera.position.z >= minZ && camera.position.z <= maxZ;
   }
-  if (entry.activationBounds && !entry.playWhenVisible) {
+  if (entry.activationBounds) {
     const { minX, maxX, minZ, maxZ } = entry.activationBounds;
     const insideActivationArea = camera.position.x >= minX && camera.position.x <= maxX
       && camera.position.z >= minZ && camera.position.z <= maxZ;
@@ -5254,6 +5374,18 @@ function addVideoWork(work, posterTexture) {
   video.setAttribute('playsinline', '');
   document.body.appendChild(video);
 
+  if (INITIAL_WARMUP_VIDEO_SOURCES.has(work.source)) {
+    let settled = false;
+    const markWarmupVideoReady = () => {
+      if (settled) return;
+      settled = true;
+      initialWarmupVideoPending.delete(work.source);
+      if (!initialWarmupVideoPending.size) initialWarmupVideoResolve();
+    };
+    video.addEventListener('canplay', markWarmupVideoReady, { once: true });
+    video.addEventListener('error', markWarmupVideoReady, { once: true });
+  }
+
   const videoTexture = new THREE.VideoTexture(video);
   videoTexture.colorSpace = THREE.SRGBColorSpace;
   videoTexture.minFilter = THREE.LinearFilter;
@@ -5711,11 +5843,13 @@ function animateLoadingProgress() {
     if (remaining <= 0.05) {
       loadingDisplayProgress = loadingProgressTarget;
       loadingBar.style.width = `${loadingDisplayProgress}%`;
+      loadingStatus.textContent = `${Math.round(loadingDisplayProgress)}%`;
       loadingProgressAnimation = 0;
       return;
     }
     loadingDisplayProgress += Math.max(0.18, remaining * 0.055);
     loadingBar.style.width = `${Math.min(100, loadingDisplayProgress)}%`;
+    loadingStatus.textContent = `${Math.round(loadingDisplayProgress)}%`;
     loadingProgressAnimation = window.requestAnimationFrame(tick);
   };
   loadingProgressAnimation = window.requestAnimationFrame(tick);
@@ -5726,17 +5860,27 @@ function setLoadingProgressTarget(target) {
   animateLoadingProgress();
 }
 
-function finishLoading() {
+function completeInitialLoading() {
   sceneReady = true;
   setLoadingProgressTarget(100);
-  loadingStatus.textContent = 'Gallery ready.';
+  loadingStatus.textContent = '100%';
+  // Warm the initial room from several yaw angles only after the two eager
+  // videos have reached a playable state, so their video textures are included.
   warmInitialCamera();
   window.setTimeout(() => {
     warmInitialCamera();
     loadingScreen.hidden = true;
     showWelcome('initial');
   }, 220);
+}
 
+function finishLoading() {
+  if (initialWarmupVideoPending.size) {
+    setLoadingProgressTarget(96);
+    initialWarmupVideosReady.then(completeInitialLoading);
+    return;
+  }
+  completeInitialLoading();
 }
 
 function configureTouchFallback() {
@@ -5760,7 +5904,10 @@ function enterGallery() {
   galleryActive = true;
   videoRoomAudioUnlocked = true;
   galleryVideos.forEach((entry) => {
-    if (entry.videoRoom) enableVideoAudio(entry);
+    if (entry.videoRoom || entry.autoplayWithSound) {
+      entry.audioEnabled = true;
+      enableVideoAudio(entry);
+    }
   });
   primeShrimpRoomMusic();
   preloadGalleryVideos();
@@ -5897,17 +6044,17 @@ function initializeGallery() {
     // completion, so it does not jump to 26/28 and then appear frozen.
     const percentage = 8 + (loaded / Math.max(1, total)) * 82;
     setLoadingProgressTarget(percentage);
-    loadingStatus.textContent = 'Preparing gallery...';
+    loadingStatus.textContent = `${Math.round(loadingDisplayProgress)}%`;
   };
   manager.onLoad = finishLoading;
   manager.onError = () => {
-    loadingStatus.textContent = 'An artwork preview could not be loaded. The poster index is still available.';
+    loadingStatus.textContent = `${Math.round(loadingDisplayProgress)}%`;
   };
 
   // Move the visual progress off the static CSS starting point as soon as
   // the core scene and manager exist, before the first texture finishes.
   setLoadingProgressTarget(6);
-  loadingStatus.textContent = 'Loading core gallery assets...';
+  loadingStatus.textContent = '6%';
 
   const textureLoader = new THREE.TextureLoader(manager);
   [defenseScreeningWork, ...appDemoWorks, ...myPhysioVideoWorks].forEach((work) => {
@@ -5926,6 +6073,12 @@ function initializeGallery() {
   resumePages.forEach((page) => {
     mainRoomLoadedImages.add(page.image);
     textureLoader.load(page.image, (texture) => addResumePage(page, texture));
+  });
+  // The paper-figure sheet is also visible in the first Research room, so it
+  // must be ready before the camera warm-up runs.
+  figureClusters.forEach((cluster) => {
+    mainRoomLoadedImages.add(cluster.image);
+    textureLoader.load(cluster.image, (texture) => addFigureCluster(cluster, texture));
   });
   // These are the first visible Art-room assets. Gate them with the initial
   // loading screen, then let the rest of the Art room continue in background.

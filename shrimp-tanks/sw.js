@@ -1,4 +1,4 @@
-const CACHE_NAME = "cherry-tanks-phaser-6c9142f1155c06ec";
+const CACHE_NAME = "cherry-tanks-phaser-01a25162b5340213";
 const APP_SHELL = [
   "./index.html",
   "./manifest.webmanifest",
@@ -46,7 +46,7 @@ const APP_SHELL = [
   "./assets/shrimp/tail-swim-2.png?v=v78-notebook-dna-assets-r1",
   "./assets/tank/water.webp?v=v78-notebook-dna-assets-r1",
   "./assets/tank/sand.webp?v=v78-notebook-dna-assets-r1",
-  "./assets/tank/generated/hardscape-masks.8e0a0df45afc2bc7.bin",
+  "./assets/tank/generated/hardscape-masks.7019ba9cd00449c2.bin",
   "./assets/tank/generated/rock1.790fa6d3b8c94d4e.png",
   "./assets/tank/generated/rock2.fb8a1c2b609b0e7d.png",
   "./assets/tank/generated/rock3.1079b54d7aaba352.png",
@@ -70,15 +70,17 @@ const APP_SHELL = [
   "./assets/tank/generated/elephant.905940fc86b79e6b.png",
   "./assets/tank/generated/panthon.6d8f7c1f06355a24.png",
   "./assets/tank/generated/lion.2c5879d67f607c5c.png",
+  "./assets/tank/generated/head1.68698078617fd7b6.png",
+  "./assets/tank/generated/head2.efc9dc7af65eee2f.png",
   "./assets/tank/generated/magic-mushroom.d7ce8349607543c8.png",
-  "./assets/TankScene-DehJbX1m.js",
+  "./assets/TankScene-Bfd9L7J7.js",
   "./assets/depthFigure8Lab-DTIJShp-.js",
   "./assets/lifespanRenderLab-CrmCEB0e.js",
-  "./assets/main-BcsGXhrT.js",
-  "./assets/main-DepEhUmY.css",
-  "./assets/matingDanceLab-DGt-KgtO.js",
+  "./assets/main-BIUBHK0I.js",
+  "./assets/main-DpfbixuU.css",
+  "./assets/matingDanceLab-Cd0q-H58.js",
   "./assets/modulepreload-polyfill-B5Qt9EMX.js",
-  "./assets/movementLab-CFu8fkrx.js",
+  "./assets/movementLab-DAkBji6H.js",
   "./assets/phaser-BFjO2D3v.js",
   "./assets/phaser-DFK5Ua9d.js"
 ];

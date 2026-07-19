@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Art Room Object Placement</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #111416;
+      color: #e9ecec;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: #111416; }
+    .app { display: grid; grid-template-columns: minmax(0, 1fr) 350px; min-height: 100vh; }
+    #preview { display: block; width: 100%; height: 100vh; background: #d7d4cd; }
+    .panel { padding: 14px 15px; overflow: hidden; border-left: 1px solid #30383a; background: #171b1d; }
+    h1 { margin: 0 0 5px; font-size: 19px; line-height: 1.1; }
+    p { margin: 0 0 8px; color: #aeb7b8; font-size: 12px; line-height: 1.35; }
+    .status { min-height: 17px; margin-bottom: 8px; color: #8bd0bc; font-size: 11px; }
+    .transform-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 6px; }
+    .transform-tabs button { padding: 6px 4px; font-size: 11px; }
+    .transform-tabs button.active { border-color: #83c6b3; background: #31534d; color: #ffffff; }
+    .section { padding: 8px 0; border-top: 1px solid #30383a; }
+    .section:first-of-type { border-top: 0; padding-top: 0; }
+    .section-title { margin-bottom: 5px; color: #dfe7e7; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    label { display: grid; grid-template-columns: 50px 1fr 58px; align-items: center; gap: 7px; margin: 4px 0; font-size: 11px; color: #b8c0c1; }
+    input[type="range"] { width: 100%; accent-color: #83c6b3; }
+    output { padding: 2px 4px; border-radius: 4px; background: #242b2d; color: #e2e9e9; font-variant-numeric: tabular-nums; text-align: right; }
+    button { border: 1px solid #4a585b; border-radius: 5px; padding: 6px 8px; background: #232b2d; color: #e3e9e9; cursor: pointer; font: inherit; font-size: 11px; }
+    button:hover { background: #304043; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .nudge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; max-width: 190px; margin: 8px auto 0; }
+    .nudge-grid button { min-height: 31px; padding: 3px; }
+    .nudge-grid .empty { visibility: hidden; }
+    .hint { margin-top: 5px; color: #829092; font-size: 10px; line-height: 1.25; }
+    .color-editor { margin-top: 8px; padding-top: 8px; border-top: 1px solid #30383a; }
+    .color-editor-copy { margin: 0 0 6px; color: #829092; font-size: 10px; line-height: 1.25; }
+    .color-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px; margin-bottom: 6px; }
+    .color-toolbar input[type="search"] { min-width: 0; width: 100%; padding: 6px 7px; border: 1px solid #4a585b; border-radius: 5px; background: #121718; color: #e3e9e9; font: inherit; font-size: 11px; }
+    .selection-summary { min-height: 17px; margin-bottom: 6px; color: #83c6b3; font-size: 10px; line-height: 1.25; }
+    .component-color-list { max-height: 220px; overflow-y: auto; border: 1px solid #30383a; border-radius: 5px; background: #121718; }
+    .component-color-empty { padding: 8px; color: #829092; font-size: 10px; }
+    .component-color-group { border-bottom: 1px solid #30383a; }
+    .component-color-group:last-child { border-bottom: 0; }
+    .component-color-group-header { display: grid; grid-template-columns: minmax(0, 1fr) 30px 38px; align-items: center; gap: 6px; padding: 5px 6px; background: #1c2325; }
+    .component-color-group-header button { min-width: 0; overflow: hidden; padding: 3px 0; border: 0; background: transparent; color: #dfe7e7; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+    .component-color-group-header button:hover { background: transparent; color: #ffffff; }
+    .component-color-group-header.selected { background: #31534d; }
+    .component-color-group-items[hidden] { display: none; }
+    .component-color-group-count { color: #829092; font-size: 9px; text-align: right; }
+    .component-color-row { display: grid; grid-template-columns: minmax(0, 1fr) 30px 38px; align-items: center; gap: 6px; padding: 5px 6px 5px 14px; border-bottom: 1px solid #242b2d; cursor: pointer; }
+    .component-color-row:last-child { border-bottom: 0; }
+    .component-color-name { min-width: 0; overflow: hidden; color: #b8c0c1; font-size: 10px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+    .component-color-row:hover, .component-color-row:focus-visible { outline: 0; background: #202b2d; }
+    .component-color-row.selected { background: #31534d; box-shadow: inset 3px 0 #83c6b3; }
+    .component-color-row input[type="color"] { width: 30px; height: 24px; padding: 1px; border: 1px solid #4a585b; border-radius: 4px; background: #232b2d; cursor: pointer; }
+    .component-color-value { color: #829092; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 9px; }
+    .component-color-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+    .component-color-actions button { width: 100%; }
+    .transform-panel[hidden] { display: none; }
+    @media (max-width: 760px) {
+      .app { display: block; }
+      #preview { height: 62vh; min-height: 360px; }
+      .panel { border-left: 0; border-top: 1px solid #30383a; overflow: visible; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <canvas id="preview" aria-label="Interactive Art room house placement preview"></canvas>
+    <aside class="panel">
+      <h1>Art room object placement</h1>
+      <p>Walk around the real Art room layout and transform the house, screen, or miniature. The photo is attached directly to the screen display. The house inspector groups editable parts as metal frames, glasses, wood, roof, white stone, and base stone.</p>
+      <div class="status" id="status">Loading Art room and house…</div>
+
+      <div class="transform-tabs" role="tablist" aria-label="Object to transform">
+        <button type="button" class="active" data-transform-tab="house">House</button>
+        <button type="button" data-transform-tab="screen">Rain screen</button>
+        <button type="button" data-transform-tab="photo">Photo</button>
+        <button type="button" data-transform-tab="miniature">Miniature</button>
+      </div>
+
+      <section class="section transform-panel" data-transform-panel="house">
+        <div class="section-title">House · floor model</div>
+        <label>X <input id="position-x" type="range" min="-30" max="20" step="0.01"><output id="position-x-value"></output></label>
+        <label>Y <input id="position-y" type="range" min="-1" max="4" step="0.01"><output id="position-y-value"></output></label>
+        <label>Z <input id="position-z" type="range" min="25" max="75" step="0.01"><output id="position-z-value"></output></label>
+        <label>Scale <input id="scale" type="range" min="0.1" max="2.2" step="0.01"><output id="scale-value"></output></label>
+        <label>Rotate Y <input id="rotation-y" type="range" min="-180" max="180" step="1"><output id="rotation-y-value"></output></label>
+        <div class="hint">Uses the same model normalization and initial placement as the gallery.</div>
+        <div class="color-editor">
+          <div class="section-title">House component colors</div>
+          <p class="color-editor-copy">Recolor the metal frames, glasses, or wood together, or select a single component. You can also click a component in the model.</p>
+          <div class="color-toolbar">
+            <input id="component-search" type="search" placeholder="Filter components" aria-label="Filter house components">
+            <button id="apply-photo-palette" type="button">Photo palette</button>
+          </div>
+          <div id="selection-summary" class="selection-summary">Click the model or a list item to select it.</div>
+          <div id="component-color-list" class="component-color-list">
+            <div class="component-color-empty">Loading house components…</div>
+          </div>
+          <div class="component-color-actions">
+            <button id="copy-house-colors" type="button" disabled>Copy color settings</button>
+            <button id="reset-house-colors" type="button" disabled>Reset source colors</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section transform-panel" data-transform-panel="screen" hidden>
+        <div class="section-title">Rain screen · stand</div>
+        <label>X <input id="rain-x" type="range" min="-30" max="20" step="0.01"><output id="rain-x-value"></output></label>
+        <label>Y <input id="rain-y" type="range" min="-1" max="5" step="0.01"><output id="rain-y-value"></output></label>
+        <label>Z <input id="rain-z" type="range" min="25" max="75" step="0.01"><output id="rain-z-value"></output></label>
+        <label>Scale <input id="rain-scale" type="range" min="0.25" max="3" step="0.01"><output id="rain-scale-value"></output></label>
+        <label>Tilt X <input id="rain-tilt-x" type="range" min="-90" max="90" step="1"><output id="rain-tilt-x-value"></output></label>
+        <label>Tilt Y <input id="rain-tilt-y" type="range" min="-90" max="90" step="1"><output id="rain-tilt-y-value"></output></label>
+        <label>Tilt Z <input id="rain-tilt-z" type="range" min="-90" max="90" step="1"><output id="rain-tilt-z-value"></output></label>
+        <label>Heading <input id="rain-rotation-y" type="range" min="-180" max="180" step="1"><output id="rain-rotation-y-value"></output></label>
+        <div class="hint">Same screen, stand, tilt, and starting transform as the gallery.</div>
+      </section>
+
+      <section class="section transform-panel" data-transform-panel="photo" hidden>
+        <div class="section-title">Photo · attached to screen</div>
+        <div class="hint">The photo is locked to the screen display area and follows the Rain screen position, scale, tilt, and heading controls.</div>
+      </section>
+
+      <section class="section transform-panel" data-transform-panel="miniature" hidden>
+        <div class="section-title">Miniature · gallery model</div>
+        <label>X <input id="miniature-x" type="range" min="-30" max="20" step="0.01"><output id="miniature-x-value"></output></label>
+        <label>Y <input id="miniature-y" type="range" min="-1" max="4" step="0.01"><output id="miniature-y-value"></output></label>
+        <label>Z <input id="miniature-z" type="range" min="25" max="75" step="0.01"><output id="miniature-z-value"></output></label>
+        <label>Scale <input id="miniature-scale" type="range" min="0.01" max="0.2" step="0.001"><output id="miniature-scale-value"></output></label>
+        <label>Rotate Y <input id="miniature-rotation-y" type="range" min="-180" max="180" step="1"><output id="miniature-rotation-y-value"></output></label>
+        <div class="hint">Moves the Art-room miniature model, including its attached nested miniature.</div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">Camera</div>
+        <button id="walk" type="button">Start walking / mouse look</button>
+        <div class="hint">Click the canvas after starting. Use WASD to walk; click again or press Esc to release the mouse.</div>
+        <div class="button-row">
+          <button data-view="south">View from south</button>
+          <button data-view="north">View from north</button>
+          <button data-view="west">View from west</button>
+          <button data-view="east">View from east</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="button-row">
+          <button id="reset">Reset placement</button>
+          <button id="copy">Copy transform</button>
+        </div>
+      </section>
+    </aside>
+  </main>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three.module.min.js",
+      "three/addons/controls/PointerLockControls.js": "./vendor/PointerLockControls.js"
+    }
+  }
+  </script>
+  <script type="module" src="house-placement.js?v=20260719-house-placement46"></script>
+</body>
+</html>

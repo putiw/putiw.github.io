@@ -1,0 +1,936 @@
+{
+  "capturedFrom": "http://localhost:8080/gallery/house-placement.html?v=20260719-house-placement21",
+  "capturedAt": "2026-07-19",
+  "colors": [
+    {
+      "color": "#ffffff",
+      "index": 0,
+      "name": "Plane126"
+    },
+    {
+      "color": "#ffffff",
+      "index": 1,
+      "name": "cut_long_wall_top_window"
+    },
+    {
+      "color": "#ffffff",
+      "index": 2,
+      "name": "leftwall"
+    },
+    {
+      "color": "#ffffff",
+      "index": 3,
+      "name": "midwall1"
+    },
+    {
+      "color": "#ffffff",
+      "index": 4,
+      "name": "middlefrontwall"
+    },
+    {
+      "color": "#ffffff",
+      "index": 5,
+      "name": "front_wall_right_side"
+    },
+    {
+      "color": "#ffffff",
+      "index": 6,
+      "name": "right_middle_wall"
+    },
+    {
+      "color": "#ffffff",
+      "index": 7,
+      "name": "middlefrontwall004"
+    },
+    {
+      "color": "#ffffff",
+      "index": 8,
+      "name": "midwall1002"
+    },
+    {
+      "color": "#ffffff",
+      "index": 9,
+      "name": "midwall1027"
+    },
+    {
+      "color": "#ffffff",
+      "index": 10,
+      "name": "midwall1028"
+    },
+    {
+      "color": "#ffffff",
+      "index": 11,
+      "name": "leftwall002"
+    },
+    {
+      "color": "#ffffff",
+      "index": 12,
+      "name": "middlefrontwall001"
+    },
+    {
+      "color": "#ffffff",
+      "index": 13,
+      "name": "left_wall_top_front004"
+    },
+    {
+      "color": "#ffffff",
+      "index": 14,
+      "name": "left_wall_top_front006"
+    },
+    {
+      "color": "#ffffff",
+      "index": 15,
+      "name": "circle_wall"
+    },
+    {
+      "color": "#e7e7e7",
+      "index": 16,
+      "name": "Plane003"
+    },
+    {
+      "color": "#e7e7e7",
+      "index": 17,
+      "name": "Plane001"
+    },
+    {
+      "color": "#e7e7e7",
+      "index": 18,
+      "name": "Plane005"
+    },
+    {
+      "color": "#ffffff",
+      "index": 19,
+      "name": "ROOF_TOP_FLOOR"
+    },
+    {
+      "color": "#ffffff",
+      "index": 20,
+      "name": "Cylinder"
+    },
+    {
+      "color": "#ffffff",
+      "index": 21,
+      "name": "kitchen"
+    },
+    {
+      "color": "#e7e7e7",
+      "index": 22,
+      "name": "Plane018"
+    },
+    {
+      "color": "#e7e7e7",
+      "index": 23,
+      "name": "Plane012"
+    },
+    {
+      "color": "#e7e7e7",
+      "index": 24,
+      "name": "Plane019"
+    },
+    {
+      "color": "#ffffff",
+      "index": 25,
+      "name": "Plane020"
+    },
+    {
+      "color": "#ffffff",
+      "index": 26,
+      "name": "Plane002"
+    },
+    {
+      "color": "#ffffff",
+      "index": 27,
+      "name": "Plane023"
+    },
+    {
+      "color": "#ffffff",
+      "index": 28,
+      "name": "Plane004"
+    },
+    {
+      "color": "#ffffff",
+      "index": 29,
+      "name": "Plane021"
+    },
+    {
+      "color": "#ffffff",
+      "index": 30,
+      "name": "Plane022"
+    },
+    {
+      "color": "#ffffff",
+      "index": 31,
+      "name": "Plane024"
+    },
+    {
+      "color": "#ffffff",
+      "index": 32,
+      "name": "Plane043"
+    },
+    {
+      "color": "#e7e7e7",
+      "index": 33,
+      "name": "Cube"
+    },
+    {
+      "color": "#ffffff",
+      "index": 34,
+      "name": "left_wall_top_front"
+    },
+    {
+      "color": "#ffffff",
+      "index": 35,
+      "name": "left_wall_top_back"
+    },
+    {
+      "color": "#ffffff",
+      "index": 36,
+      "name": "wall_top"
+    },
+    {
+      "color": "#ffffff",
+      "index": 37,
+      "name": "middle_wall_top_front"
+    },
+    {
+      "color": "#ffffff",
+      "index": 38,
+      "name": "middle_wall_top_front001"
+    },
+    {
+      "color": "#ffffff",
+      "index": 39,
+      "name": "right_wall_top_back"
+    },
+    {
+      "color": "#ffffff",
+      "index": 40,
+      "name": "right_wall_top_front002"
+    },
+    {
+      "color": "#54636f",
+      "index": 41,
+      "name": "right_middle_wall_2"
+    },
+    {
+      "color": "#e7e7e7",
+      "index": 42,
+      "name": "middle_wall_top_front004"
+    },
+    {
+      "color": "#54636f",
+      "index": 43,
+      "name": "right_middle_wall_2001"
+    },
+    {
+      "color": "#54636f",
+      "index": 44,
+      "name": "right_middle_wall_2002"
+    },
+    {
+      "color": "#ffffff",
+      "index": 45,
+      "name": "right_middle_wall_2003"
+    },
+    {
+      "color": "#54636f",
+      "index": 46,
+      "name": "right_middle_wall_2004"
+    },
+    {
+      "color": "#ffffff",
+      "index": 47,
+      "name": "right_middle_wall_2005"
+    },
+    {
+      "color": "#ffffff",
+      "index": 48,
+      "name": "wall_top001"
+    },
+    {
+      "color": "#b8b8ae",
+      "index": 49,
+      "name": "Plane"
+    },
+    {
+      "color": "#b8b8ae",
+      "index": 50,
+      "name": "Plane014"
+    },
+    {
+      "color": "#b8b8ae",
+      "index": 51,
+      "name": "Plane015"
+    },
+    {
+      "color": "#b8b8ae",
+      "index": 52,
+      "name": "Plane074"
+    },
+    {
+      "color": "#e7e7e7",
+      "index": 53,
+      "name": "water"
+    },
+    {
+      "color": "#2ecde7",
+      "index": 54,
+      "name": "Cylinder002"
+    },
+    {
+      "color": "#ffffff",
+      "index": 55,
+      "name": "woodboard001"
+    },
+    {
+      "color": "#626262",
+      "index": 56,
+      "name": "roomfloor"
+    },
+    {
+      "color": "#4f5964",
+      "index": 57,
+      "name": "holding_the_glass"
+    },
+    {
+      "color": "#ffffff",
+      "index": 58,
+      "name": "long_stairs_block"
+    },
+    {
+      "color": "#4f5964",
+      "index": 59,
+      "name": "holding_the_glass001"
+    },
+    {
+      "color": "#4f5964",
+      "index": 60,
+      "name": "holding_the_glass002"
+    },
+    {
+      "color": "#4f5964",
+      "index": 61,
+      "name": "holding_the_glass004"
+    },
+    {
+      "color": "#4f5964",
+      "index": 62,
+      "name": "holding_the_glass003"
+    },
+    {
+      "color": "#4f5964",
+      "index": 63,
+      "name": "holding_the_glass005"
+    },
+    {
+      "color": "#ffffff",
+      "index": 64,
+      "name": "Plane028"
+    },
+    {
+      "color": "#4f5964",
+      "index": 65,
+      "name": "Plane026"
+    },
+    {
+      "color": "#ffffff",
+      "index": 66,
+      "name": "Plane025"
+    },
+    {
+      "color": "#ffffff",
+      "index": 67,
+      "name": "Plane030"
+    },
+    {
+      "color": "#ffffff",
+      "index": 68,
+      "name": "Plane066"
+    },
+    {
+      "color": "#ffffff",
+      "index": 69,
+      "name": "Plane068"
+    },
+    {
+      "color": "#4f5964",
+      "index": 70,
+      "name": "Plane027"
+    },
+    {
+      "color": "#ffffff",
+      "index": 71,
+      "name": "Plane035"
+    },
+    {
+      "color": "#4f5964",
+      "index": 72,
+      "name": "Plane036"
+    },
+    {
+      "color": "#4f5964",
+      "index": 73,
+      "name": "Plane037"
+    },
+    {
+      "color": "#4f5964",
+      "index": 74,
+      "name": "Plane038"
+    },
+    {
+      "color": "#ffffff",
+      "index": 75,
+      "name": "Plane039"
+    },
+    {
+      "color": "#ffffff",
+      "index": 76,
+      "name": "Plane040"
+    },
+    {
+      "color": "#4f5964",
+      "index": 77,
+      "name": "Plane041"
+    },
+    {
+      "color": "#ffffff",
+      "index": 78,
+      "name": "Plane042"
+    },
+    {
+      "color": "#4f5964",
+      "index": 79,
+      "name": "Plane064"
+    },
+    {
+      "color": "#4f5964",
+      "index": 80,
+      "name": "Plane065"
+    },
+    {
+      "color": "#4f5964",
+      "index": 81,
+      "name": "Plane067"
+    },
+    {
+      "color": "#4f5964",
+      "index": 82,
+      "name": "Plane069"
+    },
+    {
+      "color": "#e7e7e7",
+      "index": 83,
+      "name": "Plane070"
+    },
+    {
+      "color": "#ffffff",
+      "index": 84,
+      "name": "Plane072"
+    },
+    {
+      "color": "#4f5964",
+      "index": 85,
+      "name": "Plane076"
+    },
+    {
+      "color": "#4f5964",
+      "index": 86,
+      "name": "Plane063"
+    },
+    {
+      "color": "#4f5964",
+      "index": 87,
+      "name": "Plane077"
+    },
+    {
+      "color": "#4f5964",
+      "index": 88,
+      "name": "Plane078"
+    },
+    {
+      "color": "#4f5964",
+      "index": 89,
+      "name": "Plane079"
+    },
+    {
+      "color": "#4f5964",
+      "index": 90,
+      "name": "Plane091"
+    },
+    {
+      "color": "#ffffff",
+      "index": 91,
+      "name": "Plane032"
+    },
+    {
+      "color": "#ffffff",
+      "index": 92,
+      "name": "Plane033"
+    },
+    {
+      "color": "#ffffff",
+      "index": 93,
+      "name": "Plane034"
+    },
+    {
+      "color": "#ffffff",
+      "index": 94,
+      "name": "midwall1015"
+    },
+    {
+      "color": "#ffffff",
+      "index": 95,
+      "name": "midwall1016"
+    },
+    {
+      "color": "#ffffff",
+      "index": 96,
+      "name": "midwall1017"
+    },
+    {
+      "color": "#ffffff",
+      "index": 97,
+      "name": "midwall1018"
+    },
+    {
+      "color": "#ffffff",
+      "index": 98,
+      "name": "midwall1019"
+    },
+    {
+      "color": "#ffffff",
+      "index": 99,
+      "name": "midwall1020"
+    },
+    {
+      "color": "#ffffff",
+      "index": 100,
+      "name": "midwall1021"
+    },
+    {
+      "color": "#ffffff",
+      "index": 101,
+      "name": "midwall1022"
+    },
+    {
+      "color": "#ffffff",
+      "index": 102,
+      "name": "midwall1023"
+    },
+    {
+      "color": "#ffffff",
+      "index": 103,
+      "name": "midwall1024"
+    },
+    {
+      "color": "#ffffff",
+      "index": 104,
+      "name": "midwall1025"
+    },
+    {
+      "color": "#ffffff",
+      "index": 105,
+      "name": "midwall1026"
+    },
+    {
+      "color": "#ffffff",
+      "index": 106,
+      "name": "Plane097"
+    },
+    {
+      "color": "#4f5964",
+      "index": 107,
+      "name": "Plane095"
+    },
+    {
+      "color": "#ffffff",
+      "index": 108,
+      "name": "Plane094"
+    },
+    {
+      "color": "#ffffff",
+      "index": 109,
+      "name": "Plane098"
+    },
+    {
+      "color": "#ffffff",
+      "index": 110,
+      "name": "Plane092"
+    },
+    {
+      "color": "#4f5964",
+      "index": 111,
+      "name": "Plane093"
+    },
+    {
+      "color": "#ffffff",
+      "index": 112,
+      "name": "Sphere010"
+    },
+    {
+      "color": "#261e1a",
+      "index": 113,
+      "name": "Torus007"
+    },
+    {
+      "color": "#ffffff",
+      "index": 114,
+      "name": "Sphere011"
+    },
+    {
+      "color": "#261e1a",
+      "index": 115,
+      "name": "Torus008"
+    },
+    {
+      "color": "#261e1a",
+      "index": 116,
+      "name": "Torus009"
+    },
+    {
+      "color": "#261e1a",
+      "index": 117,
+      "name": "Sphere012"
+    },
+    {
+      "color": "#261e1a",
+      "index": 118,
+      "name": "Sphere013"
+    },
+    {
+      "color": "#ffffff",
+      "index": 119,
+      "name": "Plane100"
+    },
+    {
+      "color": "#ffffff",
+      "index": 120,
+      "name": "Plane101"
+    },
+    {
+      "color": "#ffffff",
+      "index": 121,
+      "name": "Plane102"
+    },
+    {
+      "color": "#ffffff",
+      "index": 122,
+      "name": "Plane103"
+    },
+    {
+      "color": "#4f5964",
+      "index": 123,
+      "name": "Plane118"
+    },
+    {
+      "color": "#4f5964",
+      "index": 124,
+      "name": "Plane117"
+    },
+    {
+      "color": "#4f5964",
+      "index": 125,
+      "name": "Plane116"
+    },
+    {
+      "color": "#4f5964",
+      "index": 126,
+      "name": "Plane115"
+    },
+    {
+      "color": "#4f5964",
+      "index": 127,
+      "name": "Plane114"
+    },
+    {
+      "color": "#4f5964",
+      "index": 128,
+      "name": "Plane113"
+    },
+    {
+      "color": "#4f5964",
+      "index": 129,
+      "name": "Plane112"
+    },
+    {
+      "color": "#4f5964",
+      "index": 130,
+      "name": "Plane111"
+    },
+    {
+      "color": "#4f5964",
+      "index": 131,
+      "name": "Plane110"
+    },
+    {
+      "color": "#4f5964",
+      "index": 132,
+      "name": "Plane109"
+    },
+    {
+      "color": "#4f5964",
+      "index": 133,
+      "name": "Plane108"
+    },
+    {
+      "color": "#4f5964",
+      "index": 134,
+      "name": "Plane107"
+    },
+    {
+      "color": "#4f5964",
+      "index": 135,
+      "name": "Plane106"
+    },
+    {
+      "color": "#4f5964",
+      "index": 136,
+      "name": "Plane105"
+    },
+    {
+      "color": "#4f5964",
+      "index": 137,
+      "name": "Plane104"
+    },
+    {
+      "color": "#ffffff",
+      "index": 138,
+      "name": "Plane119"
+    },
+    {
+      "color": "#ffffff",
+      "index": 139,
+      "name": "Plane123"
+    },
+    {
+      "color": "#4f5964",
+      "index": 140,
+      "name": "Plane122"
+    },
+    {
+      "color": "#ffffff",
+      "index": 141,
+      "name": "Plane121"
+    },
+    {
+      "color": "#4f5964",
+      "index": 142,
+      "name": "Plane120"
+    },
+    {
+      "color": "#4f5964",
+      "index": 143,
+      "name": "Plane099"
+    },
+    {
+      "color": "#ffffff",
+      "index": 144,
+      "name": "Cube003"
+    },
+    {
+      "color": "#ffffff",
+      "index": 145,
+      "name": "Cube004"
+    },
+    {
+      "color": "#ffffff",
+      "index": 146,
+      "name": "Cube005"
+    },
+    {
+      "color": "#4f5964",
+      "index": 147,
+      "name": "Cube006"
+    },
+    {
+      "color": "#4f5964",
+      "index": 148,
+      "name": "Cube007"
+    },
+    {
+      "color": "#cfffef",
+      "index": 149,
+      "name": "Cube008"
+    },
+    {
+      "color": "#4f5964",
+      "index": 150,
+      "name": "Cube009"
+    },
+    {
+      "color": "#ffffff",
+      "index": 151,
+      "name": "Cube010"
+    },
+    {
+      "color": "#ffffff",
+      "index": 152,
+      "name": "Cube011"
+    },
+    {
+      "color": "#ffffff",
+      "index": 153,
+      "name": "Cube012"
+    },
+    {
+      "color": "#4f5964",
+      "index": 154,
+      "name": "Cube013"
+    },
+    {
+      "color": "#4f5964",
+      "index": 155,
+      "name": "Cube014"
+    },
+    {
+      "color": "#cfffef",
+      "index": 156,
+      "name": "Cube015"
+    },
+    {
+      "color": "#4f5964",
+      "index": 157,
+      "name": "Cube016"
+    },
+    {
+      "color": "#ffffff",
+      "index": 158,
+      "name": "Plane016"
+    },
+    {
+      "color": "#ffffff",
+      "index": 159,
+      "name": "Plane044"
+    },
+    {
+      "color": "#ffffff",
+      "index": 160,
+      "name": "Plane046"
+    },
+    {
+      "color": "#4f5964",
+      "index": 161,
+      "name": "Plane047"
+    },
+    {
+      "color": "#4f5964",
+      "index": 162,
+      "name": "Plane048"
+    },
+    {
+      "color": "#4f5964",
+      "index": 163,
+      "name": "Plane049"
+    },
+    {
+      "color": "#4f5964",
+      "index": 164,
+      "name": "Plane050"
+    },
+    {
+      "color": "#4f5964",
+      "index": 165,
+      "name": "Plane051"
+    },
+    {
+      "color": "#4f5964",
+      "index": 166,
+      "name": "Plane052"
+    },
+    {
+      "color": "#4f5964",
+      "index": 167,
+      "name": "Plane053"
+    },
+    {
+      "color": "#4f5964",
+      "index": 168,
+      "name": "Plane054"
+    },
+    {
+      "color": "#4f5964",
+      "index": 169,
+      "name": "Plane055"
+    },
+    {
+      "color": "#4f5964",
+      "index": 170,
+      "name": "Plane056"
+    },
+    {
+      "color": "#4f5964",
+      "index": 171,
+      "name": "Plane057"
+    },
+    {
+      "color": "#4f5964",
+      "index": 172,
+      "name": "Plane058"
+    },
+    {
+      "color": "#4f5964",
+      "index": 173,
+      "name": "Plane059"
+    },
+    {
+      "color": "#4f5964",
+      "index": 174,
+      "name": "Plane060"
+    },
+    {
+      "color": "#4f5964",
+      "index": 175,
+      "name": "Plane061"
+    },
+    {
+      "color": "#4f5964",
+      "index": 176,
+      "name": "Plane062"
+    },
+    {
+      "color": "#4f5964",
+      "index": 177,
+      "name": "Plane073"
+    },
+    {
+      "color": "#ffffff",
+      "index": 178,
+      "name": "Plane081"
+    },
+    {
+      "color": "#4f5964",
+      "index": 179,
+      "name": "Plane082"
+    },
+    {
+      "color": "#ffffff",
+      "index": 180,
+      "name": "Plane083"
+    },
+    {
+      "color": "#ffffff",
+      "index": 181,
+      "name": "Plane084"
+    },
+    {
+      "color": "#ffffff",
+      "index": 182,
+      "name": "Plane085"
+    },
+    {
+      "color": "#4f5964",
+      "index": 183,
+      "name": "Plane086"
+    },
+    {
+      "color": "#261e1a",
+      "index": 184,
+      "name": "Sphere007"
+    },
+    {
+      "color": "#261e1a",
+      "index": 185,
+      "name": "Sphere008"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "generatorVersion": 3,
-  "revision": "7eaf7cb90695bc265717",
+  "revision": "f2b32e26c5459329773d",
   "sourceFiles": {
     "public/assets/tank/rock1.png": "724bf01dfad95c7cbcb367c104a407115f1702323da5d3564fa7cb0dddbb25ab",
     "public/assets/tank/rock1b.png": "3cf1b7cf32b115d99e3febf9c1c1bd600d1b8dc5c95bf3d05fbe5a5c5fa5a496",
@@ -51,11 +51,17 @@
     "public/assets/tank/lion.png": "7c25612ac623c6d2b8d4a93ed2af76d6931d3a2aaf2ef97c12aaf57f75f1cab8",
     "public/assets/tank/lionb.png": "873627c0670f37a53bb757b78bbe7c0db1a91e2eda15a252808af063b625476d",
     "public/assets/tank/lionr.png": "1a78e7a2af4d95bc7342c7b9e8ae36cd31808cc74f7509f4720c5bfc7b652ada",
+    "public/assets/tank/head1.png": "ec23fe0e8961950b0d62c46d6b1f44e2cc1178f3d9cd96a2a45c62fcb779e2d3",
+    "public/assets/tank/head1b.png": "a2b031516ee69b10d01d9c594c1fce7903cbda83912e72455bcb6fc67ec8b5ea",
+    "public/assets/tank/head1r.png": "56adc4433ada3b2bddfdc8d2fa704066608bae4c1d043f4d342fc0aea1813ca9",
+    "public/assets/tank/head2.png": "2e0c37f8932f03a37496d31f727d58c4338d97e3c7e02337f6e07be7e7365eb3",
+    "public/assets/tank/head2b.png": "6a8d61059578ad3456a324367a02e92cfcf205785916f85df49b7139bf9ae6c5",
+    "public/assets/tank/head2r.png": "d2557a586645b46a4b5676d1b796f662244a9bf66d627a4a7b5bbb5086000eff",
     "public/assets/tank/magic_mushroom.png": "da5eb360b6e110300dd96c6e0e5733b97b8de83dde5d421e4179e059698a1594"
   },
   "runtimeModule": {
     "path": "src/generated/tankRuntimeAssets.ts",
-    "sha256": "13b1077045fbf291539287342284ab8ae76d27520b42c53190f9f8e9f4e12da7"
+    "sha256": "57d228fe74fe1aa3df446da8a9d194668b7d64816e38a68e39bbcd8411c6e7a5"
   },
   "outputs": {
     "public/assets/tank/generated/rock1.790fa6d3b8c94d4e.png": "81465ab215ad8b411977f5fcb32d6d34db98a08d4d2655b641db18b5c75a9598",
@@ -81,11 +87,13 @@
     "public/assets/tank/generated/elephant.905940fc86b79e6b.png": "6950d693d0b07448608aa725be2cd3d1d7a00e30e223cc5d1db8f91642e50dbc",
     "public/assets/tank/generated/panthon.6d8f7c1f06355a24.png": "10272025ae88a1c4de57718cc6de09318381be70fefa822a6faaad875fc5f0e1",
     "public/assets/tank/generated/lion.2c5879d67f607c5c.png": "065fbb01688273d8c76ff4e7e295d64b7cd6f4bb8d3b9543ce5be3171fa763e0",
+    "public/assets/tank/generated/head1.68698078617fd7b6.png": "3e9faf974d844dc63a028d920c8a13447ea64dc7be59d18e58f1ba2e22164273",
+    "public/assets/tank/generated/head2.efc9dc7af65eee2f.png": "a9c69670b63ff14e27b682b319df0208570eebe44d7f4a5a314cb010a826f061",
     "public/assets/tank/generated/magic-mushroom.d7ce8349607543c8.png": "5b7ffea922ff94e703e1ce6d4c56fdc15ba0fca491e49958f74d7bf01940156a",
-    "public/assets/tank/generated/hardscape-masks.8e0a0df45afc2bc7.bin": "0baf0bd64926d84ef9b693fdc502c27522a51ceb431ae6ca0e5948966328a58f"
+    "public/assets/tank/generated/hardscape-masks.7019ba9cd00449c2.bin": "e4bb897290f5fe38fa9ec2d13f5e6fbe4fcde62a9342f22dedc87f5a74c8b6c4"
   },
   "assets": [
-    "./assets/tank/generated/hardscape-masks.8e0a0df45afc2bc7.bin",
+    "./assets/tank/generated/hardscape-masks.7019ba9cd00449c2.bin",
     "./assets/tank/generated/rock1.790fa6d3b8c94d4e.png",
     "./assets/tank/generated/rock2.fb8a1c2b609b0e7d.png",
     "./assets/tank/generated/rock3.1079b54d7aaba352.png",
@@ -109,6 +117,8 @@
     "./assets/tank/generated/elephant.905940fc86b79e6b.png",
     "./assets/tank/generated/panthon.6d8f7c1f06355a24.png",
     "./assets/tank/generated/lion.2c5879d67f607c5c.png",
+    "./assets/tank/generated/head1.68698078617fd7b6.png",
+    "./assets/tank/generated/head2.efc9dc7af65eee2f.png",
     "./assets/tank/generated/magic-mushroom.d7ce8349607543c8.png"
   ]
 }

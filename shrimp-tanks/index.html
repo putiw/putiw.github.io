@@ -216,12 +216,12 @@
       })();
     </script>
     <title>Shrimp</title>
-    <script type="module" crossorigin src="./assets/main-BcsGXhrT.js"></script>
+    <script type="module" crossorigin src="./assets/main-BIUBHK0I.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="./assets/phaser-DFK5Ua9d.js">
     <link rel="modulepreload" crossorigin href="./assets/phaser-BFjO2D3v.js">
-    <link rel="modulepreload" crossorigin href="./assets/TankScene-DehJbX1m.js">
-    <link rel="stylesheet" crossorigin href="./assets/main-DepEhUmY.css">
+    <link rel="modulepreload" crossorigin href="./assets/TankScene-Bfd9L7J7.js">
+    <link rel="stylesheet" crossorigin href="./assets/main-DpfbixuU.css">
   </head>
   <body>
     <div id="startup-screen" class="startup-screen" aria-hidden="true">
@@ -272,26 +272,28 @@
               <span>Settings</span>
               <span class="version-note">v78</span>
             </div>
-            <section class="save-slot" aria-label="Save slot 1">
-              <div class="save-slot-summary">
-                <strong>Slot 1</strong>
-                <span id="save-game-1-time" class="save-slot-time">Checking…</span>
-              </div>
-              <div class="save-slot-actions">
-                <button id="save-game-1-button" class="settings-action" type="button" aria-label="Save to slot 1">Save</button>
-                <button id="load-game-1-button" class="settings-action" type="button" aria-label="Load slot 1">Load</button>
-              </div>
-            </section>
-            <section class="save-slot" aria-label="Save slot 2">
-              <div class="save-slot-summary">
-                <strong>Slot 2</strong>
-                <span id="save-game-2-time" class="save-slot-time">Checking…</span>
-              </div>
-              <div class="save-slot-actions">
-                <button id="save-game-2-button" class="settings-action" type="button" aria-label="Save to slot 2">Save</button>
-                <button id="load-game-2-button" class="settings-action" type="button" aria-label="Load slot 2">Load</button>
-              </div>
-            </section>
+            <div class="save-slot-grid">
+              <section class="save-slot" aria-label="Save slot 1">
+                <div class="save-slot-summary">
+                  <strong>Slot 1</strong>
+                  <span id="save-game-1-time" class="save-slot-time">Checking…</span>
+                </div>
+                <div class="save-slot-actions">
+                  <button id="save-game-1-button" class="settings-action" type="button" aria-label="Save to slot 1">Save</button>
+                  <button id="load-game-1-button" class="settings-action" type="button" aria-label="Load slot 1">Load</button>
+                </div>
+              </section>
+              <section class="save-slot" aria-label="Save slot 2">
+                <div class="save-slot-summary">
+                  <strong>Slot 2</strong>
+                  <span id="save-game-2-time" class="save-slot-time">Checking…</span>
+                </div>
+                <div class="save-slot-actions">
+                  <button id="save-game-2-button" class="settings-action" type="button" aria-label="Save to slot 2">Save</button>
+                  <button id="load-game-2-button" class="settings-action" type="button" aria-label="Load slot 2">Load</button>
+                </div>
+              </section>
+            </div>
             <p class="start-over-note">Starts a fresh game. Your saved slots stay safe.</p>
             <button id="start-over-button" class="settings-action danger" type="button" aria-label="Start Over" aria-busy="false">Start Over</button>
             <div id="debug-time-panel" class="debug-time-panel" aria-hidden="true">
