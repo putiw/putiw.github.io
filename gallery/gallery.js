@@ -51,6 +51,21 @@ const SPECULATIVE_PRELOAD_DWELL_MS = 700;
 const ORDERED_PRELOAD_PHASE_GAP_MS = 180;
 const ORDERED_VIDEO_PRELOAD_GAP_MS = 240;
 
+const ANALYTICS_HOST = 'putiw.github.io';
+const ANALYTICS_SCRIPT_URL = 'https://cloud.umami.is/script.js';
+const ANALYTICS_WEBSITE_ID = '9ae65ed7-fa3e-461b-adb5-0d37c0d0603c';
+const ANALYTICS_ROOM_LABELS = {
+  [ROOM_KEYS.main]: 'Science room',
+  [ROOM_KEYS.app]: 'App room',
+  [ROOM_KEYS.screening]: 'Defense room',
+  [ROOM_KEYS.brain]: 'Brain room',
+  [ROOM_KEYS.mri]: 'MRI room',
+  [ROOM_KEYS.game]: 'Game room',
+  [ROOM_KEYS.videos]: 'Video room',
+  [ROOM_KEYS.art]: 'Art room',
+  house: 'House in the Rain'
+};
+
 const MOTION_POSTER_HEIGHT = 3;
 const POSTER_FRAME_BORDER = 0.075;
 const APP_VIDEO_ASPECT = 640 / 412;
@@ -1027,6 +1042,11 @@ let videoSyncRequested = false;
 let lastCameraInputAt = 0;
 let currentGalleryRoomKey = null;
 let previousGalleryRoomKey = null;
+let analyticsLoadRequested = false;
+let analyticsReady = false;
+let analyticsRoomKey = null;
+let analyticsRoomEnteredAt = 0;
+const analyticsEventQueue = [];
 let speculativeOriginRoomKey = null;
 let speculativeRoomKey = null;
 let activeRoomVideoSequence = null;
@@ -1073,6 +1093,87 @@ let houseWorldEdgeDropActive = false;
 let houseWorldDropGroundOverride = false;
 const houseWalkableMeshes = [];
 const houseSolidBoxes = [];
+
+function analyticsEnabled() {
+  return window.location.hostname === ANALYTICS_HOST;
+}
+
+function sendAnalyticsEvent(name, data) {
+  if (!analyticsEnabled()) return;
+  if (!analyticsReady || typeof window.umami?.track !== 'function') {
+    if (analyticsEventQueue.length < 64) analyticsEventQueue.push({ name, data });
+    return;
+  }
+
+  try {
+    const request = window.umami.track(name, data);
+    if (request?.catch) request.catch(() => {});
+  } catch (error) {
+    // Analytics must never interrupt the gallery experience.
+  }
+}
+
+function flushAnalyticsQueue() {
+  if (!analyticsReady || typeof window.umami?.track !== 'function') return;
+  const queuedEvents = analyticsEventQueue.splice(0);
+  queuedEvents.forEach(({ name, data }) => sendAnalyticsEvent(name, data));
+}
+
+function scheduleAnalyticsLoad() {
+  if (!analyticsEnabled() || analyticsLoadRequested) return;
+  analyticsLoadRequested = true;
+
+  scheduleLowPriorityGalleryWork(() => {
+    const script = document.createElement('script');
+    script.src = ANALYTICS_SCRIPT_URL;
+    script.async = true;
+    script.dataset.websiteId = ANALYTICS_WEBSITE_ID;
+    script.dataset.autoTrack = 'false';
+    script.dataset.domains = ANALYTICS_HOST;
+    script.dataset.doNotTrack = 'true';
+    script.dataset.excludeSearch = 'true';
+    script.dataset.excludeHash = 'true';
+    script.addEventListener('load', () => {
+      if (typeof window.umami?.track !== 'function') return;
+      analyticsReady = true;
+      try {
+        const pageviewRequest = window.umami.track();
+        if (pageviewRequest?.catch) pageviewRequest.catch(() => {});
+      } catch (error) {
+        // Losing analytics is preferable to affecting the gallery.
+      }
+      flushAnalyticsQueue();
+    }, { once: true });
+    document.head.append(script);
+  }, 1000);
+}
+
+function finishAnalyticsRoomVisit(now = performance.now()) {
+  if (!analyticsRoomKey || !analyticsRoomEnteredAt) return;
+  const durationSeconds = Math.max(0, (now - analyticsRoomEnteredAt) / 1000);
+  sendAnalyticsEvent('room_dwell', {
+    room: ANALYTICS_ROOM_LABELS[analyticsRoomKey] || analyticsRoomKey,
+    seconds: Number(durationSeconds.toFixed(1))
+  });
+  analyticsRoomKey = null;
+  analyticsRoomEnteredAt = 0;
+}
+
+function beginAnalyticsRoomVisit(roomKey, now = performance.now()) {
+  if (!galleryActive || document.hidden || !roomKey) return;
+  if (analyticsRoomKey === roomKey) return;
+  finishAnalyticsRoomVisit(now);
+  analyticsRoomKey = roomKey;
+  analyticsRoomEnteredAt = now;
+  sendAnalyticsEvent('room_enter', {
+    room: ANALYTICS_ROOM_LABELS[roomKey] || roomKey
+  });
+}
+
+function resumeAnalyticsRoomTracking() {
+  if (!galleryActive || document.hidden) return;
+  beginAnalyticsRoomVisit(insideHouseWorld ? 'house' : getGalleryRoomKeyAtCamera());
+}
 const houseWalkRaycaster = new THREE.Raycaster();
 const houseWalkRayOrigin = new THREE.Vector3();
 const houseWalkDown = new THREE.Vector3(0, -1, 0);
@@ -1222,6 +1323,7 @@ function setWalkHint(mode = 'gallery') {
 }
 
 function showWelcome(mode = 'initial') {
+  finishAnalyticsRoomVisit();
   galleryActive = false;
   pauseGalleryVideos();
   dragLookEnabled = false;
@@ -1245,6 +1347,7 @@ function hideWelcome() {
 }
 
 function showCatalog() {
+  finishAnalyticsRoomVisit();
   galleryActive = false;
   pauseGalleryVideos();
   controls?.unlock();
@@ -1264,6 +1367,7 @@ function hideCatalog() {
 
 function openPoster(poster) {
   if (!poster) return;
+  finishAnalyticsRoomVisit();
   returnToGalleryAfterPoster = galleryActive;
   galleryActive = false;
   pauseGalleryVideos();
@@ -3036,6 +3140,7 @@ function setHouseWorldEnvironment() {
 
 function enterHouseWorld() {
   insideHouseWorld = true;
+  beginAnalyticsRoomVisit('house');
   houseWorldGroup.visible = true;
   setHouseWorldEnvironment();
   houseWorldGroundY = 0;
@@ -3094,6 +3199,7 @@ function exitHouseWorld() {
   setGalleryEnvironment();
   camera.position.set(HOME_PORTAL.x, STANDING_EYE_HEIGHT, HOME_PORTAL.z + 1.5);
   camera.lookAt(HOME_PORTAL.x, STANDING_EYE_HEIGHT, HOME_PORTAL.z + 8);
+  beginAnalyticsRoomVisit(getGalleryRoomKeyAtCamera());
   resetPlayerHeight();
   houseWorldGroup.visible = false;
   setWalkHint();
@@ -4567,6 +4673,7 @@ function maybeLoadNearbyRoomContent() {
   const nextCurrentRoomKey = getGalleryRoomKeyAtCamera();
   if (nextCurrentRoomKey === currentGalleryRoomKey) return;
 
+  if (!insideHouseWorld) beginAnalyticsRoomVisit(nextCurrentRoomKey);
   previousGalleryRoomKey = currentGalleryRoomKey;
   currentGalleryRoomKey = nextCurrentRoomKey;
   speculativeOriginRoomKey = null;
@@ -4578,6 +4685,9 @@ function maybeLoadNearbyRoomContent() {
 }
 
 function openResumePage() {
+  sendAnalyticsEvent('resume_open', {
+    room: ANALYTICS_ROOM_LABELS[analyticsRoomKey] || analyticsRoomKey || 'Unknown'
+  });
   const resumeWindow = window.open('/resume/', 'puti-resume');
   if (resumeWindow) {
     resumeWindow.focus();
@@ -7822,6 +7932,7 @@ function completeInitialLoading() {
     window.setTimeout(() => {
       loadingScreen.hidden = true;
       showWelcome('initial');
+      scheduleAnalyticsLoad();
     }, 220);
   }, remaining);
 }
@@ -7861,6 +7972,7 @@ function showMobileFallback() {
   resumeButton.textContent = 'View résumé';
   resumeButton.classList.remove('secondary-button');
   resumeButton.classList.add('primary-button');
+  scheduleAnalyticsLoad();
 }
 
 function enableDragLookFallback() {
@@ -7873,8 +7985,10 @@ function enableDragLookFallback() {
 
 function enterGallery() {
   if (!sceneReady || !webglAvailable || isMobileDevice) return;
+  const firstEntry = !enteredOnce;
   enteredOnce = true;
   galleryActive = true;
+  if (firstEntry) sendAnalyticsEvent('gallery_enter');
   videoRoomAudioUnlocked = true;
   galleryVideos.forEach((entry) => {
     if (entry.videoRoom || entry.autoplayWithSound) {
@@ -7884,6 +7998,7 @@ function enterGallery() {
   });
   primeShrimpRoomMusic();
   preloadGalleryVideos();
+  resumeAnalyticsRoomTracking();
   startFullGalleryBackgroundPreload();
   if (insideHouseWorld) pauseGalleryVideos();
   else playAutoplayOnEntryVideos();
@@ -7938,6 +8053,7 @@ function initializeGallery() {
     enterButton.hidden = true;
     controlSummary.textContent = '3D graphics are unavailable in this browser. The full poster index remains available.';
     showWelcome('initial');
+    scheduleAnalyticsLoad();
     return;
   }
 
@@ -7981,6 +8097,7 @@ function initializeGallery() {
     galleryActive = true;
     primeShrimpRoomMusic();
     preloadGalleryVideos();
+    resumeAnalyticsRoomTracking();
     startFullGalleryBackgroundPreload();
     if (insideHouseWorld) pauseGalleryVideos();
     else playAutoplayOnEntryVideos();
@@ -8002,6 +8119,7 @@ function initializeGallery() {
   });
 
   controls.addEventListener('unlock', () => {
+    finishAnalyticsRoomVisit();
     galleryActive = false;
     pauseShrimpRoomMusic();
     dragLookEnabled = false;
@@ -8090,6 +8208,7 @@ galleryDestinationButton.addEventListener('click', () => {
 closeIndexButton.addEventListener('click', hideCatalog);
 
 helpButton?.addEventListener('click', () => {
+  finishAnalyticsRoomVisit();
   galleryActive = false;
   pauseGalleryVideos();
   controls?.unlock();
@@ -8186,6 +8305,7 @@ window.addEventListener('keyup', (event) => {
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
+    finishAnalyticsRoomVisit();
     if (eHoldTimer) window.clearTimeout(eHoldTimer);
     eHoldTimer = 0;
     eHoldTarget = null;
@@ -8193,8 +8313,13 @@ document.addEventListener('visibilitychange', () => {
     eHoldWasPlaying = false;
     pauseGalleryVideos();
   } else if (galleryActive) {
+    resumeAnalyticsRoomTracking();
     playGalleryVideos();
   }
+});
+
+window.addEventListener('pagehide', () => {
+  finishAnalyticsRoomVisit();
 });
 
 canvas.addEventListener('pointerdown', (event) => {
@@ -8253,6 +8378,7 @@ canvas.addEventListener('click', () => {
 });
 
 window.addEventListener('beforeunload', () => {
+  finishAnalyticsRoomVisit();
   window.cancelAnimationFrame(animationFrame);
   renderer?.dispose();
 });
