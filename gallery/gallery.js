@@ -52,7 +52,7 @@ const ORDERED_PRELOAD_PHASE_GAP_MS = 180;
 const ORDERED_VIDEO_PRELOAD_GAP_MS = 240;
 
 const ANALYTICS_HOST = 'putiw.github.io';
-const ANALYTICS_SCRIPT_URL = 'https://cloud.umami.is/script.js';
+const ANALYTICS_ENDPOINT = 'https://cloud.umami.is/api/send';
 const ANALYTICS_WEBSITE_ID = '9ae65ed7-fa3e-461b-adb5-0d37c0d0603c';
 const ANALYTICS_ROOM_LABELS = {
   [ROOM_KEYS.main]: 'Science room',
@@ -1042,11 +1042,11 @@ let videoSyncRequested = false;
 let lastCameraInputAt = 0;
 let currentGalleryRoomKey = null;
 let previousGalleryRoomKey = null;
-let analyticsLoadRequested = false;
-let analyticsReady = false;
+let analyticsStarted = false;
+let analyticsCache = '';
+let analyticsRequestChain = Promise.resolve();
 let analyticsRoomKey = null;
 let analyticsRoomEnteredAt = 0;
-const analyticsEventQueue = [];
 let speculativeOriginRoomKey = null;
 let speculativeRoomKey = null;
 let activeRoomVideoSequence = null;
@@ -1098,54 +1098,52 @@ function analyticsEnabled() {
   return window.location.hostname === ANALYTICS_HOST;
 }
 
+async function postAnalyticsEvent(name, data) {
+  const payload = {
+    website: ANALYTICS_WEBSITE_ID,
+    hostname: window.location.hostname,
+    screen: `${window.screen?.width || 0}x${window.screen?.height || 0}`,
+    language: window.navigator?.language || '',
+    title: document.title,
+    url: window.location.pathname,
+    referrer: document.referrer || ''
+  };
+  if (name) payload.name = name;
+  if (data) payload.data = data;
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'x-umami-website-id': ANALYTICS_WEBSITE_ID,
+    'x-umami-hostname': ANALYTICS_HOST
+  };
+  if (analyticsCache) headers['x-umami-cache'] = analyticsCache;
+
+  const response = await window.fetch(ANALYTICS_ENDPOINT, {
+    method: 'POST',
+    keepalive: true,
+    credentials: 'omit',
+    headers,
+    body: JSON.stringify({ type: 'event', payload })
+  });
+  if (!response.ok) return;
+  const result = await response.json().catch(() => null);
+  if (result?.cache) analyticsCache = result.cache;
+}
+
 function sendAnalyticsEvent(name, data) {
   if (!analyticsEnabled()) return;
-  if (!analyticsReady || typeof window.umami?.track !== 'function') {
-    if (analyticsEventQueue.length < 64) analyticsEventQueue.push({ name, data });
-    return;
-  }
-
-  try {
-    const request = window.umami.track(name, data);
-    if (request?.catch) request.catch(() => {});
-  } catch (error) {
-    // Analytics must never interrupt the gallery experience.
-  }
+  analyticsRequestChain = analyticsRequestChain
+    .catch(() => {})
+    .then(() => postAnalyticsEvent(name, data))
+    .catch(() => {});
 }
 
-function flushAnalyticsQueue() {
-  if (!analyticsReady || typeof window.umami?.track !== 'function') return;
-  const queuedEvents = analyticsEventQueue.splice(0);
-  queuedEvents.forEach(({ name, data }) => sendAnalyticsEvent(name, data));
-}
-
-function scheduleAnalyticsLoad() {
-  if (!analyticsEnabled() || analyticsLoadRequested) return;
-  analyticsLoadRequested = true;
-
-  scheduleLowPriorityGalleryWork(() => {
-    const script = document.createElement('script');
-    script.src = ANALYTICS_SCRIPT_URL;
-    script.async = true;
-    script.dataset.websiteId = ANALYTICS_WEBSITE_ID;
-    script.dataset.autoTrack = 'false';
-    script.dataset.domains = ANALYTICS_HOST;
-    script.dataset.doNotTrack = 'true';
-    script.dataset.excludeSearch = 'true';
-    script.dataset.excludeHash = 'true';
-    script.addEventListener('load', () => {
-      if (typeof window.umami?.track !== 'function') return;
-      analyticsReady = true;
-      try {
-        const pageviewRequest = window.umami.track();
-        if (pageviewRequest?.catch) pageviewRequest.catch(() => {});
-      } catch (error) {
-        // Losing analytics is preferable to affecting the gallery.
-      }
-      flushAnalyticsQueue();
-    }, { once: true });
-    document.head.append(script);
-  }, 1000);
+function startAnalytics() {
+  if (!analyticsEnabled() || analyticsStarted) return;
+  analyticsStarted = true;
+  // Umami documents direct event submission for sites that do not use its
+  // tracker bundle. This sends the page view without loading third-party JS.
+  sendAnalyticsEvent();
 }
 
 function finishAnalyticsRoomVisit(now = performance.now()) {
@@ -7932,7 +7930,6 @@ function completeInitialLoading() {
     window.setTimeout(() => {
       loadingScreen.hidden = true;
       showWelcome('initial');
-      scheduleAnalyticsLoad();
     }, 220);
   }, remaining);
 }
@@ -7972,7 +7969,6 @@ function showMobileFallback() {
   resumeButton.textContent = 'View résumé';
   resumeButton.classList.remove('secondary-button');
   resumeButton.classList.add('primary-button');
-  scheduleAnalyticsLoad();
 }
 
 function enableDragLookFallback() {
@@ -8053,7 +8049,6 @@ function initializeGallery() {
     enterButton.hidden = true;
     controlSummary.textContent = '3D graphics are unavailable in this browser. The full poster index remains available.';
     showWelcome('initial');
-    scheduleAnalyticsLoad();
     return;
   }
 
@@ -8383,5 +8378,6 @@ window.addEventListener('beforeunload', () => {
   renderer?.dispose();
 });
 
+startAnalytics();
 setWalkHint();
 initializeGallery();
