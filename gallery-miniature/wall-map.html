@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gallery wall map</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #111416;
+      color: #e7ebeb;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: #111416; }
+    header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.2rem 1.4rem 1rem;
+      border-bottom: 1px solid #2c3336;
+    }
+    h1, h2, p { margin: 0; }
+    h1 { font-size: clamp(1.15rem, 2vw, 1.6rem); font-weight: 650; letter-spacing: -0.02em; }
+    header p, #map-status { color: #94a0a3; font-size: 0.82rem; }
+    .layout { display: grid; grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr); min-height: calc(100vh - 4.8rem); }
+    aside { padding: 1.1rem; border-right: 1px solid #2c3336; overflow: auto; }
+    aside h2 { margin-bottom: 0.7rem; font-size: 0.95rem; font-weight: 650; }
+    .instruction { margin-bottom: 1rem; color: #aab4b6; font-size: 0.82rem; line-height: 1.45; }
+    .orientation-key {
+      margin-bottom: 1rem;
+      padding: 0.7rem;
+      border: 1px solid #394447;
+      border-radius: 0.4rem;
+      background: #121819;
+      color: #c1cccd;
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+    .orientation-key strong { color: #f0d79a; }
+    #wall-list { display: grid; gap: 0.32rem; }
+    .wall-button {
+      display: block;
+      width: 100%;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid #30393c;
+      border-radius: 0.35rem;
+      background: #171c1e;
+      color: #dce2e2;
+      text-align: left;
+      cursor: pointer;
+    }
+    .wall-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.3rem; align-items: stretch; }
+    .wall-button:hover, .wall-button:focus-visible, .wall-button.selected { border-color: #a9c7ca; background: #202a2d; outline: none; }
+    .wall-button strong { display: block; font-size: 0.72rem; letter-spacing: 0.03em; color: #a9c7ca; }
+    .wall-button span { display: block; margin-top: 0.18rem; font-size: 0.78rem; line-height: 1.25; }
+    .copy-id {
+      padding: 0.45rem 0.6rem;
+      border: 1px solid #4d6265;
+      border-radius: 0.3rem;
+      background: #202a2d;
+      color: #dcebea;
+      cursor: pointer;
+    }
+    .copy-id-row { align-self: stretch; font-size: 0.7rem; white-space: nowrap; }
+    .copy-id:hover, .copy-id:focus-visible { border-color: #d4e7e6; outline: none; }
+    #detail { margin-top: 1rem; padding: 0.8rem; border: 1px solid #30393c; background: #171c1e; border-radius: 0.4rem; }
+    #detail strong { display: block; color: #d4e7e6; font-size: 0.9rem; }
+    #detail p { margin-top: 0.45rem; color: #aab4b6; font-size: 0.78rem; line-height: 1.45; }
+    main { min-width: 0; overflow: hidden; }
+    .map-scroll { height: calc(100vh - 4.8rem); min-height: 38rem; overflow: auto; padding: 1rem; }
+    svg { display: block; width: min(100%, 60rem); height: auto; min-height: 48rem; margin: 0 auto; border: 1px solid #30393c; background: #0b0e0f; }
+    .walkable-area { fill: #2c3d40; fill-opacity: 0.55; fill-rule: nonzero; pointer-events: none; }
+    .room { stroke: none; fill-opacity: 0.12; }
+    .room-label { fill: #dbe3e3; font-size: 0.55px; font-weight: 700; text-anchor: middle; pointer-events: none; }
+    .wall { stroke: #d4dddd; stroke-width: 0.2; stroke-linecap: butt; cursor: pointer; }
+    .wall:hover, .wall.selected { stroke: #ffffff; stroke-width: 0.34; }
+    .wall-id { fill: #91a2a5; font-size: 0.24px; font-weight: 650; letter-spacing: 0.02em; pointer-events: none; }
+    .marker { fill: #f0c36a; stroke: #111416; stroke-width: 0.08; cursor: pointer; }
+    .marker-label { fill: #f0d79a; font-size: 0.28px; font-weight: 700; pointer-events: none; }
+    .grid-line { stroke: #20282a; stroke-width: 0.03; }
+    .axis-label { fill: #637174; font-size: 0.27px; }
+    .north-arrow { fill: #b6c8ca; font-size: 0.38px; font-weight: 700; }
+    @media (max-width: 760px) {
+      .layout { display: block; }
+      aside { max-height: 42vh; border-right: 0; border-bottom: 1px solid #2c3336; }
+      .map-scroll { height: 58vh; min-height: 28rem; }
+      svg { min-height: 34rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Gallery wall map</h1>
+      <p>Coordinate reference for naming rooms, walls, openings, and text surfaces.</p>
+    </div>
+    <div id="map-status">Loading shared layout…</div>
+  </header>
+  <div class="layout">
+    <aside>
+      <p class="instruction">The shaded shape is the connected walkable area, including hallways. Click a wall label or line. The IDs are the names to use when requesting a change; shared walls have separate room-side IDs. The map watches the shared layout module and redraws when its coordinates change.</p>
+      <div class="orientation-key"><strong>Visitor-view orientation</strong><br>This map is shown as if you are standing in the Main gallery and looking toward the Art room: north is up, south is down, <strong>east is left</strong>, and <strong>west is right</strong>. The wall details still report the original world coordinates.</div>
+      <h2>Walls</h2>
+      <div id="wall-list"></div>
+      <div id="detail" aria-live="polite">
+        <strong>Select a wall</strong>
+        <p>The selected wall’s exact orientation, coordinates, room side, and notes will appear here.</p>
+      </div>
+    </aside>
+    <main>
+      <div class="map-scroll">
+        <svg id="wall-map" role="img" aria-label="Top-down labeled map of the gallery rooms"></svg>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    const svg = document.getElementById('wall-map');
+    const wallList = document.getElementById('wall-list');
+    const detail = document.getElementById('detail');
+    const status = document.getElementById('map-status');
+    let currentLayout;
+    let currentSignature = '';
+    let selectedWallId = '';
+
+    const svgEl = (name, attributes = {}) => {
+      const element = document.createElementNS('http://www.w3.org/2000/svg', name);
+      Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
+      return element;
+    };
+
+    const formatRange = (a, b) => `${a.toFixed(2)} to ${b.toFixed(2)}`;
+    // Match the visitor's view from Main toward Art. In that south-facing
+    // view, world east is on screen-left and world west is on screen-right.
+    const worldPoint = (x, z) => ({ x: -x, y: -z });
+    const faceDescription = (face) => ({
+      'east-facing': 'Visible from the east/left side in this visitor view; stand east of the wall and face west',
+      'west-facing': 'Visible from the west/right side in this visitor view; stand west of the wall and face east',
+      'north-facing': 'Visible from the north/top side; stand north of the wall and face south',
+      'south-facing': 'Visible from the south/bottom side; stand south of the wall and face north',
+      'both-facing': 'An opening or shared edge; there is no single front face'
+    }[face] || 'Use the compass directions above');
+    const visibleWalls = (layout) => layout.walls.filter((wall) => wall.type !== 'opening');
+    const visitorRectPath = (rect) => {
+      const left = -rect.right;
+      const right = -rect.left;
+      const top = -rect.far;
+      const bottom = -rect.near;
+      return `M ${left} ${top} H ${right} V ${bottom} H ${left} Z`;
+    };
+
+    function selectWall(wallId) {
+      selectedWallId = wallId;
+      const wall = currentLayout.walls.find((candidate) => candidate.id === wallId);
+      if (!wall) return;
+      document.querySelectorAll('[data-wall-id]').forEach((element) => {
+        element.classList.toggle('selected', element.dataset.wallId === wallId);
+      });
+      document.querySelectorAll('.wall-button').forEach((element) => {
+        element.classList.toggle('selected', element.dataset.wallId === wallId);
+      });
+      const selectedRow = wallList.querySelector(`.wall-row[data-wall-id="${wall.id}"]`);
+      if (selectedRow) wallList.prepend(selectedRow);
+      detail.innerHTML = `
+        <strong>${wall.id} · ${wall.label}</strong>
+        <p>Orientation: ${wall.orientation}<br>
+        Face: ${wall.face}<br>
+        Room side: ${wall.roomSide || 'perimeter / shared boundary'}<br>
+        Physical wall: ${wall.physicalId || wall.id}<br>
+        Thickness: ${(wall.thickness || 0).toFixed(2)} world units<br>
+        Viewer reference: ${faceDescription(wall.face)}<br>
+        X: ${formatRange(wall.x1, wall.x2)}<br>
+        Z: ${formatRange(wall.z1, wall.z2)}<br>
+        ${wall.notes || ''}</p>`;
+    }
+
+    async function copyWallId(wallId, copyButton) {
+      let copied = false;
+      try {
+        if (navigator.clipboard) {
+          copied = await Promise.race([
+            navigator.clipboard.writeText(wallId).then(() => true),
+            new Promise((resolve) => window.setTimeout(() => resolve(false), 250))
+          ]);
+        }
+      } catch (error) {
+        copied = false;
+      }
+      if (!copied) {
+        const fallback = document.createElement('textarea');
+        fallback.value = wallId;
+        fallback.setAttribute('readonly', '');
+        fallback.style.position = 'fixed';
+        fallback.style.opacity = '0';
+        document.body.append(fallback);
+        fallback.select();
+        copied = document.execCommand('copy');
+        fallback.remove();
+      }
+      copyButton.textContent = copied ? 'Copied' : 'Copy failed';
+      window.setTimeout(() => { copyButton.textContent = 'Copy'; }, 1200);
+    }
+
+    function drawGrid(minX, maxX, minY, maxY) {
+      for (let x = Math.ceil(minX); x <= maxX; x += 1) {
+        svg.append(svgEl('line', { class: 'grid-line', x1: x, x2: x, y1: minY, y2: maxY }));
+      }
+      for (let y = Math.ceil(minY); y <= maxY; y += 1) {
+        svg.append(svgEl('line', { class: 'grid-line', x1: minX, x2: maxX, y1: y, y2: y }));
+      }
+      const xLabel = svgEl('text', { class: 'axis-label', x: minX + 0.2, y: maxY - 0.3 });
+      xLabel.textContent = 'east ←     west →';
+      svg.append(xLabel);
+      const zLabel = svgEl('text', { class: 'axis-label', x: minX + 0.2, y: minY + 0.5 });
+      zLabel.textContent = 'north ↑  (world z decreases upward)';
+      svg.append(zLabel);
+    }
+
+    function drawLayout(layout) {
+      currentLayout = layout;
+      const allX = layout.rooms.flatMap((room) => [-room.left, -room.right]);
+      const allY = layout.rooms.flatMap((room) => [-room.near, -room.far]);
+      const padding = 3;
+      const minX = Math.min(...allX) - padding;
+      const maxX = Math.max(...allX) + padding;
+      const minY = Math.min(...allY) - padding;
+      const maxY = Math.max(...allY) + padding;
+      svg.setAttribute('viewBox', `${minX} ${minY} ${maxX - minX} ${maxY - minY}`);
+      svg.replaceChildren();
+      drawGrid(minX, maxX, minY, maxY);
+
+      const walkableArea = svgEl('path', {
+        class: 'walkable-area',
+        d: (layout.walkable || []).map(visitorRectPath).join(' ')
+      });
+      svg.append(walkableArea);
+
+      layout.rooms.forEach((room) => {
+        const top = -room.far;
+        const left = -room.right;
+        const right = -room.left;
+        const rectangle = svgEl('rect', {
+          class: 'room', x: left, y: top,
+          width: right - left, height: room.far - room.near,
+          fill: room.color, stroke: room.color
+        });
+        svg.append(rectangle);
+        const roomLabel = svgEl('text', { class: 'room-label', x: (left + right) / 2, y: top + (room.far - room.near) / 2 });
+        roomLabel.textContent = room.label;
+        svg.append(roomLabel);
+      });
+
+      visibleWalls(layout).forEach((wall) => {
+        const offsetX = wall.lineOffsetX || 0;
+        const offsetZ = wall.lineOffsetZ || 0;
+        const p1 = worldPoint(wall.x1 + offsetX, wall.z1 + offsetZ);
+        const p2 = worldPoint(wall.x2 + offsetX, wall.z2 + offsetZ);
+        const line = svgEl('line', { class: 'wall', 'data-wall-id': wall.id, x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y });
+        line.addEventListener('click', () => selectWall(wall.id));
+        svg.append(line);
+        const labelX = (p1.x + p2.x) / 2;
+        const labelY = (p1.y + p2.y) / 2;
+        const label = svgEl('text', { class: 'wall-id', 'data-wall-id': wall.id, x: labelX, y: labelY });
+        label.textContent = wall.id;
+        if (wall.orientation === 'vertical') label.setAttribute('transform', `rotate(-90 ${labelX} ${labelY})`);
+        svg.append(label);
+      });
+
+      layout.markers.forEach((marker) => {
+        const point = worldPoint(marker.x, marker.z);
+        const circle = svgEl('circle', { class: 'marker', cx: point.x, cy: point.y, r: 0.18, 'data-wall-id': marker.wallId });
+        circle.addEventListener('click', () => selectWall(marker.wallId));
+        svg.append(circle);
+        const label = svgEl('text', { class: 'marker-label', x: point.x + 0.28, y: point.y - 0.25 });
+        label.textContent = marker.label;
+        svg.append(label);
+      });
+
+      const arrow = svgEl('text', { class: 'north-arrow', x: maxX - 3.5, y: minY + 0.9 });
+      arrow.textContent = 'N ↑';
+      svg.append(arrow);
+
+      wallList.replaceChildren();
+      visibleWalls(layout).forEach((wall) => {
+        const row = document.createElement('div');
+        row.className = 'wall-row';
+        row.dataset.wallId = wall.id;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'wall-button';
+        button.dataset.wallId = wall.id;
+        button.innerHTML = `<strong>${wall.id}</strong><span>${wall.label}</span>`;
+        button.addEventListener('click', () => selectWall(wall.id));
+        const copyButton = document.createElement('button');
+        copyButton.type = 'button';
+        copyButton.className = 'copy-id copy-id-row';
+        copyButton.textContent = 'Copy';
+        copyButton.setAttribute('aria-label', `Copy ${wall.id}`);
+        copyButton.addEventListener('click', (event) => {
+          event.stopPropagation();
+          copyWallId(wall.id, copyButton);
+        });
+        row.append(button, copyButton);
+        wallList.append(row);
+      });
+      if (selectedWallId && visibleWalls(layout).some((wall) => wall.id === selectedWallId)) selectWall(selectedWallId);
+      status.textContent = `Live · layout ${layout.version} · watching shared coordinates`;
+    }
+
+    async function loadLayout() {
+      try {
+        const moduleUrl = `./wall-map-layout.js?map=${Date.now()}`;
+        const module = await import(moduleUrl);
+        const signature = JSON.stringify(module.WALL_MAP_LAYOUT);
+        if (signature === currentSignature) return;
+        currentSignature = signature;
+        drawLayout(module.WALL_MAP_LAYOUT);
+      } catch (error) {
+        status.textContent = `Could not load shared layout: ${error?.message || error}`;
+        console.error(error);
+      }
+    }
+
+    await loadLayout();
+    window.setInterval(loadLayout, 1500);
+  </script>
+</body>
+</html>

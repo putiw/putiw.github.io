@@ -21,6 +21,36 @@ import {
   ART_ROOM
 } from './wall-map-layout.js?v=20260718-all-door-headers-labels-contrast1-map-path1';
 
+const ROOM_KEYS = {
+  main: 'main',
+  app: 'app',
+  screening: 'screening',
+  brain: 'brain',
+  mri: 'mri',
+  game: 'game',
+  videos: 'videos',
+  art: 'art'
+};
+const MAIN_ROOM_AREA = {
+  centerX: 0,
+  halfWidth: ROOM.halfWidth,
+  nearZ: -ROOM.halfDepth,
+  farZ: ROOM.halfDepth
+};
+const GALLERY_ROOM_AREAS = [
+  { key: ROOM_KEYS.main, room: MAIN_ROOM_AREA },
+  { key: ROOM_KEYS.app, room: APP_ROOM },
+  { key: ROOM_KEYS.screening, room: SCREENING_ROOM },
+  { key: ROOM_KEYS.brain, room: BRAIN_ROOM },
+  { key: ROOM_KEYS.mri, room: EMPTY_GAME_ROOM },
+  { key: ROOM_KEYS.game, room: GAME_ROOM },
+  { key: ROOM_KEYS.videos, room: VIDEOS_ROOM },
+  { key: ROOM_KEYS.art, room: ART_ROOM }
+];
+const SPECULATIVE_PRELOAD_DWELL_MS = 700;
+const ORDERED_PRELOAD_PHASE_GAP_MS = 180;
+const ORDERED_VIDEO_PRELOAD_GAP_MS = 240;
+
 const MOTION_POSTER_HEIGHT = 3;
 const POSTER_FRAME_BORDER = 0.075;
 const APP_VIDEO_ASPECT = 640 / 412;
@@ -154,7 +184,7 @@ const videoWork = {
   width: 4.4,
   position: [9.36, 3.15, -2.55],
   rotationY: -Math.PI / 2,
-  eagerLoad: true,
+  roomKey: ROOM_KEYS.main,
   playWhenVisible: true,
   playDistance: 12,
   interactionRadius: 7
@@ -182,7 +212,8 @@ const MRI_WALL_SHEETS = [
 const MRI_VIDEO_WORKS = [
   {
     title: 'AFQView',
-    source: './media/mri-afqview-hd.m4v',
+    source: './media/mri-afqview-hd.mp4',
+    roomKey: ROOM_KEYS.mri,
     side: 'south',
     sheetAspect: 4781 / 1744,
     // PDF page 5 marker bounds in the cropped 4781 x 1744 image.
@@ -191,7 +222,8 @@ const MRI_VIDEO_WORKS = [
   },
   {
     title: 'Functional MRI',
-    source: './media/mri-fmri-hd.m4v',
+    source: './media/mri-fmri-hd.mp4',
+    roomKey: ROOM_KEYS.mri,
     side: 'north',
     sheetAspect: 2299 / 1744,
     // PDF page 7 marker bounds in the cropped 2299 x 1744 image.
@@ -246,27 +278,52 @@ const ART_PDF_CATEGORIES = new Set([
 
 const ART_WALL_SHEETS = [
   {
-    image: './art/walls/home.png?v=20260717-1915',
+    images: [
+      './art/walls/hd/home-0.webp?v=20260720-hd2x1',
+      './art/walls/hd/home-1.webp?v=20260720-hd2x1'
+    ],
+    tilePixelWidths: [3705, 3705],
     aspect: 4631 / 1867,
     side: 'near-left'
   },
   {
-    image: './art/walls/others-apartment-updated.png?v=20260718-apartment-pdf-transparent',
+    images: [
+      './art/walls/hd/others-apartment-0.webp?v=20260720-hd2x1',
+      './art/walls/hd/others-apartment-1.webp?v=20260720-hd2x1',
+      './art/walls/hd/others-apartment-2.webp?v=20260720-hd2x1',
+      './art/walls/hd/others-apartment-3.webp?v=20260720-hd2x1'
+    ],
+    tilePixelWidths: [3739, 3739, 3739, 3739],
     aspect: 7478 / 1867,
     side: 'left'
   },
   {
-    image: './art/walls/art-south-updated.png?v=20260719-art-south-artboard3-transparent6',
+    images: [
+      './art/walls/hd/art-south-0.webp?v=20260720-hd2x1',
+      './art/walls/hd/art-south-1.webp?v=20260720-hd2x1',
+      './art/walls/hd/art-south-2.webp?v=20260720-hd2x1',
+      './art/walls/hd/art-south-3.webp?v=20260720-hd2x1'
+    ],
+    tilePixelWidths: [4034, 4034, 4034, 4034],
     aspect: 8068 / 1494,
     side: 'far'
   },
   {
-    image: './art/walls/sick-black-and-white.png?v=20260717-1915',
+    images: [
+      './art/walls/hd/sick-black-white-0.webp?v=20260720-hd2x1',
+      './art/walls/hd/sick-black-white-1.webp?v=20260720-hd2x1',
+      './art/walls/hd/sick-black-white-2.webp?v=20260720-hd2x1'
+    ],
+    tilePixelWidths: [3989, 3989, 3988],
     aspect: 7478 / 1867,
     side: 'right'
   },
   {
-    image: './art/walls/final-wall.png?v=20260717-1915',
+    images: [
+      './art/walls/hd/final-wall-0.webp?v=20260720-hd2x1',
+      './art/walls/hd/final-wall-1.webp?v=20260720-hd2x1'
+    ],
+    tilePixelWidths: [3705, 3705],
     aspect: 4631 / 1867,
     side: 'near-right'
   }
@@ -351,7 +408,7 @@ const MUG_DISPLAYS = [
     rotationY: -0.54
   },
   {
-    texture: './art/hadi-mug-updated.png?v=20260719-hadi-mug',
+    texture: './art/hadi-mug.webp?v=20260720-current-artwork',
     x: ART_ROOM.centerX + 1.25,
     z: 49.15,
     pedestalHeight: 1.7,
@@ -399,6 +456,7 @@ const HOME_FLOOR_ARROW = {
   shaftWidth: 0.58,
   headWidth: 1.75
 };
+const ART_ROOM_FLOOR_COLOR = 0xaaa397;
 const HOUSE_WORLD_LAYER = 1;
 const HOUSE_WORLD_EYE_HEIGHT = 1.68;
 const HOUSE_WORLD = {
@@ -493,6 +551,7 @@ const HOUSE_RAIN_DISPLAY = {
   preloadPriority: 20,
   manualOnly: false,
   requireInteractionRange: true,
+  roomKey: ROOM_KEYS.art,
   autoplayWithSound: true,
   hasSound: true
 };
@@ -543,7 +602,8 @@ const GAME_DISPLAY_WORKS = [
   manualOnly: false,
   requireInteractionRange: false,
   hasSound: true,
-  activationBounds: null
+  activationBounds: null,
+  roomKey: ROOM_KEYS.game
 }));
 
 const GAME_WALL_SHEETS = [
@@ -610,6 +670,7 @@ const VIDEO_ROOM_WORKS = [
   }
 ].map((work) => ({
   ...work,
+  posterImage: `${work.posterImage}?v=${VIDEO_ROOM_POSTER_VERSION}`,
   aspect: 16 / 9,
   width: VIDEO_ROOM_SCREEN_WIDTH,
   labelWidth: 2.5,
@@ -625,8 +686,10 @@ const VIDEO_ROOM_WORKS = [
   requireFocusForPlayback: true,
   activationBounds: VIDEO_ROOM_ACTIVATION_BOUNDS,
   videoRoom: true,
+  roomKey: ROOM_KEYS.videos,
   deferVideoLoad: true,
   hasSound: true,
+  labelColor: '#eef2f3',
   preloadPriority: 0
 }));
 
@@ -645,7 +708,7 @@ const defenseScreeningWork = {
   width: 6.2,
   position: [SCREENING_ROOM.centerX, 2.8, SCREENING_ROOM.farZ - 0.1],
   rotationY: Math.PI,
-  eagerLoad: true,
+  roomKey: ROOM_KEYS.screening,
   preloadPriority: 70,
   playDistance: 9,
   showLabel: false,
@@ -747,7 +810,8 @@ const appDemoWorks = [
     maxX: APP_ROOM.centerX + APP_ROOM.halfWidth + 0.5,
     minZ: APP_ROOM.nearZ - 0.5,
     maxZ: APP_ROOM.farZ + 0.5
-  }
+  },
+  roomKey: ROOM_KEYS.app
 }));
 
 const myPhysioVideoWorks = [
@@ -813,7 +877,8 @@ const myPhysioVideoWorks = [
     maxX: APP_ROOM.centerX + APP_ROOM.halfWidth + 0.5,
     minZ: APP_ROOM.nearZ - 0.5,
     maxZ: APP_ROOM.farZ + 0.5
-  }
+  },
+  roomKey: ROOM_KEYS.app
 }));
 
 const myPhysioImageWorks = [
@@ -847,13 +912,6 @@ const myPhysioImageWorks = [
   }
 ];
 
-const APP_ROOM_LOADING_ASSETS = new Set([
-  ...appDemoWorks.map((work) => work.source),
-  ...myPhysioVideoWorks.map((work) => work.source),
-  ...myPhysioImageWorks.map((work) => work.image)
-]);
-const APP_ROOM_PROGRESS_SLICE_SECONDS = 6.5;
-
 const figureSalonStatement = {
   body: 'Not posters, just random figures from my papers, I spent a lot of time on them so they are here as a record of the past even tho they are definitely not my favourite in this room :)'
 };
@@ -868,7 +926,7 @@ const resumePages = [
   {
     title: 'Puti Wen — Résumé',
     url: '/resume/',
-    image: './resume/resume-page-1.jpg?v=20260718-resume-update',
+    image: './resume/resume-page-1.jpg?v=20260720-resume-refresh2',
     width: 3.28,
     aspect: 1391 / 1800,
     position: [1.9, 2.72, 6.9],
@@ -877,7 +935,7 @@ const resumePages = [
   {
     title: 'Puti Wen — Résumé',
     url: '/resume/',
-    image: './resume/resume-page-2.jpg?v=20260718-resume-update',
+    image: './resume/resume-page-2.jpg?v=20260720-resume-refresh2',
     width: 3.28,
     aspect: 1391 / 1800,
     position: [-1.9, 2.72, 6.9],
@@ -961,39 +1019,46 @@ let dragLookEnabled = false;
 let draggingView = false;
 let dragMoved = false;
 let returnToGalleryAfterPoster = false;
-let videoPreloadStarted = false;
-let galleryVideoPreloadComplete = false;
 let videoRoomLoadRequested = false;
 let videoRoomDisplaysLoaded = false;
-let videoRoomVideosPreloadStarted = false;
 let videoRoomAudioUnlocked = false;
 const videoRoomEntries = [];
 let videoSyncRequested = false;
 let lastCameraInputAt = 0;
+let currentGalleryRoomKey = null;
+let previousGalleryRoomKey = null;
+let speculativeOriginRoomKey = null;
+let speculativeRoomKey = null;
+let activeRoomVideoSequence = null;
+let fullGalleryPreloadStarted = false;
+const fullGalleryPreloadRoomKeys = new Set();
+const roomVisualReadyKeys = new Set([ROOM_KEYS.main]);
+const roomVisualReadyResolvers = new Map();
+const roomLoadControllers = new Map();
 let artGalleryLoadStarted = false;
 let backgroundGalleryLoadsStarted = false;
+let artRoomMugLoadPromise = null;
+let artRoomPeripheralLoadPromise = null;
+let artRoomHdUpgradePromise = null;
 let lastDragX = 0;
 let lastDragY = 0;
 let lastFrame = performance.now();
 let brainSurfaceLoadStarted = false;
+let brainSurfaceLoadPromise = null;
 let mriWallLoadsStarted = false;
+let mriVideoDisplaysLoaded = false;
 let brainWallLoadsStarted = false;
 let gameRoomLoadsStarted = false;
 let gameRoomKiosksReady = false;
 let researchRoomLoadsStarted = false;
-const appRoomReadyAssets = new Set();
-let appRoomLoadingIndicator = null;
-let appRoomLoadingFill = null;
-let appRoomLoadingLabelCanvas = null;
-let appRoomLoadingLabelTexture = null;
-let appRoomDisplayProgress = 0;
-let appRoomLoadingDisplayedPercentage = -1;
+let screeningRoomLoadsStarted = false;
 let mainRoomBackgroundLoadsStarted = false;
 const mainRoomLoadedImages = new Set();
 const artRoomLoadedImages = new Set();
-let roomBackgroundPreloadPipelineQueued = false;
+const artWallTileMaterials = new Map();
 let galleryMiniature = null;
 let galleryMiniatureRefreshesQueued = false;
+let galleryMiniatureRefreshTimer = 0;
 let houseWorldGroup = null;
 let houseWorldReady = false;
 let insideHouseWorld = false;
@@ -1030,8 +1095,8 @@ const HOUSE_POND_COLLISION_OFFSETS = [
 const galleryMiniaturePosterTextures = new Map();
 const galleryMiniaturePosterLoads = new Map();
 const GALLERY_MINIATURE_POSTER_OVERRIDES = new Map([
-  ['mri-afqview-hd.m4v', '../gallery-miniature/media/video-posters/mri-afqview-miniature.jpg'],
-  ['mri-fmri-hd.m4v', '../gallery-miniature/media/video-posters/mri-fmri-miniature.jpg']
+  ['mri-afqview-hd.mp4', '../gallery-miniature/media/video-posters/mri-afqview-miniature.jpg'],
+  ['mri-fmri-hd.mp4', '../gallery-miniature/media/video-posters/mri-fmri-miniature.jpg']
 ]);
 let animationFrame = 0;
 let eHoldTimer = 0;
@@ -1039,8 +1104,11 @@ let eHoldTarget = null;
 let eHoldTriggered = false;
 let eHoldWasPlaying = false;
 let loadingDisplayProgress = 0;
-let loadingProgressTarget = 0;
 let loadingProgressAnimation = 0;
+const INITIAL_LOADING_MIN_DURATION_MS = 4000;
+// performance.now() starts at navigation, which is also when the static
+// loading screen becomes visible. Include module startup in the visible gate.
+const initialLoadingStartedAt = 0;
 const shrimpRoomMusic = new Audio('./media/shrimp-game-music.mp3?v=20260717');
 shrimpRoomMusic.loop = true;
 shrimpRoomMusic.preload = 'auto';
@@ -1058,10 +1126,6 @@ const SHRIMP_MUSIC_FADE_RATE = 8;
 let shrimpMusicPrimed = false;
 let shrimpMusicPlayBlocked = false;
 const shrimpMusicPlayPending = new Set();
-const soundReminderSeenZones = new Set();
-let soundReminderZone = null;
-let soundReminderZoneEnteredAt = 0;
-let soundReminderHideTimer = 0;
 
 const pressedKeys = new Set();
 const posterMeshes = [];
@@ -1070,15 +1134,6 @@ const videoMeshes = [];
 const brainMeshes = [];
 const galleryVideos = [];
 const manualVideoEntries = [];
-const INITIAL_WARMUP_VIDEO_SOURCES = new Set([
-  videoWork.source,
-  defenseScreeningWork.source
-]);
-const initialWarmupVideoPending = new Set(INITIAL_WARMUP_VIDEO_SOURCES);
-let initialWarmupVideoResolve;
-const initialWarmupVideosReady = new Promise((resolve) => {
-  initialWarmupVideoResolve = resolve;
-});
 const raycaster = new THREE.Raycaster();
 const pointerCenter = new THREE.Vector2(0, 0);
 const dragEuler = new THREE.Euler(0, 0, 0, 'YXZ');
@@ -1137,10 +1192,33 @@ function setWelcomeMode(mode) {
     return;
   }
 
-  welcomeEyebrow.textContent = 'Interactive research archive';
-  welcomeTitle.textContent = 'Walk through the work.';
-  welcomeCopy.textContent = 'Eight posters, three app showcases, a figure salon, a dark screening room, a brain room, a game room, and an art room of drawings, designs, and experiments.';
+  welcomeEyebrow.textContent = 'Puti Wen · Neuroimaging scientist & clinical tool builder';
+  welcomeTitle.textContent = 'Walk through the research.';
+  welcomeCopy.textContent = 'Explore an interactive 3D gallery of clinical tools, MRI and neuroimaging work, research posters, scientific figures, films, games, and artwork.';
   enterButton.textContent = 'Enter gallery';
+}
+
+function setWalkHint(mode = 'gallery') {
+  const items = mode === 'house'
+    ? [
+      '<span class="walk-hint-item"><span class="walk-hint-keys"><kbd>WASD</kbd></span><span class="walk-hint-action">Explore</span></span>',
+      '<span class="walk-hint-item walk-hint-note"><span class="walk-hint-action">Walk off the platform to descend</span></span>',
+      '<span class="walk-hint-item"><span class="walk-hint-keys"><kbd>Space</kbd><i>+</i><kbd>WASD</kbd></span><span class="walk-hint-action">Jump from roof</span></span>',
+      '<span class="walk-hint-item walk-hint-note"><span class="walk-hint-action">Glowing wall returns to gallery</span></span>'
+    ]
+    : [
+      '<span class="walk-hint-item"><span class="walk-hint-keys"><kbd>WASD</kbd></span><span class="walk-hint-action">Move</span></span>',
+      '<span class="walk-hint-item"><span class="walk-hint-keys"><kbd>Mouse</kbd></span><span class="walk-hint-action">Look</span></span>',
+      '<span class="walk-hint-item walk-hint-video"><span class="walk-hint-keys"><kbd>E</kbd></span><span class="walk-hint-action">Video: play/pause · hold to restart</span></span>',
+      '<span class="walk-hint-item"><span class="walk-hint-keys"><kbd>←</kbd><kbd>→</kbd></span><span class="walk-hint-action">Video ±5 sec</span></span>'
+    ];
+  walkHint.innerHTML = items.join('<span class="walk-hint-separator" aria-hidden="true"></span>');
+  walkHint.setAttribute(
+    'aria-label',
+    mode === 'house'
+      ? 'WASD explores. Walk off the platform to descend. Press Space while moving to jump from the roof. The glowing wall returns to the gallery.'
+      : 'WASD moves. Mouse looks. Press E to play or pause the focused video, or hold E to restart it. Left and right arrows skip the focused video by five seconds.'
+  );
 }
 
 function showWelcome(mode = 'initial') {
@@ -1335,14 +1413,7 @@ function createRoom() {
     0,
     GAME_ROOM.doorWidth,
     190,
-    '#303a3e'
-  );
-  addRoomHeading(
-    'Videos',
-    [VIDEOS_ROOM.centerX, 3.67, VIDEOS_ROOM.nearZ + 0.15],
-    0,
-    GAME_ROOM.doorWidth,
-    190
+    '#dce4e7'
   );
   addRoomHeading(
     'MRI Room',
@@ -1478,146 +1549,6 @@ function addGalleryMap() {
   scene.add(map);
 }
 
-function updateAppRoomLoadingIndicator(delta = 0) {
-  const totalAssets = Math.max(1, APP_ROOM_LOADING_ASSETS.size);
-  const completedProgress = appRoomReadyAssets.size / totalAssets;
-  appRoomDisplayProgress = Math.max(appRoomDisplayProgress, completedProgress);
-
-  if (completedProgress >= 1) {
-    if (!appRoomLoadingIndicator) return false;
-    appRoomLoadingIndicator.removeFromParent();
-    appRoomLoadingIndicator.traverse((child) => {
-      child.geometry?.dispose?.();
-      const materials = Array.isArray(child.material) ? child.material : [child.material];
-      materials.filter(Boolean).forEach((material) => {
-        material.map?.dispose?.();
-        material.dispose?.();
-      });
-    });
-    appRoomLoadingIndicator = null;
-    appRoomLoadingFill = null;
-    appRoomLoadingLabelCanvas = null;
-    appRoomLoadingLabelTexture = null;
-    appRoomLoadingDisplayedPercentage = -1;
-    needsRender = true;
-    return false;
-  }
-
-  if (!appRoomLoadingIndicator) return false;
-
-  const previousDisplayProgress = appRoomDisplayProgress;
-  if (delta > 0) {
-    const nextCheckpoint = (appRoomReadyAssets.size + 1) / totalAssets;
-    // Creep through the open interval before the next real asset checkpoint.
-    // Keeping the rounded label one point below that checkpoint prevents the
-    // visual progress from claiming an asset has finished before it has.
-    const nextCheckpointPercentage = Math.round(nextCheckpoint * 100);
-    const previewLimit = Math.max(
-      completedProgress,
-      (nextCheckpointPercentage - 0.51) / 100
-    );
-    const sliceRate = (previewLimit - completedProgress) / APP_ROOM_PROGRESS_SLICE_SECONDS;
-    appRoomDisplayProgress = Math.min(
-      previewLimit,
-      appRoomDisplayProgress + Math.max(0, sliceRate) * delta
-    );
-  }
-
-  const progressChanged = Math.abs(appRoomDisplayProgress - previousDisplayProgress) > 0.000001;
-  const displayedPercentage = Math.round(appRoomDisplayProgress * 100);
-  if (!progressChanged && displayedPercentage === appRoomLoadingDisplayedPercentage) return false;
-
-  const trackWidth = appRoomLoadingIndicator.userData.trackWidth;
-  appRoomLoadingFill.scale.x = Math.max(0.001, appRoomDisplayProgress);
-  appRoomLoadingFill.position.x = -trackWidth * (1 - appRoomDisplayProgress) / 2;
-
-  if (displayedPercentage !== appRoomLoadingDisplayedPercentage) {
-    const context = appRoomLoadingLabelCanvas.getContext('2d');
-    context.clearRect(0, 0, appRoomLoadingLabelCanvas.width, appRoomLoadingLabelCanvas.height);
-    context.fillStyle = '#f4f3ed';
-    context.font = '700 46px Inter, Arial, sans-serif';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillText(
-      `APP ROOM LOADING · ${displayedPercentage}%`,
-      appRoomLoadingLabelCanvas.width / 2,
-      appRoomLoadingLabelCanvas.height / 2
-    );
-    appRoomLoadingLabelTexture.needsUpdate = true;
-    appRoomLoadingDisplayedPercentage = displayedPercentage;
-  }
-  needsRender = true;
-  return true;
-}
-
-function markAppRoomAssetReady(asset) {
-  if (!APP_ROOM_LOADING_ASSETS.has(asset) || appRoomReadyAssets.has(asset)) return;
-  appRoomReadyAssets.add(asset);
-  updateAppRoomLoadingIndicator();
-}
-
-function createAppRoomLoadingFloorIndicator() {
-  if (appRoomLoadingIndicator || appRoomReadyAssets.size >= APP_ROOM_LOADING_ASSETS.size) return;
-  const group = new THREE.Group();
-  group.name = 'App Room floor loading progress';
-  const trackWidth = APP_ROOM.doorWidth - 0.28;
-  group.userData.trackWidth = trackWidth;
-
-  const background = new THREE.Mesh(
-    new THREE.PlaneGeometry(APP_ROOM.doorWidth - 0.12, 0.82),
-    new THREE.MeshBasicMaterial({ color: 0x202729, toneMapped: false })
-  );
-  background.rotation.x = -Math.PI / 2;
-  background.position.y = 0.012;
-  group.add(background);
-
-  const track = new THREE.Mesh(
-    new THREE.PlaneGeometry(trackWidth, 0.15),
-    new THREE.MeshBasicMaterial({ color: 0x5f686b, toneMapped: false })
-  );
-  track.rotation.x = -Math.PI / 2;
-  track.position.set(0, 0.016, 0.22);
-  group.add(track);
-
-  appRoomLoadingFill = new THREE.Mesh(
-    new THREE.PlaneGeometry(trackWidth, 0.15),
-    new THREE.MeshBasicMaterial({ color: 0x197293, toneMapped: false })
-  );
-  appRoomLoadingFill.rotation.x = -Math.PI / 2;
-  appRoomLoadingFill.position.set(-trackWidth / 2, 0.02, 0.22);
-  appRoomLoadingFill.scale.x = 0.001;
-  group.add(appRoomLoadingFill);
-
-  appRoomLoadingLabelCanvas = document.createElement('canvas');
-  appRoomLoadingLabelCanvas.width = 768;
-  appRoomLoadingLabelCanvas.height = 112;
-  appRoomLoadingLabelTexture = new THREE.CanvasTexture(appRoomLoadingLabelCanvas);
-  appRoomLoadingLabelTexture.colorSpace = THREE.SRGBColorSpace;
-  appRoomLoadingLabelTexture.minFilter = THREE.LinearFilter;
-  appRoomLoadingLabelTexture.magFilter = THREE.LinearFilter;
-  appRoomLoadingLabelTexture.generateMipmaps = false;
-  const label = new THREE.Mesh(
-    new THREE.PlaneGeometry(trackWidth, 0.2),
-    new THREE.MeshBasicMaterial({
-      map: appRoomLoadingLabelTexture,
-      transparent: true,
-      depthWrite: false,
-      toneMapped: false
-    })
-  );
-  label.rotation.x = -Math.PI / 2;
-  label.position.set(0, 0.022, -0.18);
-  label.renderOrder = 4;
-  group.add(label);
-
-  group.position.set(APP_ROOM.centerX, 0, ROOM.halfDepth + 1.2);
-  group.rotation.y = Math.PI;
-  appRoomLoadingIndicator = group;
-  appRoomLoadingDisplayedPercentage = -1;
-  scene.add(group);
-  updateAppRoomLoadingIndicator();
-}
-
 function createAppRoom() {
   const doorLeft = APP_ROOM.centerX - APP_ROOM.doorWidth / 2;
   const doorRight = APP_ROOM.centerX + APP_ROOM.doorWidth / 2;
@@ -1644,7 +1575,6 @@ function createAppRoom() {
   const hallFloor = new THREE.Mesh(new THREE.BoxGeometry(APP_ROOM.doorWidth, 0.08, floorLength), floorMaterial);
   hallFloor.position.set(APP_ROOM.centerX, -0.04, floorStartZ + floorLength / 2);
   scene.add(hallFloor);
-  createAppRoomLoadingFloorIndicator();
 
   const hallCeiling = new THREE.Mesh(new THREE.BoxGeometry(APP_ROOM.doorWidth + 0.12, 0.08, wallLength), ceilingMaterial);
   hallCeiling.position.set(APP_ROOM.centerX, APP_ROOM.doorHeight, wallStartZ + wallLength / 2);
@@ -2173,6 +2103,43 @@ function createHomeFloorArrow() {
   fill.renderOrder = 3;
   arrow.add(fill);
 
+  const labelCanvas = document.createElement('canvas');
+  labelCanvas.width = 512;
+  labelCanvas.height = 256;
+  const labelContext = labelCanvas.getContext('2d');
+  labelContext.clearRect(0, 0, labelCanvas.width, labelCanvas.height);
+  labelContext.fillStyle = '#aaa397';
+  labelContext.font = '700 220px Arial, Helvetica, sans-serif';
+  labelContext.textAlign = 'center';
+  labelContext.textBaseline = 'middle';
+  // This floor label is read from the back of its double-sided plane after
+  // the arrow is aimed at the portal, so pre-mirror it to remain legible.
+  labelContext.translate(labelCanvas.width, 0);
+  labelContext.scale(-1, 1);
+  labelContext.fillText('Run', labelCanvas.width / 2, labelCanvas.height / 2 + 8);
+
+  const labelTexture = new THREE.CanvasTexture(labelCanvas);
+  labelTexture.colorSpace = THREE.SRGBColorSpace;
+  labelTexture.minFilter = THREE.LinearMipmapLinearFilter;
+  labelTexture.magFilter = THREE.LinearFilter;
+  labelTexture.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
+
+  const labelGeometry = new THREE.PlaneGeometry(HOME_FLOOR_ARROW.shaftWidth * 0.94, 0.29);
+  labelGeometry.rotateX(Math.PI / 2);
+  const label = new THREE.Mesh(
+    labelGeometry,
+    new THREE.MeshBasicMaterial({
+      map: labelTexture,
+      transparent: true,
+      depthWrite: false,
+      toneMapped: false,
+      side: THREE.DoubleSide
+    })
+  );
+  label.position.set(0, 0.004, -halfLength * 0.68);
+  label.renderOrder = 4;
+  arrow.add(label);
+
   const directionX = HOME_FLOOR_ARROW.targetX - HOME_FLOOR_ARROW.x;
   const directionZ = HOME_PORTAL.z - HOME_FLOOR_ARROW.z;
   arrow.position.set(HOME_FLOOR_ARROW.x, 0.012, HOME_FLOOR_ARROW.z);
@@ -2193,7 +2160,7 @@ function createArtRoom() {
   const wallLength = wallEndZ - wallStartZ;
   const roomDepth = ART_ROOM.farZ - ART_ROOM.nearZ;
   const wallMaterial = new THREE.MeshStandardMaterial({ color: 0xeeeae2, roughness: 0.98, metalness: 0 });
-  const floorMaterial = new THREE.MeshStandardMaterial({ color: 0xaaa397, roughness: 1, metalness: 0 });
+  const floorMaterial = new THREE.MeshStandardMaterial({ color: ART_ROOM_FLOOR_COLOR, roughness: 1, metalness: 0 });
   const ceilingMaterial = new THREE.MeshStandardMaterial({ color: 0xf2eee7, roughness: 1, metalness: 0 });
   const portalWallMaterial = new THREE.MeshBasicMaterial({ color: ART_PORTAL_COLOR, toneMapped: false });
 
@@ -2521,7 +2488,7 @@ const HOUSE_EXTERIOR_WALKABLE_AREAS = [
     minX: 11.76, maxX: 14.32, minZ: 3.32, maxZ: 7.13,
     height: (x) => THREE.MathUtils.lerp(
       1.03,
-      0.05,
+      0.28,
       THREE.MathUtils.clamp((x - 11.85) / 2.4, 0, 1)
     )
   },
@@ -2900,6 +2867,22 @@ function createFullScaleHouse(gltf) {
   );
   modelPivot.add(model);
 
+  // Close the exposed underside at the approach-facing edge of the main
+  // stairs. Keeping this as a shallow apron preserves the authored stair
+  // treads and the existing walkable heights while hiding the two supports
+  // that otherwise peek out below the lowest slab.
+  const frontStairApron = new THREE.Mesh(
+    new THREE.BoxGeometry(0.34, 0.32, 4.0),
+    new THREE.MeshStandardMaterial({
+      color: HOUSE_COLOR_PRESET.stone,
+      roughness: 0.94,
+      metalness: 0
+    })
+  );
+  frontStairApron.name = 'Main stone stair front apron';
+  frontStairApron.position.set(14.17, 0.125, HOUSE_WORLD.portalZ);
+  modelPivot.add(frontStairApron);
+
   const houseShadow = new THREE.Mesh(
     new THREE.CircleGeometry(16.2, 64),
     new THREE.MeshBasicMaterial({ color: 0x182019, transparent: true, opacity: 0.18, depthWrite: false })
@@ -3098,7 +3081,7 @@ function enterHouseWorld() {
   focusCard.hidden = true;
   portalPrompt.hidden = true;
   reticle.classList.remove('active');
-  walkHint.textContent = 'WASD explore   Walk off the main platform   Space + move to jump off the hallway roof   The luminous wall returns to the gallery';
+  setWalkHint('house');
   needsRender = true;
 }
 
@@ -3113,7 +3096,7 @@ function exitHouseWorld() {
   camera.lookAt(HOME_PORTAL.x, STANDING_EYE_HEIGHT, HOME_PORTAL.z + 8);
   resetPlayerHeight();
   houseWorldGroup.visible = false;
-  walkHint.textContent = 'WASD move   Mouse to look   Left/right arrows skip a focused video by 5 sec   Space/up jump   Down crouch';
+  setWalkHint();
   playGalleryVideos();
   requestVideoSync();
   needsRender = true;
@@ -3412,9 +3395,9 @@ function getMiniatureStaticTexture(entry) {
     texture.generateMipmaps = false;
     placeholder.dispose();
     galleryMiniaturePosterTextures.set(entry, texture);
-    if (galleryMiniature) createGalleryMiniature();
+    if (galleryMiniature) requestGalleryMiniatureRefresh();
   }, undefined, () => {
-    if (galleryMiniature) createGalleryMiniature();
+    if (galleryMiniature) requestGalleryMiniatureRefresh();
   });
   return placeholder;
 }
@@ -3502,11 +3485,26 @@ function createGalleryMiniature() {
   needsRender = true;
 }
 
+function requestGalleryMiniatureRefresh(delay = 0) {
+  if (galleryMiniatureRefreshTimer) return;
+  const attemptRefresh = () => {
+    galleryMiniatureRefreshTimer = 0;
+    // Rebuilding the nested miniature clones the full scene twice. Never do
+    // that during movement; coalesce any poster callbacks and try once idle.
+    if (galleryActive && performance.now() - lastCameraInputAt < 1200) {
+      galleryMiniatureRefreshTimer = window.setTimeout(attemptRefresh, 350);
+      return;
+    }
+    createGalleryMiniature();
+  };
+  galleryMiniatureRefreshTimer = window.setTimeout(attemptRefresh, delay);
+}
+
 function queueGalleryMiniatureRefreshes() {
   if (galleryMiniatureRefreshesQueued) return;
   galleryMiniatureRefreshesQueued = true;
   [1200, 7000, 15000, 26000].forEach((delay) => {
-    window.setTimeout(() => createGalleryMiniature(), delay);
+    window.setTimeout(() => requestGalleryMiniatureRefresh(), delay);
   });
 }
 
@@ -3786,7 +3784,7 @@ function createStandingVideoDisplay(work, posterTexture) {
   const video = document.createElement('video');
   video.className = 'gallery-video-source';
   video.poster = work.posterImage;
-  video.preload = work.eagerLoad ? 'auto' : 'metadata';
+  video.preload = 'none';
   video.loop = true;
   video.muted = true;
   video.defaultMuted = true;
@@ -3803,14 +3801,8 @@ function createStandingVideoDisplay(work, posterTexture) {
   videoTexture.magFilter = THREE.LinearFilter;
   videoTexture.generateMipmaps = false;
 
-  let displayTextAdded = false;
-  const addDisplayTextAfterVideoLoad = () => {
-    if (displayTextAdded) return;
-    displayTextAdded = true;
-    if (work.description) addStandingDisplayLabel(screenAssembly, work, frameHeight);
-    if (work.launchAction) addGameLaunchButton(screenAssembly, work, frameHeight);
-  };
-  video.addEventListener('loadeddata', addDisplayTextAfterVideoLoad, { once: true });
+  if (work.description) addStandingDisplayLabel(screenAssembly, work, frameHeight);
+  if (work.launchAction) addGameLaunchButton(screenAssembly, work, frameHeight);
 
   const entry = {
     title: work.title,
@@ -3833,6 +3825,7 @@ function createStandingVideoDisplay(work, posterTexture) {
     supportsFrameCallback: typeof video.requestVideoFrameCallback === 'function',
     texture: videoTexture,
     preloadPriority: work.preloadPriority || 0,
+    roomKey: work.roomKey,
     userPaused: false,
     playbackStarted: false,
     manualOnly: Boolean(work.manualOnly),
@@ -3867,11 +3860,7 @@ function createStandingVideoDisplay(work, posterTexture) {
   videoMeshes.push(interactionTarget);
   galleryVideos.push(entry);
   manualVideoEntries.push(entry);
-  if (work.eagerLoad || videoPreloadStarted) {
-    video.preload = 'auto';
-    video.src = entry.source;
-    video.load();
-  }
+  maybePrepareNewVideoEntry(entry);
   scene.add(group);
   if (galleryActive) requestVideoSync();
   needsRender = true;
@@ -4002,54 +3991,170 @@ function replaceVideoPosterTexture(entry, texture) {
   needsRender = true;
 }
 
+function startArtRoomMugLoads() {
+  if (artRoomMugLoadPromise) return artRoomMugLoadPromise;
+  const textureLoader = new THREE.TextureLoader();
+  artRoomMugLoadPromise = Promise.all(MUG_DISPLAYS.map((config) => new Promise((resolve) => {
+    if (artRoomLoadedImages.has(config.texture)) {
+      resolve();
+      return;
+    }
+    artRoomLoadedImages.add(config.texture);
+    textureLoader.load(
+      config.texture,
+      (texture) => {
+        createMugDisplay(texture, config);
+        resolve();
+      },
+      undefined,
+      resolve
+    );
+  })));
+  return artRoomMugLoadPromise;
+}
+
+function getArtApproachImage(image) {
+  const cleanPath = image.split('?')[0];
+  return `${cleanPath.replace('/walls/hd/', '/walls/approach/')}?v=20260720-progressive1`;
+}
+
+function loadArtWallTile(textureLoader, sheet, image, tileIndex, quality = 'approach') {
+  const source = quality === 'hd' ? image : getArtApproachImage(image);
+  if (artRoomLoadedImages.has(source)) return Promise.resolve();
+  artRoomLoadedImages.add(source);
+  return new Promise((resolve) => {
+    textureLoader.load(
+      source,
+      (texture) => {
+        addArtWallSheet(sheet, texture, tileIndex);
+        resolve();
+      },
+      undefined,
+      resolve
+    );
+  });
+}
+
+function loadArtWallSheetTiles(textureLoader, sheet, quality = 'approach') {
+  return Promise.all(sheet.images.map((image, tileIndex) => (
+    loadArtWallTile(textureLoader, sheet, image, tileIndex, quality)
+  )));
+}
+
+function waitForGalleryCameraIdle(minimumIdleMs = 1200) {
+  if (!galleryActive || performance.now() - lastCameraInputAt >= minimumIdleMs) {
+    return Promise.resolve();
+  }
+  return new Promise((resolve) => {
+    window.setTimeout(() => {
+      waitForGalleryCameraIdle(minimumIdleMs).then(resolve);
+    }, 250);
+  });
+}
+
+function startArtRoomHdUpgrades() {
+  if (artRoomHdUpgradePromise) return artRoomHdUpgradePromise;
+  artRoomHdUpgradePromise = (async () => {
+    await waitForRoomVisualsReady(ROOM_KEYS.art);
+    const textureLoader = new THREE.TextureLoader();
+    const farSheet = ART_WALL_SHEETS.find((sheet) => sheet.side === 'far');
+    const orderedSheets = [farSheet, ...ART_WALL_SHEETS.filter((sheet) => sheet !== farSheet)]
+      .filter(Boolean);
+
+    // Decode and swap only one 4K tile at a time. Movement resets the idle
+    // window, so sprinting or rotating can never trigger the full wall burst.
+    for (const sheet of orderedSheets) {
+      for (let tileIndex = 0; tileIndex < sheet.images.length; tileIndex += 1) {
+        await waitForGalleryCameraIdle(1400);
+        await loadArtWallTile(
+          textureLoader,
+          sheet,
+          sheet.images[tileIndex],
+          tileIndex,
+          'hd'
+        );
+        await new Promise((resolve) => window.setTimeout(resolve, 420));
+      }
+    }
+  })();
+  return artRoomHdUpgradePromise;
+}
+
 function startArtRoomLoads() {
-  if (backgroundGalleryLoadsStarted) return;
+  const mugLoadPromise = startArtRoomMugLoads();
+  if (backgroundGalleryLoadsStarted) {
+    roomLoadControllers.get(ROOM_KEYS.art)?.resume();
+    return;
+  }
   backgroundGalleryLoadsStarted = true;
   const textureLoader = new THREE.TextureLoader();
+  const approachLoadPromises = [];
+  const peripheralLoadPromises = [];
   const tshirtWallSheet = ART_WALL_SHEETS.find((sheet) => sheet.side === 'far');
   const remainingArtWallSheets = ART_WALL_SHEETS.filter((sheet) => sheet !== tshirtWallSheet);
   const jobs = [
-    ...MUG_DISPLAYS.map((config) => () => {
-      if (artRoomLoadedImages.has(config.texture)) return;
-      artRoomLoadedImages.add(config.texture);
-      textureLoader.load(config.texture, (texture) => createMugDisplay(texture, config));
-    }),
     () => {
-      if (!tshirtWallSheet || artRoomLoadedImages.has(tshirtWallSheet.image)) return;
-      artRoomLoadedImages.add(tshirtWallSheet.image);
-      textureLoader.load(
-        tshirtWallSheet.image,
-        (texture) => addArtWallSheet(tshirtWallSheet, texture)
-      );
+      if (!tshirtWallSheet) return;
+      approachLoadPromises.push(loadArtWallSheetTiles(textureLoader, tshirtWallSheet));
     },
     () => createArtGallery(),
     ...remainingArtWallSheets.map((sheet) => () => {
-      if (artRoomLoadedImages.has(sheet.image)) return;
-      artRoomLoadedImages.add(sheet.image);
-      textureLoader.load(sheet.image, (texture) => addArtWallSheet(sheet, texture));
+      approachLoadPromises.push(loadArtWallSheetTiles(textureLoader, sheet));
     }),
     () => {
       const houseRainEntry = createHouseRainDisplay(createVideoPlaceholderTexture());
-      textureLoader.load(
-        HOUSE_RAIN_DISPLAY.posterImage,
-        (texture) => replaceVideoPosterTexture(houseRainEntry, texture)
-      );
-      textureLoader.load(
-        HOUSE_RAIN_DISPLAY.photoImage,
-        (texture) => replaceHouseRainPhotoTexture(houseRainEntry, texture)
-      );
+      peripheralLoadPromises.push(new Promise((resolve) => {
+        textureLoader.load(
+          HOUSE_RAIN_DISPLAY.posterImage,
+          (texture) => {
+            replaceVideoPosterTexture(houseRainEntry, texture);
+            prepareDeferredRoomVideos(ROOM_KEYS.art);
+            resolve();
+          },
+          undefined,
+          resolve
+        );
+      }));
+      peripheralLoadPromises.push(new Promise((resolve) => {
+        textureLoader.load(
+          HOUSE_RAIN_DISPLAY.photoImage,
+          (texture) => {
+            replaceHouseRainPhotoTexture(houseRainEntry, texture);
+            resolve();
+          },
+          undefined,
+          resolve
+        );
+      }));
     },
     () => {
       const houseLoader = new GLTFLoader();
-      houseLoader.load(HOUSE_DISPLAY.model, (gltf) => {
-        createHouseFloorPreview(gltf);
-        createFullScaleHouse(gltf);
-      }, undefined, (error) => {
-        console.warn('Could not load childhood house model.', error);
-      });
+      peripheralLoadPromises.push(new Promise((resolve) => {
+        houseLoader.load(HOUSE_DISPLAY.model, (gltf) => {
+          createHouseFloorPreview(gltf);
+          createFullScaleHouse(gltf);
+          resolve();
+        }, undefined, (error) => {
+          console.warn('Could not load childhood house model.', error);
+          resolve();
+        });
+      }));
+    },
+    () => {
+      artRoomPeripheralLoadPromise = Promise.all(peripheralLoadPromises);
+      Promise.all([mugLoadPromise, ...approachLoadPromises])
+        .then(() => markRoomVisualsReady(ROOM_KEYS.art));
     }
   ];
-  scheduleLowPriorityGallerySequence(jobs, 0, 360);
+  roomLoadControllers.set(
+    ROOM_KEYS.art,
+    scheduleLowPriorityGallerySequence(
+      jobs,
+      0,
+      360,
+      () => isRoomPreparationAllowed(ROOM_KEYS.art)
+    )
+  );
 }
 
 function startMainRoomBackgroundLoads() {
@@ -4069,63 +4174,194 @@ function startMainRoomBackgroundLoads() {
 }
 
 function startResearchRoomLoads() {
-  if (researchRoomLoadsStarted) return;
+  if (researchRoomLoadsStarted) {
+    roomLoadControllers.get(ROOM_KEYS.app)?.resume();
+    return;
+  }
   researchRoomLoadsStarted = true;
   const textureLoader = new THREE.TextureLoader();
-  // The defense, app-demo, and physiology video posters are part of the
-  // initial manager queue. Re-adding them here would create a second video
-  // at the same wall position and make the first frame appear to reset.
-  const jobs = myPhysioImageWorks.map((work) => () => {
-    textureLoader.load(
-      work.image,
-      (texture) => {
-        addImageWork(work, texture);
-        markAppRoomAssetReady(work.image);
-      },
-      undefined,
-      () => markAppRoomAssetReady(work.image)
-    );
-  });
-  scheduleLowPriorityGallerySequence(jobs, 0, 260);
-}
-
-function startMriWallLoads() {
-  if (mriWallLoadsStarted) return;
-  mriWallLoadsStarted = true;
-  const textureLoader = new THREE.TextureLoader();
-  scheduleLowPriorityGallerySequence(
-    MRI_WALL_SHEETS.map((sheet) => () => {
-      textureLoader.load(sheet.image, (texture) => addMriWallSheet(sheet, texture));
+  const videoWorks = [...appDemoWorks, ...myPhysioVideoWorks];
+  let remainingVisuals = videoWorks.length + myPhysioImageWorks.length;
+  const markVisualReady = () => {
+    remainingVisuals -= 1;
+    if (remainingVisuals === 0) {
+      markRoomVisualsReady(ROOM_KEYS.app);
+      prepareDeferredRoomVideos(ROOM_KEYS.app);
+    }
+  };
+  const jobs = [
+    ...videoWorks.map((work) => () => {
+      textureLoader.load(
+        work.posterImage,
+        (texture) => {
+          addVideoWork(work, texture);
+          markVisualReady();
+        },
+        undefined,
+        () => {
+          addVideoWork(work, createVideoPlaceholderTexture());
+          markVisualReady();
+        }
+      );
     }),
-    0,
-    420
+    ...myPhysioImageWorks.map((work) => () => {
+      textureLoader.load(
+        work.image,
+        (texture) => {
+          addImageWork(work, texture);
+          markVisualReady();
+        },
+        undefined,
+        () => {
+          markVisualReady();
+        }
+      );
+    })
+  ];
+  roomLoadControllers.set(
+    ROOM_KEYS.app,
+    scheduleLowPriorityGallerySequence(
+      jobs,
+      0,
+      260,
+      () => isRoomPreparationAllowed(ROOM_KEYS.app)
+    )
   );
 }
 
+function startScreeningRoomLoads() {
+  if (screeningRoomLoadsStarted) {
+    roomLoadControllers.get(ROOM_KEYS.screening)?.resume();
+    return;
+  }
+  screeningRoomLoadsStarted = true;
+  const textureLoader = new THREE.TextureLoader();
+  const jobs = [() => {
+    textureLoader.load(
+      defenseScreeningWork.posterImage,
+      (texture) => {
+        addVideoWork(defenseScreeningWork, texture);
+        markRoomVisualsReady(ROOM_KEYS.screening);
+        prepareDeferredRoomVideos(ROOM_KEYS.screening);
+      },
+      undefined,
+      () => {
+        addVideoWork(defenseScreeningWork, createVideoPlaceholderTexture());
+        markRoomVisualsReady(ROOM_KEYS.screening);
+        prepareDeferredRoomVideos(ROOM_KEYS.screening);
+      }
+    );
+  }];
+  roomLoadControllers.set(
+    ROOM_KEYS.screening,
+    scheduleLowPriorityGallerySequence(
+      jobs,
+      0,
+      260,
+      () => isRoomPreparationAllowed(ROOM_KEYS.screening)
+    )
+  );
+}
+
+function startMriWallLoads() {
+  if (mriWallLoadsStarted) {
+    roomLoadControllers.get(ROOM_KEYS.mri)?.resume();
+    return;
+  }
+  mriWallLoadsStarted = true;
+  const textureLoader = new THREE.TextureLoader();
+  let remainingWalls = MRI_WALL_SHEETS.length;
+  const finishWall = () => {
+    remainingWalls -= 1;
+    if (remainingWalls > 0) return;
+    ensureMriVideoDisplays();
+    markRoomVisualsReady(ROOM_KEYS.mri);
+  };
+  const jobs = MRI_WALL_SHEETS.map((sheet) => () => {
+    textureLoader.load(
+      sheet.image,
+      (texture) => {
+        addMriWallSheet(sheet, texture);
+        finishWall();
+      },
+      undefined,
+      finishWall
+    );
+  });
+  roomLoadControllers.set(
+    ROOM_KEYS.mri,
+    scheduleLowPriorityGallerySequence(
+      jobs,
+      0,
+      420,
+      () => isRoomPreparationAllowed(ROOM_KEYS.mri)
+    )
+  );
+}
+
+function ensureMriVideoDisplays() {
+  if (mriVideoDisplaysLoaded) return;
+  mriVideoDisplaysLoaded = true;
+  MRI_VIDEO_WORKS.forEach((work) => addMriVideoWork(work));
+  prepareDeferredRoomVideos(ROOM_KEYS.mri);
+}
+
 function startBrainWallLoads() {
-  if (brainWallLoadsStarted) return;
+  if (brainWallLoadsStarted) {
+    roomLoadControllers.get(ROOM_KEYS.brain)?.resume();
+    return;
+  }
   brainWallLoadsStarted = true;
   const textureLoader = new THREE.TextureLoader();
-  scheduleLowPriorityGallerySequence(
-    BRAIN_WALL_SHEETS.map((sheet) => () => {
-      textureLoader.load(sheet.image, (texture) => addBrainWallSheet(sheet, texture));
-    }),
-    0,
-    420
+  let remainingWalls = BRAIN_WALL_SHEETS.length;
+  const finishWall = () => {
+    remainingWalls -= 1;
+    if (remainingWalls === 0) markRoomVisualsReady(ROOM_KEYS.brain);
+  };
+  roomLoadControllers.set(
+    ROOM_KEYS.brain,
+    scheduleLowPriorityGallerySequence(
+      BRAIN_WALL_SHEETS.map((sheet) => () => {
+        textureLoader.load(
+          sheet.image,
+          (texture) => {
+            addBrainWallSheet(sheet, texture);
+            finishWall();
+          },
+          undefined,
+          finishWall
+        );
+      }),
+      0,
+      420,
+      () => isRoomPreparationAllowed(ROOM_KEYS.brain)
+    )
   );
 }
 
 function startGameRoomLoads() {
-  if (gameRoomLoadsStarted) return;
+  if (gameRoomLoadsStarted) {
+    roomLoadControllers.get(ROOM_KEYS.game)?.resume();
+    return;
+  }
   gameRoomLoadsStarted = true;
   const textureLoader = new THREE.TextureLoader();
   const shrimpKiosk = GAME_DISPLAY_WORKS.find((work) => work.title === 'Shrimp');
   const otherKiosks = GAME_DISPLAY_WORKS.filter((work) => work !== shrimpKiosk);
   const kioskWorks = [shrimpKiosk, ...otherKiosks].filter(Boolean);
   let readyKioskCount = 0;
+  let remainingVisuals = kioskWorks.length + GAME_WALL_SHEETS.length;
+  const markVisualReady = () => {
+    remainingVisuals -= 1;
+    if (remainingVisuals === 0) {
+      markRoomVisualsReady(ROOM_KEYS.game);
+      prepareDeferredRoomVideos(ROOM_KEYS.game);
+    }
+  };
   const markKioskReady = () => {
     readyKioskCount += 1;
     if (readyKioskCount === kioskWorks.length) gameRoomKiosksReady = true;
+    markVisualReady();
   };
   const jobs = [
     ...kioskWorks.map((work) => () => {
@@ -4143,11 +4379,27 @@ function startGameRoomLoads() {
       );
     }),
     ...GAME_WALL_SHEETS.map((sheet) => () => {
-      textureLoader.load(sheet.image, (texture) => addGameWallSheet(sheet, texture));
+      textureLoader.load(
+        sheet.image,
+        (texture) => {
+          addGameWallSheet(sheet, texture);
+          markVisualReady();
+        },
+        undefined,
+        markVisualReady
+      );
     })
   ];
   if (!kioskWorks.length) gameRoomKiosksReady = true;
-  scheduleLowPriorityGallerySequence(jobs, 0, 300);
+  roomLoadControllers.set(
+    ROOM_KEYS.game,
+    scheduleLowPriorityGallerySequence(
+      jobs,
+      0,
+      300,
+      () => isRoomPreparationAllowed(ROOM_KEYS.game)
+    )
+  );
 }
 
 function isCameraNearRoom(room, margin = 2) {
@@ -4169,34 +4421,160 @@ function isCameraInsideRoom(room, margin = 0.35) {
     && camera.position.z <= room.farZ - margin;
 }
 
-function maybeStartRoomBackgroundPreloads() {
-  if (!galleryActive || !sceneReady || roomBackgroundPreloadPipelineQueued) return;
-  roomBackgroundPreloadPipelineQueued = true;
+function getDistanceToRoom(room) {
+  const roomLeft = room.centerX - room.halfWidth;
+  const roomRight = room.centerX + room.halfWidth;
+  const nearestX = Math.max(roomLeft, Math.min(camera.position.x, roomRight));
+  const nearestZ = Math.max(room.nearZ, Math.min(camera.position.z, room.farZ));
+  return Math.hypot(camera.position.x - nearestX, camera.position.z - nearestZ);
+}
 
-  // Once the initial, high-priority gallery queue is complete, continue
-  // warming the remaining rooms in the background. This is intentionally
-  // independent of the camera position after entry: walking away or standing
-  // still must not strand the rest of the queue.
-  scheduleLowPriorityGallerySequence([
-    () => startBrainWallLoads(),
-    () => requestBrainSurfaceLoad(),
-    () => startMriWallLoads(),
-    () => startArtRoomLoads(),
-    () => startGameRoomLoads()
-  ], 900, 700);
-  queueGalleryMiniatureRefreshes();
+function getGalleryRoomKeyAtCamera() {
+  const containingRoom = GALLERY_ROOM_AREAS.find(({ room }) => isCameraInsideRoom(room, 0));
+  if (containingRoom) return containingRoom.key;
+  return GALLERY_ROOM_AREAS.reduce((nearest, candidate) => (
+    getDistanceToRoom(candidate.room) < getDistanceToRoom(nearest.room) ? candidate : nearest
+  )).key;
+}
+
+function allowsSpeculativeVideoPreload(connection = (
+  navigator.connection || navigator.mozConnection || navigator.webkitConnection
+)) {
+  if (!connection) return true;
+  if (connection.saveData) return false;
+  return !/^(slow-2g|2g)$/.test(connection.effectiveType || '');
+}
+
+function isStationaryForSpeculativePreload(now = performance.now()) {
+  return galleryActive && now - lastCameraInputAt >= SPECULATIVE_PRELOAD_DWELL_MS;
+}
+
+function isRoomPreparationAllowed(roomKey) {
+  if (!galleryActive) {
+    if (fullGalleryPreloadRoomKeys.has(roomKey)) return true;
+    return roomKey === ROOM_KEYS.art
+      && (
+        previewParams.has('home-world-preview')
+        || previewParams.has('home-transition-preview')
+        || previewParams.has('house-rain-preview')
+      );
+  }
+  if (currentGalleryRoomKey === roomKey) return true;
+  if (fullGalleryPreloadRoomKeys.has(roomKey)) {
+    return !currentGalleryRoomKey || roomVisualReadyKeys.has(currentGalleryRoomKey);
+  }
+  return speculativeRoomKey === roomKey
+    && speculativeOriginRoomKey === currentGalleryRoomKey
+    && isStationaryForSpeculativePreload();
+}
+
+function prepareGalleryRoomContent(
+  roomKey,
+  { speculative = false, originRoomKey = null, background = false } = {}
+) {
+  if (!roomKey) return;
+  if (background) fullGalleryPreloadRoomKeys.add(roomKey);
+  if (speculative) {
+    speculativeOriginRoomKey = originRoomKey;
+    speculativeRoomKey = roomKey;
+  }
+
+  if (roomKey === ROOM_KEYS.main) startMainRoomBackgroundLoads();
+  if (roomKey === ROOM_KEYS.app) startResearchRoomLoads();
+  if (roomKey === ROOM_KEYS.screening) startScreeningRoomLoads();
+  if (roomKey === ROOM_KEYS.brain) {
+    startBrainWallLoads();
+    requestBrainSurfaceLoad();
+  }
+  if (roomKey === ROOM_KEYS.mri) {
+    requestBrainSurfaceLoad();
+    startMriWallLoads();
+  }
+  if (roomKey === ROOM_KEYS.game) startGameRoomLoads();
+  if (roomKey === ROOM_KEYS.videos) requestVideoRoomLoad();
+  if (roomKey === ROOM_KEYS.art) {
+    startArtRoomLoads();
+    if (!background) startArtRoomHdUpgrades();
+  }
+
+  if (!background) prepareRoomVideosSequentially(roomKey, { speculative, originRoomKey });
+}
+
+function prepareDeferredRoomVideos(roomKey) {
+  if (currentGalleryRoomKey === roomKey) {
+    prepareRoomVideosSequentially(roomKey);
+    return;
+  }
+  if (
+    speculativeRoomKey === roomKey
+    && speculativeOriginRoomKey === currentGalleryRoomKey
+    && isStationaryForSpeculativePreload()
+  ) {
+    prepareRoomVideosSequentially(roomKey, {
+      speculative: true,
+      originRoomKey: speculativeOriginRoomKey
+    });
+  }
+}
+
+function getNearestPlausibleNextRoomKey(currentRoomKey) {
+  const candidates = GALLERY_ROOM_AREAS.filter(({ key }) => (
+    key !== currentRoomKey && key !== previousGalleryRoomKey
+  ));
+  const availableCandidates = candidates.length
+    ? candidates
+    : GALLERY_ROOM_AREAS.filter(({ key }) => key !== currentRoomKey);
+  return availableCandidates.reduce((nearest, candidate) => {
+    const roomCenterZ = (candidate.room.nearZ + candidate.room.farZ) / 2;
+    const nearestCenterZ = (nearest.room.nearZ + nearest.room.farZ) / 2;
+    const candidateDistance = Math.hypot(
+      camera.position.x - candidate.room.centerX,
+      camera.position.z - roomCenterZ
+    );
+    const nearestDistance = Math.hypot(
+      camera.position.x - nearest.room.centerX,
+      camera.position.z - nearestCenterZ
+    );
+    return candidateDistance < nearestDistance ? candidate : nearest;
+  }).key;
+}
+
+function maybeStartRoomBackgroundPreloads(now = performance.now()) {
+  if (!galleryActive || !sceneReady || !currentGalleryRoomKey) return;
+  if (fullGalleryPreloadStarted) return;
+  if (!isStationaryForSpeculativePreload(now)) return;
+
+  if (
+    speculativeRoomKey
+    && speculativeOriginRoomKey === currentGalleryRoomKey
+  ) {
+    prepareGalleryRoomContent(speculativeRoomKey, {
+      speculative: true,
+      originRoomKey: speculativeOriginRoomKey
+    });
+    return;
+  }
+
+  const nextRoomKey = getNearestPlausibleNextRoomKey(currentGalleryRoomKey);
+  prepareGalleryRoomContent(nextRoomKey, {
+    speculative: true,
+    originRoomKey: currentGalleryRoomKey
+  });
 }
 
 function maybeLoadNearbyRoomContent() {
   if (!galleryActive || !sceneReady) return;
+  const nextCurrentRoomKey = getGalleryRoomKeyAtCamera();
+  if (nextCurrentRoomKey === currentGalleryRoomKey) return;
 
-  if (isCameraNearRoom(ART_ROOM, 2.5)) startArtRoomLoads();
-  if (isCameraNearRoom(GAME_ROOM, 3) || isCameraNearRoom(VIDEOS_ROOM, 3)) startGameRoomLoads();
-  if (isCameraNearRoom(EMPTY_GAME_ROOM, 3)) startMriWallLoads();
-  if (isCameraNearRoom(BRAIN_ROOM, 3)) startBrainWallLoads();
-  if (isCameraNearRoom(APP_ROOM, 3) || isCameraNearRoom(SCREENING_ROOM, 3)) {
-    startResearchRoomLoads();
+  previousGalleryRoomKey = currentGalleryRoomKey;
+  currentGalleryRoomKey = nextCurrentRoomKey;
+  speculativeOriginRoomKey = null;
+  speculativeRoomKey = null;
+  if (activeRoomVideoSequence?.roomKey !== currentGalleryRoomKey) {
+    activeRoomVideoSequence.stopped = true;
   }
+  prepareGalleryRoomContent(currentGalleryRoomKey);
 }
 
 function openResumePage() {
@@ -4220,13 +4598,27 @@ function scheduleLowPriorityGalleryWork(callback, delay = 1200) {
   }, delay);
 }
 
-function scheduleLowPriorityGallerySequence(jobs, initialDelay = 0, gap = 300) {
+function scheduleLowPriorityGallerySequence(
+  jobs,
+  initialDelay = 0,
+  gap = 300,
+  shouldContinue = () => true
+) {
   let cursor = 0;
+  let scheduled = false;
+  let finished = false;
   const scheduleNext = (delay) => {
-    if (cursor >= jobs.length) return;
-    const job = jobs[cursor];
-    cursor += 1;
+    if (finished || scheduled || cursor >= jobs.length) {
+      if (cursor >= jobs.length) finished = true;
+      return;
+    }
+    if (!shouldContinue()) return;
+    scheduled = true;
     scheduleLowPriorityGalleryWork(() => {
+      scheduled = false;
+      if (!shouldContinue()) return;
+      const job = jobs[cursor];
+      cursor += 1;
       try {
         job();
       } finally {
@@ -4237,12 +4629,162 @@ function scheduleLowPriorityGallerySequence(jobs, initialDelay = 0, gap = 300) {
   // Leave a small gap after the room trigger so the current movement frame
   // finishes before the first background request is started.
   scheduleNext(Math.max(180, initialDelay));
+  return {
+    resume() {
+      scheduleNext(180);
+    }
+  };
+}
+
+function markRoomVisualsReady(roomKey) {
+  if (roomVisualReadyKeys.has(roomKey)) return;
+  roomVisualReadyKeys.add(roomKey);
+  const resolvers = roomVisualReadyResolvers.get(roomKey) || [];
+  roomVisualReadyResolvers.delete(roomKey);
+  resolvers.forEach((resolve) => resolve());
+  fullGalleryPreloadRoomKeys.forEach((backgroundRoomKey) => {
+    if (backgroundRoomKey !== roomKey) {
+      roomLoadControllers.get(backgroundRoomKey)?.resume();
+    }
+  });
+}
+
+function waitForRoomVisualsReady(roomKey) {
+  if (roomVisualReadyKeys.has(roomKey)) return Promise.resolve();
+  return new Promise((resolve) => {
+    const resolvers = roomVisualReadyResolvers.get(roomKey) || [];
+    resolvers.push(resolve);
+    roomVisualReadyResolvers.set(roomKey, resolvers);
+  });
+}
+
+function waitForOrderedPreloadGap(delay = ORDERED_PRELOAD_PHASE_GAP_MS) {
+  return new Promise((resolve) => scheduleLowPriorityGalleryWork(resolve, delay));
+}
+
+function preloadVideoEntryInBackground(entry) {
+  if (entry.element.hasAttribute('src')) return Promise.resolve();
+  return new Promise((resolve) => {
+    const video = entry.element;
+    let settled = false;
+    let timeoutId = 0;
+    const settle = () => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timeoutId);
+      video.removeEventListener('canplay', settle);
+      video.removeEventListener('error', settle);
+      resolve();
+    };
+    video.addEventListener('canplay', settle);
+    video.addEventListener('error', settle);
+    timeoutId = window.setTimeout(settle, 7000);
+    video.preload = 'auto';
+    video.src = entry.source;
+    video.load();
+  });
+}
+
+async function preloadRoomVideosInBackground(roomKey) {
+  if (!allowsSpeculativeVideoPreload()) return;
+  const entries = galleryVideos
+    .filter((entry) => entry.roomKey === roomKey)
+    .sort((a, b) => (b.preloadPriority || 0) - (a.preloadPriority || 0));
+  for (const entry of entries) {
+    if (
+      galleryActive
+      && currentGalleryRoomKey
+      && currentGalleryRoomKey !== roomKey
+      && !roomVisualReadyKeys.has(currentGalleryRoomKey)
+    ) {
+      await waitForRoomVisualsReady(currentGalleryRoomKey);
+    }
+    await preloadVideoEntryInBackground(entry);
+    await waitForOrderedPreloadGap(ORDERED_VIDEO_PRELOAD_GAP_MS);
+  }
+}
+
+async function startFullGalleryBackgroundPreload() {
+  // Begin as soon as the core scene is ready. When this happens before entry,
+  // the loading screen turns otherwise idle time into useful room preparation.
+  // The current-room checks below still take priority once the visitor enters.
+  if (fullGalleryPreloadStarted || !sceneReady) return;
+  fullGalleryPreloadStarted = true;
+  if (currentGalleryRoomKey) fullGalleryPreloadRoomKeys.add(currentGalleryRoomKey);
+  try {
+    // 1. The science/main room is part of the initial loading gate.
+    // 2. Prepare the defense film poster before any secondary-room content.
+    fullGalleryPreloadRoomKeys.add(ROOM_KEYS.screening);
+    startScreeningRoomLoads();
+    await waitForRoomVisualsReady(ROOM_KEYS.screening);
+    await waitForOrderedPreloadGap();
+
+    // 3. App screenshots and video poster frames, without the video files yet.
+    fullGalleryPreloadRoomKeys.add(ROOM_KEYS.app);
+    startResearchRoomLoads();
+    await waitForRoomVisualsReady(ROOM_KEYS.app);
+    await waitForOrderedPreloadGap();
+
+    // 4. Brain-room walls and floor.
+    fullGalleryPreloadRoomKeys.add(ROOM_KEYS.brain);
+    startBrainWallLoads();
+    await waitForRoomVisualsReady(ROOM_KEYS.brain);
+    await waitForOrderedPreloadGap();
+
+    // 5. The cortical surface in the MRI room.
+    await requestBrainSurfaceLoad();
+    await waitForOrderedPreloadGap();
+
+    // 6. Remaining MRI walls and the two embedded video poster frames.
+    fullGalleryPreloadRoomKeys.add(ROOM_KEYS.mri);
+    startMriWallLoads();
+    await waitForRoomVisualsReady(ROOM_KEYS.mri);
+    await waitForOrderedPreloadGap();
+
+    // 7. The two art-room mugs.
+    await startArtRoomMugLoads();
+    await waitForOrderedPreloadGap();
+
+    // 8. App-room video files, one at a time.
+    await preloadRoomVideosInBackground(ROOM_KEYS.app);
+    await waitForOrderedPreloadGap();
+
+    // 9. Game-room content and all video-room poster frames. Game videos may
+    // warm now; video-room files deliberately remain last.
+    fullGalleryPreloadRoomKeys.add(ROOM_KEYS.game);
+    fullGalleryPreloadRoomKeys.add(ROOM_KEYS.videos);
+    startGameRoomLoads();
+    requestVideoRoomLoad();
+    await Promise.all([
+      waitForRoomVisualsReady(ROOM_KEYS.game),
+      waitForRoomVisualsReady(ROOM_KEYS.videos)
+    ]);
+    await preloadRoomVideosInBackground(ROOM_KEYS.game);
+    await waitForOrderedPreloadGap();
+
+    // 10. Everything else in the art room. Approach-resolution walls become
+    // usable first; final 4K tiles then replace them one at a time while idle.
+    fullGalleryPreloadRoomKeys.add(ROOM_KEYS.art);
+    startArtRoomLoads();
+    await waitForRoomVisualsReady(ROOM_KEYS.art);
+    await Promise.all([
+      startArtRoomHdUpgrades(),
+      artRoomPeripheralLoadPromise || Promise.resolve()
+    ]);
+    await waitForOrderedPreloadGap();
+
+    // 11. Video-room files are the final background media phase.
+    await preloadRoomVideosInBackground(ROOM_KEYS.videos);
+  } catch (error) {
+    console.warn('Could not finish the ordered gallery preload.', error);
+  }
 }
 
 function requestBrainSurfaceLoad() {
-  if (brainSurfaceLoadStarted) return;
+  if (brainSurfaceLoadStarted) return brainSurfaceLoadPromise || Promise.resolve();
   brainSurfaceLoadStarted = true;
-  loadBrainSurfaceObject();
+  brainSurfaceLoadPromise = loadBrainSurfaceObject();
+  return brainSurfaceLoadPromise;
 }
 
 function maybeLoadBrainSurface() {
@@ -4291,14 +4833,35 @@ function createHouseRenderWall(textureLoader) {
   );
 }
 
-function addArtWallSheet(sheet, texture) {
+function addArtWallSheet(sheet, texture, tileIndex = 0) {
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  // Approach and final wall tiles both sample their source directly. The
+  // lower-resolution map is replaced in-place once its 4K counterpart loads.
+  texture.minFilter = THREE.LinearFilter;
   texture.magFilter = THREE.LinearFilter;
-  texture.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
+  texture.generateMipmaps = false;
+
+  const tileKey = `${sheet.side}:${tileIndex}`;
+  const existingMaterial = artWallTileMaterials.get(tileKey);
+  if (existingMaterial) {
+    const previousTexture = existingMaterial.map;
+    existingMaterial.map = texture;
+    existingMaterial.needsUpdate = true;
+    if (previousTexture && previousTexture !== texture) previousTexture.dispose();
+    needsRender = true;
+    return;
+  }
 
   const height = ART_ROOM.height;
   const width = height * sheet.aspect;
+  const totalPixelWidth = sheet.tilePixelWidths.reduce((total, value) => total + value, 0);
+  const tilePixelWidth = sheet.tilePixelWidths[tileIndex];
+  const precedingPixelWidth = sheet.tilePixelWidths
+    .slice(0, tileIndex)
+    .reduce((total, value) => total + value, 0);
+  const tileWidth = width * tilePixelWidth / totalPixelWidth;
+  const tileCenterX = -width / 2
+    + width * (precedingPixelWidth + tilePixelWidth / 2) / totalPixelWidth;
   const material = new THREE.MeshBasicMaterial({
     map: texture,
     transparent: true,
@@ -4306,8 +4869,9 @@ function addArtWallSheet(sheet, texture) {
     depthWrite: false,
     toneMapped: false
   });
-  const wallSheet = new THREE.Mesh(new THREE.PlaneGeometry(width, height), material);
-  wallSheet.position.y = height / 2;
+  artWallTileMaterials.set(tileKey, material);
+  const wallSheet = new THREE.Mesh(new THREE.PlaneGeometry(tileWidth, height), material);
+  wallSheet.position.set(tileCenterX, height / 2, 0);
 
   const group = new THREE.Group();
   const roomLeft = ART_ROOM.centerX - ART_ROOM.halfWidth;
@@ -4337,7 +4901,9 @@ function addArtWallSheet(sheet, texture) {
 
 function createArtWallSheets(textureLoader) {
   ART_WALL_SHEETS.forEach((sheet) => {
-    textureLoader.load(sheet.image, (texture) => addArtWallSheet(sheet, texture));
+    sheet.images.forEach((image, tileIndex) => {
+      textureLoader.load(image, (texture) => addArtWallSheet(sheet, texture, tileIndex));
+    });
   });
 }
 
@@ -5815,7 +6381,6 @@ function addMriVideoWork(work) {
     showFocusOutline: false,
     blackOutline: true,
     blackOutlinePadding: 0.1,
-    eagerLoad: true,
     preloadPriority: 92,
     playWhenVisible: true,
     playDistance: 100,
@@ -6000,7 +6565,7 @@ function loadBrainSurfaceObject(manager = null) {
 
   const trackedItem = 'brain-room-surface-object';
   if (manager) manager.itemStart(trackedItem);
-  Promise.all([
+  return Promise.all([
     loadSurface(BRAIN_SOURCES.left),
     loadSurface(BRAIN_SOURCES.right),
     loadSurface(BRAIN_ANNOTATIONS.left),
@@ -6219,148 +6784,137 @@ function playVideoEntry(entry) {
 }
 
 function preloadGalleryVideos() {
-  if (videoPreloadStarted) return;
-  videoPreloadStarted = true;
-  // The final two App Room assets are static MyPhysio displays. Start them
-  // with the video queue so the hallway progress indicator cannot wait at
-  // 12/14 (86%) for a separate camera-proximity trigger.
-  startResearchRoomLoads();
-  const queue = galleryVideos
-    .filter((entry) => !entry.element.hasAttribute('src'))
-    .sort((a, b) => (b.preloadPriority || 0) - (a.preloadPriority || 0));
-  const markComplete = () => {
-    if (galleryVideoPreloadComplete) return;
-    galleryVideoPreloadComplete = true;
-    startVideoRoomLoadIfReady();
-    if (videoRoomDisplaysLoaded) preloadVideoRoomVideos();
-  };
-  const schedule = (callback) => {
-    if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(callback, { timeout: 1200 });
-      return;
-    }
-    window.setTimeout(callback, 140);
+  const roomKey = getGalleryRoomKeyAtCamera();
+  if (currentGalleryRoomKey !== roomKey) {
+    previousGalleryRoomKey = currentGalleryRoomKey;
+    currentGalleryRoomKey = roomKey;
+    speculativeOriginRoomKey = null;
+    speculativeRoomKey = null;
+  }
+  prepareGalleryRoomContent(roomKey);
+}
+
+function shouldContinueRoomVideoSequence(sequence) {
+  if (sequence.stopped || activeRoomVideoSequence !== sequence) return false;
+  if (!sequence.speculative) return currentGalleryRoomKey === sequence.roomKey;
+  return allowsSpeculativeVideoPreload()
+    && speculativeRoomKey === sequence.roomKey
+    && speculativeOriginRoomKey === sequence.originRoomKey
+    && currentGalleryRoomKey === sequence.originRoomKey
+    && isStationaryForSpeculativePreload();
+}
+
+function loadNextRoomVideo(sequence) {
+  sequence.loading = false;
+  if (!shouldContinueRoomVideoSequence(sequence)) return;
+  const entry = galleryVideos
+    .filter((candidate) => (
+      candidate.roomKey === sequence.roomKey
+      && !candidate.element.hasAttribute('src')
+    ))
+    .sort((a, b) => (b.preloadPriority || 0) - (a.preloadPriority || 0))[0];
+  if (!entry) return;
+
+  sequence.loading = true;
+  const video = entry.element;
+  let settled = false;
+  let timeoutId = 0;
+  const settle = () => {
+    if (settled) return;
+    settled = true;
+    sequence.loading = false;
+    window.clearTimeout(timeoutId);
+    video.removeEventListener('canplay', settle);
+    video.removeEventListener('error', settle);
+    if (!shouldContinueRoomVideoSequence(sequence)) return;
+    scheduleLowPriorityGalleryWork(() => loadNextRoomVideo(sequence), 260);
   };
 
-  // Keep video prefetch from competing with the first room render. These are
-  // intentionally background downloads; one-at-a-time is slower overall but
-  // makes the gallery responsive while the queue is warming up.
-  const maximumConcurrentLoads = 1;
-  let activeLoads = 0;
-  if (!queue.length) {
-    markComplete();
+  video.addEventListener('canplay', settle);
+  video.addEventListener('error', settle);
+  timeoutId = window.setTimeout(settle, 7000);
+  video.preload = 'auto';
+  video.src = entry.source;
+  video.load();
+}
+
+function prepareRoomVideosSequentially(
+  roomKey,
+  { speculative = false, originRoomKey = null } = {}
+) {
+  if (speculative && !allowsSpeculativeVideoPreload()) return;
+  if (activeRoomVideoSequence?.roomKey === roomKey) {
+    activeRoomVideoSequence.speculative = speculative;
+    activeRoomVideoSequence.originRoomKey = originRoomKey;
+    activeRoomVideoSequence.stopped = false;
+    if (!activeRoomVideoSequence.loading) loadNextRoomVideo(activeRoomVideoSequence);
     return;
   }
 
-  const loadNext = () => {
-    while (activeLoads < maximumConcurrentLoads && queue.length) {
-      const entry = queue.shift();
-      const video = entry.element;
-      activeLoads += 1;
-
-      let settled = false;
-      let timeoutId = 0;
-      const settle = () => {
-        if (settled) return;
-        settled = true;
-        markAppRoomAssetReady(entry.source);
-        window.clearTimeout(timeoutId);
-        video.removeEventListener('canplay', settle);
-        video.removeEventListener('error', settle);
-        activeLoads -= 1;
-        if (!queue.length && activeLoads === 0) markComplete();
-        window.setTimeout(() => schedule(loadNext), 650);
-      };
-
-      video.addEventListener('canplay', settle);
-      video.addEventListener('error', settle);
-      timeoutId = window.setTimeout(settle, 7000);
-      video.preload = 'auto';
-      if (!video.hasAttribute('src')) video.src = entry.source;
-      video.load();
-    }
+  if (activeRoomVideoSequence) activeRoomVideoSequence.stopped = true;
+  activeRoomVideoSequence = {
+    roomKey,
+    speculative,
+    originRoomKey,
+    loading: false,
+    stopped: false
   };
+  loadNextRoomVideo(activeRoomVideoSequence);
+}
 
-  schedule(loadNext);
+function maybePrepareNewVideoEntry(entry) {
+  if (!galleryActive || !entry.roomKey) return;
+  if (currentGalleryRoomKey === entry.roomKey) {
+    prepareRoomVideosSequentially(entry.roomKey);
+  }
 }
 
 function requestVideoRoomLoad() {
-  if (videoRoomLoadRequested || !galleryActive || !sceneReady || !gameRoomKiosksReady) return;
+  if (!sceneReady) return;
+  if (!galleryActive && !fullGalleryPreloadRoomKeys.has(ROOM_KEYS.videos)) return;
   videoRoomLoadRequested = true;
   startVideoRoomLoadIfReady();
 }
 
-function preloadVideoRoomVideos() {
-  if (videoRoomVideosPreloadStarted) return;
-  const queue = [...videoRoomEntries];
-  if (!queue.length) return;
-  videoRoomVideosPreloadStarted = true;
-  let index = 0;
-  const schedule = (callback) => {
-    if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(callback, { timeout: 2500 });
-      return;
-    }
-    window.setTimeout(callback, 300);
-  };
-  const loadNext = () => {
-    const entry = queue[index++];
-    if (!entry) return;
-    const video = entry.element;
-    if (video.hasAttribute('src')) {
-      schedule(loadNext);
-      return;
-    }
-    let settled = false;
-    let timeoutId = 0;
-    const settle = () => {
-      if (settled) return;
-      settled = true;
-      window.clearTimeout(timeoutId);
-      video.removeEventListener('canplay', settle);
-      video.removeEventListener('error', settle);
-      schedule(loadNext);
-    };
-    video.addEventListener('canplay', settle);
-    video.addEventListener('error', settle);
-    timeoutId = window.setTimeout(settle, 6000);
-    video.preload = 'auto';
-    video.src = entry.source;
-    video.load();
-  };
-  schedule(loadNext);
-}
-
 function startVideoRoomLoadIfReady() {
-  if (!videoRoomLoadRequested || videoRoomDisplaysLoaded) return;
-  videoRoomDisplaysLoaded = true;
-  const start = () => {
-    const textureLoader = new THREE.TextureLoader();
-    let remaining = VIDEO_ROOM_WORKS.length;
-    const finishDisplay = () => {
-      remaining -= 1;
-      if (remaining === 0 && galleryVideoPreloadComplete) preloadVideoRoomVideos();
-    };
-    VIDEO_ROOM_WORKS.forEach((work) => {
-      textureLoader.load(
-        `${work.posterImage}?v=${VIDEO_ROOM_POSTER_VERSION}`,
-        (texture) => {
-          addVideoWork(work, texture);
-          finishDisplay();
-        },
-        undefined,
-        () => {
-          addVideoWork(work, createVideoPlaceholderTexture());
-          finishDisplay();
-        }
-      );
-    });
-  };
-  if ('requestIdleCallback' in window) {
-    window.requestIdleCallback(start, { timeout: 3000 });
-  } else {
-    window.setTimeout(start, 900);
+  if (!videoRoomLoadRequested) return;
+  if (videoRoomDisplaysLoaded) {
+    roomLoadControllers.get(ROOM_KEYS.videos)?.resume();
+    return;
   }
+  videoRoomDisplaysLoaded = true;
+  const textureLoader = new THREE.TextureLoader();
+  let remaining = VIDEO_ROOM_WORKS.length;
+  const finishDisplay = () => {
+    remaining -= 1;
+    if (remaining === 0) {
+      markRoomVisualsReady(ROOM_KEYS.videos);
+      prepareDeferredRoomVideos(ROOM_KEYS.videos);
+    }
+  };
+  const jobs = VIDEO_ROOM_WORKS.map((work) => () => {
+    textureLoader.load(
+      work.posterImage,
+      (texture) => {
+        addVideoWork(work, texture);
+        finishDisplay();
+      },
+      undefined,
+      () => {
+        addVideoWork(work, createVideoPlaceholderTexture());
+        finishDisplay();
+      }
+    );
+  });
+  roomLoadControllers.set(
+    ROOM_KEYS.videos,
+    scheduleLowPriorityGallerySequence(
+      jobs,
+      0,
+      300,
+      () => isRoomPreparationAllowed(ROOM_KEYS.videos)
+    )
+  );
 }
 
 function primeShrimpRoomMusic() {
@@ -6383,7 +6937,7 @@ function primeShrimpRoomMusic() {
       track.pause();
       track.muted = false;
     });
-    shrimpMusicPlayBlocked = true;
+    shrimpMusicPlayBlocked = false;
   });
 }
 
@@ -6434,39 +6988,19 @@ function pauseShrimpRoomMusic() {
 
 function hideSoundReminder() {
   soundReminder.hidden = true;
-  if (soundReminderHideTimer) window.clearTimeout(soundReminderHideTimer);
-  soundReminderHideTimer = 0;
 }
 
 function getSoundReminderZone() {
   if (!galleryActive || insideHouseWorld) return null;
-  if (isCameraInsideRoom(GAME_ROOM, 0.15)) return 'game-room';
-  if (isCameraInsideRoom(VIDEOS_ROOM, 0.15)) return 'video-room';
+  if (isCameraInsideRoom(GAME_ROOM, 0.15)) return ROOM_KEYS.game;
+  if (isCameraInsideRoom(VIDEOS_ROOM, 0.15)) return ROOM_KEYS.videos;
 
-  const nearHouseRainDisplay = isCameraInsideRoom(ART_ROOM, 0.15)
-    && Math.hypot(
-      camera.position.x - HOUSE_RAIN_DISPLAY.x,
-      camera.position.z - HOUSE_RAIN_DISPLAY.z
-    ) <= HOUSE_RAIN_DISPLAY.interactionRadius + 0.8;
-  return nearHouseRainDisplay ? 'house-rain-display' : null;
+  const lookingAtHouseRainDisplay = focusedManualVideo?.source === HOUSE_RAIN_DISPLAY.source;
+  return lookingAtHouseRainDisplay ? 'house-rain-display' : null;
 }
 
-function updateSoundReminder(now) {
-  const nextZone = getSoundReminderZone();
-  if (nextZone !== soundReminderZone) {
-    hideSoundReminder();
-    soundReminderZone = nextZone;
-    soundReminderZoneEnteredAt = now;
-  }
-  if (!nextZone || soundReminderSeenZones.has(nextZone)) return;
-  if (now - soundReminderZoneEnteredAt < 1400) return;
-
-  soundReminderSeenZones.add(nextZone);
-  soundReminder.hidden = false;
-  soundReminderHideTimer = window.setTimeout(() => {
-    soundReminder.hidden = true;
-    soundReminderHideTimer = 0;
-  }, 8000);
+function updateSoundReminder() {
+  soundReminder.hidden = !getSoundReminderZone();
 }
 
 function syncGalleryVideos(entries = galleryVideos) {
@@ -6671,7 +7205,7 @@ function addVideoWork(work, posterTexture) {
   const video = document.createElement('video');
   video.className = 'gallery-video-source';
   if (work.posterImage) video.poster = work.posterImage;
-  video.preload = work.eagerLoad ? 'auto' : 'none';
+  video.preload = 'none';
   video.loop = true;
   video.muted = true;
   video.defaultMuted = true;
@@ -6682,29 +7216,6 @@ function addVideoWork(work, posterTexture) {
   video.setAttribute('aria-hidden', 'true');
   video.setAttribute('playsinline', '');
   document.body.appendChild(video);
-
-  if (APP_ROOM_LOADING_ASSETS.has(work.source)) {
-    let appRoomMediaSettled = false;
-    const markAppRoomMediaReady = () => {
-      if (appRoomMediaSettled) return;
-      appRoomMediaSettled = true;
-      markAppRoomAssetReady(work.source);
-    };
-    video.addEventListener('canplay', markAppRoomMediaReady, { once: true });
-    video.addEventListener('error', markAppRoomMediaReady, { once: true });
-  }
-
-  if (INITIAL_WARMUP_VIDEO_SOURCES.has(work.source)) {
-    let settled = false;
-    const markWarmupVideoReady = () => {
-      if (settled) return;
-      settled = true;
-      initialWarmupVideoPending.delete(work.source);
-      if (!initialWarmupVideoPending.size) initialWarmupVideoResolve();
-    };
-    video.addEventListener('canplay', markWarmupVideoReady, { once: true });
-    video.addEventListener('error', markWarmupVideoReady, { once: true });
-  }
 
   const videoTexture = new THREE.VideoTexture(video);
   videoTexture.colorSpace = THREE.SRGBColorSpace;
@@ -6725,6 +7236,7 @@ function addVideoWork(work, posterTexture) {
     playDistance: work.playDistance || 6,
     requireFocusForPlayback: Boolean(work.requireFocusForPlayback),
     preloadPriority: work.preloadPriority || 0,
+    roomKey: work.roomKey,
     position: new THREE.Vector3(...work.position),
     screen,
     focusOutline,
@@ -6763,23 +7275,13 @@ function addVideoWork(work, posterTexture) {
     needsRender = true;
   });
 
-  let wallLabelAdded = false;
-  const addWallLabelAfterVideoLoad = () => {
-    if (wallLabelAdded || work.showLabel === false) return;
-    wallLabelAdded = true;
-    addWallLabel(group, work, height);
-  };
-  video.addEventListener('loadeddata', addWallLabelAfterVideoLoad, { once: true });
+  if (work.showLabel !== false) addWallLabel(group, work, height);
 
   screen.userData.videoEntry = entry;
   videoMeshes.push(screen);
   galleryVideos.push(entry);
   if (work.videoRoom) videoRoomEntries.push(entry);
-  if (work.eagerLoad || (videoPreloadStarted && !work.deferVideoLoad)) {
-    video.preload = 'auto';
-    video.src = entry.source;
-    video.load();
-  }
+  maybePrepareNewVideoEntry(entry);
   scene.add(group);
   if (galleryActive) {
     if (entry.autoplayOnEntry) playVideoEntry(entry);
@@ -6866,7 +7368,7 @@ function addWallLabel(group, poster, posterHeight) {
   const context = labelCanvas.getContext('2d');
 
   context.textBaseline = 'top';
-  context.fillStyle = '#17191a';
+  context.fillStyle = poster.labelColor || '#17191a';
   if (showCategory) {
     context.font = '700 34px Arial, Helvetica, sans-serif';
     context.fillText(poster.category.toUpperCase(), 18, 18);
@@ -6876,7 +7378,7 @@ function addWallLabel(group, poster, posterHeight) {
     titleLines.forEach((line, index) => context.fillText(line, 18, 68 + index * 58));
 
     if (poster.showMeta !== false) {
-      context.fillStyle = '#34383a';
+      context.fillStyle = poster.labelMetaColor || '#34383a';
       context.font = '400 36px Arial, Helvetica, sans-serif';
       const meta = poster.labelMeta || poster.authors;
       const metaLines = wrapLabelText(context, meta, 1564, 2);
@@ -6888,7 +7390,7 @@ function addWallLabel(group, poster, posterHeight) {
     titleLines.forEach((line, index) => context.fillText(line, 18, 20 + index * 72));
 
     if (poster.showMeta !== false) {
-      context.fillStyle = '#34383a';
+      context.fillStyle = poster.labelMetaColor || '#34383a';
       context.font = '400 48px Arial, Helvetica, sans-serif';
       const subtitle = poster.labelMeta || poster.authors;
       const subtitleLines = wrapLabelText(context, subtitle, 1564, 2);
@@ -7176,15 +7678,12 @@ function animate(now) {
   const delta = Math.min((now - lastFrame) / 1000, 0.05);
   lastFrame = now;
   const moved = updateMovement(delta);
-  updateAppRoomLoadingIndicator(delta);
   const portalAnimated = updateHomePortalEffects(now);
-  maybeStartRoomBackgroundPreloads();
   maybeLoadNearbyRoomContent();
-  maybeLoadBrainSurface();
-  requestVideoRoomLoad();
+  maybeStartRoomBackgroundPreloads(now);
   syncFocusLockedVideos();
   updateShrimpRoomMusic(delta);
-  updateSoundReminder(now);
+  updateSoundReminder();
   flushVideoSync(now);
   const focusChanged = updateFocusedPoster();
   refreshFocusedVideoTime();
@@ -7229,51 +7728,106 @@ function warmInitialCamera() {
   needsRender = true;
 }
 
+function warmPreparedRoomCameras() {
+  if (!renderer || !scene || !camera || galleryActive) return;
+
+  const originalPosition = camera.position.clone();
+  const originalQuaternion = camera.quaternion.clone();
+  const yawAxis = new THREE.Vector3(0, 1, 0);
+  const yawQuaternion = new THREE.Quaternion();
+  const roomKeysToWarm = new Set([ROOM_KEYS.main, ...roomVisualReadyKeys]);
+  const warmupYawOffsets = [0, Math.PI / 2, Math.PI, -Math.PI / 2];
+
+  GALLERY_ROOM_AREAS.forEach(({ key, room }) => {
+    if (!roomKeysToWarm.has(key)) return;
+    camera.position.set(
+      room.centerX,
+      Math.min(STANDING_EYE_HEIGHT, ROOM.height / 2),
+      (room.nearZ + room.farZ) / 2
+    );
+    warmupYawOffsets.forEach((offset) => {
+      yawQuaternion.setFromAxisAngle(yawAxis, offset);
+      camera.quaternion.copy(yawQuaternion);
+      camera.updateMatrixWorld();
+      renderer.compile(scene, camera);
+      renderer.render(scene, camera);
+    });
+  });
+
+  camera.position.copy(originalPosition);
+  camera.quaternion.copy(originalQuaternion);
+  camera.updateMatrixWorld();
+  needsRender = true;
+}
+
 function animateLoadingProgress() {
   if (loadingProgressAnimation) return;
   const tick = () => {
-    const remaining = loadingProgressTarget - loadingDisplayProgress;
-    if (remaining <= 0.05) {
-      loadingDisplayProgress = loadingProgressTarget;
-      loadingBar.style.width = `${loadingDisplayProgress}%`;
-      loadingStatus.textContent = `${Math.round(loadingDisplayProgress)}%`;
-      loadingProgressAnimation = 0;
-      return;
-    }
-    loadingDisplayProgress += Math.max(0.18, remaining * 0.055);
-    loadingBar.style.width = `${Math.min(100, loadingDisplayProgress)}%`;
+    const elapsed = Math.max(0, performance.now() - initialLoadingStartedAt);
+    const gateRatio = Math.min(1, elapsed / INITIAL_LOADING_MIN_DURATION_MS);
+    // Move steadily from 0–96% across the useful four-second preload gate.
+    // If real asset work takes longer, continue creeping toward 99% instead
+    // of displaying a frozen percentage while still reserving 100% for ready.
+    const timedProgress = gateRatio < 1
+      ? gateRatio * 96
+      : 96 + 3 * (1 - Math.exp(-(elapsed - INITIAL_LOADING_MIN_DURATION_MS) / 3000));
+    loadingDisplayProgress = Math.max(loadingDisplayProgress, Math.min(99, timedProgress));
+    loadingBar.style.width = `${loadingDisplayProgress}%`;
     loadingStatus.textContent = `${Math.round(loadingDisplayProgress)}%`;
     loadingProgressAnimation = window.requestAnimationFrame(tick);
   };
   loadingProgressAnimation = window.requestAnimationFrame(tick);
 }
 
-function setLoadingProgressTarget(target) {
-  loadingProgressTarget = Math.max(loadingProgressTarget, Math.min(100, target));
-  animateLoadingProgress();
-}
-
 function completeInitialLoading() {
   sceneReady = true;
-  setLoadingProgressTarget(100);
-  loadingStatus.textContent = '100%';
-  // Warm the initial room from several yaw angles only after the two eager
-  // videos have reached a playable state, so their video textures are included.
+  queueGalleryMiniatureRefreshes();
+  // Start the ordered secondary-room queue while the minimum loading gate is
+  // still visible. Large video files retain their later positions in the queue.
+  startFullGalleryBackgroundPreload();
+  // Compile the poster-only initial room while the preload queue gets started.
   warmInitialCamera();
+
+  const elapsed = performance.now() - initialLoadingStartedAt;
+  const remaining = Math.max(0, INITIAL_LOADING_MIN_DURATION_MS - elapsed);
+  // Perform the heavier multi-room render shortly before the gate ends so it
+  // is included in the requested wait instead of extending it afterward.
   window.setTimeout(() => {
-    warmInitialCamera();
-    loadingScreen.hidden = true;
-    showWelcome('initial');
-  }, 220);
+    warmPreparedRoomCameras();
+  }, Math.max(0, remaining - 650));
+  window.setTimeout(() => {
+    if (loadingProgressAnimation) {
+      window.cancelAnimationFrame(loadingProgressAnimation);
+      loadingProgressAnimation = 0;
+    }
+    loadingDisplayProgress = 100;
+    loadingBar.style.width = '100%';
+    loadingStatus.textContent = '100%';
+    window.setTimeout(() => {
+      loadingScreen.hidden = true;
+      showWelcome('initial');
+    }, 220);
+  }, remaining);
 }
 
 function finishLoading() {
-  if (initialWarmupVideoPending.size) {
-    setLoadingProgressTarget(96);
-    initialWarmupVideosReady.then(completeInitialLoading);
-    return;
-  }
   completeInitialLoading();
+}
+
+function getInitialVideoPosterImages() {
+  const mriVideoPosterSheets = MRI_VIDEO_WORKS
+    .map((work) => MRI_WALL_SHEETS.find((sheet) => sheet.side === work.side)?.image)
+    .filter(Boolean);
+  return [...new Set([
+    videoWork.posterImage,
+    defenseScreeningWork.posterImage,
+    ...appDemoWorks.map((work) => work.posterImage),
+    ...myPhysioVideoWorks.map((work) => work.posterImage),
+    ...GAME_DISPLAY_WORKS.map((work) => work.posterImage),
+    ...VIDEO_ROOM_WORKS.map((work) => work.posterImage),
+    HOUSE_RAIN_DISPLAY.posterImage,
+    ...mriVideoPosterSheets
+  ].filter(Boolean))];
 }
 
 function showMobileFallback() {
@@ -7297,7 +7851,7 @@ function enableDragLookFallback() {
   if (!galleryActive || controls?.isLocked) return;
   dragLookEnabled = true;
   galleryApp.classList.add('drag-look');
-    walkHint.textContent = 'WASD move   Mouse to look   Left/right arrows skip a focused video by 5 sec   Space/up jump   Down crouch';
+    setWalkHint();
   needsRender = true;
 }
 
@@ -7314,13 +7868,14 @@ function enterGallery() {
   });
   primeShrimpRoomMusic();
   preloadGalleryVideos();
+  startFullGalleryBackgroundPreload();
   if (insideHouseWorld) pauseGalleryVideos();
   else playAutoplayOnEntryVideos();
   requestVideoSync();
   scheduleLowPriorityGalleryWork(() => startMainRoomBackgroundLoads(), 700);
   dragLookEnabled = false;
   galleryApp.classList.remove('drag-look', 'dragging-view');
-  walkHint.textContent = 'WASD move   Mouse to look   Left/right arrows skip a focused video by 5 sec   Space/up jump   Down crouch';
+  setWalkHint();
   pressedKeys.clear();
   resetPlayerHeight();
   hideWelcome();
@@ -7380,7 +7935,18 @@ function initializeGallery() {
   camera = new THREE.PerspectiveCamera(67, window.innerWidth / window.innerHeight, 0.08, 100);
   camera.position.set(0.8, ROOM.height / 2, 1.5);
   camera.lookAt(9.36, ROOM.height / 2, 0.2);
-  if (previewParams.has('brain-preview')) {
+  if (previewParams.has('house-rain-preview')) {
+    camera.position.set(
+      HOUSE_RAIN_DISPLAY.x + 3.2,
+      STANDING_EYE_HEIGHT,
+      HOUSE_RAIN_DISPLAY.z
+    );
+    camera.lookAt(
+      HOUSE_RAIN_DISPLAY.x,
+      (HOUSE_RAIN_DISPLAY.positionY ?? 0) + HOUSE_RAIN_DISPLAY.screenY,
+      HOUSE_RAIN_DISPLAY.z
+    );
+  } else if (previewParams.has('brain-preview')) {
     const brainCenterZ = (EMPTY_GAME_ROOM.nearZ + EMPTY_GAME_ROOM.farZ) / 2;
     camera.position.set(EMPTY_GAME_ROOM.centerX, 2.4, EMPTY_GAME_ROOM.nearZ + 2.2);
     camera.lookAt(EMPTY_GAME_ROOM.centerX, 0.9, brainCenterZ);
@@ -7399,13 +7965,14 @@ function initializeGallery() {
     galleryActive = true;
     primeShrimpRoomMusic();
     preloadGalleryVideos();
+    startFullGalleryBackgroundPreload();
     if (insideHouseWorld) pauseGalleryVideos();
     else playAutoplayOnEntryVideos();
     requestVideoSync();
     scheduleLowPriorityGalleryWork(() => startMainRoomBackgroundLoads(), 700);
     dragLookEnabled = false;
     galleryApp.classList.remove('drag-look', 'dragging-view');
-    walkHint.textContent = 'WASD move   Mouse to look   Left/right arrows skip a focused video by 5 sec   Space/up jump   Down crouch';
+    setWalkHint();
     pressedKeys.clear();
     resetPlayerHeight();
     hideWelcome();
@@ -7450,42 +8017,24 @@ function initializeGallery() {
   createRoom();
   createHomePortalSurface();
   createHouseWorldShell();
-  if (previewParams.has('home-world-preview') || previewParams.has('home-transition-preview')) {
+  if (
+    previewParams.has('home-world-preview')
+    || previewParams.has('home-transition-preview')
+    || previewParams.has('house-rain-preview')
+  ) {
     startArtRoomLoads();
   }
-  // MRI wall videos use the marked rectangles in the corresponding PDF
-  // artboards. They are eager-loaded and follow the normal camera-visible
-  // autoplay rule, without requiring interaction range.
-  MRI_VIDEO_WORKS.forEach((work) => addMriVideoWork(work));
-
   const manager = new THREE.LoadingManager();
-  manager.onProgress = (_url, loaded, total) => {
-    // Keep the progress display readable when the first few small assets
-    // finish together. The final stretch is reserved for the actual manager
-    // completion, so it does not jump to 26/28 and then appear frozen.
-    const percentage = 8 + (loaded / Math.max(1, total)) * 82;
-    setLoadingProgressTarget(percentage);
-    loadingStatus.textContent = `${Math.round(loadingDisplayProgress)}%`;
-  };
   manager.onLoad = finishLoading;
   manager.onError = () => {
     loadingStatus.textContent = `${Math.round(loadingDisplayProgress)}%`;
   };
 
-  // Move the visual progress off the static CSS starting point as soon as
-  // the core scene and manager exist, before the first texture finishes.
-  setLoadingProgressTarget(6);
-  loadingStatus.textContent = '6%';
+  // The visible progress follows the useful preload window rather than cached
+  // request bursts, so it keeps moving smoothly even on repeat visits.
+  animateLoadingProgress();
 
   const textureLoader = new THREE.TextureLoader(manager);
-  [defenseScreeningWork, ...appDemoWorks, ...myPhysioVideoWorks].forEach((work) => {
-    textureLoader.load(
-      work.posterImage,
-      (texture) => addVideoWork(work, texture),
-      undefined,
-      () => addVideoWork(work, createVideoPlaceholderTexture())
-    );
-  });
   posters.forEach((poster) => {
     textureLoader.load(poster.wallImage, (texture) => addPoster(poster, texture));
   });
@@ -7501,20 +8050,14 @@ function initializeGallery() {
     mainRoomLoadedImages.add(cluster.image);
     textureLoader.load(cluster.image, (texture) => addFigureCluster(cluster, texture));
   });
-  // These are the first visible Art-room assets. Gate them with the initial
-  // loading screen, then let the rest of the Art room continue in background.
-  MUG_DISPLAYS.forEach((config) => {
-    artRoomLoadedImages.add(config.texture);
-    textureLoader.load(config.texture, (texture) => createMugDisplay(texture, config));
-  });
-  const initialTshirtWallSheet = ART_WALL_SHEETS.find((sheet) => sheet.side === 'far');
-  if (initialTshirtWallSheet) {
-    artRoomLoadedImages.add(initialTshirtWallSheet.image);
-    textureLoader.load(
-      initialTshirtWallSheet.image,
-      (texture) => addArtWallSheet(initialTshirtWallSheet, texture)
-    );
-  }
+  // Cache every film/demo poster before the visitor can enter. Room loaders
+  // can then place their screens immediately, while the much larger video
+  // files remain in the ordered post-entry queue.
+  getInitialVideoPosterImages()
+    .filter((image) => image !== videoWork.posterImage)
+    .forEach((image) => {
+      textureLoader.load(image, (texture) => texture.dispose(), undefined, () => {});
+    });
   textureLoader.load(videoWork.posterImage, (texture) => addVideoWork(videoWork, texture));
   resize();
   window.addEventListener('resize', resize, { passive: true });
@@ -7698,4 +8241,5 @@ window.addEventListener('beforeunload', () => {
   renderer?.dispose();
 });
 
+setWalkHint();
 initializeGallery();

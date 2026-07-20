@@ -48,7 +48,7 @@ Puti builds AI-assisted clinical tools, MRI and neuroimaging pipelines, scientif
 - Problem: tractography quality control for 100+ subjects, 20+ tracts, and 10 iterated versions per subject was being completed file by file.
 - Contribution: Puti built an interactive 3D web application with side-by-side comparisons, per-subject navigation, and color-coded availability indicators.
 - Research relevance: the tool supports scalable white-matter tractography quality control.
-- Demo: [interactive tractography visualization](https://putiw.github.io/gallery/media/mri-afqview.mp4).
+- Demo: [interactive tractography visualization](https://putiw.github.io/gallery/media/mri-afqview-hd.mp4).
 
 ### [Interactive 3D portfolio](https://putiw.github.io/)
 

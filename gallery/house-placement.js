@@ -28,11 +28,11 @@ const RAIN_SCREEN_HEIGHT = RAIN_SCREEN_WIDTH / (16 / 9);
 const RAIN_PHOTO_WIDTH = 1.06;
 const RAIN_PHOTO_HEIGHT = RAIN_PHOTO_WIDTH / (4 / 3);
 const ART_WALL_SHEETS = [
-  { image: './art/walls/home.png?v=20260717-1915', aspect: 4631 / 1867, side: 'near-left' },
-  { image: './art/walls/others-apartment-updated.png?v=20260718-apartment-pdf-transparent', aspect: 7478 / 1867, side: 'left' },
-  { image: './art/walls/art-south-updated.png?v=20260719-art-south-artboard3-transparent6', aspect: 8068 / 1494, side: 'far' },
-  { image: './art/walls/sick-black-and-white.png?v=20260717-1915', aspect: 7478 / 1867, side: 'right' },
-  { image: './art/walls/final-wall.png?v=20260717-1915', aspect: 4631 / 1867, side: 'near-right' }
+  { image: './art/walls/home.webp?v=20260720-webp1', aspect: 4631 / 1867, side: 'near-left' },
+  { image: './art/walls/others-apartment-updated.webp?v=20260720-webp1', aspect: 7478 / 1867, side: 'left' },
+  { image: './art/walls/art-south-updated.webp?v=20260720-webp1', aspect: 8068 / 1494, side: 'far' },
+  { image: './art/walls/sick-black-and-white.webp?v=20260720-webp1', aspect: 7478 / 1867, side: 'right' },
+  { image: './art/walls/final-wall.webp?v=20260720-webp1', aspect: 4631 / 1867, side: 'near-right' }
 ];
 
 const SEMANTIC_HOUSE_GROUPS = [
