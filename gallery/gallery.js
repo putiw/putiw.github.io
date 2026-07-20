@@ -211,6 +211,13 @@ const videoWork = {
   position: [9.36, 3.15, -2.55],
   rotationY: -Math.PI / 2,
   roomKey: ROOM_KEYS.main,
+  autoplayInBounds: true,
+  activationBounds: {
+    minX: -ROOM.halfWidth - 0.5,
+    maxX: ROOM.halfWidth + 0.5,
+    minZ: -ROOM.halfDepth - 0.5,
+    maxZ: ROOM.halfDepth + 0.5
+  },
   playWhenVisible: true,
   playDistance: 12,
   interactionRadius: 7
@@ -451,8 +458,17 @@ const HOUSE_DISPLAY = {
   plinthHeight: 1.25
 };
 const HOUSE_POND = {
-  centerX: 23.79,
-  centerZ: 2.71,
+  // Measurements from childhood-house-pond.glb, normalized around the same
+  // house origin used by prepareHouseModel. Keeping these source dimensions
+  // lets the lake inherit the house placement without losing its OG ratio.
+  centerX: 23.861792347598647,
+  centerZ: 2.460796638391791,
+  width: 16.441970825195312,
+  depth: 20.82552657279642,
+  outlineCenterX: 0.1,
+  outlineCenterZ: 0.2,
+  outlineWidth: 15.8,
+  outlineDepth: 19.8,
   waterLevel: -0.004,
   outline: [
     [-7.8, -2.2], [-6.4, -7.1], [-2.2, -9.7], [2.5, -9.4],
@@ -484,31 +500,68 @@ const HOME_FLOOR_ARROW = {
 };
 const ART_ROOM_FLOOR_COLOR = 0xaaa397;
 const HOUSE_WORLD_LAYER = 1;
-const HOUSE_WORLD_EYE_HEIGHT = 1.68;
+const HOUSE_WORLD_PLAYER_SCALE = 1 / 1.5;
+const HOUSE_WORLD_EYE_HEIGHT = 1.68 * HOUSE_WORLD_PLAYER_SCALE;
+const HOUSE_WORLD_MODEL_PLACEMENT = Object.freeze({
+  x: 0,
+  // Equivalent to the original -0.51 offset after removing the 1.5x model
+  // scale: -0.51 / 1.5 = -0.34.
+  y: -0.34,
+  z: 0,
+  scale: 1
+});
+
+function houseLocalToWorldX(x) {
+  return HOUSE_WORLD_MODEL_PLACEMENT.x + x * HOUSE_WORLD_MODEL_PLACEMENT.scale;
+}
+
+function houseLocalToWorldY(y) {
+  return HOUSE_WORLD_MODEL_PLACEMENT.y + y * HOUSE_WORLD_MODEL_PLACEMENT.scale;
+}
+
+function houseLocalToWorldZ(z) {
+  return HOUSE_WORLD_MODEL_PLACEMENT.z + z * HOUSE_WORLD_MODEL_PLACEMENT.scale;
+}
+
+function houseWorldToLocalX(x) {
+  return (x - HOUSE_WORLD_MODEL_PLACEMENT.x) / HOUSE_WORLD_MODEL_PLACEMENT.scale;
+}
+
+function houseWorldToLocalZ(z) {
+  return (z - HOUSE_WORLD_MODEL_PLACEMENT.z) / HOUSE_WORLD_MODEL_PLACEMENT.scale;
+}
+
 const HOUSE_WORLD = {
   // The grouped Blender export is already authored in metres. Preserve its
   // measured 28.27 m width so the exterior reads at human scale.
   modelWidth: 28.27074351296743,
-  minX: -48,
-  maxX: 48,
-  minZ: -40,
-  maxZ: 32,
+  minX: houseLocalToWorldX(-48),
+  maxX: houseLocalToWorldX(48),
+  minZ: houseLocalToWorldZ(-40),
+  maxZ: houseLocalToWorldZ(32),
   // Run the portal approach directly into the foot of the main stone stairs,
   // centered between its two floor lamps. Enter on the house-facing side of
   // the frame, still well outside the building footprint.
-  portalX: 34.5,
-  portalZ: 5.225,
+  portalX: houseLocalToWorldX(34.5),
+  portalZ: houseLocalToWorldZ(5.225),
   portalRotationY: Math.PI / 2,
-  portalTriggerX: 33.95,
-  arrival: new THREE.Vector3(33.15, HOUSE_WORLD_EYE_HEIGHT, 5.225),
-  stairPathStartX: 14.25,
-  pathWidth: 3.4,
-  maxStepUp: 0.8,
+  portalTriggerX: houseLocalToWorldX(33.95),
+  arrival: new THREE.Vector3(
+    houseLocalToWorldX(33.15),
+    HOUSE_WORLD_EYE_HEIGHT,
+    houseLocalToWorldZ(5.225)
+  ),
+  stairPathStartX: houseLocalToWorldX(14.25),
+  pathWidth: 3.4 * HOUSE_WORLD_MODEL_PLACEMENT.scale,
+  maxStepUp: 0.8 * HOUSE_WORLD_PLAYER_SCALE,
   // The front platform is about one metre high: it is safe to drop from, but
   // remains too tall to climb or jump onto from the surrounding ground.
-  maxStepDown: 1.25,
-  playerRadius: 0.29
+  maxStepDown: 1.25 * HOUSE_WORLD_PLAYER_SCALE,
+  playerRadius: 0.29 * HOUSE_WORLD_PLAYER_SCALE
 };
+const HOUSE_WORLD_MOVE_SPEED = 4.35 * HOUSE_WORLD_PLAYER_SCALE;
+const HOUSE_WORLD_MOVE_SUBSTEP = 0.08 * HOUSE_WORLD_PLAYER_SCALE;
+const HOUSE_WORLD_AUTO_DROP_THRESHOLD = 0.45 * HOUSE_WORLD_PLAYER_SCALE;
 const HOUSE_COLOR_PRESET = {
   metal: '#8d949a',
   glass: '#dfded8',
@@ -845,48 +898,48 @@ const myPhysioVideoWorks = [
     title: 'App Welcome',
     category: 'Demo 1',
     labelMeta: 'Launches MyPhysio and introduces the patient experience.',
-    source: './media/myphysio-01-app-welcome.mp4',
+    source: './media/myphysio-01-app-welcome.mp4?v=20260720-balanced1',
     positionZ: 12.35
   },
   {
     title: "Today's Exercise Plan",
     category: 'Demo 2',
     labelMeta: 'Shows the exercises assigned for the day.',
-    source: './media/myphysio-02-daily-exercise.mp4',
+    source: './media/myphysio-02-daily-exercise.mp4?v=20260720-balanced1',
     positionZ: 14.7
   },
   {
     title: 'Guided Workout Tracker',
     category: 'Demo 3',
     labelMeta: 'Follows the patient through an exercise session.',
-    source: './media/myphysio-03-workout-tracker.mp4',
+    source: './media/myphysio-03-workout-tracker.mp4?v=20260720-balanced1',
     positionZ: 17.05
   },
   {
     title: 'Pain & Discomfort Diary',
     category: 'Demo 4',
     labelMeta: 'Records pain and discomfort over time.',
-    source: './media/myphysio-04-pain-diary.mp4',
+    source: './media/myphysio-04-pain-diary.mp4?v=20260720-balanced1',
     positionZ: 19.4
   },
   {
     title: 'Range-of-Motion Diary',
     category: 'Demo 5',
     labelMeta: 'Logs and tracks patient range of motion.',
-    source: './media/myphysio-05-rom-diary.mp4',
+    source: './media/myphysio-05-rom-diary.mp4?v=20260720-balanced1',
     positionZ: 21.75
   },
   {
     title: 'Exercise Program Manager',
     category: 'Demo 6',
     labelMeta: 'Manages the exercise program assigned to the patient.',
-    source: './media/myphysio-06-manage-program.mp4',
+    source: './media/myphysio-06-manage-program.mp4?v=20260720-balanced1',
     positionZ: 24.1
   }
 ].map((work) => ({
   ...work,
   preloadPriority: 55,
-  posterImage: `./media/video-posters/${work.source.split('/').pop().replace(/\.mp4$/i, '.jpg')}`,
+  posterImage: `./media/video-posters/${work.source.split('/').pop().split('?')[0].replace(/\.mp4$/i, '.jpg')}`,
   playWhenVisible: true,
   playDistance: 5.5,
   interactionRadius: 5,
@@ -1062,6 +1115,7 @@ let speculativeOriginRoomKey = null;
 let speculativeRoomKey = null;
 let activeRoomVideoSequence = null;
 let fullGalleryPreloadStarted = false;
+const backgroundVideoPreloadPromises = new WeakMap();
 const fullGalleryPreloadRoomKeys = new Set();
 const roomVisualReadyKeys = new Set([ROOM_KEYS.main]);
 const roomVisualReadyResolvers = new Map();
@@ -1283,7 +1337,7 @@ function resetPlayerHeight() {
 function startJump() {
   if (!galleryActive || posterDialog.open || !posterIndex.hidden) return;
   if (jumpOffset > 0.001 || jumpVelocity > 0) return;
-  jumpVelocity = JUMP_SPEED;
+  jumpVelocity = JUMP_SPEED * (insideHouseWorld ? HOUSE_WORLD_PLAYER_SCALE : 1);
   needsRender = true;
 }
 
@@ -2603,9 +2657,10 @@ const HOUSE_GROUND_SOLID_AREAS = [
 const HOUSE_EXTERIOR_WALKABLE_AREAS = [
   {
     name: 'main stone stair',
-    // Slightly overlap the platform and portal path so a movement substep can
-    // never land in a support seam at either end of the staircase.
-    minX: 11.76, maxX: 14.32, minZ: 3.32, maxZ: 7.13,
+    // One continuous safety surface spans both flights and the center seam.
+    // These bounds slightly exceed the measured STONE STAIR mesh bounds
+    // (x 11.98–14.14, z 3.25–7.23) and overlap the platform and road.
+    minX: 11.7, maxX: 14.42, minZ: 3.12, maxZ: 7.36,
     height: (x) => THREE.MathUtils.lerp(
       1.03,
       0.28,
@@ -2624,31 +2679,70 @@ const HOUSE_EXTERIOR_WALKABLE_AREAS = [
   },
   {
     name: 'side stair',
-    minX: 9.7, maxX: 11.3, minZ: -3.35, maxZ: 2.15,
-    height: (_x, z) => THREE.MathUtils.lerp(3.78, 1.55, (z + 3.35) / 5.5)
+    // Follow the actual lower and middle flights with the red intermediate
+    // platform held level between z -1.17 and -2.60.
+    minX: 9.05, maxX: 12.0, minZ: -3.9, maxZ: 2.4,
+    height: (_x, z) => {
+      if (z >= -1.17) {
+        return THREE.MathUtils.lerp(
+          3.39,
+          1.0,
+          THREE.MathUtils.clamp((z + 1.17) / 3.57, 0, 1)
+        );
+      }
+      if (z >= -2.6) return 3.39;
+      return THREE.MathUtils.lerp(
+        4.1,
+        3.39,
+        THREE.MathUtils.clamp((z + 3.9) / 1.3, 0, 1)
+      );
+    }
   },
   {
     name: 'upper stair landing',
-    minX: 9.7, maxX: 11.3, minZ: -6.6, maxZ: -3.35,
-    height: () => 3.66
+    // The orange platform is the second flat pause before the final flight.
+    minX: 9.05, maxX: 12.0, minZ: -6.97, maxZ: -3.9,
+    height: () => 4.1
   },
   {
     name: 'hallway roof connector',
-    minX: 7.75, maxX: 9.7, minZ: -6.6, maxZ: -4.5,
-    height: (x) => THREE.MathUtils.lerp(4.3, 3.66, (x - 7.75) / 1.95)
+    minX: 7.45, maxX: 9.05, minZ: -6.97, maxZ: -3.9,
+    height: (x) => THREE.MathUtils.lerp(
+      4.72,
+      4.1,
+      THREE.MathUtils.clamp((x - 7.45) / 1.6, 0, 1)
+    )
   },
   {
     name: 'hallway roof',
-    minX: -4.2, maxX: 7.75, minZ: -6.65, maxZ: -4.2,
-    height: () => 4.3
+    minX: -5.2, maxX: 7.45, minZ: -7.0, maxZ: -3.85,
+    height: () => 4.72
   }
 ];
 const HOUSE_MAIN_PLATFORM_AREA = HOUSE_EXTERIOR_WALKABLE_AREAS.find(
   (area) => area.name === 'main platform'
 );
+const HOUSE_SIDE_STAIR_AREA = HOUSE_EXTERIOR_WALKABLE_AREAS.find(
+  (area) => area.name === 'side stair'
+);
+const HOUSE_UPPER_STAIR_LANDING_AREA = HOUSE_EXTERIOR_WALKABLE_AREAS.find(
+  (area) => area.name === 'upper stair landing'
+);
+const HOUSE_HALLWAY_ROOF_CONNECTOR_AREA = HOUSE_EXTERIOR_WALKABLE_AREAS.find(
+  (area) => area.name === 'hallway roof connector'
+);
+const HOUSE_MAIN_STAIR_AREA = HOUSE_EXTERIOR_WALKABLE_AREAS.find(
+  (area) => area.name === 'main stone stair'
+);
 const HOUSE_HALLWAY_ROOF_AREA = HOUSE_EXTERIOR_WALKABLE_AREAS.find(
   (area) => area.name === 'hallway roof'
 );
+const HOUSE_SMOOTH_STAIR_ROUTE_AREAS = [
+  HOUSE_SIDE_STAIR_AREA,
+  HOUSE_UPPER_STAIR_LANDING_AREA,
+  HOUSE_HALLWAY_ROOF_CONNECTOR_AREA,
+  HOUSE_HALLWAY_ROOF_AREA
+];
 
 function isHouseWalkableMesh(mesh) {
   const hierarchy = houseHierarchyLabel(mesh);
@@ -2688,7 +2782,7 @@ function registerHouseExteriorCollision(model) {
     if (lampBox.isEmpty()) return;
     lampBox.expandByVector(new THREE.Vector3(
       HOUSE_WORLD.playerRadius,
-      0.08,
+      0.08 * HOUSE_WORLD_PLAYER_SCALE,
       HOUSE_WORLD.playerRadius
     ));
     houseSolidBoxes.push(lampBox);
@@ -2699,7 +2793,7 @@ function registerHouseExteriorCollision(model) {
 }
 
 function isHouseExteriorBlocked(x, z, surfaceY) {
-  const bodyMinY = surfaceY + 0.08;
+  const bodyMinY = surfaceY + 0.08 * HOUSE_WORLD_PLAYER_SCALE;
   const bodyMaxY = surfaceY + HOUSE_WORLD_EYE_HEIGHT * 0.94;
   return houseSolidBoxes.some((box) => (
     x >= box.min.x && x <= box.max.x
@@ -2742,14 +2836,30 @@ function getHouseWalkableSurfaceY(x, z, currentY = houseWorldGroundY) {
     return null;
   }
   if (!isOnHousePortalPath(x, z) && isHousePondBlocked(x, z)) return null;
-  houseWalkRayOrigin.set(x, 12, z);
+  houseWalkRayOrigin.set(x, 24, z);
   houseWalkRaycaster.set(houseWalkRayOrigin, houseWalkDown);
   houseWalkRaycaster.near = 0;
-  houseWalkRaycaster.far = 14;
+  houseWalkRaycaster.far = 30;
   const hits = houseWalkRaycaster.intersectObjects(houseWalkableMeshes, false);
   const maximumY = currentY + HOUSE_WORLD.maxStepUp;
   const minimumY = currentY - HOUSE_WORLD.maxStepDown;
   const candidates = [];
+  const localX = houseWorldToLocalX(x);
+  const localZ = houseWorldToLocalZ(z);
+
+  // Follow the authored rise/landing profile instead of individual overlapping
+  // tread meshes: smooth on each flight, stationary on both mid platforms.
+  const smoothRouteArea = HOUSE_SMOOTH_STAIR_ROUTE_AREAS.find(
+    (area) => isInsideHouseWalkArea(area, x, z)
+  );
+  if (smoothRouteArea) {
+    const smoothRouteY = houseLocalToWorldY(
+      smoothRouteArea.height(localX, localZ)
+    ) + 0.018;
+    if (smoothRouteY <= maximumY
+      && smoothRouteY >= minimumY
+      && !isHouseExteriorBlocked(x, z, smoothRouteY)) return smoothRouteY;
+  }
 
   for (const hit of hits) {
     if (!hit.face) continue;
@@ -2760,8 +2870,8 @@ function getHouseWalkableSurfaceY(x, z, currentY = houseWorldGroundY) {
   }
 
   HOUSE_EXTERIOR_WALKABLE_AREAS.forEach((area) => {
-    if (x < area.minX || x > area.maxX || z < area.minZ || z > area.maxZ) return;
-    candidates.push(area.height(x, z) + 0.018);
+    if (!isInsideHouseWalkArea(area, x, z)) return;
+    candidates.push(houseLocalToWorldY(area.height(localX, localZ)) + 0.018);
   });
 
   candidates.sort((a, b) => b - a);
@@ -2770,12 +2880,12 @@ function getHouseWalkableSurfaceY(x, z, currentY = houseWorldGroundY) {
     if (!isHouseExteriorBlocked(x, z, surfaceY)) return surfaceY;
   }
 
-  const insideHouseGroundSolidFootprint = HOUSE_GROUND_SOLID_AREAS.some((area) => (
-    x >= area.minX && x <= area.maxX && z >= area.minZ && z <= area.maxZ
-  ));
-  const insideRaisedWalkableFootprint = HOUSE_EXTERIOR_WALKABLE_AREAS.some((area) => (
-    x >= area.minX && x <= area.maxX && z >= area.minZ && z <= area.maxZ
-  ));
+  const insideHouseGroundSolidFootprint = HOUSE_GROUND_SOLID_AREAS.some(
+    (area) => isInsideHouseWalkArea(area, x, z)
+  );
+  const insideRaisedWalkableFootprint = HOUSE_EXTERIOR_WALKABLE_AREAS.some(
+    (area) => isInsideHouseWalkArea(area, x, z)
+  );
   const insideHouseFootprint = insideHouseGroundSolidFootprint || insideRaisedWalkableFootprint;
   // Never substitute ground level while the player is still over a raised
   // platform or stair. If its surface is rejected by a railing collision,
@@ -2832,10 +2942,10 @@ function createHouseWorldSky() {
   texture.wrapS = THREE.RepeatWrapping;
   texture.repeat.x = 4;
   const sky = new THREE.Mesh(
-    new THREE.SphereGeometry(92, 48, 28),
+    new THREE.SphereGeometry(92 * HOUSE_WORLD_MODEL_PLACEMENT.scale, 48, 28),
     new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide, fog: false, toneMapped: false })
   );
-  sky.position.y = 15;
+  sky.position.y = 15 * HOUSE_WORLD_MODEL_PLACEMENT.scale;
   return sky;
 }
 
@@ -2920,7 +3030,10 @@ function createHouseWorldShell() {
   houseWorldGroup.add(createHouseWorldSky());
 
   const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(112, 96),
+    new THREE.PlaneGeometry(
+      112 * HOUSE_WORLD_MODEL_PLACEMENT.scale,
+      96 * HOUSE_WORLD_MODEL_PLACEMENT.scale
+    ),
     new THREE.MeshStandardMaterial({ color: 0x68705b, roughness: 1, metalness: 0 })
   );
   ground.rotation.x = -Math.PI / 2;
@@ -2954,12 +3067,18 @@ function createHouseWorldShell() {
     [48, 22, 12, 16], [-33, 38, 14, 18], [31, 39, 15, 20]
   ];
   mountainSpecs.forEach(([x, z, radius, height], index) => {
+    const landscapeScale = HOUSE_WORLD_MODEL_PLACEMENT.scale;
+    const scaledHeight = height * landscapeScale;
     const mountain = new THREE.Mesh(
-      new THREE.ConeGeometry(radius, height, 7, 1),
+      new THREE.ConeGeometry(radius * landscapeScale, scaledHeight, 7, 1),
       mountainMaterial.clone()
     );
     mountain.material.color.offsetHSL(index % 2 ? 0.012 : -0.008, 0, index % 3 ? -0.015 : 0.02);
-    mountain.position.set(x, height / 2 - 1.2, z);
+    mountain.position.set(
+      houseLocalToWorldX(x),
+      scaledHeight / 2 - 1.2,
+      houseLocalToWorldZ(z)
+    );
     mountain.rotation.y = index * 0.47;
     houseWorldGroup.add(mountain);
   });
@@ -2987,29 +3106,61 @@ function createFullScaleHouse(gltf) {
   );
   modelPivot.add(model);
 
-  // Close the exposed underside at the approach-facing edge of the main
-  // stairs. Keeping this as a shallow apron preserves the authored stair
-  // treads and the existing walkable heights while hiding the two supports
-  // that otherwise peek out below the lowest slab.
-  const frontStairApron = new THREE.Mesh(
-    new THREE.BoxGeometry(0.34, 0.32, 4.0),
-    new THREE.MeshStandardMaterial({
-      color: HOUSE_COLOR_PRESET.stone,
-      roughness: 0.94,
-      metalness: 0
-    })
-  );
-  frontStairApron.name = 'Main stone stair front apron';
-  frontStairApron.position.set(14.17, 0.125, HOUSE_WORLD.portalZ);
-  modelPivot.add(frontStairApron);
+  // Extend the authored stair foundation just below the terrain. This keeps
+  // the original sloped sides and front edge while naturally concealing the
+  // two low stair pieces, without adding a separate cover block.
+  model.updateMatrixWorld(true);
+  let frontStairFoundation = null;
+  model.traverse((child) => {
+    if (!child.isMesh) return;
+    const hierarchy = houseHierarchyLabel(child);
+    if (child.name === 'Cube' && /stone[_ ]stair/.test(hierarchy)) frontStairFoundation = child;
+  });
+  if (frontStairFoundation) {
+    const originalBottomY = new THREE.Box3().setFromObject(frontStairFoundation).min.y;
+    const foundationBottomY = -0.08;
+    frontStairFoundation.geometry = frontStairFoundation.geometry.clone();
+    const positions = frontStairFoundation.geometry.getAttribute('position');
+    const toLocal = frontStairFoundation.matrixWorld.clone().invert();
+    const vertex = new THREE.Vector3();
+    for (let index = 0; index < positions.count; index += 1) {
+      vertex.fromBufferAttribute(positions, index).applyMatrix4(frontStairFoundation.matrixWorld);
+      if (vertex.y > originalBottomY + 0.01) continue;
+      vertex.y = foundationBottomY;
+      vertex.applyMatrix4(toLocal);
+      positions.setXYZ(index, vertex.x, vertex.y, vertex.z);
+    }
+    positions.needsUpdate = true;
+    frontStairFoundation.geometry.computeBoundingBox();
+    frontStairFoundation.geometry.computeBoundingSphere();
+  }
+
+  // Apply the placement selected in the interactive editor. Scale the
+  // normalized model around the house-world origin, then add its XYZ offset.
+  model.position.multiplyScalar(HOUSE_WORLD_MODEL_PLACEMENT.scale);
+  model.position.add(new THREE.Vector3(
+    HOUSE_WORLD_MODEL_PLACEMENT.x,
+    HOUSE_WORLD_MODEL_PLACEMENT.y,
+    HOUSE_WORLD_MODEL_PLACEMENT.z
+  ));
+  model.scale.multiplyScalar(HOUSE_WORLD_MODEL_PLACEMENT.scale);
+  model.updateMatrixWorld(true);
 
   const houseShadow = new THREE.Mesh(
     new THREE.CircleGeometry(16.2, 64),
     new THREE.MeshBasicMaterial({ color: 0x182019, transparent: true, opacity: 0.18, depthWrite: false })
   );
   houseShadow.rotation.x = -Math.PI / 2;
-  houseShadow.scale.z = 0.74;
-  houseShadow.position.y = 0.016;
+  houseShadow.scale.set(
+    HOUSE_WORLD_MODEL_PLACEMENT.scale,
+    HOUSE_WORLD_MODEL_PLACEMENT.scale,
+    0.74 * HOUSE_WORLD_MODEL_PLACEMENT.scale
+  );
+  houseShadow.position.set(
+    HOUSE_WORLD_MODEL_PLACEMENT.x,
+    0.016,
+    HOUSE_WORLD_MODEL_PLACEMENT.z
+  );
   modelPivot.add(houseShadow);
 
   setObjectLayer(modelPivot, HOUSE_WORLD_LAYER);
@@ -3022,7 +3173,13 @@ function createFullScaleHouse(gltf) {
 }
 
 function createHousePondGeometry(scale = 1) {
-  const controlPoints = HOUSE_POND.outline.map(([x, z]) => new THREE.Vector3(x * scale, -z * scale, 0));
+  const scaleX = HOUSE_POND.width / HOUSE_POND.outlineWidth;
+  const scaleZ = HOUSE_POND.depth / HOUSE_POND.outlineDepth;
+  const controlPoints = HOUSE_POND.outline.map(([x, z]) => new THREE.Vector3(
+    (x - HOUSE_POND.outlineCenterX) * scaleX * scale,
+    -(z - HOUSE_POND.outlineCenterZ) * scaleZ * scale,
+    0
+  ));
   const curve = new THREE.CatmullRomCurve3(controlPoints, true, 'centripetal', 0.35);
   const outline = curve.getPoints(84).map((point) => new THREE.Vector2(point.x, point.y));
   const geometry = new THREE.ShapeGeometry(new THREE.Shape(outline), 12);
@@ -3081,10 +3238,15 @@ function createFullScaleHousePond() {
   if (!houseWorldGroup || housePondMeshes.length) return;
   const pond = new THREE.Group();
   pond.name = 'Full-scale outdoor childhood pond';
-  pond.position.set(HOUSE_POND.centerX, 0, HOUSE_POND.centerZ);
+  pond.position.set(
+    houseLocalToWorldX(HOUSE_POND.centerX),
+    0,
+    houseLocalToWorldZ(HOUSE_POND.centerZ)
+  );
+  const pondScale = HOUSE_WORLD_MODEL_PLACEMENT.scale;
 
   const shore = new THREE.Mesh(
-    createHousePondGeometry(1.075),
+    createHousePondGeometry(1.075 * pondScale),
     new THREE.MeshStandardMaterial({ color: 0x8b8065, roughness: 1, metalness: 0, side: THREE.DoubleSide })
   );
   shore.rotation.x = -Math.PI / 2;
@@ -3092,7 +3254,7 @@ function createFullScaleHousePond() {
   pond.add(shore);
 
   const bed = new THREE.Mesh(
-    createHousePondGeometry(0.985),
+    createHousePondGeometry(1.025 * pondScale),
     new THREE.MeshStandardMaterial({ color: 0x315956, roughness: 0.9, metalness: 0, side: THREE.DoubleSide })
   );
   bed.rotation.x = -Math.PI / 2;
@@ -3101,7 +3263,7 @@ function createFullScaleHousePond() {
 
   housePondWaterTexture = createHousePondWaterTexture();
   const water = new THREE.Mesh(
-    createHousePondGeometry(0.96),
+    createHousePondGeometry(pondScale),
     new THREE.MeshPhysicalMaterial({
       color: 0xffffff,
       map: housePondWaterTexture,
@@ -3136,6 +3298,7 @@ function activateHousePreviewIfRequested() {
 
 function setGalleryEnvironment() {
   camera.layers.set(0);
+  camera.near = 0.08;
   camera.far = 100;
   camera.updateProjectionMatrix();
   scene.background.set(0xe5e4e0);
@@ -3146,12 +3309,13 @@ function setGalleryEnvironment() {
 
 function setHouseWorldEnvironment() {
   camera.layers.set(HOUSE_WORLD_LAYER);
+  camera.near = 0.08 * HOUSE_WORLD_PLAYER_SCALE;
   camera.far = 220;
   camera.updateProjectionMatrix();
   scene.background.set(0x83938d);
   scene.fog.color.set(0x83938d);
-  scene.fog.near = 54;
-  scene.fog.far = 112;
+  scene.fog.near = 54 * HOUSE_WORLD_MODEL_PLACEMENT.scale;
+  scene.fog.far = 112 * HOUSE_WORLD_MODEL_PLACEMENT.scale;
 }
 
 function enterHouseWorld() {
@@ -3164,12 +3328,28 @@ function enterHouseWorld() {
   houseWorldEdgeDropActive = false;
   houseWorldDropGroundOverride = false;
   camera.position.copy(HOUSE_WORLD.arrival);
-  camera.lookAt(0, 2.7, 0);
+  camera.lookAt(
+    houseLocalToWorldX(0),
+    houseLocalToWorldY(2.7),
+    houseLocalToWorldZ(0)
+  );
   const worldPreview = previewParams.get('home-world-preview');
   const previewLocation = worldPreview === 'platform'
-    ? { x: 5.4, z: 7.0, expectedY: 1.0, lookX: 0, lookZ: 1.5 }
+    ? {
+      x: houseLocalToWorldX(5.4),
+      z: houseLocalToWorldZ(7.0),
+      expectedY: houseLocalToWorldY(1.0),
+      lookX: houseLocalToWorldX(0),
+      lookZ: houseLocalToWorldZ(1.5)
+    }
     : worldPreview === 'roof'
-      ? { x: 1.5, z: -5.1, expectedY: 4.3, lookX: -5.5, lookZ: -6.0 }
+      ? {
+        x: houseLocalToWorldX(1.5),
+        z: houseLocalToWorldZ(-5.1),
+        expectedY: houseLocalToWorldY(4.3),
+        lookX: houseLocalToWorldX(-5.5),
+        lookZ: houseLocalToWorldZ(-6.0)
+      }
       : null;
   if (previewLocation) {
     const surfaceY = getHouseWalkableSurfaceY(
@@ -3311,7 +3491,7 @@ function isHouseWorldPortalCrossing(x, z, previousX) {
   return insideHouseWorld
     && previousX < HOUSE_WORLD.portalTriggerX
     && x >= HOUSE_WORLD.portalTriggerX
-    && Math.abs(z - HOUSE_WORLD.portalZ) <= 2.4;
+    && Math.abs(z - HOUSE_WORLD.portalZ) <= HOUSE_WORLD.pathWidth / 2;
 }
 
 function isHouseWorldWalkablePosition(x, z) {
@@ -3319,19 +3499,27 @@ function isHouseWorldWalkablePosition(x, z) {
 }
 
 function isInsideHouseWalkArea(area, x, z, margin = 0) {
-  return Boolean(area)
-    && x >= area.minX - margin && x <= area.maxX + margin
-    && z >= area.minZ - margin && z <= area.maxZ + margin;
+  if (!area) return false;
+  const minX = houseLocalToWorldX(area.minX);
+  const maxX = houseLocalToWorldX(area.maxX);
+  const minZ = houseLocalToWorldZ(area.minZ);
+  const maxZ = houseLocalToWorldZ(area.maxZ);
+  return x >= minX - margin && x <= maxX + margin
+    && z >= minZ - margin && z <= maxZ + margin;
 }
 
 function getHouseAreaExitPosition(area, targetX, targetZ) {
-  const clearance = HOUSE_WORLD.playerRadius + 0.1;
+  const clearance = HOUSE_WORLD.playerRadius + 0.1 * HOUSE_WORLD_PLAYER_SCALE;
+  const minX = houseLocalToWorldX(area.minX);
+  const maxX = houseLocalToWorldX(area.maxX);
+  const minZ = houseLocalToWorldZ(area.minZ);
+  const maxZ = houseLocalToWorldZ(area.maxZ);
   let x = targetX;
   let z = targetZ;
-  if (targetX < area.minX) x = area.minX - clearance;
-  if (targetX > area.maxX) x = area.maxX + clearance;
-  if (targetZ < area.minZ) z = area.minZ - clearance;
-  if (targetZ > area.maxZ) z = area.maxZ + clearance;
+  if (targetX < minX) x = minX - clearance;
+  if (targetX > maxX) x = maxX + clearance;
+  if (targetZ < minZ) z = minZ - clearance;
+  if (targetZ > maxZ) z = maxZ + clearance;
   return { x, z };
 }
 
@@ -3368,7 +3556,16 @@ function tryLeaveHouseWalkArea(
 }
 
 function tryWalkOffMainPlatform(stepStartX, stepStartZ, targetX, targetZ, startingSurfaceY) {
-  if (startingSurfaceY < 0.72 || startingSurfaceY > 1.3) return false;
+  const platformY = houseLocalToWorldY(1);
+  if (startingSurfaceY < platformY - 0.28 || startingSurfaceY > platformY + 0.3) return false;
+  // A rejected movement over a stair riser or rail must stop at the current
+  // position, never be interpreted as stepping off the platform into a hole.
+  if (isInsideHouseWalkArea(
+    HOUSE_MAIN_STAIR_AREA,
+    targetX,
+    targetZ,
+    0.12 * HOUSE_WORLD_PLAYER_SCALE
+  )) return false;
   return tryLeaveHouseWalkArea(
     HOUSE_MAIN_PLATFORM_AREA,
     stepStartX,
@@ -3380,7 +3577,7 @@ function tryWalkOffMainPlatform(stepStartX, stepStartZ, targetX, targetZ, starti
 }
 
 function tryJumpOffHallwayRoof(stepStartX, stepStartZ, targetX, targetZ, startingSurfaceY) {
-  if (startingSurfaceY < 3.9) return false;
+  if (startingSurfaceY < houseLocalToWorldY(3.9)) return false;
   if (jumpVelocity <= 0 && jumpOffset <= 0) return false;
   return tryLeaveHouseWalkArea(
     HOUSE_HALLWAY_ROOF_AREA,
@@ -3389,7 +3586,7 @@ function tryJumpOffHallwayRoof(stepStartX, stepStartZ, targetX, targetZ, startin
     targetX,
     targetZ,
     startingSurfaceY,
-    0.35
+    0.35 * HOUSE_WORLD_PLAYER_SCALE
   );
 }
 
@@ -3416,7 +3613,7 @@ function applyHouseWorldMove(x, z, fromSurfaceY = houseWorldGroundY) {
   if (surfaceY === null) return false;
   camera.position.x = x;
   camera.position.z = z;
-  if (surfaceY < fromSurfaceY - 0.45) {
+  if (surfaceY < fromSurfaceY - HOUSE_WORLD_AUTO_DROP_THRESHOLD) {
     beginHouseWorldEdgeDrop(fromSurfaceY, surfaceY);
   } else {
     houseWorldGroundY = surfaceY;
@@ -3440,7 +3637,8 @@ function moveHouseWorldPlayer(stepStartX, stepStartZ, targetX, targetZ) {
   ) && !isInsideHouseWalkArea(HOUSE_MAIN_PLATFORM_AREA, targetX, targetZ);
   if (leavingMainPlatform) {
     const targetSurfaceY = getHouseWalkableSurfaceY(targetX, targetZ, startingSurfaceY);
-    if ((targetSurfaceY === null || targetSurfaceY < startingSurfaceY - 0.45)
+    if ((targetSurfaceY === null
+      || targetSurfaceY < startingSurfaceY - HOUSE_WORLD_AUTO_DROP_THRESHOLD)
       && tryWalkOffMainPlatform(
         stepStartX,
         stepStartZ,
@@ -4789,26 +4987,44 @@ function waitForOrderedPreloadGap(delay = ORDERED_PRELOAD_PHASE_GAP_MS) {
 }
 
 function preloadVideoEntryInBackground(entry) {
-  if (entry.element.hasAttribute('src')) return Promise.resolve();
-  return new Promise((resolve) => {
-    const video = entry.element;
-    let settled = false;
-    let timeoutId = 0;
-    const settle = () => {
-      if (settled) return;
-      settled = true;
-      window.clearTimeout(timeoutId);
-      video.removeEventListener('canplay', settle);
-      video.removeEventListener('error', settle);
-      resolve();
-    };
-    video.addEventListener('canplay', settle);
-    video.addEventListener('error', settle);
-    timeoutId = window.setTimeout(settle, 7000);
-    video.preload = 'auto';
-    video.src = entry.source;
-    video.load();
+  if (entry.element.hasAttribute('src') || entry.backgroundPreloadComplete) {
+    return Promise.resolve();
+  }
+  const existingPromise = backgroundVideoPreloadPromises.get(entry);
+  if (existingPromise) return existingPromise;
+
+  // `canplay` only means a small initial buffer is ready; the browser keeps
+  // transferring that file while the next video starts. Stream the complete
+  // response into the HTTP cache so background video transfers are genuinely
+  // one-at-a-time. The media element receives its URL only when it is visible.
+  const preloadPromise = (async () => {
+    try {
+      const response = await fetch(entry.source, {
+        cache: 'force-cache',
+        credentials: 'same-origin'
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (response.body?.getReader) {
+        const reader = response.body.getReader();
+        while (true) {
+          const { done } = await reader.read();
+          if (done) break;
+        }
+      } else {
+        await response.blob();
+      }
+      entry.backgroundPreloadComplete = true;
+    } catch (error) {
+      console.warn(`Could not preload ${entry.source} in the background.`, error);
+      // Do not trap a room sequence retrying the same failed URL forever.
+      // Normal visible playback can still request it later.
+      entry.backgroundPreloadComplete = true;
+    }
+  })().finally(() => {
+    backgroundVideoPreloadPromises.delete(entry);
   });
+  backgroundVideoPreloadPromises.set(entry, preloadPromise);
+  return preloadPromise;
 }
 
 async function preloadRoomVideosInBackground(roomKey) {
@@ -4867,15 +5083,13 @@ async function startFullGalleryBackgroundPreload() {
     await waitForRoomVisualsReady(ROOM_KEYS.mri);
     await waitForOrderedPreloadGap();
 
-    // 7. The two art-room mugs.
-    await startArtRoomMugLoads();
-    await waitForOrderedPreloadGap();
-
-    // 8. App-room video files, one at a time.
+    // 7. App-room video files, one at a time. The two Art-room mugs are
+    // already part of the initial loading gate so the doorway never looks
+    // empty while the rest of this background queue is still running.
     await preloadRoomVideosInBackground(ROOM_KEYS.app);
     await waitForOrderedPreloadGap();
 
-    // 9. Game-room content and all video-room poster frames. Game videos may
+    // 8. Game-room content and all video-room poster frames. Game videos may
     // warm now; video-room files deliberately remain last.
     fullGalleryPreloadRoomKeys.add(ROOM_KEYS.game);
     fullGalleryPreloadRoomKeys.add(ROOM_KEYS.videos);
@@ -4888,7 +5102,7 @@ async function startFullGalleryBackgroundPreload() {
     await preloadRoomVideosInBackground(ROOM_KEYS.game);
     await waitForOrderedPreloadGap();
 
-    // 10. Everything else in the art room. Approach-resolution walls become
+    // 9. Everything else in the art room. Approach-resolution walls become
     // usable first; final 4K tiles then replace them one at a time while idle.
     fullGalleryPreloadRoomKeys.add(ROOM_KEYS.art);
     startArtRoomLoads();
@@ -4899,7 +5113,7 @@ async function startFullGalleryBackgroundPreload() {
     ]);
     await waitForOrderedPreloadGap();
 
-    // 11. Video-room files are the final background media phase.
+    // 10. Video-room files are the final background media phase.
     await preloadRoomVideosInBackground(ROOM_KEYS.videos);
   } catch (error) {
     console.warn('Could not finish the ordered gallery preload.', error);
@@ -6937,31 +7151,17 @@ function loadNextRoomVideo(sequence) {
     .filter((candidate) => (
       candidate.roomKey === sequence.roomKey
       && !candidate.element.hasAttribute('src')
+      && !candidate.backgroundPreloadComplete
     ))
     .sort((a, b) => (b.preloadPriority || 0) - (a.preloadPriority || 0))[0];
   if (!entry) return;
 
   sequence.loading = true;
-  const video = entry.element;
-  let settled = false;
-  let timeoutId = 0;
-  const settle = () => {
-    if (settled) return;
-    settled = true;
+  preloadVideoEntryInBackground(entry).finally(() => {
     sequence.loading = false;
-    window.clearTimeout(timeoutId);
-    video.removeEventListener('canplay', settle);
-    video.removeEventListener('error', settle);
     if (!shouldContinueRoomVideoSequence(sequence)) return;
     scheduleLowPriorityGalleryWork(() => loadNextRoomVideo(sequence), 260);
-  };
-
-  video.addEventListener('canplay', settle);
-  video.addEventListener('error', settle);
-  timeoutId = window.setTimeout(settle, 7000);
-  video.preload = 'auto';
-  video.src = entry.source;
-  video.load();
+  });
 }
 
 function prepareRoomVideosSequentially(
@@ -7719,7 +7919,8 @@ function isWalkablePosition(x, z) {
 
 function updateMovement(delta) {
   if (!galleryActive || portalTransitioning || posterDialog.open || !posterIndex.hidden) return false;
-  const speed = 4.35;
+  const speed = insideHouseWorld ? HOUSE_WORLD_MOVE_SPEED : 4.35;
+  const maxMoveSubstep = insideHouseWorld ? HOUSE_WORLD_MOVE_SUBSTEP : 0.08;
   const forward = Number(pressedKeys.has('KeyW')) - Number(pressedKeys.has('KeyS'));
   const sideways = Number(pressedKeys.has('KeyD')) - Number(pressedKeys.has('KeyA'));
   const previousX = camera.position.x;
@@ -7727,7 +7928,7 @@ function updateMovement(delta) {
   const previousZ = camera.position.z;
 
   const requestedDistance = speed * delta * Math.hypot(forward, sideways);
-  const stepCount = Math.max(1, Math.ceil(requestedDistance / 0.08));
+  const stepCount = Math.max(1, Math.ceil(requestedDistance / maxMoveSubstep));
   const forwardStep = forward * speed * delta / stepCount;
   const sidewaysStep = sideways * speed * delta / stepCount;
 
@@ -7762,7 +7963,8 @@ function updateMovement(delta) {
 
   if (jumpVelocity !== 0 || jumpOffset > 0) {
     const previousJumpOffset = jumpOffset;
-    jumpVelocity -= JUMP_GRAVITY * delta;
+    const jumpGravity = JUMP_GRAVITY * (insideHouseWorld ? HOUSE_WORLD_PLAYER_SCALE : 1);
+    jumpVelocity -= jumpGravity * delta;
     jumpOffset += jumpVelocity * delta;
 
     // An edge drop can cross over the main stairs or another exterior deck.
@@ -7807,7 +8009,8 @@ function updateMovement(delta) {
   }
   const eyeHeight = insideHouseWorld ? HOUSE_WORLD_EYE_HEIGHT : STANDING_EYE_HEIGHT;
   const groundY = insideHouseWorld ? houseWorldCameraGroundY : 0;
-  camera.position.y = groundY + eyeHeight - CROUCH_DROP * crouchAmount + jumpOffset;
+  const crouchDrop = CROUCH_DROP * (insideHouseWorld ? HOUSE_WORLD_PLAYER_SCALE : 1);
+  camera.position.y = groundY + eyeHeight - crouchDrop * crouchAmount + jumpOffset;
 
   const moved = Boolean(forward || sideways || Math.abs(camera.position.y - previousY) > 0.0001);
   if (moved) requestVideoSync();
@@ -8196,6 +8399,19 @@ function initializeGallery() {
   figureClusters.forEach((cluster) => {
     mainRoomLoadedImages.add(cluster.image);
     textureLoader.load(cluster.image, (texture) => addFigureCluster(cluster, texture));
+  });
+  // These two small textures are the first visible hint of the Art room from
+  // the App hallway. Place the mugs during the initial loading gate; all other
+  // Art-room walls, models, and media retain their later background priority.
+  MUG_DISPLAYS.forEach((config) => {
+    if (artRoomLoadedImages.has(config.texture)) return;
+    artRoomLoadedImages.add(config.texture);
+    textureLoader.load(
+      config.texture,
+      (texture) => createMugDisplay(texture, config),
+      undefined,
+      () => artRoomLoadedImages.delete(config.texture)
+    );
   });
   // Cache every film/demo poster before the visitor can enter. Room loaders
   // can then place their screens immediately, while the much larger video
