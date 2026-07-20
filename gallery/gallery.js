@@ -457,6 +457,7 @@ const HOUSE_DISPLAY = {
   depth: 1.54,
   plinthHeight: 1.25
 };
+const HOUSE_WORLD_ROOMFLOOR_PATCH = './models/childhood-house-life-size-roomfloor.glb?v=20260720-newblend1';
 const HOUSE_POND = {
   // Measurements from childhood-house-pond.glb, normalized around the same
   // house origin used by prepareHouseModel. Keeping these source dimensions
@@ -1078,6 +1079,7 @@ const isMobileDevice = navigator.userAgentData?.mobile === true
   || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
 const previewParams = new URLSearchParams(window.location.search);
+let housePreviewActivationConsumed = false;
 
 let renderer;
 let camera;
@@ -2678,6 +2680,21 @@ const HOUSE_EXTERIOR_WALKABLE_AREAS = [
     height: () => 1.06
   },
   {
+    name: 'hall door approach',
+    // The open pair of doors at the courtyard is the intended ground-floor
+    // entrance. Bridge the short section between the main platform and the
+    // authored hallway floor so the player remains supported through it.
+    minX: 5.82, maxX: 7.18, minZ: -4.2, maxZ: -1.75,
+    height: () => 1.0
+  },
+  {
+    name: 'ground-floor hallway',
+    // Keep the complete hall walkable once the player has crossed the door.
+    // The surrounding long-hall wall meshes still provide its boundaries.
+    minX: -4.2, maxX: 7.18, minZ: -6.9, maxZ: -3.8,
+    height: () => 1.0
+  },
+  {
     name: 'side stair',
     // Follow the actual lower and middle flights with the red intermediate
     // platform held level between z -1.17 and -2.60.
@@ -2750,6 +2767,35 @@ function isHouseWalkableMesh(mesh) {
     || /stone_stair|stairs_i_want/.test(hierarchy);
 }
 
+function isOpenHallDoorCollisionMesh(mesh) {
+  const hierarchy = houseHierarchyLabel(mesh);
+  const normalizedName = (mesh.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  return (/long[ _]+hall/.test(hierarchy) && normalizedName === 'plane024')
+    || (/hall[ _]+door/.test(hierarchy)
+      && (normalizedName === 'plane100' || normalizedName === 'plane101'));
+}
+
+const HOUSE_EXPLICIT_GLASS_BARRIERS = [
+  {
+    // Courtyard façade beside the wooden main door. The visual glass/open
+    // frames must not become an unintended shortcut into the main house.
+    minX: -3.42, maxX: -3.04, minY: 0.9, maxY: 4.2, minZ: 0.45, maxZ: 5.45
+  },
+  {
+    // Perpendicular glass frontage shown immediately to the right of that
+    // doorway. Together the two barriers close the full L-shaped façade.
+    minX: -5.35, maxX: -3.15, minY: 0.9, maxY: 4.2, minZ: 2.38, maxZ: 2.76
+  },
+  {
+    // The corner glass bay beneath the upper stair landing contains several
+    // panes and open frame meshes. Treat its ground-floor volume as one solid
+    // enclosure so none of those visual seams becomes a route into the house.
+    // Its ceiling remains below the authored y=4.1 landing, so the stair route
+    // above stays fully walkable.
+    minX: 9.4, maxX: 12.08, minY: 0.85, maxY: 3.5, minZ: -7.1, maxZ: -4.14
+  }
+];
+
 function registerHouseExteriorCollision(model) {
   houseWalkableMeshes.length = 0;
   houseSolidBoxes.length = 0;
@@ -2764,9 +2810,30 @@ function registerHouseExteriorCollision(model) {
     const box = new THREE.Box3().setFromObject(child);
     const size = box.getSize(new THREE.Vector3());
     const isWallOrRailing = size.y >= 0.55 && (size.x <= 0.72 || size.z <= 0.72);
-    if (!isWallOrRailing) return;
+    if (!isWallOrRailing || isOpenHallDoorCollisionMesh(child)) return;
     box.expandByVector(new THREE.Vector3(HOUSE_WORLD.playerRadius, 0, HOUSE_WORLD.playerRadius));
     houseSolidBoxes.push(box);
+  });
+
+  HOUSE_EXPLICIT_GLASS_BARRIERS.forEach((barrier) => {
+    const barrierBox = new THREE.Box3(
+      new THREE.Vector3(
+        houseLocalToWorldX(barrier.minX),
+        houseLocalToWorldY(barrier.minY),
+        houseLocalToWorldZ(barrier.minZ)
+      ),
+      new THREE.Vector3(
+        houseLocalToWorldX(barrier.maxX),
+        houseLocalToWorldY(barrier.maxY),
+        houseLocalToWorldZ(barrier.maxZ)
+      )
+    );
+    barrierBox.expandByVector(new THREE.Vector3(
+      HOUSE_WORLD.playerRadius,
+      0,
+      HOUSE_WORLD.playerRadius
+    ));
+    houseSolidBoxes.push(barrierBox);
   });
 
   // Each stair-side floor lamp is assembled from several individually short
@@ -3095,11 +3162,22 @@ function createHouseWorldShell() {
   scene.add(houseWorldGroup);
 }
 
-function createFullScaleHouse(gltf) {
+function createFullScaleHouse(gltf, roomfloorPatchGltf = null) {
   if (!houseWorldGroup || houseWorldReady) return;
   const modelPivot = new THREE.Group();
+  const fullScaleHouseScene = gltf.scene.clone(true);
+  if (roomfloorPatchGltf?.scene) {
+    fullScaleHouseScene.traverse((child) => {
+      if (!child.isMesh) return;
+      const normalizedName = (child.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (normalizedName === 'roomfloor') child.visible = false;
+    });
+    const roomfloorPatch = roomfloorPatchGltf.scene.clone(true);
+    roomfloorPatch.name = 'Life-size roomfloor patch from new.blend';
+    fullScaleHouseScene.add(roomfloorPatch);
+  }
   const model = prepareHouseModel(
-    gltf.scene.clone(true),
+    fullScaleHouseScene,
     1,
     0,
     HOUSE_WORLD.modelWidth
@@ -3288,10 +3366,16 @@ function createFullScaleHousePond() {
 }
 
 function activateHousePreviewIfRequested() {
-  if (!galleryActive || !houseWorldReady || insideHouseWorld || portalTransitioning) return;
+  if (housePreviewActivationConsumed
+    || !galleryActive
+    || !houseWorldReady
+    || insideHouseWorld
+    || portalTransitioning) return;
   if (previewParams.has('home-world-preview')) {
-    enterHouseWorld();
+    housePreviewActivationConsumed = true;
+    enterHouseWorld(true);
   } else if (previewParams.has('home-transition-preview')) {
+    housePreviewActivationConsumed = true;
     window.setTimeout(() => beginPortalTransition('home'), 80);
   }
 }
@@ -3318,7 +3402,7 @@ function setHouseWorldEnvironment() {
   scene.fog.far = 112 * HOUSE_WORLD_MODEL_PLACEMENT.scale;
 }
 
-function enterHouseWorld() {
+function enterHouseWorld(usePreviewLocation = false) {
   insideHouseWorld = true;
   beginAnalyticsRoomVisit('house');
   houseWorldGroup.visible = true;
@@ -3333,7 +3417,12 @@ function enterHouseWorld() {
     houseLocalToWorldY(2.7),
     houseLocalToWorldZ(0)
   );
-  const worldPreview = previewParams.get('home-world-preview');
+  // Preview coordinates are only for the initial localhost/debug launch.
+  // Re-entering through the Art-room photo wall must always use the real
+  // approach-path arrival between the house and the return portal.
+  const worldPreview = usePreviewLocation
+    ? previewParams.get('home-world-preview')
+    : null;
   const previewLocation = worldPreview === 'platform'
     ? {
       x: houseLocalToWorldX(5.4),
@@ -3393,8 +3482,16 @@ function exitHouseWorld() {
   houseWorldEdgeDropActive = false;
   houseWorldDropGroundOverride = false;
   setGalleryEnvironment();
-  camera.position.set(HOME_PORTAL.x, STANDING_EYE_HEIGHT, HOME_PORTAL.z + 1.5);
-  camera.lookAt(HOME_PORTAL.x, STANDING_EYE_HEIGHT, HOME_PORTAL.z + 8);
+  camera.position.set(
+    HOME_FLOOR_ARROW.x,
+    STANDING_EYE_HEIGHT,
+    HOME_FLOOR_ARROW.z
+  );
+  camera.lookAt(
+    HOME_FLOOR_ARROW.targetX,
+    STANDING_EYE_HEIGHT,
+    HOME_PORTAL.z
+  );
   beginAnalyticsRoomVisit(getGalleryRoomKeyAtCamera());
   resetPlayerHeight();
   houseWorldGroup.visible = false;
@@ -4452,8 +4549,20 @@ function startArtRoomLoads() {
       peripheralLoadPromises.push(new Promise((resolve) => {
         houseLoader.load(HOUSE_DISPLAY.model, (gltf) => {
           createHouseFloorPreview(gltf);
-          createFullScaleHouse(gltf);
-          resolve();
+          const roomfloorPatchLoader = new GLTFLoader();
+          roomfloorPatchLoader.load(
+            HOUSE_WORLD_ROOMFLOOR_PATCH,
+            (roomfloorPatchGltf) => {
+              createFullScaleHouse(gltf, roomfloorPatchGltf);
+              resolve();
+            },
+            undefined,
+            (error) => {
+              console.warn('Could not load life-size roomfloor patch.', error);
+              createFullScaleHouse(gltf);
+              resolve();
+            }
+          );
         }, undefined, (error) => {
           console.warn('Could not load childhood house model.', error);
           resolve();
