@@ -65,6 +65,17 @@ const ANALYTICS_ROOM_LABELS = {
   [ROOM_KEYS.art]: 'Art room',
   house: 'House in the Rain'
 };
+const ANALYTICS_ROOM_TIME_REFERRERS = {
+  [ROOM_KEYS.main]: 'https://science-room.gallery/',
+  [ROOM_KEYS.app]: 'https://app-room.gallery/',
+  [ROOM_KEYS.screening]: 'https://defense-room.gallery/',
+  [ROOM_KEYS.brain]: 'https://brain-room.gallery/',
+  [ROOM_KEYS.mri]: 'https://mri-room.gallery/',
+  [ROOM_KEYS.game]: 'https://game-room.gallery/',
+  [ROOM_KEYS.videos]: 'https://video-room.gallery/',
+  [ROOM_KEYS.art]: 'https://art-room.gallery/',
+  house: 'https://house-in-the-rain.gallery/'
+};
 
 const MOTION_POSTER_HEIGHT = 3;
 const POSTER_FRAME_BORDER = 0.075;
@@ -1098,7 +1109,7 @@ function analyticsEnabled() {
   return window.location.hostname === ANALYTICS_HOST;
 }
 
-async function postAnalyticsEvent(name, data) {
+async function postAnalyticsEvent(name, data, options = {}) {
   const payload = {
     website: ANALYTICS_WEBSITE_ID,
     hostname: window.location.hostname,
@@ -1106,7 +1117,7 @@ async function postAnalyticsEvent(name, data) {
     language: window.navigator?.language || '',
     title: document.title,
     url: window.location.pathname,
-    referrer: document.referrer || ''
+    referrer: options.referrer ?? document.referrer ?? ''
   };
   if (name) payload.name = name;
   if (data) payload.data = data;
@@ -1130,11 +1141,11 @@ async function postAnalyticsEvent(name, data) {
   if (result?.cache) analyticsCache = result.cache;
 }
 
-function sendAnalyticsEvent(name, data) {
+function sendAnalyticsEvent(name, data, options) {
   if (!analyticsEnabled()) return;
   analyticsRequestChain = analyticsRequestChain
     .catch(() => {})
-    .then(() => postAnalyticsEvent(name, data))
+    .then(() => postAnalyticsEvent(name, data, options))
     .catch(() => {});
 }
 
@@ -1149,9 +1160,16 @@ function startAnalytics() {
 function finishAnalyticsRoomVisit(now = performance.now()) {
   if (!analyticsRoomKey || !analyticsRoomEnteredAt) return;
   const durationSeconds = Math.max(0, (now - analyticsRoomEnteredAt) / 1000);
+  const roomKey = analyticsRoomKey;
   sendAnalyticsEvent('room_dwell', {
-    room: ANALYTICS_ROOM_LABELS[analyticsRoomKey] || analyticsRoomKey,
-    seconds: Number(durationSeconds.toFixed(1))
+    room: ANALYTICS_ROOM_LABELS[roomKey] || roomKey,
+    seconds: Number(durationSeconds.toFixed(1)),
+    // Umami Boards cannot sum arbitrary numeric event properties. Its Revenue
+    // components can, so $1 is deliberately used as one minute of room time.
+    revenue: Number((durationSeconds / 60).toFixed(4)),
+    currency: 'USD'
+  }, {
+    referrer: ANALYTICS_ROOM_TIME_REFERRERS[roomKey]
   });
   analyticsRoomKey = null;
   analyticsRoomEnteredAt = 0;
