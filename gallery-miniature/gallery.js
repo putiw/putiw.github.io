@@ -41,8 +41,8 @@ const posters = [
     id: 'fst',
     title: 'Localizing visual motion area FST in human',
     category: 'Visual neuroscience',
-    authors: 'VSS poster - 2024',
-    labelMeta: 'VSS poster - 2024',
+    authors: 'Vision Sciences Society Annual Meeting (poster) - May 2024',
+    labelMeta: 'Vision Sciences Society Annual Meeting (poster) - May 2024',
     wallImage: './posters/fst-wall.webp',
     detailImage: './posters/fst-detail.webp',
     aspect: 3072 / 1808,
@@ -57,8 +57,8 @@ const posters = [
     id: 'decoding',
     title: 'Single-trial fMRI decoding of 3D motion with stereoscopic and perspective cues',
     category: 'fMRI and computational neuroscience',
-    authors: 'Research poster - 2023',
-    labelMeta: 'Research poster - 2023',
+    authors: 'Vision Sciences Society Annual Meeting, St. Pete Beach (poster) - May 2023',
+    labelMeta: 'Vision Sciences Society Annual Meeting, St. Pete Beach (poster) - May 2023',
     wallImage: './posters/decoding-wall.webp',
     detailImage: './posters/decoding-detail.webp',
     aspect: 16 / 9,
@@ -71,11 +71,10 @@ const posters = [
   },
   {
     id: 'cbh',
-    title: 'Research Institute Day at New York University Abu Dhabi, 2025',
+    title: 'Center for Brain and Health - Research Institute Day Poster',
     category: 'CBH NYUAD',
-    authors: '',
-    labelMeta: '',
-    showMeta: false,
+    authors: 'Designed for the Center for Brain and Health at NYU Abu Dhabi - Research Institute Day 2025',
+    labelMeta: 'Designed for the Center for Brain and Health at NYU Abu Dhabi - Research Institute Day 2025',
     wallImage: './posters/cbh-wall.webp',
     detailImage: './posters/cbh-detail.webp',
     aspect: 2048 / 1127,
@@ -87,8 +86,9 @@ const posters = [
     id: 'ms-lesion-metrics',
     title: 'Enhanced Prediction of Multiple Sclerosis Disabilities Using Tract-Specific Lesion Load and Advanced Quantitative MRI Metrics',
     category: 'Multiple sclerosis neuroimaging',
-    authors: 'Multiple sclerosis research poster - 2025',
-    labelMeta: 'Multiple sclerosis research poster - 2025',
+    authors: 'MENACTRIMS Congress, Jeddah (poster) - November 2024; NYU Abu Dhabi Division of Science Annual Research Conference (First Place Poster) - January 2025',
+    labelMeta: 'MENACTRIMS Congress, Jeddah (poster) - November 2024; NYU Abu Dhabi Division of Science Annual Research Conference (First Place Poster) - January 2025',
+    labelMetaFontSize: 30,
     wallImage: './posters/ms-lesion-metrics-wall.webp',
     detailImage: './posters/ms-lesion-metrics-detail.webp',
     aspect: 2175 / 3072,
@@ -100,8 +100,8 @@ const posters = [
     id: 'ohbm-pdi',
     title: 'MP2RAGE Ventricle Distance Profiling Improves Classification of Multiple Sclerosis Subtypes',
     category: 'Multiple sclerosis neuroimaging',
-    authors: 'OHBM poster - 2025',
-    labelMeta: 'OHBM poster - 2025',
+    authors: 'Organization for Human Brain Mapping Annual Meeting, Brisbane (poster) - June 2025',
+    labelMeta: 'Organization for Human Brain Mapping Annual Meeting, Brisbane (poster) - June 2025',
     wallImage: './posters/ohbm-pdi-wall.webp',
     detailImage: './posters/ohbm-pdi-detail.webp',
     aspect: 2175 / 3072,
@@ -115,6 +115,7 @@ const posters = [
     category: 'Research engagement and outreach',
     authors: 'Made this banner for an event for the National Multiple Sclerosis Society and NYU Abu Dhabi - 5 November 2025',
     labelMeta: 'Made this banner for an event for the National Multiple Sclerosis Society and NYU Abu Dhabi - 5 November 2025',
+    labelMetaSingleLine: true,
     wallImage: './posters/ms-research-day-wall.webp',
     detailImage: './posters/ms-research-day-detail.webp',
     aspect: 1337 / 3072,
@@ -141,8 +142,8 @@ const posters = [
     id: 'menactrims-cvsview',
     title: 'CVS-View: AI-powered central vein sign identification',
     category: 'Multiple sclerosis software and AI',
-    authors: 'MENACTRIMS poster - 5-6 December 2025',
-    labelMeta: 'MENACTRIMS poster - 5-6 December 2025',
+    authors: 'Tenth MENACTRIMS Congress, Dubai (poster) - 5-6 December 2025',
+    labelMeta: 'Tenth MENACTRIMS Congress, Dubai (poster) - 5-6 December 2025',
     wallImage: './posters/menactrims-cvsview-wall.webp',
     detailImage: './posters/menactrims-cvsview-detail.webp',
     aspect: 1240 / 2048,
@@ -154,10 +155,9 @@ const posters = [
 ];
 
 const videoWork = {
-  title: 'One minute of Center for Brain and Health',
+  title: 'Center for Brain and Health - One-Minute Overview Film',
   category: 'CBH NYUAD',
-  labelMeta: 'Made this one-minute video as an introduction demo for the Center for Brain and Health',
-  showMeta: false,
+  labelMeta: 'Produced for the Center for Brain and Health at NYU Abu Dhabi - Research Institute Day 2025',
   source: './media/cbh-center-film.mp4',
   posterImage: './media/cbh-center-film-poster.webp',
   aspect: 16 / 9,
@@ -5218,6 +5218,18 @@ function wrapLabelText(context, text, maxWidth, maxLines) {
   return lines;
 }
 
+function fitLabelFontSize(context, text, maxWidth, startSize, minSize) {
+  let fontSize = startSize;
+  context.font = `400 ${fontSize}px Arial, Helvetica, sans-serif`;
+
+  while (fontSize > minSize && context.measureText(text).width > maxWidth) {
+    fontSize -= 1;
+    context.font = `400 ${fontSize}px Arial, Helvetica, sans-serif`;
+  }
+
+  return fontSize;
+}
+
 function addWallLabel(group, poster, posterHeight) {
   const labelWidth = poster.labelWidth || Math.min(Math.max(poster.width, 2.5), 3.8);
   const artworkWidth = poster.frameWidth || poster.width;
@@ -5240,9 +5252,13 @@ function addWallLabel(group, poster, posterHeight) {
 
     if (poster.showMeta !== false) {
       context.fillStyle = '#34383a';
-      context.font = '400 36px Arial, Helvetica, sans-serif';
       const meta = poster.labelMeta || poster.authors;
-      const metaLines = wrapLabelText(context, meta, 1564, 2);
+      const metaFontSize = poster.labelMetaFontSize || 36;
+      context.font = `400 ${metaFontSize}px Arial, Helvetica, sans-serif`;
+      if (poster.labelMetaSingleLine) {
+        fitLabelFontSize(context, meta, 1564, metaFontSize, 20);
+      }
+      const metaLines = poster.labelMetaSingleLine ? [meta] : wrapLabelText(context, meta, 1564, 2);
       metaLines.forEach((line, index) => context.fillText(line, 18, 230 + index * 43));
     }
   } else {
