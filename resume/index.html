@@ -73,7 +73,7 @@
     <div class="home-layout">
       <main class="cv-document">
         <article class="paper page-one" aria-label="Résumé page 1">
-          <a class="resume-download-button" href="Puti_Wen_Resume_2026.pdf?v=20260720-resume-refresh2" target="_blank" rel="noopener">Download PDF <span aria-hidden="true">↓</span></a>
+          <a class="resume-download-button" href="Puti_Wen_Resume_2026.pdf?v=20260720-resume-refresh3" target="_blank" rel="noopener">Download PDF <span aria-hidden="true">↓</span></a>
           <header class="cv-header">
             <h1>Puti Wen <span class="chinese-name">温菩提</span></h1>
             <p class="headline">Neuroimaging Scientist | Research Infrastructure | MRI Analysis &amp; Clinical Imaging Tools</p>
@@ -86,7 +86,7 @@
               <span aria-hidden="true">|</span>
               <a href="https://putiw.github.io/" target="_blank" rel="noopener">Interactive Portfolio</a>
             </p>
-            <p class="summary">A somewhat unconventional neuroscientist. My Ph.D. was in visual neuroscience, but these days I spend most of my time building the infrastructure, pipelines, and practical software that keep brain-imaging projects moving—large MRI datasets, multiple-sclerosis research, and clinician-facing tools. I work comfortably across psychology, radiology, engineering, and clinical neurology, especially when a useful problem does not fit neatly inside one field.</p>
+            <p class="summary">A somewhat unconventional neuroscientist. My Ph.D. was in visual neuroscience, but these days I spend most of my time building the infrastructure, pipelines, and practical software that keep brain-imaging projects moving: large MRI datasets, multiple-sclerosis research, and clinician-facing tools. I work comfortably across psychology, radiology, engineering, and clinical neurology, especially when a useful problem does not fit neatly inside one field.</p>
           </header>
 
           <section class="cv-section skills-section" aria-labelledby="strengths-heading">
@@ -94,13 +94,13 @@
             <dl class="skills-list">
               <div><dt>Infrastructure</dt><dd>XNAT, Slurm/Jubail HPC, Docker, Singularity/Apptainer, GitHub Actions, Box API</dd></div>
               <div><dt>Neuroimaging</dt><dd>fMRIPrep, FreeSurfer, TractoFlow, MRIQC, BIDS, dcm2bids, DICOM, ANTs, SPM12, MELD/MAP18</dd></div>
-              <div><dt>Programming</dt><dd>Python, MATLAB, TypeScript/JavaScript, React Native, Next.js, Node.js/Express, Three.js, Phaser, Supabase</dd></div>
+              <div><dt>Programming</dt><dd>Python, MATLAB, TypeScript/JavaScript, React Native, Next.js, Node.js/Express, Three.js, Supabase</dd></div>
             </dl>
           </section>
 
           <section class="cv-section" aria-labelledby="experience-heading">
             <h2 id="experience-heading">Experience</h2>
-            <article class="role-entry">
+            <article class="role-entry" id="project-xnat-biobank">
               <div class="role-heading">
                 <h3><span>Postdoctoral Fellow</span><i aria-hidden="true">|</i><em>NYU Abu Dhabi, Center for Brain and Health</em></h3>
                 <span class="date-range"><time datetime="2024-09">Sep 2024</time> – Present</span>
@@ -108,20 +108,20 @@
 
               <h4>Research infrastructure &amp; analysis</h4>
               <ul>
-                <li><strong>Imaging data platform.</strong> Built six containerized XNAT/HPC pipelines—fMRI preprocessing, structural segmentation, diffusion tractography, MRI QC, cortical mapping, and BIDS validation—plus automated data curation and QA, a nightly per-subject validation dashboard, automated XNAT-to-Box backup, and full user documentation (350+ commits; 25+ issues resolved).</li>
+                <li><strong>Imaging data platform.</strong> Integrated and deployed leading open-source neuroimaging tools (fMRIPrep, MRIQC, TractoFlow, HCP, dcm2bids, and deep-learning visual-area segmentation) as containerized XNAT/HPC pipelines, so researchers can run them on their own data directly on the platform; also built two in-house pipelines (a BIDS-to-HCP converter and the ARI validator), plus automated data curation and QA, a nightly validation dashboard, XNAT-to-Box backup, and the documentation the imaging team relies on.</li>
                 <li><strong>Scanner-upgrade QC.</strong> Ran cross-scanner QC (SNR/tSNR/CNR) across Siemens CIMA.X and Prisma systems in Germany, NYUAD, and UAEU; the comparison report supported NYUAD's decision to upgrade to the CIMA.X.</li>
                 <li><strong>Normative brain dashboard.</strong> Processed 9,000+ HCP and ADNI subjects into an age- and sex-referenced dashboard with an upload-and-compare interface.</li>
                 <li><strong>Stimulus-computer migration.</strong> Rebuilt the CBH MRI stimulus setup from Intel to Apple Silicon: ported and tested active experiments, created reusable templates, and restored EyeLink, VPixx, and ProPixx integration.</li>
                 <li><strong>MS imaging analysis.</strong> Co-led tract-based quantitative MRI across 27 white-matter pathways, testing whether lesion location and tissue composition predict disability beyond total lesion load.</li>
-                <li><strong>Cross-department fMRI support.</strong> Co-authored an Engineering EEG-fMRI BCI study of how the brain's hand representation reorganizes for supernumerary robotic-thumb motor imagery before and after training.</li>
-                <li><strong>Training &amp; support.</strong> Trained 10+ researchers and built afqView, a BIDS-aware browser app for reviewing tractography across 116 subjects.</li>
+                <li><strong>Cross-department fMRI support.</strong> Co-authored an Engineering EEG-fMRI brain-computer interface (BCI) study of how the brain's hand representation reorganizes as users learn to control a supernumerary robotic thumb by motor imagery before and after training.</li>
+                <li id="project-afqview"><strong>Training &amp; support.</strong> Trained 10+ researchers across fMRI, diffusion, vision, biobank, genetics, and MS projects; resolved 25+ reported data-validation and pipeline issues; built afqView, a BIDS-aware browser app for reviewing tractography across 116 subjects.</li>
               </ul>
 
               <h4>Clinical imaging tools &amp; support</h4>
               <ul>
-                <li><strong>LesionView.</strong> Built longitudinal review and reporting for new and enlarging MS lesions; migrated the MATLAB prototype to the browser, iterated weekly with Yas Clinic, and contributed to provisional patent ABD01-03.</li>
-                <li><strong>CvsView.</strong> Built CVS/PRL review tooling; corrected SWI-FLAIR registration through relabeling, developed a LightGBM workflow, and containerized and deployed the tool for Harley Street Medical Centre.</li>
-                <li><strong>Brain-atrophy pipeline.</strong> Supported the pipeline used at Yas Clinic and ran FLAIR* CVS analysis for Harley Street Medical Centre and Cleveland Clinic Abu Dhabi.</li>
+                <li id="project-lesionview"><strong>LesionView.</strong> Built longitudinal lesion review and clinician-facing HTML/PDF report generation for new and enlarging MS lesions; migrated the original MATLAB prototype to a browser-based app and iterated weekly with Yas Clinic neurologists. Co-inventor on a provisional patent application (NYU Ref. ABD01-03).</li>
+                <li id="project-cvsview"><strong>CvsView.</strong> Built central-vein-sign and paramagnetic-rim-lesion review tooling; corrected SWI-FLAIR registration artifacts through relabeling, developed a LightGBM classification workflow, and containerized the tool for internal research evaluation and clinician review, piloted with Harley Street Medical Centre.</li>
+                <li><strong>Brain-atrophy pipeline.</strong> Built for internal research review and reporting in collaboration with Yas Clinic clinicians; also ran FLAIR* central-vein-sign processing for Harley Street Medical Centre and Cleveland Clinic Abu Dhabi.</li>
                 <li><strong>Epilepsy MRI.</strong> Supported CCAD using MELD and in-house MAP18/VBM against a 1,618-subject reference dataset; produced reports and joined multidisciplinary case review.</li>
                 <li><strong>Presurgical fMRI.</strong> Supported task-language mapping for an AVM case, from acquisition and processing through analysis and clinical review.</li>
               </ul>
@@ -155,18 +155,6 @@
             </article>
           </section>
 
-          <section class="cv-section" aria-labelledby="software-heading">
-            <h2 id="software-heading">Independent Software Projects</h2>
-            <article class="project-entry">
-              <h3><span>MyPhysio</span><i aria-hidden="true">—</i><em>physiotherapy practice app · 2026</em></h3>
-              <ul><li>Co-built a full-stack React Native / Next.js / Supabase app with admin dashboards, patient portals, exercise prescription, and pain and range-of-motion tracking.</li></ul>
-            </article>
-            <article class="project-entry">
-              <h3><span>Shrimp</span><i aria-hidden="true">—</i><em>aquarium simulation game (live) · 2026</em></h3>
-              <ul><li>Built a browser-based Phaser game with shrimp genetics and DNA testing, multi-tank management, aquascaping, save slots, custom animation, and offline/PWA support.</li></ul>
-            </article>
-          </section>
-
           <section class="cv-section" aria-labelledby="education-heading">
             <h2 id="education-heading">Education</h2>
             <div class="education-list">
@@ -191,17 +179,17 @@
           <section class="cv-section" aria-labelledby="recognition-heading">
             <h2 id="recognition-heading">Intellectual Property, Grants &amp; Recognition</h2>
             <ul>
-              <li>Co-inventor on provisional patents for LesionView and the automated cloud-based MS MRI pipeline / LAMINATE, filed via NYU Technology Opportunities &amp; Ventures, May 2026.</li>
+              <li>Co-inventor on provisional patent applications for LesionView and the automated cloud-based MS MRI pipeline / LAMINATE, filed via NYU Technology Opportunities &amp; Ventures, May 2026.</li>
               <li>Co-investigator on an Abu Dhabi Department of Health grant application on MRI characterization of optic-nerve myelination with Cleveland Clinic Abu Dhabi and Polytechnique Montréal, submitted January 2026.</li>
               <li>First Place Poster, NYU Abu Dhabi Division of Science Annual Research Conference, January 2025.</li>
-              <li>Co-author, LAMINATE oral presentation—Best Presentation Award, Tenth MENACTRIMS Congress, December 2025.</li>
+              <li>Co-author, LAMINATE oral presentation: Best Presentation Award, Tenth MENACTRIMS Congress, December 2025.</li>
             </ul>
           </section>
 
           <section class="cv-section" aria-labelledby="talks-heading">
             <h2 id="talks-heading">Selected Talks &amp; Presentations</h2>
             <ul>
-              <li>WHX Dubai Total Radiology Conference—invited talk on AI-powered detection of new lesions and central vein sign in MS; panelist on AI in neuroradiology (February 2026).</li>
+              <li>WHX Dubai Total Radiology Conference: invited talk on AI-powered detection of new lesions and central vein sign in MS; panelist on AI in neuroradiology (February 2026).</li>
               <li>Invited talks and lectures at NYUAD and the NYU Vision Journal Club (2022–2025); research briefings to NYUAD leadership and a Siemens Healthineers delegation.</li>
               <li>Posters and talks at Vision Sciences Society (2022–2024), ISMRM (2025), OHBM (2025), MENACTRIMS (2024–2025), and Innovations in Neuroimaging Methods (2026).</li>
             </ul>
@@ -209,6 +197,14 @@
 
           <section class="cv-section personal-section" aria-labelledby="outside-heading">
             <h2 id="outside-heading">Outside the Lab</h2>
+            <article class="project-entry" id="project-myphysio">
+              <h3><span>MyPhysio:</span> <em>physiotherapy practice app · 2026</em></h3>
+              <ul><li>Co-built a full-stack React Native / Next.js / Supabase app with admin dashboards, patient portals, exercise prescription, and pain and range-of-motion tracking.</li></ul>
+            </article>
+            <article class="project-entry">
+              <h3><span>Shrimp:</span> <em>aquarium simulation game (live) · 2026</em></h3>
+              <ul><li>Built a browser-based Phaser game with shrimp genetics and DNA testing, multi-tank management, aquascaping, save slots, custom animation, and offline/PWA support.</li></ul>
+            </article>
             <p>Languages: English and Chinese; basic Turkish. I design shirts and scientific illustrations for Cold Spring Harbor Laboratory and NYUAD's Center for Brain and Health, make science videos through <a href="https://www.youtube.com/@NARThings" target="_blank" rel="noopener">N.A.R. Things</a>, and keep a self-sustaining aquarium with no filter or routine cleaning. My artwork has appeared in fashion shows in China, and I once reached Grandmaster in Teamfight Tactics.</p>
           </section>
 
@@ -260,8 +256,8 @@
         ['gallery/vendor/loaders/GLTFLoader.js', 'script'],
         ['gallery/style.css?v=20260720-loading-motion1', 'style'],
         ['gallery/fonts/inter-regular.ttf', 'font'],
-        ['gallery/resume/resume-page-1.jpg?v=20260720-resume-refresh2', 'image'],
-        ['gallery/resume/resume-page-2.jpg?v=20260720-resume-refresh2', 'image'],
+        ['gallery/resume/resume-page-1.jpg?v=20260720-resume-refresh3', 'image'],
+        ['gallery/resume/resume-page-2.jpg?v=20260720-resume-refresh3', 'image'],
         ['gallery/posters/fst-wall.webp', 'image'],
         ['gallery/posters/decoding-wall.webp', 'image'],
         ['gallery/posters/cbh-wall.webp', 'image'],

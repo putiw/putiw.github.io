@@ -926,7 +926,7 @@ const resumePages = [
   {
     title: 'Puti Wen — Résumé',
     url: '/resume/',
-    image: './resume/resume-page-1.jpg?v=20260720-resume-refresh2',
+    image: './resume/resume-page-1.jpg?v=20260720-resume-refresh3',
     width: 3.28,
     aspect: 1391 / 1800,
     position: [1.9, 2.72, 6.9],
@@ -935,7 +935,7 @@ const resumePages = [
   {
     title: 'Puti Wen — Résumé',
     url: '/resume/',
-    image: './resume/resume-page-2.jpg?v=20260720-resume-refresh2',
+    image: './resume/resume-page-2.jpg?v=20260720-resume-refresh3',
     width: 3.28,
     aspect: 1391 / 1800,
     position: [-1.9, 2.72, 6.9],
