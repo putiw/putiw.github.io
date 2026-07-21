@@ -1052,6 +1052,7 @@ const galleryDestinationButton = document.getElementById('gallery-destination-bu
 const resumeButton = document.getElementById('resume-button');
 const controlSummary = document.getElementById('control-summary');
 const reticle = document.getElementById('reticle');
+const brainFixationLabel = document.getElementById('brain-fixation-label');
 const focusCard = document.getElementById('focus-card');
 const focusTitle = document.getElementById('focus-title');
 const focusEyebrow = focusCard.querySelector('small');
@@ -1091,6 +1092,9 @@ let focusedResumeLink = null;
 let focusedManualVideo = null;
 let focusedGameAction = null;
 let focusedBrainRegion = null;
+const BRAIN_RAYCAST_INTERVAL_MS = 80;
+let lastBrainRaycastAt = -Infinity;
+let cachedBrainRegion = null;
 let enteredOnce = false;
 let sceneReady = false;
 let webglAvailable = true;
@@ -1405,6 +1409,11 @@ function showWelcome(mode = 'initial') {
   welcomeScreen.hidden = false;
   reticle.hidden = true;
   walkHint.hidden = true;
+  focusedBrainRegion = null;
+  cachedBrainRegion = null;
+  lastBrainRaycastAt = -Infinity;
+  brainFixationLabel.textContent = '';
+  brainFixationLabel.hidden = true;
   focusCard.hidden = true;
   portalPrompt.hidden = true;
   hideSoundReminder();
@@ -1423,6 +1432,11 @@ function showCatalog() {
   galleryActive = false;
   pauseGalleryVideos();
   controls?.unlock();
+  focusedBrainRegion = null;
+  cachedBrainRegion = null;
+  lastBrainRaycastAt = -Infinity;
+  brainFixationLabel.textContent = '';
+  brainFixationLabel.hidden = true;
   galleryApp.classList.add('catalog-open');
   posterIndex.hidden = false;
   posterIndex.setAttribute('aria-hidden', 'false');
@@ -3468,6 +3482,9 @@ function enterHouseWorld(usePreviewLocation = false) {
   focusedManualVideo = null;
   focusedGameAction = null;
   focusedBrainRegion = null;
+  cachedBrainRegion = null;
+  lastBrainRaycastAt = -Infinity;
+  brainFixationLabel.hidden = true;
   focusCard.hidden = true;
   portalPrompt.hidden = true;
   reticle.classList.remove('active');
@@ -3940,14 +3957,6 @@ function refreshFocusCard() {
     focusEyebrow.textContent = 'Artwork · In view';
     focusTitle.textContent = focusedPhoto.title;
     focusAction.innerHTML = '<b class="video-primary"><kbd>E</kbd> Open high resolution</b>';
-    return;
-  }
-  if (focusedBrainRegion) {
-    focusCard.classList.remove('video-focus');
-    focusCard.classList.remove('is-playing');
-    focusEyebrow.textContent = 'Cortical region · Fixation target';
-    focusTitle.textContent = `${focusedBrainRegion.hemisphere} ${focusedBrainRegion.name}`;
-    focusAction.textContent = 'Move the reticle across the brain to inspect regions.';
     return;
   }
   if (focusedGameAction) {
@@ -6934,7 +6943,7 @@ function createBrainSurfaceMesh(surface, color) {
     color,
     roughness: 0.68,
     metalness: 0.02,
-    side: THREE.DoubleSide
+    side: THREE.FrontSide
   });
   return new THREE.Mesh(geometry, material);
 }
@@ -7877,7 +7886,7 @@ function addWallLabel(group, poster, posterHeight) {
   group.add(label);
 }
 
-function updateFocusedPoster() {
+function updateFocusedPoster(now = performance.now()) {
   if (!galleryActive) return false;
   if (insideHouseWorld) {
     const hadFocus = Boolean(focusedPoster || focusedPhoto || focusedResumeLink || focusedManualVideo || focusedGameAction || focusedBrainRegion);
@@ -7887,6 +7896,9 @@ function updateFocusedPoster() {
     focusedManualVideo = null;
     focusedGameAction = null;
     focusedBrainRegion = null;
+    cachedBrainRegion = null;
+    lastBrainRaycastAt = -Infinity;
+    brainFixationLabel.hidden = true;
     focusCard.hidden = true;
     reticle.classList.remove('active');
     return hadFocus;
@@ -7900,8 +7912,17 @@ function updateFocusedPoster() {
   const videoHit = nextPoster || nextResumeLink ? null : raycaster.intersectObjects(videoMeshes, false)[0];
   const gameAction = videoHit?.object?.userData?.gameAction || null;
   const videoEntry = videoHit?.object?.userData?.videoEntry || null;
-  const brainHit = nextPoster || videoHit ? null : raycaster.intersectObjects(brainMeshes, false)[0];
-  const nextBrainRegion = brainHit ? getBrainRegionAtHit(brainHit) : null;
+  let nextBrainRegion = cachedBrainRegion;
+  if (nextPoster || videoHit) {
+    cachedBrainRegion = null;
+    lastBrainRaycastAt = -Infinity;
+    nextBrainRegion = null;
+  } else if (now - lastBrainRaycastAt >= BRAIN_RAYCAST_INTERVAL_MS) {
+    lastBrainRaycastAt = now;
+    const brainHit = raycaster.intersectObjects(brainMeshes, false)[0];
+    cachedBrainRegion = brainHit ? getBrainRegionAtHit(brainHit) : null;
+    nextBrainRegion = cachedBrainRegion;
+  }
   if (videoEntry) videoEntry.screen.getWorldPosition(videoWorldPosition);
   const videoInRange = videoEntry
     && camera.position.distanceTo(videoWorldPosition) <= videoEntry.interactionRadius;
@@ -7935,13 +7956,17 @@ function updateFocusedPoster() {
   focusedManualVideo = nextManualVideo;
   focusedGameAction = nextGameAction;
   focusedBrainRegion = nextBrainRegion;
-  // Static artwork still highlights under the reticle, but only videos and
-  // active buttons and brain regions get the instructional tooltip card.
-  focusCard.hidden = !nextPhoto && !nextResumeLink && !nextManualVideo && !nextGameAction && !nextBrainRegion;
+  brainFixationLabel.hidden = !nextBrainRegion;
+  brainFixationLabel.textContent = nextBrainRegion
+    ? `${nextBrainRegion.hemisphere} ${nextBrainRegion.name}`
+    : '';
+  // Static artwork and brain regions still highlight under the reticle, but
+  // only videos and active buttons get the instructional tooltip card.
+  focusCard.hidden = !nextPhoto && !nextResumeLink && !nextManualVideo && !nextGameAction;
   focusCard.classList.toggle('video-focus', Boolean(focusedManualVideo));
   if (!focusedManualVideo && !focusedGameAction) focusCard.classList.remove('is-playing');
   reticle.classList.toggle('active', Boolean(focusedPoster || focusedPhoto || focusedResumeLink || focusedManualVideo || focusedGameAction || focusedBrainRegion));
-  if (focusedPhoto || focusedResumeLink || focusedManualVideo || focusedGameAction || focusedBrainRegion) refreshFocusCard();
+  if (focusedPhoto || focusedResumeLink || focusedManualVideo || focusedGameAction) refreshFocusCard();
   return true;
 }
 
@@ -8105,7 +8130,7 @@ function updateMovement(delta) {
       houseWorldEdgeDropActive = false;
     }
   }
-  const crouchTarget = pressedKeys.has('ArrowDown') ? 1 : 0;
+  const crouchTarget = pressedKeys.has('ShiftLeft') || pressedKeys.has('ShiftRight') ? 1 : 0;
   crouchAmount = THREE.MathUtils.damp(crouchAmount, crouchTarget, 14, delta);
   if (insideHouseWorld) {
     // Snap upward onto each stair immediately so the camera can never lag
@@ -8139,7 +8164,7 @@ function animate(now) {
   updateShrimpRoomMusic(delta);
   updateSoundReminder();
   flushVideoSync(now);
-  const focusChanged = updateFocusedPoster();
+  const focusChanged = updateFocusedPoster(now);
   refreshFocusedVideoTime();
   const fallbackVideoPlaying = galleryVideos
     .some((entry) => !entry.supportsFrameCallback && !entry.element.paused && entry.element.readyState >= 2);
@@ -8461,6 +8486,11 @@ function initializeGallery() {
     focusedResumeLink = null;
     focusedManualVideo = null;
     focusedGameAction = null;
+    focusedBrainRegion = null;
+    cachedBrainRegion = null;
+    lastBrainRaycastAt = -Infinity;
+    brainFixationLabel.textContent = '';
+    brainFixationLabel.hidden = true;
     posterMeshes.forEach((mesh) => {
       mesh.userData.frame.material.color.set(mesh.userData.defaultFrameColor);
       mesh.userData.frame.material.emissive.set(0x000000);
@@ -8581,12 +8611,12 @@ window.addEventListener('keydown', (event) => {
     return;
   }
 
-  const movementKeys = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowDown'];
+  const movementKeys = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ShiftLeft', 'ShiftRight'];
   if (movementKeys.includes(event.code)) {
     pressedKeys.add(event.code);
     if (galleryActive) event.preventDefault();
   }
-  if (event.code === 'Space' || event.code === 'ArrowUp') {
+  if (event.code === 'Space') {
     if (galleryActive) event.preventDefault();
     if (!event.repeat) startJump();
   }

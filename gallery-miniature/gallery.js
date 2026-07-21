@@ -5473,7 +5473,7 @@ function updateMovement(delta) {
       jumpVelocity = 0;
     }
   }
-  const crouchTarget = pressedKeys.has('ArrowDown') ? 1 : 0;
+  const crouchTarget = pressedKeys.has('ShiftLeft') || pressedKeys.has('ShiftRight') ? 1 : 0;
   crouchAmount = THREE.MathUtils.damp(crouchAmount, crouchTarget, 14, delta);
   camera.position.y = STANDING_EYE_HEIGHT - CROUCH_DROP * crouchAmount + jumpOffset;
 
@@ -6148,12 +6148,12 @@ window.addEventListener('keydown', (event) => {
     return;
   }
 
-  const movementKeys = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowDown'];
+  const movementKeys = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ShiftLeft', 'ShiftRight'];
   if (movementKeys.includes(event.code)) {
     pressedKeys.add(event.code);
     if (galleryActive) event.preventDefault();
   }
-  if (event.code === 'Space' || event.code === 'ArrowUp') {
+  if (event.code === 'Space') {
     if (galleryActive) event.preventDefault();
     if (!event.repeat) startJump();
   }
