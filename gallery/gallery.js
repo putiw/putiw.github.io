@@ -266,13 +266,13 @@ const MRI_VIDEO_WORKS = [
 ];
 
 const BRAIN_SOURCES = {
-  left: '../mri/lh.pial',
-  right: '../mri/rh.pial'
+  left: '../mri/lh.optimized.pial',
+  right: '../mri/rh.optimized.pial'
 };
 
 const BRAIN_ANNOTATIONS = {
-  left: '../mri/lh.aparc.DKTatlas.annot',
-  right: '../mri/rh.aparc.DKTatlas.annot'
+  left: '../mri/lh.aparc.DKTatlas.optimized.annot',
+  right: '../mri/rh.aparc.DKTatlas.optimized.annot'
 };
 
 const APP_VIDEO_WIDTH = 2.8;

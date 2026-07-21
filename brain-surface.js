@@ -174,8 +174,8 @@ async function init() {
   try {
     setStatus('Loading left hemisphere…');
     const [left, right] = await Promise.all([
-      loadSurface('mri/lh.pial', 'Left hemisphere', 0x51bfd1),
-      loadSurface('mri/rh.pial', 'Right hemisphere', 0xe89a87)
+      loadSurface('mri/lh.optimized.pial', 'Left hemisphere', 0x51bfd1),
+      loadSurface('mri/rh.optimized.pial', 'Right hemisphere', 0xe89a87)
     ]);
 
     hemisphereMeshes.left = left;

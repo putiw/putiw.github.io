@@ -1,0 +1,25 @@
+{
+  "ratio": 0.2,
+  "hemispheres": {
+    "lh": {
+      "source_vertices": 139521,
+      "optimized_vertices": 27905,
+      "source_triangles": 279038,
+      "optimized_triangles": 55806,
+      "source_bytes": 6141830,
+      "optimized_bytes": 1229254,
+      "nearest_source_distance_mm_p95": 0.5866956324155354,
+      "nearest_source_distance_mm_max": 1.0300916027921692
+    },
+    "rh": {
+      "source_vertices": 140896,
+      "optimized_vertices": 28180,
+      "source_triangles": 281788,
+      "optimized_triangles": 56356,
+      "source_bytes": 6202330,
+      "optimized_bytes": 1241354,
+      "nearest_source_distance_mm_p95": 0.5837017063767171,
+      "nearest_source_distance_mm_max": 1.1091895004197005
+    }
+  }
+}
