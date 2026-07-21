@@ -31,6 +31,17 @@ const ROOM_KEYS = {
   videos: 'videos',
   art: 'art'
 };
+const ROOM_CONTENT_SIGHTLINES = {
+  [ROOM_KEYS.main]: [ROOM_KEYS.main, ROOM_KEYS.app, ROOM_KEYS.screening],
+  [ROOM_KEYS.app]: [ROOM_KEYS.main, ROOM_KEYS.app, ROOM_KEYS.game, ROOM_KEYS.mri, ROOM_KEYS.art],
+  [ROOM_KEYS.screening]: [ROOM_KEYS.main, ROOM_KEYS.screening, ROOM_KEYS.brain],
+  [ROOM_KEYS.brain]: [ROOM_KEYS.screening, ROOM_KEYS.brain, ROOM_KEYS.mri],
+  [ROOM_KEYS.mri]: [ROOM_KEYS.app, ROOM_KEYS.brain, ROOM_KEYS.mri, ROOM_KEYS.game],
+  [ROOM_KEYS.game]: [ROOM_KEYS.app, ROOM_KEYS.game, ROOM_KEYS.videos],
+  [ROOM_KEYS.videos]: [ROOM_KEYS.game, ROOM_KEYS.videos],
+  [ROOM_KEYS.art]: [ROOM_KEYS.main, ROOM_KEYS.app, ROOM_KEYS.art]
+};
+const MUG_SIGHTLINE_ROOM_KEYS = [ROOM_KEYS.main, ROOM_KEYS.app, ROOM_KEYS.art];
 const MAIN_ROOM_AREA = {
   centerX: 0,
   halfWidth: ROOM.halfWidth,
@@ -1092,9 +1103,13 @@ let focusedResumeLink = null;
 let focusedManualVideo = null;
 let focusedGameAction = null;
 let focusedBrainRegion = null;
-const BRAIN_RAYCAST_INTERVAL_MS = 80;
-let lastBrainRaycastAt = -Infinity;
-let cachedBrainRegion = null;
+const FOCUS_TARGET_INTERVAL_MS = 1000 / 15;
+const AMBIENT_EFFECT_INTERVAL_MS = 1000 / 30;
+const FOCUSED_VIDEO_TIME_INTERVAL_MS = 1000;
+let lastFocusTargetUpdateAt = -Infinity;
+let focusTargetUpdateRequested = false;
+let lastAmbientEffectUpdateAt = -Infinity;
+let lastFocusedVideoTimeUpdateAt = -Infinity;
 let enteredOnce = false;
 let sceneReady = false;
 let webglAvailable = true;
@@ -1124,6 +1139,7 @@ let fullGalleryPreloadStarted = false;
 const backgroundVideoPreloadPromises = new WeakMap();
 const fullGalleryPreloadRoomKeys = new Set();
 const roomVisualReadyKeys = new Set([ROOM_KEYS.main]);
+const roomVisibilityEntries = new Map();
 const roomVisualReadyResolvers = new Map();
 const roomLoadControllers = new Map();
 let artGalleryLoadStarted = false;
@@ -1410,8 +1426,8 @@ function showWelcome(mode = 'initial') {
   reticle.hidden = true;
   walkHint.hidden = true;
   focusedBrainRegion = null;
-  cachedBrainRegion = null;
-  lastBrainRaycastAt = -Infinity;
+  focusTargetUpdateRequested = false;
+  lastFocusTargetUpdateAt = -Infinity;
   brainFixationLabel.textContent = '';
   brainFixationLabel.hidden = true;
   focusCard.hidden = true;
@@ -1421,6 +1437,8 @@ function showWelcome(mode = 'initial') {
 
 function hideWelcome() {
   welcomeScreen.hidden = true;
+  focusTargetUpdateRequested = true;
+  lastFocusTargetUpdateAt = -Infinity;
   if (!isCoarsePointer) {
     reticle.hidden = false;
     walkHint.hidden = false;
@@ -1433,8 +1451,8 @@ function showCatalog() {
   pauseGalleryVideos();
   controls?.unlock();
   focusedBrainRegion = null;
-  cachedBrainRegion = null;
-  lastBrainRaycastAt = -Infinity;
+  focusTargetUpdateRequested = false;
+  lastFocusTargetUpdateAt = -Infinity;
   brainFixationLabel.textContent = '';
   brainFixationLabel.hidden = true;
   galleryApp.classList.add('catalog-open');
@@ -1736,7 +1754,7 @@ function addGalleryMap() {
   map.position.set(blankSectionCenter, APP_ROOM.height / 2 + 0.08, APP_ROOM.nearZ + 0.1);
   map.rotation.y = 0;
   map.renderOrder = 6;
-  scene.add(map);
+  addRoomContent(ROOM_KEYS.app, map);
 }
 
 function createAppRoom() {
@@ -2155,7 +2173,12 @@ function createGameRoomShell(room, doorSide) {
   });
   const roomLight = new THREE.PointLight(0xc8d7dc, 12, 8, 2);
   roomLight.position.set(room.centerX, room.height - 0.7, roomCenterZ);
-  scene.add(roomLight);
+  const roomKey = room === GAME_ROOM
+    ? ROOM_KEYS.game
+    : room === VIDEOS_ROOM
+      ? ROOM_KEYS.videos
+      : ROOM_KEYS.mri;
+  addRoomContent(roomKey, roomLight);
 }
 
 function createGameRoom() {
@@ -2194,7 +2217,7 @@ function addGameWallSheet(sheet, texture) {
     group.rotation.y = Math.PI / 2;
   }
   group.add(artwork);
-  scene.add(group);
+  addRoomContent(ROOM_KEYS.game, group);
   needsRender = true;
 }
 
@@ -2334,7 +2357,7 @@ function createHomeFloorArrow() {
   const directionZ = HOME_PORTAL.z - HOME_FLOOR_ARROW.z;
   arrow.position.set(HOME_FLOOR_ARROW.x, 0.012, HOME_FLOOR_ARROW.z);
   arrow.rotation.y = Math.atan2(directionX, directionZ);
-  scene.add(arrow);
+  addRoomContent(ROOM_KEYS.art, arrow);
 }
 
 function createArtRoom() {
@@ -2485,11 +2508,11 @@ function createMugDisplay(texture, config) {
   mug.add(handle);
 
   display.add(mug);
-  scene.add(display);
+  addRoomContent(ROOM_KEYS.art, display, MUG_SIGHTLINE_ROOM_KEYS);
 
   const mugLight = new THREE.PointLight(0xfff5e3, 30, 7, 2);
   mugLight.position.set(config.x, 4.1, config.z - 0.6);
-  scene.add(mugLight);
+  addRoomContent(ROOM_KEYS.art, mugLight, MUG_SIGHTLINE_ROOM_KEYS);
   needsRender = true;
 }
 
@@ -2613,7 +2636,7 @@ function createHouseDisplay(gltf) {
   modelPivot.add(model);
   display.add(modelPivot);
 
-  scene.add(display);
+  addRoomContent(ROOM_KEYS.art, display);
   needsRender = true;
 }
 
@@ -2636,7 +2659,7 @@ function createHouseFloorPreview(gltf) {
   modelPivot.rotation.y = HOUSE_FLOOR_PREVIEW.rotationY;
   modelPivot.add(model);
   display.add(modelPivot);
-  scene.add(display);
+  addRoomContent(ROOM_KEYS.art, display);
   needsRender = true;
 }
 
@@ -3000,7 +3023,7 @@ function createHomePortalSurface() {
   );
   veil.position.set(HOME_PORTAL.x, HOME_PORTAL.height / 2, HOME_PORTAL.z + 0.102);
   veil.renderOrder = 12;
-  scene.add(veil);
+  addRoomContent(ROOM_KEYS.art, veil);
   homePortalVeil = veil;
   homePortalVeilMaterial = material;
 }
@@ -3476,14 +3499,15 @@ function enterHouseWorld(usePreviewLocation = false) {
   resetPlayerHeight();
   pauseGalleryVideos();
   pauseShrimpRoomMusic();
+  hideSoundReminder();
   focusedPoster = null;
   focusedPhoto = null;
   focusedResumeLink = null;
   focusedManualVideo = null;
   focusedGameAction = null;
   focusedBrainRegion = null;
-  cachedBrainRegion = null;
-  lastBrainRaycastAt = -Infinity;
+  focusTargetUpdateRequested = false;
+  lastFocusTargetUpdateAt = -Infinity;
   brainFixationLabel.hidden = true;
   focusCard.hidden = true;
   portalPrompt.hidden = true;
@@ -3515,6 +3539,9 @@ function exitHouseWorld() {
   setWalkHint();
   playGalleryVideos();
   requestVideoSync();
+  focusTargetUpdateRequested = true;
+  lastFocusTargetUpdateAt = -Infinity;
+  updatePositionDependentState();
   needsRender = true;
 }
 
@@ -3592,6 +3619,17 @@ function updateHomePortalEffects(now) {
     portalPrompt.hidden = true;
   }
   return nearPortal;
+}
+
+function flushAmbientEffects(now) {
+  if (now - lastAmbientEffectUpdateAt < AMBIENT_EFFECT_INTERVAL_MS) return false;
+  if (Number.isFinite(lastAmbientEffectUpdateAt)) {
+    const elapsed = now - lastAmbientEffectUpdateAt;
+    lastAmbientEffectUpdateAt = now - (elapsed % AMBIENT_EFFECT_INTERVAL_MS);
+  } else {
+    lastAmbientEffectUpdateAt = now;
+  }
+  return updateHomePortalEffects(now);
 }
 
 function isHomePortalCrossing(x, z, previousZ) {
@@ -3865,7 +3903,7 @@ function copyMiniatureObject(source) {
   copy.position.copy(source.position);
   copy.quaternion.copy(source.quaternion);
   copy.scale.copy(source.scale);
-  copy.visible = source.visible;
+  copy.visible = source.userData.galleryRoomKey ? true : source.visible;
   copy.renderOrder = source.renderOrder;
   copy.frustumCulled = source.frustumCulled;
   source.children.forEach((child) => {
@@ -3895,7 +3933,7 @@ function populateMiniature(target) {
 
 function createGalleryMiniature() {
   if (!scene || !sceneReady) return;
-  if (galleryMiniature) scene.remove(galleryMiniature);
+  if (galleryMiniature) removeRoomContent(galleryMiniature);
 
   const miniature = new THREE.Group();
   miniature.name = 'Full gallery miniature without table';
@@ -3914,7 +3952,7 @@ function createGalleryMiniature() {
   populateMiniature(nestedMiniature);
   miniature.add(nestedMiniature);
 
-  scene.add(miniature);
+  addRoomContent(ROOM_KEYS.art, miniature);
   galleryMiniature = miniature;
   needsRender = true;
 }
@@ -3981,6 +4019,7 @@ function refreshFocusCard() {
     <b class="video-primary"><kbd>E</kbd> ${isPlaying ? 'Pause' : 'Play'} <i>or click</i></b>
     <em class="video-secondary"><em class="video-time">${formatVideoTime(focusedManualVideo.element.currentTime)} / ${formatVideoTime(focusedManualVideo.element.duration)}</em> · <kbd>←</kbd> <kbd>→</kbd> skip 5 sec · hold <kbd>E</kbd> to restart</em>
   `;
+  lastFocusedVideoTimeUpdateAt = performance.now();
 }
 
 function formatVideoTime(seconds) {
@@ -3991,10 +4030,12 @@ function formatVideoTime(seconds) {
   return `${minutes}:${remainder}`;
 }
 
-function refreshFocusedVideoTime() {
+function refreshFocusedVideoTime(now = performance.now(), force = false) {
   if (!focusedManualVideo) return;
+  if (!force && now - lastFocusedVideoTimeUpdateAt < FOCUSED_VIDEO_TIME_INTERVAL_MS) return;
   const timeLabel = focusCard.querySelector('.video-time');
   if (!timeLabel) return;
+  lastFocusedVideoTimeUpdateAt = now;
   const nextLabel = `${formatVideoTime(focusedManualVideo.element.currentTime)} / ${formatVideoTime(focusedManualVideo.element.duration)}`;
   if (timeLabel.textContent !== nextLabel) timeLabel.textContent = nextLabel;
 }
@@ -4063,6 +4104,7 @@ function restartVideoEntry(entry) {
 
   const restart = () => {
     video.currentTime = 0;
+    refreshFocusedVideoTime(performance.now(), true);
     if (!shouldPlayVideo(entry)) {
       video.pause();
       refreshFocusCard();
@@ -4098,6 +4140,7 @@ function seekVideoEntry(entry, offsetSeconds) {
     const duration = Number.isFinite(video.duration) ? video.duration : 0;
     const latestTime = duration > 0 ? Math.max(0, duration - 0.05) : Number.POSITIVE_INFINITY;
     video.currentTime = THREE.MathUtils.clamp(video.currentTime + offsetSeconds, 0, latestTime);
+    refreshFocusedVideoTime(performance.now(), true);
     needsRender = true;
   };
 
@@ -4205,6 +4248,7 @@ function createStandingVideoDisplay(work, posterTexture) {
     photo.position.set(0, angledNeck.position.y, 0.136);
     screenAssembly.add(photo);
     photoMeshes.push(photo);
+    requestFocusTargetUpdate();
   }
 
   const video = document.createElement('video');
@@ -4232,6 +4276,7 @@ function createStandingVideoDisplay(work, posterTexture) {
 
   const entry = {
     title: work.title,
+    root: group,
     source: work.source,
     posterImage: work.posterImage,
     activationBounds: work.activationBounds,
@@ -4284,10 +4329,11 @@ function createStandingVideoDisplay(work, posterTexture) {
   });
   interactionTarget.userData.videoEntry = entry;
   videoMeshes.push(interactionTarget);
+  requestFocusTargetUpdate();
   galleryVideos.push(entry);
   manualVideoEntries.push(entry);
   maybePrepareNewVideoEntry(entry);
-  scene.add(group);
+  addRoomContent(work.roomKey, group);
   if (galleryActive) requestVideoSync();
   needsRender = true;
   return entry;
@@ -4387,6 +4433,7 @@ function addGameLaunchButton(screenAssembly, work, frameHeight) {
   screenAssembly.parent?.updateMatrixWorld(true);
   button.getWorldPosition(button.userData.gameAction.position);
   videoMeshes.push(button);
+  requestFocusTargetUpdate();
 }
 
 function createHouseRainDisplay(posterTexture) {
@@ -4441,7 +4488,7 @@ function startArtRoomMugLoads() {
 
 function getArtApproachImage(image) {
   const cleanPath = image.split('?')[0];
-  return `${cleanPath.replace('/walls/hd/', '/walls/approach/')}?v=20260720-progressive1`;
+  return `${cleanPath.replace('/walls/hd/', '/walls/approach/')}?v=20260721-quarter-size1`;
 }
 
 function loadArtWallTile(textureLoader, sheet, image, tileIndex, quality = 'approach') {
@@ -4452,19 +4499,17 @@ function loadArtWallTile(textureLoader, sheet, image, tileIndex, quality = 'appr
     textureLoader.load(
       source,
       (texture) => {
-        addArtWallSheet(sheet, texture, tileIndex);
-        resolve();
+        const applyTexture = () => {
+          addArtWallSheet(sheet, texture, tileIndex);
+          resolve();
+        };
+        if (quality === 'hd') waitForGalleryCameraIdle(1400).then(applyTexture);
+        else applyTexture();
       },
       undefined,
       resolve
     );
   });
-}
-
-function loadArtWallSheetTiles(textureLoader, sheet, quality = 'approach') {
-  return Promise.all(sheet.images.map((image, tileIndex) => (
-    loadArtWallTile(textureLoader, sheet, image, tileIndex, quality)
-  )));
 }
 
 function waitForGalleryCameraIdle(minimumIdleMs = 1200) {
@@ -4487,8 +4532,8 @@ function startArtRoomHdUpgrades() {
     const orderedSheets = [farSheet, ...ART_WALL_SHEETS.filter((sheet) => sheet !== farSheet)]
       .filter(Boolean);
 
-    // Decode and swap only one 4K tile at a time. Movement resets the idle
-    // window, so sprinting or rotating can never trigger the full wall burst.
+    // Request one 4K tile at a time and recheck the idle window before its
+    // GPU swap, so movement that starts mid-download still stays smooth.
     for (const sheet of orderedSheets) {
       for (let tileIndex = 0; tileIndex < sheet.images.length; tileIndex += 1) {
         await waitForGalleryCameraIdle(1400);
@@ -4518,15 +4563,44 @@ function startArtRoomLoads() {
   const peripheralLoadPromises = [];
   const tshirtWallSheet = ART_WALL_SHEETS.find((sheet) => sheet.side === 'far');
   const remainingArtWallSheets = ART_WALL_SHEETS.filter((sheet) => sheet !== tshirtWallSheet);
+  let approachLoadChain = Promise.resolve();
+  const createApproachSheetJob = (sheet) => () => {
+    sheet.images.forEach((image, tileIndex) => {
+      approachLoadChain = approachLoadChain.then(() => (
+        loadArtWallTile(textureLoader, sheet, image, tileIndex)
+      ));
+      approachLoadPromises.push(approachLoadChain);
+    });
+  };
   const jobs = [
     () => {
-      if (!tshirtWallSheet) return;
-      approachLoadPromises.push(loadArtWallSheetTiles(textureLoader, tshirtWallSheet));
+      const houseLoader = new GLTFLoader();
+      peripheralLoadPromises.push(new Promise((resolve) => {
+        houseLoader.load(HOUSE_DISPLAY.model, (gltf) => {
+          createHouseFloorPreview(gltf);
+          const roomfloorPatchLoader = new GLTFLoader();
+          roomfloorPatchLoader.load(
+            HOUSE_WORLD_ROOMFLOOR_PATCH,
+            (roomfloorPatchGltf) => {
+              createFullScaleHouse(gltf, roomfloorPatchGltf);
+              resolve();
+            },
+            undefined,
+            (error) => {
+              console.warn('Could not load life-size roomfloor patch.', error);
+              createFullScaleHouse(gltf);
+              resolve();
+            }
+          );
+        }, undefined, (error) => {
+          console.warn('Could not load childhood house model.', error);
+          resolve();
+        });
+      }));
     },
+    ...(tshirtWallSheet ? [createApproachSheetJob(tshirtWallSheet)] : []),
     () => createArtGallery(),
-    ...remainingArtWallSheets.map((sheet) => () => {
-      approachLoadPromises.push(loadArtWallSheetTiles(textureLoader, sheet));
-    }),
+    ...remainingArtWallSheets.map(createApproachSheetJob),
     () => {
       const houseRainEntry = createHouseRainDisplay(createVideoPlaceholderTexture());
       peripheralLoadPromises.push(new Promise((resolve) => {
@@ -4551,31 +4625,6 @@ function startArtRoomLoads() {
           undefined,
           resolve
         );
-      }));
-    },
-    () => {
-      const houseLoader = new GLTFLoader();
-      peripheralLoadPromises.push(new Promise((resolve) => {
-        houseLoader.load(HOUSE_DISPLAY.model, (gltf) => {
-          createHouseFloorPreview(gltf);
-          const roomfloorPatchLoader = new GLTFLoader();
-          roomfloorPatchLoader.load(
-            HOUSE_WORLD_ROOMFLOOR_PATCH,
-            (roomfloorPatchGltf) => {
-              createFullScaleHouse(gltf, roomfloorPatchGltf);
-              resolve();
-            },
-            undefined,
-            (error) => {
-              console.warn('Could not load life-size roomfloor patch.', error);
-              createFullScaleHouse(gltf);
-              resolve();
-            }
-          );
-        }, undefined, (error) => {
-          console.warn('Could not load childhood house model.', error);
-          resolve();
-        });
       }));
     },
     () => {
@@ -4850,6 +4899,52 @@ function isCameraNearRoom(room, margin = 2) {
   return Math.hypot(camera.position.x - nearestX, camera.position.z - nearestZ) <= margin;
 }
 
+function isRoomContentVisible(roomKey, visibleFromRoomKeys = null) {
+  if (!currentGalleryRoomKey) return true;
+  if (visibleFromRoomKeys) return visibleFromRoomKeys.includes(currentGalleryRoomKey);
+  return ROOM_CONTENT_SIGHTLINES[currentGalleryRoomKey]?.includes(roomKey) ?? true;
+}
+
+function addRoomContent(roomKey, object, visibleFromRoomKeys = null) {
+  object.userData.galleryRoomKey = roomKey;
+  object.visible = isRoomContentVisible(roomKey, visibleFromRoomKeys);
+  roomVisibilityEntries.set(object, { object, roomKey, visibleFromRoomKeys });
+  scene.add(object);
+  return object;
+}
+
+function removeRoomContent(object) {
+  roomVisibilityEntries.delete(object);
+  scene.remove(object);
+}
+
+function updateRoomContentVisibility() {
+  let changed = false;
+  roomVisibilityEntries.forEach(({ object, roomKey, visibleFromRoomKeys }) => {
+    const visible = isRoomContentVisible(roomKey, visibleFromRoomKeys);
+    if (object.visible === visible) return;
+    object.visible = visible;
+    changed = true;
+  });
+  if (!changed) return;
+  requestFocusTargetUpdate();
+  requestVideoSync();
+  needsRender = true;
+}
+
+function isObjectVisibleInHierarchy(object) {
+  let current = object;
+  while (current) {
+    if (!current.visible) return false;
+    current = current.parent;
+  }
+  return true;
+}
+
+function getVisibleInteractionMeshes(meshes) {
+  return meshes.filter(isObjectVisibleInHierarchy);
+}
+
 function isCameraInsideRoom(room, margin = 0.35) {
   const roomLeft = room.centerX - room.halfWidth;
   const roomRight = room.centerX + room.halfWidth;
@@ -4898,6 +4993,9 @@ function isRoomPreparationAllowed(roomKey) {
       );
   }
   if (currentGalleryRoomKey === roomKey) return true;
+  if (currentGalleryRoomKey === ROOM_KEYS.game && roomKey === ROOM_KEYS.videos) return true;
+  if (currentGalleryRoomKey === ROOM_KEYS.app && roomKey === ROOM_KEYS.art) return true;
+  if (currentGalleryRoomKey === ROOM_KEYS.mri && roomKey === ROOM_KEYS.game) return true;
   if (fullGalleryPreloadRoomKeys.has(roomKey)) {
     return !currentGalleryRoomKey || roomVisualReadyKeys.has(currentGalleryRoomKey);
   }
@@ -4918,7 +5016,10 @@ function prepareGalleryRoomContent(
   }
 
   if (roomKey === ROOM_KEYS.main) startMainRoomBackgroundLoads();
-  if (roomKey === ROOM_KEYS.app) startResearchRoomLoads();
+  if (roomKey === ROOM_KEYS.app) {
+    startResearchRoomLoads();
+    startArtRoomLoads();
+  }
   if (roomKey === ROOM_KEYS.screening) startScreeningRoomLoads();
   if (roomKey === ROOM_KEYS.brain) {
     startBrainWallLoads();
@@ -4927,8 +5028,12 @@ function prepareGalleryRoomContent(
   if (roomKey === ROOM_KEYS.mri) {
     requestBrainSurfaceLoad();
     startMriWallLoads();
+    startGameRoomLoads();
   }
-  if (roomKey === ROOM_KEYS.game) startGameRoomLoads();
+  if (roomKey === ROOM_KEYS.game) {
+    startGameRoomLoads();
+    requestVideoRoomLoad();
+  }
   if (roomKey === ROOM_KEYS.videos) requestVideoRoomLoad();
   if (roomKey === ROOM_KEYS.art) {
     startArtRoomLoads();
@@ -5008,12 +5113,19 @@ function maybeLoadNearbyRoomContent() {
   if (!insideHouseWorld) beginAnalyticsRoomVisit(nextCurrentRoomKey);
   previousGalleryRoomKey = currentGalleryRoomKey;
   currentGalleryRoomKey = nextCurrentRoomKey;
+  updateRoomContentVisibility();
   speculativeOriginRoomKey = null;
   speculativeRoomKey = null;
   if (activeRoomVideoSequence?.roomKey !== currentGalleryRoomKey) {
     activeRoomVideoSequence.stopped = true;
   }
   prepareGalleryRoomContent(currentGalleryRoomKey);
+}
+
+function updatePositionDependentState() {
+  if (insideHouseWorld) return;
+  maybeLoadNearbyRoomContent();
+  updateSoundReminder();
 }
 
 function openResumePage() {
@@ -5283,7 +5395,7 @@ function createHouseRenderWall(textureLoader) {
   const doorLeft = ART_ROOM.centerX + ART_ROOM.doorOffsetX - ART_ROOM.doorWidth / 2;
   const wallGroup = new THREE.Group();
   wallGroup.position.set((roomLeft + doorLeft) / 2, 0, ART_ROOM.nearZ + 0.075);
-  scene.add(wallGroup);
+  addRoomContent(ROOM_KEYS.art, wallGroup);
 
   textureLoader.load(
     HOUSE_RENDER_WALL.image,
@@ -5353,7 +5465,7 @@ function addArtWallSheet(sheet, texture, tileIndex = 0) {
   }
 
   group.add(wallSheet);
-  scene.add(group);
+  addRoomContent(ROOM_KEYS.art, group);
   needsRender = true;
 }
 
@@ -5395,7 +5507,7 @@ function createTshirtWall(textureLoader) {
     ART_ROOM.farZ - 0.1
   );
   wallGroup.rotation.y = Math.PI;
-  scene.add(wallGroup);
+  addRoomContent(ROOM_KEYS.art, wallGroup);
   textureLoader.load(
     TSHIRT_TEMPLATE_PANEL.image,
     (texture) => addArtTemplatePanel(wallGroup, TSHIRT_TEMPLATE_PANEL, texture)
@@ -5572,11 +5684,11 @@ function createScreeningRoom() {
 
   const hallwayGlow = new THREE.PointLight(0xc6d2d9, 18, 7, 2);
   hallwayGlow.position.set(SCREENING_ROOM.centerX, 3.15, 9.55);
-  scene.add(hallwayGlow);
+  addRoomContent(ROOM_KEYS.screening, hallwayGlow);
 
   const screeningGlow = new THREE.PointLight(0xb9c6ce, 10, 9, 2);
   screeningGlow.position.set(SCREENING_ROOM.centerX, 4.25, 14.4);
-  scene.add(screeningGlow);
+  addRoomContent(ROOM_KEYS.screening, screeningGlow);
 }
 
 function createBrainRoom() {
@@ -5683,7 +5795,7 @@ function createBrainRoom() {
 
   const brainLight = new THREE.PointLight(0xb9d0d7, 8, 7.5, 2);
   brainLight.position.set(BRAIN_ROOM.centerX, BRAIN_ROOM.height - 0.65, roomCenterZ);
-  scene.add(brainLight);
+  addRoomContent(ROOM_KEYS.brain, brainLight);
 
   const doorwayLight = new THREE.PointLight(0x8fa4ac, 2.5, 4.5, 2);
   doorwayLight.position.set(
@@ -5691,7 +5803,7 @@ function createBrainRoom() {
     BRAIN_ROOM.doorHeight - 0.35,
     doorCenterZ
   );
-  scene.add(doorwayLight);
+  addRoomContent(ROOM_KEYS.brain, doorwayLight);
 
 }
 
@@ -6257,7 +6369,7 @@ function createArtGallery() {
       );
       wallGroup.rotation.y = isLeft ? Math.PI / 2 : -Math.PI / 2;
     }
-    scene.add(wallGroup);
+    addRoomContent(ROOM_KEYS.art, wallGroup);
 
     const templatePanel = ART_TEMPLATE_PANELS[panel.category];
     if (templatePanel) {
@@ -6348,7 +6460,7 @@ function addFigureSalonStatement() {
   const statement = new THREE.Mesh(new THREE.PlaneGeometry(2.8, 0.342), statementMaterial);
   statement.position.set(7.95, 3.4, 6.89);
   statement.rotation.y = Math.PI;
-  scene.add(statement);
+  addRoomContent(ROOM_KEYS.main, statement);
 }
 
 function addDefenseStatement() {
@@ -6386,7 +6498,7 @@ function addDefenseStatement() {
     (SCREENING_ROOM.nearZ + SCREENING_ROOM.farZ) / 2
   );
   statement.rotation.y = Math.PI / 2;
-  scene.add(statement);
+  addRoomContent(ROOM_KEYS.screening, statement);
 }
 
 function addDefenseIntroStatement() {
@@ -6435,7 +6547,7 @@ function addDefenseIntroStatement() {
     4.6,
     SCREENING_ROOM.nearZ + 0.071
   );
-  scene.add(statement);
+  addRoomContent(ROOM_KEYS.screening, statement);
 }
 
 function addMriRoomIntroStatement() {
@@ -6502,7 +6614,7 @@ function addMriRoomIntroStatement() {
     wallTopZ + wallMargin + wallWidth / 2
   );
   statement.rotation.y = Math.PI / 2;
-  scene.add(statement);
+  addRoomContent(ROOM_KEYS.brain, statement);
 }
 
 function addVideosRoomIntroStatement() {
@@ -6567,7 +6679,7 @@ function addVideosRoomIntroStatement() {
     VIDEOS_ROOM.farZ - 0.021
   );
   statement.rotation.y = Math.PI;
-  scene.add(statement);
+  addRoomContent(ROOM_KEYS.videos, statement);
 }
 
 function addGameRoomIntroStatement() {
@@ -6637,7 +6749,7 @@ function addGameRoomIntroStatement() {
     wallTopZ + wallMargin + statementWidth / 2
   );
   statement.rotation.y = -Math.PI / 2;
-  scene.add(statement);
+  addRoomContent(ROOM_KEYS.game, statement);
 }
 
 function addBrainWallSheet(sheet, texture) {
@@ -6661,7 +6773,7 @@ function addBrainWallSheet(sheet, texture) {
     sheetMesh.position.set(BRAIN_ROOM.centerX, 0.006, roomMiddleZ);
     sheetMesh.rotation.x = -Math.PI / 2;
     sheetMesh.rotation.z = -Math.PI / 2;
-    scene.add(sheetMesh);
+    addRoomContent(ROOM_KEYS.brain, sheetMesh);
     needsRender = true;
     return;
   }
@@ -6692,7 +6804,7 @@ function addBrainWallSheet(sheet, texture) {
     sheetMesh.rotation.y = Math.PI / 2;
   }
 
-  scene.add(sheetMesh);
+  addRoomContent(ROOM_KEYS.brain, sheetMesh);
   needsRender = true;
 }
 
@@ -6805,7 +6917,7 @@ function addMriWallSheet(sheet, texture) {
     layout.centerZ - shiftSin
   );
   sheetMesh.rotation.y = layout.rotationY;
-  scene.add(sheetMesh);
+  addRoomContent(ROOM_KEYS.mri, sheetMesh);
   needsRender = true;
 }
 
@@ -6985,6 +7097,7 @@ function addBrainSurfaceObject(leftBuffer, rightBuffer, leftAnnotationBuffer, ri
   left.userData.annotation = readFreeSurferAnnotation(leftAnnotationBuffer);
   right.userData.annotation = readFreeSurferAnnotation(rightAnnotationBuffer);
   brainMeshes.push(left, right);
+  requestFocusTargetUpdate();
   const surfaceGroup = new THREE.Group();
   surfaceGroup.add(left, right);
 
@@ -7010,7 +7123,7 @@ function addBrainSurfaceObject(leftBuffer, rightBuffer, leftAnnotationBuffer, ri
     (EMPTY_GAME_ROOM.nearZ + EMPTY_GAME_ROOM.farZ) / 2
   );
   display.add(surfaceGroup);
-  scene.add(display);
+  addRoomContent(ROOM_KEYS.mri, display);
   needsRender = true;
 }
 
@@ -7070,8 +7183,9 @@ function addResumePage(page, texture) {
   pageMesh.position.z = 0.02;
   group.add(pageMesh);
   photoMeshes.push(pageMesh);
+  requestFocusTargetUpdate();
 
-  scene.add(group);
+  addRoomContent(ROOM_KEYS.main, group);
   needsRender = true;
 }
 
@@ -7111,8 +7225,9 @@ function addPoster(poster, texture) {
 
   addWallLabel(group, poster, height);
 
-  scene.add(group);
+  addRoomContent(ROOM_KEYS.main, group);
   posterMeshes.push(mesh);
+  requestFocusTargetUpdate();
   needsRender = true;
 }
 
@@ -7144,8 +7259,9 @@ function addFigureCluster(cluster, texture) {
   clusterMesh.userData.defaultFrameColor = 0xffffff;
   group.add(clusterMesh);
 
-  scene.add(group);
+  addRoomContent(ROOM_KEYS.main, group);
   posterMeshes.push(clusterMesh);
+  requestFocusTargetUpdate();
   needsRender = true;
 }
 
@@ -7170,6 +7286,7 @@ function cancelVideoFrame(entry) {
 
 function shouldPlayVideo(entry) {
   if (!galleryActive || insideHouseWorld) return false;
+  if (entry.root && !isObjectVisibleInHierarchy(entry.root)) return false;
   if (entry.autoplayOnEntry) return true;
   if (entry.autoplayInBounds) {
     if (!entry.activationBounds) return false;
@@ -7195,7 +7312,7 @@ function shouldPlayVideo(entry) {
   if (entry.requireFocusForPlayback) {
     raycaster.setFromCamera(pointerCenter, camera);
     raycaster.far = 7;
-    const focusedHit = raycaster.intersectObjects(videoMeshes, false)[0];
+    const focusedHit = raycaster.intersectObjects(getVisibleInteractionMeshes(videoMeshes), false)[0];
     if (focusedHit?.object?.userData?.videoEntry !== entry) return false;
   }
 
@@ -7246,6 +7363,7 @@ function preloadGalleryVideos() {
   if (currentGalleryRoomKey !== roomKey) {
     previousGalleryRoomKey = currentGalleryRoomKey;
     currentGalleryRoomKey = roomKey;
+    updateRoomContentVisibility();
     speculativeOriginRoomKey = null;
     speculativeRoomKey = null;
   }
@@ -7431,7 +7549,7 @@ function pauseShrimpRoomMusic() {
 }
 
 function hideSoundReminder() {
-  soundReminder.hidden = true;
+  if (!soundReminder.hidden) soundReminder.hidden = true;
 }
 
 function getSoundReminderZone() {
@@ -7444,7 +7562,8 @@ function getSoundReminderZone() {
 }
 
 function updateSoundReminder() {
-  soundReminder.hidden = !getSoundReminderZone();
+  const shouldHide = !getSoundReminderZone();
+  if (soundReminder.hidden !== shouldHide) soundReminder.hidden = shouldHide;
 }
 
 function syncGalleryVideos(entries = galleryVideos) {
@@ -7482,6 +7601,20 @@ function syncFocusLockedVideos() {
   const entries = galleryVideos.filter((entry) => entry.requireFocusForPlayback);
   if (!entries.length) return;
   syncGalleryVideos(entries);
+}
+
+function requestFocusTargetUpdate() {
+  if (!galleryActive || insideHouseWorld) return;
+  focusTargetUpdateRequested = true;
+}
+
+function flushFocusTargetUpdate(now) {
+  if (!focusTargetUpdateRequested
+    || now - lastFocusTargetUpdateAt < FOCUS_TARGET_INTERVAL_MS) return false;
+  focusTargetUpdateRequested = false;
+  lastFocusTargetUpdateAt = now;
+  syncFocusLockedVideos();
+  return updateFocusedPoster();
 }
 
 function requestVideoSync() {
@@ -7669,6 +7802,7 @@ function addVideoWork(work, posterTexture) {
 
   const entry = {
     title: work.title || 'Video display',
+    root: group,
     activationBounds: work.activationBounds,
     posterImage: work.posterImage,
     element: video,
@@ -7723,10 +7857,11 @@ function addVideoWork(work, posterTexture) {
 
   screen.userData.videoEntry = entry;
   videoMeshes.push(screen);
+  requestFocusTargetUpdate();
   galleryVideos.push(entry);
   if (work.videoRoom) videoRoomEntries.push(entry);
   maybePrepareNewVideoEntry(entry);
-  scene.add(group);
+  addRoomContent(work.roomKey, group);
   if (galleryActive) {
     if (entry.autoplayOnEntry) playVideoEntry(entry);
     else requestVideoSync();
@@ -7753,7 +7888,7 @@ function addImageWork(work, texture) {
   group.add(screen);
 
   if (work.showLabel !== false) addWallLabel(group, work, height);
-  scene.add(group);
+  addRoomContent(ROOM_KEYS.app, group);
   needsRender = true;
 }
 
@@ -7886,7 +8021,7 @@ function addWallLabel(group, poster, posterHeight) {
   group.add(label);
 }
 
-function updateFocusedPoster(now = performance.now()) {
+function updateFocusedPoster() {
   if (!galleryActive) return false;
   if (insideHouseWorld) {
     const hadFocus = Boolean(focusedPoster || focusedPhoto || focusedResumeLink || focusedManualVideo || focusedGameAction || focusedBrainRegion);
@@ -7896,8 +8031,6 @@ function updateFocusedPoster(now = performance.now()) {
     focusedManualVideo = null;
     focusedGameAction = null;
     focusedBrainRegion = null;
-    cachedBrainRegion = null;
-    lastBrainRaycastAt = -Infinity;
     brainFixationLabel.hidden = true;
     focusCard.hidden = true;
     reticle.classList.remove('active');
@@ -7905,24 +8038,22 @@ function updateFocusedPoster(now = performance.now()) {
   }
   raycaster.setFromCamera(pointerCenter, camera);
   raycaster.far = 7;
-  const hit = raycaster.intersectObjects(posterMeshes.concat(photoMeshes), false)[0];
+  const hit = raycaster.intersectObjects(
+    getVisibleInteractionMeshes(posterMeshes.concat(photoMeshes)),
+    false
+  )[0];
   const nextPoster = hit?.object?.userData?.poster || null;
   const nextPhoto = hit?.object?.userData?.housePhoto ? nextPoster : null;
   const nextResumeLink = hit?.object?.userData?.resumeLink || null;
-  const videoHit = nextPoster || nextResumeLink ? null : raycaster.intersectObjects(videoMeshes, false)[0];
+  const videoHit = nextPoster || nextResumeLink
+    ? null
+    : raycaster.intersectObjects(getVisibleInteractionMeshes(videoMeshes), false)[0];
   const gameAction = videoHit?.object?.userData?.gameAction || null;
   const videoEntry = videoHit?.object?.userData?.videoEntry || null;
-  let nextBrainRegion = cachedBrainRegion;
-  if (nextPoster || videoHit) {
-    cachedBrainRegion = null;
-    lastBrainRaycastAt = -Infinity;
-    nextBrainRegion = null;
-  } else if (now - lastBrainRaycastAt >= BRAIN_RAYCAST_INTERVAL_MS) {
-    lastBrainRaycastAt = now;
-    const brainHit = raycaster.intersectObjects(brainMeshes, false)[0];
-    cachedBrainRegion = brainHit ? getBrainRegionAtHit(brainHit) : null;
-    nextBrainRegion = cachedBrainRegion;
-  }
+  const brainHit = nextPoster || videoHit
+    ? null
+    : raycaster.intersectObjects(getVisibleInteractionMeshes(brainMeshes), false)[0];
+  const nextBrainRegion = brainHit ? getBrainRegionAtHit(brainHit) : null;
   if (videoEntry) videoEntry.screen.getWorldPosition(videoWorldPosition);
   const videoInRange = videoEntry
     && camera.position.distanceTo(videoWorldPosition) <= videoEntry.interactionRadius;
@@ -7967,6 +8098,7 @@ function updateFocusedPoster(now = performance.now()) {
   if (!focusedManualVideo && !focusedGameAction) focusCard.classList.remove('is-playing');
   reticle.classList.toggle('active', Boolean(focusedPoster || focusedPhoto || focusedResumeLink || focusedManualVideo || focusedGameAction || focusedBrainRegion));
   if (focusedPhoto || focusedResumeLink || focusedManualVideo || focusedGameAction) refreshFocusCard();
+  updateSoundReminder();
   return true;
 }
 
@@ -8146,9 +8278,15 @@ function updateMovement(delta) {
   const crouchDrop = CROUCH_DROP * (insideHouseWorld ? HOUSE_WORLD_PLAYER_SCALE : 1);
   camera.position.y = groundY + eyeHeight - crouchDrop * crouchAmount + jumpOffset;
 
-  const moved = Boolean(forward || sideways || Math.abs(camera.position.y - previousY) > 0.0001);
-  if (moved) requestVideoSync();
-  return moved;
+  const positionChanged = Math.abs(camera.position.x - previousX) > 0.0001
+    || Math.abs(camera.position.y - previousY) > 0.0001
+    || Math.abs(camera.position.z - previousZ) > 0.0001;
+  if (positionChanged) {
+    requestVideoSync();
+    requestFocusTargetUpdate();
+    updatePositionDependentState();
+  }
+  return positionChanged;
 }
 
 function animate(now) {
@@ -8157,18 +8295,15 @@ function animate(now) {
   const delta = Math.min((now - lastFrame) / 1000, 0.05);
   lastFrame = now;
   const moved = updateMovement(delta);
-  const portalAnimated = updateHomePortalEffects(now);
-  maybeLoadNearbyRoomContent();
+  const ambientAnimated = flushAmbientEffects(now);
   maybeStartRoomBackgroundPreloads(now);
-  syncFocusLockedVideos();
   updateShrimpRoomMusic(delta);
-  updateSoundReminder();
   flushVideoSync(now);
-  const focusChanged = updateFocusedPoster(now);
-  refreshFocusedVideoTime();
+  const focusChanged = flushFocusTargetUpdate(now);
+  refreshFocusedVideoTime(now);
   const fallbackVideoPlaying = galleryVideos
     .some((entry) => !entry.supportsFrameCallback && !entry.element.paused && entry.element.readyState >= 2);
-  if (needsRender || moved || focusChanged || fallbackVideoPlaying || portalAnimated) {
+  if (needsRender || moved || focusChanged || fallbackVideoPlaying || ambientAnimated) {
     renderer.render(scene, camera);
     needsRender = false;
   }
@@ -8178,7 +8313,12 @@ function resize() {
   if (!renderer || !camera) return;
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isCoarsePointer ? 1.25 : 2));
+  const requestedPixelRatio = Number(previewParams.get('dpr'));
+  const defaultPixelRatio = isCoarsePointer ? 1.25 : 2;
+  const pixelRatio = Number.isFinite(requestedPixelRatio) && requestedPixelRatio > 0
+    ? Math.min(requestedPixelRatio, 2)
+    : defaultPixelRatio;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, pixelRatio));
   renderer.setSize(window.innerWidth, window.innerHeight, false);
   needsRender = true;
 }
@@ -8354,6 +8494,8 @@ function enterGallery() {
   if (insideHouseWorld) pauseGalleryVideos();
   else playAutoplayOnEntryVideos();
   requestVideoSync();
+  focusTargetUpdateRequested = true;
+  lastFocusTargetUpdateAt = -Infinity;
   scheduleLowPriorityGalleryWork(() => startMainRoomBackgroundLoads(), 700);
   dragLookEnabled = false;
   galleryApp.classList.remove('drag-look', 'dragging-view');
@@ -8362,6 +8504,7 @@ function enterGallery() {
   resetPlayerHeight();
   hideWelcome();
   activateHousePreviewIfRequested();
+  updatePositionDependentState();
   needsRender = true;
 
   try {
@@ -8452,6 +8595,8 @@ function initializeGallery() {
     if (insideHouseWorld) pauseGalleryVideos();
     else playAutoplayOnEntryVideos();
     requestVideoSync();
+    focusTargetUpdateRequested = true;
+    lastFocusTargetUpdateAt = -Infinity;
     scheduleLowPriorityGalleryWork(() => startMainRoomBackgroundLoads(), 700);
     dragLookEnabled = false;
     galleryApp.classList.remove('drag-look', 'dragging-view');
@@ -8460,11 +8605,13 @@ function initializeGallery() {
     resetPlayerHeight();
     hideWelcome();
     activateHousePreviewIfRequested();
+    updatePositionDependentState();
     needsRender = true;
   });
 
   controls.addEventListener('change', () => {
     requestVideoSync();
+    requestFocusTargetUpdate();
     needsRender = true;
   });
 
@@ -8487,8 +8634,8 @@ function initializeGallery() {
     focusedManualVideo = null;
     focusedGameAction = null;
     focusedBrainRegion = null;
-    cachedBrainRegion = null;
-    lastBrainRaycastAt = -Infinity;
+    focusTargetUpdateRequested = false;
+    lastFocusTargetUpdateAt = -Infinity;
     brainFixationLabel.textContent = '';
     brainFixationLabel.hidden = true;
     posterMeshes.forEach((mesh) => {
@@ -8714,6 +8861,7 @@ canvas.addEventListener('pointermove', (event) => {
   dragEuler.x = THREE.MathUtils.clamp(dragEuler.x, -1.05, 1.05);
   camera.quaternion.setFromEuler(dragEuler);
   requestVideoSync();
+  requestFocusTargetUpdate();
   needsRender = true;
 });
 
