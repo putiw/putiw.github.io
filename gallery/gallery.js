@@ -1163,6 +1163,7 @@ let mainRoomBackgroundLoadsStarted = false;
 const mainRoomLoadedImages = new Set();
 const artRoomLoadedImages = new Set();
 const artWallTileMaterials = new Map();
+const artWallTileMeshes = new Map();
 let galleryMiniature = null;
 let galleryMiniatureRefreshesQueued = false;
 let galleryMiniatureRefreshTimer = 0;
@@ -4499,12 +4500,8 @@ function loadArtWallTile(textureLoader, sheet, image, tileIndex, quality = 'appr
     textureLoader.load(
       source,
       (texture) => {
-        const applyTexture = () => {
-          addArtWallSheet(sheet, texture, tileIndex);
-          resolve();
-        };
-        if (quality === 'hd') waitForGalleryCameraIdle(1400).then(applyTexture);
-        else applyTexture();
+        addArtWallSheet(sheet, texture, tileIndex);
+        resolve();
       },
       undefined,
       resolve
@@ -4512,15 +4509,15 @@ function loadArtWallTile(textureLoader, sheet, image, tileIndex, quality = 'appr
   });
 }
 
-function waitForGalleryCameraIdle(minimumIdleMs = 1200) {
-  if (!galleryActive || performance.now() - lastCameraInputAt >= minimumIdleMs) {
-    return Promise.resolve();
-  }
-  return new Promise((resolve) => {
-    window.setTimeout(() => {
-      waitForGalleryCameraIdle(minimumIdleMs).then(resolve);
-    }, 250);
-  });
+function getArtWallTileViewScore({ sheet, tileIndex }) {
+  const mesh = artWallTileMeshes.get(`${sheet.side}:${tileIndex}`);
+  if (!mesh || !camera) return -Infinity;
+  const cameraToTile = mesh.getWorldPosition(new THREE.Vector3()).sub(camera.position);
+  const distance = cameraToTile.length();
+  if (!distance) return Infinity;
+  const alignment = camera.getWorldDirection(new THREE.Vector3())
+    .dot(cameraToTile.multiplyScalar(1 / distance));
+  return alignment * 100 - distance;
 }
 
 function startArtRoomHdUpgrades() {
@@ -4528,24 +4525,29 @@ function startArtRoomHdUpgrades() {
   artRoomHdUpgradePromise = (async () => {
     await waitForRoomVisualsReady(ROOM_KEYS.art);
     const textureLoader = new THREE.TextureLoader();
-    const farSheet = ART_WALL_SHEETS.find((sheet) => sheet.side === 'far');
-    const orderedSheets = [farSheet, ...ART_WALL_SHEETS.filter((sheet) => sheet !== farSheet)]
-      .filter(Boolean);
+    const pendingTiles = ART_WALL_SHEETS.flatMap((sheet) => (
+      sheet.images.map((image, tileIndex) => ({ sheet, image, tileIndex }))
+    ));
 
-    // Request one 4K tile at a time and recheck the idle window before its
-    // GPU swap, so movement that starts mid-download still stays smooth.
-    for (const sheet of orderedSheets) {
-      for (let tileIndex = 0; tileIndex < sheet.images.length; tileIndex += 1) {
-        await waitForGalleryCameraIdle(1400);
-        await loadArtWallTile(
-          textureLoader,
-          sheet,
-          sheet.images[tileIndex],
-          tileIndex,
-          'hd'
-        );
-        await new Promise((resolve) => window.setTimeout(resolve, 420));
-      }
+    // Keep only one 4K request in flight. After each tile finishes, choose the
+    // remaining tile closest to the center of the visitor's current view.
+    while (pendingTiles.length) {
+      let nextTileIndex = 0;
+      let nextTileScore = -Infinity;
+      pendingTiles.forEach((tile, index) => {
+        const score = getArtWallTileViewScore(tile);
+        if (score <= nextTileScore) return;
+        nextTileIndex = index;
+        nextTileScore = score;
+      });
+      const [nextTile] = pendingTiles.splice(nextTileIndex, 1);
+      await loadArtWallTile(
+        textureLoader,
+        nextTile.sheet,
+        nextTile.image,
+        nextTile.tileIndex,
+        'hd'
+      );
     }
   })();
   return artRoomHdUpgradePromise;
@@ -5442,6 +5444,7 @@ function addArtWallSheet(sheet, texture, tileIndex = 0) {
   artWallTileMaterials.set(tileKey, material);
   const wallSheet = new THREE.Mesh(new THREE.PlaneGeometry(tileWidth, height), material);
   wallSheet.position.set(tileCenterX, height / 2, 0);
+  artWallTileMeshes.set(tileKey, wallSheet);
 
   const group = new THREE.Group();
   const roomLeft = ART_ROOM.centerX - ART_ROOM.halfWidth;
