@@ -1,5 +1,5 @@
-import { FEATURED_ROUTE, NODE_BY_ID, ROOM_LABELS, TOUR_NODES } from './tour-manifest.js?v=20260722-app-center-device1';
-import { WORKS_BY_ID } from '../project-data.js?v=20260722-app-center-device1';
+import { FEATURED_ROUTE, NODE_BY_ID, ROOM_LABELS, TOUR_NODES } from './tour-manifest.js?v=20260723-resume-update3';
+import { WORKS_BY_ID } from '../project-data.js?v=20260723-resume-update3';
 
 const FACES = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 const FACE_TARGETS = [

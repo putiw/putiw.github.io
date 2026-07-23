@@ -25,7 +25,7 @@ Puti builds AI-assisted clinical tools, MRI and neuroimaging pipelines, scientif
 - Problem: clinicians need to compare multiple sclerosis lesions across timepoints and verify new or enlarging lesions.
 - Contribution: Puti built a clinical lesion-tracking application and an automated longitudinal report with color-coded and animated visualization. She migrated the application from a MATLAB prototype to a browser-based React Native and Expo application.
 - Clinical relevance: features were iterated weekly with Yas Clinic neurologists.
-- Evidence: Puti is a co-inventor on the LesionView provisional patent application, filed in May 2026.
+- Evidence: Puti is named on the LesionView innovation disclosure (NYU Ref. ABD01-03).
 - Demo: [longitudinal comparison](https://putiw.github.io/gallery/media/lesionview-longitudinal-comparison-native.mp4).
 
 ### [CvsView](https://putiw.github.io/resume/#project-cvsview)
@@ -33,7 +33,7 @@ Puti builds AI-assisted clinical tools, MRI and neuroimaging pipelines, scientif
 - Problem: clinicians need an efficient way to verify the central vein sign in multiple sclerosis lesions.
 - Contribution: Puti built a web review tool with a modular AI component, identified SWI-FLAIR co-registration artifacts, manually relabeled affected data, containerized the application, and deployed it for on-demand clinical processing.
 - Methods: medical image co-registration, modular AI integration, web application development, and Docker.
-- Clinical relevance: the deployed service processes clinical data on demand for Harley Street Medical Centre.
+- Clinical relevance: internal research evaluation uses clinical MRI data shared by Harley Street Medical Centre.
 - Demo: [CVS/PRL review and reporting](https://putiw.github.io/gallery/media/cvsview-cvs-prl-review-web-720.mp4).
 
 ### [MyPhysio](https://putiw.github.io/resume/#project-myphysio)

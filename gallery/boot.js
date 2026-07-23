@@ -45,8 +45,8 @@ function showBootError(error) {
 
 if (useGuidedTour) {
   document.documentElement.classList.add('guided-gallery');
-  import('./mobile/main.js?v=20260723-desktop-isolation1').catch(showBootError);
+  import('./mobile/main.js?v=20260723-resume-update3').catch(showBootError);
 } else {
   window.__PUTI_FORCE_FULL_3D__ = requestedMode === 'full' || captureMode;
-  import('./gallery.js?v=20260722-mri-previews1').catch(showBootError);
+  import('./gallery.js?v=20260723-resume-update3').catch(showBootError);
 }

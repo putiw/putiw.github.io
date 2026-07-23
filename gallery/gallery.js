@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { GLTFLoader } from './vendor/loaders/GLTFLoader.js';
 import { artWorks } from './art/works.js';
-import { WORKS_BY_ID } from './project-data.js?v=20260722-mri-previews1';
+import { WORKS_BY_ID } from './project-data.js?v=20260723-resume-update3';
 import {
   MAIN_ROOM as ROOM,
   SCREENING_ROOM,

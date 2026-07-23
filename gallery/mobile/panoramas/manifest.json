@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "assetVersion": "20260722-mri-previews1",
+  "assetVersion": "20260723-resume-update3",
   "generatedBy": "gallery/mobile/scripts/generate-panoramas.mjs",
   "capture": {
     "url": "/?gallery=full&gallery-capture=1",
@@ -58,20 +58,20 @@
     "nodeCount": 18,
     "capturedFaceCount": 108,
     "assetFileCount": 4536,
-    "assetBytes": 22323718
+    "assetBytes": 22364926
   },
   "nodes": [
     {
       "id": "main-intro",
       "faceCount": 6,
       "assetFileCount": 252,
-      "baseBytes": 41024,
-      "refinementBytes": 1424054,
+      "baseBytes": 41164,
+      "refinementBytes": 1432328,
       "refinementBytesByLevel": {
-        "2048": 588456,
-        "2560": 835598
+        "2048": 592212,
+        "2560": 840116
       },
-      "assetBytes": 1465078,
+      "assetBytes": 1473492,
       "files": [
         {
           "path": "main-intro/base/px.webp",
@@ -1929,8 +1929,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 7484,
-          "sha256": "0d9b00acf425cd7bdbf742efc1f9a59a96d4241b7920e93457ee85fe8ae69302"
+          "bytes": 7624,
+          "sha256": "22416d91b9eef7c74205b5ff69934029f36231cfb819b8df7c25c2458f3fe15d"
         },
         {
           "path": "main-intro/2048/pz/0-0.webp",
@@ -1995,8 +1995,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 29278,
-          "sha256": "38219ac023ac5211fbff4b6dedd0cb1b3374a9a86f61ed103bf7e00c61dad4e6"
+          "bytes": 29028,
+          "sha256": "8accdb72c1e8b72a22a3fe1d19e5e25aebc56cf1586533022d1ed14ce36f28bb"
         },
         {
           "path": "main-intro/2048/pz/1-2.webp",
@@ -2006,8 +2006,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 30574,
-          "sha256": "332c0652f6664ffc789b55b4ada6a7992db117b42b2ef879ff650f7764ca62ec"
+          "bytes": 31116,
+          "sha256": "7c368ec0f0848662230819c42623817a97e5c790d8cc497957d0ca318d802ff0"
         },
         {
           "path": "main-intro/2048/pz/1-3.webp",
@@ -2039,8 +2039,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 28908,
-          "sha256": "122e27079c8d70ebfb0530d537c892ffd1603b8902cc4c5d628ba2b6c0b2788c"
+          "bytes": 31382,
+          "sha256": "76c01342a9718c356b47832e1efa4bda7953cfd2cc7a51827bf3eb40607899fc"
         },
         {
           "path": "main-intro/2048/pz/2-2.webp",
@@ -2050,8 +2050,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 31700,
-          "sha256": "af72c7d56f73c5929d80e0d180f8d632f426f88396006cb91ed746384ef5bb19"
+          "bytes": 32690,
+          "sha256": "b1b1a50cf47436dadc62e4396d9191bedff47133515caa64d9c244bc6726b8cd"
         },
         {
           "path": "main-intro/2048/pz/2-3.webp",
@@ -2237,8 +2237,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 36438,
-          "sha256": "eb93838c9402410ea354a819f8898fe6418f0332e61131d019ae9556d7e85183"
+          "bytes": 35554,
+          "sha256": "e6ccfb891bffcb03f37b20356f99d97e290b069d7b522d9fc3354c94cd5479f9"
         },
         {
           "path": "main-intro/2560/pz/2-2.webp",
@@ -2248,8 +2248,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 43500,
-          "sha256": "9c872190acdc5c01291ef733fa19f0bec1e74e7d0d05bd12fa08eec582749a0f"
+          "bytes": 43860,
+          "sha256": "eba30740955ebe498ab6e5a781e7de101da1a2fdf7d877234a2bae6b3f734da9"
         },
         {
           "path": "main-intro/2560/pz/2-3.webp",
@@ -2259,8 +2259,8 @@
           "column": 3,
           "width": 512,
           "height": 512,
-          "bytes": 52840,
-          "sha256": "4d57151070c5e5538b2cff4ac140076b9fc75f86e7de49eebb3a0585c154694d"
+          "bytes": 54706,
+          "sha256": "0de800a958ee6d1c2edb3a0ec8e3024d36cc0d9a9e71ca91e149e3c0348ed408"
         },
         {
           "path": "main-intro/2560/pz/2-4.webp",
@@ -2292,8 +2292,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 7794,
-          "sha256": "f000998d9bac9a858bbeaf47b940f870e6e9e94ad14b48e4395b7f785fb10afd"
+          "bytes": 9812,
+          "sha256": "5f7359119867c650fb57525bc67f8d43e0ff527465ea0d5460d722fd3ce94530"
         },
         {
           "path": "main-intro/2560/pz/3-2.webp",
@@ -2303,8 +2303,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 8370,
-          "sha256": "d71f4b66590156ab100987cab9c2889b9879e0d28fcd4e717580ed9225944743"
+          "bytes": 9528,
+          "sha256": "43fbe7285b08062e80941ab784545beb820c1c94a5b4684ef9a9f33489dfe4e2"
         },
         {
           "path": "main-intro/2560/pz/3-3.webp",
@@ -2851,13 +2851,13 @@
       "id": "main-science",
       "faceCount": 6,
       "assetFileCount": 252,
-      "baseBytes": 49752,
-      "refinementBytes": 1634546,
+      "baseBytes": 49874,
+      "refinementBytes": 1640112,
       "refinementBytesByLevel": {
-        "2048": 679464,
-        "2560": 955082
+        "2048": 682190,
+        "2560": 957922
       },
-      "assetBytes": 1684298,
+      "assetBytes": 1689986,
       "files": [
         {
           "path": "main-science/base/px.webp",
@@ -4715,8 +4715,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 5486,
-          "sha256": "6f3d7bfcdd150051ce5ebb9d910c82a65c5a0d1847d136e0f3f1eaaa1433e352"
+          "bytes": 5608,
+          "sha256": "35c1a685f50f485629c6642fdfc3d8c182839293c81b5e9e6696ff169888022a"
         },
         {
           "path": "main-science/2048/pz/0-0.webp",
@@ -4781,8 +4781,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 16864,
-          "sha256": "60fcfeafb07e7515b7d9db0d9680ac5bd43913f2706fa6bbcb1841703fd10307"
+          "bytes": 16682,
+          "sha256": "17b38ad13de1f05505974efdf8312caab7625acfe4978657b2a2678ba8e7975c"
         },
         {
           "path": "main-science/2048/pz/1-2.webp",
@@ -4792,8 +4792,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 17630,
-          "sha256": "8f11044e1a5879e4d9a09f5987b2a620fb3bffdfff64b4bf7c69572c359ac93e"
+          "bytes": 17982,
+          "sha256": "e270e5edd211fe9c0a334d165b08d2cbc501110872010c8d6a52bebd49f32848"
         },
         {
           "path": "main-science/2048/pz/1-3.webp",
@@ -4825,8 +4825,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 16486,
-          "sha256": "8dd991a8b7656cc0eed53811bd4946d37bbfbffb442f813760408846da1c599c"
+          "bytes": 18502,
+          "sha256": "c05ee5f7984803cdc27d1d854413856a268b32036b99cd2b1125dac4874ede14"
         },
         {
           "path": "main-science/2048/pz/2-2.webp",
@@ -4836,8 +4836,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 17148,
-          "sha256": "02a8de32844cde3362ab0f340d8628d83f5fd2c70b0f124e36746de452c39f07"
+          "bytes": 17688,
+          "sha256": "f5e6f8297afa31d5cdacc7f526976433ab49b0e0a64829a6c6e50d90e794393f"
         },
         {
           "path": "main-science/2048/pz/2-3.webp",
@@ -5023,8 +5023,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 20186,
-          "sha256": "5bf1e075bf24307b7af47a6e61a2a7d81d59d3dc38f7ed21554850bdf5cd72f6"
+          "bytes": 19300,
+          "sha256": "8e83ab90be4cbaf9074620fe56cabdc79d0fbc328d6fbdc4ef525655c6d84cf3"
         },
         {
           "path": "main-science/2560/pz/2-2.webp",
@@ -5034,8 +5034,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 51304,
-          "sha256": "588519072feda534551f78cf5e354f00674a4e8e725bc4e86bf9909e7b548732"
+          "bytes": 51288,
+          "sha256": "e365a74eb84c2c4749320f2a8c65af536c0bd18dabda47f8229beeb90d195d12"
         },
         {
           "path": "main-science/2560/pz/2-3.webp",
@@ -5045,8 +5045,8 @@
           "column": 3,
           "width": 512,
           "height": 512,
-          "bytes": 34998,
-          "sha256": "e23ed38b8c7ff43eef88b2f051eab18053aa0ebaa3aa350a6103f7376479b78e"
+          "bytes": 35600,
+          "sha256": "88ebd2231bc6808ba7b7d755f85de0f319b9f7094d753714bd516ac460534c94"
         },
         {
           "path": "main-science/2560/pz/2-4.webp",
@@ -5078,8 +5078,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 886,
-          "sha256": "951f8326b245fe5c49df278157af0cad6730b87217852ac6dbe957a692b16900"
+          "bytes": 2530,
+          "sha256": "97ca893d90e6444b93062fb9baf60e0799b4718e3dec97c86dfd4d6e2609286f"
         },
         {
           "path": "main-science/2560/pz/3-2.webp",
@@ -5089,8 +5089,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 1130,
-          "sha256": "e15114c513fc64f4a2cffd0630f261e2c73b93c35687ac985774f866cc0c7b63"
+          "bytes": 2626,
+          "sha256": "0edf0f24463b599596b0bc770ccc1ccd8018af08abfc6b5e9037980e81ff43c9"
         },
         {
           "path": "main-science/2560/pz/3-3.webp",
@@ -5637,13 +5637,13 @@
       "id": "main-resume",
       "faceCount": 6,
       "assetFileCount": 252,
-      "baseBytes": 59646,
-      "refinementBytes": 1896668,
+      "baseBytes": 60150,
+      "refinementBytes": 1923270,
       "refinementBytesByLevel": {
-        "2048": 801350,
-        "2560": 1095318
+        "2048": 811984,
+        "2560": 1111286
       },
-      "assetBytes": 1956314,
+      "assetBytes": 1983420,
       "files": [
         {
           "path": "main-resume/base/px.webp",
@@ -5653,8 +5653,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 8840,
-          "sha256": "34bda661c0f4b3f6ce8c429948c8b8cf8cf0ef06d4107550ba4eae26f9cb5ba8"
+          "bytes": 8844,
+          "sha256": "fc1a99ee71908cb66c6280b398a4fc2b04a58e407664c1ba6a35bbb1a8462a87"
         },
         {
           "path": "main-resume/2048/px/0-0.webp",
@@ -5708,8 +5708,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 9058,
-          "sha256": "0f3d4a261b368f3867f6c0c2ca84976386b867ef049d937dadb9832540c38c31"
+          "bytes": 9030,
+          "sha256": "8e47ab12011ebe4506d09ac248b0cfb02b73723708eee25657a617cd5f1c79e9"
         },
         {
           "path": "main-resume/2048/px/1-1.webp",
@@ -5752,8 +5752,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 6360,
-          "sha256": "7994164b2c7a9d249569124d3dae941260fee063662bb7957d57613a1e93f19a"
+          "bytes": 6332,
+          "sha256": "90084515e59ec464ca1fc4ef95c9b1dd631e424a1a7a687332937d08ff26c364"
         },
         {
           "path": "main-resume/2048/px/2-1.webp",
@@ -5950,8 +5950,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 6210,
-          "sha256": "9b1cc1134841eaeefa1ca869f7a720e8ae1d950e1af56dc9b030515baf794103"
+          "bytes": 6152,
+          "sha256": "64a074e52576e30cc6b09e5206275d76053f150c5c9f6f978915cf949feb6643"
         },
         {
           "path": "main-resume/2560/px/2-1.webp",
@@ -6005,8 +6005,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 6244,
-          "sha256": "2ae8cd4d0b28529a653d984d96637021afb81865ff35651ee6f1fce268c34749"
+          "bytes": 6260,
+          "sha256": "9f946f5e0d726eb7953b3b59a843294c6c3fede72fbc63e62832b9664d4f7bed"
         },
         {
           "path": "main-resume/2560/px/3-1.webp",
@@ -6115,8 +6115,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 10878,
-          "sha256": "aead8287d4f442ccca3c31eb9d188ac356206fb5f43473189c1a7d941661083a"
+          "bytes": 10884,
+          "sha256": "e67640da102df9dca9d31f99ce44720520167d05165c6031e14c24aff2e62d00"
         },
         {
           "path": "main-resume/2048/nx/0-0.webp",
@@ -6247,8 +6247,8 @@
           "column": 3,
           "width": 512,
           "height": 512,
-          "bytes": 2988,
-          "sha256": "c1a1df089735d01cba04bcfc4383c09221cd06536593399e90c721106b7b4823"
+          "bytes": 2900,
+          "sha256": "0ee0a698f1ad0c6ec6e741ab02843ac2542d1a757c80624abde859dd46f02011"
         },
         {
           "path": "main-resume/2048/nx/3-0.webp",
@@ -6291,8 +6291,8 @@
           "column": 3,
           "width": 512,
           "height": 512,
-          "bytes": 3918,
-          "sha256": "5db0a0925eeb331ec8b6accbcfc9cfbc61751b7e0b17238a610f49dd6ffa7dd5"
+          "bytes": 4116,
+          "sha256": "ab61a1101b5a84ce5dd24dafe57e664f3a2e58dbb2682911402b738ee08107e6"
         },
         {
           "path": "main-resume/2560/nx/0-0.webp",
@@ -6456,8 +6456,8 @@
           "column": 4,
           "width": 512,
           "height": 512,
-          "bytes": 2596,
-          "sha256": "e685020c5fe63eec8259759291a7e2d2029c6bd49c3758d4264e1124470d36b5"
+          "bytes": 2712,
+          "sha256": "527aa6f2cefeee978dacb814a45bedee24217add44b2f076cee16773cab7ee5a"
         },
         {
           "path": "main-resume/2560/nx/3-0.webp",
@@ -6511,8 +6511,8 @@
           "column": 4,
           "width": 512,
           "height": 512,
-          "bytes": 4204,
-          "sha256": "872129a01bdc8eda698717cd988e17798cf06e8d16eb7c107e7e31a30d97b45c"
+          "bytes": 4304,
+          "sha256": "500dfa4093852437aed85c0ed2a43cf0f91766d58976a810ed5209828d113c10"
         },
         {
           "path": "main-resume/2560/nx/4-0.webp",
@@ -6566,8 +6566,8 @@
           "column": 4,
           "width": 512,
           "height": 512,
-          "bytes": 3434,
-          "sha256": "f7ad4041dbb62307251d346f2bb1be09ea35e29fd04d437b3266547bcdd19b92"
+          "bytes": 3446,
+          "sha256": "5be5d05464284e158f7df0815c7e92cd2955c1fda5b7815c03fccbfc07966155"
         },
         {
           "path": "main-resume/base/py.webp",
@@ -7501,8 +7501,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 30652,
-          "sha256": "b32968f03c913aa2e43812637dc2bba8e8dbc72238193da2b5973590a52c015d"
+          "bytes": 31146,
+          "sha256": "b7545a17313680f5616bd926b61648643d9badb9c93c9e0cfd713da6019af552"
         },
         {
           "path": "main-resume/2048/pz/0-0.webp",
@@ -7556,8 +7556,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 37042,
-          "sha256": "468d4ee44285fb9d6325479ef65020fbe29ed75773ab0577206540a0af67d476"
+          "bytes": 36150,
+          "sha256": "5dfe90563977faf1af902edbb42f450b3fac7a4aa45c48e7535ec8ce67342125"
         },
         {
           "path": "main-resume/2048/pz/1-1.webp",
@@ -7567,8 +7567,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 50170,
-          "sha256": "9f42e0b2e915b2bc477a817d7749e1d40b11df1345e46e67869e4634de160505"
+          "bytes": 50388,
+          "sha256": "56d2eca80dcaeef25f40335abc54b2811738bd36868e2f86d19799d84760408a"
         },
         {
           "path": "main-resume/2048/pz/1-2.webp",
@@ -7578,8 +7578,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 28714,
-          "sha256": "611358182c7b06d428949a6a381faedeb51e9339295be2bcb45291fa5f593f31"
+          "bytes": 29914,
+          "sha256": "71248bbf9eaaa588ea39d3874fa421856cb567c250b323fcad8827b013c669cb"
         },
         {
           "path": "main-resume/2048/pz/1-3.webp",
@@ -7589,8 +7589,8 @@
           "column": 3,
           "width": 512,
           "height": 512,
-          "bytes": 69172,
-          "sha256": "3f33d5ebd2069f166e20e7d79888e32cfc6b130e93363f899816390516d11af5"
+          "bytes": 71244,
+          "sha256": "58e98d7989467bb9f1f7f4dc9b590c68453ad26d02028dc1bd375e8293d3b412"
         },
         {
           "path": "main-resume/2048/pz/2-0.webp",
@@ -7600,8 +7600,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 39722,
-          "sha256": "d4614f76d7438db66f8c3f7584c05a44e0d3fe1b082f37306b76b55f7a9ed035"
+          "bytes": 38712,
+          "sha256": "185241294df1c71447fcc2e50dac72f9958828fd27ddc2ee3e3598663aa855bb"
         },
         {
           "path": "main-resume/2048/pz/2-1.webp",
@@ -7611,8 +7611,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 47328,
-          "sha256": "0d5ed598c58a48b3c2b6c430a8921d57256e6b3474b4d6940fbd5ad0b10a0738"
+          "bytes": 45602,
+          "sha256": "0e3528cb0e6d2debbbfd508c799add753f28b5944077fa1546f1a0b8d4e646f7"
         },
         {
           "path": "main-resume/2048/pz/2-2.webp",
@@ -7622,8 +7622,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 33524,
-          "sha256": "d46a11c168c992e573bac804097151454b4bdb5da5326592ee64f1bc4d828f98"
+          "bytes": 35012,
+          "sha256": "3e7c94f163ba5f581f6ccbf7c7eeccb2b82e5343f04de279eb5ac9c1e0fd8543"
         },
         {
           "path": "main-resume/2048/pz/2-3.webp",
@@ -7633,8 +7633,8 @@
           "column": 3,
           "width": 512,
           "height": 512,
-          "bytes": 68632,
-          "sha256": "2114698876393fcb91e2a11ee67741ccff92f6d5ac710c4ffaea45d2136d939b"
+          "bytes": 71542,
+          "sha256": "52a87f1868bce8efeb86314e2929eb46d528fccbbdeeba2b812b41b97b40994f"
         },
         {
           "path": "main-resume/2048/pz/3-0.webp",
@@ -7644,8 +7644,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 11346,
-          "sha256": "e0fdbc80a8baf05d3d659c9fd3cdf91bcea33a0809c3a7369a196a890e8cd816"
+          "bytes": 14374,
+          "sha256": "4eb35bd01bd3db9eae0962b344cca2415ae11f90b1421a19c5c6b1889d2397d7"
         },
         {
           "path": "main-resume/2048/pz/3-1.webp",
@@ -7655,8 +7655,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 9480,
-          "sha256": "b596d3f4673b30382228613126a0ef620996c2abacc6f55fdbfbb38e781bd729"
+          "bytes": 12772,
+          "sha256": "bd3d4421c27face63731b20ad40ea165c3942a273fe467231fcd5f9437121689"
         },
         {
           "path": "main-resume/2048/pz/3-2.webp",
@@ -7798,8 +7798,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 35682,
-          "sha256": "6ba49cc91661579644a26a3a5842f5147efa2a6151140244a0ea7858ed84b4c8"
+          "bytes": 36652,
+          "sha256": "91850132e1838c8fb820da950861c9938374722dd49d1132065a2c5a0c78be79"
         },
         {
           "path": "main-resume/2560/pz/2-1.webp",
@@ -7809,8 +7809,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 60332,
-          "sha256": "6e6ae67ef3e730e03c82658acd23a35aedf6c7a4c07a909cfb05617f56e60b69"
+          "bytes": 61140,
+          "sha256": "248b70ed38462fa8dc94b18ea565fa8154fe7ab5a3881b4d5e065d0365038da0"
         },
         {
           "path": "main-resume/2560/pz/2-2.webp",
@@ -7820,8 +7820,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 9648,
-          "sha256": "1c32de1531d9420a50698c14cb44be9475474f63100448625b13074cccfb756b"
+          "bytes": 9714,
+          "sha256": "faf40bff73e2c0c16913f4d6128613f56494d90090ff596b8de4ff1aa123a6ba"
         },
         {
           "path": "main-resume/2560/pz/2-3.webp",
@@ -7831,8 +7831,8 @@
           "column": 3,
           "width": 512,
           "height": 512,
-          "bytes": 45050,
-          "sha256": "2a04a99b87524c751e813b8e4aaa685ac2745e012d0336c5be44cc1c56b61807"
+          "bytes": 50220,
+          "sha256": "9b11b21ee8db547ec66d9ea149506eb97f1c05c5913be561ac5340d04f172a9a"
         },
         {
           "path": "main-resume/2560/pz/2-4.webp",
@@ -7842,8 +7842,8 @@
           "column": 4,
           "width": 512,
           "height": 512,
-          "bytes": 60208,
-          "sha256": "63a9d4cbbf2dd90da22511d05f5c62b516584aebcd253b126c8b9ba1a7fd0881"
+          "bytes": 64388,
+          "sha256": "60d9ad5657ff8f48c322e122682782734a93df20d15b7927d7c3a2536ba7da51"
         },
         {
           "path": "main-resume/2560/pz/3-0.webp",
@@ -7853,8 +7853,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 33226,
-          "sha256": "9eeeca435e4f717d5dcec7e22b3eb195f0501acd900eb50ebe28eb8ea54097d9"
+          "bytes": 33956,
+          "sha256": "75e38463b042c1ca7176a99471e84b054ac0156c56e83ee06f376a2ea71ce1eb"
         },
         {
           "path": "main-resume/2560/pz/3-1.webp",
@@ -7864,8 +7864,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 51404,
-          "sha256": "376d1cc4ce40fbcd1c95c06895dd92be29524ccce8ea11f1093bb990a904a5f4"
+          "bytes": 51718,
+          "sha256": "3bf44b6b783dfc80efbcd3fd4d461648ff7c680907de60166e091e75b50d74cf"
         },
         {
           "path": "main-resume/2560/pz/3-2.webp",
@@ -7875,8 +7875,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 9558,
-          "sha256": "5c5131548f90150c3a3902f00b83304de6178857b7777f88445c4df73c2bdcba"
+          "bytes": 9058,
+          "sha256": "d378831605f1984fca9f7a4c496b2c9595d5debed0aeafc7dca6454041b5b1b5"
         },
         {
           "path": "main-resume/2560/pz/3-3.webp",
@@ -7886,8 +7886,8 @@
           "column": 3,
           "width": 512,
           "height": 512,
-          "bytes": 43616,
-          "sha256": "82197865435a434adaf8e76a3e915a6885a5991b996b63e1c56292928b42fb07"
+          "bytes": 43458,
+          "sha256": "4c169c1051ce08047af5dcabfc948e6d202408e6777dd8332e07c64757385c65"
         },
         {
           "path": "main-resume/2560/pz/3-4.webp",
@@ -7897,8 +7897,8 @@
           "column": 4,
           "width": 512,
           "height": 512,
-          "bytes": 56296,
-          "sha256": "e5bbc4699a7ad18689bee27ec533ae7195d719472446e224cd6961353f35b2e9"
+          "bytes": 56502,
+          "sha256": "3821ead27e03e04a65f4c6aba375cb1dc195e491c0a3fafcc434be180671e633"
         },
         {
           "path": "main-resume/2560/pz/4-0.webp",
@@ -7908,8 +7908,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 822,
-          "sha256": "24ab11b2229890dbbec0564174fbdcec5786d025d02e599dfe711c4ba997aec0"
+          "bytes": 2098,
+          "sha256": "c365a76dbe7b14e974e647a6a33e66b863c161aad39fbe18beee93d283294339"
         },
         {
           "path": "main-resume/2560/pz/4-1.webp",
@@ -7919,8 +7919,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 822,
-          "sha256": "24ab11b2229890dbbec0564174fbdcec5786d025d02e599dfe711c4ba997aec0"
+          "bytes": 2932,
+          "sha256": "9c02bf6f26e7fef9fea82563606b313209c2bb516c98790c64570095ab6a951b"
         },
         {
           "path": "main-resume/2560/pz/4-2.webp",
@@ -7930,8 +7930,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 988,
-          "sha256": "86b4a3fd24d474d51a53075714d4b2176383ab566ecb72cafbfff4d3f71d5be9"
+          "bytes": 1598,
+          "sha256": "2f45947bc6a56d1721ab43a97e1e1caded66650314b9756d4029f6aff0ac65bf"
         },
         {
           "path": "main-resume/2560/pz/4-3.webp",

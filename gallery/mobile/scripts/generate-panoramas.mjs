@@ -26,7 +26,7 @@ const EXPECTED_NODES = [
   'art-entry', 'art-home', 'art-salon',
   'house-approach', 'house-platform', 'house-roof'
 ];
-const ASSET_VERSION = '20260722-mri-previews1';
+const ASSET_VERSION = '20260723-resume-update3';
 const SOURCE_SIZE = 2560;
 const BASE_SIZE = 512;
 const TILE_SIZE = 512;
