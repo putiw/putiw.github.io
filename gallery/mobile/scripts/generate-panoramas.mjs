@@ -3,7 +3,7 @@
 import { spawn, execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { access, lstat, mkdir, mkdtemp, readFile, readdir, rename, rm, stat, writeFile } from 'node:fs/promises';
+import { access, copyFile, lstat, mkdir, mkdtemp, readFile, readdir, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -54,7 +54,7 @@ function usage() {
   return `Usage:
   node gallery/mobile/scripts/generate-panoramas.mjs
   node gallery/mobile/scripts/generate-panoramas.mjs --nodes main-intro,app-north
-  node gallery/mobile/scripts/generate-panoramas.mjs --verify [--nodes id,id]
+  node gallery/mobile/scripts/generate-panoramas.mjs --verify
 
 Environment overrides: CHROME_PATH, MAGICK_PATH, CWEBP_PATH`;
 }
@@ -77,6 +77,9 @@ function parseArgs(argv) {
       const selected = new Set(requested);
       result.nodes = EXPECTED_NODES.filter((id) => selected.has(id));
     } else throw new Error(`Unknown argument: ${argument}\n\n${usage()}`);
+  }
+  if (result.verify && result.nodes) {
+    throw new Error('--verify checks the complete panorama set and cannot be combined with --nodes.');
   }
   return result;
 }
@@ -538,10 +541,10 @@ function expectedNodeAssets(nodeId) {
   return expected;
 }
 
-async function verify(directory = OUTPUT_DIR, requestedNodes = null) {
+async function verify(directory = OUTPUT_DIR, { expectedAssetVersion = ASSET_VERSION } = {}) {
   if ((await readFile(path.join(directory, MARKER), 'utf8')) !== MARKER_TEXT) throw new Error('Panorama marker is missing or invalid.');
   const manifest = JSON.parse(await readFile(path.join(directory, 'manifest.json'), 'utf8'));
-  const expectedNodes = requestedNodes || EXPECTED_NODES;
+  const expectedNodes = EXPECTED_NODES;
   if (JSON.stringify(manifest.nodes.map((node) => node.id)) !== JSON.stringify(expectedNodes)) throw new Error('Manifest node list is not the expected list.');
   const refinementLayoutsAreValid = REFINEMENT_LEVELS.every((level) => {
     const layout = manifest.layout?.[level];
@@ -556,7 +559,9 @@ async function verify(directory = OUTPUT_DIR, requestedNodes = null) {
     .map(Number)
     .sort((left, right) => left - right);
   if (manifest.schemaVersion !== 3
-    || manifest.assetVersion !== ASSET_VERSION
+    || typeof manifest.assetVersion !== 'string'
+    || !manifest.assetVersion.trim()
+    || (expectedAssetVersion !== null && manifest.assetVersion !== expectedAssetVersion)
     || manifest.capture?.sourceFaceSize !== SOURCE_SIZE
     || manifest.layout?.base?.faceSize !== BASE_SIZE
     || manifest.layout.base.tileSize !== BASE_SIZE
@@ -617,6 +622,39 @@ async function verify(directory = OUTPUT_DIR, requestedNodes = null) {
   console.log(`Recorded toolchain: ${manifest.toolchain.chrome}; ${manifest.toolchain.imageMagick}; cwebp ${manifest.toolchain.cwebp}`);
 }
 
+async function loadIncrementalBaseline() {
+  try {
+    const manifest = JSON.parse(await readFile(path.join(OUTPUT_DIR, 'manifest.json'), 'utf8'));
+    const existingVersion = typeof manifest.assetVersion === 'string' && manifest.assetVersion.trim()
+      ? manifest.assetVersion
+      : null;
+    if (!existingVersion) throw new Error('Existing manifest has no asset version.');
+    await verify(OUTPUT_DIR, { expectedAssetVersion: existingVersion });
+    return manifest;
+  } catch (error) {
+    throw new Error(`Incremental generation requires a complete, compatible panorama set. Run once without --nodes. ${error.message}`);
+  }
+}
+
+async function copyPreservedNodes(buildDir, manifest, selectedNodes) {
+  const selected = new Set(selectedNodes);
+  const preserved = new Map();
+  for (const node of manifest.nodes) {
+    if (selected.has(node.id)) continue;
+    for (const record of node.files) {
+      const source = path.resolve(OUTPUT_DIR, record.path);
+      const destination = path.resolve(buildDir, record.path);
+      if (!source.startsWith(`${OUTPUT_DIR}${path.sep}`) || !destination.startsWith(`${buildDir}${path.sep}`)) {
+        throw new Error(`Unsafe preserved asset path: ${record.path}`);
+      }
+      await mkdir(path.dirname(destination), { recursive: true });
+      await copyFile(source, destination);
+    }
+    preserved.set(node.id, node);
+  }
+  return preserved;
+}
+
 async function removeMarked(directory, allowedParent, prefix) {
   if (path.dirname(directory) !== allowedParent || !path.basename(directory).startsWith(prefix)) throw new Error(`Refusing unsafe cleanup: ${directory}`);
   let item;
@@ -652,6 +690,8 @@ async function stopChrome(chrome) {
 
 async function generate(options) {
   const selectedNodes = options.nodes || EXPECTED_NODES;
+  const incremental = options.nodes !== null && selectedNodes.length < EXPECTED_NODES.length;
+  const existingManifest = incremental ? await loadIncrementalBaseline() : null;
   const [chromeTool, magickTool, cwebpTool] = await Promise.all([
     findChrome(), findCommand('MAGICK_PATH', ['magick', 'convert'], ['-version']),
     findCommand('CWEBP_PATH', ['cwebp'], ['-version'])
@@ -662,11 +702,16 @@ async function generate(options) {
   const buildDir = await mkdtemp(path.join(MOBILE_DIR, '.panoramas-build-'));
   const workDir = await mkdtemp(path.join(tmpdir(), 'gallery-panorama-work-'));
   const chromeProfile = await mkdtemp(path.join(tmpdir(), 'gallery-panorama-chrome-'));
-  await writeFile(path.join(buildDir, MARKER), MARKER_TEXT);
+  let manifestNodesById = new Map();
   let server;
   let browser;
   let client;
   try {
+    await writeFile(path.join(buildDir, MARKER), MARKER_TEXT);
+    if (existingManifest) {
+      manifestNodesById = await copyPreservedNodes(buildDir, existingManifest, selectedNodes);
+      console.log(`Incremental build: rebuilding ${selectedNodes.length} node(s) and preserving ${manifestNodesById.size}.`);
+    }
     server = await startStaticServer();
     browser = await launchChrome(chromeTool.command, chromeProfile);
     client = await CdpClient.connect(browser.pageWs);
@@ -702,7 +747,6 @@ async function generate(options) {
     confirmCaptureScene(failures, captureInfo.diagnostics);
     console.log(`Capture readiness: ${JSON.stringify(captureInfo.diagnostics)}`);
     assertClean(failures, server);
-    const manifestNodes = [];
     let captureIndex = 0;
     for (const nodeId of selectedNodes) {
       const files = [];
@@ -729,7 +773,7 @@ async function generate(options) {
           throw new Error(`${nodeId} ${level}px refinement is ${levelBytes} bytes; budget is ${MAX_REFINEMENT_BYTES}.`);
         }
       }
-      manifestNodes.push({
+      manifestNodesById.set(nodeId, {
         id: nodeId,
         faceCount: FACES.length,
         assetFileCount: files.length,
@@ -740,6 +784,8 @@ async function generate(options) {
         files
       });
     }
+    const manifestNodes = EXPECTED_NODES.map((nodeId) => manifestNodesById.get(nodeId));
+    if (manifestNodes.some((node) => !node)) throw new Error('Complete manifest could not be assembled.');
     await new Promise((resolve) => setTimeout(resolve, 250));
     assertClean(failures, server);
     const assetFileCount = manifestNodes.reduce((sum, node) => sum + node.assetFileCount, 0);
@@ -771,7 +817,7 @@ async function generate(options) {
       nodes: manifestNodes
     };
     await writeFile(path.join(buildDir, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
-    await verify(buildDir, selectedNodes);
+    await verify(buildDir);
     client.close();
     client = null;
     await stopChrome(browser.chrome);
@@ -779,7 +825,7 @@ async function generate(options) {
     await server.close();
     server = null;
     await replaceOutput(buildDir);
-    console.log(`Wrote ${OUTPUT_DIR}`);
+    console.log(`${incremental ? 'Updated' : 'Wrote'} ${OUTPUT_DIR}`);
   } finally {
     if (client) client.close();
     if (browser) await stopChrome(browser.chrome);
@@ -793,7 +839,7 @@ async function generate(options) {
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   if (options.help) { console.log(usage()); return; }
-  if (options.verify) { await verify(OUTPUT_DIR, options.nodes); return; }
+  if (options.verify) { await verify(OUTPUT_DIR); return; }
   await generate(options);
 }
 

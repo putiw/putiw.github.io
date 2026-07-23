@@ -17,13 +17,15 @@ Run from the website repository root (`putiw.github.io`):
 node gallery/mobile/scripts/generate-panoramas.mjs
 ```
 
-The default command captures all 18 audited nodes and six faces per node at 2560×2560. For a Main/App vertical slice:
+The default command captures all 18 audited nodes and six faces per node at 2560×2560. To update only the visitor-facing central Science-room camera:
 
 ```sh
-node gallery/mobile/scripts/generate-panoramas.mjs --nodes main-intro,app-mid
+node gallery/mobile/scripts/generate-panoramas.mjs --nodes main-intro
 ```
 
-`--nodes` creates a complete, internally consistent slice and replaces the generated panorama directory with only those nodes. It is not an incremental update. Regenerate without `--nodes` before publishing.
+`--nodes` is incremental. It first verifies the complete existing panorama set, rebuilds only the requested cameras, preserves every manifest-listed file for the other cameras byte-for-byte, assembles a complete 18-node manifest, and verifies the combined result before publishing it locally. A single camera contains six cube faces and 252 progressively loaded WebPs; updating one camera therefore avoids recapturing the other 17.
+
+Use the default full command when a shared scene, lighting, renderer, or room-wide change could affect cameras beyond the requested list.
 
 Verify every listed file, byte count, SHA-256 digest, WebP dimension, aggregate count, and the absence of unlisted WebPs with:
 
@@ -89,7 +91,7 @@ Video details keep the poster as the primary visual and place a compact circular
 
 Video detail copy is limited to text that is also visibly authored beside that work in the gallery. Videos without an explicit wall caption show no description; the shared project descriptions remain unchanged for the full 3D renderer.
 
-The generator refuses to replace an existing `panoramas` directory unless it contains the exact generated marker. It builds beside the target and uses rename-based replacement, restoring the previous directory if the new rename fails.
+The generator refuses to replace an existing `panoramas` directory unless it contains the exact generated marker. Full and incremental runs build a complete verified output beside the target and use rename-based replacement, restoring the previous directory if the new rename fails. Incremental runs fail without changing the current output when the existing full panorama set is missing, incomplete, corrupt, or structurally incompatible.
 
 ## Determinism and budgets
 
