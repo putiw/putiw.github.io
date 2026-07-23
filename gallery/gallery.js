@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { GLTFLoader } from './vendor/loaders/GLTFLoader.js';
 import { artWorks } from './art/works.js';
+import { WORKS_BY_ID } from './project-data.js?v=20260722-mri-previews1';
 import {
   MAIN_ROOM as ROOM,
   SCREENING_ROOM,
@@ -93,15 +94,21 @@ const POSTER_FRAME_BORDER = 0.075;
 const APP_VIDEO_ASPECT = 640 / 412;
 const MYPHYSIO_PHONE_ASPECT = 1170 / 2532;
 
+const sharedVideoWork = (id) => {
+  const work = WORKS_BY_ID[id];
+  return {
+    ...work,
+    labelMeta: work.description,
+    source: work.mediaSource
+  };
+};
+
 const posters = [
   {
-    id: 'fst',
-    title: 'Localizing visual motion area FST in human',
-    category: 'Visual neuroscience',
-    authors: 'Vision Sciences Society Annual Meeting (poster) - May 2024',
-    labelMeta: 'Vision Sciences Society Annual Meeting (poster) - May 2024',
+    ...WORKS_BY_ID.fst,
+    authors: WORKS_BY_ID.fst.meta,
+    labelMeta: WORKS_BY_ID.fst.meta,
     wallImage: './posters/fst-wall.webp',
-    detailImage: './posters/fst-detail.webp',
     aspect: 3072 / 1808,
     width: MOTION_POSTER_HEIGHT * (3072 / 1808),
     frameWidth: MOTION_POSTER_HEIGHT * (3072 / 1808) + POSTER_FRAME_BORDER * 2,
@@ -111,13 +118,10 @@ const posters = [
     rotationY: Math.PI / 2
   },
   {
-    id: 'decoding',
-    title: 'Single-trial fMRI decoding of 3D motion with stereoscopic and perspective cues',
-    category: 'fMRI and computational neuroscience',
-    authors: 'Vision Sciences Society Annual Meeting, St. Pete Beach (poster) - May 2023',
-    labelMeta: 'Vision Sciences Society Annual Meeting, St. Pete Beach (poster) - May 2023',
+    ...WORKS_BY_ID.decoding,
+    authors: WORKS_BY_ID.decoding.meta,
+    labelMeta: WORKS_BY_ID.decoding.meta,
     wallImage: './posters/decoding-wall.webp',
-    detailImage: './posters/decoding-detail.webp',
     aspect: 16 / 9,
     width: MOTION_POSTER_HEIGHT * (16 / 9),
     frameWidth: MOTION_POSTER_HEIGHT * (16 / 9) + POSTER_FRAME_BORDER * 2,
@@ -127,54 +131,42 @@ const posters = [
     rotationY: Math.PI / 2
   },
   {
-    id: 'cbh',
-    title: 'Center for Brain and Health - Research Institute Day Poster',
-    category: 'CBH NYUAD',
-    authors: 'Designed for the Center for Brain and Health at NYU Abu Dhabi - Research Institute Day 2025',
-    labelMeta: 'Designed for the Center for Brain and Health at NYU Abu Dhabi - Research Institute Day 2025',
+    ...WORKS_BY_ID.cbh,
+    authors: WORKS_BY_ID.cbh.meta,
+    labelMeta: WORKS_BY_ID.cbh.meta,
     wallImage: './posters/cbh-wall.webp',
-    detailImage: './posters/cbh-detail.webp',
     aspect: 2048 / 1127,
     width: 4.4,
     position: [9.36, 3.15, 2.55],
     rotationY: -Math.PI / 2
   },
   {
-    id: 'ms-lesion-metrics',
-    title: 'Enhanced Prediction of Multiple Sclerosis Disabilities Using Tract-Specific Lesion Load and Advanced Quantitative MRI Metrics',
-    category: 'Multiple sclerosis neuroimaging',
-    authors: 'MENACTRIMS Congress, Jeddah (poster) - November 2024; NYU Abu Dhabi Division of Science Annual Research Conference (First Place Poster) - January 2025',
-    labelMeta: 'MENACTRIMS Congress, Jeddah (poster) - November 2024; NYU Abu Dhabi Division of Science Annual Research Conference (First Place Poster) - January 2025',
+    ...WORKS_BY_ID['ms-lesion-metrics'],
+    authors: WORKS_BY_ID['ms-lesion-metrics'].meta,
+    labelMeta: WORKS_BY_ID['ms-lesion-metrics'].meta,
     labelMetaFontSize: 30,
     wallImage: './posters/ms-lesion-metrics-wall.webp',
-    detailImage: './posters/ms-lesion-metrics-detail.webp',
     aspect: 2175 / 3072,
     width: 2.443,
     position: [-6.2, 3.05, -6.88],
     rotationY: 0
   },
   {
-    id: 'ohbm-pdi',
-    title: 'MP2RAGE Ventricle Distance Profiling Improves Classification of Multiple Sclerosis Subtypes',
-    category: 'Multiple sclerosis neuroimaging',
-    authors: 'Organization for Human Brain Mapping Annual Meeting, Brisbane (poster) - June 2025',
-    labelMeta: 'Organization for Human Brain Mapping Annual Meeting, Brisbane (poster) - June 2025',
+    ...WORKS_BY_ID['ohbm-pdi'],
+    authors: WORKS_BY_ID['ohbm-pdi'].meta,
+    labelMeta: WORKS_BY_ID['ohbm-pdi'].meta,
     wallImage: './posters/ohbm-pdi-wall.webp',
-    detailImage: './posters/ohbm-pdi-detail.webp',
     aspect: 2175 / 3072,
     width: 2.443,
     position: [-3.3, 3.05, -6.88],
     rotationY: 0
   },
   {
-    id: 'ms-research-day',
-    title: 'MS Research Day',
-    category: 'Research engagement and outreach',
-    authors: 'Made this banner for an event for the National Multiple Sclerosis Society and NYU Abu Dhabi - 5 November 2025',
-    labelMeta: 'Made this banner for an event for the National Multiple Sclerosis Society and NYU Abu Dhabi - 5 November 2025',
+    ...WORKS_BY_ID['ms-research-day'],
+    authors: WORKS_BY_ID['ms-research-day'].meta,
+    labelMeta: WORKS_BY_ID['ms-research-day'].meta,
     labelMetaSingleLine: true,
     wallImage: './posters/ms-research-day-wall.webp',
-    detailImage: './posters/ms-research-day-detail.webp',
     aspect: 1337 / 3072,
     width: 1.502,
     labelWidth: 2.7,
@@ -182,13 +174,10 @@ const posters = [
     rotationY: 0
   },
   {
-    id: 'laminate',
-    title: 'NMSS one pager',
-    category: 'Multiple sclerosis collaboration',
-    authors: 'Made this one pager for the National Multiple Sclerosis Society - 2025',
-    labelMeta: 'Made this one pager for the National Multiple Sclerosis Society - 2025',
+    ...WORKS_BY_ID.laminate,
+    authors: WORKS_BY_ID.laminate.meta,
+    labelMeta: WORKS_BY_ID.laminate.meta,
     wallImage: './posters/laminate-wall.webp',
-    detailImage: './posters/laminate-detail.webp',
     aspect: 2173 / 3072,
     width: 1.22,
     labelWidth: 2.3,
@@ -196,13 +185,10 @@ const posters = [
     rotationY: 0
   },
   {
-    id: 'menactrims-cvsview',
-    title: 'CVS-View: AI-powered central vein sign identification',
-    category: 'Multiple sclerosis software and AI',
-    authors: 'Tenth MENACTRIMS Congress, Dubai (poster) - 5-6 December 2025',
-    labelMeta: 'Tenth MENACTRIMS Congress, Dubai (poster) - 5-6 December 2025',
+    ...WORKS_BY_ID['menactrims-cvsview'],
+    authors: WORKS_BY_ID['menactrims-cvsview'].meta,
+    labelMeta: WORKS_BY_ID['menactrims-cvsview'].meta,
     wallImage: './posters/menactrims-cvsview-wall.webp',
-    detailImage: './posters/menactrims-cvsview-detail.webp',
     aspect: 1240 / 2048,
     width: 2.09,
     labelWidth: 2.8,
@@ -212,11 +198,9 @@ const posters = [
 ];
 
 const videoWork = {
-  title: 'Center for Brain and Health - One-Minute Overview Film',
-  category: 'CBH NYUAD',
-  labelMeta: 'Produced for the Center for Brain and Health at NYU Abu Dhabi - Research Institute Day 2025',
-  source: './media/cbh-center-film.mp4',
-  posterImage: './media/cbh-center-film-poster.webp',
+  ...WORKS_BY_ID['cbh-film'],
+  labelMeta: WORKS_BY_ID['cbh-film'].meta,
+  source: WORKS_BY_ID['cbh-film'].mediaSource,
   aspect: 16 / 9,
   width: 4.4,
   position: [9.36, 3.15, -2.55],
@@ -244,19 +228,18 @@ const BRAIN_WALL_SHEETS = [
 // Each sheet is rendered at the room height; the west and north sheets are
 // cropped to the usable wall span so neither can cover a doorway.
 const MRI_WALL_SHEETS = [
-  { image: './mri-room/brain-pdf-5-updated-v2.png?v=20260718-mri-pdf-black-video-frames', side: 'south', aspect: 4781 / 1744 },
+  { image: WORKS_BY_ID['mri-afqview'].posterImage, side: 'south', aspect: 4781 / 1744 },
   { image: './mri-room/brain-pdf-4.png?v=20260718-hd', side: 'west', aspect: 4754 / 1744, cropAlign: 'center', contentOnly: true, contentCenterX: 0.607 },
   { image: './mri-room/brain-pdf-6-updated.png?v=20260718-mri-pdf-clean1', side: 'east', aspect: 4704 / 1744 },
   // The black artboard is cropped from the PDF page and padded with black only;
   // its title, subtitle, marked video frame, and original typography stay in
   // this single sheet texture, just like the diffusion wall.
-  { image: './mri-room/brain-pdf-7-updated-clean-v2.png?v=20260718-mri-pdf-black-video-frames', side: 'north', aspect: 2299 / 1744 }
+  { image: WORKS_BY_ID['mri-functional'].posterImage, side: 'north', aspect: 2299 / 1744 }
 ];
 
 const MRI_VIDEO_WORKS = [
   {
-    title: 'AFQView',
-    source: './media/mri-afqview-hd.mp4',
+    ...sharedVideoWork('mri-afqview'),
     roomKey: ROOM_KEYS.mri,
     side: 'south',
     sheetAspect: 4781 / 1744,
@@ -265,8 +248,7 @@ const MRI_VIDEO_WORKS = [
     videoAspect: 16 / 9
   },
   {
-    title: 'Functional MRI',
-    source: './media/mri-fmri-hd.mp4',
+    ...sharedVideoWork('mri-functional'),
     roomKey: ROOM_KEYS.mri,
     side: 'north',
     sheetAspect: 2299 / 1744,
@@ -319,6 +301,23 @@ const ART_PDF_CATEGORIES = new Set([
   'Stuff I did when I was sick',
   'Black and white stuff'
 ]);
+
+const SHARED_ARTWORK_BY_IMAGE = new Map(
+  Object.values(WORKS_BY_ID)
+    .filter((work) => work.detailImage?.startsWith('./art/assets/'))
+    .map((work) => [work.detailImage, work])
+);
+const sharedArtWorks = artWorks.map((work) => {
+  const sharedWork = SHARED_ARTWORK_BY_IMAGE.get(work.image);
+  if (!sharedWork) return work;
+  return {
+    ...work,
+    title: sharedWork.title,
+    category: sharedWork.category,
+    note: work.note ? sharedWork.description : work.note,
+    image: sharedWork.detailImage
+  };
+});
 
 const ART_WALL_SHEETS = [
   {
@@ -621,9 +620,9 @@ const NESTED_GALLERY_MINIATURE = {
 };
 
 const HOUSE_RAIN_DISPLAY = {
-  title: 'House in the Rain, 2020',
-  source: './media/house-in-rain.mp4',
-  posterImage: './media/house-in-rain-poster.jpg',
+  title: WORKS_BY_ID['house-in-rain'].title,
+  source: WORKS_BY_ID['house-in-rain'].mediaSource,
+  posterImage: WORKS_BY_ID['house-in-rain'].posterImage,
   photoImage: './placement-assets/img-0168.jpg',
   aspect: 16 / 9,
   width: 2.35,
@@ -649,10 +648,7 @@ const HOUSE_RAIN_DISPLAY = {
 
 const GAME_DISPLAY_WORKS = [
   {
-    title: 'Echoing End',
-    description: 'Post-apocalyptic survival of a kid and a dog.',
-    source: './media/everything-everywhere-game.mp4',
-    posterImage: './media/video-posters/everything-everywhere-game.png',
+    ...sharedVideoWork('game-echoing-end'),
     aspect: 1172 / 660,
     contentHeight: 1.15,
     frameWidth: 2.7,
@@ -661,10 +657,7 @@ const GAME_DISPLAY_WORKS = [
     z: 29.05
   },
   {
-    title: 'Shrimp',
-    description: 'Shrimp farm simulation.',
-    source: './media/shrimp-tanks-game.mp4',
-    posterImage: './media/video-posters/shrimp-tanks-game.png',
+    ...sharedVideoWork('game-shrimp'),
     aspect: 1594 / 730,
     contentHeight: 1.15,
     frameWidth: 2.7,
@@ -673,7 +666,7 @@ const GAME_DISPLAY_WORKS = [
     z: 32.45,
     launchAction: {
       label: 'PLAY',
-      url: '../shrimp-tanks/?v=20260718-shrimp-build-6c9142f1155c06ec'
+      url: WORKS_BY_ID['game-shrimp'].href
     }
   }
 ].map((work) => ({
@@ -710,8 +703,6 @@ const VIDEO_ROOM_SCREEN_WIDTH = 3.15;
 const VIDEO_ROOM_SCREEN_Y = 2.8;
 // Video Room audio is attenuated in the source files; keep the element at unity gain.
 const VIDEO_ROOM_VOLUME = 1;
-const VIDEO_ROOM_ASSET_VERSION = '20260718-video-room-audio-50';
-const VIDEO_ROOM_POSTER_VERSION = '20260718-video-room3-poster-frames';
 const VIDEO_ROOM_WALL_ZS = [
   VIDEOS_ROOM.nearZ + 4.1,
   VIDEOS_ROOM.nearZ + 9.45
@@ -725,43 +716,32 @@ const VIDEO_ROOM_ACTIVATION_BOUNDS = {
 
 const VIDEO_ROOM_WORKS = [
   {
-    title: 'Cataract',
-    source: `./media/videos/cataract-audio-50.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
-    posterImage: './media/video-posters/cataract-poster-00-20.jpg',
+    ...sharedVideoWork('film-cataract'),
     position: [VIDEOS_ROOM.centerX, VIDEO_ROOM_SCREEN_Y, VIDEOS_ROOM.nearZ + 0.14],
     rotationY: 0
   },
   {
-    title: 'Lower Back Pain',
-    source: `./media/videos/lower-back-pain-audio-50.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
-    posterImage: './media/video-posters/lower-back-pain-poster-00-11.jpg',
+    ...sharedVideoWork('film-lower-back-pain'),
     position: [VIDEOS_ROOM.centerX + VIDEOS_ROOM.halfWidth - 0.14, VIDEO_ROOM_SCREEN_Y, VIDEO_ROOM_WALL_ZS[0]],
     rotationY: -Math.PI / 2
   },
   {
-    title: 'Goosebumps, Hiccups, and Yawns',
-    source: `./media/videos/goosebumps-hiccup-yawn-sub-audio-50.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
-    posterImage: './media/video-posters/goosebumps-hiccup-yawn-sub-poster-00-11.jpg',
+    ...sharedVideoWork('film-goosebumps'),
     position: [VIDEOS_ROOM.centerX + VIDEOS_ROOM.halfWidth - 0.14, VIDEO_ROOM_SCREEN_Y, VIDEO_ROOM_WALL_ZS[1]],
     rotationY: -Math.PI / 2
   },
   {
-    title: 'Teeth',
-    source: `./media/videos/teeth-audio-50.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
-    posterImage: './media/video-posters/teeth-poster-00-47.jpg',
+    ...sharedVideoWork('film-teeth'),
     position: [VIDEOS_ROOM.centerX - VIDEOS_ROOM.halfWidth + 0.14, VIDEO_ROOM_SCREEN_Y, VIDEO_ROOM_WALL_ZS[0]],
     rotationY: Math.PI / 2
   },
   {
-    title: 'How to Kill Spider Mites',
-    source: `./media/videos/spider-mites-sub-audio-50.mp4?v=${VIDEO_ROOM_ASSET_VERSION}`,
-    posterImage: './media/video-posters/spider-mites-sub-poster-00-24.jpg',
+    ...sharedVideoWork('film-spider-mites'),
     position: [VIDEOS_ROOM.centerX - VIDEOS_ROOM.halfWidth + 0.14, VIDEO_ROOM_SCREEN_Y, VIDEO_ROOM_WALL_ZS[1]],
     rotationY: Math.PI / 2
   }
 ].map((work) => ({
   ...work,
-  posterImage: `${work.posterImage}?v=${VIDEO_ROOM_POSTER_VERSION}`,
   aspect: 16 / 9,
   width: VIDEO_ROOM_SCREEN_WIDTH,
   labelWidth: 2.5,
@@ -785,16 +765,14 @@ const VIDEO_ROOM_WORKS = [
 }));
 
 const HOUSE_RENDER_WALL = {
-  image: './house-renders/home-all-wall.png',
+  image: WORKS_BY_ID['house-experience'].wallImage,
   aspect: 4427 / 1627,
   width: PDF_ART_PANEL_HEIGHT * (4427 / 1627),
   y: ART_ROOM.height / 2
 };
 
 const defenseScreeningWork = {
-  title: 'PhD Defense',
-  source: './media/defense-screening-web.mp4?v=20260717-faststart',
-  posterImage: './media/video-posters/defense-screening-web.jpg',
+  ...sharedVideoWork('phd-defense'),
   aspect: 1280 / 828,
   width: 6.2,
   position: [SCREENING_ROOM.centerX, 2.8, SCREENING_ROOM.farZ - 0.1],
@@ -814,10 +792,8 @@ const defenseScreeningWork = {
 
 const appDemoWorks = [
   {
-    title: 'Lesion-Centered Mask Review',
+    ...sharedVideoWork('cvs-mask-review'),
     category: '1 · CVSView',
-    labelMeta: 'Centers the camera on each lesion and toggles its mask.',
-    source: './media/cvsview-lesion-mask-native.mp4',
     aspect: APP_VIDEO_ASPECT,
     width: APP_VIDEO_WIDTH,
     position: [APP_ROOM.centerX + APP_ROOM.halfWidth - 0.14, 3.1, CVS_VIDEO_FIRST_Z + APP_VIDEO_STEP * 2],
@@ -826,10 +802,8 @@ const appDemoWorks = [
     rotationY: -Math.PI / 2
   },
   {
-    title: 'Rapid Lesion Navigation',
+    ...sharedVideoWork('cvs-rapid-navigation'),
     category: '2 · CVSView',
-    labelMeta: 'Moves quickly between lesions with automatic camera centering.',
-    source: './media/cvsview-rapid-navigation-native.mp4',
     aspect: APP_VIDEO_ASPECT,
     width: APP_VIDEO_WIDTH,
     position: [APP_ROOM.centerX + APP_ROOM.halfWidth - 0.14, 3.1, CVS_VIDEO_FIRST_Z + APP_VIDEO_STEP],
@@ -838,10 +812,8 @@ const appDemoWorks = [
     rotationY: -Math.PI / 2
   },
   {
-    title: 'CVS/PRL Review and Reporting',
+    ...sharedVideoWork('cvs-prl-review'),
     category: '3 · CVSView',
-    labelMeta: 'Reviews co-registered FLAIR*, phase, and FLAIR images at each lesion and saves the results.',
-    source: './media/cvsview-cvs-prl-review-web-720.mp4',
     preloadPriority: 95,
     aspect: APP_VIDEO_ASPECT,
     width: APP_VIDEO_WIDTH,
@@ -851,10 +823,8 @@ const appDemoWorks = [
     rotationY: -Math.PI / 2
   },
   {
-    title: 'Lesion-Centered Segmentation',
+    ...sharedVideoWork('lesion-segmentation'),
     category: '1 · LesionView',
-    labelMeta: 'Shows the segmentation mask with the camera centered on the lesion.',
-    source: './media/lesionview-lesion-segmentation-native.mp4',
     aspect: APP_VIDEO_ASPECT,
     width: APP_VIDEO_WIDTH,
     position: [APP_ROOM.centerX + APP_ROOM.halfWidth - 0.14, 3.1, LESION_VIDEO_FIRST_Z + APP_VIDEO_STEP * 2],
@@ -863,10 +833,8 @@ const appDemoWorks = [
     rotationY: -Math.PI / 2
   },
   {
-    title: 'Baseline and Follow-up Comparison',
+    ...sharedVideoWork('lesion-comparison'),
     category: '2 · LesionView',
-    labelMeta: 'Displays co-registered baseline and follow-up scans for any lesion.',
-    source: './media/lesionview-longitudinal-comparison-native.mp4',
     aspect: APP_VIDEO_ASPECT,
     width: APP_VIDEO_WIDTH,
     position: [APP_ROOM.centerX + APP_ROOM.halfWidth - 0.14, 3.1, LESION_VIDEO_FIRST_Z + APP_VIDEO_STEP],
@@ -875,10 +843,8 @@ const appDemoWorks = [
     rotationY: -Math.PI / 2
   },
   {
-    title: 'New Lesion Verification',
+    ...sharedVideoWork('lesion-verification'),
     category: '3 · LesionView',
-    labelMeta: 'Reviews and verifies newly detected lesions.',
-    source: './media/lesionview-new-lesion-verification-native.mp4',
     aspect: APP_VIDEO_ASPECT,
     width: APP_VIDEO_WIDTH,
     position: [APP_ROOM.centerX + APP_ROOM.halfWidth - 0.14, 3.1, LESION_VIDEO_FIRST_Z],
@@ -889,7 +855,8 @@ const appDemoWorks = [
 ].map((work) => ({
   ...work,
   preloadPriority: work.preloadPriority ?? 75,
-  posterImage: `./media/video-posters/${work.source.split('/').pop().replace(/\.mp4$/i, '.jpg')}`,
+  posterImage: work.posterImage
+    || `./media/video-posters/${work.source.split('/').pop().replace(/\.mp4$/i, '.jpg')}`,
   playWhenVisible: true,
   playDistance: 6,
   interactionRadius: 5.5,
@@ -907,10 +874,8 @@ const appDemoWorks = [
 
 const myPhysioVideoWorks = [
   {
-    title: 'App Welcome',
+    ...sharedVideoWork('myphysio-app-welcome'),
     category: 'Demo 1',
-    labelMeta: 'Launches MyPhysio and introduces the patient experience.',
-    source: './media/myphysio-01-app-welcome.mp4?v=20260720-balanced1',
     positionZ: 12.35
   },
   {
@@ -921,10 +886,8 @@ const myPhysioVideoWorks = [
     positionZ: 14.7
   },
   {
-    title: 'Guided Workout Tracker',
+    ...sharedVideoWork('myphysio-workout-tracker'),
     category: 'Demo 3',
-    labelMeta: 'Follows the patient through an exercise session.',
-    source: './media/myphysio-03-workout-tracker.mp4?v=20260720-balanced1',
     positionZ: 17.05
   },
   {
@@ -942,16 +905,15 @@ const myPhysioVideoWorks = [
     positionZ: 21.75
   },
   {
-    title: 'Exercise Program Manager',
+    ...sharedVideoWork('myphysio-program-manager'),
     category: 'Demo 6',
-    labelMeta: 'Manages the exercise program assigned to the patient.',
-    source: './media/myphysio-06-manage-program.mp4?v=20260720-balanced1',
     positionZ: 24.1
   }
 ].map((work) => ({
   ...work,
   preloadPriority: 55,
-  posterImage: `./media/video-posters/${work.source.split('/').pop().split('?')[0].replace(/\.mp4$/i, '.jpg')}`,
+  posterImage: work.posterImage
+    || `./media/video-posters/${work.source.split('/').pop().split('?')[0].replace(/\.mp4$/i, '.jpg')}`,
   playWhenVisible: true,
   playDistance: 5.5,
   interactionRadius: 5,
@@ -974,10 +936,10 @@ const myPhysioVideoWorks = [
 
 const myPhysioImageWorks = [
   {
-    title: 'Patient Progress at a Glance',
+    ...WORKS_BY_ID['myphysio-patient-progress'],
     category: 'Demo 7',
-    labelMeta: 'Exercise completion, pain, and range-of-motion tracking.',
-    image: './media/myphysio-07-stats.png',
+    labelMeta: WORKS_BY_ID['myphysio-patient-progress'].description,
+    image: WORKS_BY_ID['myphysio-patient-progress'].detailImage,
     aspect: MYPHYSIO_PHONE_ASPECT,
     width: 1.1,
     position: [APP_ROOM.centerX - APP_ROOM.halfWidth + 0.14, 3.1, 26.45],
@@ -988,10 +950,10 @@ const myPhysioImageWorks = [
     device: 'phone'
   },
   {
-    title: 'Physiotherapist Dashboard',
+    ...WORKS_BY_ID['myphysio-physio-dashboard'],
     category: 'Demo 8',
-    labelMeta: 'Desktop overview for monitoring patients and managing care.',
-    image: './media/myphysio-08-physio-dashboard.png',
+    labelMeta: WORKS_BY_ID['myphysio-physio-dashboard'].description,
+    image: WORKS_BY_ID['myphysio-physio-dashboard'].detailImage,
     aspect: 2892 / 2004,
     width: 2.25,
     position: [APP_ROOM.centerX - APP_ROOM.halfWidth + 0.14, 3.1, 29.3],
@@ -1015,18 +977,18 @@ const VIDEOS_INTRO_FONT_FAMILY = '"Inter", Arial, Helvetica, sans-serif';
 
 const resumePages = [
   {
-    title: 'Puti Wen — Résumé',
-    url: '/resume/',
-    image: './resume/resume-page-1.jpg?v=20260720-resume-refresh3',
+    title: WORKS_BY_ID.resume.title,
+    url: WORKS_BY_ID.resume.href,
+    image: WORKS_BY_ID.resume.posterImage,
     width: 3.28,
     aspect: 1391 / 1800,
     position: [1.9, 2.72, 6.9],
     rotationY: Math.PI
   },
   {
-    title: 'Puti Wen — Résumé',
-    url: '/resume/',
-    image: './resume/resume-page-2.jpg?v=20260720-resume-refresh3',
+    title: WORKS_BY_ID.resume.title,
+    url: WORKS_BY_ID.resume.href,
+    image: WORKS_BY_ID.contact.posterImage,
     width: 3.28,
     aspect: 1391 / 1800,
     position: [-1.9, 2.72, 6.9],
@@ -1036,11 +998,9 @@ const resumePages = [
 
 const figureClusters = [
   {
-    title: 'Random figures from published papers',
-    category: 'Paper figures',
-    labelMeta: 'A single sheet of figures from past papers',
-    image: './figures/paper-figures-sheet.jpg',
-    detailImage: './figures/paper-figures-sheet.jpg',
+    ...WORKS_BY_ID['paper-figures'],
+    labelMeta: WORKS_BY_ID['paper-figures'].meta,
+    image: WORKS_BY_ID['paper-figures'].detailImage,
     aspect: 3000 / 1649,
     width: 2.6,
     position: [7.95, 2.515, 6.9],
@@ -1086,11 +1046,17 @@ const dialogImage = document.getElementById('dialog-image');
 const detailLoading = document.getElementById('detail-loading');
 const helpDialog = document.getElementById('help-dialog');
 const helpButton = document.getElementById('help-button');
-const isMobileDevice = navigator.userAgentData?.mobile === true
-  || /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent)
-  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
 const previewParams = new URLSearchParams(window.location.search);
+const galleryCaptureMode = previewParams.has('gallery-capture');
+const forceFullGallery = window.__PUTI_FORCE_FULL_3D__ === true
+  || previewParams.get('gallery') === 'full'
+  || galleryCaptureMode;
+const isMobileDevice = !forceFullGallery && (
+  navigator.userAgentData?.mobile === true
+  || /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+);
+const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
 let housePreviewActivationConsumed = false;
 
 let renderer;
@@ -1143,6 +1109,7 @@ const roomVisibilityEntries = new Map();
 const roomVisualReadyResolvers = new Map();
 const roomLoadControllers = new Map();
 let artGalleryLoadStarted = false;
+let artGalleryLoadPromise = null;
 let backgroundGalleryLoadsStarted = false;
 let artRoomMugLoadPromise = null;
 let artRoomPeripheralLoadPromise = null;
@@ -1153,7 +1120,7 @@ let lastFrame = performance.now();
 let brainSurfaceLoadStarted = false;
 let brainSurfaceLoadPromise = null;
 let mriWallLoadsStarted = false;
-let mriVideoDisplaysLoaded = false;
+let mriVideoDisplaysLoadPromise = null;
 let brainWallLoadsStarted = false;
 let gameRoomLoadsStarted = false;
 let gameRoomKiosksReady = false;
@@ -1303,14 +1270,18 @@ const INITIAL_LOADING_MIN_DURATION_MS = 4000;
 // performance.now() starts at navigation, which is also when the static
 // loading screen becomes visible. Include module startup in the visible gate.
 const initialLoadingStartedAt = 0;
-const shrimpRoomMusic = new Audio('./media/shrimp-game-music.mp3?v=20260717');
+const shrimpRoomMusic = galleryCaptureMode
+  ? new Audio()
+  : new Audio('./media/shrimp-game-music.mp3?v=20260717');
 shrimpRoomMusic.loop = true;
-shrimpRoomMusic.preload = 'auto';
+shrimpRoomMusic.preload = galleryCaptureMode ? 'none' : 'auto';
 shrimpRoomMusic.volume = 0;
 shrimpRoomMusic.setAttribute('aria-hidden', 'true');
-const shrimpRoomWater = new Audio('./media/shrimp-game-water.mp3?v=20260717');
+const shrimpRoomWater = galleryCaptureMode
+  ? new Audio()
+  : new Audio('./media/shrimp-game-water.mp3?v=20260717');
 shrimpRoomWater.loop = true;
-shrimpRoomWater.preload = 'auto';
+shrimpRoomWater.preload = galleryCaptureMode ? 'none' : 'auto';
 shrimpRoomWater.volume = 0;
 shrimpRoomWater.setAttribute('aria-hidden', 'true');
 const shrimpRoomTracks = [shrimpRoomMusic, shrimpRoomWater];
@@ -1595,7 +1566,7 @@ function createRoom() {
   createBrainRoom();
   createArtRoom();
   addRoomHeading(
-    'PhD Defense',
+    WORKS_BY_ID['phd-defense'].title,
     [SCREENING_ROOM.centerX, 3.67, ROOM.halfDepth - 0.11],
     Math.PI,
     SCREENING_ROOM.doorWidth,
@@ -4763,8 +4734,7 @@ function startMriWallLoads() {
   const finishWall = () => {
     remainingWalls -= 1;
     if (remainingWalls > 0) return;
-    ensureMriVideoDisplays();
-    markRoomVisualsReady(ROOM_KEYS.mri);
+    ensureMriVideoDisplays().finally(() => markRoomVisualsReady(ROOM_KEYS.mri));
   };
   const jobs = MRI_WALL_SHEETS.map((sheet) => () => {
     textureLoader.load(
@@ -4789,10 +4759,25 @@ function startMriWallLoads() {
 }
 
 function ensureMriVideoDisplays() {
-  if (mriVideoDisplaysLoaded) return;
-  mriVideoDisplaysLoaded = true;
-  MRI_VIDEO_WORKS.forEach((work) => addMriVideoWork(work));
-  prepareDeferredRoomVideos(ROOM_KEYS.mri);
+  if (mriVideoDisplaysLoadPromise) return mriVideoDisplaysLoadPromise;
+  const textureLoader = new THREE.TextureLoader();
+  mriVideoDisplaysLoadPromise = Promise.all(MRI_VIDEO_WORKS.map((work) => new Promise((resolve) => {
+    textureLoader.load(
+      work.previewImage,
+      (texture) => {
+        addMriVideoWork(work, texture);
+        resolve();
+      },
+      undefined,
+      () => {
+        addMriVideoWork(work);
+        resolve();
+      }
+    );
+  }))).then(() => {
+    prepareDeferredRoomVideos(ROOM_KEYS.mri);
+  });
+  return mriVideoDisplaysLoadPromise;
 }
 
 function startBrainWallLoads() {
@@ -4835,7 +4820,7 @@ function startGameRoomLoads() {
   }
   gameRoomLoadsStarted = true;
   const textureLoader = new THREE.TextureLoader();
-  const shrimpKiosk = GAME_DISPLAY_WORKS.find((work) => work.title === 'Shrimp');
+  const shrimpKiosk = GAME_DISPLAY_WORKS.find((work) => work.id === 'game-shrimp');
   const otherKiosks = GAME_DISPLAY_WORKS.filter((work) => work !== shrimpKiosk);
   const kioskWorks = [shrimpKiosk, ...otherKiosks].filter(Boolean);
   let readyKioskCount = 0;
@@ -4975,6 +4960,7 @@ function getGalleryRoomKeyAtCamera() {
 function allowsSpeculativeVideoPreload(connection = (
   navigator.connection || navigator.mozConnection || navigator.webkitConnection
 )) {
+  if (galleryCaptureMode) return false;
   if (!connection) return true;
   if (connection.saveData) return false;
   return !/^(slow-2g|2g)$/.test(connection.effectiveType || '');
@@ -5134,14 +5120,14 @@ function openResumePage() {
   sendAnalyticsEvent('resume_open', {
     room: ANALYTICS_ROOM_LABELS[analyticsRoomKey] || analyticsRoomKey || 'Unknown'
   });
-  const resumeWindow = window.open('/resume/', 'puti-resume');
+  const resumeWindow = window.open(WORKS_BY_ID.resume.href, 'puti-resume');
   if (resumeWindow) {
     resumeWindow.focus();
     return;
   }
   // A same-tab fallback keeps the résumé reachable when a browser blocks the
   // user-initiated secondary tab.
-  window.location.assign('/resume/');
+  window.location.assign(WORKS_BY_ID.resume.href);
 }
 
 function scheduleLowPriorityGalleryWork(callback, delay = 1200) {
@@ -6326,13 +6312,13 @@ function addArtTemplatePanel(parent, panel, texture) {
 }
 
 function createArtGallery() {
-  if (artGalleryLoadStarted) return;
+  if (artGalleryLoadStarted) return artGalleryLoadPromise || Promise.resolve();
   artGalleryLoadStarted = true;
   const placements = [];
   const templatePanels = [];
 
   ART_SALON_PANELS.forEach((panel) => {
-    let works = artWorks.filter((work) => work.category === panel.category);
+    let works = sharedArtWorks.filter((work) => work.category === panel.category);
     if (!works.length) return;
     if (ART_PDF_CATEGORIES.has(panel.category)) return;
 
@@ -6384,12 +6370,35 @@ function createArtGallery() {
     placements.push(...createCategoryPlacements(wallGroup, works, panel));
   });
 
-  const textureLoader = new THREE.TextureLoader();
-  templatePanels.forEach((panel) => {
-    textureLoader.load(panel.image, (texture) => addArtTemplatePanel(panel.parent, panel, texture));
+  let resolveArtGalleryLoad;
+  artGalleryLoadPromise = new Promise((resolve) => {
+    resolveArtGalleryLoad = resolve;
   });
+  const textureLoader = new THREE.TextureLoader();
   let cursor = 0;
   let activeLoads = 0;
+  let pendingTemplatePanels = templatePanels.length;
+  let artGalleryResolved = false;
+  const maybeResolveArtGalleryLoad = () => {
+    if (artGalleryResolved || pendingTemplatePanels > 0 || cursor < placements.length || activeLoads > 0) return;
+    artGalleryResolved = true;
+    resolveArtGalleryLoad();
+  };
+  templatePanels.forEach((panel) => {
+    const finishTemplatePanel = () => {
+      pendingTemplatePanels -= 1;
+      maybeResolveArtGalleryLoad();
+    };
+    textureLoader.load(
+      panel.image,
+      (texture) => {
+        addArtTemplatePanel(panel.parent, panel, texture);
+        finishTemplatePanel();
+      },
+      undefined,
+      finishTemplatePanel
+    );
+  });
   const loadNext = () => {
     while (activeLoads < 4 && cursor < placements.length) {
       const placement = placements[cursor];
@@ -6404,6 +6413,7 @@ function createArtGallery() {
           addArtworkCollection(placement, collectionTextures);
           activeLoads -= 1;
           loadNext();
+          maybeResolveArtGalleryLoad();
         };
         placement.work.collectionWorks.forEach((work, index) => {
           textureLoader.load(
@@ -6424,16 +6434,20 @@ function createArtGallery() {
           addArtPiece(placement, texture);
           activeLoads -= 1;
           loadNext();
+          maybeResolveArtGalleryLoad();
         },
         undefined,
         () => {
           activeLoads -= 1;
           loadNext();
+          maybeResolveArtGalleryLoad();
         }
       );
     }
+    maybeResolveArtGalleryLoad();
   };
   loadNext();
+  return artGalleryLoadPromise;
 }
 
 function addFigureSalonStatement() {
@@ -6924,7 +6938,7 @@ function addMriWallSheet(sheet, texture) {
   needsRender = true;
 }
 
-function addMriVideoWork(work) {
+function addMriVideoWork(work, posterTexture = createVideoPlaceholderTexture()) {
   const sheet = MRI_WALL_SHEETS.find((candidate) => candidate.side === work.side);
   if (!sheet) return;
   const layout = getMriWallLayout(sheet);
@@ -6943,8 +6957,9 @@ function addMriVideoWork(work) {
   ];
   const width = layout.width * displayedWidth;
   const height = layout.height * rect.height;
-  addVideoWork({
+  return addVideoWork({
     ...work,
+    posterImage: work.previewImage || work.posterImage,
     width,
     aspect: width / height,
     position,
@@ -6959,7 +6974,7 @@ function addMriVideoWork(work) {
     playDistance: 100,
     activationBounds: null,
     requireFocusForPlayback: false
-  }, createVideoPlaceholderTexture());
+  }, posterTexture);
 }
 
 function readFreeSurferSurface(buffer) {
@@ -7870,6 +7885,7 @@ function addVideoWork(work, posterTexture) {
     else requestVideoSync();
   }
   needsRender = true;
+  return entry;
 }
 
 function addImageWork(work, texture) {
@@ -8401,8 +8417,141 @@ function animateLoadingProgress() {
   loadingProgressAnimation = window.requestAnimationFrame(tick);
 }
 
+const GALLERY_CAPTURE_FACES = Object.freeze({
+  px: 0,
+  nx: 1,
+  py: 2,
+  ny: 3,
+  pz: 4,
+  nz: 5
+});
+let galleryCaptureNodes = new Map();
+let galleryCaptureTarget = null;
+let galleryCaptureNodeId = null;
+let galleryCaptureSize = 0;
+let galleryCaptureQueue = Promise.resolve();
+
+function disposeGalleryCaptureTarget() {
+  galleryCaptureTarget?.dispose();
+  galleryCaptureTarget = null;
+  galleryCaptureNodeId = null;
+  galleryCaptureSize = 0;
+}
+
+function configureGalleryCaptureNode(node) {
+  if (node.environment === 'house') {
+    insideHouseWorld = true;
+    houseWorldGroup.visible = true;
+    setHouseWorldEnvironment();
+  } else {
+    insideHouseWorld = false;
+    houseWorldGroup.visible = false;
+    setGalleryEnvironment();
+    currentGalleryRoomKey = node.room;
+    updateRoomContentVisibility();
+  }
+  camera.position.set(...node.position);
+  camera.updateMatrixWorld(true);
+  scene.updateMatrixWorld(true);
+}
+
+function encodeGalleryCaptureFace(pixels, size) {
+  const canvasElement = document.createElement('canvas');
+  canvasElement.width = size;
+  canvasElement.height = size;
+  const context = canvasElement.getContext('2d', { alpha: false });
+  context.putImageData(new ImageData(new Uint8ClampedArray(pixels), size, size), 0, 0);
+  return canvasElement.toDataURL('image/png');
+}
+
+async function renderGalleryCaptureNode(node, size) {
+  disposeGalleryCaptureTarget();
+  configureGalleryCaptureNode(node);
+  renderer.compile(scene, camera);
+  const target = new THREE.WebGLCubeRenderTarget(size, {
+    generateMipmaps: false,
+    minFilter: THREE.LinearFilter,
+    magFilter: THREE.LinearFilter,
+    colorSpace: THREE.SRGBColorSpace
+  });
+  const near = node.environment === 'house' ? 0.05 : 0.08;
+  const far = node.environment === 'house' ? 220 : 100;
+  const cubeCamera = new THREE.CubeCamera(near, far, target);
+  cubeCamera.position.set(...node.position);
+  cubeCamera.children.forEach((faceCamera) => {
+    faceCamera.layers.mask = camera.layers.mask;
+  });
+  cubeCamera.updateMatrixWorld(true);
+  cubeCamera.update(renderer, scene);
+  galleryCaptureTarget = target;
+  galleryCaptureNodeId = node.id;
+  galleryCaptureSize = size;
+}
+
+async function prepareGalleryCapture() {
+  const manifest = await import('./mobile/tour-manifest.js');
+  galleryCaptureNodes = new Map(manifest.TOUR_NODES.map((node) => [node.id, node]));
+  await startFullGalleryBackgroundPreload();
+  await (artGalleryLoadPromise || Promise.resolve());
+  await document.fonts?.ready;
+  renderer.compile(scene, camera);
+  renderer.render(scene, camera);
+  if (brainMeshes.length !== 2 || !houseWorldReady) {
+    throw new Error('Capture scene is missing the brain surface or full-scale house.');
+  }
+  return true;
+}
+
+function installGalleryCaptureApi() {
+  const ready = prepareGalleryCapture();
+  window.__galleryCapture = {
+    ready,
+    get nodeIds() {
+      return [...galleryCaptureNodes.keys()];
+    },
+    get diagnostics() {
+      return {
+        brainMeshCount: brainMeshes.length,
+        houseWorldReady
+      };
+    },
+    captureFace(nodeId, face, size = 1024) {
+      const task = galleryCaptureQueue.catch(() => {}).then(async () => {
+        await ready;
+        const node = galleryCaptureNodes.get(nodeId);
+        if (!node) throw new Error(`Unknown panorama node: ${nodeId}`);
+        const faceIndex = GALLERY_CAPTURE_FACES[face];
+        if (faceIndex === undefined) throw new Error(`Unknown cube face: ${face}`);
+        const requestedSize = Math.max(256, Math.min(2560, Math.round(size)));
+        if (galleryCaptureNodeId !== nodeId || galleryCaptureSize !== requestedSize) {
+          await renderGalleryCaptureNode(node, requestedSize);
+        }
+        const pixels = new Uint8Array(requestedSize * requestedSize * 4);
+        renderer.readRenderTargetPixels(
+          galleryCaptureTarget,
+          0,
+          0,
+          requestedSize,
+          requestedSize,
+          pixels,
+          faceIndex
+        );
+        return encodeGalleryCaptureFace(pixels, requestedSize);
+      });
+      galleryCaptureQueue = task;
+      return task;
+    },
+    dispose: disposeGalleryCaptureTarget
+  };
+}
+
 function completeInitialLoading() {
   sceneReady = true;
+  if (galleryCaptureMode) {
+    loadingScreen.hidden = true;
+    installGalleryCaptureApi();
+    return;
+  }
   queueGalleryMiniatureRefreshes();
   // Start the ordered secondary-room queue while the minimum loading gate is
   // still visible. Large video files retain their later positions in the queue.
@@ -8448,7 +8597,8 @@ function getInitialVideoPosterImages() {
     ...GAME_DISPLAY_WORKS.map((work) => work.posterImage),
     ...VIDEO_ROOM_WORKS.map((work) => work.posterImage),
     HOUSE_RAIN_DISPLAY.posterImage,
-    ...mriVideoPosterSheets
+    ...mriVideoPosterSheets,
+    ...MRI_VIDEO_WORKS.map((work) => work.previewImage)
   ].filter(Boolean))];
 }
 
@@ -8671,7 +8821,7 @@ function initializeGallery() {
 
   // The visible progress follows the useful preload window rather than cached
   // request bursts, so it keeps moving smoothly even on repeat visits.
-  animateLoadingProgress();
+  if (!galleryCaptureMode) animateLoadingProgress();
 
   const textureLoader = new THREE.TextureLoader(manager);
   posters.forEach((poster) => {
@@ -8713,7 +8863,7 @@ function initializeGallery() {
   textureLoader.load(videoWork.posterImage, (texture) => addVideoWork(videoWork, texture));
   resize();
   window.addEventListener('resize', resize, { passive: true });
-  animationFrame = window.requestAnimationFrame(animate);
+  if (!galleryCaptureMode) animationFrame = window.requestAnimationFrame(animate);
 }
 
 enterButton.addEventListener('click', enterGallery);
@@ -8902,6 +9052,6 @@ window.addEventListener('beforeunload', () => {
   renderer?.dispose();
 });
 
-startAnalytics();
+if (!galleryCaptureMode) startAnalytics();
 setWalkHint();
 initializeGallery();

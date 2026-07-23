@@ -28,6 +28,47 @@
     aside { padding: 1.1rem; border-right: 1px solid #2c3336; overflow: auto; }
     aside h2 { margin-bottom: 0.7rem; font-size: 0.95rem; font-weight: 650; }
     .instruction { margin-bottom: 1rem; color: #aab4b6; font-size: 0.82rem; line-height: 1.45; }
+    .camera-picker {
+      margin-bottom: 1rem;
+      padding: 0.85rem;
+      border: 1px solid #42666b;
+      border-radius: 0.45rem;
+      background: #122023;
+    }
+    .camera-picker h2 { margin-bottom: 0.35rem; color: #c9f3f3; }
+    .camera-picker > p { color: #a8bec0; font-size: 0.78rem; line-height: 1.45; }
+    .coordinate-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.45rem; margin-top: 0.7rem; }
+    .coordinate-grid label { color: #a8bec0; font-size: 0.7rem; font-weight: 650; }
+    .coordinate-grid input {
+      width: 100%;
+      margin-top: 0.22rem;
+      padding: 0.45rem 0.5rem;
+      border: 1px solid #46676c;
+      border-radius: 0.3rem;
+      background: #0c1416;
+      color: #eefafa;
+      font: inherit;
+      font-size: 0.8rem;
+    }
+    .coordinate-grid input:focus-visible { border-color: #73dfe6; outline: 2px solid #29565b; outline-offset: 1px; }
+    .camera-readout { margin-top: 0.7rem; padding: 0.55rem 0.6rem; border-radius: 0.32rem; background: #0c1416; }
+    .camera-readout code { display: block; overflow-wrap: anywhere; color: #d7ffff; font-size: 0.78rem; }
+    #camera-area { margin-top: 0.3rem; color: #87a7aa; font-size: 0.7rem; }
+    #copy-camera {
+      width: 100%;
+      margin-top: 0.65rem;
+      padding: 0.55rem 0.7rem;
+      border: 1px solid #5aa7ae;
+      border-radius: 0.35rem;
+      background: #1c5359;
+      color: #efffff;
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #copy-camera:hover, #copy-camera:focus-visible { border-color: #b8fbff; background: #23646b; outline: none; }
+    #copy-camera:disabled { cursor: not-allowed; opacity: 0.45; }
     .orientation-key {
       margin-bottom: 1rem;
       padding: 0.7rem;
@@ -79,6 +120,13 @@
     .wall-id { fill: #91a2a5; font-size: 0.24px; font-weight: 650; letter-spacing: 0.02em; pointer-events: none; }
     .marker { fill: #f0c36a; stroke: #111416; stroke-width: 0.08; cursor: pointer; }
     .marker-label { fill: #f0d79a; font-size: 0.28px; font-weight: 700; pointer-events: none; }
+    .camera-marker { cursor: grab; touch-action: none; }
+    .camera-marker.is-dragging { cursor: grabbing; }
+    .camera-marker-hit { fill: transparent; pointer-events: all; }
+    .camera-marker-ring { fill: #72e7ee; fill-opacity: 0.28; stroke: #b8fbff; stroke-width: 0.12; pointer-events: none; }
+    .camera-marker-dot { fill: #d9ffff; stroke: #0b2529; stroke-width: 0.08; pointer-events: none; }
+    .camera-marker-cross { stroke: #b8fbff; stroke-width: 0.09; stroke-linecap: round; pointer-events: none; }
+    .camera-marker-label { fill: #b8fbff; font-size: 0.3px; font-weight: 750; pointer-events: none; paint-order: stroke; stroke: #0b0e0f; stroke-width: 0.1; }
     .grid-line { stroke: #20282a; stroke-width: 0.03; }
     .axis-label { fill: #637174; font-size: 0.27px; }
     .north-arrow { fill: #b6c8ca; font-size: 0.38px; font-weight: 700; }
@@ -102,6 +150,19 @@
     <aside>
       <p class="instruction">The shaded shape is the connected walkable area, including hallways. Click a wall label or line. The IDs are the names to use when requesting a change; shared walls have separate room-side IDs. The map watches the shared layout module and redraws when its coordinates change.</p>
       <div class="orientation-key"><strong>Visitor-view orientation</strong><br>This map is shown as if you are standing in the Main gallery and looking toward the Art room: north is up, south is down, <strong>east is left</strong>, and <strong>west is right</strong>. The wall details still report the original world coordinates.</div>
+      <section class="camera-picker" aria-labelledby="camera-picker-title">
+        <h2 id="camera-picker-title">360 camera viewpoint</h2>
+        <p>Click an open area on the map or drag the cyan marker, then copy the position and send it to me. Camera height stays fixed at Y 2.8.</p>
+        <div class="coordinate-grid">
+          <label>X<input id="camera-x" type="number" step="0.01" inputmode="decimal" aria-label="Camera X coordinate"></label>
+          <label>Z<input id="camera-z" type="number" step="0.01" inputmode="decimal" aria-label="Camera Z coordinate"></label>
+        </div>
+        <div class="camera-readout">
+          <code id="camera-position">position: [0.8, 2.8, 1.5]</code>
+          <p id="camera-area">Main gallery</p>
+        </div>
+        <button id="copy-camera" type="button">Copy camera position</button>
+      </section>
       <h2>Walls</h2>
       <div id="wall-list"></div>
       <div id="detail" aria-live="polite">
@@ -118,12 +179,22 @@
 
   <script type="module">
     const svg = document.getElementById('wall-map');
+    const mapScroll = document.querySelector('.map-scroll');
     const wallList = document.getElementById('wall-list');
     const detail = document.getElementById('detail');
     const status = document.getElementById('map-status');
+    const cameraXInput = document.getElementById('camera-x');
+    const cameraZInput = document.getElementById('camera-z');
+    const cameraPositionOutput = document.getElementById('camera-position');
+    const cameraAreaOutput = document.getElementById('camera-area');
+    const copyCameraButton = document.getElementById('copy-camera');
     let currentLayout;
     let currentSignature = '';
     let selectedWallId = '';
+    let cameraPosition = { x: 0.037, y: 2.8, z: 0.04 };
+    let cameraMarker;
+    let cameraDragPointerId = null;
+    let centerInitialCameraMarker = true;
 
     const svgEl = (name, attributes = {}) => {
       const element = document.createElementNS('http://www.w3.org/2000/svg', name);
@@ -132,6 +203,11 @@
     };
 
     const formatRange = (a, b) => `${a.toFixed(2)} to ${b.toFixed(2)}`;
+    const formatCoordinate = (value) => {
+      const rounded = Math.abs(value) < 0.0005 ? 0 : Number(value.toFixed(3));
+      return String(rounded);
+    };
+    const cameraPositionText = () => `position: [${formatCoordinate(cameraPosition.x)}, ${formatCoordinate(cameraPosition.y)}, ${formatCoordinate(cameraPosition.z)}]`;
     // Match the visitor's view from Main toward Art. In that south-facing
     // view, world east is on screen-left and world west is on screen-right.
     const worldPoint = (x, z) => ({ x: -x, y: -z });
@@ -176,12 +252,12 @@
         ${wall.notes || ''}</p>`;
     }
 
-    async function copyWallId(wallId, copyButton) {
+    async function copyText(text, copyButton, idleLabel) {
       let copied = false;
       try {
         if (navigator.clipboard) {
           copied = await Promise.race([
-            navigator.clipboard.writeText(wallId).then(() => true),
+            navigator.clipboard.writeText(text).then(() => true),
             new Promise((resolve) => window.setTimeout(() => resolve(false), 250))
           ]);
         }
@@ -190,7 +266,7 @@
       }
       if (!copied) {
         const fallback = document.createElement('textarea');
-        fallback.value = wallId;
+        fallback.value = text;
         fallback.setAttribute('readonly', '');
         fallback.style.position = 'fixed';
         fallback.style.opacity = '0';
@@ -200,7 +276,121 @@
         fallback.remove();
       }
       copyButton.textContent = copied ? 'Copied' : 'Copy failed';
-      window.setTimeout(() => { copyButton.textContent = 'Copy'; }, 1200);
+      window.setTimeout(() => { copyButton.textContent = idleLabel; }, 1200);
+    }
+
+    function copyWallId(wallId, copyButton) {
+      return copyText(wallId, copyButton, 'Copy');
+    }
+
+    function cameraAreaLabel() {
+      if (!currentLayout) return 'Loading room location…';
+      const room = currentLayout.rooms.find((candidate) => (
+        cameraPosition.x >= candidate.left && cameraPosition.x <= candidate.right
+        && cameraPosition.z >= candidate.near && cameraPosition.z <= candidate.far
+      ));
+      if (room) return room.label;
+      const walkway = currentLayout.walkable.find((candidate) => (
+        cameraPosition.x >= candidate.left && cameraPosition.x <= candidate.right
+        && cameraPosition.z >= candidate.near && cameraPosition.z <= candidate.far
+      ));
+      return walkway ? `Hallway · ${walkway.id}` : 'Outside the connected gallery floor';
+    }
+
+    function updateCameraMarker() {
+      if (!cameraMarker) return;
+      const point = worldPoint(cameraPosition.x, cameraPosition.z);
+      cameraMarker.setAttribute('transform', `translate(${point.x} ${point.y})`);
+      cameraMarker.setAttribute('aria-label', `Camera at ${cameraPositionText()}. Use arrow keys to adjust.`);
+      const label = cameraMarker.querySelector('.camera-marker-label');
+      if (label) label.textContent = `Camera · x ${formatCoordinate(cameraPosition.x)}, z ${formatCoordinate(cameraPosition.z)}`;
+    }
+
+    function updateCameraUi({ syncInputs = true } = {}) {
+      if (syncInputs) {
+        cameraXInput.value = formatCoordinate(cameraPosition.x);
+        cameraZInput.value = formatCoordinate(cameraPosition.z);
+      }
+      cameraPositionOutput.textContent = cameraPositionText();
+      cameraAreaOutput.textContent = cameraAreaLabel();
+      copyCameraButton.disabled = false;
+      updateCameraMarker();
+    }
+
+    function renderCameraMarker() {
+      cameraMarker?.remove();
+      cameraMarker = svgEl('g', {
+        class: 'camera-marker',
+        role: 'button',
+        tabindex: '0'
+      });
+      cameraMarker.append(
+        svgEl('circle', { class: 'camera-marker-hit', cx: 0, cy: 0, r: 0.85 }),
+        svgEl('circle', { class: 'camera-marker-ring', cx: 0, cy: 0, r: 0.42 }),
+        svgEl('line', { class: 'camera-marker-cross', x1: -0.62, x2: 0.62, y1: 0, y2: 0 }),
+        svgEl('line', { class: 'camera-marker-cross', x1: 0, x2: 0, y1: -0.62, y2: 0.62 }),
+        svgEl('circle', { class: 'camera-marker-dot', cx: 0, cy: 0, r: 0.14 })
+      );
+      const label = svgEl('text', { class: 'camera-marker-label', x: 0.72, y: -0.55 });
+      cameraMarker.append(label);
+      cameraMarker.addEventListener('pointerdown', (event) => beginCameraDrag(event, false));
+      cameraMarker.addEventListener('click', (event) => event.stopPropagation());
+      cameraMarker.addEventListener('keydown', (event) => {
+        const amount = event.shiftKey ? 1 : 0.1;
+        if (event.key === 'ArrowLeft') cameraPosition.x += amount;
+        else if (event.key === 'ArrowRight') cameraPosition.x -= amount;
+        else if (event.key === 'ArrowUp') cameraPosition.z -= amount;
+        else if (event.key === 'ArrowDown') cameraPosition.z += amount;
+        else if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          copyCameraButton.click();
+          return;
+        } else return;
+        event.preventDefault();
+        updateCameraUi();
+      });
+      svg.append(cameraMarker);
+      updateCameraUi();
+      if (centerInitialCameraMarker) {
+        centerInitialCameraMarker = false;
+        window.requestAnimationFrame(() => {
+          const markerBounds = cameraMarker?.getBoundingClientRect();
+          const scrollBounds = mapScroll.getBoundingClientRect();
+          if (!markerBounds) return;
+          mapScroll.scrollTop += markerBounds.top + markerBounds.height / 2
+            - scrollBounds.top - scrollBounds.height / 2;
+          mapScroll.scrollLeft += markerBounds.left + markerBounds.width / 2
+            - scrollBounds.left - scrollBounds.width / 2;
+        });
+      }
+    }
+
+    function pointerWorldPosition(event) {
+      const matrix = svg.getScreenCTM();
+      if (!matrix) return null;
+      const point = svg.createSVGPoint();
+      point.x = event.clientX;
+      point.y = event.clientY;
+      const mapped = point.matrixTransform(matrix.inverse());
+      return { x: -mapped.x, z: -mapped.y };
+    }
+
+    function setCameraFromPointer(event) {
+      const point = pointerWorldPosition(event);
+      if (!point) return;
+      cameraPosition.x = point.x;
+      cameraPosition.z = point.z;
+      updateCameraUi();
+    }
+
+    function beginCameraDrag(event, placeImmediately) {
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (placeImmediately) setCameraFromPointer(event);
+      cameraDragPointerId = event.pointerId;
+      svg.setPointerCapture(event.pointerId);
+      cameraMarker?.classList.add('is-dragging');
     }
 
     function drawGrid(minX, maxX, minY, maxY) {
@@ -278,6 +468,8 @@
         svg.append(label);
       });
 
+      renderCameraMarker();
+
       const arrow = svgEl('text', { class: 'north-arrow', x: maxX - 3.5, y: minY + 0.9 });
       arrow.textContent = 'N ↑';
       svg.append(arrow);
@@ -308,6 +500,48 @@
       if (selectedWallId && visibleWalls(layout).some((wall) => wall.id === selectedWallId)) selectWall(selectedWallId);
       status.textContent = `Live · layout ${layout.version} · watching shared coordinates`;
     }
+
+    svg.addEventListener('pointerdown', (event) => {
+      if (event.target.closest('.wall, .marker, .camera-marker')) return;
+      beginCameraDrag(event, true);
+    });
+    svg.addEventListener('pointermove', (event) => {
+      if (event.pointerId !== cameraDragPointerId) return;
+      event.preventDefault();
+      setCameraFromPointer(event);
+    });
+    const finishCameraDrag = (event) => {
+      if (event.pointerId !== cameraDragPointerId) return;
+      if (svg.hasPointerCapture(event.pointerId)) svg.releasePointerCapture(event.pointerId);
+      cameraDragPointerId = null;
+      cameraMarker?.classList.remove('is-dragging');
+    };
+    svg.addEventListener('pointerup', finishCameraDrag);
+    svg.addEventListener('pointercancel', finishCameraDrag);
+
+    [cameraXInput, cameraZInput].forEach((input) => {
+      input.addEventListener('input', () => {
+        const next = {
+          x: Number(cameraXInput.value),
+          y: 2.8,
+          z: Number(cameraZInput.value)
+        };
+        const valid = Object.values(next).every(Number.isFinite)
+          && cameraXInput.value !== '' && cameraZInput.value !== '';
+        copyCameraButton.disabled = !valid;
+        if (!valid) {
+          cameraPositionOutput.textContent = 'Enter valid X and Z coordinates';
+          cameraAreaOutput.textContent = 'Camera position is incomplete';
+          return;
+        }
+        cameraPosition = next;
+        updateCameraUi({ syncInputs: false });
+      });
+    });
+    copyCameraButton.addEventListener('click', () => {
+      copyText(cameraPositionText(), copyCameraButton, 'Copy camera position');
+    });
+    updateCameraUi();
 
     async function loadLayout() {
       try {

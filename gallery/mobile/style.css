@@ -1,0 +1,755 @@
+html.guided-gallery,
+html.guided-gallery body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #101719;
+}
+
+html.guided-gallery .gallery-app {
+  display: none !important;
+}
+
+.mobile-tour,
+.mobile-tour * {
+  box-sizing: border-box;
+}
+
+.mobile-tour {
+  --ink: #172023;
+  --paper: #f7f6f1;
+  --blue: #176789;
+  --glass: rgba(247, 246, 241, 0.92);
+  position: fixed;
+  z-index: 200;
+  inset: 0;
+  overflow: hidden;
+  color: #fff;
+  background: #101719;
+  font-family: Calibri, Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  touch-action: none;
+}
+
+.tour-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #101719;
+  touch-action: none;
+}
+
+.tour-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(4, 10, 12, 0.46) 0, transparent 25%, transparent 57%, rgba(4, 10, 12, 0.58) 100%),
+    radial-gradient(circle at center, transparent 62%, rgba(3, 8, 9, 0.13) 100%);
+}
+
+.tour-header {
+  position: absolute;
+  z-index: 7;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: max(12px, env(safe-area-inset-top)) max(13px, env(safe-area-inset-right)) 10px max(13px, env(safe-area-inset-left));
+  pointer-events: none;
+}
+
+.tour-top-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+  pointer-events: auto;
+}
+
+.tour-top-actions > * {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 0;
+  color: #fff;
+  background: rgba(12, 21, 24, 0.76);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+}
+
+.tour-map-trigger {
+  color: var(--ink);
+  background: rgba(247, 246, 241, 0.95);
+}
+
+.tour-desktop-note {
+  display: inline-flex;
+  flex: 0 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  align-items: center;
+  margin: 0;
+  padding: 10px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #bfe7f6;
+  background: rgba(12, 21, 24, 0.76);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  pointer-events: none;
+  backdrop-filter: blur(12px);
+}
+
+.tour-desktop-note[hidden] {
+  display: none;
+}
+
+.tour-place {
+  position: absolute;
+  z-index: 4;
+  right: 16px;
+  bottom: calc(20px + max(9px, env(safe-area-inset-bottom)));
+  left: 16px;
+  max-width: 520px;
+  pointer-events: none;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.75);
+}
+
+.tour-room {
+  margin: 0 0 5px;
+  color: #c7e5f1;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.tour-node-title {
+  margin: 0;
+  font-size: clamp(27px, 8vw, 43px);
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+}
+
+.tour-instruction {
+  margin: 9px 0 0;
+  font-size: 12px;
+  opacity: 0.84;
+}
+
+.tour-hotspots {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  pointer-events: none;
+}
+
+.tour-hotspot {
+  position: absolute;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: max-content;
+  max-width: min(178px, 44vw);
+  padding: 0;
+  border: 0;
+  color: #fff;
+  background: transparent;
+  font: inherit;
+  text-decoration: none;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.7));
+}
+
+.tour-hotspot i {
+  position: relative;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.94);
+  border-radius: 50%;
+  background: rgba(19, 103, 137, 0.9);
+  box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.12);
+  font-style: normal;
+  font-size: 23px;
+  font-weight: 400;
+}
+
+.tour-hotspot-arrow i,
+.tour-hotspot-door i,
+.tour-hotspot-portal i {
+  border-radius: 50% 50% 50% 7px;
+  transform: rotate(-45deg);
+}
+
+.tour-hotspot-arrow i::after,
+.tour-hotspot-door i::after,
+.tour-hotspot-portal i::after {
+  width: 11px;
+  height: 11px;
+  border-top: 3px solid #fff;
+  border-right: 3px solid #fff;
+  content: '';
+  transform: rotate(45deg);
+}
+
+.tour-hotspot span {
+  display: block;
+  padding: 6px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(9, 17, 19, 0.76);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.15;
+  backdrop-filter: blur(9px);
+}
+
+.tour-loading {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 15px;
+  padding: 30px;
+  color: var(--ink);
+  background: #e8e7e2;
+  text-align: center;
+}
+
+.tour-loading-mark {
+  width: 44px;
+  height: 44px;
+  border: 2px solid #aeb4b4;
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: tour-spin 0.85s linear infinite;
+}
+
+.tour-loading p {
+  max-width: 300px;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.tour-loading-actions,
+.tour-boot-error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tour-loading-actions button,
+.tour-boot-error-actions button,
+.tour-boot-error-actions a {
+  min-height: 48px;
+  padding: 12px 18px;
+  border: 1px solid var(--blue);
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.tour-loading-primary {
+  color: #fff;
+  background: var(--blue);
+}
+
+.tour-loading-secondary {
+  color: var(--blue);
+  background: #fff;
+}
+
+.tour-fallback-link {
+  min-height: 48px;
+  padding: 13px 22px;
+  color: #fff;
+  background: var(--blue);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+@keyframes tour-spin {
+  to { transform: rotate(360deg); }
+}
+
+.tour-sheet,
+.tour-detail {
+  width: 100%;
+  max-width: none;
+  height: min(88dvh, 760px);
+  max-height: none;
+  margin: auto 0 0;
+  padding: 0;
+  overflow: auto;
+  border: 0;
+  border-top: 4px solid var(--blue);
+  border-radius: 0;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: 0 -24px 70px rgba(0, 0, 0, 0.34);
+}
+
+.tour-sheet::backdrop,
+.tour-detail::backdrop {
+  background: rgba(4, 10, 12, 0.66);
+  backdrop-filter: blur(5px);
+}
+
+.tour-sheet > header,
+.tour-detail > header {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid #d3d5d3;
+  background: rgba(247, 246, 241, 0.95);
+  backdrop-filter: blur(12px);
+}
+
+.tour-sheet header p,
+.tour-detail header p {
+  margin: 0 0 5px;
+  color: var(--blue);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.tour-sheet h2,
+.tour-detail h2 {
+  margin: 0;
+  font-size: clamp(27px, 8vw, 42px);
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.tour-sheet [data-close],
+.tour-detail [data-close],
+.tour-detail [data-wall-back] {
+  min-width: 54px;
+  min-height: 42px;
+  padding: 9px 10px;
+  border: 1px solid #bfc3c2;
+  color: var(--ink);
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.detail-header-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+.tour-detail [data-wall-back] {
+  border-color: var(--blue);
+  color: #fff;
+  background: var(--blue);
+}
+
+.tour-map {
+  display: grid;
+  grid-template:
+    'art art art' 1.3fr
+    'research app media' 1.05fr
+    'science science science' 0.78fr
+    / 1.25fr 1fr 0.78fr;
+  gap: 10px;
+  width: min(calc(100% - 28px), 620px);
+  height: clamp(430px, 64dvh, 620px);
+  margin: 14px auto calc(24px + env(safe-area-inset-bottom));
+  background: var(--paper);
+}
+
+.tour-map-room {
+  display: grid;
+  min-width: 44px;
+  min-height: 44px;
+  overflow: hidden;
+  padding: 10px;
+  place-items: center;
+  border: 0;
+  color: #172023;
+  background: #d7d9d8;
+  box-shadow: inset 0 0 0 1px rgba(23, 32, 35, 0.05);
+  font: inherit;
+  font-size: clamp(17px, 5vw, 30px);
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.tour-map-art {
+  grid-area: art;
+}
+
+.tour-map-research {
+  position: relative;
+  grid-area: research;
+  min-width: 0;
+}
+
+.tour-map-mri {
+  position: absolute;
+  inset: 0;
+  padding: 0 38% 24% 0;
+}
+
+.tour-map-phd {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 56%;
+  height: 42%;
+  box-shadow: -10px -10px 0 var(--paper);
+  text-transform: none;
+}
+
+.tour-map-app {
+  grid-area: app;
+}
+
+.tour-map-media {
+  display: grid;
+  grid-area: media;
+  grid-template-rows: 0.58fr 1fr;
+  gap: 10px;
+  min-width: 0;
+}
+
+.tour-map-science {
+  grid-area: science;
+}
+
+.tour-detail {
+  height: 100dvh;
+}
+
+.detail-media {
+  position: relative;
+  display: grid;
+  min-height: min(58vh, 560px);
+  overflow: hidden;
+  place-items: center;
+  border-bottom: 1px solid #d2d5d3;
+  background: #111719;
+  touch-action: none;
+}
+
+.detail-media.is-video-preview {
+  min-height: 220px;
+}
+
+.detail-media img,
+.detail-media video {
+  display: block;
+  max-width: 100%;
+  max-height: min(66vh, 660px);
+  object-fit: contain;
+}
+
+.detail-media img {
+  transform-origin: center;
+  transition: transform 80ms linear;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.detail-media.is-gesturing img {
+  transition: none;
+}
+
+.detail-media video {
+  width: 100%;
+  background: #000;
+}
+
+.detail-video-play {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 68px;
+  height: 68px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(7, 15, 18, 0.8);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.34);
+  transform: translate(-50%, -50%);
+  backdrop-filter: blur(12px);
+  transition: background 140ms ease, transform 140ms ease;
+}
+
+.detail-video-play::before {
+  width: 0;
+  height: 0;
+  margin-left: 5px;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 16px solid currentColor;
+  content: '';
+}
+
+.detail-video-play:active {
+  transform: translate(-50%, -50%) scale(0.96);
+}
+
+.detail-media.is-wall-gallery {
+  display: block;
+  min-height: 0;
+  padding: 14px;
+  overflow: visible;
+  background: #e8e8e3;
+  touch-action: pan-y;
+}
+
+.detail-wall-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.detail-wall-overview {
+  display: grid;
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #9ea7a6;
+  color: #fff;
+  background: #111719;
+  font: inherit;
+  text-align: left;
+}
+
+.detail-wall-overview img {
+  width: 100%;
+  height: auto;
+  max-height: none;
+  object-fit: contain;
+}
+
+.detail-wall-overview span {
+  padding: 11px 12px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.detail-wall-item {
+  display: grid;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #c7cac7;
+  color: var(--ink);
+  background: #fff;
+  font: inherit;
+  text-align: left;
+}
+
+.detail-wall-item img {
+  width: 100%;
+  height: auto;
+  max-height: none;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: #111719;
+}
+
+.detail-wall-item span {
+  padding: 10px 10px 0;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.detail-wall-item span:last-child {
+  padding-bottom: 10px;
+}
+
+.detail-wall-item small {
+  padding: 5px 10px 10px;
+  color: #60686a;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.detail-wall-loading {
+  margin: 0;
+  padding: 38px 12px;
+  color: #555e60;
+  text-align: center;
+}
+
+.detail-copy {
+  padding: 20px 18px calc(28px + env(safe-area-inset-bottom));
+}
+
+.detail-copy > p {
+  max-width: 62ch;
+  margin: 0;
+  color: #555e60;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.detail-actions:empty {
+  display: none;
+}
+
+.detail-primary,
+.detail-secondary {
+  display: inline-flex;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 19px;
+  border: 1px solid var(--blue);
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.detail-primary {
+  color: #fff;
+  background: var(--blue);
+}
+
+.detail-secondary {
+  color: var(--blue);
+  background: transparent;
+}
+
+.tour-status {
+  position: fixed;
+  z-index: 40;
+  top: -100px;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.mobile-tour button,
+.mobile-tour a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-tour button:focus-visible,
+.mobile-tour a:focus-visible {
+  outline: 3px solid #9edaf2;
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .tour-top-actions > *:hover,
+  .tour-map-room:hover,
+  .tour-map-room:focus-visible {
+    filter: brightness(0.95);
+  }
+
+  .tour-hotspot:hover i {
+    background: #1b7ca4;
+    transform: scale(1.06);
+  }
+
+  .detail-video-play:hover {
+    background: rgba(16, 42, 52, 0.92);
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+
+  .tour-hotspot-arrow:hover i,
+  .tour-hotspot-door:hover i,
+  .tour-hotspot-portal:hover i {
+    transform: rotate(-45deg) scale(1.06);
+  }
+}
+
+@media (orientation: landscape) and (max-height: 620px) {
+  .tour-header {
+    padding-top: max(8px, env(safe-area-inset-top));
+  }
+
+  .tour-instruction {
+    display: none;
+  }
+
+  .tour-place {
+    right: auto;
+    bottom: calc(12px + max(4px, env(safe-area-inset-bottom)));
+    width: min(42vw, 390px);
+  }
+
+  .tour-node-title {
+    font-size: clamp(24px, 5vw, 36px);
+  }
+
+  .tour-sheet,
+  .tour-detail {
+    width: min(78vw, 760px);
+    height: 100dvh;
+    margin-left: auto;
+    border-top: 0;
+    border-left: 4px solid var(--blue);
+  }
+
+  .detail-media {
+    min-height: 58vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-loading-mark {
+    animation: none;
+  }
+
+  .detail-media img,
+  .tour-hotspot i,
+  .detail-video-play {
+    transition: none;
+  }
+}

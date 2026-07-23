@@ -73,6 +73,11 @@ a:hover {
   top: 19px;
   right: 24px;
   z-index: 1;
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   padding: 7px 10px;
   color: #32434c;
   border: 1px solid #9da7ad;
@@ -170,35 +175,75 @@ a:hover {
   68% { transform: translateX(0) rotate(0); }
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
   .home-layout {
     display: flex;
     flex-direction: column;
+    gap: 18px;
   }
 
   .gallery-home-aside {
     position: static;
     order: -1;
-    width: 100%;
-    margin-bottom: 26px;
+    display: flex;
+    width: min(100%, 950px);
+    justify-content: flex-end;
+    margin: 0 auto;
   }
 
   .gallery-home-window {
-    width: min(100%, 420px);
-    margin-left: auto;
+    width: auto;
+    margin: 0;
+    border-top-width: 3px;
+    box-shadow: none;
+  }
+
+  .gallery-home-window:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .gallery-home-window-bar,
+  .gallery-home-window-body strong {
+    display: none;
+  }
+
+  .gallery-home-window-body {
+    display: block;
+    padding: 0;
+  }
+
+  .gallery-home-window-button {
+    width: auto;
+    min-height: 44px;
+    margin: 0;
+    padding: 11px 15px;
+    font-size: 14px;
+    animation: none;
+  }
+
+  .cv-document {
+    width: min(100%, 950px);
+    margin: 0 auto;
   }
 }
 
 @media (max-width: 760px) {
-  .page-one {
-    padding-top: 58px;
-  }
-
   .resume-download-button {
-    top: 14px;
-    right: 16px;
-    font-size: 11px;
+    position: static;
+    display: flex;
+    width: max-content;
+    min-height: 44px;
+    margin: 0 0 18px auto;
+    padding: 10px 12px;
+    font-size: 12px;
   }
+}
+
+.resume-download-button:focus-visible,
+.gallery-home-window:focus-visible {
+  outline: 3px solid #7fc3df;
+  outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -482,6 +527,13 @@ h2 {
   padding-top: 54px;
 }
 
+@media (max-width: 1200px) {
+  .paper {
+    padding-right: clamp(38px, 5vw, 64px);
+    padding-left: clamp(38px, 5vw, 64px);
+  }
+}
+
 @media (max-width: 760px) {
   body {
     font-size: 15px;
@@ -502,7 +554,7 @@ h2 {
 
   .paper,
   .page-two {
-    padding: 34px 21px 24px;
+    padding: 24px clamp(20px, 5vw, 24px);
   }
 
   .cv-header {
@@ -588,7 +640,16 @@ h2 {
   }
 
   .role-heading h3 i {
-    margin: 0 5px;
+    display: none;
+  }
+
+  .role-heading h3 span,
+  .role-heading h3 em {
+    display: block;
+  }
+
+  .role-heading h3 em {
+    margin-top: 2px;
   }
 
   .role-heading time,
@@ -647,6 +708,14 @@ h2 {
   .site-shell {
     width: 100%;
     padding: 0;
+  }
+
+  .home-layout {
+    display: block;
+  }
+
+  .gallery-home-aside {
+    display: none;
   }
 
   .resume-download-button {

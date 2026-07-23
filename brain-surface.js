@@ -1,5 +1,4 @@
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import * as THREE from './gallery/vendor/three.module.min.js';
 
 const viewer = document.getElementById('viewer');
 const loadState = document.getElementById('load-state');
@@ -23,13 +22,123 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.12;
 viewer.appendChild(renderer.domElement);
+renderer.domElement.tabIndex = 0;
 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.07;
-controls.screenSpacePanning = true;
-controls.minDistance = 15;
-controls.maxDistance = 900;
+const orbitTarget = new THREE.Vector3();
+const orbitSpherical = new THREE.Spherical();
+const orbitOffset = new THREE.Vector3();
+const panRight = new THREE.Vector3();
+const panUp = new THREE.Vector3();
+const orbitPointers = new Map();
+let orbitGesture = null;
+let orbitMinDistance = 15;
+let orbitMaxDistance = 900;
+
+function syncOrbitFromCamera() {
+  orbitOffset.copy(camera.position).sub(orbitTarget);
+  orbitSpherical.setFromVector3(orbitOffset);
+  orbitSpherical.makeSafe();
+}
+
+function applyOrbit() {
+  orbitSpherical.radius = THREE.MathUtils.clamp(
+    orbitSpherical.radius,
+    orbitMinDistance,
+    orbitMaxDistance
+  );
+  orbitSpherical.phi = THREE.MathUtils.clamp(orbitSpherical.phi, 0.08, Math.PI - 0.08);
+  orbitOffset.setFromSpherical(orbitSpherical);
+  camera.position.copy(orbitTarget).add(orbitOffset);
+  camera.lookAt(orbitTarget);
+}
+
+function pointerCenter(points) {
+  return {
+    x: points.reduce((sum, point) => sum + point.x, 0) / points.length,
+    y: points.reduce((sum, point) => sum + point.y, 0) / points.length
+  };
+}
+
+function pointerSeparation(points) {
+  return points.length < 2
+    ? 0
+    : Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+}
+
+function beginOrbitGesture(event = null) {
+  const points = [...orbitPointers.values()];
+  if (!points.length) {
+    orbitGesture = null;
+    viewer.classList.remove('is-dragging');
+    return;
+  }
+  orbitGesture = {
+    center: pointerCenter(points),
+    distance: pointerSeparation(points),
+    phi: orbitSpherical.phi,
+    radius: orbitSpherical.radius,
+    target: orbitTarget.clone(),
+    theta: orbitSpherical.theta,
+    pan: Boolean(event?.shiftKey || event?.button === 1 || event?.button === 2)
+  };
+  viewer.classList.add('is-dragging');
+}
+
+function panOrbit(deltaX, deltaY, startTarget = orbitTarget) {
+  const worldPerPixel = (
+    2 * orbitSpherical.radius * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2)
+  ) / Math.max(1, renderer.domElement.clientHeight);
+  panRight.set(1, 0, 0).applyQuaternion(camera.quaternion);
+  panUp.set(0, 1, 0).applyQuaternion(camera.quaternion);
+  orbitTarget.copy(startTarget)
+    .addScaledVector(panRight, -deltaX * worldPerPixel)
+    .addScaledVector(panUp, deltaY * worldPerPixel);
+}
+
+renderer.domElement.addEventListener('pointerdown', (event) => {
+  event.preventDefault();
+  orbitPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+  renderer.domElement.setPointerCapture(event.pointerId);
+  beginOrbitGesture(event);
+});
+
+renderer.domElement.addEventListener('pointermove', (event) => {
+  if (!orbitPointers.has(event.pointerId) || !orbitGesture) return;
+  orbitPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+  const points = [...orbitPointers.values()];
+  const center = pointerCenter(points);
+  const deltaX = center.x - orbitGesture.center.x;
+  const deltaY = center.y - orbitGesture.center.y;
+  if (points.length >= 2 && orbitGesture.distance > 0) {
+    orbitSpherical.radius = orbitGesture.radius
+      * orbitGesture.distance / Math.max(1, pointerSeparation(points));
+    applyOrbit();
+    panOrbit(deltaX, deltaY, orbitGesture.target);
+  } else if (orbitGesture.pan) {
+    panOrbit(deltaX, deltaY, orbitGesture.target);
+  } else {
+    orbitSpherical.theta = orbitGesture.theta - deltaX * 0.008;
+    orbitSpherical.phi = orbitGesture.phi - deltaY * 0.008;
+  }
+  applyOrbit();
+});
+
+function finishOrbitPointer(event) {
+  orbitPointers.delete(event.pointerId);
+  if (renderer.domElement.hasPointerCapture(event.pointerId)) {
+    renderer.domElement.releasePointerCapture(event.pointerId);
+  }
+  beginOrbitGesture();
+}
+
+renderer.domElement.addEventListener('pointerup', finishOrbitPointer);
+renderer.domElement.addEventListener('pointercancel', finishOrbitPointer);
+renderer.domElement.addEventListener('contextmenu', (event) => event.preventDefault());
+renderer.domElement.addEventListener('wheel', (event) => {
+  event.preventDefault();
+  orbitSpherical.radius *= Math.exp(event.deltaY * 0.0012);
+  applyOrbit();
+}, { passive: false });
 
 scene.add(new THREE.HemisphereLight(0xa7e5ed, 0x071017, 2.15));
 
@@ -126,19 +235,21 @@ function centerAndFrame() {
   camera.near = Math.max(maxSize / 10000, 0.01);
   camera.far = Math.max(maxSize * 12, 1000);
   camera.position.set(maxSize * 0.98, maxSize * 0.34, maxSize * 1.42);
-  controls.target.set(0, 0, 0);
-  controls.minDistance = maxSize * 0.32;
-  controls.maxDistance = maxSize * 5;
-  controls.update();
+  orbitTarget.set(0, 0, 0);
+  orbitMinDistance = maxSize * 0.32;
+  orbitMaxDistance = maxSize * 5;
+  syncOrbitFromCamera();
+  applyOrbit();
 
   startCameraPosition.copy(camera.position);
-  startTarget.copy(controls.target);
+  startTarget.copy(orbitTarget);
 }
 
 function resetView() {
   camera.position.copy(startCameraPosition);
-  controls.target.copy(startTarget);
-  controls.update();
+  orbitTarget.copy(startTarget);
+  syncOrbitFromCamera();
+  applyOrbit();
 }
 
 function updateVisibility() {
@@ -203,6 +314,22 @@ showRight.addEventListener('change', updateVisibility);
 surfaceStyle.addEventListener('change', updateSurfaceStyle);
 resetViewButton.addEventListener('click', resetView);
 window.addEventListener('resize', resize);
+renderer.domElement.addEventListener('keydown', (event) => {
+  const rotationStep = THREE.MathUtils.degToRad(8);
+  if (event.key === 'ArrowLeft') orbitSpherical.theta += rotationStep;
+  else if (event.key === 'ArrowRight') orbitSpherical.theta -= rotationStep;
+  else if (event.key === 'ArrowUp') orbitSpherical.phi -= rotationStep;
+  else if (event.key === 'ArrowDown') orbitSpherical.phi += rotationStep;
+  else if (event.key === '+' || event.key === '=') orbitSpherical.radius *= 0.88;
+  else if (event.key === '-' || event.key === '_') orbitSpherical.radius *= 1.12;
+  else if (event.key.toLowerCase() === 'r' || event.key === '0') {
+    resetView();
+    event.preventDefault();
+    return;
+  } else return;
+  event.preventDefault();
+  applyOrbit();
+});
 
 if ('ResizeObserver' in window) {
   new ResizeObserver(resize).observe(viewer);
@@ -210,7 +337,6 @@ if ('ResizeObserver' in window) {
 
 function animate() {
   requestAnimationFrame(animate);
-  controls.update();
   renderer.render(scene, camera);
 }
 

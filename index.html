@@ -12,7 +12,6 @@
   <link rel="canonical" href="https://putiw.github.io/">
   <link rel="alternate" type="text/plain" href="/llms.txt" title="Machine-readable portfolio summary">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml" title="Sitemap">
-  <link rel="preload" href="fonts/inter-regular.ttf" as="font" type="font/ttf" crossorigin>
   <meta property="og:type" content="website">
   <meta property="og:title" content="Puti Wen — Interactive 3D Portfolio">
   <meta property="og:description" content="An interactive 3D research gallery of Puti Wen's neuroimaging, clinical tools, MRI work, scientific software, posters, figures, films, games, and artwork.">
@@ -21,6 +20,41 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Puti Wen — Interactive 3D Portfolio">
   <meta name="twitter:description" content="An interactive 3D research gallery of neuroimaging, clinical tools, MRI work, scientific software, posters, figures, films, games, and artwork.">
+  <script>
+    {
+      const galleryParams = new URLSearchParams(window.location.search);
+      const mobileByAgent = navigator.userAgentData?.mobile === true
+        || /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent)
+        || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const guidedByDevice = mobileByAgent;
+      window.__PUTI_MOBILE_BY_AGENT__ = mobileByAgent;
+      window.__PUTI_GUIDED_BY_DEVICE__ = guidedByDevice;
+      const guidedGallery = !galleryParams.has('gallery-capture')
+        && galleryParams.get('gallery') !== 'full'
+        && (
+          galleryParams.get('gallery') === 'guided'
+          || guidedByDevice
+        );
+      if (guidedGallery) {
+        document.documentElement.classList.add('guided-gallery');
+      } else {
+        const fontPreload = document.createElement('link');
+        fontPreload.rel = 'preload';
+        fontPreload.href = './fonts/inter-regular.ttf';
+        fontPreload.as = 'font';
+        fontPreload.type = 'font/ttf';
+        fontPreload.crossOrigin = 'anonymous';
+        document.head.append(fontPreload);
+      }
+    }
+  </script>
+  <style>
+    html.guided-gallery { --sans: Calibri, Arial, Helvetica, sans-serif; }
+    html.guided-gallery body { font-family: var(--sans); }
+    html.guided-gallery .gallery-app,
+    html.guided-gallery .poster-dialog,
+    html.guided-gallery .help-dialog { display: none !important; }
+  </style>
   <link rel="stylesheet" href="style.css?v=20260720-loading-motion1">
   <noscript>
     <style>
@@ -498,6 +532,6 @@
     </article>
   </noscript>
 
-  <script type="module" src="gallery.js?v=20260720-art-mugs-initial1-stair-foundation2-house-placement1-layout3-collision1-video-linear1-collision2-landscape1-myphysio-balanced1-ogscene-player1-house-y1-cbh-room-autoplay1-side-stair-profile3-gallery-return1-hall-entry2-glass-bay2-path-arrival1-roomfloor-patch1-brain-lod1-shift-squat1-brain-fixation1-brain-pick12hz1-focus-target15hz1-room-state1-video-timer1-ambient30hz1-room-visibility2-art-approach1-house-priority1-art-view-hd1"></script>
+  <script type="module" src="boot.js?v=20260723-desktop-isolation1"></script>
 </body>
 </html>
