@@ -31,7 +31,7 @@ Puti builds AI-assisted clinical tools, MRI and neuroimaging pipelines, scientif
 ### [CvsView](https://putiw.github.io/resume/#project-cvsview)
 
 - Problem: clinicians need an efficient way to verify the central vein sign in multiple sclerosis lesions.
-- Contribution: Puti built a web review tool with a modular AI component, identified SWI-FLAIR co-registration artifacts, manually relabeled affected data, containerized the application, and deployed it for on-demand clinical processing.
+- Contribution: Puti built central-vein-sign and paramagnetic-rim-lesion review tooling, fixed SWI-FLAIR registration artifacts by relabeling data, built a LightGBM classification workflow, and containerized it for internal research evaluation using clinical MRI data shared by Harley Street Medical Centre.
 - Methods: medical image co-registration, modular AI integration, web application development, and Docker.
 - Clinical relevance: internal research evaluation uses clinical MRI data shared by Harley Street Medical Centre.
 - Demo: [CVS/PRL review and reporting](https://putiw.github.io/gallery/media/cvsview-cvs-prl-review-web-720.mp4).
