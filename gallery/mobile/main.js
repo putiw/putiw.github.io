@@ -52,7 +52,7 @@ const VIDEO_WALL_COPY_OVERRIDES = Object.freeze({
 document.querySelector('.gallery-app')?.setAttribute('hidden', '');
 const stylesheet = document.createElement('link');
 stylesheet.rel = 'stylesheet';
-stylesheet.href = './mobile/style.css?v=20260722-desktop-note2';
+stylesheet.href = './mobile/style.css?v=20260724-guided-escape1';
 document.head.append(stylesheet);
 
 const root = document.createElement('main');
@@ -61,7 +61,7 @@ root.innerHTML = `
   <canvas class="tour-canvas" aria-label="Guided 360 degree gallery view"></canvas>
   <div class="tour-shade" aria-hidden="true"></div>
   <header class="tour-header">
-    <p class="tour-desktop-note" aria-label="Best viewed on desktop for the full interactive 3D gallery" hidden>Best viewed on desktop</p>
+    <a class="tour-mode-switch" href="/?gallery=full" aria-label="Open the full 3D gallery" hidden>Full 3D</a>
     <nav class="tour-top-actions" aria-label="Portfolio links">
       <a class="tour-resume" href="/resume/" target="puti-resume" rel="noopener">Résumé</a>
       <button class="tour-map-trigger" type="button" data-action="map">Map</button>
@@ -90,6 +90,17 @@ root.innerHTML = `
     <div class="detail-media"></div>
     <div class="detail-copy"><p></p><div class="detail-actions"></div></div>
   </dialog>
+  <dialog class="tour-mode-dialog" aria-labelledby="mode-dialog-title">
+    <div class="tour-mode-dialog-card">
+      <p class="tour-mode-dialog-label">Viewing mode</p>
+      <h2 id="mode-dialog-title">Open the full 3D gallery?</h2>
+      <p class="tour-mode-dialog-copy">Move freely with a keyboard and mouse.</p>
+      <div class="tour-mode-dialog-actions">
+        <a class="tour-mode-dialog-primary" href="/?gallery=full">Open full 3D gallery</a>
+        <button class="tour-mode-dialog-secondary" type="button" data-mode-stay>Stay in guided view</button>
+      </div>
+    </div>
+  </dialog>
   <p class="tour-status" aria-live="polite"></p>
 `;
 document.body.append(root);
@@ -107,16 +118,15 @@ const nodeTitle = root.querySelector('.tour-node-title');
 const mapButton = root.querySelector('[data-action="map"]');
 const mapSheet = root.querySelector('.tour-map-sheet');
 const detailDialog = root.querySelector('.tour-detail');
+const modeDialog = root.querySelector('.tour-mode-dialog');
+const modeStayButton = modeDialog.querySelector('[data-mode-stay]');
 const detailWallBackButton = detailDialog.querySelector('[data-wall-back]');
 const mapRoot = root.querySelector('.tour-map');
 const status = root.querySelector('.tour-status');
-const desktopNote = root.querySelector('.tour-desktop-note');
-const desktopNoteEligible = window.__PUTI_MOBILE_BY_AGENT__ === true
-  || new URLSearchParams(window.location.search).get('gallery') === 'guided';
-
-function maybeShowDesktopNote() {
-  if (desktopNoteEligible) desktopNote.hidden = false;
-}
+const modeSwitch = root.querySelector('.tour-mode-switch');
+const mobileByAgent = window.__PUTI_MOBILE_BY_AGENT__ === true;
+const guidedWasRequested = new URLSearchParams(window.location.search).get('gallery') === 'guided';
+modeSwitch.hidden = mobileByAgent || !guidedWasRequested;
 
 const gl = canvas.getContext('webgl', {
   antialias: false,
@@ -927,7 +937,6 @@ async function navigateTo(nodeId) {
     updateNavigationUi();
     failedNodeId = null;
     loading.hidden = true;
-    maybeShowDesktopNote();
     animateTransition();
     prefetchAdjacentBase(node);
   } catch (error) {
@@ -1468,6 +1477,11 @@ mapSheet.addEventListener('cancel', (event) => {
   event.preventDefault();
   closeSheet(mapSheet);
 });
+modeStayButton.addEventListener('click', () => closeSheet(modeDialog));
+modeDialog.addEventListener('cancel', (event) => {
+  event.preventDefault();
+  closeSheet(modeDialog);
+});
 
 window.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && detailDialog.open) {
@@ -1475,7 +1489,12 @@ window.addEventListener('keydown', (event) => {
     closeDetail();
     return;
   }
-  if (mapSheet.open || detailDialog.open) return;
+  if (mapSheet.open || detailDialog.open || modeDialog.open) return;
+  if (event.key === 'Escape' && !event.repeat && !mobileByAgent) {
+    event.preventDefault();
+    openSheet(modeDialog);
+    return;
+  }
   if (event.key === 'ArrowLeft') {
     yaw = normalizeAngle(yaw - 8 * DEG);
     requestRender();

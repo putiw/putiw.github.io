@@ -83,9 +83,9 @@ The visitor-facing Science room uses only `main-intro`, the existing central cub
 
 The visitor-facing Clinical App room uses only the central `app-mid` cubemap, with hotspots for all 12 videos and both image displays around the room. `app-north` and `app-south` remain hidden capture-only nodes for the same panorama-contract reason. The schematic map, featured route, and every doorway resolve to `app-mid`.
 
-The guided view keeps only Map and Résumé as persistent navigation. Map opens a seven-room schematic for Art, MRI, PhD, App, Game, Video, and Science; movement within and between connected viewpoints continues through the panorama markers.
+The guided view keeps Map and Résumé as persistent navigation. Map opens a seven-room schematic for Art, MRI, PhD, App, Game, Video, and Science; movement within and between connected viewpoints continues through the panorama markers.
 
-Automatically detected mobile visitors see a persistent “Best viewed on desktop” label in the top-left, aligned with the Map and Résumé controls. It recommends the complete walk-through 3D experience without linking phones into the full renderer. Ordinary desktop browsers always retain the full 3D gallery regardless of viewport width or pointer type; `?gallery=guided` remains available for explicit testing.
+Detected mobile visitors are not offered the full 3D renderer. Desktop visitors using `?gallery=guided` can return through the top-left Full 3D link or by pressing Escape and confirming the switch; ordinary desktop browsers continue to enter the full 3D gallery by default regardless of viewport width or pointer type.
 
 Video details keep the poster as the primary visual and place a compact circular Play control directly over it. The MP4 source is not attached until Play. MRI video planes use small static `previewImage` assets that are baked into the panoramas and shown in the detail view. The cortical-surface hotspot opens the standalone touch viewer in the same tab, so its meshes and 3D renderer are also loaded only after explicit selection.
 

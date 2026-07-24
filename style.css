@@ -68,11 +68,18 @@ a:hover {
   border-color: var(--blue);
 }
 
-.resume-download-button {
+.resume-download-links {
   position: absolute;
   top: 19px;
   right: 24px;
   z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.resume-download-button {
   display: inline-flex;
   min-height: 40px;
   align-items: center;
@@ -229,12 +236,16 @@ a:hover {
 }
 
 @media (max-width: 760px) {
-  .resume-download-button {
+  .resume-download-links {
     position: static;
     display: flex;
-    width: max-content;
-    min-height: 44px;
+    justify-content: flex-end;
+    gap: 8px;
     margin: 0 0 18px auto;
+  }
+
+  .resume-download-button {
+    min-height: 44px;
     padding: 10px 12px;
     font-size: 12px;
   }
@@ -718,7 +729,7 @@ h2 {
     display: none;
   }
 
-  .resume-download-button {
+  .resume-download-links {
     display: none;
   }
 

@@ -1022,6 +1022,7 @@ const enterButton = document.getElementById('enter-button');
 const galleryDestinationButton = document.getElementById('gallery-destination-button');
 const resumeButton = document.getElementById('resume-button');
 const controlSummary = document.getElementById('control-summary');
+const guidedModeHint = document.getElementById('guided-mode-hint');
 const reticle = document.getElementById('reticle');
 const brainFixationLabel = document.getElementById('brain-fixation-label');
 const focusCard = document.getElementById('focus-card');
@@ -1081,9 +1082,8 @@ let sceneReady = false;
 let webglAvailable = true;
 let needsRender = true;
 let galleryActive = false;
-let dragLookEnabled = false;
-let draggingView = false;
-let dragMoved = false;
+let escapeResumeArmed = false;
+let pointerLockPending = false;
 let returnToGalleryAfterPoster = false;
 let videoRoomLoadRequested = false;
 let videoRoomDisplaysLoaded = false;
@@ -1114,8 +1114,6 @@ let backgroundGalleryLoadsStarted = false;
 let artRoomMugLoadPromise = null;
 let artRoomPeripheralLoadPromise = null;
 let artRoomHdUpgradePromise = null;
-let lastDragX = 0;
-let lastDragY = 0;
 let lastFrame = performance.now();
 let brainSurfaceLoadStarted = false;
 let brainSurfaceLoadPromise = null;
@@ -1301,7 +1299,6 @@ const galleryVideos = [];
 const manualVideoEntries = [];
 const raycaster = new THREE.Raycaster();
 const pointerCenter = new THREE.Vector2(0, 0);
-const dragEuler = new THREE.Euler(0, 0, 0, 'YXZ');
 const videoWorldPosition = new THREE.Vector3();
 const cameraToVideo = new THREE.Vector3();
 const videoToCamera = new THREE.Vector3();
@@ -1339,6 +1336,7 @@ function setWelcomeMode(mode) {
   const housePaused = mode === 'house-paused';
   welcomeScreen.classList.toggle('house-paused', housePaused);
   galleryDestinationButton.hidden = !housePaused;
+  guidedModeHint.hidden = mode === 'initial';
   resumeButton.textContent = housePaused ? 'Resume' : 'View résumé';
 
   if (housePaused) {
@@ -1389,10 +1387,8 @@ function setWalkHint(mode = 'gallery') {
 function showWelcome(mode = 'initial') {
   finishAnalyticsRoomVisit();
   galleryActive = false;
+  escapeResumeArmed = false;
   pauseGalleryVideos();
-  dragLookEnabled = false;
-  draggingView = false;
-  galleryApp.classList.remove('drag-look', 'dragging-view');
   setWelcomeMode(mode);
   welcomeScreen.hidden = false;
   reticle.hidden = true;
@@ -8619,20 +8615,31 @@ function showMobileFallback() {
   resumeButton.classList.add('primary-button');
 }
 
-function enableDragLookFallback() {
-  if (!galleryActive || controls?.isLocked) return;
-  dragLookEnabled = true;
-  galleryApp.classList.add('drag-look');
-    setWalkHint();
-  needsRender = true;
+function handlePointerLockFailure() {
+  if (!pointerLockPending || document.pointerLockElement === document.body) return;
+  pointerLockPending = false;
+  showWelcome(insideHouseWorld ? 'house-paused' : (enteredOnce ? 'paused' : 'initial'));
 }
 
 function enterGallery() {
-  if (!sceneReady || !webglAvailable || isMobileDevice) return;
-  const firstEntry = !enteredOnce;
-  enteredOnce = true;
-  galleryActive = true;
-  if (firstEntry) sendAnalyticsEvent('gallery_enter');
+  if (
+    !sceneReady
+    || !webglAvailable
+    || isMobileDevice
+    || pointerLockPending
+    || document.pointerLockElement === document.body
+  ) return;
+
+  pointerLockPending = true;
+  escapeResumeArmed = false;
+  try {
+    const lockRequest = document.body.requestPointerLock();
+    if (lockRequest?.catch) lockRequest.catch(handlePointerLockFailure);
+  } catch (error) {
+    handlePointerLockFailure();
+    return;
+  }
+
   videoRoomAudioUnlocked = true;
   galleryVideos.forEach((entry) => {
     if (entry.videoRoom || entry.autoplayWithSound) {
@@ -8641,35 +8648,6 @@ function enterGallery() {
     }
   });
   primeShrimpRoomMusic();
-  preloadGalleryVideos();
-  resumeAnalyticsRoomTracking();
-  startFullGalleryBackgroundPreload();
-  if (insideHouseWorld) pauseGalleryVideos();
-  else playAutoplayOnEntryVideos();
-  requestVideoSync();
-  focusTargetUpdateRequested = true;
-  lastFocusTargetUpdateAt = -Infinity;
-  scheduleLowPriorityGalleryWork(() => startMainRoomBackgroundLoads(), 700);
-  dragLookEnabled = false;
-  galleryApp.classList.remove('drag-look', 'dragging-view');
-  setWalkHint();
-  pressedKeys.clear();
-  resetPlayerHeight();
-  hideWelcome();
-  activateHousePreviewIfRequested();
-  updatePositionDependentState();
-  needsRender = true;
-
-  try {
-    const lockRequest = document.body.requestPointerLock();
-    if (lockRequest?.catch) lockRequest.catch(enableDragLookFallback);
-  } catch (error) {
-    enableDragLookFallback();
-  }
-
-  window.setTimeout(() => {
-    if (galleryActive && !controls?.isLocked) enableDragLookFallback();
-  }, 420);
 }
 
 function initializeGallery() {
@@ -8739,8 +8717,12 @@ function initializeGallery() {
   controls.maxPolarAngle = Math.PI * 0.78;
 
   controls.addEventListener('lock', () => {
+    const firstEntry = !enteredOnce;
+    pointerLockPending = false;
     enteredOnce = true;
     galleryActive = true;
+    escapeResumeArmed = false;
+    if (firstEntry) sendAnalyticsEvent('gallery_enter');
     primeShrimpRoomMusic();
     preloadGalleryVideos();
     resumeAnalyticsRoomTracking();
@@ -8751,8 +8733,6 @@ function initializeGallery() {
     focusTargetUpdateRequested = true;
     lastFocusTargetUpdateAt = -Infinity;
     scheduleLowPriorityGalleryWork(() => startMainRoomBackgroundLoads(), 700);
-    dragLookEnabled = false;
-    galleryApp.classList.remove('drag-look', 'dragging-view');
     setWalkHint();
     pressedKeys.clear();
     resetPlayerHeight();
@@ -8772,9 +8752,6 @@ function initializeGallery() {
     finishAnalyticsRoomVisit();
     galleryActive = false;
     pauseShrimpRoomMusic();
-    dragLookEnabled = false;
-    draggingView = false;
-    galleryApp.classList.remove('drag-look', 'dragging-view');
     pressedKeys.clear();
     if (eHoldTimer) window.clearTimeout(eHoldTimer);
     eHoldTimer = 0;
@@ -8796,12 +8773,12 @@ function initializeGallery() {
       mesh.userData.frame.material.emissive.set(0x000000);
     });
     reticle.classList.remove('active');
-    if (!posterDialog.open && posterIndex.hidden && !helpDialog.open) {
+    if (!pointerLockPending && !posterDialog.open && posterIndex.hidden && !helpDialog.open) {
       showWelcome(insideHouseWorld ? 'house-paused' : 'paused');
     }
   });
 
-  document.addEventListener('pointerlockerror', enableDragLookFallback);
+  document.addEventListener('pointerlockerror', handlePointerLockFailure);
 
   createRoom();
   createHomePortalSurface();
@@ -8899,6 +8876,22 @@ window.addEventListener('keydown', (event) => {
   }
 
   if (
+    event.code === 'Escape'
+    && !event.repeat
+    && escapeResumeArmed
+    && enteredOnce
+    && !welcomeScreen.hidden
+    && !posterDialog.open
+    && posterIndex.hidden
+    && !helpDialog.open
+  ) {
+    event.preventDefault();
+    escapeResumeArmed = false;
+    enterGallery();
+    return;
+  }
+
+  if (
     galleryActive
     && focusedManualVideo
     && (event.code === 'ArrowLeft' || event.code === 'ArrowRight')
@@ -8949,7 +8942,7 @@ window.addEventListener('keydown', (event) => {
     event.preventDefault();
     openPoster(focusedPoster);
   }
-  if (event.code === 'Escape' && galleryActive && !controls?.isLocked) {
+  if (event.code === 'Escape' && !event.repeat && galleryActive && !controls?.isLocked) {
     event.preventDefault();
     showWelcome(insideHouseWorld ? 'house-paused' : 'paused');
   }
@@ -8957,6 +8950,18 @@ window.addEventListener('keydown', (event) => {
 
 window.addEventListener('keyup', (event) => {
   pressedKeys.delete(event.code);
+  if (event.code === 'Escape') {
+    if (
+      enteredOnce
+      && !welcomeScreen.hidden
+      && !posterDialog.open
+      && posterIndex.hidden
+      && !helpDialog.open
+    ) {
+      escapeResumeArmed = true;
+    }
+    return;
+  }
   if (event.code !== 'KeyE' || !eHoldTarget) return;
   event.preventDefault();
   if (eHoldTimer) window.clearTimeout(eHoldTimer);
@@ -8990,47 +8995,8 @@ window.addEventListener('pagehide', () => {
   finishAnalyticsRoomVisit();
 });
 
-canvas.addEventListener('pointerdown', (event) => {
-  if (!galleryActive || !dragLookEnabled || event.button !== 0) return;
-  draggingView = true;
-  dragMoved = false;
-  lastDragX = event.clientX;
-  lastDragY = event.clientY;
-  galleryApp.classList.add('dragging-view');
-  canvas.setPointerCapture(event.pointerId);
-});
-
-canvas.addEventListener('pointermove', (event) => {
-  if (!draggingView || !dragLookEnabled) return;
-  const movementX = event.clientX - lastDragX;
-  const movementY = event.clientY - lastDragY;
-  lastDragX = event.clientX;
-  lastDragY = event.clientY;
-  if (Math.abs(movementX) + Math.abs(movementY) > 2) dragMoved = true;
-
-  dragEuler.setFromQuaternion(camera.quaternion);
-  dragEuler.y -= movementX * 0.0024;
-  dragEuler.x -= movementY * 0.0024;
-  dragEuler.x = THREE.MathUtils.clamp(dragEuler.x, -1.05, 1.05);
-  camera.quaternion.setFromEuler(dragEuler);
-  requestVideoSync();
-  requestFocusTargetUpdate();
-  needsRender = true;
-});
-
-function finishDrag(event) {
-  if (!draggingView) return;
-  draggingView = false;
-  galleryApp.classList.remove('dragging-view');
-  if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
-  window.setTimeout(() => { dragMoved = false; }, 0);
-}
-
-canvas.addEventListener('pointerup', finishDrag);
-canvas.addEventListener('pointercancel', finishDrag);
-
 canvas.addEventListener('click', () => {
-  if (!galleryActive || dragMoved) return;
+  if (!galleryActive) return;
   if (focusedResumeLink) {
     openResumePage();
     return;

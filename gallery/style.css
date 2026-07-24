@@ -82,14 +82,6 @@ button {
   touch-action: none;
 }
 
-.gallery-app.drag-look #gallery-canvas {
-  cursor: grab;
-}
-
-.gallery-app.dragging-view #gallery-canvas {
-  cursor: grabbing;
-}
-
 .gallery-app.catalog-open #gallery-canvas {
   visibility: hidden;
 }
@@ -327,6 +319,19 @@ button {
   margin: 22px 0 0;
   color: #6a7072;
   font-size: 13px;
+}
+
+.guided-mode-hint {
+  margin: 18px 0 0;
+  color: #7a7f81;
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.guided-mode-hint a {
+  color: var(--blue);
+  font-weight: 700;
 }
 
 .movement-guide {
