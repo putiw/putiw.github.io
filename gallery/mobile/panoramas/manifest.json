@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "assetVersion": "20260723-resume-update3",
+  "assetVersion": "20260728-resume-cv1",
   "generatedBy": "gallery/mobile/scripts/generate-panoramas.mjs",
   "capture": {
     "url": "/?gallery=full&gallery-capture=1",
@@ -50,7 +50,7 @@
   },
   "toolchain": {
     "node": "v24.11.0",
-    "chrome": "Google Chrome 150.0.7871.129",
+    "chrome": "Google Chrome 150.0.7871.187",
     "imageMagick": "Version: ImageMagick 7.1.2-11 Q16-HDRI aarch64 23470 https://imagemagick.org",
     "cwebp": "1.6.0"
   },
@@ -58,20 +58,20 @@
     "nodeCount": 18,
     "capturedFaceCount": 108,
     "assetFileCount": 4536,
-    "assetBytes": 22364926
+    "assetBytes": 22357286
   },
   "nodes": [
     {
       "id": "main-intro",
       "faceCount": 6,
       "assetFileCount": 252,
-      "baseBytes": 41164,
-      "refinementBytes": 1432328,
+      "baseBytes": 41082,
+      "refinementBytes": 1424770,
       "refinementBytesByLevel": {
-        "2048": 592212,
-        "2560": 840116
+        "2048": 588950,
+        "2560": 835820
       },
-      "assetBytes": 1473492,
+      "assetBytes": 1465852,
       "files": [
         {
           "path": "main-intro/base/px.webp",
@@ -1929,8 +1929,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 7624,
-          "sha256": "22416d91b9eef7c74205b5ff69934029f36231cfb819b8df7c25c2458f3fe15d"
+          "bytes": 7542,
+          "sha256": "184909e4c139013ef368e4d37e9e2938da6a7230472be909edb1caacf2d1643e"
         },
         {
           "path": "main-intro/2048/pz/0-0.webp",
@@ -2018,7 +2018,7 @@
           "width": 512,
           "height": 512,
           "bytes": 4546,
-          "sha256": "1905ec7e73e8f5d19ae4956f6fd5338382273d51b0a5e392f2bc46618993cea2"
+          "sha256": "528764cdf17e14f4cdeb0f757d6265bc81604a71b9dd4c81eccfbf50640eff53"
         },
         {
           "path": "main-intro/2048/pz/2-0.webp",
@@ -2039,8 +2039,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 31382,
-          "sha256": "76c01342a9718c356b47832e1efa4bda7953cfd2cc7a51827bf3eb40607899fc"
+          "bytes": 28120,
+          "sha256": "056f4af1350646d16d6d40739460482b2b8dc7e3a1316b6c1e979b0e8ac1c181"
         },
         {
           "path": "main-intro/2048/pz/2-2.webp",
@@ -2237,8 +2237,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 35554,
-          "sha256": "e6ccfb891bffcb03f37b20356f99d97e290b069d7b522d9fc3354c94cd5479f9"
+          "bytes": 34800,
+          "sha256": "815491232a440b9f088a05bc13dea583651ac24bc4e8ce1661d3df43103b1906"
         },
         {
           "path": "main-intro/2560/pz/2-2.webp",
@@ -2248,8 +2248,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 43860,
-          "sha256": "eba30740955ebe498ab6e5a781e7de101da1a2fdf7d877234a2bae6b3f734da9"
+          "bytes": 43884,
+          "sha256": "841a03c9bf636935a18e05d4b010c54ce4afa7160b6b302eb6d1331a29f9f7f5"
         },
         {
           "path": "main-intro/2560/pz/2-3.webp",
@@ -2270,8 +2270,8 @@
           "column": 4,
           "width": 512,
           "height": 512,
-          "bytes": 7954,
-          "sha256": "7186bd6ca7f92b25c7402a2d8b1268a3bf61f084cf1f338ebeed414e112c5b81"
+          "bytes": 7936,
+          "sha256": "ee79c80e2b76fb727e9b4593eae24481c55d549ae99c17831db97184287b888d"
         },
         {
           "path": "main-intro/2560/pz/3-0.webp",
@@ -2292,8 +2292,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 9812,
-          "sha256": "5f7359119867c650fb57525bc67f8d43e0ff527465ea0d5460d722fd3ce94530"
+          "bytes": 7652,
+          "sha256": "272bc9e271c578eb45c89b0ebbec72ffbd0a11ff54d6aec2f749bd1db818202b"
         },
         {
           "path": "main-intro/2560/pz/3-2.webp",
@@ -2303,8 +2303,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 9528,
-          "sha256": "43fbe7285b08062e80941ab784545beb820c1c94a5b4684ef9a9f33489dfe4e2"
+          "bytes": 8140,
+          "sha256": "635db29d4c6fa7dd5fe3a6135f00405f461a8c0c155e438b46d0b365cda485e9"
         },
         {
           "path": "main-intro/2560/pz/3-3.webp",

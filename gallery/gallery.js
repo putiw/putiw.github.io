@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { GLTFLoader } from './vendor/loaders/GLTFLoader.js';
 import { artWorks } from './art/works.js';
-import { WORKS_BY_ID } from './project-data.js?v=20260723-resume-update3';
+import { WORKS_BY_ID } from './project-data.js?v=20260728-resume-cv1';
 import {
   MAIN_ROOM as ROOM,
   SCREENING_ROOM,
@@ -32,7 +32,7 @@ const ROOM_KEYS = {
   videos: 'videos',
   art: 'art'
 };
-const GALLERY_BUILD_ID = '20260728-art-gaze-live1';
+const GALLERY_BUILD_ID = '20260728-resume-cv1';
 const ROOM_CONTENT_SIGHTLINES = {
   [ROOM_KEYS.main]: [ROOM_KEYS.main, ROOM_KEYS.app, ROOM_KEYS.screening],
   [ROOM_KEYS.app]: [ROOM_KEYS.main, ROOM_KEYS.app],
@@ -9834,7 +9834,7 @@ async function renderGalleryCaptureNode(node, size) {
 }
 
 async function prepareGalleryCapture() {
-  const manifest = await import('./mobile/tour-manifest.js');
+  const manifest = await import('./mobile/tour-manifest.js?v=20260728-resume-cv1');
   galleryCaptureNodes = new Map(manifest.TOUR_NODES.map((node) => [node.id, node]));
   await startFullGalleryBackgroundPreload();
   await (artGalleryLoadPromise || Promise.resolve());

@@ -50,8 +50,8 @@ function showBootError(error) {
 
 if (useGuidedTour) {
   document.documentElement.classList.add('guided-gallery');
-  import('./mobile/main.js?v=20260724-guided-escape1').catch(showBootError);
+  import('./mobile/main.js?v=20260728-resume-cv1').catch(showBootError);
 } else {
   window.__PUTI_FORCE_FULL_3D__ = requestedMode === 'full' || captureMode || benchmarkMode;
-  import('./gallery.js?v=20260728-art-gaze-live1').catch(showBootError);
+  import('./gallery.js?v=20260728-resume-cv1').catch(showBootError);
 }

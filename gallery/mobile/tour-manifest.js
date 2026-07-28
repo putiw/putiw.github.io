@@ -1,7 +1,7 @@
-import { WORKS_BY_ID } from '../project-data.js?v=20260723-resume-update3';
+import { WORKS_BY_ID } from '../project-data.js?v=20260728-resume-cv1';
 
 const PANORAMA_SPEC = Object.freeze({
-  version: '20260723-resume-update3',
+  version: '20260728-resume-cv1',
   baseSize: 512,
   faceSize: 2560,
   tileSize: 512,

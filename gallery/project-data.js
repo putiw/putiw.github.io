@@ -79,7 +79,7 @@ const WORKS = [
     title: 'Puti Wen — Résumé',
     category: 'Résumé',
     description: 'Experience, selected projects, publications, education, and technical skills.',
-    posterImage: './resume/resume-page-1.jpg?v=20260723-resume-update3',
+    posterImage: './resume/resume-page-1.jpg?v=20260728-resume-cv1',
     href: '../resume/',
     kind: 'link'
   },
@@ -88,7 +88,7 @@ const WORKS = [
     title: 'Contact Puti Wen',
     category: 'Contact',
     description: 'Email Puti about scientific visualization, research engineering, and product work.',
-    posterImage: './resume/resume-page-2.jpg?v=20260723-resume-update3',
+    posterImage: './resume/resume-page-2.jpg?v=20260728-resume-cv1',
     href: 'mailto:pw1246@nyu.edu',
     kind: 'link'
   },
