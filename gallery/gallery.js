@@ -32,7 +32,7 @@ const ROOM_KEYS = {
   videos: 'videos',
   art: 'art'
 };
-const GALLERY_BUILD_ID = '20260728-art-gaze-hd1';
+const GALLERY_BUILD_ID = '20260728-art-gaze-live1';
 const ROOM_CONTENT_SIGHTLINES = {
   [ROOM_KEYS.main]: [ROOM_KEYS.main, ROOM_KEYS.app, ROOM_KEYS.screening],
   [ROOM_KEYS.app]: [ROOM_KEYS.main, ROOM_KEYS.app],
@@ -4826,7 +4826,6 @@ function waitForArtRoomHdUpgradeWindow() {
     || (
       !insideHouseWorld
       && currentGalleryRoomKey === ROOM_KEYS.art
-      && isStationaryForSpeculativePreload()
     )
   ) {
     return Promise.resolve();
@@ -4838,7 +4837,6 @@ function waitForArtRoomHdUpgradeWindow() {
         || (
           !insideHouseWorld
           && currentGalleryRoomKey === ROOM_KEYS.art
-          && isStationaryForSpeculativePreload()
         )
       ) {
         resolve();
@@ -4860,10 +4858,6 @@ function scheduleArtRoomHdUpgrades() {
   const attemptUpgrade = () => {
     artRoomHdUpgradeTimer = 0;
     if (!galleryActive || insideHouseWorld || currentGalleryRoomKey !== ROOM_KEYS.art) return;
-    if (!isStationaryForSpeculativePreload()) {
-      artRoomHdUpgradeTimer = window.setTimeout(attemptUpgrade, 350);
-      return;
-    }
     startArtRoomHdUpgrades();
   };
   artRoomHdUpgradeTimer = window.setTimeout(attemptUpgrade, 800);
