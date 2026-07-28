@@ -32,7 +32,7 @@ const ROOM_KEYS = {
   videos: 'videos',
   art: 'art'
 };
-const GALLERY_BUILD_ID = '20260728-continuous-benchmark1';
+const GALLERY_BUILD_ID = '20260728-art-gaze-hd1';
 const ROOM_CONTENT_SIGHTLINES = {
   [ROOM_KEYS.main]: [ROOM_KEYS.main, ROOM_KEYS.app, ROOM_KEYS.screening],
   [ROOM_KEYS.app]: [ROOM_KEYS.main, ROOM_KEYS.app],
@@ -4785,14 +4785,13 @@ function getArtWallTileViewScore({ sheet, tileIndex }) {
 function startArtRoomHdUpgrades() {
   if (artRoomHdUpgradePromise) return artRoomHdUpgradePromise;
   artRoomHdUpgradePromise = (async () => {
-    await waitForRoomVisualsReady(ROOM_KEYS.art);
     const textureLoader = new THREE.TextureLoader();
     const pendingTiles = ART_WALL_SHEETS.flatMap((sheet) => (
       sheet.images.map((image, tileIndex) => ({ sheet, image, tileIndex }))
     ));
 
     // Keep only one 4K request in flight. After each tile finishes, choose the
-    // remaining tile closest to the center of the visitor's current view.
+    // low-resolution-ready tile closest to the visitor's current view.
     while (pendingTiles.length) {
       await waitForArtRoomHdUpgradeWindow();
       let nextTileIndex = 0;
@@ -4803,6 +4802,10 @@ function startArtRoomHdUpgrades() {
         nextTileIndex = index;
         nextTileScore = score;
       });
+      if (nextTileScore === -Infinity && !roomVisualReadyKeys.has(ROOM_KEYS.art)) {
+        await waitForOrderedPreloadGap(180);
+        continue;
+      }
       const [nextTile] = pendingTiles.splice(nextTileIndex, 1);
       await loadArtWallTile(
         textureLoader,
