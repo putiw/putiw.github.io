@@ -29,7 +29,12 @@
       const guidedByDevice = mobileByAgent;
       window.__PUTI_MOBILE_BY_AGENT__ = mobileByAgent;
       window.__PUTI_GUIDED_BY_DEVICE__ = guidedByDevice;
-      const guidedGallery = !galleryParams.has('gallery-capture')
+      const benchmarkGallery = [
+        'science-app-art',
+        'mri-game-video-art'
+      ].includes(galleryParams.get('benchmark'));
+      const guidedGallery = !benchmarkGallery
+        && !galleryParams.has('gallery-capture')
         && galleryParams.get('gallery') !== 'full'
         && (
           galleryParams.get('gallery') === 'guided'
@@ -55,7 +60,7 @@
     html.guided-gallery .poster-dialog,
     html.guided-gallery .help-dialog { display: none !important; }
   </style>
-  <link rel="stylesheet" href="style.css?v=20260724-pointer-lock1">
+  <link rel="stylesheet" href="style.css?v=20260724-benchmark1">
   <noscript>
     <style>
       html, body { height: auto; overflow: auto; background: #f1f0ed; }
@@ -533,6 +538,6 @@
     </article>
   </noscript>
 
-  <script type="module" src="boot.js?v=20260724-pointer-lock1"></script>
+  <script type="module" src="boot.js?v=20260728-continuous-benchmark1"></script>
 </body>
 </html>

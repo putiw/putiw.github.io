@@ -1,11 +1,16 @@
 const params = new URLSearchParams(window.location.search);
 const requestedMode = params.get('gallery');
 const captureMode = params.has('gallery-capture');
+const benchmarkMode = [
+  'science-app-art',
+  'mri-game-video-art'
+].includes(params.get('benchmark'));
 const mobileByAgent = navigator.userAgentData?.mobile === true
   || /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent)
   || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const guidedByDevice = window.__PUTI_GUIDED_BY_DEVICE__ ?? mobileByAgent;
 const useGuidedTour = !captureMode
+  && !benchmarkMode
   && requestedMode !== 'full'
   && (requestedMode === 'guided' || guidedByDevice);
 
@@ -47,6 +52,6 @@ if (useGuidedTour) {
   document.documentElement.classList.add('guided-gallery');
   import('./mobile/main.js?v=20260724-guided-escape1').catch(showBootError);
 } else {
-  window.__PUTI_FORCE_FULL_3D__ = requestedMode === 'full' || captureMode;
-  import('./gallery.js?v=20260724-pointer-lock1').catch(showBootError);
+  window.__PUTI_FORCE_FULL_3D__ = requestedMode === 'full' || captureMode || benchmarkMode;
+  import('./gallery.js?v=20260728-continuous-benchmark1').catch(showBootError);
 }
