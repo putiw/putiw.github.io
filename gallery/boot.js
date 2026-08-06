@@ -53,5 +53,5 @@ if (useGuidedTour) {
   import('./mobile/main.js?v=20260728-resume-cv1').catch(showBootError);
 } else {
   window.__PUTI_FORCE_FULL_3D__ = requestedMode === 'full' || captureMode || benchmarkMode;
-  import('./gallery.js?v=20260728-resume-cv1').catch(showBootError);
+  import('./gallery.js?v=20260806-trackpad1').catch(showBootError);
 }

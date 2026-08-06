@@ -10367,6 +10367,10 @@ window.addEventListener('keyup', (event) => {
   else if (heldLongEnough) refreshFocusCard();
 });
 
+window.addEventListener('wheel', (event) => {
+  if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) event.preventDefault();
+}, { passive: false });
+
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     if (isGalleryBenchmarkActive()) {
@@ -10385,8 +10389,24 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-window.addEventListener('pagehide', () => {
+window.addEventListener('pagehide', (event) => {
   finishAnalyticsRoomVisit();
+  if (!event.persisted || galleryCaptureMode) return;
+  window.cancelAnimationFrame(animationFrame);
+  animationFrame = 0;
+});
+
+window.addEventListener('pageshow', (event) => {
+  if (!event.persisted || galleryCaptureMode) return;
+  pointerLockPending = false;
+  pressedKeys.clear();
+  galleryActive = false;
+  pauseGalleryVideos();
+  pauseShrimpRoomMusic();
+  showWelcome(insideHouseWorld ? 'house-paused' : (enteredOnce ? 'paused' : 'initial'));
+  resize();
+  needsRender = true;
+  animationFrame = window.requestAnimationFrame(animate);
 });
 
 canvas.addEventListener('click', () => {
@@ -10405,14 +10425,6 @@ canvas.addEventListener('click', () => {
     return;
   }
   if (focusedPoster) openPoster(focusedPoster);
-});
-
-window.addEventListener('beforeunload', () => {
-  finishAnalyticsRoomVisit();
-  window.cancelAnimationFrame(animationFrame);
-  artRoomGpuWarmupTarget?.dispose();
-  artRoomGpuWarmupMaterial?.dispose();
-  renderer?.dispose();
 });
 
 if (galleryBenchmarkMode) {

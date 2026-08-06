@@ -25,6 +25,7 @@ body {
   height: 100%;
   margin: 0;
   overflow: hidden;
+  overscroll-behavior-x: none;
   color: var(--ink);
   background: #e4e3df;
   font-family: var(--sans);
