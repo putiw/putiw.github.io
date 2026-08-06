@@ -52,7 +52,7 @@ const VIDEO_WALL_COPY_OVERRIDES = Object.freeze({
 document.querySelector('.gallery-app')?.setAttribute('hidden', '');
 const stylesheet = document.createElement('link');
 stylesheet.rel = 'stylesheet';
-stylesheet.href = './mobile/style.css?v=20260724-guided-escape1';
+stylesheet.href = './mobile/style.css?v=20260806-desktop-note1';
 document.head.append(stylesheet);
 
 const root = document.createElement('main');
@@ -61,6 +61,10 @@ root.innerHTML = `
   <canvas class="tour-canvas" aria-label="Guided 360 degree gallery view"></canvas>
   <div class="tour-shade" aria-hidden="true"></div>
   <header class="tour-header">
+    <p class="tour-desktop-note" hidden>
+      <strong>Best on desktop</strong>
+      <span>Move around freely with a keyboard and mouse.</span>
+    </p>
     <a class="tour-mode-switch" href="/?gallery=full" aria-label="Open the full 3D gallery" hidden>Full 3D</a>
     <nav class="tour-top-actions" aria-label="Portfolio links">
       <a class="tour-resume" href="/resume/" target="puti-resume" rel="noopener">Résumé</a>
@@ -124,9 +128,12 @@ const detailWallBackButton = detailDialog.querySelector('[data-wall-back]');
 const mapRoot = root.querySelector('.tour-map');
 const status = root.querySelector('.tour-status');
 const modeSwitch = root.querySelector('.tour-mode-switch');
+const desktopNote = root.querySelector('.tour-desktop-note');
 const mobileByAgent = window.__PUTI_MOBILE_BY_AGENT__ === true;
+const mobilePresentation = mobileByAgent || window.innerWidth <= 760;
 const guidedWasRequested = new URLSearchParams(window.location.search).get('gallery') === 'guided';
-modeSwitch.hidden = mobileByAgent || !guidedWasRequested;
+modeSwitch.hidden = mobilePresentation || !guidedWasRequested;
+desktopNote.hidden = !mobilePresentation;
 
 const gl = canvas.getContext('webgl', {
   antialias: false,

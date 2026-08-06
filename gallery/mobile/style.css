@@ -74,6 +74,36 @@ html.guided-gallery .gallery-app {
   pointer-events: auto;
 }
 
+.tour-desktop-note {
+  flex: 0 1 200px;
+  max-width: 46vw;
+  margin: 0;
+  padding: 7px 9px;
+  border-left: 2px solid #9edaf2;
+  background: rgba(12, 21, 24, 0.68);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+}
+
+.tour-desktop-note strong,
+.tour-desktop-note span {
+  display: block;
+}
+
+.tour-desktop-note strong {
+  color: #c7e5f1;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.tour-desktop-note span {
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
 .tour-top-actions > * {
   display: inline-flex;
   min-height: 44px;
