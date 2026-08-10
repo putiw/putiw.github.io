@@ -1,5 +1,5 @@
-import { FEATURED_ROUTE, NODE_BY_ID, ROOM_LABELS, TOUR_NODES } from './tour-manifest.js?v=20260728-resume-cv1';
-import { WORKS_BY_ID } from '../project-data.js?v=20260728-resume-cv1';
+import { FEATURED_ROUTE, NODE_BY_ID, ROOM_LABELS, TOUR_NODES } from './tour-manifest.js?v=20260810-defense-teleport1';
+import { WORKS_BY_ID } from '../project-data.js?v=20260810-defense-teleport1';
 
 const FACES = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 const FACE_TARGETS = [

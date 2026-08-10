@@ -186,6 +186,56 @@ button {
   box-shadow: 0 24px 70px rgba(34, 37, 39, 0.16);
 }
 
+.welcome-screen.teleport-open .welcome-card {
+  display: grid;
+  width: min(100%, 900px);
+  max-height: calc(100vh - 48px);
+  grid-template-columns: minmax(0, 1fr) 190px;
+  gap: 30px;
+  overflow-y: auto;
+}
+
+.teleport-panel {
+  min-width: 0;
+  padding-left: 28px;
+  border-left: 1px solid var(--line);
+}
+
+.teleport-panel h2 {
+  margin: 0 0 16px;
+  font-size: 19px;
+  letter-spacing: -0.01em;
+}
+
+.teleport-list {
+  display: grid;
+}
+
+.teleport-list button {
+  padding: 10px 2px;
+  border: 0;
+  border-bottom: 1px solid #dde0de;
+  background: transparent;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.teleport-list button:first-child {
+  border-top: 1px solid #dde0de;
+}
+
+.teleport-list button:hover,
+.teleport-list button:focus-visible,
+.teleport-list button[aria-current='location'] {
+  color: var(--blue);
+}
+
+.teleport-list button:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
 .eyebrow {
   margin: 0 0 9px;
   color: var(--blue);
@@ -1209,6 +1259,26 @@ dialog::backdrop {
 }
 
 @media (max-width: 860px) {
+  .welcome-screen.teleport-open .welcome-card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .teleport-panel {
+    padding: 22px 0 0;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+
+  .teleport-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 20px;
+  }
+
+  .teleport-list button:nth-child(2) {
+    border-top: 1px solid #dde0de;
+  }
+
   .poster-grid {
     grid-template-columns: 1fr;
   }

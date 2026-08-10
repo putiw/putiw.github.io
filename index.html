@@ -60,7 +60,7 @@
     html.guided-gallery .poster-dialog,
     html.guided-gallery .help-dialog { display: none !important; }
   </style>
-  <link rel="stylesheet" href="style.css?v=20260806-trackpad1">
+  <link rel="stylesheet" href="style.css?v=20260810-defense-teleport1">
   <noscript>
     <style>
       html, body { height: auto; overflow: auto; background: #f1f0ed; }
@@ -279,26 +279,42 @@
 
     <section class="welcome-screen" id="welcome-screen" aria-labelledby="welcome-title" aria-describedby="welcome-copy" hidden>
       <div class="welcome-card">
-        <p class="eyebrow" id="welcome-eyebrow">Puti Wen · Neuroimaging scientist &amp; clinical tool builder</p>
-        <h1 id="welcome-title">Walk through the research.</h1>
-        <p class="welcome-copy" id="welcome-copy">Explore an interactive 3D gallery of clinical tools, MRI and neuroimaging work, research posters, scientific figures, films, games, and artwork.</p>
-        <div class="welcome-actions">
-          <button class="primary-button" type="button" id="enter-button" aria-label="Enter Puti Wen's interactive 3D portfolio">Enter gallery</button>
-          <button class="secondary-button destination-button" type="button" id="gallery-destination-button" hidden>Gallery</button>
-          <a class="secondary-button resume-button" id="resume-button" href="/resume/" target="puti-resume" rel="noopener">View résumé</a>
-        </div>
-        <div class="movement-guide" role="group" aria-label="Movement controls">
-          <div class="key-cluster" aria-hidden="true">
-            <div class="key-row"><kbd>W</kbd></div>
-            <div class="key-row"><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div>
+        <div class="welcome-main">
+          <p class="eyebrow" id="welcome-eyebrow">Puti Wen · Neuroimaging scientist &amp; clinical tool builder</p>
+          <h1 id="welcome-title">Walk through the research.</h1>
+          <p class="welcome-copy" id="welcome-copy">Explore an interactive 3D gallery of clinical tools, MRI and neuroimaging work, research posters, scientific figures, films, games, and artwork.</p>
+          <div class="welcome-actions">
+            <button class="primary-button" type="button" id="enter-button" aria-label="Enter Puti Wen's interactive 3D portfolio">Enter gallery</button>
+            <button class="secondary-button destination-button" type="button" id="gallery-destination-button" hidden>Gallery</button>
+            <a class="secondary-button resume-button" id="resume-button" href="/resume/" target="puti-resume" rel="noopener">View résumé</a>
           </div>
-          <div class="movement-copy">
-            <strong>Move with WASD</strong>
-            <span>Mouse looks · hold Shift to squat</span>
+          <div class="movement-guide" role="group" aria-label="Movement controls">
+            <div class="key-cluster" aria-hidden="true">
+              <div class="key-row"><kbd>W</kbd></div>
+              <div class="key-row"><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div>
+            </div>
+            <div class="movement-copy">
+              <strong>Move with WASD</strong>
+              <span>Mouse looks · hold Shift to squat</span>
+            </div>
           </div>
+          <p class="control-summary" id="control-summary"><kbd>E</kbd> play/pause a focused video · hold to restart <span>/</span> <kbd>←</kbd> <kbd>→</kbd> skip by 5 seconds</p>
+          <p class="guided-mode-hint" id="guided-mode-hint" hidden>Too slow? <a href="/?gallery=guided">Try guided view</a></p>
         </div>
-        <p class="control-summary" id="control-summary"><kbd>E</kbd> play/pause a focused video · hold to restart <span>/</span> <kbd>←</kbd> <kbd>→</kbd> skip by 5 seconds</p>
-        <p class="guided-mode-hint" id="guided-mode-hint" hidden>Too slow? <a href="/?gallery=guided">Try guided view</a></p>
+        <nav class="teleport-panel" id="teleport-panel" aria-labelledby="teleport-title" hidden>
+          <p class="eyebrow">Teleport</p>
+          <h2 id="teleport-title">Choose a room</h2>
+          <div class="teleport-list">
+            <button type="button" data-teleport-room="main">Science</button>
+            <button type="button" data-teleport-room="app">App</button>
+            <button type="button" data-teleport-room="screening">Defense</button>
+            <button type="button" data-teleport-room="brain">Brain</button>
+            <button type="button" data-teleport-room="mri">MRI</button>
+            <button type="button" data-teleport-room="game">Game</button>
+            <button type="button" data-teleport-room="videos">Video</button>
+            <button type="button" data-teleport-room="art">Art</button>
+          </div>
+        </nav>
       </div>
     </section>
 
@@ -538,6 +554,6 @@
     </article>
   </noscript>
 
-  <script type="module" src="boot.js?v=20260806-desktop-note1"></script>
+  <script type="module" src="boot.js?v=20260810-defense-teleport1"></script>
 </body>
 </html>

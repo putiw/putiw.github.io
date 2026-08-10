@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { GLTFLoader } from './vendor/loaders/GLTFLoader.js';
 import { artWorks } from './art/works.js';
-import { WORKS_BY_ID } from './project-data.js?v=20260728-resume-cv1';
+import { WORKS_BY_ID } from './project-data.js?v=20260810-defense-teleport1';
 import {
   MAIN_ROOM as ROOM,
   SCREENING_ROOM,
@@ -32,7 +32,7 @@ const ROOM_KEYS = {
   videos: 'videos',
   art: 'art'
 };
-const GALLERY_BUILD_ID = '20260728-resume-cv1';
+const GALLERY_BUILD_ID = '20260810-defense-teleport1';
 const ROOM_CONTENT_SIGHTLINES = {
   [ROOM_KEYS.main]: [ROOM_KEYS.main, ROOM_KEYS.app, ROOM_KEYS.screening],
   [ROOM_KEYS.app]: [ROOM_KEYS.main, ROOM_KEYS.app],
@@ -803,7 +803,10 @@ const defenseScreeningWork = {
   rotationY: Math.PI,
   roomKey: ROOM_KEYS.screening,
   preloadPriority: 70,
-  playDistance: 9,
+  playDistance: 5.5,
+  interactionRadius: 5.5,
+  requireInteractionRange: true,
+  requireFocusForPlayback: true,
   showLabel: false,
   activationBounds: {
     minX: SCREENING_ROOM.centerX - SCREENING_ROOM.halfWidth - 0.5,
@@ -1071,6 +1074,8 @@ const dialogImage = document.getElementById('dialog-image');
 const detailLoading = document.getElementById('detail-loading');
 const helpDialog = document.getElementById('help-dialog');
 const helpButton = document.getElementById('help-button');
+const teleportPanel = document.getElementById('teleport-panel');
+const teleportButtons = Array.from(document.querySelectorAll('[data-teleport-room]'));
 const previewParams = new URLSearchParams(window.location.search);
 const galleryCaptureMode = previewParams.has('gallery-capture');
 const galleryBenchmarkId = previewParams.get('benchmark');
@@ -1344,6 +1349,16 @@ const videoScreenQuaternion = new THREE.Quaternion();
 const videoFrustum = new THREE.Frustum();
 const videoFrustumMatrix = new THREE.Matrix4();
 const STANDING_EYE_HEIGHT = ROOM.height / 2;
+const TELEPORT_DESTINATIONS = {
+  [ROOM_KEYS.main]: { position: [0.037, 0.04], yaw: 90.6, pitch: 0 },
+  [ROOM_KEYS.app]: { position: [-5.82, 22.392], yaw: 93.4, pitch: 0 },
+  [ROOM_KEYS.screening]: { position: [5.697, 14.146], yaw: -179.4, pitch: 0 },
+  [ROOM_KEYS.brain]: { position: [16.006, 15.408], yaw: 0.5, pitch: 0 },
+  [ROOM_KEYS.mri]: { position: [11.917, 23.042], yaw: -176.5, pitch: -15 },
+  [ROOM_KEYS.game]: { position: [-16.18, 30.433], yaw: -88.4, pitch: -4.8 },
+  [ROOM_KEYS.videos]: { position: [-18.944, 17.571], yaw: 0.8, pitch: 0 },
+  [ROOM_KEYS.art]: { position: [-5.73, 40.2], yaw: 180, pitch: 0 }
+};
 const CROUCH_DROP = 0.86;
 const JUMP_SPEED = 3.9;
 const JUMP_GRAVITY = 12.4;
@@ -1574,7 +1589,11 @@ function startJump() {
 
 function setWelcomeMode(mode) {
   const housePaused = mode === 'house-paused';
+  const teleportOpen = (mode === 'paused' || housePaused) && !galleryBenchmarkMode;
   welcomeScreen.classList.toggle('house-paused', housePaused);
+  welcomeScreen.classList.toggle('teleport-open', teleportOpen);
+  teleportPanel.hidden = !teleportOpen;
+  if (teleportOpen) updateTeleportCurrentRoom();
   galleryDestinationButton.hidden = !housePaused;
   guidedModeHint.hidden = mode === 'initial';
   resumeButton.textContent = housePaused ? 'Resume' : 'View résumé';
@@ -8354,6 +8373,7 @@ function addVideoWork(work, posterTexture) {
     playWhenVisible: Boolean(work.playWhenVisible),
     playDistance: work.playDistance || 6,
     requireFocusForPlayback: Boolean(work.requireFocusForPlayback),
+    requireInteractionRange: Boolean(work.requireInteractionRange),
     preloadPriority: work.preloadPriority || 0,
     roomKey: work.roomKey,
     position: new THREE.Vector3(...work.position),
@@ -9834,7 +9854,7 @@ async function renderGalleryCaptureNode(node, size) {
 }
 
 async function prepareGalleryCapture() {
-  const manifest = await import('./mobile/tour-manifest.js?v=20260728-resume-cv1');
+  const manifest = await import('./mobile/tour-manifest.js?v=20260810-defense-teleport1');
   galleryCaptureNodes = new Map(manifest.TOUR_NODES.map((node) => [node.id, node]));
   await startFullGalleryBackgroundPreload();
   await (artGalleryLoadPromise || Promise.resolve());
@@ -9959,6 +9979,40 @@ function showMobileFallback() {
   resumeButton.textContent = 'View résumé';
   resumeButton.classList.remove('secondary-button');
   resumeButton.classList.add('primary-button');
+}
+
+function updateTeleportCurrentRoom() {
+  const currentRoomKey = camera && !insideHouseWorld
+    ? getGalleryRoomKeyAtCamera()
+    : null;
+  teleportButtons.forEach((button) => {
+    if (button.dataset.teleportRoom === currentRoomKey) {
+      button.setAttribute('aria-current', 'location');
+    } else {
+      button.removeAttribute('aria-current');
+    }
+  });
+}
+
+function teleportToGalleryRoom(roomKey) {
+  const destination = TELEPORT_DESTINATIONS[roomKey];
+  if (!destination || !sceneReady || !camera) return;
+  if (insideHouseWorld) exitHouseWorld();
+
+  const [x, z] = destination.position;
+  const yaw = THREE.MathUtils.degToRad(destination.yaw);
+  const pitch = THREE.MathUtils.degToRad(destination.pitch);
+  const horizontalScale = Math.cos(pitch);
+  camera.position.set(x, STANDING_EYE_HEIGHT, z);
+  resetPlayerHeight();
+  camera.lookAt(
+    x + Math.sin(yaw) * horizontalScale,
+    camera.position.y + Math.sin(pitch),
+    z - Math.cos(yaw) * horizontalScale
+  );
+  pressedKeys.clear();
+  needsRender = true;
+  enterGallery();
 }
 
 function handlePointerLockFailure() {
@@ -10234,6 +10288,12 @@ enterButton.addEventListener('click', enterGallery);
 galleryDestinationButton.addEventListener('click', () => {
   if (insideHouseWorld) exitHouseWorld();
   enterGallery();
+});
+
+teleportButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    teleportToGalleryRoom(button.dataset.teleportRoom);
+  });
 });
 
 closeIndexButton.addEventListener('click', hideCatalog);

@@ -1,7 +1,7 @@
-import { WORKS_BY_ID } from '../project-data.js?v=20260728-resume-cv1';
+import { WORKS_BY_ID } from '../project-data.js?v=20260810-defense-teleport1';
 
 const PANORAMA_SPEC = Object.freeze({
-  version: '20260728-resume-cv1',
+  version: '20260810-defense-first-frame1',
   baseSize: 512,
   faceSize: 2560,
   tileSize: 512,

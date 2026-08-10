@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "assetVersion": "20260728-resume-cv1",
+  "assetVersion": "20260810-defense-first-frame1",
   "generatedBy": "gallery/mobile/scripts/generate-panoramas.mjs",
   "capture": {
     "url": "/?gallery=full&gallery-capture=1",
@@ -50,7 +50,7 @@
   },
   "toolchain": {
     "node": "v24.11.0",
-    "chrome": "Google Chrome 150.0.7871.187",
+    "chrome": "Google Chrome 151.0.7922.77",
     "imageMagick": "Version: ImageMagick 7.1.2-11 Q16-HDRI aarch64 23470 https://imagemagick.org",
     "cwebp": "1.6.0"
   },
@@ -58,7 +58,7 @@
     "nodeCount": 18,
     "capturedFaceCount": 108,
     "assetFileCount": 4536,
-    "assetBytes": 22357286
+    "assetBytes": 22291452
   },
   "nodes": [
     {
@@ -16781,13 +16781,13 @@
       "id": "defense",
       "faceCount": 6,
       "assetFileCount": 252,
-      "baseBytes": 32042,
-      "refinementBytes": 670182,
+      "baseBytes": 28214,
+      "refinementBytes": 608176,
       "refinementBytesByLevel": {
-        "2048": 286866,
-        "2560": 383316
+        "2048": 259382,
+        "2560": 348794
       },
-      "assetBytes": 702224,
+      "assetBytes": 636390,
       "files": [
         {
           "path": "defense/base/px.webp",
@@ -18645,8 +18645,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 6004,
-          "sha256": "d0ba4d41c4b070b5e272513f536674125115285576e2f5600dc50450b6c508b3"
+          "bytes": 2176,
+          "sha256": "62705604b589473172dc73e2797a3ab6636df1da159a3b05f4b0ddb2edae7294"
         },
         {
           "path": "defense/2048/pz/0-0.webp",
@@ -18700,8 +18700,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 2350,
-          "sha256": "6ebfddb35267a8d260a99a8b8052ea39d68872c977b89518d65056002f83d976"
+          "bytes": 712,
+          "sha256": "560843f3ea5c0a70732fa8d1d0c7cffff32e84875fb4bf70660f0691999172ae"
         },
         {
           "path": "defense/2048/pz/1-1.webp",
@@ -18711,8 +18711,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 10068,
-          "sha256": "bd9935989b67d59ec5843c3047b46a62d7de1546a63e4142b2b1fb80a5f64665"
+          "bytes": 2276,
+          "sha256": "53f81378e900f1078ff29d958dc48b63dc0c15098cab6585f7d891dfb2a748a1"
         },
         {
           "path": "defense/2048/pz/1-2.webp",
@@ -18722,8 +18722,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 9244,
-          "sha256": "d871e2721d03a9f5932cc2c6b5f5c6b68cf7e1800c2075aa907c800f4d20941e"
+          "bytes": 1620,
+          "sha256": "5665b73530bb843ae983ed62e35871aa45c7142f75416500ec6c2705a4dcea61"
         },
         {
           "path": "defense/2048/pz/1-3.webp",
@@ -18733,8 +18733,8 @@
           "column": 3,
           "width": 512,
           "height": 512,
-          "bytes": 2066,
-          "sha256": "dd0b195296fc25069b7a654fdc952711504e6b14d6e38ea1a1c70cb5aace88ce"
+          "bytes": 622,
+          "sha256": "e2e4aa1e37e121acf3b00853a223624ba23f6580381322151fac49af48d077b0"
         },
         {
           "path": "defense/2048/pz/2-0.webp",
@@ -18744,8 +18744,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 1618,
-          "sha256": "4fed4bf05ba48c2b75471e0c3d5af84c8f41eca5db96016edb4bd967b1583aaa"
+          "bytes": 624,
+          "sha256": "7e9eaaeee4fe3b8e2d5d372ea44b04d58241d9068e4d5e2cbc098ff80cf42c70"
         },
         {
           "path": "defense/2048/pz/2-1.webp",
@@ -18755,8 +18755,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 5284,
-          "sha256": "e8bb38cef7a5a4fb47c71da2c183247950c5ccbb41281543c0bc2d89bd2ec65e"
+          "bytes": 3282,
+          "sha256": "e38e22184b8c8f79df4346fb81ff5f43d82d1f3627f42acba9520592388b32a3"
         },
         {
           "path": "defense/2048/pz/2-2.webp",
@@ -18766,8 +18766,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 8488,
-          "sha256": "5150031644ba9430f83f4e344f2e939e0e8bf1207357047ce0bcbc5e5a25c60a"
+          "bytes": 3822,
+          "sha256": "df05322c4aec422d4251e19cb203de32e76320f3e66bfade4161737216c431f0"
         },
         {
           "path": "defense/2048/pz/2-3.webp",
@@ -18777,8 +18777,8 @@
           "column": 3,
           "width": 512,
           "height": 512,
-          "bytes": 1880,
-          "sha256": "35a09bdb3ef0038922d620f67afdda8ac8cfef136cd548f8de2bb2f08f34dfdd"
+          "bytes": 556,
+          "sha256": "52628feb34dd0d80bec36df5d6911703da79c52616e3d0b047c2a41cde0f88b2"
         },
         {
           "path": "defense/2048/pz/3-0.webp",
@@ -18887,8 +18887,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 698,
-          "sha256": "e7661310b0ef7a212555d7a98e4091e033eb444ec406c55353efdccc7f1daba6"
+          "bytes": 696,
+          "sha256": "c93f5721057d7b5c901d038c2ab5a88dfb8ea822cc002d61f54da074528a9be9"
         },
         {
           "path": "defense/2560/pz/1-1.webp",
@@ -18931,8 +18931,8 @@
           "column": 4,
           "width": 512,
           "height": 512,
-          "bytes": 600,
-          "sha256": "80e3ef2c184656eb3bbfa188129ba278b5114c2d5bf1302664e97f160333c7d2"
+          "bytes": 616,
+          "sha256": "78a24990090129f0cceb11e4ac25eb702c730b6c6a2769f7a87414c18a59d0d5"
         },
         {
           "path": "defense/2560/pz/2-0.webp",
@@ -18942,8 +18942,8 @@
           "column": 0,
           "width": 512,
           "height": 512,
-          "bytes": 1112,
-          "sha256": "bfd72a1d8058edf25c28e3d7736934b8b85410fd7ffa33226704f94a1d059707"
+          "bytes": 572,
+          "sha256": "a95daa931125771f0e7651a43222bc655fed7ba93b29e074b0d85e066972d8f6"
         },
         {
           "path": "defense/2560/pz/2-1.webp",
@@ -18953,8 +18953,8 @@
           "column": 1,
           "width": 512,
           "height": 512,
-          "bytes": 13846,
-          "sha256": "92f8553a9f0b319635cbce0a155c4a544a1a36dfdd2fdfe641f203fc7890c496"
+          "bytes": 816,
+          "sha256": "df2c6715a804cf6a80d228bb48814ca1de8575aa87173eadb19177e91f1f527c"
         },
         {
           "path": "defense/2560/pz/2-2.webp",
@@ -18964,8 +18964,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 17966,
-          "sha256": "6e52e0f2b11c788f0d860817c6fd1a2dc86f87e2e7bd4c48a6908877123af27d"
+          "bytes": 10948,
+          "sha256": "096b361148976541cb7639c303b3ff9bc8577696a30eb7c5bf879fe374f93ec2"
         },
         {
           "path": "defense/2560/pz/2-3.webp",
@@ -18975,8 +18975,8 @@
           "column": 3,
           "width": 512,
           "height": 512,
-          "bytes": 15172,
-          "sha256": "c3a9fd6506bfc73b61d7c12d1e5a09cd3909e6073f62a92fbf763a4ab38d2f6c"
+          "bytes": 1204,
+          "sha256": "46bbaeecf04fcbec5079746863d1e6ed88ccd9a3d1e525b436eddcf127dbfb05"
         },
         {
           "path": "defense/2560/pz/2-4.webp",
@@ -19019,8 +19019,8 @@
           "column": 2,
           "width": 512,
           "height": 512,
-          "bytes": 544,
-          "sha256": "1cd16a20663d175e7fd0961b6a0c43d20101f772484d91ef7e0e276d8debc30f"
+          "bytes": 564,
+          "sha256": "b785aebc742ab3c0edd0ec361a9e83992ad1ef56a41cc64b3e35cd3a912379e1"
         },
         {
           "path": "defense/2560/pz/3-3.webp",

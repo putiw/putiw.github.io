@@ -229,7 +229,7 @@ const WORKS = [
     title: 'PhD Defense',
     category: 'Visual neuroscience',
     description: 'A defense presentation about motion perception and how the mind reconstructs the external world.',
-    posterImage: './media/video-posters/defense-screening-web.jpg',
+    posterImage: './media/video-posters/defense-screening-web.jpg?v=20260810-first-frame1',
     mediaSource: './media/defense-screening-web.mp4?v=20260717-faststart',
     kind: 'video'
   },
