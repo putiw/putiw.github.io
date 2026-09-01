@@ -245,16 +245,8 @@ button {
   text-transform: uppercase;
 }
 
-.welcome-identity h1 {
-  display: inline;
-  margin: 0;
-  color: inherit;
-  font: inherit;
-  letter-spacing: inherit;
-}
-
-.loading-title,
-.welcome-title,
+.loading-card h1,
+.welcome-card h1,
 .poster-index h2,
 .poster-dialog h2,
 .help-dialog h2 {
@@ -1318,8 +1310,8 @@ dialog::backdrop {
     padding: 24px 21px;
   }
 
-  .welcome-title,
-  .loading-title {
+  .welcome-card h1,
+  .loading-card h1 {
     font-size: 35px;
   }
 

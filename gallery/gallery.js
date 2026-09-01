@@ -1603,7 +1603,7 @@ function setWelcomeMode(mode) {
     guidedModeHint.hidden = true;
     movementGuide.hidden = true;
     controlSummary.hidden = true;
-    welcomeEyebrow.textContent = ' · Gallery performance benchmark';
+    welcomeEyebrow.textContent = 'Gallery performance benchmark';
     welcomeTitle.textContent = 'Measure the full 3D route.';
     welcomeCopy.textContent = GALLERY_BENCHMARK.welcomeCopy;
     enterButton.textContent = 'Start benchmark';
@@ -1612,7 +1612,7 @@ function setWelcomeMode(mode) {
   }
 
   if (housePaused) {
-    welcomeEyebrow.textContent = ' · House paused';
+    welcomeEyebrow.textContent = 'House paused';
     welcomeTitle.textContent = 'Where would you like to go?';
     welcomeCopy.textContent = 'Continue exploring the house, return to the gallery, or open the résumé.';
     enterButton.textContent = 'House';
@@ -1620,14 +1620,14 @@ function setWelcomeMode(mode) {
   }
 
   if (mode === 'paused') {
-    welcomeEyebrow.textContent = ' · Gallery paused';
+    welcomeEyebrow.textContent = 'Gallery paused';
     welcomeTitle.textContent = 'Take your time.';
     welcomeCopy.textContent = 'Return when you are ready.';
     enterButton.textContent = 'Return to gallery';
     return;
   }
 
-  welcomeEyebrow.textContent = ' · Neuroimaging scientist & clinical tool builder';
+  welcomeEyebrow.textContent = 'Puti Wen · Neuroimaging scientist & clinical tool builder';
   welcomeTitle.textContent = 'Walk through the research.';
   welcomeCopy.textContent = 'Explore an interactive 3D gallery of clinical tools, MRI and neuroimaging work, research posters, scientific figures, films, games, and artwork.';
   enterButton.textContent = 'Enter gallery';
@@ -9299,7 +9299,7 @@ function installGalleryBenchmarkPanel() {
     download: downloadGalleryBenchmarkResult
   };
   loadingScreen.querySelector('.eyebrow').textContent = 'Gallery performance benchmark';
-  loadingScreen.querySelector('#loading-title').textContent = 'Preparing the benchmark';
+  loadingScreen.querySelector('h1').textContent = 'Preparing the benchmark';
   updateGalleryBenchmarkPanel();
 }
 
@@ -9968,7 +9968,7 @@ function showMobileFallback() {
   loadingScreen.hidden = true;
   welcomeScreen.hidden = false;
   welcomeScreen.classList.remove('house-paused');
-  welcomeEyebrow.textContent = ' · 3D gallery · Desktop only';
+  welcomeEyebrow.textContent = '3D gallery · Desktop only';
   welcomeTitle.textContent = 'Please visit from a laptop.';
   welcomeCopy.textContent = 'This 3D gallery needs a keyboard and mouse. In the meantime, you can view my résumé.';
   enterButton.hidden = true;

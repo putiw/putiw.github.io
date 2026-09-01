@@ -1,4 +1,4 @@
-import { FEATURED_ROUTE, NODE_BY_ID, ROOM_LABELS, TOUR_NODES } from './tour-manifest.js?v=20260901-search-console1';
+import { FEATURED_ROUTE, NODE_BY_ID, ROOM_LABELS, TOUR_NODES } from './tour-manifest.js?v=20260810-defense-teleport1';
 import { WORKS_BY_ID } from '../project-data.js?v=20260810-defense-teleport1';
 
 const FACES = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
@@ -52,7 +52,7 @@ const VIDEO_WALL_COPY_OVERRIDES = Object.freeze({
 document.querySelector('.gallery-app')?.setAttribute('hidden', '');
 const stylesheet = document.createElement('link');
 stylesheet.rel = 'stylesheet';
-stylesheet.href = './mobile/style.css?v=20260901-search-console1';
+stylesheet.href = './mobile/style.css?v=20260806-desktop-note1';
 document.head.append(stylesheet);
 
 const root = document.createElement('main');
@@ -72,8 +72,8 @@ root.innerHTML = `
     </nav>
   </header>
   <section class="tour-place" aria-live="polite">
-    <div class="tour-room"><h1 class="tour-person-name">Puti Wen</h1><span aria-hidden="true"> · </span><span class="tour-room-label"></span></div>
-    <h2 class="tour-node-title"></h2>
+    <p class="tour-room"></p>
+    <h1 class="tour-node-title"></h1>
     <p class="tour-instruction">Drag to look · Pinch to zoom · Tap a marker to move</p>
   </section>
   <div class="tour-hotspots" aria-label="Viewpoints and works in this view"></div>
@@ -117,7 +117,7 @@ const loadingMark = loading.querySelector('.tour-loading-mark');
 const loadingActions = loading.querySelector('.tour-loading-actions');
 const loadingRetryButton = loading.querySelector('[data-loading-retry]');
 const loadingMapButton = loading.querySelector('[data-loading-map]');
-const roomLabel = root.querySelector('.tour-room-label');
+const roomLabel = root.querySelector('.tour-room');
 const nodeTitle = root.querySelector('.tour-node-title');
 const mapButton = root.querySelector('[data-action="map"]');
 const mapSheet = root.querySelector('.tour-map-sheet');
@@ -836,12 +836,9 @@ function buildHotspots(node) {
 }
 
 function updateNavigationUi() {
-  const isPortfolioIntroduction = currentNode.id === 'main-intro';
   roomLabel.textContent = ROOM_LABELS[currentNode.room] || currentNode.room;
   nodeTitle.textContent = currentNode.label;
-  document.title = isPortfolioIntroduction
-    ? 'Puti Wen — Interactive 3D Portfolio'
-    : `${currentNode.label} — Puti Wen`;
+  document.title = `${currentNode.label} — Puti Wen`;
   buildHotspots(currentNode);
 }
 
