@@ -1306,7 +1306,10 @@ let eHoldTriggered = false;
 let eHoldWasPlaying = false;
 let loadingDisplayProgress = 0;
 let loadingProgressAnimation = 0;
+let initialLoadingComplete = false;
+let initialLoadingMaxTimer = 0;
 const INITIAL_LOADING_MIN_DURATION_MS = 4000;
+const INITIAL_LOADING_MAX_DURATION_MS = 8000;
 // performance.now() starts at navigation, which is also when the static
 // loading screen becomes visible. Include module startup in the visible gate.
 const initialLoadingStartedAt = 0;
@@ -9707,7 +9710,7 @@ function resize() {
 }
 
 function warmInitialCamera() {
-  if (!renderer || !scene || !camera) return;
+  if (!renderer || !scene || !camera || galleryActive) return;
 
   const originalPosition = camera.position.clone();
   const originalQuaternion = camera.quaternion.clone();
@@ -9911,6 +9914,12 @@ function installGalleryCaptureApi() {
 }
 
 function completeInitialLoading() {
+  if (initialLoadingComplete) return;
+  initialLoadingComplete = true;
+  if (initialLoadingMaxTimer) {
+    window.clearTimeout(initialLoadingMaxTimer);
+    initialLoadingMaxTimer = 0;
+  }
   sceneReady = true;
   if (galleryCaptureMode) {
     loadingScreen.hidden = true;
@@ -9918,19 +9927,18 @@ function completeInitialLoading() {
     return;
   }
   queueGalleryMiniatureRefreshes();
-  // Start the ordered secondary-room queue while the minimum loading gate is
-  // still visible. Large video files retain their later positions in the queue.
-  startFullGalleryBackgroundPreload();
-  // Compile the poster-only initial room while the preload queue gets started.
-  warmInitialCamera();
+  if (galleryBenchmarkMode) {
+    startFullGalleryBackgroundPreload();
+    warmInitialCamera();
+  }
 
   const elapsed = performance.now() - initialLoadingStartedAt;
   const remaining = Math.max(0, INITIAL_LOADING_MIN_DURATION_MS - elapsed);
-  // Perform the heavier multi-room render shortly before the gate ends so it
-  // is included in the requested wait instead of extending it afterward.
-  window.setTimeout(() => {
-    warmPreparedRoomCameras();
-  }, Math.max(0, remaining - 650));
+  if (galleryBenchmarkMode) {
+    window.setTimeout(() => {
+      warmPreparedRoomCameras();
+    }, Math.max(0, remaining - 650));
+  }
   window.setTimeout(() => {
     if (loadingProgressAnimation) {
       window.cancelAnimationFrame(loadingProgressAnimation);
@@ -9943,25 +9951,18 @@ function completeInitialLoading() {
       loadingScreen.hidden = true;
       markGalleryBenchmarkReady();
       showWelcome('initial');
+      if (!galleryBenchmarkMode) {
+        // GPU warm-ups and secondary-room media must not hold the loader at 99%.
+        scheduleLowPriorityGalleryWork(warmInitialCamera, 250);
+        scheduleLowPriorityGalleryWork(() => startFullGalleryBackgroundPreload(), 700);
+        scheduleLowPriorityGalleryWork(warmPreparedRoomCameras, 1400);
+      }
     }, 220);
   }, remaining);
 }
 
 function finishLoading() {
   completeInitialLoading();
-}
-
-function getInitialVideoPosterImages() {
-  return [...new Set([
-    videoWork.posterImage,
-    defenseScreeningWork.posterImage,
-    ...appDemoWorks.map((work) => work.posterImage),
-    ...myPhysioVideoWorks.map((work) => work.posterImage),
-    ...GAME_DISPLAY_WORKS.map((work) => work.posterImage),
-    ...VIDEO_ROOM_WORKS.map((work) => work.posterImage),
-    HOUSE_RAIN_DISPLAY.posterImage,
-    ...MRI_VIDEO_WORKS.map((work) => work.previewImage)
-  ].filter(Boolean))];
 }
 
 function showMobileFallback() {
@@ -10224,6 +10225,14 @@ function initializeGallery() {
   // The visible progress follows the useful preload window rather than cached
   // request bursts, so it keeps moving smoothly even on repeat visits.
   if (!galleryCaptureMode) animateLoadingProgress();
+  if (!galleryCaptureMode && !galleryBenchmarkMode) {
+    // A slow or stalled image must not trap a normal visit behind the loader.
+    const elapsed = performance.now() - initialLoadingStartedAt;
+    initialLoadingMaxTimer = window.setTimeout(
+      finishLoading,
+      Math.max(0, INITIAL_LOADING_MAX_DURATION_MS - elapsed)
+    );
+  }
 
   const textureLoader = new THREE.TextureLoader(manager);
   posters.forEach((poster) => {
@@ -10241,42 +10250,6 @@ function initializeGallery() {
     mainRoomLoadedImages.add(cluster.image);
     textureLoader.load(cluster.image, (texture) => addFigureCluster(cluster, texture));
   });
-  // These small textures are the first visible hints of the Art room through
-  // the aligned Science and App doorways. Place them during the initial gate;
-  // all other Art walls, models, and media retain their later priority.
-  MUG_DISPLAYS.forEach((config) => {
-    if (artRoomLoadedImages.has(config.texture)) return;
-    artRoomLoadedImages.add(config.texture);
-    textureLoader.load(
-      config.texture,
-      (texture) => createMugDisplay(texture, config),
-      undefined,
-      () => artRoomLoadedImages.delete(config.texture)
-    );
-  });
-  const artDoorwayPreviewSheet = ART_WALL_SHEETS.find((sheet) => sheet.side === 'far');
-  ART_DOORWAY_PREVIEW_TILE_INDICES.forEach((tileIndex) => {
-    const image = artDoorwayPreviewSheet?.images[tileIndex];
-    if (!image) return;
-    loadArtWallTile(textureLoader, artDoorwayPreviewSheet, image, tileIndex);
-  });
-  // A tiny version of the wall opposite the MRI doorway prevents the black
-  // room shell from reading as an unloaded void while visitors are in App.
-  const mriDoorwayPreviewSheet = MRI_WALL_SHEETS.find((sheet) => sheet.doorwayImage);
-  if (mriDoorwayPreviewSheet) {
-    textureLoader.load(
-      mriDoorwayPreviewSheet.doorwayImage,
-      (texture) => addMriWallSheet(mriDoorwayPreviewSheet, texture)
-    );
-  }
-  // Cache every film/demo poster before the visitor can enter. Room loaders
-  // can then place their screens immediately, while the much larger video
-  // files remain in the ordered post-entry queue.
-  getInitialVideoPosterImages()
-    .filter((image) => image !== videoWork.posterImage)
-    .forEach((image) => {
-      textureLoader.load(image, (texture) => texture.dispose(), undefined, () => {});
-    });
   textureLoader.load(videoWork.posterImage, (texture) => addVideoWork(videoWork, texture));
   resize();
   window.addEventListener('resize', resize, { passive: true });
