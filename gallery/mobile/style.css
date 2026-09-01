@@ -172,6 +172,14 @@ html.guided-gallery .gallery-app {
   text-transform: uppercase;
 }
 
+.tour-person-name {
+  display: inline;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
 .tour-node-title {
   margin: 0;
   font-size: clamp(27px, 8vw, 43px);
