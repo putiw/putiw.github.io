@@ -274,7 +274,7 @@ th:first-child,td:first-child{text-align:left}
     <div class="cyc"><span>Nitrite eaters</span><div class="t"><i id="sc-b" style="width:0"></i></div><span class="mono" id="sc-bv">0%</span></div>
     </div>
     <label class="toggle" hidden><input type="checkbox" id="t-autoDose"> Add ammonia automatically</label>
-    <div class="btns"><button class="btn primary" data-act="ammonia" id="btn-ammonia" hidden>Dose ammonia<small id="amm-sub">+1.5 ppm</small></button><button class="btn" data-act="wc" id="btn-scwc" hidden>Change water</button><button class="btn" data-act="bottle" id="btn-bottle2" hidden>Buy another bottle<small>AED 40 · 10 doses</small></button><button class="btn primary" data-act="gomarket" id="btn-gomarket" hidden>Go to Trade and buy shrimp</button></div>
+    <div class="btns"><button class="btn primary" data-act="ammonia" id="btn-ammonia" hidden>Dose ammonia<small id="amm-sub">+1.5 ppm</small></button><button class="btn" data-act="maintain" id="btn-maintain" hidden>Maintenance dose<small>+0.25 ppm · uses 1 bottle dose</small></button><button class="btn" data-act="wc" id="btn-scwc" hidden>Change water</button><button class="btn" data-act="bottle" id="btn-bottle2" hidden>Buy another bottle<small>AED 40 · 10 doses</small></button><button class="btn primary" data-act="gomarket" id="btn-gomarket" hidden>Go to Trade and buy shrimp</button></div>
   </div>
 
   <div class="card" id="feedcard">
@@ -797,7 +797,7 @@ function buyStdTank(G){
   G.tanks.push(T);log(G,'Set up '+T.name+' as a standard tank');return true;
 }
 var GOALS=[
-  {id:'cycle',t:'Cycle your first tank',r:'AED 20',ok:function(G){var T=G.tanks[0];return T.chem.bacA>=bacTarget(T)&&T.chem.bacB>=bacTarget(T);},give:function(G){earn(G,20,'shrimp');}},
+  {id:'cycle',t:'Cycle your first tank',r:'AED 20',ok:function(G){var T=G.tanks[0];return rememberCycle(G,T);},give:function(G){earn(G,20,'shrimp');}},
   {id:'stock',t:'Put shrimp in a tank',r:'✦ 1',ok:function(G){return allN(G)>=1;},give:function(G){gainInf(G,1);}},
   {id:'hatch',t:'See your first shrimplets hatch',r:'AED 15',ok:function(G){return G.stats.born>=5;},give:function(G){earn(G,15,'shrimp');}},
   {id:'sell10',t:'Sell 10 shrimp',r:'AED 30',ok:function(G){return G.stats.sold>=10;},give:function(G){earn(G,30,'shrimp');}},
@@ -857,7 +857,7 @@ function newGame(){
 }
 function newEmp(){return{inf:0,infTotal:0,regions:['auh'],shops:{},farms:{},proj:{},q:0.6,beta:0.02,ceil:0.2,mat:KIT_COST,autoPack:true,packTarget:20,gala:0,acc:0,won:0,failed:0,prod:0,packed:0,soldToday:0,staff:{sales:0,pack:0,mgr:0,tech:0,aiSales:false,aiMgr:false,aiTech:false,tier:0,lines:0},goals:{},movie:{n:0,left:0},op:newOpinion(),leases:[],lic:null};}
 function newOpt(){return{slow:true,collapse:false};}
-function migrate(G){if(!G.ob)G.ob=G.day>0?{kit:1,bottle:1,doses:10,wc:1,sell:1,up:1,market:1,hatch:1,fs:0}:{kit:0,bottle:0,doses:0};if(!G.emp)G.emp=newEmp();if(!G.adRepeat)G.adRepeat={};var E=G.emp,d=newEmp();for(var k in d)if(E[k]===undefined)E[k]=d[k];if(E.shownEmp&&G.ob.eproj===undefined){var o=G.ob,sc=shopCount(G);if(G.kits.sold>=1||Object.keys(E.proj).length)o.eproj=1;if(o.eproj&&(G.kits.sold>=10||sc>0))o.eshops=1;if(o.eshops&&(sc>0||E.regions.length>1))o.ereg=1;if(E.proj.farmlic)o.efarm=1;}E.staff.tech=0;E.staff.aiTech=false;if(!G.opt)G.opt=newOpt();if(!E.movie)E.movie={n:0,left:0};if(!E.op)E.op=newOpinion();if(!E.leases){E.leases=[];var dd=Math.floor(G.day)+30;SHOPS.forEach(function(x){for(var q=0;q<(E.shops[x.id]||0);q++)E.leases.push({id:x.id,due:dd});});if(shopCount(G)>0)E.lic={due:dd};}if(E.proj.schools&&!E.proj.elem){E.proj.elem=E.proj.middle=E.proj.high=E.proj.schools;}if(E.proj.autopack&&!E.staff.tier){E.staff.tier=1;E.staff.pack=Math.max(1,E.staff.pack);}G.tanks.forEach(function(t){if(t.set.maxN==null)t.set.maxN=3*t.vol;});return G;}
+function migrate(G){if(!G.ob)G.ob=G.day>0?{kit:1,bottle:1,doses:10,wc:1,sell:1,up:1,market:1,hatch:1,fs:0}:{kit:0,bottle:0,doses:0};if(!G.emp)G.emp=newEmp();if(!G.adRepeat)G.adRepeat={};var E=G.emp,d=newEmp();for(var k in d)if(E[k]===undefined)E[k]=d[k];if(E.shownEmp&&G.ob.eproj===undefined){var o=G.ob,sc=shopCount(G);if(G.kits.sold>=1||Object.keys(E.proj).length)o.eproj=1;if(o.eproj&&(G.kits.sold>=10||sc>0))o.eshops=1;if(o.eshops&&(sc>0||E.regions.length>1))o.ereg=1;if(E.proj.farmlic)o.efarm=1;}E.staff.tech=0;E.staff.aiTech=false;if(!G.opt)G.opt=newOpt();if(!E.movie)E.movie={n:0,left:0};if(!E.op)E.op=newOpinion();if(!E.leases){E.leases=[];var dd=Math.floor(G.day)+30;SHOPS.forEach(function(x){for(var q=0;q<(E.shops[x.id]||0);q++)E.leases.push({id:x.id,due:dd});});if(shopCount(G)>0)E.lic={due:dd};}if(E.proj.schools&&!E.proj.elem){E.proj.elem=E.proj.middle=E.proj.high=E.proj.schools;}if(E.proj.autopack&&!E.staff.tier){E.staff.tier=1;E.staff.pack=Math.max(1,E.staff.pack);}G.tanks.forEach(function(t){if(t.set.maxN==null)t.set.maxN=3*t.vol;if(t===G.tanks[0]&&t.cycledAt==null&&!t.had&&((G.emp.goals&&G.emp.goals.cycle)||G.ob.market))t.cycledAt=G.day;rememberCycle(G,t);});return G;}
 function rate(G,k,n){var f=(G.fin||[]).slice(-(n||7));if(!f.length)return 0;var t=0;f.forEach(function(x){t+=x[k]||0;});return t/f.length;}
 function netPerDay(G){var h=G.mh||[];if(h.length<3)return null;return (G.money-h[0])/h.length;}
 var FIN_CATS=[['shrimp','Shrimp sales',1],['kits','Kit sales',1],['running','Electricity and heating',0],['food','Food',0],['water','Water changes',0],['supplies','Shrimp, kit packing and supplies',0],['equipment','Tanks and equipment',0],['ads','Advertising',0],['shops','Shops and rent',0],['farms','Farms and kit materials',0],['projects','Projects, regions and galas',0],['staff','Staff wages and AI tokens',0],['tax','VAT and corporate tax',0]];
@@ -878,7 +878,14 @@ function breedFactor(T){
   return ft*fed*gh*ph*n3*tox*cr;
 }
 
+// Completing the empty-tank tutorial is permanent; water safety remains separate.
+function rememberCycle(G,T){
+  var tg=bacTarget(T);
+  if(T.cycledAt==null&&T.chem.bacA>=tg&&T.chem.bacB>=tg)T.cycledAt=G.day;
+  return T.cycledAt!=null;
+}
 function stepTank(G,T){
+  rememberCycle(G,T);
   var c=T.chem,vol=T.vol,set=T.set,i,k,t0=clock(G),food=FOODS[set.food||0];
   var amb=roomT(G,t0);
   var target=amb-(T.fan?1.5:0);
@@ -911,9 +918,12 @@ function stepTank(G,T){
   c.no2-=nitB;c.no3+=nitB;
   var cap=capA(T);
   var uA=clamp(nitA/DT/c.bacA,0,1),uB=clamp(nitB/DT/c.bacB,0,1);
-  c.bacA+=c.bacA*0.22*uA*phF*tB*DT*(1-c.bacA/cap)-c.bacA*0.012*DT*(1-uA);
-  c.bacB+=c.bacB*0.18*uB*phF*tB*DT*(1-c.bacB/cap)-c.bacB*0.012*DT*(1-uB);
+  var waiting=totalN(T)<1&&!T.had&&T.cycledAt!=null;
+  var decay=waiting?(G.day-T.cycledAt<7?0:0.003):0.012;
+  c.bacA+=c.bacA*0.22*uA*phF*tB*DT*(1-c.bacA/cap)-c.bacA*decay*DT*(1-uA);
+  c.bacB+=c.bacB*0.18*uB*phF*tB*DT*(1-c.bacB/cap)-c.bacB*decay*DT*(1-uB);
   c.bacA=clamp(c.bacA,0.05,cap);c.bacB=clamp(c.bacB,0.05,cap);
+  rememberCycle(G,T);
   c.ph+=(phEq(c.kh)-c.ph)*Math.min(1,0.4*DT);
   var N=totalN(T);
   c.gh=Math.max(0,c.gh-0.012*(N/vol)*DT);
@@ -1177,9 +1187,9 @@ function addAd(G,id){
   for(var j=0;j<G.ads.length;j++)if(G.ads[j].id===id)return false;
   pay(G,a.cost,'ads');G.ads.push({id:a.id,name:a.name,boost:a.boost,left:a.days,days:a.days});log(G,'Started: '+a.name);return true;
 }
-function addAmmonia(G,T,auto){
-  if(G.ob&&G.ob.bottle){if(G.ob.doses<=0)return false;G.ob.doses--;}else{if(G.money<4)return false;pay(G,4,'supplies');}T.chem.nh+=1.5*T.vol;
-  if(!auto)log(G,'Added ammonia',T);return true;
+function addAmmonia(G,T,auto,maintenance){
+  if(G.ob&&G.ob.bottle){if(G.ob.doses<=0)return false;G.ob.doses--;}else{if(G.money<4)return false;pay(G,4,'supplies');}T.chem.nh+=(maintenance?0.25:1.5)*T.vol;
+  if(!auto)log(G,maintenance?'Added a small maintenance dose':'Added ammonia',T);return true;
 }
 function buyStarter(G,T){
   if(G.tanks.length<2||G.money<45)return false;pay(G,45,'supplies');
@@ -1296,9 +1306,9 @@ function tips(T){
   if(N>0&&c.food>1.5*appetite(T)+2)out.push({sev:'warn',t:pre+'About '+Math.round(c.food)+' mg of uneaten food is rotting. Lower the ration.'});
   if(N/T.vol>5)out.push({sev:'info',t:pre+'Tank holds '+(N/T.vol).toFixed(1)+' shrimp per liter and breeding is slowing. Sell shrimp, move some to another tank, or upgrade.'});
   var pool=c.nh+c.no2;
-  if(N<1&&!T.had&&pa>=1&&pb>=1&&pool<0.02*T.vol)out.push({sev:'info',t:pre+(P.no3>20||c.kh<2?'Tank is cycled. Change water until nitrate is under 20 ppm and KH is above 2, then buy shrimp.':'Tank is cycled. Buy shrimp in the Trade tab.')});
-  else if(N<1&&!T.had&&(pa<1||pb<1)&&pool>0.02*T.vol)out.push({sev:'info',t:pre+'Cycling. Ammonia eaters '+Math.round(Math.min(1,pa)*100)+'%, nitrite eaters '+Math.round(Math.min(1,pb)*100)+'%. Buy shrimp when both reach 100% and ammonia and nitrite read zero.'});
-  else if(N<1&&!T.had&&(pa<1||pb<1)&&pool<=0.02*T.vol)out.push({sev:'info',t:pre+'Bacteria need ammonia to grow. Tap Add ammonia in the New tank card.'});
+  if(N<1&&!T.had&&rememberCycle(G,T)&&pool<0.02*T.vol)out.push({sev:'info',t:pre+(P.no3>20||c.kh<2?'Tank is cycled. Change water until nitrate is under 20 ppm and KH is above 2, then buy shrimp.':'Tank is cycled. Buy shrimp in the Trade tab.')});
+  else if(N<1&&!T.had&&!rememberCycle(G,T)&&(pa<1||pb<1)&&pool>0.02*T.vol)out.push({sev:'info',t:pre+'Cycling. Ammonia eaters '+Math.round(Math.min(1,pa)*100)+'%, nitrite eaters '+Math.round(Math.min(1,pb)*100)+'%. Buy shrimp when both reach 100% and ammonia and nitrite read zero.'});
+  else if(N<1&&!T.had&&!rememberCycle(G,T)&&(pa<1||pb<1)&&pool<=0.02*T.vol)out.push({sev:'info',t:pre+'Bacteria need ammonia to grow. Tap Add ammonia in the New tank card.'});
   var rank={bad:0,warn:1,info:2};
   out.sort(function(a,b){return rank[a.sev]-rank[b.sev];});
   return out;
@@ -1517,7 +1527,7 @@ function updateReveal(){
   var o=G.ob,T0=G.tanks[0],tg=bacTarget(T0),P=ppm(T0),had=anyHad();
   if(had&&o.fs==null)o.fs=Math.floor(G.day);
   var fire=function(k,msg){if(!o[k]){o[k]=1;if(!G.opt.all)toast(msg);cache={};lastChips='';lastColSig='';lastChartKey='';lastAlerts='';}};
-  if(o.kit&&(had||(T0.chem.bacA>=tg&&T0.chem.bacB>=tg&&P.nh<0.05&&P.no2<0.05&&P.no3<=20&&T0.chem.kh>=2)))fire('market','The Trade tab is open. Buy your first shrimp there.');
+  if(o.kit&&(had||(rememberCycle(G,T0)&&P.nh<0.05&&P.no2<0.05&&P.no3<=20&&T0.chem.kh>=2)))fire('market','The Trade tab is open. Buy your first shrimp there.');
   if(o.kit&&(T0.chem.kh<2.5||P.no3>20||(had&&G.day-o.fs>=5)))fire('wc','Water changes and the full Water test card are now open. Changes dilute waste and refill KH and GH.');
   if(G.stats.sold>0||(had&&sellableStock(G)>0))fire('sell','Your first shrimp are old enough to sell. Tap Sell at the top. Advertising is open in the new Promote tab.');
   if(had&&(G.stats.sold>0||T0.chem.temp>27.5||T0.chem.temp<20))fire('up','The Upgrades tab is open: heaters, fans, filters and bigger tanks.');
@@ -1569,18 +1579,19 @@ function updateTank(){
   if(!$('startcard').hidden){var PP=ppm(T),o=G.ob,kit=rv('kit'),bot=!!o.bottle||G.opt.all,sct=$('sc-text');
     $('sc-water').hidden=!kit;$('scp-ph').hidden=!rv('phkh');$('scp-kh').hidden=!rv('phkh');$('sc-bars').hidden=!bot;
     if(kit)[['nh',PP.nh,2,' ppm'],['no2',PP.no2,2,' ppm'],['no3',PP.no3,0,' ppm'],['ph',T.chem.ph,2,''],['kh',T.chem.kh,1,'']].forEach(function(x){var g=gaugeById(x[0]),st=gstate(g,x[1]);setT('scv-'+x[0],st.dir+x[1].toFixed(x[2])+x[3]);var e=$('scp-'+x[0]),cl='wp '+st.st;if(e.className!==cl)e.className=cl;});
-    var cyc=pa>=100&&pb>=100,clear=PP.nh<0.05&&PP.no2<0.05,stall=T.chem.kh<0.5&&T.chem.ph<6.6,dirty=PP.no3>20||T.chem.kh<2,title,txt;
+    var cyc=rememberCycle(G,T),clear=PP.nh<0.05&&PP.no2<0.05,stall=T.chem.kh<0.5&&T.chem.ph<6.6,dirty=PP.no3>20||T.chem.kh<2,title,txt;
     if(!kit){title='Your first tank';txt='You have a 20 L tank with a sponge filter and AED '+fmt(Math.max(0,Math.floor(G.money)))+'. Shrimp die in a brand-new tank because nothing breaks down their waste yet. First you need a way to see what is in the water.';}
     else if(!bot){title='Clean water, no bacteria';txt='The test reads zero for everything. That sounds good, but it means no bacteria live here yet. Bacteria eat ammonia, the waste shrimp make, so feed them some first.';}
     else if(stall&&!clear){title='The cycle is slowing';txt='The bacteria used up the KH and the pH has fallen to '+T.chem.ph.toFixed(1)+', so they work slower. Change some water to bring KH and pH back.';}
     else if(!cyc){title='Growing bacteria';txt=PP.nh>=0.25?'Ammonia eaters are turning ammonia into nitrite, and nitrite eaters turn that into nitrate. Wait until ammonia reads near zero before the next dose.':'Ammonia is near zero, so the bacteria have nothing to eat. Dose again. A real tank takes 3 to 5 weeks and several doses to cycle.';}
     else if(!clear){title='Bacteria ready, water still clearing';txt='Both groups are strong enough. Stop dosing and wait a few days for ammonia and nitrite to reach zero, or change some water.';}
     else if(dirty){title='Cycled! Now clean the water';txt='Cycling left '+PP.no3.toFixed(0)+' ppm nitrate and KH at '+T.chem.kh.toFixed(1)+'. Change water until nitrate is under 20 and KH is back above 2, then buy shrimp.';}
-    else{title='Cycled! Time for shrimp';txt='Both bacteria groups are at full strength and ammonia and nitrite read zero. Open the Trade tab and buy your first shrimp.';}
+    else{title='Cycled! Time for shrimp';txt='Cycling complete! Your bacteria have a 7-day grace period, then decline slowly while the tank is empty. Buy your first shrimp in Trade when the water is safe. If you wait longer, a small maintenance dose feeds the bacteria; wait for ammonia and nitrite to clear before buying shrimp.';}
     setT('sc-title',title);if(sct.textContent!==txt)sct.textContent=txt;
     $('btn-kit').hidden=kit;$('btn-bottle').hidden=!kit||bot;$('sc-buy').hidden=kit&&bot;
+    $('btn-maintain').hidden=!(bot&&cyc&&clear&&!dirty&&G.day-T.cycledAt>=7);$('btn-maintain').disabled=o.bottle&&o.doses<=0&&!G.opt.all;
     $('btn-ammonia').hidden=!bot||cyc||o.doses<=0&&!G.opt.all;setT('amm-sub',o.bottle?o.doses+' doses left · +1.5 ppm':'AED 4 · +1.5 ppm');
-    $('btn-bottle2').hidden=!(o.bottle&&o.doses<=0&&!cyc);$('btn-scwc').hidden=!(bot&&(stall||(cyc&&(!clear||dirty))));
+    $('btn-bottle2').hidden=!(o.bottle&&o.doses<=0);$('btn-scwc').hidden=!(bot&&(stall||(cyc&&(!clear||dirty))));
     $('btn-gomarket').hidden=!(cyc&&clear&&!dirty);
     $('sc-a').style.width=pa+'%';$('sc-b').style.width=pb+'%';setT('sc-av',pa+'%');setT('sc-bv',pb+'%');}
   if(N>=1){var wl=appetite(T)*0.045/T.vol,no3w=wl*7*4.43,khw=0.4*wl*7,f=T.set.wcPct/100,P0=ppm(T);
@@ -1963,6 +1974,7 @@ function initControls(){
     if(a==='wc'&&G.recipe){var tl=0;G.tanks.forEach(function(t){tl+=waterChange(G,t,t.set.wcPct);});toast('Changed '+T.set.wcPct+'% of the water in all '+G.tanks.length+' tanks'+(tl>=1?', '+Math.round(tl)+' shrimp stressed by the swing':''));bump(b);}
     else if(a==='ice'){if(iceBottle(G,T)){bump(b);cache={};}}
     else if(a==='wc'){var lost=waterChange(G,T,T.set.wcPct);toast('Changed '+T.set.wcPct+'% of the water'+(lost>=1?', but '+Math.round(lost)+' shrimp were stressed by the swing':''));bump(b);}
+    if(a==='maintain'){var P=ppm(T);if(rememberCycle(G,T)&&!T.had&&totalN(T)<1&&P.nh<0.05&&P.no2<0.05&&addAmmonia(G,T,false,true))toast('Maintenance dose added. Wait for ammonia and nitrite to clear before buying shrimp.');}
     if(a==='ammonia'){if(addAmmonia(G,T))toast('Added ammonia, +1.5 ppm');bump(b);}
     if(a==='starter'){if(buyStarter(G,T))toast('Bacteria starter added to '+T.name);bump(b);}
     if(a==='seed'){if(seedFilter(G,T,G.tanks[+b.dataset.from]))toast('Filter seeded from '+G.tanks[+b.dataset.from].name);bump(b);}
