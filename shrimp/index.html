@@ -1128,7 +1128,7 @@ function breedFactor(T){
   var ph=(c.ph>=6.5&&c.ph<=8)?1:0.4;
   var n3=P.no3<20?1:P.no3<60?1-(P.no3-20)*0.0175:0.3;
   var tox=(P.nh>0.1||P.no2>0.2)?0.3:1;
-  var d=N/T.vol,cr=d<5?1:d<10?1-(d-5)*0.15:0.25;
+  var d=N/T.vol,cr=d<4?1:d<7?1-(d-4)*0.31:0.05;
   return ft*fed*gh*ph*n3*tox*cr;
 }
 
@@ -1193,7 +1193,7 @@ function stepTank(G,T){
   var env=1-surv,deadMass=0,died=0;
   for(i=0;i<T.pop.length;i++){
     k=T.pop[i];var a=k.age;
-    var base=a<10?0.012:a<30?0.008:a<75?0.004:0.0015+(a>(rd(G,'longevity')?455:365)?(a-(rd(G,'longevity')?455:365))*0.00006:0);
+    var old=rd(G,'longevity')?630:540,base=a<10?0.004:a<30?0.0015:a<75?0.0008:0.0004+(a>old?(a-old)*0.000069:0);
     var sens=a<30?1.4:a<75?1:0.5;
     var daily=1-(1-base)*(1-clamp(env*sens,0,0.95));
     var die=k.n*(1-Math.pow(1-daily,DT));
@@ -1356,12 +1356,7 @@ function waterChange(G,T,pct,auto){
 
 function doSell(G,T,dry,budget,quiet){
   var set=T.set,m=G.market.m,p=G.price;
-  var adults=T.pop.filter(function(k){return k.age>=75&&!k.b;}).sort(function(a,b){return b.g-a.g;});
-  var protect=new Map(),left=set.keep-boughtAdults(T);
-  adults.forEach(function(k){
-    if(set.cull>0&&k.g<set.cull)return;
-    var pr=Math.max(0,Math.min(k.n,left));protect.set(k,pr);left-=pr;
-  });
+  var protect=breederProtection(T);
   var cands=[],culls=[];
   T.pop.forEach(function(k){
     if(k.b)return;var avail=Math.floor(k.n-(protect.get(k)||0)+1e-9);if(avail<=0)return;
@@ -1576,7 +1571,11 @@ function cashRunway(G){var net=operatingNet(G);return net!=null&&net<0?Math.max(
 function payrollPreview(G,role){if(!consultHas(G,'fix'))return '';var extra=STAFF[role].pay,net=operatingNet(G);return 'Hiring adds '+Math.round(extra)+' AED/day. '+(net==null?'Profit forecast needs a day of records.':'Projected operating profit '+Math.round(net-extra)+' AED/day. ')+ 'After seven days of this wage: AED '+Math.round(G.money-extra*7)+'.';}
 function allStarterAuto(G){return G.tanks.length>=3&&G.tanks.slice(0,3).every(function(t){return t.feeder&&t.autoWC;});}
 function boughtAdults(T){var n=0;T.pop.forEach(function(k){if(k.b&&k.age>=75)n+=k.n;});return n;}
-function breederProtection(T){var result=new Map(),left=(T.set.keep||0)-boughtAdults(T);T.pop.forEach(function(k){if(k.b)result.set(k,k.n);});T.pop.filter(function(k){return k.age>=75&&!k.b&&(!T.set.cull||k.g>=T.set.cull);}).sort(function(a,b){return b.g-a.g;}).forEach(function(k){var n=Math.max(0,Math.min(left,k.n));result.set(k,n);left-=n;});return result;}
+function breederProtection(T){var result=new Map(),left=(T.set.keep||0)-boughtAdults(T),ok=function(k){return !k.b&&(!T.set.cull||k.g>=T.set.cull);};T.pop.forEach(function(k){if(k.b)result.set(k,k.n);});
+ T.pop.filter(function(k){return k.age>=75&&ok(k);}).sort(function(a,b){return b.g-a.g;}).forEach(function(k){var n=Math.max(0,Math.min(left,k.n));result.set(k,n);left-=n;});
+ // not enough adults yet: hold back the oldest, best young shrimp so they grow into breeders
+ if(left>0)T.pop.filter(function(k){return k.age<75&&k.age>=20&&ok(k);}).sort(function(a,b){return b.age-a.age||b.g-a.g;}).forEach(function(k){var n=Math.max(0,Math.min(left,k.n));if(n>0)result.set(k,n);left-=n;});
+ return result;}
 function spareKitShrimp(G){var n=0;G.tanks.forEach(function(t){var p=breederProtection(t);t.pop.forEach(function(k){if(k.age>=20&&!k.b)n+=Math.max(0,Math.floor(k.n-(p.get(k)||0)));});});return n;}
 function saleForecast(G){
   var stock=sellableStock(G);if(stock>0)return Math.round(stock)+' ready · '+Math.round(demandLeft(G))+' buyers left this week.';
@@ -2123,7 +2122,7 @@ function updateTank(){
 function readyStats(G){var n=0,rev=0;G.tanks.forEach(function(t){var r=doSell(G,t,true,1e9);n+=r.normal;rev+=r.revenue;});return {n:n,rev:rev};}
 function updateRules(){
   var T=TK(),N=totalN(T);
-  var sa=Math.max(45,TK().set.sellAge),af=ageFactor(sa);setEmphasisText('h-sellAge','At '+sa+' days: '+Math.round(af*100)+'% of top price. Prime is 100 to 180 days; color fades to 60% by 300 days.'+(sa<75?' Younger than adulthood (75 d): sold before they can breed.':''),['Prime is 100 to 180 days','younger than adulthood','before they can breed']);
+  var sa=Math.max(45,TK().set.sellAge),af=ageFactor(sa);setEmphasisText('h-sellAge','At '+sa+' days: '+Math.round(af*100)+'% of top price. Prime is 100 to 180 days; color fades to 60% by 300 days.'+(sa<75?' Younger than adulthood (75 d): young shrimp are held back until your breeder slots are full.':''),['Prime is 100 to 180 days','held back']);
   setT('salesrules-h',G.recipe?'Sales rules, every tank':'Sales rules, '+TK().name);
   var ex=0;(G.recipe?G.tanks:[T]).forEach(function(t){ex+=Math.max(0,Math.floor(totalN(t)-t.set.maxN));});
   var tv=G.recipe?G.tanks[G.tanks.length-1].vol:T.vol;var rec='~3 shrimp/L keeps breeding fast ('+(3*tv)+' in '+tv+' L). '+(G.recipe?'The limit applies to each tank. ':'');

@@ -177,6 +177,14 @@ if(g.progress.queue.length||!g.story.letters.million.historical||g.story.anniver
 check('letters are saved at milestones and survive save/load without changing the clock', `
 var g=readyGame();g.day=49;g.stats.born=5;detectMilestones(g);if(g.story.letters.hatch.day!==49||g.story.letters.kit)throw Error('Wrong letter unlock');g.progress.queue=[];g.day=60;detectMilestones(g);if(g.story.letters.hatch.day!==49)throw Error('Letter timestamp moved');var saved=JSON.parse(JSON.stringify(g));migrate(saved);if(saved.story.letters.hatch.day!==49||saved.day!==60)throw Error('Letter save lost');
 `);
+check('clean-water lifespans and breeder slots filled from young shrimp',`
+var g=readyGame(),T=g.tanks[0];
+function survive(days){var s=1;for(var a=0;a<days;a++){var b=a<10?0.004:a<30?0.0015:a<75?0.0008:0.0004+(a>540?(a-540)*0.000069:0);s*=1-b;}return s;}
+if(Math.abs(survive(75)-0.9)>0.02||Math.abs(survive(365)-0.8)>0.02||Math.abs(survive(730)-0.2)>0.03)throw Error('Clean-water lifespan targets: 90% adult, 80% one year, 20% two years');
+T.pop=[{age:60,n:50,g:80},{age:90,n:5,g:80}];T.set.keep=40;T.set.sellAge=45;T.set.cull=0;
+var p=breederProtection(T),held=0;p.forEach(function(n){held+=n;});if(Math.round(held)!==40)throw Error('Young shrimp should fill breeder slots: held '+held);
+`);
+if(!html.includes("var old=rd(G,'longevity')?630:540,base=a<10?0.004:a<30?0.0015:a<75?0.0008:0.0004+(a>old?(a-old)*0.000069:0);"))throw Error('Mortality curve changed without updating the lifespan check');
 check('owners’ tanks: welfare, kit design, climate, feed, water and shrimp prices in AED',`
 var g=newGame();g.ob.kit=1;g.stats.sold=KIT_UNLOCK;g.kits.sold=60;g.humans=2e5;g.money=5e8;g.emp.regions=['auh','dxb','uae','gcc','mena','eu'];
 if(!(regionMix(g).cold>0.3))throw Error('Europe should bring cold winters');
