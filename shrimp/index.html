@@ -91,7 +91,7 @@ button{font:inherit;color:inherit}
 .wp small{display:block;font-size:10px;letter-spacing:.03em}
 .wp b{font:500 12px var(--font-data)}
 .wp.ok b{color:var(--good)} .wp.warn{border-color:var(--warn)} .wp.warn b{color:var(--warn)} .wp.bad{border-color:var(--bad)} .wp.bad b{color:var(--bad)}
-.wp[data-param],.g[data-param]{cursor:help;touch-action:pan-y}
+.wp[data-param],.g[data-param]{cursor:pointer;touch-action:pan-y}
 .g[data-param]:focus-visible,.wp[data-param]:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
 .param-tooltip{position:fixed;z-index:20;width:max-content;max-width:min(340px,calc(100vw - 24px));max-height:42vh;overflow:auto;padding:10px 12px;border:1px solid var(--accent);border-radius:10px;background:var(--surface);color:var(--ink);box-shadow:0 8px 24px rgba(15,36,34,.22);font-size:13px;line-height:1.45;pointer-events:none}
 .param-tooltip[hidden]{display:none!important}.param-tooltip strong{display:block;font-size:14px;margin-bottom:4px}.param-tooltip p{margin:2px 0}.param-tooltip b{font-weight:700}
@@ -208,6 +208,7 @@ th:first-child,td:first-child{text-align:left}
 .coll.shut>.hd h2::before{transform:rotate(-90deg)}
 .coll:not(.shut)>.hd{margin-bottom:4px}
 .coll.shut>:not(.hd){display:none!important}
+.opsrow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:6px 0;font-size:13.5px}.opsrow small{display:block;color:var(--ink-3);font-size:11.5px}.opsrow select{font:500 13px var(--font-body);padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);min-height:34px}
 .coll.fresh>.hd h2::after{content:'new';margin-left:6px;padding:0 5px;border:1px solid var(--accent);border-radius:8px;color:var(--accent);font:600 10px var(--font-body);vertical-align:middle}
 .item .hb .btn{min-width:0;padding:6px 10px}
 .item .eta{display:block;font-size:11px;color:var(--ink-3);margin-top:2px}
@@ -351,15 +352,6 @@ th:first-child,td:first-child{text-align:left}
   </div>
 
   <div class="two">
-    <div class="card" id="wtcard">
-      <div class="hd"><h2>Water test</h2><small id="b-tankline"></small></div>
-      <div id="gauges"></div>
-      <p class="hint">Press and hold a water reading to see what raises or lowers it.</p>
-      <div id="wt-bac"><hr>
-      <div class="cyc"><span>Ammonia eaters</span><div class="t"><i id="cy-a" style="width:0"></i></div><span class="mono" id="cy-av">0%</span></div>
-      <div class="cyc"><span>Nitrite eaters</span><div class="t"><i id="cy-b" style="width:0"></i></div><span class="mono" id="cy-bv">0%</span></div>
-      <p class="hint">Filter bacteria are behind your tank's waste, so ammonia or nitrite can build up. They catch up in a few days if you feed lightly. This disappears once both reach 100%.</p></div>
-    </div>
     <div class="card" id="wccard">
       <div class="hd"><h2>Water care</h2></div>
       <div class="ctl"><label for="s-wcPct">Change</label><input type="range" id="s-wcPct" data-x="1" min="5" max="60" step="1"><span class="v" id="v-wcPct"></span></div>
@@ -376,6 +368,15 @@ th:first-child,td:first-child{text-align:left}
       <p class="hint" id="h-ac"></p>
       <div class="btns"><button class="btn" data-act="ice" id="btn-ice">Float a frozen water bottle<small id="ice-sub">AED 1 · melts in about 12 hours</small></button></div>
       <p class="hint" id="h-ice"></p></div>
+    </div>
+    <div class="card" id="wtcard">
+      <div class="hd"><h2>Water test</h2><small id="b-tankline"></small></div>
+      <div id="gauges"></div>
+      <p class="hint">Tap a water reading to see what raises or lowers it.</p>
+      <div id="wt-bac"><hr>
+      <div class="cyc"><span>Ammonia eaters</span><div class="t"><i id="cy-a" style="width:0"></i></div><span class="mono" id="cy-av">0%</span></div>
+      <div class="cyc"><span>Nitrite eaters</span><div class="t"><i id="cy-b" style="width:0"></i></div><span class="mono" id="cy-bv">0%</span></div>
+      <p class="hint">Filter bacteria are behind your tank's waste, so ammonia or nitrite can build up. They catch up in a few days if you feed lightly. This disappears once both reach 100%.</p></div>
     </div>
   </div>
 
@@ -401,7 +402,7 @@ th:first-child,td:first-child{text-align:left}
     <div class="chart" id="c1"><h3></h3><div class="ro"></div><svg viewBox="0 0 340 150" role="img" aria-label="Ammonia and nitrite over time"></svg></div>
     <div class="chart" id="c2"><h3></h3><div class="ro"></div><svg viewBox="0 0 340 150" role="img" aria-label="Nitrate over time"></svg></div>
     <div class="chart" id="c3"><h3></h3><div class="ro"></div><svg viewBox="0 0 340 150" role="img" aria-label="Shrimp count over time"></svg></div>
-    <p class="cap">Source: this tank's simulated test kit, one reading per day, last 90 days. Ammonia is total ammonia nitrogen, nitrite as NO₂, nitrate as NO₃.</p>
+    <p class="cap">One test-kit reading a day, last 90 days. Ammonia as total ammonia nitrogen, nitrite as NO₂, nitrate as NO₃.</p>
     <details><summary>Show last 14 days as a table</summary><div class="tblw"><table id="tbl"></table></div></details>
   </div>
 
@@ -425,17 +426,17 @@ th:first-child,td:first-child{text-align:left}
     </details>
   </div>
   <div class="card coll" data-k="rules" id="rulescard"><div class="hd"><h2 id="salesrules-h">Sales rules</h2></div>
-    <div class="ctl"><label for="s-sellAge">Sell older than</label><input type="range" id="s-sellAge" data-x="1" min="45" max="200" step="1"><span class="v" id="v-sellAge"></span></div>
+    <div class="ctl"><label for="s-sellAge">Sell age</label><input type="range" id="s-sellAge" data-x="1" min="45" max="200" step="1"><span class="v" id="v-sellAge"></span></div>
     <p class="hint" id="h-sellAge"></p>
-    <div class="ctl"><label for="s-keep">Keep breeders</label><input type="range" id="s-keep" data-x="1" min="0" max="600" step="1"><span class="v" id="v-keep"></span></div>
+    <div class="ctl"><label for="s-keep">Breeders</label><input type="range" id="s-keep" data-x="1" min="0" max="600" step="1"><span class="v" id="v-keep"></span></div>
     <div class="ctl"><label for="s-cull">Cull below</label><input type="range" id="s-cull" data-x="1" min="0" max="70" step="1"><span class="v" id="v-cull"></span></div>
-    <p class="hint">Shrimp you bought are never sold; they count as breeders. Best-grade adults fill the rest. Culls sell at ¼ price and never breed, which raises grade.</p>
+    <p class="hint">Bought shrimp count as breeders and are never sold; best-grade adults fill the rest. Culls sell at ¼ price and never breed, raising grade.</p>
     <div class="ctl" id="row-maxN"><label for="s-maxN">Pack above</label><input type="range" id="s-maxN" min="20" max="3000" step="10"><span class="v" id="v-maxN"></span></div>
     <p class="hint" id="h-maxN"></p>
     <label class="toggle" id="row-autoSell"><input type="checkbox" id="t-autoSell"> <span id="l-autoSell">Salespeople sell from this tank every day</span></label>
   </div>
   <div class="card" id="excelcard"><div class="hd"><h2>Money over time</h2></div>
-    <p class="sub">You have a rough idea of your cash, but no real bookkeeping. An online Excel course teaches you to track income and spending properly, and unlocks cash charts and the detailed expense table. Basic profit and runway are always visible.</p>
+    <p class="sub">No bookkeeping yet. An online Excel course unlocks cash charts and the expense table.</p>
     <div class="btns"><button class="btn primary" data-act="excel" id="btn-excel">Take the online Excel course · AED 100</button></div></div>
   <div class="card coll" data-k="fin" id="fincard" hidden><div class="hd"><h2>Money over time</h2><small>touch a chart for one day</small></div>
     <div class="chart" id="c4"><h3></h3><div class="ro"></div><svg viewBox="0 0 340 150" role="img" aria-label="Daily income and spending"></svg></div>
@@ -468,7 +469,7 @@ th:first-child,td:first-child{text-align:left}
   </div>
   <div class="card phase-note" id="business-guide"><h2 id="business-title"></h2><p class="sub" id="business-body"></p><p class="hint" id="business-roadmap"></p><div class="btns" id="business-actions"></div></div>
   <div class="card" id="lab-card" hidden><div class="hd"><h2>Breeding laboratory</h2><small id="lab-score"></small></div><p class="sub" id="lab-description"></p><div class="btns"><button class="btn" data-act="lab-certify" id="lab-certify">Certify this colony</button></div></div>
-  <div class="card" id="operations-card" hidden><div class="hd"><h2>Operating controls</h2></div><p class="hint">Cash kept for overhead before making stock. Mothballed farms stop output and upkeep.</p><label for="inventory-days">Warehouse target (days of orders)</label><select id="inventory-days"><option value="3">3 days</option><option value="7">7 days</option><option value="14">14 days</option></select> <label for="reserve-days">Cash reserve (days of overhead)</label><select id="reserve-days"><option value="7">7 days</option><option value="14">14 days</option><option value="30">30 days</option></select><p class="hint" id="operating-plan"></p></div>
+  <div class="card" id="operations-card" hidden><div class="hd"><h2>Operating controls</h2></div><div class="opsrow"><label for="inventory-days">Warehouse stock<small>days of orders</small></label><select id="inventory-days"><option value="3">3 days</option><option value="7">7 days</option><option value="14">14 days</option></select></div><div class="opsrow"><label for="reserve-days">Cash reserve<small>days of overhead, kept before making stock</small></label><select id="reserve-days"><option value="7">7 days</option><option value="14">14 days</option><option value="30">30 days</option></select></div><p class="hint" id="operating-plan"></p></div>
   <div class="card" id="wincard" hidden></div>
   <div class="card coll" data-k="staff" id="c-staff"><div class="hd"><h2>Packing &amp; staff</h2><small id="e-staffsum"></small></div>
     <p class="sub">Build packing capacity as orders grow. Hatcheries supply shrimp; these workers and machines turn them into kits. Wages are charged each day.</p>
@@ -499,7 +500,7 @@ th:first-child,td:first-child{text-align:left}
     <div id="op-desk"></div>
   </div>
   <div class="card coll" data-k="shops" id="c-shops" hidden><div class="hd"><h2>Shops</h2><small id="e-shopsum"></small></div>
-    <p class="sub">Shops add customers, kit orders and a little ✦. First shop needs a trade license (AED 12,000/yr). Rent paid yearly up front. Each extra shop of a type costs 15% more.</p>
+    <p class="sub">More customers, kit orders and a little ✦ · trade license AED 12,000/yr · rent paid yearly · each extra of a type +15%</p>
     <div id="e-shops"></div></div>
   <div class="card coll" data-k="farms" id="c-farms" hidden><div class="hd"><h2>Hatcheries &amp; breeding</h2><small id="e-farmsum"></small></div><div id="e-farms"></div></div>
   <div class="card coll" data-k="reg" id="c-reg" hidden><div class="hd"><h2>Regions</h2><small id="e-regsum"></small></div>
@@ -546,10 +547,10 @@ var HEAT_COST=[0,60,1300];
 var NEW_TANK_COST=[0,150,150], MAX_TANKS=3, MAX_ALL_TANKS=12;
 var BASE_PRICE=5, KIT_REF=250, KIT_COST=100, ELEC=0.30, LICENSE=12000, WORLD=8.2e9, KIT_UNLOCK=60, KIT_SHRIMP=8, DEMAND_BASE=16;
 var PACKS=[
-  {name:'Cherry shrimp ×5',note:'Plain cherry grade, a mix of paler and redder animals.',cost:15,g:35},
-  {name:'Sakura shrimp ×5',note:'Solid red coloring.',cost:35,g:55},
-  {name:'Fire red shrimp ×5',note:'Deep red, strong color all over.',cost:45,g:75},
-  {name:'Painted fire red ×5',note:'Show quality, red right down to the legs.',cost:55,g:92}
+  {name:'Cherry shrimp ×5',note:'Mixed pale and red.',cost:15,g:35},
+  {name:'Sakura shrimp ×5',note:'Solid red.',cost:35,g:55},
+  {name:'Fire red shrimp ×5',note:'Deep red all over.',cost:45,g:75},
+  {name:'Painted fire red ×5',note:'Show quality, red to the legs.',cost:55,g:92}
 ];
 var FOODS=[
   {name:'Algae wafers',g:3,q:1.0,col:0,gh:0,note:'Plain staple food. Nothing fancy, nothing wrong.'},
@@ -562,7 +563,7 @@ var ADS=[
   {id:'shelf',name:'Pet shop shelf',cost:600,days:30,boost:1.5,note:'A tank on the shelf of a local pet shop.'},
   {id:'expo',name:'Aquarium expo booth',cost:900,days:3,boost:9,note:'One busy weekend. Bring plenty of stock.'},
   {id:'yt',name:'Shrimp YouTuber sponsorship',cost:5000,days:30,boost:6,note:'A month of steady attention.'},
-  {id:'web',name:'Online shop',cost:1500,days:0,boost:1,note:'Permanent. Orders arrive from across the country.'},
+  {id:'web',name:'Online shop',cost:1500,days:0,boost:1,note:'Orders arrive from across the country.'},
   {id:'reel',name:'Daily Instagram reel',cost:10,days:1,boost:0.5,note:'One fresh reel of your shrimp every day. Set it to repeat.',req:'social'}
 ];
 var REGIONS=[
@@ -611,10 +612,10 @@ var PROJ=[
   {id:'autopackm',c:'biz',name:'Automatic packaging machine',d:'Takes counted shrimp from the camera, then fills, oxygenates and seals each bag with no hands. Packs up to 20 kits/day without staff; unlocks robotic lines after 300 kits sold.',m:12000,i:0,req:function(G){return pd(G,'aicam')&&G.kits.sold>=100;}},
   {id:'drones',c:'biz',name:'Delivery drone fleet',d:'Drones carry sealed bags from your tanks to customers\' doors. With the camera and packaging machine, AI agents can now take over sales.',m:80000,i:0,req:function(G){return pd(G,'autopackm')&&pd(G,'aiconsult');}},
   {id:'app',c:'biz',name:'Shrimp care app',d:'Push alerts when owners forget their water changes. Kit survival +8%.',m:3e5,i:0,req:function(G){return pd(G,'precycle')&&pd(G,'farmlic');},eff:function(E){E.q+=0.08;}},
-  {id:'factory',c:'biz',name:'Own glass factory',d:'Kit materials cost half again.',m:2e7,i:0,req:function(G){return pd(G,'bulk')&&regOpen(G,'mena');},eff:function(E){E.mat/=2;}},
+  {id:'factory',c:'biz',name:'Own glass factory',d:'Kit materials −50%.',m:2e7,i:0,req:function(G){return pd(G,'bulk')&&regOpen(G,'mena');},eff:function(E){E.mat/=2;}},
   {id:'hotline',c:'biz',name:'24/7 shrimp hotline',d:'Someone always answers, even at 3 am. Kit survival +5%.',m:1e8,i:0,req:function(G){return pd(G,'app')&&regOpen(G,'eu');},eff:function(E){E.q+=0.05;}},
   {id:'ocean',c:'biz',name:'Ocean ranching permit',d:'Unlocks ocean shrimp ranches.',m:1e8,i:0,req:function(G){return pd(G,'farmlic')&&regOpen(G,'eu');}},
-  {id:'recycle',c:'biz',name:'Recycled-bottle tanks',d:'Kit materials cost half again.',m:2e9,i:0,req:function(G){return pd(G,'factory');},eff:function(E){E.mat/=2;}},
+  {id:'recycle',c:'biz',name:'Recycled-bottle tanks',d:'Kit materials −50% again.',m:2e9,i:0,req:function(G){return pd(G,'factory');},eff:function(E){E.mat/=2;}},
   {id:'arco',c:'biz',name:'Shrimp arcology blueprint',d:'Unlocks shrimp arcologies.',m:3e9,i:0,req:function(G){return pd(G,'ocean')&&regOpen(G,'ea');}},
   {id:'brand',c:'biz',name:'Customer stories',d:'Publish real owner success stories. Referrals +0.5 percentage points per owner/day.',m:15000,i:0,req:function(G){return pd(G,'refer')&&G.kits.sold>=1000;},eff:function(E){E.beta+=0.005;}},
   {id:'retention',c:'biz',name:'Customer care team',d:'Replace broad advertising with follow-up care. Survival +2 points and referrals +0.5 points.',m:250000,i:0,req:function(G){return pd(G,'brand')&&G.kits.sold>=10000;},eff:function(E){E.q+=0.02;E.beta+=0.005;}},
@@ -739,7 +740,7 @@ function opinionDay(G){
 function movieCost(n){return Math.round(3e5*Math.pow(2.3,n));}
 function greenlight(G,cut){var E=G.emp,mv=E.movie;if(!pd(G,'studio')||mv.left>0||mv.n>=MOVIES.length)return false;var c=movieCost(mv.n);if(E.inf<c)return false;E.inf-=c;mv.left=30;mv.cut=cut||0;log(G,'Shrimp Pictures greenlit '+MOVIES[mv.n][0]);return true;}
 function pm(G,p){return p.id==='aicam'&&pd(G,'college')?p.m/2:p.m;}
-var GALA={name:'Charity shrimp gala',d:'Rich people dressed in red. Turns money into influence.'};
+var GALA={name:'Charity shrimp gala',d:'Rich people dressed in red. Money into ✦.'};
 function galaCost(G){return Math.round(1000*Math.pow(1.35,G.emp.gala));}
 function galaGain(G){return Math.round(40*Math.pow(1.3,G.emp.gala));}
 
@@ -893,7 +894,7 @@ function buyShop(G,id){var s=null;SHOPS.forEach(function(x){if(x.id===id)s=x;});
   pay(G,c+s.rent*365,'shops');G.emp.shops[id]=(G.emp.shops[id]||0)+1;G.emp.shopStage=Math.max(G.emp.shopStage,SHOPS.indexOf(s));G.emp.leases.push({id:id,due:Math.floor(G.day)+365});
   if(first){var lf=licFee(G);pay(G,lf,'shops');G.emp.lic={due:Math.floor(G.day)+365};log(G,'Trade license issued: AED '+lf+' a year');}
   log(G,'Opened a '+s.name.toLowerCase()+', first year of rent paid');return true;}
-function buyFarm(G,id){var f=null;FARMS.forEach(function(x){if(x.id===id)f=x;});if(!f||!farmOk(G,f))return false;var c=farmCost(G,f);if(G.money<c)return false;if(G.money<c+farmWorkingCapital(G,f))return false;pay(G,c,'equipment');G.emp.farms[id]=(G.emp.farms[id]||0)+1;G.emp.farmStage=Math.max(G.emp.farmStage,FARMS.indexOf(f));G.emp.farmPaid[id]=G.emp.farmPaid[id]||[];G.emp.farmPaid[id].push(c);if(G.labQuality==null)G.labQuality=labCandidate(G);log(G,'Built a '+f.name.toLowerCase());return true;}
+function buyFarm(G,id){var f=null;FARMS.forEach(function(x){if(x.id===id)f=x;});if(!f||!farmOk(G,f))return false;var c=farmCost(G,f);if(G.money<c)return false;if(G.money<c+farmWorkingCapital(G,f))return false;pay(G,c,'equipment');G.emp.farms[id]=(G.emp.farms[id]||0)+1;G.emp.farmStage=Math.max(G.emp.farmStage,FARMS.indexOf(f));G.emp.farmPaid[id]=G.emp.farmPaid[id]||[];G.emp.farmPaid[id].push(c);if(G.labQuality==null)G.labQuality=labCandidate(G);log(G,'Built '+(/^[aeiou]/i.test(f.name)?'an ':'a ')+f.name.toLowerCase());return true;}
 function nextRegion(G){for(var i=0;i<REGIONS.length;i++)if(!regOpen(G,REGIONS[i].id))return REGIONS[i];return null;}
 function buyRegion(G){var r=nextRegion(G);if(!r||(G.kits.sold<100&&G.emp.regions.length<2)||G.money<regionCost(G,r)+capitalReserve(G)||G.emp.inf<r.i)return false;pay(G,regionCost(G,r),'projects');G.emp.inf-=r.i;G.emp.regions.push(r.id);log(G,'Expanded into '+r.name);return true;}
 function projAvail(G){return PROJ.filter(function(p){return !G.emp.proj[p.id]&&p.req(G)&&(projectArea(p)!=='world'||worldOpen(G));});}
@@ -1639,7 +1640,7 @@ function gstate(g,v){
 }
 function gaugeHTML(g){
   var span=g.max-g.min,p=function(v){return clamp((v-g.min)/span*100,0,100).toFixed(1)+'%';};
-  var param=g.scope==='w'?' data-param="'+g.id+'" tabindex="0" role="group" aria-label="'+g.name+' water parameter; hold for causes"':'';
+  var param=g.scope==='w'?' data-param="'+g.id+'" tabindex="0" role="group" aria-label="'+g.name+' water parameter; tap for causes"':'';
   var bg='linear-gradient(90deg,var(--zone-bad) 0,var(--zone-bad) '+p(g.warn[0])+',var(--zone-warn) '+p(g.warn[0])+',var(--zone-warn) '+p(g.ok[0])+
     ',var(--zone-ok) '+p(g.ok[0])+',var(--zone-ok) '+p(g.ok[1])+',var(--zone-warn) '+p(g.ok[1])+',var(--zone-warn) '+p(g.warn[1])+
     ',var(--zone-bad) '+p(g.warn[1])+',var(--zone-bad) 100%)';
@@ -1652,7 +1653,7 @@ function buildGauges(){
   GAUGES.forEach(function(g){if(g.scope==='w')w+=gaugeHTML(g);else f+=gaugeHTML(g);});
   $('gauges').innerHTML=w;$('feedg').innerHTML=f;
   $('vwater').innerHTML=[['no3','NO₃'],['kh','KH'],['gh','GH'],['ph','pH'],['temp','Temp']].map(function(x){
-    return '<div class="wp" id="wp-'+x[0]+'" data-param="'+x[0]+'" tabindex="0" role="group" aria-label="'+x[1]+' water reading; hold for causes"><small>'+x[1]+'</small><b id="wv-'+x[0]+'">0</b></div>';}).join('');
+    return '<div class="wp" id="wp-'+x[0]+'" data-param="'+x[0]+'" tabindex="0" role="group" aria-label="'+x[1]+' water reading; tap for causes"><small>'+x[1]+'</small><b id="wv-'+x[0]+'">0</b></div>';}).join('');
 }
 function updateGauges(){
   var T=TK();
@@ -1675,16 +1676,14 @@ var PARAM_TIPS={
  dens:{name:'Stocking density',up:'Buying or hatching shrimp raises shrimp per liter.',down:'Selling or losing shrimp lowers it; a larger tank also lowers the per-liter density.'}
 };
 function initParameterTooltips(){
- var tip=$('param-tooltip'),timer=null,pending=null,shown=null,x0=0,y0=0;
- function hide(){clearTimeout(timer);timer=null;pending=null;if(shown)shown.removeAttribute('aria-describedby');shown=null;tip.hidden=true;}
- function show(el){var data=PARAM_TIPS[el.dataset.param];if(!data)return;clearTimeout(timer);pending=null;shown=el;tip.textContent='';var head=document.createElement('strong');head.textContent=data.name;tip.appendChild(head);[['Raises',data.up],['Lowers',data.down]].forEach(function(row){var p=document.createElement('p'),b=document.createElement('b');b.textContent=row[0]+': ';p.appendChild(b);p.appendChild(document.createTextNode(row[1]));tip.appendChild(p);});tip.hidden=false;el.setAttribute('aria-describedby','param-tooltip');var r=el.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight,left=clamp(r.left+r.width/2-w/2,8,innerWidth-w-8),top=r.top-h-8;if(top<8)top=Math.min(innerHeight-h-8,r.bottom+8);tip.style.left=Math.round(left)+'px';tip.style.top=Math.round(clamp(top,8,innerHeight-h-8))+'px';}
- document.addEventListener('pointerdown',function(e){var el=e.target.closest('[data-param]');if(shown===el&&el){hide();return;}hide();if(!el||!PARAM_TIPS[el.dataset.param])return;pending=el;x0=e.clientX;y0=e.clientY;timer=setTimeout(function(){show(el);},550);});
- document.addEventListener('pointermove',function(e){if(pending&&Math.hypot(e.clientX-x0,e.clientY-y0)>12){clearTimeout(timer);timer=null;pending=null;}});
- ['pointerup','pointercancel'].forEach(function(n){document.addEventListener(n,function(){clearTimeout(timer);timer=null;pending=null;});});
- document.addEventListener('focusin',function(e){if(e.target.matches('[data-param]:focus-visible'))show(e.target);});
+ var tip=$('param-tooltip'),shown=null;
+ function hide(){if(shown)shown.removeAttribute('aria-describedby');shown=null;tip.hidden=true;}
+ function show(el){var data=PARAM_TIPS[el.dataset.param];if(!data)return;shown=el;tip.textContent='';var head=document.createElement('strong');head.textContent=data.name;tip.appendChild(head);[['Raises',data.up],['Lowers',data.down]].forEach(function(row){var p=document.createElement('p'),b=document.createElement('b');b.textContent=row[0]+': ';p.appendChild(b);p.appendChild(document.createTextNode(row[1]));tip.appendChild(p);});tip.hidden=false;el.setAttribute('aria-describedby','param-tooltip');var r=el.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight,left=clamp(r.left+r.width/2-w/2,8,innerWidth-w-8),top=r.top-h-8;if(top<8)top=Math.min(innerHeight-h-8,r.bottom+8);tip.style.left=Math.round(left)+'px';tip.style.top=Math.round(clamp(top,8,innerHeight-h-8))+'px';}
+ function toggle(el){if(shown===el){hide();return;}hide();if(el&&PARAM_TIPS[el.dataset.param])show(el);}
+ document.addEventListener('click',function(e){toggle(e.target.closest('[data-param]'));});
+ document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-param]')){e.preventDefault();toggle(e.target);}});
  document.addEventListener('focusout',function(e){if(shown===e.target)hide();});
  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&shown)hide();});
- document.addEventListener('contextmenu',function(e){if(shown&&e.target.closest('[data-param]')===shown)e.preventDefault();});
  window.addEventListener('scroll',hide,true);window.addEventListener('resize',hide);
 }
 
@@ -1773,7 +1772,7 @@ function updateVitals(){
   setT('vv-nutr',N<1?'-':Math.round(nv)+'% '+nw);
   $('vm-nutr').className='vm '+ns;$('vb-nutr').style.width=(N<1?0:clamp(nv/160*100,0,100))+'%';
   setT('vv-food',Math.round(c.food)+' mg');
-  setT('tb-feed',N>=1?(T.feeder?'Extra feed · ':'Feed · ')+trim(feedCost(T,T.set.ration/100),2):'Feed');$('tb-feed').title=T.feeder?'The auto feeder already feeds this tank. This adds more on top.':'Feed this tank at your ration';$('tb-feed').disabled=N<1;
+  setT('tb-feed',N>=1?(T.feeder?'Extra feed':'Feed · '+trim(feedCost(T,T.set.ration/100),2)):'Feed');$('tb-feed').title=T.feeder?'The auto feeder already feeds this tank. This adds more on top.':'Feed this tank at your ration';$('tb-feed').disabled=N<1;
   setT('tb-wc','Water '+T.set.wcPct+'%');
   var sa=sellAll(G,true);setT('tb-sell',sa.count>0?'Sell '+sa.count+' · '+aed(sa.revenue):'Sell: none ready');$('tb-sell').disabled=sa.count<=0;
   [['no3'],['kh'],['gh'],['ph'],['temp']].forEach(function(x){
@@ -1891,7 +1890,7 @@ function drawAgeHist(T,histId,titleId,capId){
   o+='<text class="ax" x="'+L+'" y="'+(Tp-3)+'">shrimp</text>';
   $(histId).innerHTML=o;
   setT(titleId,(G.recipe?'Age across all tanks':'Age in '+T.name)+', 10-day bins');
-  setT(capId,'Grey line: adult at 75 d, breeds. Blue line: sell age ('+sa+' d, set in Trade). Blue bars sellable. Breeders and bought shrimp never sold. Touch a bar for its count.');
+  setT(capId,'Grey line: adult (75 d). Blue line: sell age ('+sa+' d, Trade). Blue bars: sellable. Touch a bar for its count.');
 }
 function updateColony(){
   var T=TK(),N=totalN(T),b=0,j=0,a=0,i,k;
@@ -2010,17 +2009,17 @@ function updateTank(){
     $('btn-bottle2').hidden=!(o.bottle&&o.doses<=0);$('btn-scwc').hidden=!(bot&&(stall||(cyc&&(!clear||dirty))));
     $('sc-a').style.width=pa+'%';$('sc-b').style.width=pb+'%';setT('sc-av',pa+'%');setT('sc-bv',pb+'%');}
   if(N>=1){var wl=appetite(T)*0.045/T.vol,no3w=wl*7*4.43,khw=0.4*wl*7,f=T.set.wcPct/100,P0=ppm(T);
-    setT('h-waste','At '+(N/T.vol).toFixed(1)+' shrimp per liter, their waste adds about '+no3w.toFixed(1)+' ppm nitrate and uses about '+khw.toFixed(2)+' KH each week. One '+T.set.wcPct+'% change removes about '+(P0.no3*f).toFixed(1)+' ppm nitrate and puts back about '+Math.max(0,(T.set.remKH-T.chem.kh)*f).toFixed(2)+' KH. More shrimp per liter means faster swings.');}
+    setT('h-waste','Per week at '+(N/T.vol).toFixed(1)+' shrimp/L: nitrate +'+no3w.toFixed(1)+' ppm, KH −'+khw.toFixed(2)+'. One '+T.set.wcPct+'% change: nitrate −'+(P0.no3*f).toFixed(1)+' ppm, KH +'+Math.max(0,(T.set.remKH-T.chem.kh)*f).toFixed(2)+'.');}
   else setT('h-waste','');
-  $('h-wc')&&($('h-wc').textContent='Removes '+Math.round(T.vol*T.set.wcPct/100)+' L and refills at the GH and KH above. Big swings in GH or pH stress shrimp.');
-  $('h-heat')&&($('h-heat').textContent=T.heater===0?'No heater, so the tank follows the room ('+roomT(G,clock(G)).toFixed(1)+' °C now'+(T.fan?', minus 1.5 for the fan':'')+').':T.heater===1?'The heater lifts the tank to this setpoint. It cannot cool. Running this tank costs about '+aed(dailyCost(G,T))+' a day now.':'The chiller holds this setpoint, heating or cooling. Running this tank costs about '+aed(dailyCost(G,T))+' a day now.');
+  $('h-wc')&&($('h-wc').textContent='Swaps '+Math.round(T.vol*T.set.wcPct/100)+' L for new water at this GH and KH. Big swings stress shrimp.');
+  $('h-heat')&&($('h-heat').textContent=T.heater===0?'No heater: tank follows the room ('+roomT(G,clock(G)).toFixed(1)+' °C'+(T.fan?', −1.5 with the fan':'')+').':T.heater===1?'Heater warms to this setpoint; cannot cool. About '+aed(dailyCost(G,T))+'/day.':'Chiller holds this setpoint, heating or cooling. About '+aed(dailyCost(G,T))+'/day.');
   var hotNow=ambient(clock(G))>26.5;if(anyHad()&&hotNow&&!G.ob.hot)G.ob.hot=1;
   var allChill=G.tanks.every(function(t){return t.heater>=2;});
   $('coolrow').hidden=!(G.ac||(!!G.ob.hot||G.opt.all)&&anyHad()&&!allChill);
   if(!$('coolrow').hidden){var rawR=ambient(clock(G)),acDay=AC_KWH*Math.max(0,rawR-AC_SET)*ELEC;
-    setT('h-ac',G.ac?'The room is held at 24 °C. Today that costs about '+aed(acDay)+' in electricity, more at the peak of summer and nothing in winter. Turn it off when the room is cool anyway.':'The room is '+rawR.toFixed(1)+' °C. Running the AC all day would hold it at 24 °C for about '+aed(acDay)+' a day now. No upfront cost, but it adds up over a summer, which is why a chiller pays off later.');
+    setT('h-ac',G.ac?'Room held at 24 °C · about '+aed(acDay)+'/day today. Turn off when the room is cool.':'Room '+rawR.toFixed(1)+' °C. AC holds 24 °C for about '+aed(acDay)+'/day. No upfront cost, but it adds up over a summer.');
     $('btn-ice').hidden=T.heater>=2;
-    setT('h-ice',T.ice>0?'A bottle is melting. About '+Math.ceil(T.ice*24)+' hours left, taking about '+iceDrop(T).toFixed(1)+' °C off this tank.':'A frozen 1.5 L bottle takes about '+iceDrop(T).toFixed(1)+' °C off this '+T.vol+' L tank while it melts, then the heat comes back. An emergency fix, not a plan.'+(T.fan?'':' A cooling fan (AED 60, Upgrades) takes 1.5 °C off for good.'));
+    setT('h-ice',T.ice>0?'Melting · ~'+Math.ceil(T.ice*24)+' h left · −'+iceDrop(T).toFixed(1)+' °C.':'−'+iceDrop(T).toFixed(1)+' °C on this '+T.vol+' L tank while it melts. Emergency only.'+(T.fan?'':' A fan (AED 60, Equipment) takes 1.5 °C off for good.'));
     $('btn-ice').disabled=(T.ice||0)>=1||G.money<1;}
   document.querySelector('[data-act="ammonia"]').disabled=G.money<4;
   $('s-heat').closest('.ctl').hidden=T.heater===0;
@@ -2033,10 +2032,10 @@ function updateTank(){
 function readyStats(G){var n=0,rev=0;G.tanks.forEach(function(t){var r=doSell(G,t,true,1e9);n+=r.normal;rev+=r.revenue;});return {n:n,rev:rev};}
 function updateRules(){
   var T=TK(),N=totalN(T);
-  var sa=Math.max(45,TK().set.sellAge),af=ageFactor(sa);setEmphasisText('h-sellAge','At '+sa+' days a shrimp fetches '+Math.round(af*100)+'% of its top price. Prime is 100 to 180 days. After that, color fades and the price slides to 60% by 300 days. Breeders are never sold.'+(sa<75?' Careful: this is younger than adulthood (75 days), so young shrimp are sold before they can breed, and only the breeders you keep will ever have babies.':''),['Prime is 100 to 180 days','Breeders are never sold','younger than adulthood','before they can breed']);
+  var sa=Math.max(45,TK().set.sellAge),af=ageFactor(sa);setEmphasisText('h-sellAge','At '+sa+' days: '+Math.round(af*100)+'% of top price. Prime is 100 to 180 days; color fades to 60% by 300 days.'+(sa<75?' Younger than adulthood (75 d): sold before they can breed.':''),['Prime is 100 to 180 days','younger than adulthood','before they can breed']);
   setT('salesrules-h',G.recipe?'Sales rules, every tank':'Sales rules, '+TK().name);
   var ex=0;(G.recipe?G.tanks:[T]).forEach(function(t){ex+=Math.max(0,Math.floor(totalN(t)-t.set.maxN));});
-  var tv=G.recipe?G.tanks[G.tanks.length-1].vol:T.vol;var rec='About 3 shrimp per liter keeps breeding fast ('+(3*tv)+' for a '+tv+' L tank). '+(G.recipe?'The limit applies to each tank. ':'');
+  var tv=G.recipe?G.tanks[G.tanks.length-1].vol:T.vol;var rec='~3 shrimp/L keeps breeding fast ('+(3*tv)+' in '+tv+' L). '+(G.recipe?'The limit applies to each tank. ':'');
   setEmphasisText('h-maxN',rec+(!kitsOpen(G)?'Shrimp above this number get packed into kits once kits unlock and you have packers.':!packCap(G)?'Shrimp above this number get packed into kits once you hire packers (Business tab). '+ex+' extra now.':ex>0?ex+' extra shrimp now. Packers turn them into kits each day.':'Below the limit, nothing to pack.'),['packed into kits','hire packers','turn them into kits']);
   $('row-maxN').hidden=!(kitsOpen(G)||G.opt.all);$('h-maxN').hidden=$('row-maxN').hidden;
   var hs=hasSales(G);$('row-autoSell').hidden=!hs;
@@ -2105,7 +2104,7 @@ function updateMarket(){
   var ssig='sh'+safeToStock(G,T)+'|'+Math.round(G.money)+'|'+G.sel+'|'+G.tanks.length+'|'+G.stats.sold+'|'+G.kits.stock+'|'+G.kitPrice+'|'+Math.round(allN(G));
   if(cache.shopsig!==ssig){
     cache.shopsig=ssig;
-    $('shopshrimp').innerHTML=(!T.had&&!safeToStock(G,T)?'<p class="hint">Stocking is paused until this tank is cycled, ammonia and nitrite are clear, nitrate is at most 20 ppm and KH is at least 2. Return to Tank for the next step.</p>':'')+PACKS.map(function(p,i){return '<div class="item"><div><h3>'+p.name+'</h3><p>'+p.note+' Grade about '+p.g+'. Five 90-day-old adults.</p></div><button class="btn" data-act="buy" data-i="'+i+'"'+(G.money<p.cost||(!T.had&&!safeToStock(G,T))?' disabled':'')+'>'+aed(p.cost)+'</button></div>';}).join('');
+    $('shopshrimp').innerHTML=(!T.had&&!safeToStock(G,T)?'<p class="hint">Stocking waits for a cycled tank: ammonia and nitrite 0, nitrate ≤ 20 ppm, KH ≥ 2.</p>':'')+PACKS.map(function(p,i){return '<div class="item"><div><h3>'+p.name+'</h3><p>'+p.note+' Grade ~'+p.g+' · 90-day adults.</p></div><button class="btn" data-act="buy" data-i="'+i+'"'+(G.money<p.cost||(!T.had&&!safeToStock(G,T))?' disabled':'')+'>'+aed(p.cost)+'</button></div>';}).join('');
     var sup='';
     if(G.recipe)sup='<div class="lock">Your standard tanks arrive cycled. New shrimp packs go into the tank with the fewest shrimp.</div>';
     else if(G.tanks.length<2)sup='<div class="lock">Bacteria starter unlocks when you own a second tank. Your first tank has to cycle the slow way.</div>';
@@ -2151,7 +2150,7 @@ function etaTxt(m,i){
   if(m>G.money&&!(G.fin&&G.fin.length))return '';
   var nm=operatingNet(G)||0,ni=rate(G,'_inf',7),dm=m>G.money?(nm>0?(m-G.money)/nm:Infinity):0,di=i>G.emp.inf?(ni>0?(i-G.emp.inf)/ni:Infinity):0,d=Math.max(dm,di);
   if(d<=0)return '';if(!isFinite(d)||d>3000)return '<span class="eta">Not affordable at your current income</span>';
-  return '<span class="eta">Affordable in about '+(d<1?'1 day':Math.ceil(d)+' days')+'</span>';
+  return '<span class="eta">Affordable in about '+(d<1?'1 day':d<60?Math.ceil(d)+' days':d<730?Math.round(d/30)+' months':Math.round(d/365)+' years')+'</span>';
 }
 var PROJ_SHOW=3;
 function shownProj(G,area,c){var E=G.emp,okp=function(p){return G.money>=pm(G,p)&&E.inf>=p.i;};return projAvail(G).filter(function(p){return p.c===c&&projectArea(p)===area;}).sort(function(a,b){return projectRank(G,a)-projectRank(G,b)||(pm(G,a)+a.i)-(pm(G,b)+b.i);}).slice(0,PROJ_SHOW);}
@@ -2206,7 +2205,7 @@ function updateEmpire(){
     var bp=bestKitPrice(G);$('btn-kitprice').textContent='Market price (AED '+bp+')';$('btn-kitprice').disabled=bp===G.kitPrice;
     var spare=spareKitShrimp(G)+(E.rawShrimp||0);setT('e-kithint',spare<KIT_SHRIMP?'Pack needs '+KIT_SHRIMP+' spare shrimp 20+ days old (not breeders or bought). Have '+Math.floor(spare)+'.':G.money<kitMaterials(G)?'Pack needs '+aed(kitMaterials(G))+' for materials.':'');
     var ks=kitStage(G),w=E.kitWip||{mat:0,shrimp:0},stepMode=ks===0||w.mat||w.shrimp;
-    var mg=G.kitPrice/(G.vat?1.05:1)-productionUnitCost(G);setT('kit-margin',ks?'Profit per kit '+(mg<0?'−':'')+aed(Math.abs(mg))+' · about '+(dem<10?trim(dem,1):big(dem))+' orders a day at this price':'');$('kit-margin').style.color=mg<0?'var(--bad)':'';
+    var mg=G.kitPrice/(G.vat?1.05:1)-productionUnitCost(G);setT('kit-margin',ks?(mg<0?'Loss ':'Profit ')+aed(Math.abs(mg))+'/kit · ~'+(dem<10?trim(dem,1):big(dem))+' orders/day at this price':'');$('kit-margin').style.color=mg<0?'var(--bad)':'';
     $('kit-steps').hidden=!stepMode;$('kit-sub').hidden=ks===0;$('kit-pricerow').hidden=ks===0;$('e-kv').hidden=ks===0;$('btn-pack1').hidden=stepMode;$('btn-pack10').hidden=ks<2;$('btn-kitprice').hidden=ks<2;
     if(ks<2){var kv1=[['Orders/day',dem<10?trim(dem,1):big(dem)],['In stock',big(G.kits.stock)],['Owners',big(Math.floor(G.humans))]];var h1=kv1.map(function(x){return '<span>'+x[0]+'</span><span>'+x[1]+'</span>';}).join('');if(cache.ekv!==h1){cache.ekv=h1;$('e-kv').innerHTML=h1;}}
     if(stepMode){var st3=function(done,label,act,ok,note){return '<div class="kstep'+(done?' done':'')+'"><span>'+(done?'✓':'')+'</span><div><b>'+label+'</b><small>'+note+'</small></div>'+(done?'':'<button class="btn'+(ok?' primary':'')+'" data-act="kitstep" data-s="'+act+'"'+(ok?'':' disabled')+'>'+({mat:'Buy',catch:'Catch',pack:'Pack'}[act])+'</button>')+'</div>';};
@@ -2221,10 +2220,10 @@ function updateEmpire(){
     cache.estaff=stsig;var h='';
     var row=function(role,desc){var n=st[role];return itemHTML(STAFF[role].pl+(n?' ×'+n:''),desc+' '+aed(STAFF[role].pay)+' a day each. '+payrollPreview(G,role),'<div class="hb">'+bbtn('hire','data-role="'+role+'" data-d="-1" aria-label="Let one go"','−',n>0)+bbtn('hire','data-role="'+role+'" data-d="1"','+ Hire',(role!=='pack'||st.tier>0)&&G.money>=corporateTaxReserve(G)+Math.max(7*STAFF[role].pay,7*fixedOverhead(G)+7*STAFF[role].pay),true)+'</div>');};
     if(activeTab==='promote'&&st.aiSales)h+=itemHTML('AI sales agents','Sell every day from every tank. Customers +100%, like four salespeople. About '+aed(Math.min(300,1+0.00005*E.soldToday))+'/day in tokens.','<button class="btn" disabled>Running</button>');
-    else if(activeTab==='promote'&&(G.kits.sold>=30||st.sales))h+=row('sales','Sells shrimp from your tanks every day and brings shrimp and kit customers: +25% each, up to 4.');
+    else if(activeTab==='promote'&&(G.kits.sold>=30||st.sales))h+=row('sales','Sells tank shrimp daily. +25% shrimp and kit customers each, up to 4.');
     if(activeTab==='emp'&&!st.tier)h+=itemHTML('Packing bench',PACK_TIERS[1].note+' You operate it yourself: 1 kit/day, no payroll. Hiring packers is optional.',bbtn('packtier','',aed(PACK_TIERS[1].m),G.money>=PACK_TIERS[1].m&&kitsOpen(G),true));
     else if(activeTab==='emp'){
-      if(G.kits.sold>=10||st.pack)h+=row('pack','Packs hatchery shrimp and protected tank surplus: about '+(PACK_TIERS[st.tier].per*(pd(G,'aicam')?2:1))+' kits a day each with your '+PACK_TIERS[st.tier].name.toLowerCase()+(pd(G,'aicam')?' and AI camera':'')+'.');
+      if(G.kits.sold>=10||st.pack)h+=row('pack','About '+(PACK_TIERS[st.tier].per*(pd(G,'aicam')?2:1))+' kits/day each with your '+PACK_TIERS[st.tier].name.toLowerCase()+(pd(G,'aicam')?' and AI camera':'')+'.');
       var nt=PACK_TIERS[st.tier+1];if(nt&&G.kits.sold>=20)h+=itemHTML(nt.name,nt.note,bbtn('packtier','',cost2(nt.m,nt.i),G.money>=nt.m+capitalReserve(G)&&E.inf>=nt.i,true));
     }
     if(activeTab==='emp'&&packingMachineCap(G)>=400&&!st.pack)h='<details><summary>Earlier manual packing tools</summary>'+h+'</details>';
@@ -2236,11 +2235,11 @@ function updateEmpire(){
       if(!st.aiMgr)h+=itemHTML('Replace shop managers with AI agents','Every shop managed, at a token bill that grows with the number of shops. One-time setup.',bbtn('ai','data-role="mgr"',aed(20000),G.money>=20000,true));
 
     }
-    if(activeTab==='emp'&&pd(G,'autopackm')&&!PACK_LINES.some(function(l,i){return lineCount(G,i)>0;}))h+=itemHTML('Automatic packaging machine','20 kits/day, no staff. Let packers go yourself.','<button class="btn" disabled>Running</button>');
+    if(activeTab==='emp'&&pd(G,'autopackm')&&!PACK_LINES.some(function(l,i){return lineCount(G,i)>0;}))h+=itemHTML('Automatic packaging machine','20 kits/day, no staff. Packers now optional.','<button class="btn" disabled>Running</button>');
     var topLine=-1;PACK_LINES.forEach(function(l,i){if(lineCount(G,i))topLine=i;});PACK_LINES.forEach(function(l,i){if(activeTab!=='emp'||!lineReady(G,i)||(!E.showEarlierPacking&&i<topLine))return;h+=itemHTML(l.name+(lineCount(G,i)?' ×'+lineCount(G,i):''),'Packs '+big(l.out)+' kits/day from '+big(l.out*KIT_SHRIMP)+' shrimp. Upkeep '+aed(l.up)+'/day. No packing wages. '+purchaseForecast(G,lineCost(G,i),0,l.out,l.up),bbtn('line','data-tier="'+i+'"',aed(lineCost(G,i)),G.money>=lineCost(G,i)+capitalReserve(G)+7*l.up,true));});
     if(activeTab==='emp'&&E.legacyPacking)h+='<p class="hint">Existing-save packing: '+big(E.legacyPacking)+' kits/day. Your old farms retain their matching packing capacity; new farms need separate equipment.</p>';
     if(activeTab==='emp'&&topLine>0)h+='<button class="btn" data-act="earlier-packing">'+(E.showEarlierPacking?'Hide earlier packing lines':'Show earlier packing lines')+'</button>';
-    var nextLine=PACK_LINES[Math.min(PACK_LINES.length-1,topLine+1)];if(activeTab==='emp')h+='<p class="hint">Next: '+(E.legacyPacking&&!st.tier?'Legacy packing covers existing farms; add modern machinery only for extra capacity':!st.tier?'packing bench':st.tier<2?'sealer after 20 kits sold':!pd(G,'aicam')?'counting camera after 30 kits sold':!pd(G,'autopackm')?'automatic packaging after 100 kits sold':topLine===PACK_LINES.length-1?'Global packing installed':nextLine.name+' after '+big(nextLine.sold)+' kits sold, supply of '+big(nextLine.supply)+' kits worth/day'+(topLine<0?'':' and the preceding packing line'))+'.</p>';
+    var nextLine=PACK_LINES[Math.min(PACK_LINES.length-1,topLine+1)];if(activeTab==='emp')h+='<p class="hint">Next: '+(E.legacyPacking&&!st.tier?'Legacy packing covers existing farms; add modern machinery only for extra capacity':!st.tier?'packing bench':st.tier<2?'sealer after 20 kits sold':!pd(G,'aicam')?'counting camera after 30 kits sold':!pd(G,'autopackm')?'automatic packaging after 100 kits sold':topLine===PACK_LINES.length-1?'every packing line built':nextLine.name+' · needs '+big(nextLine.sold)+' kits sold, shrimp for '+big(nextLine.supply)+' kits/day'+(topLine<0?'':', previous line built'))+'.</p>';
     $('e-staff').innerHTML=h;
     var packingPayroll=st.pack*STAFF.pack.pay+(E.legacyPacking||0)*.05;PACK_LINES.forEach(function(l,i){packingPayroll+=lineCount(G,i)*l.up;});var shownPayroll=activeTab==='promote'?staffCost(G)-packingPayroll:packingPayroll;setT('e-staffsum',shownPayroll>0?aed(shownPayroll)+' a day':'');
   }
@@ -2273,7 +2272,7 @@ function updateEmpire(){
           mv.left>0?'<button class="btn" disabled>'+mv.left+' d left</button>':'<div class="hb" style="flex-direction:column;grid-column:1/-1">'+CUTS[mv.n].map(function(c,k){return bbtn('movie','data-cut="'+k+'" title="'+c[0]+'"',c[0]+' · '+inf(mc),E.inf>=mc,!k);}).join('')+'</div>');
         if(mv.left===0)html=html.replace(/<\/p><\/div>(<div class="hb" style="flex-direction:column">)/,'<span class="eta" style="color:var(--ink-2)">Pick the main message. A: '+CUTS[mv.n][0][0]+'. B: '+CUTS[mv.n][1][0]+'.</span></p></div>$1');}
     }
-    if(G.kits.sold>=100&&activeTab==='world')html+=itemHTML(GALA.name+(E.gala?' #'+(E.gala+1):''),GALA.d+' Gives '+inf(galaGain(G))+'. '+aed(galaCost(G)/galaGain(G))+' per influence. Each gala costs 35% more.',bbtn('proj','data-id="gala"',aed(galaCost(G)),G.money>=galaCost(G)+capitalReserve(G)));
+    if(G.kits.sold>=100&&activeTab==='world')html+=itemHTML(GALA.name+(E.gala?' #'+(E.gala+1):''),GALA.d+' Gives '+inf(galaGain(G))+' ('+aed(galaCost(G)/galaGain(G))+' per ✦). Each gala +35%.',bbtn('proj','data-id="gala"',aed(galaCost(G)),G.money>=galaCost(G)+capitalReserve(G)));
     $('e-proj').innerHTML=html||'';
     var done=PROJ.filter(function(p){return E.proj[p.id]&&projectArea(p)===activeTab;});$('c-proj').dataset.empty=html?'':'1';
     setT('e-donesum','Completed projects ('+done.length+' of '+PROJ.length+')');
@@ -2300,7 +2299,7 @@ function updateEmpire(){
       $('e-farms').innerHTML='<p class="sub">8 shrimp = 1 kit · AED 12 breeding/kit · idle farms still pay upkeep · each +9%</p>'+FARMS.map(function(x){
         var n=E.farms[x.id]||0;up+=activeFarms(G,x.id)*x.up;var title=x.name+(n?' ×'+n:'');
         if(!farmOk(G,x))return '';var ix=FARMS.indexOf(x);if(!E.showEarlierFarms&&ix!==Math.max(0,ownedTier)&&ix!==ownedTier+1)return '';
-        var wc=farmWorkingCapital(G,x),short=G.money>=farmCost(G,x)&&G.money<farmCost(G,x)+wc;return itemHTML(title,x.note+' '+big(x.out*KIT_SHRIMP)+' shrimp/day = '+big(x.out)+' kits. Upkeep '+aed(x.up)+'/day.'+(n?' '+activeFarms(G,x.id)+' of '+n+' running.':'')+(short?' Keep '+aed(wc)+' in reserve to buy.':''),bbtn('farm','data-id="'+x.id+'"',aed(farmCost(G,x)),G.money>=farmCost(G,x)+farmWorkingCapital(G,x),true),(consultHas(G,'fix')?'<p class="impact">After purchase and reserve: '+aed(G.money-farmCost(G,x)-wc)+'. '+purchaseForecast(G,farmCost(G,x),x.out,0,x.up)+'</p>':'')+(n?'<div class="mini">'+bbtn('farm-pause','data-id="'+x.id+'"','Mothball',activeFarms(G,x.id)>0)+(((E.pausedFarms||{})[x.id]||0)>0?bbtn('farm-resume','data-id="'+x.id+'"','Restart',G.money>=wc):'')+bbtn('farm-sell','data-id="'+x.id+'"','Sell '+aed(farmSalvage(G,x)),true)+'</div>':''));
+        var wc=farmWorkingCapital(G,x),short=G.money>=farmCost(G,x)&&G.money<farmCost(G,x)+wc;return itemHTML(title,x.note+' '+big(x.out*KIT_SHRIMP)+' shrimp/day = '+big(x.out)+(x.out===1?' kit':' kits')+'. Upkeep '+aed(x.up)+'/day.'+(n?' '+activeFarms(G,x.id)+' of '+n+' running.':'')+(short?' Keep '+aed(wc)+' in reserve to buy.':''),bbtn('farm','data-id="'+x.id+'"',aed(farmCost(G,x)),G.money>=farmCost(G,x)+farmWorkingCapital(G,x),true),(consultHas(G,'fix')?'<p class="impact">After purchase and reserve: '+aed(G.money-farmCost(G,x)-wc)+'. '+purchaseForecast(G,farmCost(G,x),x.out,0,x.up)+'</p>':'')+(n?'<div class="mini">'+bbtn('farm-pause','data-id="'+x.id+'"','Mothball',activeFarms(G,x.id)>0)+(((E.pausedFarms||{})[x.id]||0)>0?bbtn('farm-resume','data-id="'+x.id+'"','Restart',G.money>=wc):'')+bbtn('farm-sell','data-id="'+x.id+'"','Sell '+aed(farmSalvage(G,x)),true)+'</div>':''));
       }).join('');
       $('e-farms').innerHTML+='<button class="btn" data-act="earlier-farms">'+(E.showEarlierFarms?'Hide earlier & future farm tiers':'Show earlier & future farm tiers')+'</button>';
       setT('e-farmsum',up?'upkeep '+aed(up)+' a day':'');
@@ -2428,7 +2427,7 @@ function renderChapters(){
  }
  var target=$('space-card'),s='<div class="hd"><h2>A dream beyond Earth</h2></div>';
  if(!S.started){s+='<blockquote class="grandpa-letter">“Last night I dreamed the shrimp were looking up at the stars,” Grandpa says. “They wondered what the water was like out there. Shall we find out together?”</blockquote><p>The new chapter opens at ten years. Earth adoption and research continue alongside exploration. Earth does not need to be complete.</p>';
- if(G.emp.won&&!spaceOpen(G))s+='<p>You completed Earth early. You can explicitly skip the quiet years to the ten-year reunion; cash and completed Earth progress are preserved.</p>';
+ if(G.emp.won&&!spaceOpen(G))s+='<p>Earth done early. Skip ahead to the ten-year reunion; cash and progress are kept.</p>';
  s+=chapterButton('space-dream',spaceOpen(G)?'Hear Grandpa’s new dream':'Reunite at ten years',spaceOpen(G)||!!G.emp.won);
  }else{
  s+='<p>Earth: '+(G.emp.won?'dream achieved.':'still growing · '+big(G.humans)+' keepers.')+'</p><p>Knowledge '+Math.floor(A.knowledge)+' · crew '+Math.floor(A.crew)+'. Habitats run on food, water and power; no cash upkeep.</p>';
@@ -2467,7 +2466,7 @@ function selectTab(tab){
   ['tank','up','market','promote','emp','world','space'].forEach(function(t){$('p-'+t).hidden=t!==tab;});
 }
 function adImpact(G,boost){if(!consultHas(G,'fix'))return '';var extra=boost;if(kitsOpen(G)){var K=kitCap(G),room=Math.max(0,K-G.humans);var added=K?0.25*extra*(1+salesBoost(G))*Math.max(room/K,0.03)*Math.pow(KIT_REF/G.kitPrice,2):0;return 'Estimated extra kit orders: '+added.toFixed(2)+'/day at this price. Referrals and stock limits are separate.';}return 'Estimated extra shrimp customers: '+Math.round(baseDemand(G)*extra*G.market.m*Math.pow(G.price,-2))+'/week at this price. Does not increase shrimp supply.';}
-function campaignHint(m){var w=m.e.w||0,f=m.e.f||0;return (w>f?'Likely to appeal more to Water: science and new ideas.':f>w?'Likely to appeal more to Fire: family and tradition.':'A broad message for both audiences.')+(m.risk?' A disputed claim: backlash is possible.':'')+(m.rep?' Repeating a message has diminishing effects.':'');}
+function campaignHint(m){var w=m.e.w||0,f=m.e.f||0;return (w>f?'Likely to appeal more to Water: science and new ideas.':f>w?'Likely to appeal more to Fire: family and tradition.':'A broad message for both audiences.')+(m.risk?' A disputed claim: backlash is possible.':'')+(m.rep?' Repeats work less.':'');}
 function campaignRecap(G){var r=G.emp.op.recap;if(!r)return '';var delta=function(n){return(n>=0?'+':'')+Math.round(n*100)+' points';};var ch=[];if(Math.round(r.w*100))ch.push('Water '+delta(r.w));if(Math.round(r.f*100))ch.push('Fire '+delta(r.f));return '<div class="phase-note" style="padding:10px"><h3>Last campaign: '+r.title+'</h3><p>'+(ch.length?ch.join(' · ')+' · overall '+delta(r.appeal):'No change in interest')+(r.backlash?'. A backlash followed for five days.':'.')+'</p></div>';}
 function projectImpact(G,p){if(!consultHas(G,'fix'))return '';
   if(p.id==='farmlic')return 'Next role: breeding at scale. Grow racks start at AED 2,000 plus working capital.';

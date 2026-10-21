@@ -19,8 +19,10 @@ if(html.includes('data-act="milestone-continue"')||!html.includes('Next step (pa
 console.log('PASS milestones use one paused next-step action and instructional text can emphasize key terms');
 const tooltipMap=html.split('var PARAM_TIPS={')[1].split('};\nfunction initParameterTooltips')[0];
 for(const id of ['nh','no2','no3','ph','kh','gh','temp','dens'])if(!tooltipMap.includes(id+':{name:'))throw Error('Missing cause tooltip for water parameter '+id);
-if(!html.includes("addEventListener('pointerdown'")||!html.includes('Press and hold a water reading'))throw Error('Water tooltips must be discoverable through press and hold');
-console.log('PASS all water readings explain what raises and lowers them on press and hold');
+if(!html.includes("addEventListener('click'")||!html.includes("e.key==='Enter'||e.key===' '")||!html.includes('Tap a water reading to see what raises or lowers it.'))throw Error('Water tooltips must open on tap and keyboard activation');
+console.log('PASS all water readings explain what raises and lowers them on tap and keyboard activation');
+if(html.indexOf('id="wccard"')>html.indexOf('id="wtcard"'))throw Error('Water care should appear before the water test');
+console.log('PASS water care appears before the water test');
 if(!html.includes("$('vwater').innerHTML=[['no3','NO₃'],['kh','KH'],['gh','GH'],['ph','pH'],['temp','Temp']]"))throw Error('Top readings should show nitrate, KH, GH, pH and temperature in order');
 console.log('PASS top readings show NO₃, KH, GH, pH and temperature');
 const goalRowStart=html.indexOf('<div class="goalrow">'),dreamSummary=html.indexOf('id="dream-tracker"'),nextHeaderRow=html.indexOf('<div class="chips" id="tankchips"');
