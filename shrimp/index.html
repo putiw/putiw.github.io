@@ -40,8 +40,10 @@ button{font:inherit;color:inherit}
 .brand{padding:6px 0 2px;gap:8px}
 .brand h1{font-size:16px;white-space:nowrap}
 .date{flex:1;min-width:0;font:400 11.5px var(--font-data);color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.goalrow{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-2);margin-top:3px;white-space:nowrap;overflow:hidden}
-.goalrow .goal-bar{flex:0 0 60px}
+.goalrow{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-2);margin-top:3px;white-space:nowrap;overflow:visible}
+.goalrow .goal-bar{flex:0 0 48px}
+#b-goal{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+#b-goal-short{display:none}
 .r1{flex-wrap:nowrap}
 .cash small{font-size:11px;margin-left:5px}
 #b-inf{font-size:11.5px;color:var(--s4);flex:0 0 auto}
@@ -89,13 +91,18 @@ button{font:inherit;color:inherit}
 .wp small{display:block;font-size:10px;letter-spacing:.03em}
 .wp b{font:500 12px var(--font-data)}
 .wp.ok b{color:var(--good)} .wp.warn{border-color:var(--warn)} .wp.warn b{color:var(--warn)} .wp.bad{border-color:var(--bad)} .wp.bad b{color:var(--bad)}
+.wp[data-param],.g[data-param]{cursor:help;touch-action:pan-y}
+.g[data-param]:focus-visible,.wp[data-param]:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.param-tooltip{position:fixed;z-index:20;width:max-content;max-width:min(340px,calc(100vw - 24px));max-height:42vh;overflow:auto;padding:10px 12px;border:1px solid var(--accent);border-radius:10px;background:var(--surface);color:var(--ink);box-shadow:0 8px 24px rgba(15,36,34,.22);font-size:13px;line-height:1.45;pointer-events:none}
+.param-tooltip[hidden]{display:none!important}.param-tooltip strong{display:block;font-size:14px;margin-bottom:4px}.param-tooltip p{margin:2px 0}.param-tooltip b{font-weight:700}
 
 main{padding-top:8px}
 .panel[hidden]{display:none!important}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:10px 12px;margin-bottom:8px}
 .card .hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px}
-.card .sub{color:var(--ink-2);font-size:12.5px;margin-bottom:6px}
-.hint{font-size:11.5px;color:var(--ink-3);margin:2px 0 0}
+.card .sub{color:var(--ink-2);font-size:14px;line-height:1.45;margin-bottom:6px}
+.hint{font-size:12.5px;line-height:1.4;color:var(--ink-2);margin:3px 0 0}
+.sub strong,.hint strong,.cap strong{font-weight:700;color:var(--ink)}
 hr{border:0;border-top:1px solid var(--line);margin:8px 0}
 .two{display:grid;gap:8px}
 @media (min-width:660px){.two{grid-template-columns:1fr 1fr;align-items:start}.two>.card{margin-bottom:0}}
@@ -173,7 +180,7 @@ hr{border:0;border-top:1px solid var(--line);margin:8px 0}
 .chart svg{display:block;width:100%;height:auto;touch-action:pan-y}
 .ax{font:400 10px var(--font-data);fill:var(--ink-3)}
 .lab{font:500 10px var(--font-body);fill:var(--ink-2)}
-.cap{font-size:11px;color:var(--ink-3);margin-top:2px}
+.cap{font-size:12px;line-height:1.35;color:var(--ink-2);margin-top:3px}
 details{margin-top:6px}
 summary{cursor:pointer;font-size:12.5px;color:var(--ink-2);min-height:28px}
 .tblw{overflow-x:auto}
@@ -236,7 +243,7 @@ th:first-child,td:first-child{text-align:left}
 .business-strip small,.business-strip b{display:block}.business-strip small{font-size:11px;color:var(--ink-2)}
 .business-strip b{font:500 13px var(--font-data);overflow-wrap:anywhere}
 .business-context .astrip{height:auto;min-height:30px;font-size:12px;line-height:1.4;padding:6px 8px}
-.phase-note{border-left:4px solid var(--accent)}.phase-note h2{font-size:17px}.phase-note .sub{margin:8px 0}
+.phase-note{border-left:4px solid var(--accent)}.phase-note h2{font-size:17px}.phase-note .sub{font-size:14.5px;line-height:1.5;margin:8px 0}
 .goal-summary{list-style:none;display:flex;align-items:baseline;flex-wrap:wrap;gap:3px 8px;color:var(--ink);font-size:15px}
 .goal-summary::-webkit-details-marker{display:none}.goal-summary:after{content:'Show details +';margin-left:auto;color:var(--ink-3);font-size:11px;font-weight:400}
 #next-card[open]>.goal-summary:after{content:'Hide details −'}
@@ -245,10 +252,11 @@ th:first-child,td:first-child{text-align:left}
 .biznav [aria-pressed=true]{background:var(--ink);color:var(--bg)}
 .item>.btns,.item>.impact,.item>.hb{grid-column:1/-1}
 .impact{display:block;margin-top:5px;font-size:12px;color:var(--ink-2)}
-.dream-tracker{margin-top:6px;font-size:12px;border-top:1px solid var(--line);padding-top:5px}
-.dream-tracker>summary{cursor:pointer;display:flex;align-items:baseline;justify-content:space-between;gap:8px;list-style:revert}
+.dream-tracker{position:static;flex:0 0 auto;margin:0;font-size:11px;border:0;padding:0}
+.dream-tracker>summary{cursor:pointer;display:flex;align-items:baseline;gap:4px;list-style:revert;white-space:nowrap;min-height:24px;padding:0;max-width:175px;overflow:hidden}
+.dream-tracker>summary>span{overflow:hidden;text-overflow:ellipsis;min-width:0}
 .dream-tracker>summary>span::before{content:'▸ ';color:var(--ink-3)}.dream-tracker[open]>summary>span::before{content:'▾ '}
-.dream-tracker small{color:var(--good);text-align:right}.dream-inner{max-height:45vh;overflow:auto;padding:8px 2px 4px;white-space:normal}
+.dream-tracker small{color:var(--good);text-align:right;overflow:hidden;text-overflow:ellipsis;max-width:90px}.dream-inner{position:absolute;top:100%;left:0;right:0;z-index:11;max-height:45vh;overflow:auto;padding:8px 12px 12px;white-space:normal;background:var(--surface);border:1px solid var(--line);border-radius:0 0 11px 11px;box-shadow:0 8px 20px rgba(15,36,34,.16)}
 .dream-inner h3{margin:10px 0 5px}.dream-inner details{border-top:1px solid var(--line);padding:6px 0}.dream-inner details p{white-space:pre-line;margin-top:5px}
 .grandpa-letter{margin:10px 0;padding:10px 12px;background:var(--surface-2);border-left:3px solid var(--accent);font-size:13px;white-space:pre-line}
 #milestone-body{white-space:pre-line}body.story-intro .top,body.story-intro .tabs{display:none!important}
@@ -258,6 +266,7 @@ th:first-child,td:first-child{text-align:left}
 .btn,.stp{touch-action:manipulation}.ctl .stp{min-height:36px}
 @media(max-width:480px){.business-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.tabs button{font-size:11px;padding:10px 3px}.btns{flex-wrap:wrap}.item{grid-template-columns:minmax(0,1fr) auto}.ctl{grid-template-columns:82px 30px minmax(0,1fr) 30px 58px}.brand{flex-wrap:wrap}.business-strip b{font-size:12px}.business-strip div:nth-child(n+4){display:none}}
 @media(max-width:480px){#academy-card .item,#space-card .item{grid-template-columns:1fr}#world-mode .btns{display:flex;flex-wrap:wrap}#world-mode .btn{flex:1;white-space:normal}#p-space .btn{white-space:normal}}
+@media(max-width:520px){.goalrow{gap:4px}.goalrow .goal-bar{flex-basis:36px}#b-goal-wide{display:none}#b-goal-short{display:inline}.dream-tracker>summary{max-width:132px}.dream-tracker small{max-width:38px}}
 </style>
 </head>
 <body>
@@ -272,8 +281,7 @@ th:first-child,td:first-child{text-align:left}
       <span class="clock" id="b-day">D0</span><button data-speed="0" aria-label="Pause">❚❚</button><button data-speed="1">1×</button><button data-speed="4">4×</button><button data-speed="12">12×</button><button data-speed="40" id="sp40">40×</button>
     </div>
   </div>
-  <div class="goalrow"><div class="goal-bar"><i id="b-goalbar" style="width:0"></i></div><span id="b-goal" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis"></span><span id="b-inf" class="mono" title="Influence"></span><button class="fold" id="fold" aria-expanded="true">readings ▴</button></div>
-  <details class="dream-tracker" id="dream-tracker"><summary><span id="dream-year"></span><small id="dream-badge"></small></summary><div class="dream-inner"><p>A tank for everyone. Ten years to try.</p><p class="hint" id="dream-time"></p><p class="hint" id="dream-progress"></p><p class="hint">The tenth year is a celebration. You can keep growing the dream afterward.</p><p class="hint">Opening this journal pauses time. Resume whenever you’re ready.</p><h3>Letters from Grandpa</h3><div id="dream-letters"></div></div></details>
+  <div class="goalrow"><div class="goal-bar"><i id="b-goalbar" style="width:0"></i></div><span id="b-goal"><span id="b-goal-wide"></span><span id="b-goal-short"></span></span><details class="dream-tracker" id="dream-tracker"><summary><span id="dream-year"></span><small id="dream-badge"></small></summary><div class="dream-inner"><p>A tank for everyone. Ten years to try.</p><p class="hint" id="dream-time"></p><p class="hint" id="dream-progress"></p><p class="hint">The tenth year is a celebration. You can keep growing the dream afterward.</p><p class="hint">Opening this journal pauses time. Resume whenever you’re ready.</p><h3>Letters from Grandpa</h3><div id="dream-letters"></div></div></details><span id="b-inf" class="mono" title="Influence"></span><button class="fold" id="fold" aria-expanded="true">readings ▴</button></div>
   <div class="chips" id="tankchips" hidden></div>
   <div class="vitals" id="vitals">
     <div class="vn"><b class="mono" id="vt-n">0</b><small>shrimp</small></div>
@@ -310,7 +318,7 @@ th:first-child,td:first-child{text-align:left}
   </div>
   <div class="card" id="startcard">
     <div class="hd"><h2 id="sc-title">New tank: cycle it first</h2></div>
-    <p class="sub" id="sc-text">A new tank has no filter bacteria, so waste has nowhere to go and shrimp added now will mostly die. Add ammonia to feed the bacteria. One group eats ammonia and makes nitrite, a second eats nitrite and makes nitrate. Add more only when ammonia drops near zero, until both bars reach 100% and ammonia and nitrite read zero. That takes three to four weeks. Too much ammonia burns through KH; when KH hits zero the pH falls and the cycle stalls, and a water change fixes it.</p>
+    <p class="sub" id="sc-text">A new tank has <strong>no filter bacteria</strong>, so waste has nowhere to go and shrimp added now will mostly die. Add ammonia to feed the bacteria. One group eats ammonia and makes nitrite, a second eats nitrite and makes nitrate. <strong>Add more only when ammonia drops near zero</strong>, until <strong>both bacteria bars reach 100% and ammonia and nitrite read zero</strong>. That takes three to four weeks. Too much ammonia burns through KH; <strong>when KH hits zero the pH falls and the cycle stalls. A water change fixes it.</strong></p>
     <div class="btns" id="sc-buy"><button class="btn primary" data-act="testkit" id="btn-kit">Buy a liquid test kit<small>AED 120 · ammonia, nitrite, nitrate, pH, KH</small></button><button class="btn primary" data-act="bottle" id="btn-bottle" hidden>Buy a bottle of ammonia<small>AED 40 · 10 doses</small></button></div>
     <div class="water" id="sc-water" hidden><div class="wp" id="scp-nh"><small>Ammonia</small><b id="scv-nh">0</b></div><div class="wp" id="scp-no2"><small>Nitrite</small><b id="scv-no2">0</b></div><div class="wp" id="scp-no3"><small>Nitrate</small><b id="scv-no3">0</b></div><div class="wp" id="scp-ph"><small>pH</small><b id="scv-ph">0</b></div><div class="wp" id="scp-kh"><small>KH</small><b id="scv-kh">0</b></div></div>
     <div id="sc-bars" hidden>
@@ -339,6 +347,7 @@ th:first-child,td:first-child{text-align:left}
     <div class="card" id="wtcard">
       <div class="hd"><h2>Water test</h2><small id="b-tankline"></small></div>
       <div id="gauges"></div>
+      <p class="hint">Press and hold a water reading to see what raises or lowers it.</p>
       <div id="wt-bac"><hr>
       <div class="cyc"><span>Ammonia eaters</span><div class="t"><i id="cy-a" style="width:0"></i></div><span class="mono" id="cy-av">0%</span></div>
       <div class="cyc"><span>Nitrite eaters</span><div class="t"><i id="cy-b" style="width:0"></i></div><span class="mono" id="cy-bv">0%</span></div>
@@ -462,7 +471,7 @@ th:first-child,td:first-child{text-align:left}
     <div class="lock" id="e-kitlock"></div>
     <div id="e-kitbody">
       <div id="kit-steps" hidden></div>
-      <p class="sub" id="kit-sub">Kit = small tank + food + 8 young shrimp. Living kits count toward the goal, bring referrals and ✦. Dead kits cost ✦. Breeders and shrimp you bought are never packed.</p>
+      <p class="sub" id="kit-sub">Kit = small tank + food + <strong>8 young shrimp</strong>. <strong>Living kits count toward the goal</strong>, bring referrals and ✦. <strong>Dead kits cost ✦.</strong> <strong>Breeders and shrimp you bought are never packed.</strong></p>
       <div class="ctl" id="kit-pricerow"><label for="s-kitPrice">Kit price</label><input type="range" id="s-kitPrice" min="100" max="600" step="10"><span class="v" id="v-kitPrice"></span></div>
       <div class="kv" id="e-kv"></div>
       <p class="hint" id="e-kithint"></p>
@@ -509,7 +518,7 @@ th:first-child,td:first-child{text-align:left}
 </main>
 </div>
 
-<div id="toast" role="status" aria-live="polite"></div>
+<div id="param-tooltip" class="param-tooltip" role="tooltip" hidden></div><div id="toast" role="status" aria-live="polite"></div>
 <nav class="tabs" role="tablist" aria-label="Sections"><div class="tabs-in">
   <button role="tab" data-tab="tank" id="tab-tank" aria-selected="true">Tank</button>
   <button role="tab" data-tab="up" id="tab-up" aria-selected="false" hidden>Equipment</button>
@@ -1398,6 +1407,7 @@ function migrateStory(G){
   if(legacy){recordLetters(G,true);var p=ensureProgress(G);p.seen.intro=true;if(G.humans>=1e6)p.seen.million=true;if(G.day>=DREAM_DAYS){p.seen.tenyears=true;S.anniversary={day:DREAM_DAYS,owners:null,historical:true};S.letters.tenyears={day:DREAM_DAYS,historical:true};}}
   updateStory(G);
 }
+var TASK_EMPHASIS=['Buy','Sell','Trade','Equipment','Marketing','Kits','Farms','Research','Space','nutrition','daily ration','100%','zero','AED','million','Earth','about a week'];
 var MILESTONES={
   intro:{title:'One empty tank. One big dream.',body:GRANDPA_LETTERS.gift.body,tab:'tank'},
   cycle:{title:'Your tank is cycled',body:"Water is safe. Buy your first shrimp in Trade. Bacteria hold for about a week without shrimp.",tab:'market'},
@@ -1579,6 +1589,7 @@ function buildFT(){
 }
 var cache={};
 function setT(id,txt){var e=cache[id]||(cache[id]=$(id));if(e&&e.textContent!==txt)e.textContent=txt;}
+function setEmphasisText(id,txt,terms){var e=cache[id]||(cache[id]=$(id));if(!e||e.dataset.emphasisText===txt)return;e.dataset.emphasisText=txt;while(e.firstChild)e.removeChild(e.firstChild);var at=0,lower=txt.toLowerCase(),used=0;while(at<txt.length&&used++<64){var best=-1,word='';terms.forEach(function(term){var i=lower.indexOf(term.toLowerCase(),at);if(i>=0&&(best<0||i<best||i===best&&term.length>word.length)){best=i;word=term;}});if(best<0)break;if(best>at)e.appendChild(document.createTextNode(txt.slice(at,best)));var strong=document.createElement('strong');strong.textContent=txt.slice(best,best+word.length);e.appendChild(strong);at=best+word.length;}if(at<txt.length)e.appendChild(document.createTextNode(txt.slice(at)));}
 function fmt(n,d){return Number(n).toLocaleString('en-US',{minimumFractionDigits:d||0,maximumFractionDigits:d||0});}
 function sig3(x){return trim(x,x>=100?0:x>=10?1:2);}
 function big(n){var a=Math.abs(n),sg=n<0?'-':'';if(a>=1e12)return sg+sig3(a/1e12)+'T';if(a>=1e9)return sg+sig3(a/1e9)+'B';if(a>=1e6)return sg+sig3(a/1e6)+'M';if(a>=1e4)return sg+sig3(a/1e3)+'k';return sg+fmt(a,a<10&&a%1!==0?1:0);}
@@ -1609,19 +1620,20 @@ function gstate(g,v){
 }
 function gaugeHTML(g){
   var span=g.max-g.min,p=function(v){return clamp((v-g.min)/span*100,0,100).toFixed(1)+'%';};
+  var param=g.scope==='w'?' data-param="'+g.id+'" tabindex="0" role="group" aria-label="'+g.name+' water parameter; hold for causes"':'';
   var bg='linear-gradient(90deg,var(--zone-bad) 0,var(--zone-bad) '+p(g.warn[0])+',var(--zone-warn) '+p(g.warn[0])+',var(--zone-warn) '+p(g.ok[0])+
     ',var(--zone-ok) '+p(g.ok[0])+',var(--zone-ok) '+p(g.ok[1])+',var(--zone-warn) '+p(g.ok[1])+',var(--zone-warn) '+p(g.warn[1])+
     ',var(--zone-bad) '+p(g.warn[1])+',var(--zone-bad) 100%)';
   var target=g.ok[0]<=g.min?'under '+g.ok[1]:g.ok[0]+' to '+g.ok[1];
-  return '<div class="g" title="'+(g.tip||g.name)+'"><div class="g-top"><span class="g-name">'+g.name+'<small>'+target+' '+g.unit+'</small></span><span class="g-val" id="gv-'+g.id+'">0</span></div>'+
+  return '<div class="g"'+param+'><div class="g-top"><span class="g-name">'+g.name+'<small>'+target+' '+g.unit+'</small></span><span class="g-val" id="gv-'+g.id+'">0</span></div>'+
     '<div class="g-track" style="background:'+bg+'"><i id="gm-'+g.id+'" style="left:0"></i></div></div>';
 }
 function buildGauges(){
   var w='',f='';
   GAUGES.forEach(function(g){if(g.scope==='w')w+=gaugeHTML(g);else f+=gaugeHTML(g);});
   $('gauges').innerHTML=w;$('feedg').innerHTML=f;
-  $('vwater').innerHTML=[['nh','NH₃'],['no2','NO₂'],['no3','NO₃'],['ph','pH'],['temp','Temp']].map(function(x){
-    return '<div class="wp" id="wp-'+x[0]+'"><small>'+x[1]+'</small><b id="wv-'+x[0]+'">0</b></div>';}).join('');
+  $('vwater').innerHTML=[['no3','NO₃'],['kh','KH'],['gh','GH'],['ph','pH'],['temp','Temp']].map(function(x){
+    return '<div class="wp" id="wp-'+x[0]+'" data-param="'+x[0]+'" tabindex="0" role="group" aria-label="'+x[1]+' water reading; hold for causes"><small>'+x[1]+'</small><b id="wv-'+x[0]+'">0</b></div>';}).join('');
 }
 function updateGauges(){
   var T=TK();
@@ -1633,6 +1645,29 @@ function updateGauges(){
   });
 }
 function gaugeById(id){for(var i=0;i<GAUGES.length;i++)if(GAUGES[i].id===id)return GAUGES[i];}
+var PARAM_TIPS={
+ nh:{name:'Ammonia (NH₃)',up:'Ammonia doses, shrimp waste, and rotting leftover food or dead matter.',down:'Filter bacteria consume it; water changes dilute it.'},
+ no2:{name:'Nitrite (NO₂)',up:'Ammonia-eating bacteria turn ammonia into nitrite.',down:'Nitrite-eating bacteria turn it into nitrate; water changes dilute it.'},
+ no3:{name:'Nitrate (NO₃)',up:'Nitrite-eating bacteria turn nitrite into nitrate.',down:'Water changes remove it.'},
+ ph:{name:'pH',up:'Water changes with higher-KH water raise pH toward that water’s level.',down:'The cycle uses KH, which lowers the pH the tank settles toward.'},
+ kh:{name:'KH · carbonate hardness',up:'A water change adds the KH you set under Water care.',down:'Ammonia-to-nitrite bacteria use KH as they work. Low KH can stall the cycle and drop pH.'},
+ gh:{name:'GH · general hardness',up:'A water change adds the GH you set under Water care.',down:'Shrimp gradually use minerals; higher stocking density uses GH faster.'},
+ temp:{name:'Temperature',up:'A warmer room or a higher heater setting raises it. Water changes move it toward room temperature.',down:'A cooling fan, room AC, frozen bottle, or a cooler room lowers it.'},
+ dens:{name:'Stocking density',up:'Buying or hatching shrimp raises shrimp per liter.',down:'Selling or losing shrimp lowers it; a larger tank also lowers the per-liter density.'}
+};
+function initParameterTooltips(){
+ var tip=$('param-tooltip'),timer=null,pending=null,shown=null,x0=0,y0=0;
+ function hide(){clearTimeout(timer);timer=null;pending=null;if(shown)shown.removeAttribute('aria-describedby');shown=null;tip.hidden=true;}
+ function show(el){var data=PARAM_TIPS[el.dataset.param];if(!data)return;clearTimeout(timer);pending=null;shown=el;tip.textContent='';var head=document.createElement('strong');head.textContent=data.name;tip.appendChild(head);[['Raises',data.up],['Lowers',data.down]].forEach(function(row){var p=document.createElement('p'),b=document.createElement('b');b.textContent=row[0]+': ';p.appendChild(b);p.appendChild(document.createTextNode(row[1]));tip.appendChild(p);});tip.hidden=false;el.setAttribute('aria-describedby','param-tooltip');var r=el.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight,left=clamp(r.left+r.width/2-w/2,8,innerWidth-w-8),top=r.top-h-8;if(top<8)top=Math.min(innerHeight-h-8,r.bottom+8);tip.style.left=Math.round(left)+'px';tip.style.top=Math.round(clamp(top,8,innerHeight-h-8))+'px';}
+ document.addEventListener('pointerdown',function(e){var el=e.target.closest('[data-param]');if(shown===el&&el){hide();return;}hide();if(!el||!PARAM_TIPS[el.dataset.param])return;pending=el;x0=e.clientX;y0=e.clientY;timer=setTimeout(function(){show(el);},550);});
+ document.addEventListener('pointermove',function(e){if(pending&&Math.hypot(e.clientX-x0,e.clientY-y0)>12){clearTimeout(timer);timer=null;pending=null;}});
+ ['pointerup','pointercancel'].forEach(function(n){document.addEventListener(n,function(){clearTimeout(timer);timer=null;pending=null;});});
+ document.addEventListener('focusin',function(e){if(e.target.matches('[data-param]:focus-visible'))show(e.target);});
+ document.addEventListener('focusout',function(e){if(shown===e.target)hide();});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&shown)hide();});
+ document.addEventListener('contextmenu',function(e){if(shown&&e.target.closest('[data-param]')===shown)e.preventDefault();});
+ window.addEventListener('scroll',hide,true);window.addEventListener('resize',hide);
+}
 
 function empTips(){
   var out=[],E=G.emp,today=Math.floor(G.day),due=0;
@@ -1722,7 +1757,7 @@ function updateVitals(){
   setT('tb-feed',N>=1?'Feed · '+trim(feedCost(T,T.set.ration/100),2):'Feed');$('tb-feed').title='Feed this tank at your ration';$('tb-feed').disabled=N<1;
   setT('tb-wc','Water '+T.set.wcPct+'%');
   var sa=sellAll(G,true);setT('tb-sell',sa.count>0?'Sell '+sa.count+' · '+aed(sa.revenue):'Sell: none ready');$('tb-sell').disabled=sa.count<=0;
-  [['temp'],['ph'],['nh'],['no2'],['no3']].forEach(function(x){
+  [['no3'],['kh'],['gh'],['ph'],['temp']].forEach(function(x){
     var g=gaugeById(x[0]),v=g.get(T),s=gstate(g,v);
     var e=$('wp-'+x[0]);var cls='wp '+s.st;if(e.className!==cls)e.className=cls;
     setT('wv-'+x[0],s.dir+v.toFixed(g.dec));
@@ -1874,7 +1909,7 @@ function updateFeed(){
   $('f-foodbar').style.width=(fr*100).toFixed(1)+'%';
   var hrs=app>0?c.food/(0.03125*app):0;
   setT('f-foodnote',c.food<0.5?(N>=1?'Nothing left. They are grazing on biofilm only.':'Empty.'):'≈ '+(hrs<36?Math.round(hrs)+' h':trim(hrs/24,1)+' days')+' of food. Leftovers rot into ammonia.');
-  setT('h-ration',N>=1?'100% = full appetite. They graze, so 80% is usually enough. Above 100% rots.':'Ration is a share of their daily appetite.');
+  setEmphasisText('h-ration',N>=1?'100% = full appetite. They graze, so 80% is usually enough. Above 100% rots.':'Ration is a share of their daily appetite.',['100%','80%','Above 100%']);
 }
 function anyHad(){for(var i=0;i<G.tanks.length;i++)if(G.tanks[i].had)return true;return false;}
 function rv(k){
@@ -1903,7 +1938,7 @@ function updateReveal(){
 function applyReveal(){
   var sh=rv('shrimp'),kit=rv('kit');
   $('vitals').hidden=!sh;$('fold').hidden=!rv('wc');
-  ['nh','no2','no3'].forEach(function(k){$('wp-'+k).hidden=!kit;});['temp','ph'].forEach(function(k){$('wp-'+k).hidden=!rv('phkh');});
+  ['no3','kh','gh'].forEach(function(k){$('wp-'+k).hidden=!kit;});['temp','ph'].forEach(function(k){$('wp-'+k).hidden=!rv('phkh');});
   $('vwater').hidden=!kit||!sh;
   ['ph','gh','kh'].forEach(function(k){var e=$('gv-'+k);if(e){var g=e.closest('.g');if(g)g.hidden=!rv('phkh');}});
   $('tb-feed').hidden=!sh;$('tb-wc').hidden=!rv('wc');$('tb-sell').hidden=!sh;
@@ -1979,11 +2014,11 @@ function updateTank(){
 function readyStats(G){var n=0,rev=0;G.tanks.forEach(function(t){var r=doSell(G,t,true,1e9);n+=r.normal;rev+=r.revenue;});return {n:n,rev:rev};}
 function updateRules(){
   var T=TK(),N=totalN(T);
-  var sa=Math.max(45,TK().set.sellAge),af=ageFactor(sa);setT('h-sellAge','At '+sa+' days a shrimp fetches '+Math.round(af*100)+'% of its top price. Prime is 100 to 180 days. After that, color fades and the price slides to 60% by 300 days. Breeders are never sold.'+(sa<75?' Careful: this is younger than adulthood (75 days), so young shrimp are sold before they can breed, and only the breeders you keep will ever have babies.':''));
+  var sa=Math.max(45,TK().set.sellAge),af=ageFactor(sa);setEmphasisText('h-sellAge','At '+sa+' days a shrimp fetches '+Math.round(af*100)+'% of its top price. Prime is 100 to 180 days. After that, color fades and the price slides to 60% by 300 days. Breeders are never sold.'+(sa<75?' Careful: this is younger than adulthood (75 days), so young shrimp are sold before they can breed, and only the breeders you keep will ever have babies.':''),['Prime is 100 to 180 days','Breeders are never sold','younger than adulthood','before they can breed']);
   setT('salesrules-h',G.recipe?'Sales rules, every tank':'Sales rules, '+TK().name);
   var ex=0;(G.recipe?G.tanks:[T]).forEach(function(t){ex+=Math.max(0,Math.floor(totalN(t)-t.set.maxN));});
   var tv=G.recipe?G.tanks[G.tanks.length-1].vol:T.vol;var rec='About 3 shrimp per liter keeps breeding fast ('+(3*tv)+' for a '+tv+' L tank). '+(G.recipe?'The limit applies to each tank. ':'');
-  setT('h-maxN',rec+(!kitsOpen(G)?'Shrimp above this number get packed into kits once kits unlock and you have packers.':!packCap(G)?'Shrimp above this number get packed into kits once you hire packers (Business tab). '+ex+' extra now.':ex>0?ex+' extra shrimp now. Packers turn them into kits each day.':'Below the limit, nothing to pack.'));
+  setEmphasisText('h-maxN',rec+(!kitsOpen(G)?'Shrimp above this number get packed into kits once kits unlock and you have packers.':!packCap(G)?'Shrimp above this number get packed into kits once you hire packers (Business tab). '+ex+' extra now.':ex>0?ex+' extra shrimp now. Packers turn them into kits each day.':'Below the limit, nothing to pack.'),['packed into kits','hire packers','turn them into kits']);
   $('row-maxN').hidden=!(kitsOpen(G)||G.opt.all);$('h-maxN').hidden=$('row-maxN').hidden;
   var hs=hasSales(G);$('row-autoSell').hidden=!hs;
 }
@@ -2288,7 +2323,7 @@ function updateHeader(){
   var d=new Date(2026,9,20+Math.floor(G.day));
   setT('b-day','D'+Math.floor(G.day));setT('b-date','Day '+Math.floor(G.day)+', '+d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+', room '+roomT(G,clock(G)).toFixed(1)+' °C'+(G.ac?' (AC)':''));
   var r=G.humans/WORLD;
-  setT('b-goal',big(Math.floor(G.humans))+' of 8.2B people own a shrimp tank');
+  var owners=big(Math.floor(G.humans));setT('b-goal-wide',owners+' of 8.2B people own a shrimp tank');setT('b-goal-short',owners+' / 8.2B owners');
   setT('b-inf',G.emp.infTotal>0?inf(G.emp.inf):'');
   var fo=!!G.opt.collapse;document.querySelector('.top').classList.toggle('folded',fo);setT('fold',fo?'readings ▾':'readings ▴');$('fold').setAttribute('aria-expanded',String(!fo));
   $('empdot').hidden=!empireNew();
@@ -2412,8 +2447,8 @@ function renderMilestone(){
   if(speed)setSpeed(0);if(renderMilestone.last!==key){renderMilestone.last=key;setTimeout(function(){card.scrollIntoView({block:'start',behavior:'instant'});$('milestone-title').focus({preventScroll:true});},0);}var m=MILESTONES[key];setT('milestone-scope',key==='intro'?'A gift from Grandpa · time paused':'Milestone · time paused');setT('milestone-title',m.title);var body=m.body;
   if(key==='tenyears'){var anniversary=G.story.anniversary;body+=' '+(anniversary&&anniversary.owners!=null?'Together, you reached '+big(anniversary.owners)+' shrimp keepers in your first decade.':'Your first decade is already part of this journey.');}
   if(key==='win')body+=(G.story.tenYearAchieved?' A dream in ten years — achieved.':' Grandpa’s dream came true. Every year of care helped get you here.')+' You reached '+big(G.humans)+' owners on day '+G.emp.won+'. Filter maturity: day '+Math.floor(G.tanks[0].cycledAt||0)+'. Kits delivered: '+big(G.kits.sold)+'. Regions: '+G.emp.regions.length+'.';
-  setT('milestone-body',body);var letter=key==='intro'?null:GRANDPA_LETTERS[key];$('milestone-letter').hidden=!letter;if(letter)setT('milestone-letter','Grandpa’s note · '+letter.title+'\n\n'+grandpaLetter(G,key));
-  var h=key==='intro'?'<button class="btn primary" data-act="milestone-next">Accept Grandpa’s tank</button>':key==='tenyears'?'<button class="btn primary" data-act="milestone-next">Look around (paused)</button><button class="btn" data-act="milestone-continue">Continue</button>':key==='win'?'<button class="btn primary" data-act="review-empire">Review your empire</button><button class="btn" data-act="sandbox">Continue sandbox</button><button class="btn" data-act="reset">New game</button>':'<button class="btn primary" data-act="milestone-next">Show me (paused)</button><button class="btn" data-act="milestone-continue">Continue</button>';
+ setEmphasisText('milestone-body',body,TASK_EMPHASIS);var letter=key==='intro'?null:GRANDPA_LETTERS[key];$('milestone-letter').hidden=!letter;if(letter)setT('milestone-letter','Grandpa’s note · '+letter.title+'\n\n'+grandpaLetter(G,key));
+ var h=key==='intro'?'<button class="btn primary" data-act="milestone-next">Accept Grandpa’s tank</button>':key==='win'?'<button class="btn primary" data-act="review-empire">Review your empire</button><button class="btn" data-act="sandbox">Continue sandbox</button><button class="btn" data-act="reset">New game</button>':'<button class="btn primary" data-act="milestone-next">Next step (paused)</button>';
   if(key==='spaceDream')h=chapterButton('begin-space','Begin the space chapter · stay paused',true);
   if($('milestone-actions').innerHTML!==h)$('milestone-actions').innerHTML=h;
 }
@@ -2427,7 +2462,7 @@ function renderDream(){
 }
 function renderProgression(){
  selectTab(activeTab);renderMilestone();renderDream();var E=G.emp,open=kitsOpen(G),hasFarm=Object.keys(E.farms).some(function(k){return E.farms[k]>0;}),business=open&&['emp','up','promote','world'].indexOf(activeTab)>=0,phase=phaseInfo(G);
- setT('g-sum',GOALS.filter(function(g){return E.goals[g.id];}).length+' of '+GOALS.length+' done');setT('phase-name',phase.name);setT('next-title',phase.goal);setT('next-body',phase.body);$('next-card').hidden=business;
+ setT('g-sum',GOALS.filter(function(g){return E.goals[g.id];}).length+' of '+GOALS.length+' done');setT('phase-name',phase.name);setT('next-title',phase.goal);setEmphasisText('next-body',phase.body,TASK_EMPHASIS);$('next-card').hidden=business;
  setT('sale-forecast',!hasFarm&&G.tanks.some(function(t){return t.had;})?saleForecast(G):'');document.body.classList.toggle('business-context',business);var intro=G.progress.queue[0]==='intro';document.body.classList.toggle('story-intro',intro);if(intro){$('next-card').hidden=true;['tank','up','market','promote','emp','world'].forEach(function(tab){$('p-'+tab).hidden=true;});}
  $('tab-market').hidden=!rv('market');$('tab-promote').hidden=!rv('sell');$('tab-world').hidden=!worldOpen(G)&&!academyOpen(G)&&!(G.emp.ripple&&G.emp.ripple.n);
  setT('tab-up','Equipment');setT('tab-promote','Marketing');
@@ -2461,7 +2496,7 @@ function initProgressionControls(){
   document.addEventListener('click',function(e){
     var b=e.target.closest('[data-act]');if(!b||b.disabled)return;var a=b.dataset.act,changed=true;
     if(a==='navigate'){selectTab(b.dataset.tab);}
-    else if(a==='milestone-next'||a==='milestone-continue'){var key=acknowledgeMilestone(G);if(key){selectTab(key==='tenyears'?phaseInfo(G).tab:MILESTONES[key].tab);if(key==='farm')G.emp.bizView='production';if(key==='ministry')G.emp.bizView='culture';}setSpeed(a==='milestone-continue'?1:0);}
+    else if(a==='milestone-next'){var key=acknowledgeMilestone(G);if(key){selectTab(key==='tenyears'?phaseInfo(G).tab:MILESTONES[key].tab);if(key==='farm')G.emp.bizView='production';if(key==='ministry')G.emp.bizView='culture';}setSpeed(0);}
     else if(a==='bizview'){G.emp.bizView=b.dataset.view;cache.eproj=null;}
     else if(a==='small-toggle')G.emp.showSmall=!G.emp.showSmall;
     else if(a==='earlier-packing'){G.emp.showEarlierPacking=!G.emp.showEarlierPacking;cache.estaff=null;}
@@ -2654,7 +2689,7 @@ function start(data){
     }
   }
   if(!G.ob.bottle&&!G.opt.all)speed=0;if(G.progress&&G.progress.home)activeTab=G.progress.home;
-  buildGauges();initControls();initProgressionControls();initChartEvents();syncControls();setSpeed(speed);
+  buildGauges();initParameterTooltips();initControls();initProgressionControls();initChartEvents();syncControls();setSpeed(speed);
   if(window.claude&&window.claude.hot&&window.claude.hot.snapshot)window.claude.hot.snapshot(function(){return{G:G};});
   detectMilestones(G);if(progressionBlocked(G))setSpeed(0);selectTab(activeTab);render();requestAnimationFrame(tick);
   if(away)toast(away);

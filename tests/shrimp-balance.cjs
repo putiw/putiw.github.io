@@ -15,6 +15,17 @@ const tankStart=html.indexOf('<section class="panel" id="p-tank">'),marketStart=
 if(!(tankStart>=0&&tankStart<goalCard&&goalCard<marketStart&&marketStart<tradeColony&&tradeColony<marketEnd))throw Error('Goal or Trade colony card is outside its intended tab');
 if(html.includes('id="next-actions"')||html.includes('id="btn-gomarket"'))throw Error('Confusing Go-to CTA remains in the goal flow');
 console.log('PASS goal panel is Tank-only, navigation is tab-based and Trade includes the colony card');
+if(html.includes('data-act="milestone-continue"')||!html.includes('Next step (paused)')||!html.includes('function setEmphasisText'))throw Error('Milestones should use one consistent paused action with readable emphasis');
+console.log('PASS milestones use one paused next-step action and instructional text can emphasize key terms');
+const tooltipMap=html.split('var PARAM_TIPS={')[1].split('};\nfunction initParameterTooltips')[0];
+for(const id of ['nh','no2','no3','ph','kh','gh','temp','dens'])if(!tooltipMap.includes(id+':{name:'))throw Error('Missing cause tooltip for water parameter '+id);
+if(!html.includes("addEventListener('pointerdown'")||!html.includes('Press and hold a water reading'))throw Error('Water tooltips must be discoverable through press and hold');
+console.log('PASS all water readings explain what raises and lowers them on press and hold');
+if(!html.includes("$('vwater').innerHTML=[['no3','NO₃'],['kh','KH'],['gh','GH'],['ph','pH'],['temp','Temp']]"))throw Error('Top readings should show nitrate, KH, GH, pH and temperature in order');
+console.log('PASS top readings show NO₃, KH, GH, pH and temperature');
+const goalRowStart=html.indexOf('<div class="goalrow">'),dreamSummary=html.indexOf('id="dream-tracker"'),nextHeaderRow=html.indexOf('<div class="chips" id="tankchips"');
+if(!(goalRowStart>=0&&goalRowStart<dreamSummary&&dreamSummary<nextHeaderRow&&html.includes('id="b-goal-short"')))throw Error('Grandpa year tracker should share the compact progress row');
+console.log('PASS Grandpa year tracker shares the progress row with a compact mobile progress label');
 check('fresh starts preserve milestones; high-speed batches stop at a boundary',`
 var g=readyGame(),t=g.tanks[0];t.chem.bacA=t.chem.bacB=bacTarget(t);t.chem.nh=t.chem.no2=0;rememberCycle(g,t);
 for(var i=0;i<400;i++)stepGame(g);
