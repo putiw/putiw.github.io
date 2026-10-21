@@ -117,3 +117,29 @@ trawler headline cools Fire −8% (undone by the AED 500k retraining fund),
 mangroves give ✦, wild shrimp cut farm upkeep 5%, typhoon makes regions 10%
 cheaper, blue carbon pays AED per shrimp-free person per day. Strong bot sees
 all 25 by its win (~day 2,990); the casual bot by ~day 4,900.
+
+Flow fixes (21 Oct afternoon, Claude): at 40x the game now slows to 12x only
+for big moments (headline, new region, farm tier, shop type, bulk order) and at
+most once per 30 real seconds; project items and campaign ideas no longer slow
+it. Kit phase gets bulk kit orders (`kitOrderDay`, 12 days of orders at +15%
+price, until 40x) and a "Profit per kit · orders a day" line under the price.
+The food-rot warning needs 2.5 days of food (daily 80% feeding peaks at ~2), and
+the top Feed button reads "Extra feed" on auto-fed tanks. Phase goals show
+progress (0 / 60, 4 / 10 kits, owners). "Another tank" appears after the first
+sale. Bot pacing: casual mid-game longest gap 76 s → 14 s.
+
+UI cleanup (21 Oct, Claude): shorter header (date · room °C, "Year N"), hunger
+reads "fed" / "peckish 50%", business strip shows profit, packed/orders and
+cash runway only when cash is falling, emphasis only bolds whole words, empty
+project cards hide, farm rows lose duplicate text and use small Mothball/Sell
+chips (shops: "Close one (35% back)"), hatch log lines merge into one per day,
+World view switch is a proper segmented control, shorter opinion/AI texts and
+campaign recap, Water test card hides while the cycling card shows, Dose
+ammonia is only the primary button once ammonia is near zero.
+
+## UI tidy pass 2 (Claude)
+- Kits stats: 4 key numbers (Orders/day, In stock, Owners, Cost per kit); the rest under "More numbers".
+- Hatcheries intro is one line; Starter kits intro shortened.
+- Milestone card is compact: Grandpa's letter is folded into a "Grandpa's note" toggle (closed on each new milestone); smaller type on phones.
+- "Max shrimp" renamed "Pack above". All-tanks table shows "594 packs >60" instead of "594/60".
+- Tried scaling the default pack threshold with tank volume (3 shrimp/L). Codex playthroughs slowed by ~480 days and seed 42 failed to finish, so the sim default stays 60. Display-only change; all balance numbers identical to before.

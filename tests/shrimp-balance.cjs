@@ -117,6 +117,14 @@ g.money=1e6;var before=g.emp.op.f.i;buyProj(g,'retrain');if(!(g.emp.op.f.i>befor
 R.free=3e9;var inf=g.emp.inf;rippleDay(g);if(R.n!==RIPPLE.length||!(g.emp.inf>inf))throw Error('Late ripple incomplete');
 if(regionCost(g,REGIONS[3])>=REGIONS[3].m)throw Error('Typhoon discount missing');
 `);
+check('bulk kit orders, honest feeding alerts and progress goals', `
+var g=readyGame();g.stats.sold=60;g.kits.sold=12;g.money=1e5;g.humans=50;var t=g.tanks[0];
+for(var i=0;i<5&&!g.korder;i++){g.day++;kitOrderDay(g);}if(!g.korder||g.korder.n<20)throw Error('No bulk order offered');
+var o=g.korder;o.taken=true;g.kits.stock=o.n;var cash=g.money,own=g.humans;if(!deliverKitOrder(g)||g.kits.stock!==0||!(g.money>cash)||!(g.humans>own)||g.korder)throw Error('Bulk order delivery');
+g.emp.fastUnlocked=true;g.korderNext=0;g.day++;kitOrderDay(g);if(g.korder)throw Error('Bulk orders continue at 40x');
+g.tanks[0].had=1;if(phaseInfo(g).goal.indexOf('·')<0)throw Error('Goal lacks progress');
+var g2=readyGame();g2.stats.born=1;g2.tanks[0].had=1;if(phaseInfo(g2).goal.indexOf('0 / 60')<0)throw Error('Breeder goal lacks a count');
+`);
 check('speeds unlock through care, automation and profitable fulfilment', `
 var g=readyGame(),t=g.tanks[0];if(maxSpeed(g)!==4)throw Error('Fast start');g.stats.born=1;t.feeder=t.autoWC=1;if(maxSpeed(g)!==12)throw Error('Care did not unlock 12');
 g.stats.sold=60;g.money=1000000;g.emp.farms.barn=1;g.emp.staff.tier=2;g.emp.proj.autopackm=1;g.emp.beta=.05;g.humans=100;g.kits.stock=0;g.kitPrice=250;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(g.emp.fastUnlocked)throw Error('Thin margins unlocked 40');g.kitPrice=600;g.humans=2000;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(g.emp.fastUnlocked||!g.emp.fastReady)throw Error('40 before a million owners');g.humans=1e6;g.day++;empireDay(g);if(!g.emp.fastUnlocked||maxSpeed(g)!==40)throw Error('Profitable business at a million owners did not unlock 40');
