@@ -6,6 +6,7 @@ let count=0;function check(name,code){const c=engine();vm.runInContext(code,c);c
 check('opening is concise and the Tank goal preference survives saves',`
 var intro=MILESTONES.intro.body,g=newGame();
 if(intro.includes('You took him seriously.')||intro.includes('A tank for everyone. Ten years to try.'))throw Error('Opening still has the removed lines');
+if(!GRANDPA_LETTERS.gift.body.includes('“Everyone on Earth?”')||!GRANDPA_LETTERS.gift.body.includes('“Well, we’d better get started. Let’s see what we can do in ten years.”')||GRANDPA_LETTERS.gift.body.includes('You laughed'))throw Error('Grandpa opening exchange is incorrect');
 if(g.opt.goalOpen!==true)throw Error('New goal panel should start expanded');g.opt.goalOpen=false;
 if(migrate(JSON.parse(JSON.stringify(g))).opt.goalOpen!==false)throw Error('Goal panel preference did not persist');
 var old=newGame();delete old.opt.goalOpen;if(migrate(old).opt.goalOpen!==true)throw Error('Old saves need the expanded default');
