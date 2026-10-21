@@ -177,6 +177,19 @@ if(g.progress.queue.length||!g.story.letters.million.historical||g.story.anniver
 check('letters are saved at milestones and survive save/load without changing the clock', `
 var g=readyGame();g.day=49;g.stats.born=5;detectMilestones(g);if(g.story.letters.hatch.day!==49||g.story.letters.kit)throw Error('Wrong letter unlock');g.progress.queue=[];g.day=60;detectMilestones(g);if(g.story.letters.hatch.day!==49)throw Error('Letter timestamp moved');var saved=JSON.parse(JSON.stringify(g));migrate(saved);if(saved.story.letters.hatch.day!==49||saved.day!==60)throw Error('Letter save lost');
 `);
+check('owners’ tanks: welfare, kit design, climate, feed, water and shrimp prices in AED',`
+var g=newGame();g.ob.kit=1;g.stats.sold=KIT_UNLOCK;g.kits.sold=60;g.humans=2e5;g.money=5e8;g.emp.regions=['auh','dxb','uae','gcc','mena','eu'];
+if(!(regionMix(g).cold>0.3))throw Error('Europe should bring cold winters');
+var before=welfareTarget(g);if(!buyWelfare(g,'winter'))throw Error('Winter kits');if(!(welfareTarget(g)>before))throw Error('Winter kits should help');
+var m0=kitMaterials(g);if(!buyWelfare(g,'moss'))throw Error('Moss kits');if(kitMaterials(g)!==m0+12||kitDesign(g)!==1)throw Error('Moss kits cost AED 12 more');
+setKitDesign(g,0);if(kitMaterials(g)!==m0)throw Error('Basic design should drop the extra cost');
+g.kitPrice=100;g.emp.commit=commitOf(100);if(!(welfareTarget(g)<0.6))throw Error('Very cheap kits should lower welfare');
+g.emp.wel=0.3;var h=g.humans;welfareDay(g);if(!(g.humans<h&&g.emp.lapsed>0))throw Error('Struggling owners should lapse');
+g.emp.wel=0.9;if(!(welfareMult(g)>1.1))throw Error('Thriving owners should refer more');
+var f=fairShrimpPrice(g);g.priceAED=f*1.5;g.market.m=1.2;g.price=clamp(g.priceAED/fairShrimpPrice(g),0.5,3);if(Math.abs(g.price*fairShrimpPrice(g)-f*1.5)>1e-9)throw Error('An AED shrimp price must hold as mood moves');
+g.emp.won=1;g.emp.farms={rack:3};var raw=g.emp.rawShrimp;empireDay(g);if(g.emp.rawShrimp>raw)throw Error('Farms stop breeding kit stock after the win');
+var w=WORLDS[0];if(!w.wild||!/released/.test(w.why))throw Error('Space worlds should end with free-living shrimp');
+`);
 {const g=html.slice(html.indexOf('function guideTarget(){'),html.indexOf('function applyGuide(){'));
 if(!g||!html.includes('applyGuide();\n}')||g.indexOf("bottleneck(G)")<0||g.indexOf("consultHas(G,'fix')")>g.indexOf("bottleneck(G)")||/bnText\(G\)/.test(g.slice(0,g.indexOf("consultHas(G,'diag')"))))throw Error('The guide must run each render and only use bottleneck advice the player has paid for');
 if(!html.includes('id="guidebar"')||html.includes('bar.dataset.tab'))throw Error('Guide bar must not reuse data-tab, which tab code selects on');
