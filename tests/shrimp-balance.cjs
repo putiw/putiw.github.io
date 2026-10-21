@@ -85,9 +85,18 @@ var g=readyGame();delete g.emp.chainVersion;g.emp.farms={hatch:2,ocean:1};g.emp.
 var cap=packCap(g);if(cap!==50500||g.kits.stock!==123||farmSalvage(g,FARMS.find(x=>x.id==='ocean'))!==25000000)throw Error('Migration output or value changed');
 migrate(g);if(packCap(g)!==cap)throw Error('Duplicate migration gift');
 `);
+check('shrimp-free ripple fires headlines in order with effects and a retraining fix', `
+var g=readyGame();g.humans=5e5;g.emp.q=0.9;var f0=g.emp.op.f.i;for(var i=0;i<400;i++){g.day++;rippleDay(g);}
+var R=g.emp.ripple;if(R.n<3||R.log[0].i!==0||R.log[1].d<R.log[0].d)throw Error('Headlines out of order');
+if(!(g.emp.op.f.i<f0))throw Error('Trawler headline did not cool Fire');
+g.humans=4e9;R.free=2.1e6;rippleDay(g);if(!rippleHas(g,'retrain')||!projAvail(g).some(p=>p.id==='retrain'))throw Error('Retraining not offered');
+g.money=1e6;var before=g.emp.op.f.i;buyProj(g,'retrain');if(!(g.emp.op.f.i>before))throw Error('Retraining did not help Fire');
+R.free=3e9;var inf=g.emp.inf;rippleDay(g);if(R.n!==RIPPLE.length||!(g.emp.inf>inf))throw Error('Late ripple incomplete');
+if(regionCost(g,REGIONS[3])>=REGIONS[3].m)throw Error('Typhoon discount missing');
+`);
 check('speeds unlock through care, automation and profitable fulfilment', `
 var g=readyGame(),t=g.tanks[0];if(maxSpeed(g)!==4)throw Error('Fast start');g.stats.born=1;t.feeder=t.autoWC=1;if(maxSpeed(g)!==12)throw Error('Care did not unlock 12');
-g.stats.sold=60;g.money=1000000;g.emp.farms.barn=1;g.emp.staff.tier=2;g.emp.proj.autopackm=1;g.emp.beta=.05;g.humans=100;g.kits.stock=0;g.kitPrice=250;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(!g.emp.fastUnlocked||maxSpeed(g)!==40)throw Error('Stable business did not unlock 40');
+g.stats.sold=60;g.money=1000000;g.emp.farms.barn=1;g.emp.staff.tier=2;g.emp.proj.autopackm=1;g.emp.beta=.05;g.humans=100;g.kits.stock=0;g.kitPrice=250;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(g.emp.fastUnlocked)throw Error('Thin margins unlocked 40');g.kitPrice=600;g.humans=2000;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(g.emp.fastUnlocked||!g.emp.fastReady)throw Error('40 before a million owners');g.humans=1e6;g.day++;empireDay(g);if(!g.emp.fastUnlocked||maxSpeed(g)!==40)throw Error('Profitable business at a million owners did not unlock 40');
 `);
 check('industrial upgrades need real preceding stages and output', `
 var g=readyGame();g.money=1e12;g.stats.sold=60;g.emp.proj.farmlic=1;if(farmOk(g,FARMS[2])||buyFarm(g,'hatch')||buyPackTier(g)&&buyPackTier(g))throw Error('Skipped chapter');
