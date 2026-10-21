@@ -230,7 +230,6 @@ th:first-child,td:first-child{text-align:left}
 .sheet{position:fixed;inset:0;z-index:60;background:color-mix(in srgb,var(--ink) 35%,transparent);display:flex;align-items:flex-end;justify-content:center}.sheet[hidden]{display:none}
 .sheet-in{background:var(--surface);width:100%;max-width:560px;border-radius:16px 16px 0 0;padding:16px 18px 24px;box-shadow:0 -6px 24px color-mix(in srgb,var(--ink) 20%,transparent)}
 .sheet-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.sheet-hd h2{font-size:17px}
-#world-mode .btns{display:flex;gap:6px;flex-wrap:nowrap}#world-mode .btn.seg{flex:1;min-height:36px;padding:6px 10px;font-size:13.5px;white-space:nowrap}
 .guidebar{display:flex;align-items:center;gap:8px;width:100%;text-align:left;margin:0 0 10px;padding:9px 12px;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;background:var(--surface);font:500 13.5px/1.35 var(--font-body);color:var(--ink);cursor:pointer}
 .guidebar .gb-k{font:600 10.5px var(--font-body);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);flex:0 0 auto}
 .guidebar .gb-t{flex:1;min-width:0}.guidebar .gb-go{flex:0 0 auto;white-space:nowrap;color:var(--accent);font-weight:600;font-size:12.5px}
@@ -307,7 +306,7 @@ th:first-child,td:first-child{text-align:left}
 .coll>.hd:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 .btn,.stp{touch-action:manipulation}.ctl .stp{min-height:36px}
 @media(max-width:480px){.tabs button{font-size:11px;padding:10px 3px}.btns{flex-wrap:wrap}.item{grid-template-columns:minmax(0,1fr) auto}.ctl{grid-template-columns:82px 30px minmax(0,1fr) 30px 58px}.brand{flex-wrap:wrap}.business-strip b{font-size:12px}.business-strip div:nth-child(n+4){display:none}}
-@media(max-width:480px){#academy-card .item,#space-card .item{grid-template-columns:1fr}#world-mode .btns{display:flex;flex-wrap:wrap}#world-mode .btn{flex:1;white-space:normal}#p-space .btn{white-space:normal}}
+@media(max-width:480px){#academy-card .item,#space-card .item{grid-template-columns:1fr}#p-space .btn{white-space:normal}}
 @media(max-width:520px){.goalrow{gap:4px}.goalrow .goal-bar{flex-basis:36px}#b-goal-wide{display:none}#b-goal-short{display:inline}.dream-tracker>summary{max-width:132px}.dream-tracker small{max-width:38px}}
 </style>
 </head>
@@ -540,7 +539,7 @@ th:first-child,td:first-child{text-align:left}
     <p class="sub">Kit buyers only come from open regions, up to your adoption ceiling.</p>
     <div id="e-regions"></div></div>
 </section>
-<section class="panel" id="p-world" hidden><div class="card coll" data-k="academy" id="academy-card" style="order:-20"></div><div class="card coll" data-k="ripple" id="ripplecard" hidden><div class="hd"><h2>The Shrimp Times</h2><small id="rp-sum"></small></div><p class="rp-head" id="rp-latest"></p><div class="rp-bar"><i id="rp-fill"></i></div><p class="hint" id="rp-next"></p><p class="hint" id="rp-fx"></p><details><summary id="rp-archsum">Earlier stories</summary><ol class="rp-arch" id="rp-archive"></ol></details></div></section><section class="panel" id="p-space" hidden><div class="card coll" data-k="space" id="space-card"></div></section>
+<section class="panel" id="p-world" hidden><div class="card coll" data-k="academy" id="academy-card" style="order:5"></div><div class="card coll" data-k="ripple" id="ripplecard" hidden><div class="hd"><h2>The Shrimp Times</h2><small id="rp-sum"></small></div><p class="rp-head" id="rp-latest"></p><div class="rp-bar"><i id="rp-fill"></i></div><p class="hint" id="rp-next"></p><p class="hint" id="rp-fx"></p><details><summary id="rp-archsum">Earlier stories</summary><ol class="rp-arch" id="rp-archive"></ol></details></div></section><section class="panel" id="p-space" hidden><div class="card coll" data-k="space" id="space-card"></div></section>
 <section class="panel" id="p-up" hidden>
   <div class="card"><div class="hd"><h2>Equipment</h2><small id="u-for"></small></div><div id="upgrades"></div></div>
   <div class="card"><div class="hd"><h2>Tanks</h2><small id="u-tanks"></small></div><div id="newtank"></div></div>
@@ -2648,13 +2647,12 @@ function chapterButton(action,label,enabled,id,extra){return '<button class="btn
 function chapterHTML(el,h){if(el.innerHTML===h)return;var open=Array.from(el.querySelectorAll('details[open]')).map(function(d){return d.querySelector('summary').textContent;});el.innerHTML=h;el.querySelectorAll('details').forEach(function(d){if(open.indexOf(d.querySelector('summary').textContent)>=0)d.open=true;});}
 function chapterRow(title,body,button){return '<div class="item"><div><h3>'+title+'</h3><p>'+body+'</p></div><div>'+button+'</div></div>';}
 function renderChapters(){
- var A=G.academy,S=G.space,open=academyOpen(G),a=$('academy-card');a.hidden=!open||A.view!=='research';
- if(open){var nav=$('world-mode');if(!nav){nav=document.createElement('div');nav.id='world-mode';nav.className='card';nav.style.order='-30';$('p-world').insertBefore(nav,a);}var navHTML='<div class="btns">'+chapterButton('society-view','Adoption',true).replace('class="btn"','class="btn seg'+(A.view==='society'?' on':'')+'" aria-pressed="'+(A.view==='society')+'"')+chapterButton('research-view','Research',true).replace('class="btn"','class="btn seg'+(A.view==='research'?' on':'')+'" aria-pressed="'+(A.view==='research')+'"')+'</div><p class="sub">'+(!A.level?'A research partnership is available: pilot grants start at AED 500,000.':A.active?'Current study: '+studyById(A.active.id).name+' · '+A.funded+' funded days remaining.':A.professors?'Your university team is ready for research and teaching.':'Choose a study to put your funded team to work.')+'</p>';chapterHTML(nav,navHTML);
- if(A.view==='research')Array.from($('p-world').children).forEach(function(el){if(el!==a&&el!==nav)el.hidden=true;});
+ var A=G.academy,S=G.space,open=academyOpen(G),a=$('academy-card');a.hidden=!open;a.style.order='5';
+ if(open){
  if(!A.level&&activeTab!=='world'&&$('business-roadmap'))$('business-roadmap').textContent+=' Research grants open in World.';
  }
  $('tab-space').hidden=!spaceOpen(G)&&!G.emp.won;
- if(activeTab==='space'||activeTab==='world'&&A.view==='research'){document.body.classList.add('business-context');['business-strip','astrip','next-card','vitals','vwater','acts','tankchips','apop','fold'].forEach(function(id){$(id).hidden=true;});}
+ if(activeTab==='space'){document.body.classList.add('business-context');['business-strip','astrip','next-card','vitals','vwater','acts','tankchips','apop','fold'].forEach(function(id){$(id).hidden=true;});}
  if(open){
  var h='<div class="hd"><h2>Research & university</h2></div><p class="sub">Earth research starts now. Discoveries improve your existing business; space adds new questions after ten years. Grants prepay researchers and consumables. An idle or unfunded lab has no recurring bill.</p><p class="sub">Protected Earth working capital: '+aed(earthArchived(G)?0:capitalReserve(G))+'. Available above that reserve: '+aed(Math.max(0,G.money-(earthArchived(G)?0:capitalReserve(G))))+'.</p>';
  if(!A.level)h+=chapterRow('Start a research partnership','After 1,000 delivered kits, fund a pilot grant: AED 500,000 covers 90 working days. First study: reusable materials. Keep your business reserve intact.',chapterButton('fund','Fund pilot · AED 500,000',chapterAffordable(G,500000)));
@@ -2682,8 +2680,8 @@ function renderChapters(){
  s+=chapterButton('space-dream',spaceOpen(G)?'Hear Grandpa’s new dream':'Reunite at ten years',spaceOpen(G)||!!G.emp.won);
  }else{
  s+='<p>Earth: '+(G.emp.won?'dream achieved.':'still growing · '+big(G.humans)+' keepers.')+'</p><p>Knowledge '+Math.floor(A.knowledge)+' · crew '+Math.floor(A.crew)+'. Seeding stations run on food, water and power; no cash upkeep. Once stable, the shrimp are released to live free.</p>';
- s+=chapterButton('research-view','Open Research & university',true);s+=chapterButton('crew','Contract 50 crew · AED 10M',chapterAffordable(G,10000000));
- if(!rd(G,'water')||!rd(G,'algae'))s+='<p class="phase-note">Before launching, complete Water buffering and Balanced algae ecosystems in World → Research. The first seeding station needs those discoveries.</p>';
+ s+=chapterButton('world-tab','Open World tab',true);s+=chapterButton('crew','Contract 50 crew · AED 10M',chapterAffordable(G,10000000));
+ if(!rd(G,'water')||!rd(G,'algae'))s+='<p class="phase-note">Before launching, complete Water buffering and Balanced algae ecosystems in the World tab’s Research &amp; university section. The first seeding station needs those discoveries.</p>';
  if(S.survey)s+='<p>Surveying '+worldById(S.survey.id).name+' · '+S.survey.left+' days remaining.</p>';
  if(S.won)s+='<p class="phase-note"><b>Grandpa’s dream has reached the stars.</b> Shrimp live free on every explored world. Your Earth journey can continue.</p>';
  WORLDS.filter(function(w){return !w.prev||(S.colonies[w.prev]&&S.colonies[w.prev].settled);}).forEach(function(w){var p=S.colonies[w.id];s+=(p&&p.settled?'<details class="card"><summary>'+w.name+' · '+big(p.wild||p.n)+' free in the '+w.water+'</summary>':'<div class="card"><h3>'+w.name+'</h3>')+'<p>'+w.why+'</p>'+(p&&p.settled?'<p><b>'+big(p.wild||p.n)+' shrimp live free</b> in the '+w.water+', room for about '+big(w.wild)+'.</p>':'');
@@ -2700,7 +2698,7 @@ function renderChapters(){
  if((G.progress.queue[0]==='tenyears'||G.progress.queue[0]==='win')&&!S.started&&!$('chapter-milestone')){var b=document.createElement('button');b.id='chapter-milestone';b.className='btn';b.dataset.chapter='space-dream';b.textContent=spaceOpen(G)?'Hear Grandpa’s new dream':'Reunite at ten years';$('milestone-actions').appendChild(b);}
 }
 document.addEventListener('click',function(e){var b=e.target.closest('[data-chapter]');if(!b||b.disabled)return;var a=b.dataset.chapter,id=b.dataset.id,ok=false;
- if(a==='research-view'||a==='society-view'){G.academy.view=a==='research-view'?'research':'society';selectTab('world');ok=true;}
+ if(a==='world-tab'){selectTab('world');ok=true;}
  if(a==='fund')ok=fundAcademy(G);if(a==='academic')ok=academyUpgrade(G,id);if(a==='study')ok=startStudy(G,id);if(a==='pause-study')ok=pauseStudy(G);if(a==='course')ok=openCourse(G,id);
  if(a==='autofund'){G.academy.autoFund=!G.academy.autoFund;ok=true;}if(a==='repeat'){G.academy.repeat=!G.academy.repeat;ok=true;}
  if(a==='space-dream')ok=requestSpaceDream(G);if(a==='begin-space')ok=beginSpace(G);
