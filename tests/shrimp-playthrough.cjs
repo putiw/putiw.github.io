@@ -48,6 +48,16 @@ if(kitsOpen(G)){
  if(farmCap(G)&&E.inf<1000&&G.money>galaCost(G)*10)buyProj(G,'gala');
  G.kitPrice=farmCap(G)?${process.env.REVIEW_KIT_PRICE==='market'?'bestKitPrice(G)':Number(process.env.REVIEW_KIT_PRICE||600)}:250;
  if(G.humans>=100)note('100 owners');if(G.humans>=10000)note('10k owners');if(G.humans>=1e6)note('million owners');if(pd(G,'ministry'))note('ministry');if(pd(G,'last'))note('last holdouts');
+ if(${process.env.REVIEW_ACADEMY==='1'?'true':'false'}&&academyOpen(G)){
+  var A=G.academy;if(G.money>10000000+capitalReserve(G)&&A.funded<30)fundAcademy(G);
+  if(A.level){note('first research grant');if(A.level===1&&uniqueStudies(G)&&G.money>10000000+capitalReserve(G))academyUpgrade(G,'lab');
+   if(!A.active){var study=STUDIES.find(x=>x.id!=='observe'&&x.req(G)&&!rd(G,x.id));startStudy(G,study?study.id:'observe');}
+   if(A.phds&&!A.postdocs&&G.money>10000000+capitalReserve(G))academyUpgrade(G,'postdoc');
+   if(A.postdocs&&A.level<3&&G.money>10000000+capitalReserve(G))academyUpgrade(G,'group');
+   if(A.professors)for(var course of COURSES)openCourse(G,course.id);
+   if(A.phds)note('PhD graduates');if(A.professors)note('first professor');if(uniqueStudies(G)>=6)note('Earth research complete');
+  }
+ }
  if(E.won)note('win');
 }
 }

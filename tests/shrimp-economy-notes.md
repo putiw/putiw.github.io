@@ -117,3 +117,32 @@ to make the achievement reachable while leaving early care, unlocks, production
 capacity and packing requirements unchanged. Capital per daily potential kit
 still rises from mega hatchery (5,714 AED) to ocean (6,000) to arcology (7,500).
 This does not guarantee that every pricing or expansion strategy meets ten years.
+
+## Research before the anniversary
+
+A research partnership opens after 1,000 kit deliveries, independently of the
+calendar. Pilot grants prepay AED 500,000 for 90 working days; university grants
+AED 1 million for 120 days; independent-group grants AED 2 million for 180 days.
+An idle lab spends no funding. With no funding, research/teaching pauses without
+cash debt. Optional automatic renewal protects the same Earth capital reserve as
+construction. Academic setup is explicit: lab AED 1M, postdoc fellowship AED 500k,
+independent group AED 1M. A professor requires completed PhDs, postdoctoral work,
+PI experience and discoveries. Teaching starts after this progression.
+
+Discoveries apply as factors at the point of use: materials −10%, machine
+capacity +20%, new robotic line price −15%, distribution −10%, breeding −10%,
+food −15%, and 90 additional days before age-related mortality accelerates.
+Existing material contracts stack once; migration cannot repeatedly multiply
+saved base values. Research/space outlays appear in finance and are excluded
+from operating margin, like other capital development.
+
+Space opens at day 3650 even with unfinished Earth adoption. Missions use cash,
+research knowledge and trained or contracted crew. Only the next world appears;
+settled habitats fold into a summary. Habitat costs are prepaid, with visible
+food, water and power balances instead of hidden cash payroll. Settlement tests
+supply at the habitat's full capacity, preventing an apparently stable colony
+from outgrowing its infrastructure. Cooling and shade replace each other.
+Pelagia also requires research and 180 healthy restoration days. Once Earth is
+complete and space has begun, Earth operations are archived without further
+bills; before that, both chapters run together. The space ending does not stop
+unfinished Earth adoption.
