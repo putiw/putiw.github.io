@@ -60,8 +60,9 @@ var g=readyGame();delete g.progress;g.day=600;g.tanks[0].had=1;g.tanks[0].set.ke
 migrate(g);detectMilestones(g);if(g.progress.queue.length||g.tanks[0].set.keep!==20||g.progress.home!=='emp')throw Error('Migration regressed');
 `);
 check('bench is owner-operated; unsafe payroll cannot be hired',`
-var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=400;if(!buyPackTier(g))throw Error('Bench failed');
-if(g.emp.staff.pack!==0||staffCost(g)!==0||packCap(g)!==1)throw Error('Surprise payroll');
+var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=400;if(!buyPackTier(g)||!hasTool(g,'bag')||g.emp.staff.tier)throw Error('First packing tool failed');
+if(hire(g,'pack',1))throw Error('Packers need the full packing station');g.money=10000;var n=0;while(buyPackTier(g)&&g.emp.staff.tier===0)n++;if(!stationDone(g)||g.emp.staff.tier!==1)throw Error('Five tools should complete the station');
+if(g.emp.staff.pack!==0||staffCost(g)!==0||packCap(g)!==1)throw Error('Surprise payroll');g.money=400;
 if(hire(g,'sales',1))throw Error('Unsafe hire');g.money=10000;if(!hire(g,'sales',1)||staffCost(g)!==130)throw Error('Safe hire failed');
 `);
 check('construction reserves, mothball, restart and sale are consistent',`
@@ -149,11 +150,11 @@ g.tanks[0].had=1;if(phaseInfo(g).goal.indexOf('·')<0)throw Error('Goal lacks pr
 var g2=readyGame();g2.stats.born=1;g2.tanks[0].had=1;if(phaseInfo(g2).goal.indexOf('0 / '+KIT_UNLOCK)<0)throw Error('Breeder goal lacks a count');
 `);
 check('speeds unlock through care, automation and profitable fulfilment', `
-var g=readyGame(),t=g.tanks[0];if(maxSpeed(g)!==4)throw Error('Fast start');g.stats.born=1;t.feeder=t.autoWC=1;if(maxSpeed(g)!==12)throw Error('Care did not unlock 12');
-g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=1000000;g.emp.farms.barn=1;g.emp.staff.tier=2;g.emp.proj.autopackm=1;g.emp.beta=.05;g.humans=100;g.kits.stock=0;g.kitPrice=250;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(g.emp.fastUnlocked)throw Error('Thin margins unlocked 40');g.kitPrice=600;g.humans=2000;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(g.emp.fastUnlocked||!g.emp.fastReady)throw Error('40 before a million owners');g.humans=1e6;g.day++;empireDay(g);if(!g.emp.fastUnlocked||maxSpeed(g)!==40)throw Error('Profitable business at a million owners did not unlock 40');
+var g=readyGame(),t=g.tanks[0];if(maxSpeed(g)!==2)throw Error('Fast start');g.stats.born=1;t.feeder=t.autoWC=1;if(maxSpeed(g)!==2)throw Error('Tank care alone should not unlock 4x');
+g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=1000000;g.emp.farms.barn=1;g.emp.staff.tier=2;if(maxSpeed(g)!==4)throw Error('First hatchery should unlock 4x');g.emp.proj.autopackm=1;g.emp.beta=.05;g.humans=100;g.kits.stock=0;g.kitPrice=250;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(g.emp.fastUnlocked)throw Error('Thin margins unlocked 40');g.kitPrice=600;g.humans=2000;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(g.emp.fastUnlocked||!g.emp.fastReady)throw Error('40 before a million owners');g.humans=1e6;g.day++;empireDay(g);if(!g.emp.fastUnlocked||maxSpeed(g)!==12)throw Error('Profitable business at a million owners did not unlock 12');g.emp.won=1;if(maxSpeed(g)!==40)throw Error('Everyone with a tank should unlock 40x');
 `);
 check('industrial upgrades need real preceding stages and output', `
-var g=readyGame();g.money=1e12;g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.emp.proj.farmlic=1;if(farmOk(g,FARMS[2])||buyFarm(g,'hatch')||buyPackTier(g)&&buyPackTier(g))throw Error('Skipped chapter');
+var g=readyGame();g.money=1e12;g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.emp.proj.farmlic=1;if(farmOk(g,FARMS[2])||buyFarm(g,'hatch')||(g.emp.tools={bag:1,catch:1,o2:1,seal:1,box:1},g.emp.staff.tier=1,buyPackTier(g)))throw Error('Skipped chapter');
 g.emp.proj.autopackm=1;g.kits.sold=10000;g.emp.farms.hatch=1;if(lineReady(g,1))throw Error('Skipped first robotic line');g.emp.staff.lines=1;if(!lineReady(g,1)||!buyLine(g,1))throw Error('Next packing tier inaccessible');
 `);
 check('capital purchases protect accrued annual tax', `
@@ -209,6 +210,19 @@ g.emp.wel=0.9;if(!(welfareMult(g)>1.1))throw Error('Thriving owners should refer
 var f=fairShrimpPrice(g);g.priceAED=f*1.5;g.market.m=1.2;g.price=clamp(g.priceAED/fairShrimpPrice(g),0.5,3);if(Math.abs(g.price*fairShrimpPrice(g)-f*1.5)>1e-9)throw Error('An AED shrimp price must hold as mood moves');
 g.emp.won=1;g.emp.farms={rack:3};var raw=g.emp.rawShrimp;empireDay(g);if(g.emp.rawShrimp>raw)throw Error('Farms stop breeding kit stock after the win');
 var w=WORLDS[0];if(!w.wild||!/released/.test(w.why))throw Error('Space worlds should end with free-living shrimp');
+`);
+check('hand packing, packing tools, health checks, treats and story choices',`
+var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=10000;var t=g.tanks[0];t.had=1;t.pop=[{age:60,n:80,g:80},{age:120,n:30,g:80}];t.set.keep=10;
+var taps=0,r;do{r=handStep(g);taps++;}while(!r.kit&&taps<10);if(!r.kit||taps!==5||g.kits.stock!==1)throw Error('A hand-packed kit takes five taps: '+taps);
+if(!buyTool(g,'bag')||!buyTool(g,'catch'))throw Error('Tools');taps=0;do{r=handStep(g);taps++;}while(!r.kit&&taps<10);if(taps!==3)throw Error('Two tools should leave three taps: '+taps);
+['o2','seal','box'].forEach(function(id){buyTool(g,id);});if(!stationDone(g)||g.emp.staff.tier!==1||packCap(g)!==1)throw Error('Five tools make the packing station');
+taps=0;do{r=handStep(g);taps++;}while(!r.kit&&taps<10);if(taps!==1)throw Error('With the station a kit is one tap');
+t.ill={type:'molt',day:0,days:0,sev:1,sick:4};if(treatIll(g,0,'salt',1)!=='wrong'||!t.ill)throw Error('Wrong cure should not help');if(treatIll(g,0,'minerals',1)!=='cured'||t.ill)throw Error('Right cure with a good search heals');
+t.ill={type:'bact',day:0,days:0,sev:1,sick:4};if(treatIll(g,0,'water',0.4)!=='partial'||!t.ill||t.ill.sev!==0.5)throw Error('Missed sick shrimp should leave a milder illness');
+if(!giveTreat(g,0,'pollen')||giveTreat(g,0,'spinach')||treatMult(t)!==1.15)throw Error('One treat at a time; pollen boosts breeding');
+var w0=g.emp.op.w.i;if(!storyChoose(g,'ev_paper',0)||!(g.emp.op.w.i>w0)||!g.ads.some(function(a){return a.id==='press';}))throw Error('Story choice should apply its effect');
+['hatch','kits','farm','million'].forEach(function(k){if(!MILESTONES[k].chapter)throw Error('Chapter missing: '+k);});
+['tanks2','health','tools','station','bulk','worldtab','ripple'].forEach(function(k){if(!MILESTONES[k].intro)throw Error('Feature intro missing: '+k);});
 `);
 {const g=html.slice(html.indexOf('function guideTarget(){'),html.indexOf('function applyGuide(){'));
 if(!g||!html.includes('applyGuide();\n}')||g.indexOf("bottleneck(G)")<0||g.indexOf("consultHas(G,'fix')")>g.indexOf("bottleneck(G)")||/bnText\(G\)/.test(g.slice(0,g.indexOf("consultHas(G,'diag')"))))throw Error('The guide must run each render and only use bottleneck advice the player has paid for');
