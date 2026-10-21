@@ -35,7 +35,7 @@ if(!(goalRowStart>=0&&goalRowStart<dreamSummary&&dreamSummary<nextHeaderRow&&htm
 console.log('PASS Grandpa year tracker shares the progress row with a compact mobile progress label');
 if(!html.includes('class="card coll" data-k="charts" id="charts"')||!html.includes('class="card coll" data-k="ads" id="adscard"'))throw Error('Delayed charts and advertising should fold when first revealed');
 console.log('PASS delayed charts and advertising can fold when first revealed');
-if(!html.includes('.coll.queued{display:none!important}')||!html.includes('function promoteCardReveal(o)')||!html.includes('o.cardQueue.push({k:k,tab:activeTab})')||!html.includes('promoteCardReveal(o);render();')||!html.includes('var PROJ_SHOW=1;'))throw Error('New content should queue one at a time, focus the active card and advance when dismissed');
+if(!html.includes('.coll.queued>:not(.hd){display:none!important}')||!html.includes('function promoteCardReveal(o)')||!html.includes('o.cardQueue.push({k:k,tab:activeTab})')||!html.includes('promoteCardReveal(o);render();')||!html.includes('var PROJ_SHOW=1;'))throw Error('New content should queue one at a time, focus the active card and advance when dismissed');
 console.log('PASS newly revealed cards queue one at a time and fold other sections');
 check('fresh starts preserve milestones; high-speed batches stop at a boundary',`
 var g=readyGame(),t=g.tanks[0];t.chem.bacA=t.chem.bacB=bacTarget(t);t.chem.nh=t.chem.no2=0;rememberCycle(g,t);
@@ -177,5 +177,10 @@ if(g.progress.queue.length||!g.story.letters.million.historical||g.story.anniver
 check('letters are saved at milestones and survive save/load without changing the clock', `
 var g=readyGame();g.day=49;g.stats.born=5;detectMilestones(g);if(g.story.letters.hatch.day!==49||g.story.letters.kit)throw Error('Wrong letter unlock');g.progress.queue=[];g.day=60;detectMilestones(g);if(g.story.letters.hatch.day!==49)throw Error('Letter timestamp moved');var saved=JSON.parse(JSON.stringify(g));migrate(saved);if(saved.story.letters.hatch.day!==49||saved.day!==60)throw Error('Letter save lost');
 `);
+{const g=html.slice(html.indexOf('function guideTarget(){'),html.indexOf('function applyGuide(){'));
+if(!g||!html.includes('applyGuide();\n}')||g.indexOf("bottleneck(G)")<0||g.indexOf("consultHas(G,'fix')")>g.indexOf("bottleneck(G)")||/bnText\(G\)/.test(g.slice(0,g.indexOf("consultHas(G,'diag')"))))throw Error('The guide must run each render and only use bottleneck advice the player has paid for');
+if(!html.includes('id="guidebar"')||html.includes('bar.dataset.tab'))throw Error('Guide bar must not reuse data-tab, which tab code selects on');
+if(!g.includes("key:'feed1',tab:'tank'")||!g.includes("key:'sell',tab:'tank'"))throw Error('Feed and sell guidance must navigate to the Tank action bar');
+console.log('PASS guide points at one next step and keeps bottleneck advice behind the consultancy');}
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

@@ -112,8 +112,8 @@ hr{border:0;border-top:1px solid var(--line);margin:8px 0}
 
 .acts{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:5px;margin-top:4px}
 .acts .btn{min-height:32px;padding:3px 6px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.astrip{height:30px;margin-top:4px;display:flex;align-items:center;gap:8px;padding:0 8px;border-radius:9px;background:var(--surface);border:1px solid var(--line);cursor:pointer;overflow:hidden}
-.astrip .tx{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px}
+.astrip{min-height:30px;padding-top:4px!important;padding-bottom:4px!important;margin-top:4px;display:flex;align-items:center;gap:8px;padding:0 8px;border-radius:9px;background:var(--surface);border:1px solid var(--line);cursor:pointer;overflow:hidden}
+.astrip .tx{flex:1;min-width:0;overflow:hidden;font-size:12.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .astrip .more{font:500 11px var(--font-data);color:var(--ink-3);flex:0 0 auto}
 .astrip b,.apop .alert b{flex:0 0 auto;font:600 10.5px var(--font-data);text-transform:uppercase;letter-spacing:.06em;padding:2px 5px;border-radius:5px}
 .astrip.bad b{background:var(--zone-bad);color:var(--bad)} .astrip.warn b{background:var(--zone-warn);color:var(--warn)} .astrip.info b,.astrip.ok b{background:var(--surface-2);color:var(--ink-2)}
@@ -211,13 +211,25 @@ th:first-child,td:first-child{text-align:left}
 .coll.shut>.hd h2::before{transform:rotate(-90deg)}
 .coll:not(.shut)>.hd{margin-bottom:4px}
 .coll.shut>:not(.hd){display:none!important}
-.coll.queued{display:none!important}
+.coll.queued>:not(.hd){display:none!important}
 #wtcard>summary,#feedcard>summary{display:flex;align-items:center;gap:7px;cursor:pointer;list-style:none;margin-bottom:4px}
 #wtcard>summary::-webkit-details-marker,#feedcard>summary::-webkit-details-marker{display:none}
 #wtcard>summary::before,#feedcard>summary::before{content:'▸';color:var(--ink-3);font-size:12px}
 #wtcard[open]>summary::before,#feedcard[open]>summary::before{content:'▾'}
 #wtcard>summary h2,#feedcard>summary h2{flex:1}
 .opsrow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:6px 0;font-size:13.5px}.opsrow small{display:block;color:var(--ink-3);font-size:11.5px}.opsrow select{font:500 13px var(--font-body);padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);min-height:34px}
+.guidebar{display:flex;align-items:center;gap:8px;width:100%;text-align:left;margin:0 0 10px;padding:9px 12px;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;background:var(--surface);font:500 13.5px/1.35 var(--font-body);color:var(--ink);cursor:pointer}
+.guidebar .gb-k{font:600 10.5px var(--font-body);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);flex:0 0 auto}
+.guidebar .gb-t{flex:1;min-width:0}.guidebar .gb-go{flex:0 0 auto;white-space:nowrap;color:var(--accent);font-weight:600;font-size:12.5px}
+.guidebar .gb-x{flex:0 0 auto;font-size:11.5px;color:var(--ink-3);padding:2px 6px;border:1px solid var(--line);border-radius:8px}
+.next-step{display:block;width:100%;text-align:left;margin:6px 0 2px;padding:7px 10px;border:0;border-radius:9px;background:color-mix(in srgb,var(--accent) 10%,var(--surface));color:var(--ink);font:600 13.5px/1.35 var(--font-body);cursor:pointer}.next-step.soft{background:var(--surface-2);color:var(--ink-2);font-weight:500}
+.guidebar.soft{border-left-color:var(--ink-3);color:var(--ink-2)}.guidebar.soft .gb-k{color:var(--ink-3)}
+@keyframes guidePulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent)}70%,100%{box-shadow:0 0 0 7px color-mix(in srgb,var(--accent) 0%,transparent)}}
+@keyframes guideDot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.55}}
+.btn.guide-btn,#speed button.guide-btn{animation:guidePulse 1.6s ease-out infinite;outline:2px solid var(--accent);outline-offset:2px}
+.card.guide-card{box-shadow:0 0 0 2px var(--accent)}
+.tabs button.guide{position:relative}.tabs button.guide .dot{display:none}.tabs button.guide::after{content:'';position:absolute;top:5px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--s2);animation:guideDot 1.4s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.btn.guide-btn,#speed button.guide-btn,.tabs button.guide::after{animation:none}}
 .coll.fresh>.hd h2::after{content:'new';margin-left:6px;padding:0 5px;border:1px solid var(--accent);border-radius:8px;color:var(--accent);font:600 10px var(--font-body);vertical-align:middle}
 .item .hb .btn{min-width:0;padding:6px 10px}
 .item .eta{display:block;font-size:11px;color:var(--ink-3);margin-top:2px}
@@ -314,6 +326,7 @@ th:first-child,td:first-child{text-align:left}
 </header>
 
 <main>
+<button class="guidebar" id="guidebar" type="button" hidden><span class="gb-k" id="gb-k">Next</span><span class="gb-t" id="gb-text"></span><span class="gb-go" id="gb-go"></span><span class="gb-x" id="gb-x" role="button" tabindex="0" aria-label="Skip this suggestion" hidden>Skip</span></button>
 <section class="card phase-note" id="milestone-card" aria-labelledby="milestone-title" hidden>
   <span class="scope-label" id="milestone-scope">Milestone · time paused</span><h2 id="milestone-title" tabindex="-1"></h2>
   <p class="sub" id="milestone-body"></p><details id="milestone-letter" class="grandpa-letter" hidden><summary id="milestone-lsum"></summary><div id="milestone-ltext"></div></details><div class="btns" id="milestone-actions"></div>
@@ -322,7 +335,7 @@ th:first-child,td:first-child{text-align:left}
 <section class="panel" id="p-tank">
   <details class="card phase-note" id="next-card" open>
     <summary class="goal-summary"><span class="scope-label" id="phase-name"></span><span class="goal-title" id="next-title" role="heading" aria-level="2"></span></summary>
-    <div class="goal-content"><p class="sub" id="next-body"></p><p class="hint" id="sale-forecast"></p>
+    <div class="goal-content"><button type="button" class="next-step" id="next-step" hidden></button><p class="sub" id="next-body"></p><p class="hint" id="sale-forecast"></p>
       <details><summary>Colony goals <span id="g-sum"></span></summary><ul id="goals"></ul></details>
     </div>
   </details>
@@ -2177,8 +2190,7 @@ function checkNewThings(){var k=newThingKeys();if(!seenNew){seenNew={};k.forEach
   if(!fresh.length)return;
   var big=fresh.filter(function(x){return 'nrfsk'.indexOf(x[0].charAt(0))>=0;}),now=Date.now();
   if(big.length&&speed===40&&G.opt.slowNew!==false&&now-(checkNewThings.last||0)>30000){checkNewThings.last=now;setSpeed(12);toast('New: '+big[0][1]+'. Slowed to 12×.');}
-  else if(fresh[0][0].charAt(0)==='o')toast('A pet shop order is waiting in Trade.');
-  else if(fresh[0][0].charAt(0)==='k')toast(G.korder.who+' wants '+G.korder.n+' kits. See Kits.');}
+  else{var told=G.opt.told||(G.opt.told={}),c0=fresh[0][0].charAt(0);if((c0==='o'||c0==='k')&&!told[c0]){told[c0]=1;toast(c0==='o'?'A pet shop order is waiting in Trade.':G.korder.who+' wants '+G.korder.n+' kits. See Kits.');}}}
 function updateConsult(){
   var cc=$('consultcard');if(!cc)return;var d=consultHas(G,'diag'),f=consultHas(G,'fix');cc.hidden=!kitsOpen(G)||activeTab!=='emp'||f||G.kits.sold<5;if(cc.hidden)return;
   setT('cons-sum',d?'report shows in the bar above':'');$('cons-live').hidden=true;
@@ -2383,7 +2395,7 @@ function render(){
   if(activeTab==='up'){updateUpgrades();updateMarket();}
   if(activeTab==='promote')updateMarket();
   if(kitsOpen(G)&&['emp','up','promote','world'].indexOf(activeTab)>=0)updateEmpire();
-  renderProgression();renderChapters();markNewCards();
+  renderProgression();renderChapters();markNewCards();applyGuide();
 }
 // Newly revealed sections take turns: one stays open and marked new, while the
 // rest wait folded until the player closes the current section.
@@ -2406,14 +2418,96 @@ function markNewCards(){
     }}
   });
   promoteCardReveal(o);var active=o.activeCard&&o.activeCard.tab===activeTab?o.activeCard.k:null;
+  document.querySelectorAll('.coll.queued').forEach(function(c){if(!o.cardQueue.some(function(x){return x.k===c.dataset.k;}))c.classList.remove('queued');});
+  var force=active&&markNewCards.lastActive!==active+'@'+activeTab;
   visible.forEach(function(c){var k=c.dataset.k,queued=o.cardQueue.some(function(x){return x.k===k;});
-    c.classList.toggle('queued',queued);if(active){c.classList.toggle('shut',k!==active);o.shut[k]=k!==active;}
+    c.classList.toggle('queued',queued);if(active&&force){var sh=k!==active&&!sameGroup(k,active);c.classList.toggle('shut',sh);o.shut[k]=sh;}
     else if(markNewCards.G!==G)c.classList.toggle('shut',!!o.shut[k]);
     if(c.classList.contains('fresh')!==!!o.fresh[k])c.classList.toggle('fresh',!!o.fresh[k]);
     var h=c.querySelector(':scope>.hd'),ex=String(!c.classList.contains('shut'));if(h&&h.getAttribute('aria-expanded')!==ex)h.setAttribute('aria-expanded',ex);
   });
+  if(active)markNewCards.lastActive=active+'@'+activeTab;
   if(o.seenLegacy)o.seenTab[activeTab]=1;markNewCards.G=G;
 }
+
+// ----- guide: one next step at a time, taken from the current goal -----
+// Points at a tab, a section and a button. Bottleneck advice stays behind the paid consultancy.
+var TAB_NAME={tank:'Tank',up:'Equipment',market:'Trade',emp:'Kits',promote:'Marketing',world:'World',space:'Space'};
+function guideOk(t){return G.opt.guideSkip&&G.opt.guideSkip[t.key]?null:(t.skip=1,t);}
+function guideTarget(){
+  var t;
+  if(G.progress&&G.progress.queue.length)return null;
+  var E=G.emp,T0=G.tanks[0],T=TK(),open=kitsOpen(G),farm=Object.keys(E.farms).some(function(k){return E.farms[k]>0;});
+  var slow=maxSpeed(G)>speed&&speed>0?{key:'speed'+maxSpeed(G),sel:'#speed [data-speed="'+maxSpeed(G)+'"]',soft:true}:null;
+  function wait(text){var w=slow?{key:slow.key,sel:slow.sel,soft:true,text:text+' Try '+maxSpeed(G)+'×.'}:{key:'wait',soft:true,text:text};return w;}
+  if(!anyHad()){
+    if(safeToStock(G,T0))return {key:'buy',tab:'market',card:'buy',sel:'[data-act="buy"]',text:'Water is safe. Buy some shrimp in Trade.'};
+    return {key:'cycle',tab:'tank',card:'startcard',sel:'#startcard .btn.primary',bar:false};
+  }
+  var stepMode=$('kit-steps')&&!$('kit-steps').hidden;
+  if(G.kits.sold<1&&stepMode)return {key:'kitstep',tab:'emp',card:'kits',sel:'#kit-steps .btn.primary',text:'Starter kits are open. Make your first kit in Kits.'};
+  if(G.order&&!G.order.taken)return {key:'order'+(G.order.i||0),tab:'market',card:'order',sel:'[data-act="order-take"]',text:'A pet shop wants shrimp. Take the order in Trade.'};
+  if(G.order&&G.order.taken&&$('ord-btns')&&$('ord-btns').querySelector('[data-act="order-deliver"]:not([disabled])'))return {key:'orderd'+(G.order.i||0),tab:'market',card:'order',sel:'[data-act="order-deliver"]',text:'The pet shop order is ready. Deliver it in Trade.'};
+  if(!open){
+    if(!(G.ob.feeds||0)&&!T.feeder)return {key:'feed1',tab:'tank',sel:'#tb-feed',text:'Your shrimp are hungry. Tap Feed.'};
+    if(sellableStock(G)>0&&demandLeft(G)>0&&!T.set.autoSell)return {key:'sell',tab:'tank',sel:'#tb-sell',text:'Shrimp are ready. Tap Sell.'};
+    var fc=upgradeCost(G,T,'feeder');if(G.ob.up&&!T.feeder&&fc!=null&&G.money>=fc&&(t=guideOk({key:'feeder',tab:'up',card:'equipment',sel:'[data-act="upg"][data-id="feeder"]',text:'An auto feeder feeds daily for you and unlocks 12×.'})))return t;
+    var tc=upgradeCost(G,T,'tank');if(G.ob.up&&totalN(T)/T.vol>=4.5&&tc!=null&&G.money>=tc&&(t=guideOk({key:'bigger'+T.vol,tab:'up',card:'equipment',sel:'[data-act="upg"][data-id="tank"]',text:'Crowded tank. A bigger tank keeps breeding fast.'})))return t;
+    return wait(sellableStock(G)>0?'Buyers are used up this week.':'Waiting for shrimp to grow. '+(saleForecast(G)||''));
+  }
+  if(G.korder&&!G.korder.taken)return {key:'ko'+G.korder.i,tab:'emp',card:'korder',sel:'[data-act="korder-take"]',text:G.korder.who+' wants '+big(G.korder.n)+' kits. Accept or skip in Kits.'};
+  if(G.korder&&G.korder.taken&&G.kits.stock>=G.korder.n)return {key:'kod'+G.korder.i,tab:'emp',card:'korder',sel:'[data-act="korder-deliver"]',text:'The bulk order is packed. Deliver it in Kits.'};
+  if(!farm){
+    if(G.kits.stock<1&&!packCap(G)&&spareKitShrimp(G)>=KIT_SHRIMP&&G.money>=kitMaterials(G))return {key:'pack',tab:'emp',card:'kits',sel:'#btn-pack1',text:'No kits in stock. Pack one in Kits.'};
+    if(!E.staff.tier&&G.kits.sold>=3&&G.money>=PACK_TIERS[1].m&&(t=guideOk({key:'bench',tab:'emp',card:'staff',sel:'[data-act="packtier"]',text:'A packing bench packs 1 kit a day for you.'})))return t;
+    if(G.kits.sold<10)return wait('Kits sell as orders arrive · '+Math.floor(G.kits.sold)+' / 10 sold.');
+    var lic=PROJ.find(function(p){return p.id==='farmlic';});
+    if(!pd(G,'farmlic'))return G.money>=lic.m?{key:'lic',tab:projectArea(lic),card:'proj',sel:'[data-act="proj"][data-id="farmlic"]',text:'Buy the farm license ('+aed(lic.m)+').'}:wait('Save '+aed(lic.m)+' for the farm license.');
+    var f0=FARMS[0];return G.money>=farmCost(G,f0)+farmWorkingCapital(G,f0)?{key:'rack',tab:'up',card:'farms',sel:'[data-act="farm"][data-id="'+f0.id+'"]',text:'Build your first grow rack in Equipment.'}:wait('Save '+aed(farmCost(G,f0)+farmWorkingCapital(G,f0))+' for a grow rack.');
+  }
+  if(E.won)return null;
+  if(consultHas(G,'fix')){var b=bottleneck(G),m={packing:['emp','staff'],shrimp:['up','farms'],ceiling:['world','reg'],demand:['promote','ads'],cash:['emp','kits'],paused:['up','farms']}[b&&b.k];
+    if(m)return {key:'bn'+b.k,tab:m[0],card:m[1],text:b.d+' → '+b.f,label:'Advice'};}
+  for(var li=0;li<PACK_LINES.length;li++)if(lineReady(G,li)&&!lineCount(G,li)&&G.money>=lineCost(G,li)+capitalReserve(G)&&(t=guideOk({key:'line'+li,tab:'emp',card:'staff',sel:'[data-act="line"][data-tier="'+li+'"]',text:'New packing machine ready: '+PACK_LINES[li].name+'.'})))return t;
+  var nr=nextRegion(G);if(rv('ereg')&&nr&&G.money>=nr.m+capitalReserve(G)&&kitCap(G)-G.humans<Math.max(50,kitDemand(G)*30)&&(t=guideOk({key:'reg'+nr.id,tab:'world',card:'reg',sel:'[data-act="region"]',text:'Most willing people already have a tank. Open '+nr.name+' in World.'})))return t;
+  var cp=projAvail(G).find(function(p){return p.c==='cult'&&E.inf>=p.i&&p.id!=='gala';});if(cp&&(t=guideOk({key:'cult'+cp.id,tab:'world',card:'proj',sel:'[data-act="proj"]:not([data-id="gala"])',text:'Enough ✦ for a culture project.'})))return t;
+  var bp=null;['emp','up','promote'].forEach(function(t){if(bp)return;var top=projAvail(G).filter(function(p){return projectArea(p)===t;}).sort(function(a,b){return projectRank(G,a)-projectRank(G,b);})[0];if(top&&top.c==='biz'&&top.m>0&&G.money>=pm(G,top)+capitalReserve(G))bp={p:top,t:t};});
+  if(bp&&(t=guideOk({key:'biz'+bp.p.id,tab:bp.t,card:'proj',sel:'[data-act="proj"][data-id="'+bp.p.id+'"]',text:'Affordable now: '+bp.p.name+'.'})))return t;
+  if(pd(G,'ministry')&&!E.op.run&&E.op.offer&&E.inf>=campCost(E.op.n)&&(t=guideOk({key:'camp'+E.op.n,soft:true,tab:'world',card:'op',sel:'[data-act="camp"]',text:'A public campaign is ready to launch.'})))return t;
+  if(consultHas(G,'diag'))return {key:'bnd',soft:true,tab:'emp',card:'kits',text:bnText(G),label:'Report'};
+  if(G.money>=CONSULT.diag.cost*3&&kitDemand(G)>=1&&G.day<(G.opt.diagHint||(G.opt.diagHint=G.day+90))&&(t=guideOk({key:'diag',soft:true,tab:'emp',card:'consultcard',sel:'[data-act="consult"][data-k="diag"]',text:'Not sure what slows growth? Consultants sell a bottleneck report.'})))return t;
+  var nc=projAvail(G).filter(function(p){return p.c==='cult'&&p.id!=='gala';}).sort(function(a,b){return a.i-b.i;})[0];
+  if(G.humans>=1e6&&nc)return wait('Next culture project: ✦ '+big(nc.i)+' ('+big(Math.floor(E.inf))+' now).');
+  return wait('Owners '+big(Math.floor(G.humans))+' (+'+big(rate(G,'_own'))+'/day). Referrals drive growth; kit survival and price speed them up.');
+}
+function applyGuide(){
+  var g=guideTarget(),o=G.opt,bar=$('guidebar');
+  document.querySelectorAll('.guide-btn,.guide-card,.tabs button.guide').forEach(function(e){e.classList.remove('guide-btn','guide-card','guide');});
+  var inCard=!$('next-card').hidden&&$('next-card').getClientRects().length>0,ns=$('next-step');
+  ns.hidden=!(inCard&&g&&g.text&&g.bar!==false);if(!ns.hidden){var nt=(g.soft?'':'Next: ')+g.text+(g.tab&&g.tab!==activeTab?' Open '+TAB_NAME[g.tab]+' ›':'');if(ns.textContent!==nt)ns.textContent=nt;ns.classList.toggle('soft',!!g.soft);}
+  if(g){bar.dataset.key=g.key;bar.dataset.gtab=g.tab||'';bar.dataset.card=g.card||'';}
+  if(!g||g.bar===false||!g.text||inCard){bar.hidden=true;}
+  else{bar.hidden=false;bar.classList.toggle('soft',!!g.soft);setT('gb-k',g.label||(g.soft?'Meanwhile':'Next'));setT('gb-text',g.text);
+    var go=g.tab&&g.tab!==activeTab?TAB_NAME[g.tab]+' ›':'';setT('gb-go',go);$('gb-x').hidden=!g.skip;}
+  if(!g)return;
+  if(g.tab&&g.tab!==activeTab){var tb=document.querySelector('.tabs [data-tab="'+g.tab+'"]');if(tb&&!tb.hidden&&!g.soft)tb.classList.add('guide');return;}
+  var c=g.card&&document.querySelector('.coll[data-k="'+g.card+'"],#'+g.card);
+  if(c&&c.getClientRects().length){
+    if(!g.soft)c.classList.add('guide-card');
+    var key=g.key+'@'+activeTab;
+    if(o.guideOpened!==key&&c.classList.contains('coll')){o.guideOpened=key;var k=c.dataset.k;
+      o.cardQueue=(o.cardQueue||[]).filter(function(x){return x.k!==k;});c.classList.remove('queued');
+      if(c.classList.contains('shut')){c.classList.remove('shut');o.shut[k]=false;if(o.fresh)delete o.fresh[k];
+        document.querySelectorAll('.coll').forEach(function(x){if(x!==c&&x.dataset.k&&!sameGroup(x.dataset.k,k)&&x.getClientRects().length){x.classList.add('shut');o.shut[x.dataset.k]=true;}});}
+      o.activeCard={k:k,tab:activeTab};markNewCards.lastActive=k+'@'+activeTab;
+      var r=c.getBoundingClientRect();if(r.top>innerHeight*0.8||r.bottom<0)try{c.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}}
+  }
+  if(g.sel){var b=Array.from(document.querySelectorAll(g.sel)).find(function(e){return e.getClientRects().length&&!e.disabled;});
+    if(b&&!b.classList.contains('first-feed'))b.classList.add('guide-btn');}
+}
+// Sections used together stay open together.
+var CARD_GROUP={kits:'k',staff:'k',korder:'k',sell:'s',rules:'s'};
+function sameGroup(a,b){return !!CARD_GROUP[a]&&CARD_GROUP[a]===CARD_GROUP[b];}
 
 // Academic work belongs to the Earth chapter; astronomy adds questions later.
 function chapterButton(action,label,enabled,id,extra){return '<button class="btn" data-chapter="'+action+'"'+(id?' data-id="'+id+'"':'')+(extra?' data-upgrade="'+extra+'"':'')+(enabled?'':' disabled')+'>'+label+'</button>';}
@@ -2545,7 +2639,7 @@ function renderProgression(){
  var descriptions={emp:open?'Shrimp in, kits out. Price sets orders.':'',up:'Hatcheries supply shrimp. Packing is purchased separately in Kits. Your original tank can improve its permanent quality certificate.',promote:'Advertising attracts initial customers; referrals sustain growth. Shops add distribution and influence, with annual rent and management costs.',world:academyOpen(G)?'Research grants now improve Earth production. Build a university team before the ten-year space chapter. Regions and culture keep expanding adoption.':'Regions add reachable people. Adoption projects raise willingness; research partnerships open after 1,000 delivered kits.'};
  setT('business-title','');setT('business-body','');$('business-title').hidden=true;$('business-body').hidden=true;
  var future=projAvail(G).filter(function(p){return projectArea(p)===activeTab;}).sort(function(a,b){return projectRank(G,a)-projectRank(G,b);}).filter(function(p){return !(activeTab==='promote'&&G.kits.sold>=1000&&p.id==='social');}).slice(0,1);
- setT('business-roadmap',activeTab==='emp'&&maxSpeed(G)<40?(maxSpeed(G)<12?'12×: after a hatch + an auto feeder. ':'')+(G.emp.fastReady?'40×: at a million owners ('+big(Math.floor(G.humans))+' now).':'40×: after auto packing, a barn, 7 days of AED '+fmt(FAST_PROFIT)+'+ kit profit a day, then a million owners.'):'');
+ $('speed').title=(maxSpeed(G)<40?(maxSpeed(G)<12?'12×: after a hatch + an auto feeder. ':'')+(G.emp.fastReady?'40×: at a million owners ('+big(Math.floor(G.humans))+' now).':'40×: after auto packing, a barn, 7 days of AED '+fmt(FAST_PROFIT)+'+ kit profit a day, then a million owners.'):'');setT('business-roadmap','');
  var limit=open&&consultHas(G,'fix')?bottleneck(G):null,target=limit?{packing:'emp',shrimp:'up',ceiling:'world',demand:'promote',cash:'emp',paused:'up'}[limit.k]:null,action=target&&target!==activeTab?'<button class="btn" data-act="navigate" data-tab="'+target+'">'+({emp:'Open Kits',up:'Open Equipment',world:'Open World',promote:'Open Marketing'}[target])+'</button>':'';if($('business-actions').innerHTML!==action)$('business-actions').innerHTML=action;
  $('business-strip').hidden=!business||kitStage(G)<2;$('business-guide').hidden=!business||(!$('business-roadmap').textContent&&!$('business-actions').innerHTML);
  if(business){var net=operatingNet(G),run=cashRunway(G),d=kitDemand(G);$('business-strip').innerHTML=[['Profit/day',net==null?'…':aed(net)],['Packed / orders',big(E.packed)+' / '+big(d)]].concat(isFinite(run)?[['Cash lasts',Math.floor(run)+' days']]:[]).map(function(r){return '<div><small>'+r[0]+'</small><b>'+r[1]+'</b></div>';}).join('');['vitals','vwater','acts','tankchips','apop','fold'].forEach(function(id){$(id).hidden=true;});var bt=bnText(G);$('astrip').hidden=!bt;setT('astrip',bt);}
@@ -2637,11 +2731,15 @@ function initControls(){
     c.classList.toggle('shut');o.shut[k]=c.classList.contains('shut');
     if(o.activeCard&&o.activeCard.k===k&&o.shut[k]){delete o.fresh[k];o.activeCard=null;}
     else if(!o.shut[k]&&o.fresh[k])delete o.fresh[k];
-    if(!o.shut[k])document.querySelectorAll('.coll').forEach(function(x){if(x!==c&&x.dataset.k){o.shut[x.dataset.k]=true;x.classList.add('shut');}});
+    if(!o.shut[k])document.querySelectorAll('.coll').forEach(function(x){if(x!==c&&x.dataset.k&&!sameGroup(x.dataset.k,k)){o.shut[x.dataset.k]=true;x.classList.add('shut');}});
     promoteCardReveal(o);render();
   });
   document.querySelectorAll('.coll').forEach(function(c){var sh=G.opt.shut||{ads:true,sup:true,fin:true};if(!G.opt.shut)G.opt.shut=sh;c.classList.toggle('shut',!!sh[c.dataset.k]);});
   $('fold').addEventListener('click',function(){G.opt.collapse=!G.opt.collapse;render();});
+  $('next-step').addEventListener('click',function(){$('guidebar').click();});
+  $('gb-x').addEventListener('click',function(e){e.stopPropagation();var k=$('guidebar').dataset.key;if(k){G.opt.guideSkip=G.opt.guideSkip||{};G.opt.guideSkip[k]=1;render();}});
+  $('gb-x').addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();this.click();}});
+  $('guidebar').addEventListener('click',function(){var t=this.dataset.gtab,k=this.dataset.card;if(t&&t!==activeTab){var b=document.querySelector('.tabs [data-tab="'+t+'"]');if(b&&!b.hidden)b.click();}G.opt.guideOpened=null;render();var c=k&&document.querySelector('.coll[data-k="'+k+'"],#'+k);if(c&&c.getClientRects().length)try{c.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}});
   $('ovtbl').addEventListener('click',function(e){var r=e.target.closest('[data-sel]');if(!r)return;G.sel=+r.dataset.sel;lastChartKey='';lastColSig='';lastAlerts='';lastChips='';cache.mvsig=cache.segsig=cache.shopsig=cache.upsig=cache.ov=null;syncControls();render();});
   document.addEventListener('change',function(e){var a=e.target.dataset&&e.target.dataset.adrep;if(a){G.adRepeat[a]=e.target.checked;cache.adsig=null;}});
   $('astrip').addEventListener('click',function(e){if(e.target.closest('button'))return;var p=$('apop');if(p.innerHTML&&realTK()._a&&realTK()._a.length>=1){p.hidden=!p.hidden;$('astrip').setAttribute('aria-expanded',String(!p.hidden));}});
