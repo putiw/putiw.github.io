@@ -1,5 +1,5 @@
 const fs=require('fs'),vm=require('vm'),path=require('path');
-const html=fs.readFileSync(path.join(__dirname,'../shrimp/index.html'),'utf8');let seed=Number(process.env.REVIEW_SEED||7);const runSeed=seed;const math=Object.create(Math);math.random=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);
+const html=fs.readFileSync(process.env.SHRIMP_GAME_PATH||path.join(__dirname,'../shrimp/index.html'),'utf8');let seed=Number(process.env.REVIEW_SEED||7);const runSeed=seed;const math=Object.create(Math);math.random=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);
 const c=vm.createContext({console,Math:math});vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);
 vm.runInContext('var cache={},lastChips="",lastColSig="",lastChartKey="",lastAlerts="";function toast(){};function anyHad(){return G.tanks.some(t=>t.had||totalN(t)>=1);}'+html.split('function updateReveal(){')[1].split('function applyReveal(){')[0].replace(/^/, 'function updateReveal(){'),c);
 vm.runInContext(`
@@ -27,7 +27,7 @@ if(!T.had){
  if(T.chem.temp>28&&T.heater===1&&afford(1300))buyUpgrade(G,T,'heater');
  if(G.ob.up&&T.chem.bacA<bacTarget(T)&&upgradeCost(G,T,'filter')!=null&&afford(upgradeCost(G,T,'filter')))buyUpgrade(G,T,'filter');
 }
-checkGoals(G);
+checkGoals(G);if(G.story.anniversary)note('ten-year celebration');
 if(kitsOpen(G)){
  note('kits unlocked');
  if(!E.staff.tier&&afford(300))buyPackTier(G);
@@ -46,11 +46,14 @@ if(kitsOpen(G)){
  for(var p of PROJ.filter(p=>p.c==='cult'))if(!pd(G,p.id)&&p.req(G)&&E.inf>=p.i)buyProj(G,p.id);
  var r=nextRegion(G);if(G.ob.ereg&&r&&afford(r.m)&&G.humans>100)buyRegion(G);
  if(farmCap(G)&&E.inf<1000&&G.money>galaCost(G)*10)buyProj(G,'gala');
- G.kitPrice=farmCap(G)?600:250;
+ G.kitPrice=farmCap(G)?${process.env.REVIEW_KIT_PRICE==='market'?'bestKitPrice(G)':Number(process.env.REVIEW_KIT_PRICE||600)}:250;
  if(G.humans>=100)note('100 owners');if(G.humans>=10000)note('10k owners');if(G.humans>=1e6)note('million owners');if(pd(G,'ministry'))note('ministry');if(pd(G,'last'))note('last holdouts');
  if(E.won)note('win');
 }
 }
 for(var day=0;day<12000;day++){policy();for(var q=0;q<4;q++){if(progressionBlocked(G)){while(G.progress.queue.length)acknowledgeMilestone(G);if(G.emp.won)break;}stepGame(G);}if(G.emp.won)break;if(G.money<0){console.log('INSOLVENT',JSON.stringify({day:G.day,money:G.money,fc:farmCap(G),pc:packCap(G),d:kitDemand(G),stock:G.kits.stock,raw:G.emp.rawShrimp,overhead:fixedOverhead(G),reserve:operatingReserve(G),farms:G.emp.farms,lines:G.emp.packLines,log:G.log.slice(-15),fin:G.fin.slice(-3)}));break;}if(day%1000===0)console.log('progress',G.day,Math.round(G.money),G.kits.sold,Math.round(G.humans));}
+if(G.emp.won)note('win');
 `,c,{timeout:180000});
-fs.mkdirSync(process.env.REVIEW_OUTPUT||'/private/tmp/shrimp-tests',{recursive:true});fs.writeFileSync(path.join(process.env.REVIEW_OUTPUT||'/private/tmp/shrimp-tests',`run-${runSeed}.json`),JSON.stringify({events:c.events,day:c.G.day,won:c.G.emp.won,money:c.G.money,owners:c.G.humans,snapshots:c.snapshots}));console.log(JSON.stringify(c.events,null,2));if(!c.G.emp.won)throw Error('Playthrough failed to finish');console.log('WIN',runSeed,c.G.day,c.G.money);
+fs.mkdirSync(process.env.REVIEW_OUTPUT||'/private/tmp/shrimp-tests',{recursive:true});fs.writeFileSync(path.join(process.env.REVIEW_OUTPUT||'/private/tmp/shrimp-tests',`run-${runSeed}.json`),JSON.stringify({events:c.events,day:c.G.day,won:c.G.emp.won,money:c.G.money,owners:c.G.humans,dream:c.G.story,snapshots:c.snapshots}));console.log(JSON.stringify(c.events,null,2));if(!c.G.emp.won)throw Error('Playthrough failed to finish');console.log('WIN',runSeed,c.G.day,c.G.money,'TEN_YEAR',c.G.story.tenYearAchieved);if(process.env.REQUIRE_TEN_YEAR==='1'&&!c.G.story.tenYearAchieved)throw Error('Ten-year dream missed');
+
+if(process.env.REQUIRE_AFTER_TEN_YEAR==='1'&&!(c.G.day>c.DREAM_DAYS&&c.G.story.anniversary&&!c.G.story.tenYearAchieved))throw Error('Expected a continued run after the ten-year celebration');

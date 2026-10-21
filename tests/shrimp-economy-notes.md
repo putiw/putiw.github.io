@@ -27,8 +27,8 @@ cash is constrained, while still protecting accrued annual tax.
 | Barn | 30,000 | 30,000 | 80 shrimp/day |
 | Industrial hatchery | 600,000 | 1,200,000 | 2,000 shrimp/day |
 | Mega hatchery | 15,000,000 | 40,000,000 | 56,000 shrimp/day |
-| Ocean ranch | 50,000,000 | 600,000,000 | 400,000 shrimp/day |
-| Arcology | 1,500,000,000 | 15,000,000,000 | 8,000,000 shrimp/day |
+| Ocean ranch | 50,000,000 | 300,000,000 | 400,000 shrimp/day |
+| Arcology | 1,500,000,000 | 7,500,000,000 | 8,000,000 shrimp/day |
 | Shelf ad | 150 | 600 | Corrects unusually cheap sustained reach |
 | Expo ad | 4,000 | 900 | Short, stock-dependent launch campaign |
 | Daily reel | 25 | 10 | Small repeatable launch campaign |
@@ -97,3 +97,23 @@ not evidence that every strategy is optimal or that human pacing is settled.
 Browser checks cover actual purchases, all business tabs, phone layout, legacy
 saves and the ending. Future tuning should use player behaviour as well as these
 deterministic checks.
+
+## Grandpa’s ten-year dream
+
+The opening gifts an empty tank and a hopeful ten-year challenge. The tracker
+uses elapsed game time, with exact remaining days inside the journal. Opening
+the journal pauses time. Letters accompany the first hatch, first kit, first
+farm and millionth owner; the archive retains their original dates.
+
+At day 3,650, an unfinished run pauses for a celebration with a snapshot of
+its owners. It continues after acknowledgement. Worldwide adoption remains the
+ultimate ending, with an extra achievement for finishing on or before day 3,650.
+There is no death event, lost progress or failure state for passing ten years.
+Existing games gain historical letters without replaying the opening, and an
+existing game already past ten years does not invent an anniversary owner count.
+
+Ocean and arcology construction prices were reduced from 600M/15B to 300M/7.5B
+to make the achievement reachable while leaving early care, unlocks, production
+capacity and packing requirements unchanged. Capital per daily potential kit
+still rises from mega hatchery (5,714 AED) to ocean (6,000) to arcology (7,500).
+This does not guarantee that every pricing or expansion strategy meets ten years.

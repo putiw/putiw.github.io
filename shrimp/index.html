@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="A text-only cherry shrimp breeding and selling sim.">
+<meta name="description" content="One empty tank. One big dream. Build a shrimp-keeping community with Grandpa and try to reach the whole world in ten years.">
 <title>Universal Shrimp</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -236,6 +236,13 @@ th:first-child,td:first-child{text-align:left}
 .biznav [aria-pressed=true]{background:var(--ink);color:var(--bg)}
 .item>.btns,.item>.impact,.item>.hb{grid-column:1/-1}
 .impact{display:block;margin-top:5px;font-size:12px;color:var(--ink-2)}
+.dream-tracker{margin-top:6px;font-size:12px;border-top:1px solid var(--line);padding-top:5px}
+.dream-tracker>summary{cursor:pointer;display:flex;align-items:baseline;justify-content:space-between;gap:8px;list-style:revert}
+.dream-tracker>summary>span::before{content:'▸ ';color:var(--ink-3)}.dream-tracker[open]>summary>span::before{content:'▾ '}
+.dream-tracker small{color:var(--good);text-align:right}.dream-inner{max-height:45vh;overflow:auto;padding:8px 2px 4px;white-space:normal}
+.dream-inner h3{margin:10px 0 5px}.dream-inner details{border-top:1px solid var(--line);padding:6px 0}.dream-inner details p{white-space:pre-line;margin-top:5px}
+.grandpa-letter{margin:10px 0;padding:10px 12px;background:var(--surface-2);border-left:3px solid var(--accent);font-size:13px;white-space:pre-line}
+#milestone-body{white-space:pre-line}body.story-intro .top,body.story-intro .tabs{display:none!important}
 #milestone-card{border:2px solid var(--accent);scroll-margin-top:12px}#milestone-card h2:focus{outline:none}
 .scope-label{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
 .coll>.hd:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
@@ -256,6 +263,7 @@ th:first-child,td:first-child{text-align:left}
     </div>
   </div>
   <div class="goalrow"><div class="goal-bar"><i id="b-goalbar" style="width:0"></i></div><span id="b-goal" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis"></span><span id="b-inf" class="mono" title="Influence"></span><button class="fold" id="fold" aria-expanded="true">readings ▴</button></div>
+  <details class="dream-tracker" id="dream-tracker"><summary><span id="dream-year"></span><small id="dream-badge"></small></summary><div class="dream-inner"><p>A tank for everyone. Ten years to try.</p><p class="hint" id="dream-time"></p><p class="hint" id="dream-progress"></p><p class="hint">The tenth year is a celebration. You can keep growing the dream afterward.</p><p class="hint">Opening this journal pauses time. Resume whenever you’re ready.</p><h3>Letters from Grandpa</h3><div id="dream-letters"></div></div></details>
   <div class="chips" id="tankchips" hidden></div>
   <div class="vitals" id="vitals">
     <div class="vn"><b class="mono" id="vt-n">0</b><small>shrimp</small></div>
@@ -272,8 +280,8 @@ th:first-child,td:first-child{text-align:left}
 
 <main>
 <section class="card phase-note" id="milestone-card" aria-labelledby="milestone-title" hidden>
-  <span class="scope-label">Milestone · time paused</span><h2 id="milestone-title" tabindex="-1"></h2>
-  <p class="sub" id="milestone-body"></p><div class="btns" id="milestone-actions"></div>
+  <span class="scope-label" id="milestone-scope">Milestone · time paused</span><h2 id="milestone-title" tabindex="-1"></h2>
+  <p class="sub" id="milestone-body"></p><blockquote id="milestone-letter" class="grandpa-letter" hidden></blockquote><div class="btns" id="milestone-actions"></div>
 </section>
 <section class="card phase-note" id="next-card" aria-labelledby="next-title">
   <span class="scope-label" id="phase-name"></span><h2 id="next-title"></h2><p class="sub" id="next-body"></p>
@@ -489,7 +497,7 @@ th:first-child,td:first-child{text-align:left}
 
 <script>
 // ==SIM-START==
-var DT=0.25;
+var DT=0.25, DREAM_DAYS=3650;
 var VOLS=[20,40,80,160,320,640], VOL_COST=[0,150,350,900,2500,6500];
 var FILT_NAME=['','Sponge filter','Hang-on-back filter','Canister filter','Bio-tower'];
 var FILT_MULT=[0,1,3,9,27], FILT_COST=[0,0,120,450,1800];
@@ -542,8 +550,8 @@ var FARMS=[
   {id:'barn',name:'Shrimp barn',cost:30000,up:60,out:10,note:'Breeds 80 shrimp a day, using your certified laboratory quality. Packing is separate.'},
   {id:'hatch',name:'Industrial hatchery',cost:1.2e6,up:900,out:250,note:'Climate-controlled rooms of breeding tanks.'},
   {id:'mhatch',name:'Mega hatchery',cost:4e7,up:15000,out:7000,note:'A hatchery the size of a football stadium.'},
-  {id:'ocean',name:'Ocean shrimp ranch',cost:6e8,up:5e4,out:5e4,req:'ocean',note:'Floating pens of freshwater bags anchored at sea.'},
-  {id:'arco',name:'Shrimp arcology',cost:1.5e10,up:1e6,out:1e6,req:'arco',note:'A floating city where the shrimp outnumber the stars.'}
+  {id:'ocean',name:'Ocean shrimp ranch',cost:3e8,up:5e4,out:5e4,req:'ocean',note:'Floating pens of freshwater bags anchored at sea.'},
+  {id:'arco',name:'Shrimp arcology',cost:7.5e9,up:1e6,out:1e6,req:'arco',note:'A floating city where the shrimp outnumber the stars.'}
 ];
 function regOpen(G,id){return G.emp.regions.indexOf(id)>=0;}
 function pd(G,id){return !!G.emp.proj[id];}
@@ -590,7 +598,7 @@ var PROJ=[
   {id:'shrimpday',c:'cult',name:'World Shrimp Day',d:'A public holiday. Nobody works, everybody looks at shrimp. Adoption ceiling +15%.',m:0,i:5.4e7,req:function(G){return pd(G,'hotel');},eff:function(E){E.ceil+=0.15;}},
   {id:'songs',c:'cult',name:'Subliminal shrimp in pop songs',d:'You cannot hear it, but you suddenly want a shrimp. Word of mouth +3%.',m:0,i:1.08e8,req:function(G){return pd(G,'friends');},eff:function(E){E.beta+=0.03;}},
   {id:'code',c:'cult',name:'Shrimp-friendly building code',d:'Every new building comes with a tank niche. Adoption ceiling +10%.',m:0,i:3.6e8,req:function(G){return pd(G,'shrimpday');},eff:function(E){E.ceil+=0.10;}},
-  {id:'last',c:'cult',name:'The last holdouts',d:'Personally deliver tanks to lighthouse keepers, submarine crews, Antarctic researchers and one very stubborn grandpa. Adoption ceiling reaches 100%.',m:0,i:4e8,req:function(G){return pd(G,'code')&&G.emp.regions.length===REGIONS.length;},eff:function(E){E.ceil=1;}}
+  {id:'last',c:'cult',name:'The last holdouts',d:'Personally deliver tanks to lighthouse keepers, submarine crews, Antarctic researchers and one very stubborn neighbour. Adoption ceiling reaches 100%.',m:0,i:4e8,req:function(G){return pd(G,'code')&&G.emp.regions.length===REGIONS.length;},eff:function(E){E.ceil=1;}}
 ];
 var MOVIES=[
   ['The Shrimpfather','A crustacean crime family makes you an offer you cannot refuse: a 20 L starter kit.'],
@@ -912,7 +920,7 @@ function newTank(i){
 }
 function newGame(){
   return{
-    v:2,progress:{version:1,seen:{},queue:[],sandbox:false},day:0,step:0,money:400,sel:0,tanks:[newTank(0)],
+    v:2,story:newStory(),progress:{version:1,seen:{intro:true},queue:['intro'],sandbox:false},day:0,step:0,money:400,sel:0,tanks:[newTank(0)],
     market:{m:1},price:1,kitPrice:250,ads:[],webShop:0,soldWeek:0,
     stats:{sold:0,revenue:0,born:0,died:0,peak:0},
     kits:{stock:0,acc:0,sold:0},humans:0,log:[],adRepeat:{},emp:newEmp(),opt:newOpt(),ob:{kit:0,bottle:0,doses:0}
@@ -920,7 +928,7 @@ function newGame(){
 }
 function newEmp(){return{chainVersion:2,farmPaid:{},farmStage:-1,shopStage:-1,rawShrimp:0,packedTotal:0,packLines:{},legacyPacking:0,fastDays:0,fastUnlocked:false,inf:0,infTotal:0,regions:['auh'],shops:{},farms:{},proj:{},q:0.6,beta:0.02,ceil:0.2,mat:KIT_COST,pausedFarms:{},inventoryDays:7,reserveDays:14,bizView:'production',autoPack:true,packTarget:20,gala:0,acc:0,won:0,failed:0,prod:0,packed:0,soldToday:0,staff:{sales:0,pack:0,mgr:0,tech:0,aiSales:false,aiMgr:false,aiTech:false,tier:0,lines:0},goals:{},movie:{n:0,left:0},op:newOpinion(),leases:[],lic:null};}
 function newOpt(){return{slow:true,collapse:false};}
-function migrate(G){if(!G.ob)G.ob=G.day>0?{kit:1,bottle:1,doses:10,wc:1,sell:1,up:1,market:1,hatch:1,fs:0}:{kit:0,bottle:0,doses:0};if(!G.emp)G.emp=newEmp();if(!G.adRepeat)G.adRepeat={};var E=G.emp,oldChain=E.chainVersion!==2,d=newEmp();for(var k in d)if(E[k]===undefined)E[k]=d[k];if(E.shownEmp&&G.ob.eproj===undefined){var o=G.ob,sc=shopCount(G);if(G.kits.sold>=1||Object.keys(E.proj).length)o.eproj=1;if(o.eproj&&(G.kits.sold>=10||sc>0))o.eshops=1;if(o.eshops&&(sc>0||E.regions.length>1))o.ereg=1;if(E.proj.farmlic)o.efarm=1;}E.staff.tech=0;E.staff.aiTech=false;if(!G.opt)G.opt=newOpt();if(!E.movie)E.movie={n:0,left:0};if(!E.op)E.op=newOpinion();if(!E.leases){E.leases=[];var dd=Math.floor(G.day)+30;SHOPS.forEach(function(x){for(var q=0;q<(E.shops[x.id]||0);q++)E.leases.push({id:x.id,due:dd});});if(shopCount(G)>0)E.lic={due:dd};}if(E.proj.schools&&!E.proj.elem){E.proj.elem=E.proj.middle=E.proj.high=E.proj.schools;}if(E.proj.autopack&&!E.staff.tier){E.staff.tier=1;E.staff.pack=Math.max(1,E.staff.pack);}G.tanks.forEach(function(t){if(t.set.maxN==null)t.set.maxN=3*t.vol;if(t===G.tanks[0]&&t.cycledAt==null&&!t.had&&(G.emp.goals&&G.emp.goals.cycle))t.cycledAt=G.day;rememberCycle(G,t);});FARMS.forEach(function(f,i){if(E.farms[f.id])E.farmStage=Math.max(E.farmStage,i);});SHOPS.forEach(function(x,i){if(E.shops[x.id])E.shopStage=Math.max(E.shopStage,i);});if(oldChain){var oldCosts={rack:2000,barn:30000,hatch:600000,mhatch:15000000,ocean:50000000,arco:1500000000};FARMS.forEach(function(f){E.farmPaid[f.id]=Array.from({length:E.farms[f.id]||0},function(_,i){return scaledCost(oldCosts[f.id],i,1.12);});});E.prod=(E.prod||0)*KIT_SHRIMP;E.rawShrimp=0;E.packedTotal=Math.max(E.packedTotal||0,G.kits.sold||0);var legacySupply=0;FARMS.forEach(function(f){legacySupply+=(E.farms[f.id]||0)*f.out;});E.legacyPacking=Math.max(0,legacySupply-packingMachineCap(G));if(farmCap(G)>0)E.fastUnlocked=true;E.chainVersion=2;log(G,'Production updated: existing farms now supply shrimp. Matching legacy packing capacity preserves your output; finished stock is retained.');if(maxSpeed(G)>=12)G.ob.speed12=1;if(maxSpeed(G)>=40)G.ob.speed40=1;}migrateProgress(G);if(oldChain){var historical=milestoneConditions(G);Object.keys(historical).forEach(function(k){if(k!=='win'&&historical[k]&&G.progress.queue.indexOf(k)<0)G.progress.seen[k]=true;});}return G;}
+function migrate(G){if(!G.ob)G.ob=G.day>0?{kit:1,bottle:1,doses:10,wc:1,sell:1,up:1,market:1,hatch:1,fs:0}:{kit:0,bottle:0,doses:0};if(!G.emp)G.emp=newEmp();if(!G.adRepeat)G.adRepeat={};var E=G.emp,oldChain=E.chainVersion!==2,d=newEmp();for(var k in d)if(E[k]===undefined)E[k]=d[k];if(E.shownEmp&&G.ob.eproj===undefined){var o=G.ob,sc=shopCount(G);if(G.kits.sold>=1||Object.keys(E.proj).length)o.eproj=1;if(o.eproj&&(G.kits.sold>=10||sc>0))o.eshops=1;if(o.eshops&&(sc>0||E.regions.length>1))o.ereg=1;if(E.proj.farmlic)o.efarm=1;}E.staff.tech=0;E.staff.aiTech=false;if(!G.opt)G.opt=newOpt();if(!E.movie)E.movie={n:0,left:0};if(!E.op)E.op=newOpinion();if(!E.leases){E.leases=[];var dd=Math.floor(G.day)+30;SHOPS.forEach(function(x){for(var q=0;q<(E.shops[x.id]||0);q++)E.leases.push({id:x.id,due:dd});});if(shopCount(G)>0)E.lic={due:dd};}if(E.proj.schools&&!E.proj.elem){E.proj.elem=E.proj.middle=E.proj.high=E.proj.schools;}if(E.proj.autopack&&!E.staff.tier){E.staff.tier=1;E.staff.pack=Math.max(1,E.staff.pack);}G.tanks.forEach(function(t){if(t.set.maxN==null)t.set.maxN=3*t.vol;if(t===G.tanks[0]&&t.cycledAt==null&&!t.had&&(G.emp.goals&&G.emp.goals.cycle))t.cycledAt=G.day;rememberCycle(G,t);});FARMS.forEach(function(f,i){if(E.farms[f.id])E.farmStage=Math.max(E.farmStage,i);});SHOPS.forEach(function(x,i){if(E.shops[x.id])E.shopStage=Math.max(E.shopStage,i);});if(oldChain){var oldCosts={rack:2000,barn:30000,hatch:600000,mhatch:15000000,ocean:50000000,arco:1500000000};FARMS.forEach(function(f){E.farmPaid[f.id]=Array.from({length:E.farms[f.id]||0},function(_,i){return scaledCost(oldCosts[f.id],i,1.12);});});E.prod=(E.prod||0)*KIT_SHRIMP;E.rawShrimp=0;E.packedTotal=Math.max(E.packedTotal||0,G.kits.sold||0);var legacySupply=0;FARMS.forEach(function(f){legacySupply+=(E.farms[f.id]||0)*f.out;});E.legacyPacking=Math.max(0,legacySupply-packingMachineCap(G));if(farmCap(G)>0)E.fastUnlocked=true;E.chainVersion=2;log(G,'Production updated: existing farms now supply shrimp. Matching legacy packing capacity preserves your output; finished stock is retained.');if(maxSpeed(G)>=12)G.ob.speed12=1;if(maxSpeed(G)>=40)G.ob.speed40=1;}migrateProgress(G);if(oldChain){var historical=milestoneConditions(G);Object.keys(historical).forEach(function(k){if(k!=='win'&&historical[k]&&G.progress.queue.indexOf(k)<0)G.progress.seen[k]=true;});}migrateStory(G);return G;}
 function rate(G,k,n){var f=(G.fin||[]).slice(-(n||7));if(!f.length)return 0;var t=0;f.forEach(function(x){t+=x[k]||0;});return t/f.length;}
 function netPerDay(G){var h=G.mh||[];if(h.length<3)return null;return (G.money-h[0])/h.length;}
 var FIN_CATS=[['shrimp','Shrimp sales',1],['kits','Kit sales',1],['running','Electricity and heating',0],['food','Food',0],['water','Water changes',0],['supplies','Shrimp, kit packing and supplies',0],['equipment','Tanks and equipment',0],['ads','Advertising',0],['shops','Shops and rent',0],['farms','Shrimp breeding and farm upkeep',0],['projects','Projects, regions and galas',0],['staff','Staff wages and AI tokens',0],['logistics','Distribution and customer support',0],['tax','VAT and corporate tax',0]];
@@ -1271,21 +1279,46 @@ function seedFilter(G,T,from){
 }
 // Progression and business decisions are kept in the simulation so offline play
 // and browser play use the same boundaries and operating rules.
+var GRANDPA_LETTERS={
+  gift:{title:'The empty tank',body:"Grandpa gave you his old aquarium. Empty glass, a sponge filter, and a handwritten note.\n\n“Keeping shrimp taught me to slow down and notice little things,” he said. “Wouldn’t it be something if everyone had a little world like this to care for?”\n\nYou laughed. “Everyone on Earth?”\n\n“Well, we’d better get started. Let’s see what we can do in ten years.”\n\nYou took him seriously."},
+  hatch:{title:'A little world wakes up',body:"“You saw the babies? I knew you’d spot them before I did. Don’t hurry past this part. One tiny life becoming a whole little world—that’s what I hoped you’d find.”"},
+  kit:{title:'The first tank leaves home',body:"“Someone you’ve never met is watching their first shrimp today, because of you. Put a good care guide in the box. We’re sharing the quiet joy of keeping them, not just sending tanks out the door.”"},
+  farm:{title:'Bigger than the windowsill',body:"“I looked at your new setup and tried to imagine all those shrimp in my old tank. Take the photograph quickly, before I try counting them. Build carefully. Every tank still belongs in someone’s home.”"},
+  million:{title:'A million little worlds',body:"“A million people. I wrote it out to make sure I understood the number. I still remember you carrying that empty tank through the door. Somewhere, a million people are slowing down to watch something small.”"},
+  tenyears:{title:'Ten years together',body:"“Look how far one empty tank has taken us,” Grandpa said. “Keep going. There are still people who haven’t met their first shrimp.”"},
+  win:{title:'A tank for everyone',body:"Grandpa sat beside the original tank, watching a shrimp work its way across the sponge filter.\n\n“Everyone?” he asked.\n\n“Everyone.”\n\nHe smiled. “And it all started with a little room to care for something.”"}
+};
+function grandpaLetter(G,key){if(key==='tenyears'&&G.story.anniversary&&(G.story.anniversary.owners>=WORLD||G.story.tenYearAchieved))return '“Remember when we thought ten years might not be enough?” Grandpa said. “I still like this old tank best. Come and sit with me a while.”';return GRANDPA_LETTERS[key].body;}
+function newStory(){return {version:1,letters:{gift:{day:0,owners:0}},anniversary:null,tenYearAchieved:false};}
+function recordLetters(G,historical){var S=G.story,conditions={hatch:G.stats.born>0,kit:G.kits.sold>0,farm:Object.keys(G.emp.farms).some(function(k){return G.emp.farms[k]>0;}),million:G.humans>=1e6,win:!!G.emp.won};Object.keys(conditions).forEach(function(k){if(conditions[k]&&!S.letters[k])S.letters[k]={day:Math.floor(G.day),owners:Math.floor(G.humans),historical:!!historical};});}
+function updateStory(G){
+  if(!G.story)G.story=newStory();var S=G.story;recordLetters(G,false);
+  if(G.emp.won&&G.emp.won<=DREAM_DAYS)S.tenYearAchieved=true;
+  if(G.day>=DREAM_DAYS&&!S.anniversary){S.anniversary={day:DREAM_DAYS,owners:Math.floor(G.humans)};S.letters.tenyears={day:DREAM_DAYS,owners:Math.floor(G.humans)};}
+}
+function migrateStory(G){
+  var legacy=!G.story;if(legacy)G.story=newStory();var S=G.story;if(!S.letters)S.letters={};if(!S.letters.gift)S.letters.gift={day:0,owners:0};
+  if(legacy){recordLetters(G,true);var p=ensureProgress(G);p.seen.intro=true;if(G.humans>=1e6)p.seen.million=true;if(G.day>=DREAM_DAYS){p.seen.tenyears=true;S.anniversary={day:DREAM_DAYS,owners:null,historical:true};S.letters.tenyears={day:DREAM_DAYS,historical:true};}}
+  updateStory(G);
+}
 var MILESTONES={
-  cycle:{title:'Your tank is cycled',body:'The water is ready for your first shrimp. Cycling completion stays unlocked. Your bacteria have seven game days of grace, then decline slowly. Time stays paused while you read.',tab:'market'},
-  hatch:{title:'Your first shrimplets',body:'Your colony is reproducing. The auto feeder is now available in Equipment. Your best adults stay protected as breeders; the sale forecast explains when surplus will be ready.',tab:'up'},
-  sale:{title:'Your first shrimp sale',body:'You are a breeder now. Automate routine care, sell surplus and work toward 60 shrimp sold. Customers now includes advertising; its job is to bring orders, not increase production.',tab:'market'},
-  kits:{title:'Your kit business is open',body:'You have sold 60 shrimp. Assemble your first starter kit yourself: materials plus eight surplus shrimp. Learn orders and survival before adding wages. Kits holds packing, pricing and orders. Equipment later becomes Operations; Marketing brings customers.',tab:'emp'},
-  kit:{title:'Your first kit reached a customer',body:'Kits introduce materials, survival and referrals. The care guide improves survival and influence. Assemble a few kits yourself before paying wages. Sell 10 kits to unlock the farm license.',tab:'emp'},
-  farm:{title:'Breeding at business scale',body:'Your grow rack supplies shrimp, not finished kits. Eight shrimp pass through packing to make one kit. Check supply and packing capacity in Kits; add hatcheries in Operations. Your tank is now an optional laboratory, with a permanent certified quality bonus.',tab:'up'},
-  ministry:{title:'A new role: culture and adoption',body:'Operations supplies shrimp; Kits packs them; Marketing attracts buyers; World expands reach and adoption. Water and Fire audiences react differently. Start with one campaign, then read its result before choosing another.',tab:'world'},
-  win:{title:'Every human owns a shrimp tank',body:'Your original tank has become a worldwide movement. Time is paused. Review your journey, continue as a sandbox, or start a fresh colony.',tab:'emp'}
+  intro:{title:'One empty tank. One big dream.',body:GRANDPA_LETTERS.gift.body+'\n\nA tank for everyone. Ten years to try.',tab:'tank'},
+  cycle:{title:'Your tank is cycled',body:"The water is ready for your first shrimp. Cycling completion stays unlocked. Your bacteria have seven game days of grace, then decline slowly. Time stays paused while you read.",tab:'market'},
+  hatch:{title:'Your first shrimplets',body:"Your colony is reproducing. The auto feeder is now available in Equipment. Your best adults stay protected as breeders; the sale forecast explains when surplus will be ready.",tab:'up'},
+  sale:{title:'Your first shrimp sale',body:"You are a breeder now. Automate routine care, sell surplus and work toward 60 shrimp sold. Customers now includes advertising; its job is to bring orders, not increase production.",tab:'market'},
+  kits:{title:'Your kit business is open',body:"You have sold 60 shrimp. Assemble your first starter kit yourself: materials plus eight surplus shrimp. Learn orders and survival before adding wages. Kits holds packing, pricing and orders. Equipment later becomes Operations; Marketing brings customers.",tab:'emp'},
+  kit:{title:'Your first kit reached a customer',body:"Kits introduce materials, survival and referrals. The care guide improves survival and influence. Assemble a few kits yourself before paying wages. Sell 10 kits to unlock the farm license.",tab:'emp'},
+  farm:{title:'Breeding at business scale',body:"Your grow rack supplies shrimp, not finished kits. Eight shrimp pass through packing to make one kit. Check supply and packing capacity in Kits; add hatcheries in Operations. Your tank is now an optional laboratory, with a permanent certified quality bonus.",tab:'up'},
+  ministry:{title:'A new role: culture and adoption',body:"Operations supplies shrimp; Kits packs them; Marketing attracts buyers; World expands reach and adoption. Water and Fire audiences react differently. Start with one campaign, then read its result before choosing another.",tab:'world'},
+  million:{title:'A million little worlds',body:"One million people now keep a shrimp tank. Your business is becoming a worldwide community.",tab:'world'},
+  tenyears:{title:'Ten years together',body:"Today marks ten years since Grandpa gave you the tank. This is a moment to celebrate the journey. Your worldwide dream continues.",tab:'emp'},
+  win:{title:'Every human owns a shrimp tank',body:"Your original tank has become a worldwide movement. Time is paused. Review your journey, continue as a sandbox, or start a fresh colony.",tab:'emp'}
 };
 function milestoneConditions(G){var t=G.tanks[0],p=ppm(t);return {
   cycle:t.cycledAt!=null&&p.nh<0.05&&p.no2<0.05&&p.no3<=20&&t.chem.kh>=2,
   hatch:G.stats.born>0,sale:G.stats.sold>0,kits:kitsOpen(G),kit:G.kits.sold>0,
   farm:Object.keys(G.emp.farms).some(function(k){return G.emp.farms[k]>0;}),
-  ministry:pd(G,'ministry'),win:!!G.emp.won
+  ministry:pd(G,'ministry'),million:G.humans>=1e6,tenyears:G.day>=DREAM_DAYS&&!G.emp.won,win:!!G.emp.won
 };}
 function ensureProgress(G){if(!G.progress)G.progress={version:1,seen:{},queue:[],sandbox:false};var p=G.progress;if(!p.seen)p.seen={};if(!Array.isArray(p.queue))p.queue=[];return p;}
 function migrateProgress(G){
@@ -1298,7 +1331,7 @@ function migrateProgress(G){
   if(G.labQuality==null&&Object.keys(E.farms).some(function(k){return E.farms[k]>0;}))G.labQuality=labCandidate(G);
 }
 function detectMilestones(G){
-  var p=ensureProgress(G),conditions=milestoneConditions(G);
+  updateStory(G);var p=ensureProgress(G),conditions=milestoneConditions(G);
   Object.keys(MILESTONES).forEach(function(k){if(conditions[k]&&!p.seen[k]){p.seen[k]=true;if(!G.opt.all||k==='win')p.queue.push(k);if(k==='farm')p.home='emp';}});
 }
 function progressionBlocked(G){var p=ensureProgress(G);return p.queue.length>0||!!G.emp.won&&!p.sandbox;}
@@ -2076,17 +2109,26 @@ function projectRank(G,p){var b=bottleneck(G);if(b&&b.k==='packing'&&['aicam','a
 function renderMilestone(){
   var p=ensureProgress(G),key=p.queue[0],card=$('milestone-card');
   if(!key&&G.emp.won&&!p.sandbox&&!p.reviewing)key='win';card.hidden=!key;if(!key){renderMilestone.last=null;return;}
-  if(speed)setSpeed(0);if(renderMilestone.last!==key){renderMilestone.last=key;setTimeout(function(){card.scrollIntoView({block:'start',behavior:'instant'});$('milestone-title').focus({preventScroll:true});},0);}var m=MILESTONES[key];setT('milestone-title',m.title);var body=m.body;
-  if(key==='win')body+=' You reached '+big(G.humans)+' owners on day '+G.emp.won+'. Filter maturity: day '+Math.floor(G.tanks[0].cycledAt||0)+'. Kits delivered: '+big(G.kits.sold)+'. Regions: '+G.emp.regions.length+'.';
-  setT('milestone-body',body);
-  var h=key==='win'?'<button class="btn primary" data-act="review-empire">Review your empire</button><button class="btn" data-act="sandbox">Continue sandbox</button><button class="btn" data-act="reset">New game</button>':'<button class="btn primary" data-act="milestone-next">Show my next step · keep paused</button><button class="btn" data-act="milestone-continue">Continue at 1×</button>';
+  if(speed)setSpeed(0);if(renderMilestone.last!==key){renderMilestone.last=key;setTimeout(function(){card.scrollIntoView({block:'start',behavior:'instant'});$('milestone-title').focus({preventScroll:true});},0);}var m=MILESTONES[key];setT('milestone-scope',key==='intro'?'A gift from Grandpa · time paused':'Milestone · time paused');setT('milestone-title',m.title);var body=m.body;
+  if(key==='tenyears'){var anniversary=G.story.anniversary;body+=' '+(anniversary&&anniversary.owners!=null?'Together, you reached '+big(anniversary.owners)+' shrimp keepers in your first decade.':'Your first decade is already part of this journey.');}
+  if(key==='win')body+=(G.story.tenYearAchieved?' A dream in ten years — achieved.':' Grandpa’s dream came true. Every year of care helped get you here.')+' You reached '+big(G.humans)+' owners on day '+G.emp.won+'. Filter maturity: day '+Math.floor(G.tanks[0].cycledAt||0)+'. Kits delivered: '+big(G.kits.sold)+'. Regions: '+G.emp.regions.length+'.';
+  setT('milestone-body',body);var letter=key==='intro'?null:GRANDPA_LETTERS[key];$('milestone-letter').hidden=!letter;if(letter)setT('milestone-letter','Grandpa’s note · '+letter.title+'\n\n'+grandpaLetter(G,key));
+  var h=key==='intro'?'<button class="btn primary" data-act="milestone-next">Accept Grandpa’s tank</button>':key==='tenyears'?'<button class="btn primary" data-act="milestone-next">Keep growing the dream · stay paused</button><button class="btn" data-act="milestone-continue">Continue at 1×</button>':key==='win'?'<button class="btn primary" data-act="review-empire">Review your empire</button><button class="btn" data-act="sandbox">Continue sandbox</button><button class="btn" data-act="reset">New game</button>':'<button class="btn primary" data-act="milestone-next">Show my next step · keep paused</button><button class="btn" data-act="milestone-continue">Continue at 1×</button>';
   if($('milestone-actions').innerHTML!==h)$('milestone-actions').innerHTML=h;
 }
+function renderDream(){
+ var S=G.story,remaining=Math.max(0,DREAM_DAYS-Math.floor(G.day)),year=Math.floor(G.day/365)+1;
+ setT('dream-year',G.day===DREAM_DAYS?'Ten years together':'Year '+year+' · '+(G.day>DREAM_DAYS?'The dream continues':'Grandpa’s dream'));
+ setT('dream-badge',S.tenYearAchieved?'A dream in ten years · achieved':G.day===DREAM_DAYS?'The dream continues':'');
+ setT('dream-time',remaining?remaining.toLocaleString('en-US')+' game days until our ten-year celebration.':S.anniversary&&S.anniversary.owners!=null?'At ten years: '+big(S.anniversary.owners)+' shrimp keepers.':'Our first decade is part of this journey.');
+ setT('dream-progress',big(Math.floor(G.humans))+' of 8.2B people share the dream. Worldwide adoption remains the goal.');
+ var sig=JSON.stringify(S.letters);if(renderDream.last!==sig){renderDream.last=sig;$('dream-letters').innerHTML=Object.keys(GRANDPA_LETTERS).filter(function(k){return S.letters[k];}).map(function(k){var l=GRANDPA_LETTERS[k],r=S.letters[k];return '<details><summary>'+l.title+' · '+(r.historical?'from your earlier journey':k==='tenyears'?'Our first decade':'Year '+(Math.floor(r.day/365)+1))+'</summary><p>'+grandpaLetter(G,k)+'</p></details>';}).join('');}
+}
 function renderProgression(){
- selectTab(activeTab);renderMilestone();var E=G.emp,open=kitsOpen(G),hasFarm=Object.keys(E.farms).some(function(k){return E.farms[k]>0;}),business=open&&['emp','up','promote','world'].indexOf(activeTab)>=0,phase=phaseInfo(G);
+ selectTab(activeTab);renderMilestone();renderDream();var E=G.emp,open=kitsOpen(G),hasFarm=Object.keys(E.farms).some(function(k){return E.farms[k]>0;}),business=open&&['emp','up','promote','world'].indexOf(activeTab)>=0,phase=phaseInfo(G);
  setT('g-sum',GOALS.filter(function(g){return E.goals[g.id];}).length+' of '+GOALS.length+' done');setT('phase-name',phase.name);setT('next-title',phase.goal);setT('next-body',phase.body);$('next-card').hidden=business;
  var nextActions='<button class="btn" data-act="navigate" data-tab="'+phase.tab+'">Open next step</button>'+(rv('market')?'<button class="btn" data-act="navigate" data-tab="market">Shrimp market</button>':'');if($('next-actions').innerHTML!==nextActions)$('next-actions').innerHTML=nextActions;
- setT('sale-forecast',!hasFarm&&G.tanks.some(function(t){return t.had;})?saleForecast(G):'');document.body.classList.toggle('business-context',business);
+ setT('sale-forecast',!hasFarm&&G.tanks.some(function(t){return t.had;})?saleForecast(G):'');document.body.classList.toggle('business-context',business);var intro=G.progress.queue[0]==='intro';document.body.classList.toggle('story-intro',intro);if(intro){$('next-card').hidden=true;['tank','up','market','promote','emp','world'].forEach(function(tab){$('p-'+tab).hidden=true;});}
  $('tab-market').hidden=open||!rv('market');$('tab-promote').hidden=!rv('sell');$('tab-world').hidden=!worldOpen(G);
  setT('tab-up',hasFarm?'Operations':'Equipment');setT('tab-promote','Marketing');
  var tabs=document.querySelector('.tabs-in');tabs.insertBefore($('tab-emp'),$('tab-promote'));
@@ -2119,7 +2161,7 @@ function initProgressionControls(){
   document.addEventListener('click',function(e){
     var b=e.target.closest('[data-act]');if(!b||b.disabled)return;var a=b.dataset.act,changed=true;
     if(a==='navigate'){selectTab(b.dataset.tab);}
-    else if(a==='milestone-next'||a==='milestone-continue'){var key=acknowledgeMilestone(G);if(key){selectTab(MILESTONES[key].tab);if(key==='farm')G.emp.bizView='production';if(key==='ministry')G.emp.bizView='culture';}setSpeed(a==='milestone-continue'?1:0);}
+    else if(a==='milestone-next'||a==='milestone-continue'){var key=acknowledgeMilestone(G);if(key){selectTab(key==='tenyears'?phaseInfo(G).tab:MILESTONES[key].tab);if(key==='farm')G.emp.bizView='production';if(key==='ministry')G.emp.bizView='culture';}setSpeed(a==='milestone-continue'?1:0);}
     else if(a==='bizview'){G.emp.bizView=b.dataset.view;cache.eproj=null;}
     else if(a==='small-toggle')G.emp.showSmall=!G.emp.showSmall;
     else if(a==='earlier-packing'){G.emp.showEarlierPacking=!G.emp.showEarlierPacking;cache.estaff=null;}
@@ -2134,6 +2176,7 @@ function initProgressionControls(){
     else changed=false;
     if(changed){cache.eproj=null;cache.efarm=null;syncControls();render();save();}
   });
+  $('dream-tracker').addEventListener('toggle',function(){if(this.open){setSpeed(0);save();}});
   ['inventory-days','reserve-days'].forEach(function(id){$(id).addEventListener('change',function(){G.emp[id==='inventory-days'?'inventoryDays':'reserveDays']=+this.value;cache.efarm=null;render();save();});});
   document.querySelectorAll('.coll>.hd').forEach(function(h){h.tabIndex=0;h.setAttribute('role','button');h.setAttribute('aria-expanded',String(!h.parentNode.classList.contains('shut')));h.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();h.click();}});h.addEventListener('click',function(){setTimeout(function(){h.setAttribute('aria-expanded',String(!h.parentNode.classList.contains('shut')));},0);});});
 }
