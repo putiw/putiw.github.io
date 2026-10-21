@@ -5,6 +5,13 @@ vm.runInContext('var cache={},lastChips="",lastColSig="",lastChartKey="",lastAle
 vm.runInContext(`
 var G=newGame(),events=[],snapshots={},last={};
 function note(k){detectMilestones(G);updateReveal();if(kitsOpen(G))G.emp.shownEmp=1;if(!last[k]){last[k]=1;events.push({event:k,day:G.day,money:Math.round(G.money),shrimp:Math.round(allN(G)),sold:G.stats.sold,kits:G.kits.sold,owners:Math.round(G.humans),inf:Math.round(G.emp.inf)});snapshots[k]=JSON.parse(JSON.stringify(G));}}
+function extraTanks(buy){if(!G.tanks[0].had)return;var T0=G.tanks[0];
+ if(buy&&G.stats.sold>=1&&G.tanks.length<MAX_TANKS&&!(G.tanks.some(function(t){return !t.had;}))&&G.money>NEW_TANK_COST[G.tanks.length]+Math.max(300,capitalReserve(G)))addTank(G);
+ for(var i=1;i<G.tanks.length;i++){var t=G.tanks[i],P=ppm(t);t.set.sellAge=T0.set.sellAge;t.set.keep=T0.set.keep;
+  if(!t.had){if(t.cycledAt==null&&P.nh<.2&&P.no2<1){if(G.ob.doses<=0&&G.money>=40){pay(G,40,'supplies');G.ob.doses+=10;}addAmmonia(G,t);}if(t.chem.kh<2||P.no3>20)waterChange(G,t,50);
+   if(safeToStock(G,t)&&totalN(T0)>=30)moveShrimp(G,T0,t,totalN(T0)/3);}
+  else{if(!t.feeder)feed(G,t,.8);if(P.no3>18||t.chem.kh<2.5||t.chem.gh<5||(!t.autoWC&&G.day%7===0))waterChange(G,t,30);
+   if(!t.feeder&&G.stats.born>0&&G.money>90+150+capitalReserve(G))buyUpgrade(G,t,'feeder');if(!t.fan&&G.money>60+150+capitalReserve(G))buyUpgrade(G,t,'fan');}}}
 function afford(c){return G.money>c+Math.max(40,staffCost(G)*14);}
 function policy(){
 while(G.progress.queue.length)acknowledgeMilestone(G);updateReveal();var T=G.tanks[0],P=ppm(T),E=G.emp;
@@ -27,7 +34,7 @@ if(!T.had){
  if(T.chem.temp>28&&T.heater===1&&afford(1300))buyUpgrade(G,T,'heater');
  if(G.ob.up&&T.chem.bacA<bacTarget(T)&&upgradeCost(G,T,'filter')!=null&&afford(upgradeCost(G,T,'filter')))buyUpgrade(G,T,'filter');
 }
-checkGoals(G);if(G.story.anniversary)note('ten-year celebration');
+extraTanks(true);checkGoals(G);if(G.story.anniversary)note('ten-year celebration');
 if(kitsOpen(G)){
  note('kits unlocked');
  if(!E.staff.tier&&afford(300))buyPackTier(G);

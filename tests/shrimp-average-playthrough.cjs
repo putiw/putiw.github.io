@@ -12,7 +12,14 @@ var G=newGame(),events=[],snapshots={},actions=[],seen={},minCash=G.money,waitin
 function note(name){if(seen[name])return;seen[name]=1;events.push({event:name,day:G.day,years:+(G.day/365).toFixed(2),money:Math.round(G.money),owners:Math.round(G.humans)});snapshots[name]=JSON.parse(JSON.stringify(G));}
 function act(name,fn){var ok=fn();if(ok){actions.push({day:G.day,name:name});return true;}return false;}
 function canSpend(cost){return G.money>=cost+Math.max(200,capitalReserve(G)*1.25);}
-function care(){var T=G.tanks[0],P=ppm(T);while(G.progress.queue.length){var key=G.progress.queue[0];note('milestone '+key);acknowledgeMilestone(G);}updateReveal();
+function extraTanks(buy){if(!G.tanks[0].had)return;var T0=G.tanks[0];
+ if(buy&&G.stats.sold>=1&&G.tanks.length<MAX_TANKS&&!(G.tanks.some(function(t){return !t.had;}))&&G.money>NEW_TANK_COST[G.tanks.length]+Math.max(300,capitalReserve(G)))addTank(G);
+ for(var i=1;i<G.tanks.length;i++){var t=G.tanks[i],P=ppm(t);t.set.sellAge=T0.set.sellAge;t.set.keep=T0.set.keep;
+  if(!t.had){if(t.cycledAt==null&&P.nh<.2&&P.no2<1){if(G.ob.doses<=0&&G.money>=40){pay(G,40,'supplies');G.ob.doses+=10;}addAmmonia(G,t);}if(t.chem.kh<2||P.no3>20)waterChange(G,t,50);
+   if(safeToStock(G,t)&&totalN(T0)>=30)moveShrimp(G,T0,t,totalN(T0)/3);}
+  else{if(!t.feeder)feed(G,t,.8);if(P.no3>18||t.chem.kh<2.5||t.chem.gh<5||(!t.autoWC&&G.day%7===0))waterChange(G,t,30);
+   if(!t.feeder&&G.stats.born>0&&G.money>90+150+capitalReserve(G))buyUpgrade(G,t,'feeder');if(!t.fan&&G.money>60+150+capitalReserve(G))buyUpgrade(G,t,'fan');}}}
+function care(){extraTanks(false);var T=G.tanks[0],P=ppm(T);while(G.progress.queue.length){var key=G.progress.queue[0];note('milestone '+key);acknowledgeMilestone(G);}updateReveal();
  if(!G.ob.kit){pay(G,120,'supplies');G.ob.kit=1;}
  if(!G.ob.bottle){pay(G,40,'supplies');G.ob.bottle=1;G.ob.doses=10;}
  if(!T.had){if(T.cycledAt==null&&P.nh<.1){if(G.ob.doses<=0&&G.money>=40){pay(G,40,'supplies');G.ob.doses+=10;}addAmmonia(G,T);}if(T.chem.kh<2||P.no3>20)waterChange(G,T,50);if(safeToStock(G,T)&&buyPack(G,T,0))note('first shrimp');}
@@ -20,6 +27,7 @@ function care(){var T=G.tanks[0],P=ppm(T);while(G.progress.queue.length){var key
  checkGoals(G);if(G.stats.born)note('first hatch');if(kitsOpen(G))note('kits unlocked');if(G.kits.sold)note('first kit');if(farmCap(G))note('first farm');if(G.academy.level)note('first grant');if(G.academy.phds)note('PhDs');if(G.academy.professors)note('professor');if(G.story.anniversary)note('anniversary');if(G.emp.won)note('Earth complete');if(G.space.won)note('space complete');if(rip(G).n===RIPPLE.length)note('all newspaper headlines');
 }
 function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,S=G.space,budget=2;function spend(name,fn){if(budget<1)return false;if(act(name,fn)){budget--;return true;}return false;}
+ if(G.stats.sold>=1&&G.tanks.length<MAX_TANKS&&!G.tanks.some(t=>!t.had)&&G.money>NEW_TANK_COST[G.tanks.length]+250)spend('another tank',()=>addTank(G));
  if(G.order){if(!G.order.taken)takeOrder(G);if(orderStock(G,G.order)>=G.order.n)act('deliver pet shop order',()=>deliverOrder(G));}
  if(T.had&&!earthArchived(G)){var stock=sellableStock(G);if(stock&&!(G.order&&G.order.taken)){G.price=suggestedPrice(G,stock);act('sell surplus shrimp',()=>sellAll(G,false));}}
  if(G.ob.up&&!earthArchived(G))for(var id of ['fan','feeder','autoWC','heater','tank','filter']){var cost=upgradeCost(G,T,id);if(cost==null)continue;if(id==='heater'&&T.chem.temp<28)continue;if(id==='tank'&&totalN(T)<T.vol*2)continue;if(id==='filter'&&T.chem.bacA>=bacTarget(T))continue;if(canSpend(cost))spend('tank '+id,()=>buyUpgrade(G,T,id));}
