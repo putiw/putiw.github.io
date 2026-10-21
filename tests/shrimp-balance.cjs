@@ -23,6 +23,11 @@ if(!html.includes("addEventListener('click'")||!html.includes("e.key==='Enter'||
 console.log('PASS all water readings explain what raises and lowers them on tap and keyboard activation');
 if(html.indexOf('id="wccard"')>html.indexOf('id="wtcard"'))throw Error('Water care should appear before the water test');
 console.log('PASS water care appears before the water test');
+if((html.match(/data-act="wc"/g)||[]).length!==1||html.includes('id="btn-feed"')||html.includes('id="btn-scwc"'))throw Error('Feed and water actions should live only in the top action bar');
+if(!html.includes('details class="card" id="feedcard"')||!html.includes('details class="card" id="wtcard" open')||!html.includes("$('wtcard').open=waterStage!=='ready'")||!html.includes("$('tb-feed').classList.toggle('first-feed'"))throw Error('Feeding and stable readings should fold while the first feed is highlighted');
+if(!html.includes("$('next-card').hidden=business||!$('milestone-card').hidden||!$('startcard').hidden"))throw Error('The task card should stay out of the way while cycling or a milestone is shown');
+if(!html.includes('.goalrow{display:flex;align-items:center;gap:6px;font-size:11px;line-height:1')||!html.includes('.dream-tracker>summary{cursor:pointer;display:flex;align-items:center;'))throw Error('Header goal and year tracker should share a centered baseline');
+console.log('PASS duplicate details fold away, header lines align and the first feed is highlighted');
 if(!html.includes("$('vwater').innerHTML=[['no3','NO₃'],['kh','KH'],['gh','GH'],['ph','pH'],['temp','Temp']]"))throw Error('Top readings should show nitrate, KH, GH, pH and temperature in order');
 console.log('PASS top readings show NO₃, KH, GH, pH and temperature');
 const goalRowStart=html.indexOf('<div class="goalrow">'),dreamSummary=html.indexOf('id="dream-tracker"'),nextHeaderRow=html.indexOf('<div class="chips" id="tankchips"');
@@ -30,6 +35,8 @@ if(!(goalRowStart>=0&&goalRowStart<dreamSummary&&dreamSummary<nextHeaderRow&&htm
 console.log('PASS Grandpa year tracker shares the progress row with a compact mobile progress label');
 if(!html.includes('class="card coll" data-k="charts" id="charts"')||!html.includes('class="card coll" data-k="ads" id="adscard"'))throw Error('Delayed charts and advertising should fold when first revealed');
 console.log('PASS delayed charts and advertising can fold when first revealed');
+if(!html.includes('.coll.queued{display:none!important}')||!html.includes('function promoteCardReveal(o)')||!html.includes('o.cardQueue.push({k:k,tab:activeTab})')||!html.includes('promoteCardReveal(o);render();')||!html.includes('var PROJ_SHOW=1;'))throw Error('New content should queue one at a time, focus the active card and advance when dismissed');
+console.log('PASS newly revealed cards queue one at a time and fold other sections');
 check('fresh starts preserve milestones; high-speed batches stop at a boundary',`
 var g=readyGame(),t=g.tanks[0];t.chem.bacA=t.chem.bacB=bacTarget(t);t.chem.nh=t.chem.no2=0;rememberCycle(g,t);
 for(var i=0;i<400;i++)stepGame(g);
