@@ -30,8 +30,13 @@ if(!T.had){
 checkGoals(G);
 if(kitsOpen(G)){
  note('kits unlocked');
- if(G.money>180&&G.kits.stock<Math.max(5,kitDemand(G)*7)&&totalN(T)>T.set.keep+10)packKits(G,T,1);
- for(var id of ['guide','refer','precycle','farmlic','bulk','app','factory','hotline','ocean','recycle','arco']){var p=PROJ.find(x=>x.id===id);if(!pd(G,id)&&p.req(G)&&afford(pm(G,p)))buyProj(G,id);}
+ if(!E.staff.tier&&afford(300))buyPackTier(G);
+ if(E.staff.tier===1&&G.kits.sold>=20&&afford(1800))buyPackTier(G);
+ if(E.staff.tier&&G.kits.sold>=10&&packCap(G)<Math.min(farmCap(G),kitDemand(G))&&afford(2000)&&E.staff.pack<4)hire(G,'pack',1);
+ for(var li=0;li<PACK_LINES.length;li++)if(lineReady(G,li)&&packCap(G)<kitDemand(G)*1.3&&afford(lineCost(G,li)+PACK_LINES[li].up*30))buyLine(G,li);
+ if(packingMachineCap(G)>kitDemand(G)*1.2&&E.staff.pack)hire(G,'pack',-1);
+ if(!packCap(G)&&G.money>180&&G.kits.stock<Math.max(5,kitDemand(G)*7)&&totalN(T)>T.set.keep+10)packKits(G,T,1);
+ for(var id of ['guide','refer','precycle','farmlic','bulk','aicam','autopackm','app','brand','retention','partners','globalbrand','factory','hotline','ocean','recycle','arco']){var p=PROJ.find(x=>x.id===id);if(!pd(G,id)&&p.req(G)&&afford(pm(G,p)))buyProj(G,id);}
  if(G.kits.sold>=1)note('first kit');if(pd(G,'farmlic'))note('farm license');
  if(pd(G,'farmlic')){
   var fc=farmCap(G),d=kitDemand(G);var best=FARMS.filter(f=>farmOk(G,f)&&G.money>farmCost(G,f)+Math.max(2000,E.mat*Math.min(f.out,d*20)+f.up*60)).sort((a,b)=>farmCost(G,a)/a.out-farmCost(G,b)/b.out)[0];
@@ -46,6 +51,6 @@ if(kitsOpen(G)){
  if(E.won)note('win');
 }
 }
-for(var day=0;day<12000;day++){policy();for(var q=0;q<4;q++){if(progressionBlocked(G)){while(G.progress.queue.length)acknowledgeMilestone(G);if(G.emp.won)break;}stepGame(G);}if(G.emp.won)break;if(day%1000===0)console.log('progress',G.day,Math.round(G.money),G.kits.sold,Math.round(G.humans));}
+for(var day=0;day<12000;day++){policy();for(var q=0;q<4;q++){if(progressionBlocked(G)){while(G.progress.queue.length)acknowledgeMilestone(G);if(G.emp.won)break;}stepGame(G);}if(G.emp.won)break;if(G.money<0){console.log('INSOLVENT',JSON.stringify({day:G.day,money:G.money,fc:farmCap(G),pc:packCap(G),d:kitDemand(G),stock:G.kits.stock,raw:G.emp.rawShrimp,overhead:fixedOverhead(G),reserve:operatingReserve(G),farms:G.emp.farms,lines:G.emp.packLines,log:G.log.slice(-15),fin:G.fin.slice(-3)}));break;}if(day%1000===0)console.log('progress',G.day,Math.round(G.money),G.kits.sold,Math.round(G.humans));}
 `,c,{timeout:180000});
-fs.mkdirSync(process.env.REVIEW_OUTPUT||'/private/tmp/shrimp-tests',{recursive:true});fs.writeFileSync(path.join(process.env.REVIEW_OUTPUT||'/private/tmp/shrimp-tests',`run-${runSeed}.json`),JSON.stringify({events:c.events,day:c.G.day,won:c.G.emp.won,money:c.G.money,owners:c.G.humans}));console.log(JSON.stringify(c.events,null,2));if(!c.G.emp.won)throw Error('Playthrough failed to finish');console.log('WIN',runSeed,c.G.day,c.G.money);
+fs.mkdirSync(process.env.REVIEW_OUTPUT||'/private/tmp/shrimp-tests',{recursive:true});fs.writeFileSync(path.join(process.env.REVIEW_OUTPUT||'/private/tmp/shrimp-tests',`run-${runSeed}.json`),JSON.stringify({events:c.events,day:c.G.day,won:c.G.emp.won,money:c.G.money,owners:c.G.humans,snapshots:c.snapshots}));console.log(JSON.stringify(c.events,null,2));if(!c.G.emp.won)throw Error('Playthrough failed to finish');console.log('WIN',runSeed,c.G.day,c.G.money);
