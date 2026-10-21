@@ -65,5 +65,10 @@ for(var i=0;i<120;i++)stepGame(g);detectMilestones(g);
 if(g.money!==before||!g.progress.queue.includes('win'))throw Error('Legacy winner charged overhead');
 `);
 check('experienced-player mode skips tutorials but still pauses at victory',`var g=newGame();g.opt.all=true;g.stats.sold=60;detectMilestones(g);if(g.progress.queue.length)throw Error('Tutorial not skipped');g.emp.won=200;detectMilestones(g);if(!g.progress.queue.includes('win'))throw Error('Victory skipped');`);
+check('legacy navigation flags cannot complete a cycle or allow unsafe stocking',`
+var g=newGame();delete g.progress;g.day=4;g.ob.market=1;g.tanks[0].cycledAt=4;g.money=1000;migrate(g);
+if(g.tanks[0].cycledAt!=null||safeToStock(g,g.tanks[0])||buyPack(g,g.tanks[0],0))throw Error('Unsafe legacy stocking');
+var t=g.tanks[0];t.chem.bacA=t.chem.bacB=bacTarget(t);rememberCycle(g,t);t.chem.nh=2*t.vol;if(buyPack(g,t,0))throw Error('Stocked toxic water');t.chem.nh=t.chem.no2=0;if(!buyPack(g,t,0))throw Error('Safe stocking rejected');
+`);
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
