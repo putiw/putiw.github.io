@@ -208,6 +208,7 @@ th:first-child,td:first-child{text-align:left}
 .coll.shut>.hd h2::before{transform:rotate(-90deg)}
 .coll:not(.shut)>.hd{margin-bottom:4px}
 .coll.shut>:not(.hd){display:none!important}
+.coll.fresh>.hd h2::after{content:'new';margin-left:6px;padding:0 5px;border:1px solid var(--accent);border-radius:8px;color:var(--accent);font:600 10px var(--font-body);vertical-align:middle}
 .item .hb .btn{min-width:0;padding:6px 10px}
 .item .eta{display:block;font-size:11px;color:var(--ink-3);margin-top:2px}
 #p-emp,#p-up,#p-promote,#p-world{display:flex;flex-direction:column}
@@ -395,7 +396,7 @@ th:first-child,td:first-child{text-align:left}
     </div>
   </div>
 
-  <div class="card" id="charts">
+  <div class="card coll" data-k="charts" id="charts">
     <div class="hd"><h2>Readings over time</h2><small>touch a chart for one day</small></div>
     <div class="chart" id="c1"><h3></h3><div class="ro"></div><svg viewBox="0 0 340 150" role="img" aria-label="Ammonia and nitrite over time"></svg></div>
     <div class="chart" id="c2"><h3></h3><div class="ro"></div><svg viewBox="0 0 340 150" role="img" aria-label="Nitrate over time"></svg></div>
@@ -455,7 +456,7 @@ th:first-child,td:first-child{text-align:left}
 
 <!-- UPGRADES -->
 <section class="panel" id="p-promote" hidden>
-  <div class="card" data-k="ads" id="adscard"><div class="hd"><h2>Advertising</h2><small id="m-reach"></small></div>
+  <div class="card coll" data-k="ads" id="adscard"><div class="hd"><h2>Advertising</h2><small id="m-reach"></small></div>
     <p class="sub">More reach = more customers for shrimp and kits, if you have stock.</p>
     <div id="ads"></div></div>
 </section>
@@ -1933,7 +1934,7 @@ function anyHad(){for(var i=0;i<G.tanks.length;i++)if(G.tanks[i].had)return true
 function rv(k){
   if(G.opt.all)return true;var o=G.ob;
   if(k==='shrimp')return anyHad();if(k==='hatch')return G.stats.born>0;
-  if(k==='charts')return !!o.kit&&TK().hist.length>=14&&anyHad();
+  if(k==='charts')return !!o.kit&&TK().hist.length>=14&&anyHad()&&G.day-(o.fs||0)>=14;
   if(k==='phkh')return !!o.wc;
   return !!o[k];
 }
@@ -1965,7 +1966,7 @@ function applyReveal(){
   $('wtcard').hidden=!(rv('wc')&&kit)||(!anyHad()&&!G.opt.all);$('wccard').hidden=!rv('wc');
   $('colcard').hidden=!rv('hatch');$('charts').hidden=!rv('charts');$('logcard').hidden=!rv('hatch');
   $('tab-up').hidden=!rv('up');$('tab-market').hidden=!rv('market');$('tab-promote').hidden=!rv('sell');
-  $('sellcard').hidden=!sh;$('rulescard').hidden=!sh;$('supcard').hidden=!(G.tanks.length>1||G.opt.all);
+  $('sellcard').hidden=!(sh&&rv('sell'));$('rulescard').hidden=!(sh&&(G.stats.sold>0||G.opt.all));$('supcard').hidden=!(G.tanks.length>1||G.opt.all);
 }
 function updateOverview(){
   var multi=G.tanks.length>1;$('ovcard').hidden=!multi;$('recipecard').hidden=!G.recipe;if(G.recipe)setT('recipe-n',G.tanks.length+' tanks');
@@ -2375,7 +2376,21 @@ function render(){
   if(activeTab==='up'){updateUpgrades();updateMarket();}
   if(activeTab==='promote')updateMarket();
   if(kitsOpen(G)&&['emp','up','promote','world'].indexOf(activeTab)>=0)updateEmpire();
-  renderProgression();renderChapters();
+  renderProgression();renderChapters();markNewCards();
+}
+// New sections open folded with a 'new' tag, so each unlock adds one line, not a wall of controls.
+var OPEN_ON_REVEAL={startcard:1,buy:1,kits:1,korder:1,order:1,equipment:1,tanks:1,proj:1};
+function markNewCards(){
+  var o=G.opt;if(!o.shut)o.shut={ads:true,sup:true,fin:true};if(!o.fresh)o.fresh={};
+  if(!o.seenCard){o.seenCard={};o.seenLegacy=G.day>1;o.seenTab={};}
+  var legacy=o.seenLegacy&&!o.seenTab[activeTab],fresh=markNewCards.G!==G;
+  document.querySelectorAll('.coll').forEach(function(c){var k=c.dataset.k;
+    if(fresh)c.classList.toggle('shut',!!o.shut[k]);
+    if(!o.seenCard[k]&&!o.all&&c.getClientRects().length){o.seenCard[k]=1;
+      if(!legacy&&!OPEN_ON_REVEAL[k]){if(o.shut[k]==null)o.shut[k]=true;if(o.shut[k]){o.fresh[k]=1;c.classList.add('shut');}}}
+    if(c.classList.contains('fresh')!==!!o.fresh[k])c.classList.toggle('fresh',!!o.fresh[k]);
+    var h=c.querySelector(':scope>.hd'),ex=String(!c.classList.contains('shut'));if(h&&h.getAttribute('aria-expanded')!==ex)h.setAttribute('aria-expanded',ex);});
+  if(o.seenLegacy)o.seenTab[activeTab]=1;markNewCards.G=G;
 }
 
 // Academic work belongs to the Earth chapter; astronomy adds questions later.
@@ -2595,7 +2610,7 @@ function initControls(){
   $('t-slow').addEventListener('change',function(e){G.opt.slow=e.target.checked;});
   $('t-slownew').addEventListener('change',function(e){G.opt.slowNew=e.target.checked;});
   $('t-all').addEventListener('change',function(e){G.opt.all=e.target.checked;cache={};lastChips='';lastColSig='';lastChartKey='';render();});
-  document.addEventListener('click',function(e){var h=e.target.closest('.coll>.hd');if(!h||e.target.closest('button,input,a'))return;var c=h.parentElement,k=c.dataset.k;c.classList.toggle('shut');G.opt.shut=G.opt.shut||{};G.opt.shut[k]=c.classList.contains('shut');});
+  document.addEventListener('click',function(e){var h=e.target.closest('.coll>.hd');if(!h||e.target.closest('button,input,a'))return;var c=h.parentElement,k=c.dataset.k;c.classList.toggle('shut');G.opt.shut=G.opt.shut||{};G.opt.shut[k]=c.classList.contains('shut');if(!G.opt.shut[k]&&G.opt.fresh&&G.opt.fresh[k]){delete G.opt.fresh[k];c.classList.remove('fresh');}});
   document.querySelectorAll('.coll').forEach(function(c){var sh=G.opt.shut||{ads:true,sup:true,fin:true};if(!G.opt.shut)G.opt.shut=sh;c.classList.toggle('shut',!!sh[c.dataset.k]);});
   $('fold').addEventListener('click',function(){G.opt.collapse=!G.opt.collapse;render();});
   $('ovtbl').addEventListener('click',function(e){var r=e.target.closest('[data-sel]');if(!r)return;G.sel=+r.dataset.sel;lastChartKey='';lastColSig='';lastAlerts='';lastChips='';cache.mvsig=cache.segsig=cache.shopsig=cache.upsig=cache.ov=null;syncControls();render();});

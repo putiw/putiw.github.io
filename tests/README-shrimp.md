@@ -143,3 +143,10 @@ ammonia is only the primary button once ammonia is near zero.
 - Milestone card is compact: Grandpa's letter is folded into a "Grandpa's note" toggle (closed on each new milestone); smaller type on phones.
 - "Max shrimp" renamed "Pack above". All-tanks table shows "594 packs >60" instead of "594/60".
 - Tried scaling the default pack threshold with tank volume (3 shrimp/L). Codex playthroughs slowed by ~480 days and seed 42 failed to finish, so the sim default stays 60. Display-only change; all balance numbers identical to before.
+
+## Smoother reveals (Claude)
+- New sections open folded with a small "new" tag (cleared when opened), so an unlock adds one header line instead of a full card. Stays open when it holds the next action: start card, Buy shrimp, Starter kits, Projects, Equipment, Tanks, pet shop and bulk orders.
+- Advertising and Readings over time also fold on first reveal.
+- Existing saves: sections already present on first view of each tab are left as they were (G.opt.seenLegacy/seenTab).
+- Staggered: Sell card waits for something sellable, Sales rules wait for the first sale, Readings over time waits 14 days after the first shrimp.
+- Measured with the seed-7 policy in a browser, counting new visible controls per game day: biggest burst 63 → 32 (first shrimp day now 17), days with 10+ new controls 15 → 7. UI only; sim and balance unchanged.

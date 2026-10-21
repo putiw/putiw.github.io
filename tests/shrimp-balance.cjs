@@ -26,6 +26,8 @@ console.log('PASS top readings show NO₃, KH, GH, pH and temperature');
 const goalRowStart=html.indexOf('<div class="goalrow">'),dreamSummary=html.indexOf('id="dream-tracker"'),nextHeaderRow=html.indexOf('<div class="chips" id="tankchips"');
 if(!(goalRowStart>=0&&goalRowStart<dreamSummary&&dreamSummary<nextHeaderRow&&html.includes('id="b-goal-short"')))throw Error('Grandpa year tracker should share the compact progress row');
 console.log('PASS Grandpa year tracker shares the progress row with a compact mobile progress label');
+if(!html.includes('class="card coll" data-k="charts" id="charts"')||!html.includes('class="card coll" data-k="ads" id="adscard"'))throw Error('Delayed charts and advertising should fold when first revealed');
+console.log('PASS delayed charts and advertising can fold when first revealed');
 check('fresh starts preserve milestones; high-speed batches stop at a boundary',`
 var g=readyGame(),t=g.tanks[0];t.chem.bacA=t.chem.bacB=bacTarget(t);t.chem.nh=t.chem.no2=0;rememberCycle(g,t);
 for(var i=0;i<400;i++)stepGame(g);
