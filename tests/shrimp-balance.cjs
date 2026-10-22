@@ -46,7 +46,7 @@ if(!(infoPop>=0&&infoPop<goalRowStart&&goalRowStart<dreamSummary&&html.includes(
 console.log('PASS Grandpa year tracker shares the progress row with a compact mobile progress label');
 if(!html.includes('class="card coll" data-k="charts" id="charts"')||!html.includes('class="card coll" data-k="ads" id="adscard"'))throw Error('Delayed charts and advertising should fold when first revealed');
 console.log('PASS delayed charts and advertising can fold when first revealed');
-if(!html.includes('.coll.queued>:not(.hd){display:none!important}')||!html.includes('function promoteCardReveal(o)')||!html.includes('o.cardQueue.push({k:k,tab:activeTab})')||!html.includes('promoteCardReveal(o);render();')||!html.includes('var PROJ_SHOW=1;'))throw Error('New content should queue one at a time, focus the active card and advance when dismissed');
+if(!html.includes('.coll.queued>:not(.hd){display:none!important}')||!html.includes('function promoteCardReveal(o)')||!html.includes('o.cardQueue.push({k:k,tab:activeTab})')||!html.includes('promoteCardReveal(o);render();')||!html.includes('var PROJ_SHOW=1,'))throw Error('New content should queue one at a time, focus the active card and advance when dismissed');
 console.log('PASS newly revealed cards queue one at a time and fold other sections');
 check('fresh starts preserve milestones; high-speed batches stop at a boundary',`
 var g=readyGame(),t=g.tanks[0];t.chem.bacA=t.chem.bacB=bacTarget(t);t.chem.nh=t.chem.no2=0;rememberCycle(g,t);
@@ -92,9 +92,10 @@ if(!g.progress.queue.includes('win')||g.money!==money||g.day!==0)throw Error('Wi
 g.progress.queue=[];g.progress.sandbox=true;if(!stepGame(g))throw Error('Sandbox blocked');
 `);
 check('campaigns and films produce a persistent result',`
-var g=readyGame();g.emp.proj.ministry=1;g.emp.proj.studio=1;g.emp.inf=1e9;g.emp.op.offer=['calm'];if(!runCampaign(g,'calm'))throw Error('Campaign failed');
+var g=readyGame();g.money=1e8;g.emp.proj.ministry=1;g.emp.proj.studio=1;g.emp.inf=1e9;g.emp.op.offer=['calm'];if(!runCampaign(g,'calm'))throw Error('Campaign failed');
 if(!greenlight(g,0))throw Error('Film failed');for(var i=0;i<31;i++){g.day++;empireDay(g);}
-if(!g.emp.op.recap||g.emp.op.recap.w<=0||!g.emp.filmRecap||g.emp.movie.n!==1)throw Error('Missing result');
+if(!g.emp.op.recap||g.emp.op.recap.m<=0||!g.emp.filmRecap||g.emp.movie.n!==1)throw Error('Missing result');
+if(!g.emp.ripple.log.some(function(x){return x.tx&&/Shrimpfather/.test(x.tx);}))throw Error('Films get a Shrimp Times review');
 `);
 check('finance shows operating margin separately from purchases',`
 var g=readyGame();g.fin=[{shrimp:1000,farms:-100,logistics:-20,equipment:-9000,staff:-80}];
@@ -132,11 +133,11 @@ var cap=packCap(g);if(cap!==50500||g.kits.stock!==123||farmSalvage(g,FARMS.find(
 migrate(g);if(packCap(g)!==cap)throw Error('Duplicate migration gift');
 `);
 check('shrimp-free ripple fires headlines in order with effects and a retraining fix', `
-var g=readyGame();g.humans=5e5;g.kits.sold=2000;g.emp.q=0.9;var f0=g.emp.op.f.i;for(var i=0;i<400;i++){g.day++;rippleDay(g);}
+var g=readyGame();g.humans=5e5;g.kits.sold=2000;g.emp.q=0.9;g.emp.infOn=1;var f0=g.emp.op.m;for(var i=0;i<400;i++){g.day++;rippleDay(g);}
 var R=g.emp.ripple;if(R.n<6||R.log[0].i!==0||R.log[3].i!==3||R.log[4].d<R.log[3].d)throw Error('Headlines out of order');
-if(!(g.emp.op.f.i<f0))throw Error('Trawler headline did not cool Fire');
+for(var k=0;k<12;k++)opinionDay(g);if(!(g.emp.op.m<f0))throw Error('Trawler headline should upset people');
 g.humans=4e9;R.free=2.1e6;rippleDay(g);if(!rippleHas(g,'retrain')||!projAvail(g).some(p=>p.id==='retrain'))throw Error('Retraining not offered');
-g.money=1e6;var before=g.emp.op.f.i;buyProj(g,'retrain');if(!(g.emp.op.f.i>before))throw Error('Retraining did not help Fire');
+g.money=1e6;var before=g.emp.op.m;buyProj(g,'retrain');for(var k=0;k<12;k++)opinionDay(g);if(!(g.emp.op.m>before)||projAvail(g).some(p=>p.id==='harbors'))throw Error('Retraining should help, and close the other answer');
 R.free=3e9;var inf=g.emp.inf;rippleDay(g);if(R.n!==RIPPLE.length||!(g.emp.inf>inf))throw Error('Late ripple incomplete');
 if(regionCost(g,REGIONS[3])>=REGIONS[3].m)throw Error('Typhoon discount missing');
 `);
@@ -221,7 +222,7 @@ t.ill={type:'molt',day:0,days:0,sev:1,sick:4};if(treatIll(g,0,'salt',1)!=='wrong
 t.ill={type:'bact',day:0,days:0,frac:0.4};if(treatIll(g,0,'water',0.4)!=='partial'||!t.ill||!(t.ill.frac<0.4))throw Error('Missed sick shrimp should leave a smaller outbreak');
 t.ill={type:'scut',day:0,days:0,frac:0.3};if(treatIll(g,0,'salt',1,{ok:false,loss:0})!=='partial'||!t.ill)throw Error('A short salt dip leaves flatworms');if(treatIll(g,0,'salt',1,{ok:true,loss:0})!=='cured'||t.ill)throw Error('A good salt dip cures flatworms');
 if(!giveTreat(g,0,'pollen')||giveTreat(g,0,'pollen')||!giveTreat(g,0,'spinach')||Math.abs(treatMult(t)-1.15*1.05)>1e-9)throw Error('Treats stack, one of each; pollen boosts breeding');
-var w0=g.emp.op.w.i;if(!storyChoose(g,'ev_paper',0)||!(g.emp.op.w.i>w0)||!g.ads.some(function(a){return a.id==='press';}))throw Error('Story choice should apply its effect');
+var w0=g.emp.op.pend.length;if(!storyChoose(g,'ev_paper',0)||!(g.emp.op.pend.length>w0)||!g.ads.some(function(a){return a.id==='press';}))throw Error('Story choice should apply its effect');
 ['hatch','kits','farm','million'].forEach(function(k){if(!MILESTONES[k].chapter)throw Error('Chapter missing: '+k);});
 ['tanks2','health','tools','station','bulk','worldtab','ripple'].forEach(function(k){if(!MILESTONES[k].intro)throw Error('Feature intro missing: '+k);});
 `);
@@ -260,7 +261,7 @@ if(!hire(g,'sales',1))throw Error('Hiring failed');if(!t.set.autoSell)throw Erro
 var n0=totalN(t);dayRollover(g);if(!(totalN(t)<n0-1))throw Error('Salesperson did not sell surplus: '+n0+' -> '+totalN(t));
 `);
 if(!html.includes("else if(activeTab!=='space'){$('tankchips').hidden=G.tanks.length<2||!!G.recipe||topAway(G);}"))throw Error('Tank buttons must come back after business tabs, until every tank is fully upgraded');
-if(!html.includes("business=open&&topAway(G)&&"))throw Error('Top bar stays on every tab until every tank is fully upgraded');
+if(!html.includes("business=inBiz&&topAway(G)"))throw Error('Top bar stays on every tab until every tank is fully upgraded');
 check('consultants are paid per visit: 20% of cash, at least AED 20,000, 30 days',`
 var g=readyGame();g.emp.kitsOpened=1;g.money=50000;if(consultCost(g)!==20000)throw Error('Minimum is AED 20,000');g.money=500000;if(consultCost(g)!==100000)throw Error('20% of cash');
 if(!buyConsult(g,'visit')||g.money!==400000||!consultHas(g)||buyConsult(g,'visit'))throw Error('One paid visit at a time');g.day+=31;if(consultHas(g))throw Error('A visit lasts 30 days');
@@ -297,5 +298,44 @@ g.kits.sold=1000;rippleDay(g);if(rip(g).n!==3)throw Error('500 and 1000 kit stor
 var o=readyGame();o.emp.ripple={free:2e4,n:1,log:[{i:0,d:5}],seen:1};var R=rip(o);if(R.n!==4||R.log[0].i!==3||R.v!==2)throw Error('Old saves keep their place in the story list');
 `);
 if(html.includes("'Next story at '"))throw Error('No spoilers about the next story');
+check('robots and AI replacing staff make the news, once',`
+var g=readyGame();g.humans=50;newsEvent(g,'aisales');newsEvent(g,'aisales');var R=rip(g);if(R.log.length!==1||newsText(R.log[0]).indexOf('AI agents')<0)throw Error('One AI story');
+`);
+check('influence starts with Mira, never before',`
+var g=readyGame();gainInf(g,50);if(g.emp.inf!==0||g.emp.infTotal!==0)throw Error('No influence before Mira');
+if(!MILESTONES.ev_mira.body.includes('influence'))throw Error('Mira explains influence');
+storyChoose(g,'ev_mira',2);if(!g.emp.infOn||!(g.emp.inf>0))throw Error('Any Mira choice starts influence');
+var old=readyGame();old.emp.infTotal=40;delete old.emp.infOn;old=migrate(JSON.parse(JSON.stringify(old)));if(!old.emp.infOn)throw Error('Old saves keep influence');
+`);
+check('choices: one answer closes the other, cold answers cost heart and pay off',`
+var g=readyGame();g.emp.infOn=1;g.kits.sold=200;g.money=1e6;g.emp.inf=1e4;
+var ids=projAvail(g).map(p=>p.id);if(ids.indexOf('shipwarm')<0||ids.indexOf('shipcheap')<0)throw Error('Both shipping answers offered');
+var m0=kitMaterials(g);if(!buyProj(g,'shipcheap')||buyProj(g,'shipwarm')||projAvail(g).some(p=>p.fk==='ship'))throw Error('One answer per question');
+if(!(g.emp.heart<0)||!(kitMaterials(g)<m0))throw Error('Cheap shipping saves money and costs heart');
+Object.keys(FORK_Q).forEach(function(fk){var o=forkOpts(fk);if(o.length<2)throw Error('Question needs two answers: '+fk);if(!o.some(p=>(p.h||0)>0)||!o.some(p=>(p.h||0)<=0))throw Error('Needs a kind and a cold answer: '+fk);});
+PROJ.filter(p=>p.c==='cult'||p.c==='fork').forEach(function(p){if(p.c==='cult'&&!p.t)throw Error('World project without a track: '+p.id);});
+if(!PROJ.some(p=>p.t==='uni'&&p.m>0&&p.i>0)||!PROJ.some(p=>p.t==='pol'&&!p.m&&p.i>0)||!PROJ.some(p=>p.t==='nature'&&p.m>0&&!p.i))throw Error('Costs should mix money and ✦ by item');
+`);
+check('cold deals pay every day, bad deeds can surface later in the news',`
+var g=readyGame();g.emp.infOn=1;g.humans=2e6;g.money=1e7;g.emp.proj.filtercart=1;var m=g.money;dealsDay(g);if(!(g.money>m))throw Error('Cartridges pay daily');
+g.emp.later=[{d:Math.floor(g.day),t:'An algae bloom turns the river green.',m:-6}];var n=rip(g).log.length;laterDay(g);if(rip(g).log.length!==n+1||g.emp.later.length)throw Error('Delayed story prints once');
+g.emp.proj.paperbuy=1;newsLine(g,'Something happened.');if(!/owner/.test(newsText(rip(g).log[rip(g).log.length-1])))throw Error('An owned paper flatters you');
+`);
+check('one public mood, honest and pushy campaigns, no Water or Fire left',`
+var g=readyGame();g.emp.proj.ministry=1;drawOffer(g);var o=g.emp.op.offer.map(id=>MSGS.find(m=>m.id===id));
+if(!o.some(m=>(m.h||0)>=0)||!o.some(m=>(m.h||0)<0))throw Error('Offer mixes honest and pushy');
+if(g.emp.op.w||g.emp.op.f||typeof g.emp.op.m!=='number')throw Error('Single mood');
+var old=readyGame();old.emp.op={w:{s:0.5,i:0.6},f:{s:0.5,i:0.4},pend:[{w:.01,f:0,cv:0,left:3}],used:{},offer:null,n:0,run:null};old=migrate(JSON.parse(JSON.stringify(old)));if(Math.abs(old.emp.op.m-0.5)>1e-9||old.emp.op.pend.length)throw Error('Old two-faction saves migrate');
+`);
+if(/Water interest|Fire interest|Water and Fire/.test(html))throw Error('Water/Fire text left');
+check('research starts with a cheap postdoc and opens at 200 kits',`
+var g=readyGame();g.kits.sold=199;if(academyOpen(g))throw Error('Too early');g.kits.sold=200;if(!academyOpen(g))throw Error('Opens at 200 kits');
+var o=grantOffer(g);if(o.cost!==50000||o.days!==365)throw Error('Postdoc first');g.money=60000;fundAcademy(g);if(grantOffer(g).cost!==150000)throw Error('PhD next');
+if(STUDIES[0].id!=='automation'||!STUDIES[0].req(g))throw Error('Automation study first');
+`);
+check('the ending reads the path you took',`
+if(PROJ.filter(p=>p.end).length<20)throw Error('Ending lists what you did');
+`);
+if(!html.includes('function endingVerdict(G)')||!html.includes('What the world looks like'))throw Error('Ending shows what the world became');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

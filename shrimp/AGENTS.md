@@ -110,7 +110,11 @@ These come from Puti's feedback. Treat them as requirements.
 - Write all player-facing text in Puti's voice: short, plain, comma-spliced, no build-up. No "AI vibe" phrasing, no flourishes ("a testament to", "embark", "journey").
 - Patterns she flags as Claude-style, so don't write them: "X, so you don't have to", "for good", "by itself" / "on its own", "Nothing fancy, nothing wrong" style pairs, punchlines like "Finally, a ... that matters", poetic lists ("photos, classrooms, hospital rooms, a lighthouse"), aphorisms ("less netting, more numbers"), and "Label. Description" lines. No quote marks around narration.
 - The Shrimp Times can be political. Stay away from the sensitive topics, like abortion and religion.
-- Influence ✦ only pays for culture projects. Public opinion has two audiences, Water and Fire.
+- Influence ✦ is knowing the right people. It starts with Mira (ev_mira), nothing earns ✦ before her. Costs mix money and ✦ by what makes sense: things money can buy cost AED, things that need someone on your side cost ✦, some cost both.
+- There is one public mood (E.op.m), no audiences. Water and Fire were removed at Puti's request, don't bring them back.
+- The player picks a path, nobody pushes it. Choices come as a question with a kind answer and a cold one (PROJ items with fk, question in FORK_Q). Cold answers are cheaper or faster. A hidden heart score (E.heart) adds up kind (+) and cold (−) picks, campaigns and film stories. It is never shown as a number. It slows or speeds the good Shrimp Times stories (heartMult), and the win card shows what the world became and Grandpa's verdict. The monopoly/dictator path is allowed and valid.
+- World is split into University, Media, Politics and Nature, one thing per track at a time.
+- Films: the player picks what each film is really about. Effects are hidden, the Shrimp Times reviews it.
 
 **Shrimp**
 - Lifespans: about 90% of babies reach adulthood, 80% reach a year, 20% reach two years.
@@ -188,7 +192,6 @@ Planned and agreed with Puti, not built yet:
 - You set how kits are split between open channels.
 
 **Other planned work**
-- About 8 straight +% projects become pick-one pairs, and filler gets cut.
 - The player chooses the next region from 2–3 options with trade-offs, instead of a fixed order.
 - Story pacing: story cards at least ~30 game days apart, plus new late-game beats with choices that last (Mira's science fair, a flatworm recall, the rival's merger offer, a letter from Iceland).
 - A proper ending: a recap of the run (timeline, choices made, ocean impact, Grandpa's last note).

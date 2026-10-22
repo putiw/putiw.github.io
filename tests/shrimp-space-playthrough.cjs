@@ -1,7 +1,8 @@
-// Continue an actual Earth playthrough at its ten-year anniversary.
+// Continue an Earth playthrough at its ten-year anniversary, with both chapters active.
 const fs=require('fs'),vm=require('vm'),path=require('path'),assert=require('node:assert/strict');
 const html=fs.readFileSync(path.join(__dirname,'../shrimp/index.html'),'utf8'),input=process.env.ACADEMY_RUN||'/private/tmp/shrimp-academy-play/run-7.json';
 const source=JSON.parse(fs.readFileSync(input,'utf8')),c=vm.createContext({Math,console});
+if(!source.snapshots['ten-year celebration'])throw Error('Earth replay needs a ten-year snapshot');
 vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);c.fixture=source.snapshots['ten-year celebration'];
 vm.runInContext(`
 var G=migrate(fixture),events=[],snapshots={},earthStart=G.humans;G.opt.all=true;

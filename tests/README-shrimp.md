@@ -39,7 +39,7 @@ For the late-finish path, run `REQUIRE_AFTER_TEN_YEAR=1 REVIEW_KIT_PRICE=400
 node tests/shrimp-playthrough.cjs` on one line. This requires a completed game
 after the ten-year celebration, with no timely achievement awarded.
 
-Academic progression and parallel space chapter:
+Academic progression and year-ten parallel space chapter:
 
 ```sh
 node tests/shrimp-academy.cjs
@@ -47,14 +47,14 @@ REVIEW_ACADEMY=1 REVIEW_KIT_PRICE=250 REVIEW_OUTPUT=/private/tmp/shrimp-academy-
 ACADEMY_RUN=/private/tmp/shrimp-academy-play/run-7.json node tests/shrimp-space-playthrough.cjs
 ```
 
-The academic suite checks prepaid budgets, idle/unfunded pauses, saved partial
+The academic suite checks grant timing, idle/unfunded pauses, saved partial
 work, effects applied to actual packing and machine purchases, funded career
-requirements, teaching, old-save migration, independent year-ten access, Earth
-archival after victory, and both heat-management routes. The space continuation
-uses the anniversary state produced by the full Earth replay, buys missions and
-habitat systems through simulation actions, completes new research and all four
-worlds, checks every completed habitat is sustainable at full capacity, and
-asserts Earth adoption grew during the space journey.
+requirements, teaching, old-save migration, Space opening at year ten,
+Earth archival after victory, and both heat-management routes. The space
+continuation starts from the ten-year snapshot, buys missions and habitat
+systems through simulation actions, completes new research and all four worlds,
+checks every completed habitat is sustainable at full capacity, and confirms
+Earth adoption continues during the space journey.
 
 The average-player replay uses the default kit price and buys one inexpensive
 starter colony. It checks weekly while cycling and monthly after opening the
@@ -375,3 +375,22 @@ ammonia is only the primary button once ammonia is near zero.
 - Marketing: kit referrals are multiplied by `wordOfMouth(G)` = 0.3 + 0.7 x (1 - e^(-level/2)), level = (reach - 1) + kit shops / 3. Marketing card header shows it. Strong bot now buys the online shop, keeps a shelf or YouTuber ad running and opens a stall: wins day 2499. Average bot Earth seeds 7/1: 5893/5963.
 - Kits: consultant blurb shortened (details behind ?), QC how-to behind ?, Pack above hint shorter, hire buttons sit on the right like other rows.
 - World: kit-quality and word-of-mouth notes behind ?, "Share of people" line removed, campaign line shortened, research shows reserve and free cash on one line, fund button on the right.
+
+## Pass 47: plain news, AI job-loss news, space after Earth
+- Shrimp Times stories rewritten in plain words (no scampi, rutabaga, bycatch, bailout, hectares, cooperatives, blue-carbon asset, class-action lawsuit, appetizer, apocalypse), jokes kept.
+- Event stories (`NEWS_EV`, `newsEvent`): robots take over packing (first packing line), AI replaces salespeople, shop managers, technicians. The card now works off the story log, so event stories show and trigger the jump like the others. AI replacement rows say how many people lose their jobs.
+- Space opens once everyone on Earth has a tank (`spaceOpen` = won), not at year ten. Winning early still jumps to the year-ten reunion for Grandpa's dream. Average bot starts space after Earth: seeds 7/1 Earth 5961/5951, space done 7292.
+- Removed the call to prayer from Grandpa's star-gazing choice (now "until Grandma calls you in for dinner").
+
+## Pass 48: no more Water/Fire, kind or cold paths, influence starts with Mira
+- Water and Fire are gone. One public mood (`E.op.m`, `moodAdd`) sets how many will buy (`kitCap`) and referrals (`opMult`). Old two-faction saves migrate to their old overall appeal (`opFix`).
+- Campaigns stay. Each offer has at least one honest message and one pushy one. Pushy ones move the mood more, some aren't true and can backfire later (Shrimp Times story, mood drop).
+- Choices: 17 questions, each with a kind answer and a cold one (PROJ items with `fk`, question text in `FORK_Q`). Picking one closes the other. Cold answers are cheaper or pay every day (`dealsDay`: fish-food culls, filter cartridges, food pods, gene patent). Some cold answers come back later as news (`E.later`, `laterDay`): algae bloom, drained wetland, paid study, bribed inspector, fake reviews, bought politician. One choice shows per tab at a time.
+- World is split into University, Media, Politics and Nature, one item per track. Costs mix money and ✦ by what makes sense (`m` and `i`). New: scholarships, lab name, stress study, gene, interview or buy the Shrimp Times, welfare law, buy a politician, tax haven, hamster tax, retraining or buying harbors, almond seed in every kit, Taiwan streams, take-back, solar farms, mangroves.
+- Hidden heart (`E.heart`): kind choices, honest campaigns and kind film stories add, cold ones subtract. Never shown. It scales the good Shrimp Times stories (`heartMult`) and owners' welfare a little. The win card lists what the world looks like (`end` lines) and Grandpa's verdict (`endingVerdict`).
+- Films: pick what each film is really about. Hidden effects (word of mouth, how many want one, mood, heart, flop chance), a Shrimp Times review on release. Films cost money and ✦. If you bought the Shrimp Times, every review is five stars and every story ends flattering you.
+- Influence: no ✦ before Mira (`E.infOn`). Her story says what it is, every answer starts it. Old saves with ✦ keep it.
+- Research opens at 200 kits. A postdoc for a year costs AED 50,000, then a PhD student AED 150,000 a year, then the AED 1M lab and bigger grants. First study: cheaper packing machines (lines, AI setup, camera, machines 25% less via `autoDisc`).
+- Fixed: World projects only showed once every tank was fully upgraded (`inBiz` vs `business`).
+- Bots: strong bot takes cold answers (`BOT_HEART=kind` flips), average bot kind ones (`BOT_HEART=cold` flips). Average bot opens new regions and the first research grant before extras. Its limit for both chapters is now 21 years (it already finished space on day 7292 of 7300).
+- Pacing: strong bot cold day 2253, kind day 2449 (was 2499). Average bot Earth seeds 7/1: kind 6143/5990, cold 6047 (seed 7), space done 7488.

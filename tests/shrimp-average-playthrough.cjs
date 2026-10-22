@@ -42,10 +42,14 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,S=G.space,budget=
   for(var li=0;li<PACK_LINES.length;li++)if(lineReady(G,li)&&packCap(G)<kitDemand(G)*1.1&&canSpend(lineCost(G,li)+PACK_LINES[li].up*30))spend('packing '+PACK_LINES[li].id,()=>buyLine(G,li));
   if(packingMachineCap(G)>kitDemand(G)&&E.staff.pack)hire(G,'pack',-1);
   if(pd(G,'farmlic')&&(!farmCap(G)||bn.k==='shrimp')){var list=FARMS.filter(f=>farmOk(G,f));var next=list.find(f=>!(E.farms[f.id]>0));var existing=list.filter(f=>E.farms[f.id]>0).slice(-1)[0];var pick=next&&canSpend(farmCost(G,next))?next:existing||list[0];if(pick&&canSpend(farmCost(G,pick)))spend('farm '+pick.id,()=>buyFarm(G,pick.id));}
-  if(G.ob.eproj){for(var area of ['emp','up','promote','world'])for(var p of shownProj(G,area,area==='world'?'cult':'biz')){if(canSpend(pm(G,p))&&E.inf>=p.i)spend('project '+p.id,()=>buyProj(G,p.id));}}
+  // New regions first: a player expands before spending ✦ on extras.
+  if(academyOpen(G)&&!A.level&&canSpend(200000))spend('pilot grant',()=>fundAcademy(G));
+  var region=nextRegion(G);if(G.ob.ereg&&region&&canSpend(regionCost(G,region)))spend('region '+region.id,()=>buyRegion(G));
+  if(G.ob.eproj){for(var area of ['emp','up','promote','world'])for(var p of (area==='world'?[].concat.apply([],TRACKS.map(t=>trackProj(G,t[0]))):shownProj(G,area,'biz'))){if(canSpend(pm(G,p))&&E.inf>=p.i)spend('project '+p.id,()=>buyProj(G,p.id));}
+   // Choices: this player takes the kind answer when they can afford it (BOT_HEART=cold flips it).
+   for(var fk in FORK_Q){if(forkDone(G,fk))continue;var opts=forkOpts(fk).filter(p=>p.req(G)).sort((a,b)=>(${process.env.BOT_HEART==='cold'}?a.h-b.h:b.h-a.h));var pk=opts[0];if(pk&&canSpend(pm(G,pk))&&E.inf>=pk.i)spend('choice '+pk.id,()=>buyProj(G,pk.id));}}
   // One modest advertising attempt; later keep referrals and distribution working.
   if(G.ob.sell&&G.kits.sold<100&&!G.webShop&&canSpend(1500)&&G.kits.sold>=10)spend('online shop',()=>addAd(G,'web'));
-  var region=nextRegion(G);if(G.ob.ereg&&region&&canSpend(regionCost(G,region)))spend('region '+region.id,()=>buyRegion(G));
   if(G.ob.eshops&&!shopCount(G)&&G.money>100000)spend('market stall',()=>buyShop(G,'stall'));
   if(shopCount(G)&&!E.staff.mgr&&canSpend(5000))spend('hire manager',()=>hire(G,'mgr',1));
   if(G.kits.sold>=30&&!E.staff.sales&&!E.staff.aiSales&&canSpend(10000))spend('hire salesperson',()=>hire(G,'sales',1));
@@ -53,7 +57,7 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,S=G.space,budget=
   if(E.inf<500&&G.money>galaCost(G)*20)spend('community gala',()=>buyProj(G,'gala'));
  }
  if(academyOpen(G)){
-  if(!A.level&&G.money>5000000+capitalReserve(G))spend('pilot grant',()=>fundAcademy(G));
+  if(!A.level&&G.money>200000+capitalReserve(G))spend('pilot grant',()=>fundAcademy(G));
   if(A.level){A.autoFund=true;A.repeat=true;if(A.level===1&&uniqueStudies(G)&&canSpend(1000000))spend('university lab',()=>academyUpgrade(G,'lab'));
    if(A.phds&&!A.postdocs&&canSpend(500000))spend('postdoc',()=>academyUpgrade(G,'postdoc'));
    if(A.postdocs&&A.level<3&&canSpend(1000000))spend('independent group',()=>academyUpgrade(G,'group'));
@@ -69,12 +73,12 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,S=G.space,budget=
   for(var world of WORLDS)if(S.colonies[world.id]&&S.colonies[world.id].settled)note('settled '+world.id);
  }
 }
-for(var day=0;day<7300;day++){
+for(var day=0;day<7665;day++){
  care();if(G.day%(kitsOpen(G)?28:7)===0||G.day<35)visit();if(G.emp.won&&G.space.won)break;
- waitingSeconds+=2.4/maxSpeed(G);for(var q=0;q<4;q++){while(G.progress.queue.length){note('milestone '+G.progress.queue[0]);acknowledgeMilestone(G);}if(!stepGame(G))throw Error('Clock blocked at '+G.day);}
+ waitingSeconds+=2.4/maxSpeed(G);for(var q=0;q<4;q++){while(G.progress.queue.length){note('milestone '+G.progress.queue[0]);acknowledgeMilestone(G);}if(G.emp.won&&!G.space.started&&requestSpaceDream(G)&&beginSpace(G))note('space started');if(!stepGame(G))throw Error('Clock blocked at '+G.day);}
  minCash=Math.min(minCash,G.money);if(!Number.isFinite(G.money)||G.money<0)throw Error('Insolvent at '+G.day+' '+JSON.stringify(G.fin.slice(-3)));if(day%1000===0)console.log('progress',G.day,Math.round(G.money),Math.round(G.humans),farmCap(G),packCap(G));
  if(G.day%365===0){snapshots['year '+Math.floor(G.day/365)]=JSON.parse(JSON.stringify(G));}
 }
 care();var result={events:events,snapshots:snapshots,actions:actions,day:G.day,earth:G.emp.won,space:G.space.won,minCash:minCash,waitingMinutes:waitingSeconds/60,visits:visits,final:G};
 `,c,{timeout:180000});
-const out=process.env.REVIEW_OUTPUT||'/private/tmp/shrimp-average';fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'run-'+initialSeed+'.json'),JSON.stringify(c.result));console.log(JSON.stringify(c.events,null,2));console.log('RESULT',JSON.stringify({...c.result,snapshots:undefined,actions:undefined,final:undefined}));if(!c.G.emp.won||!c.G.space.won)throw Error('Average-player scenario did not complete both chapters within 20 game years');if(c.minCash<=0)throw Error('Average-player scenario exhausted its working cash');
+const out=process.env.REVIEW_OUTPUT||'/private/tmp/shrimp-average';fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'run-'+initialSeed+'.json'),JSON.stringify(c.result));console.log(JSON.stringify(c.events,null,2));console.log('RESULT',JSON.stringify({...c.result,snapshots:undefined,actions:undefined,final:undefined}));if(!c.G.emp.won||!c.G.space.won)throw Error('Average-player scenario did not complete both chapters within 21 game years');if(c.minCash<=0)throw Error('Average-player scenario exhausted its working cash');
