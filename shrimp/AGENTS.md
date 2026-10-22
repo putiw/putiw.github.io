@@ -57,7 +57,7 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 | `spotWatch()` | The first time any section in `SPOT_INFO` or tab in `SPOT_TAB` is on screen, it gets the spotlight: dim the rest, green ring, one line of text above, game paused, tap anywhere to go on. One at a time, after story cards. Every new section needs a `SPOT_INFO` line. |
 | `guideTarget()` / `applyGuide()` | The one "Next" hint and the pulsing button it points at. |
 | `HELP` + `.explain` | The ? on each card header. Long explanations go in `HELP[id]` or in paragraphs with class `explain` (hidden in the card, shown in the ? box). |
-| `phaseInfo(G)` + `CARE_GOALS` | The goal card on the Tank tab. |
+| `ideas(G)` | Up to three loose suggestions in the ? popup (Ideas). Only for tabs already open. `CARE_GOALS`/`phaseInfo` are legacy, no longer shown. |
 | `maxSpeed(G)` | Speeds. 4× while the tank cycles with no shrimp, 2× once shrimp are in, 4× after the first hatchery, 12× and 40× later. |
 
 ### Systems added recently
@@ -72,7 +72,7 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 These come from Puti's feedback. Treat them as requirements.
 
 **Progress and goals**
-- Goals are about better care and more capacity: automate feeding, a bigger tank, another tank, automate packing. Never shrimp counts or cash targets. The pull should be "I want that auto feeder, I need AED 90", not homework.
+- No goal card. Ideas live in the ? popup as loose suggestions (automate, more room, make the tank nicer), never an exact item to save for, never prices, counts or cash targets. Players pick their own order. Never mention something whose tab isn't open yet. Soft "Meanwhile" guide hints also go in the popup; the guide bar above the tank is only for a real next step.
 - Do things by hand first, then automate one piece at a time.
 - There should always be something to do or improve, not one button and done.
 - Bottleneck advice only comes from the paid consultancy, never free.
@@ -87,13 +87,14 @@ These come from Puti's feedback. Treat them as requirements.
 
 **Look**
 - Light mode only. The palette is the "field notebook": cream paper, dark ink, forest-green buttons, cherry red for the shrimp. ✦ influence is plum.
-- Fonts: Fraunces for titles, Inter for text and buttons, IBM Plex Mono for numbers.
+- Inter everywhere, numbers use tabular figures. No serif or mono fonts.
 - Primary buttons are green. Disabled buttons are flat grey, never faded green.
 - Highlight rings sit inside the element, so they never touch neighbours. Leave at least 10 px between buttons and the content under them.
 - It must fit a 360 px phone with no horizontal scroll and no cut-off labels.
 
 **Writing**
 - Write all player-facing text in Puti's voice: short, plain, comma-spliced, no build-up. No "AI vibe" phrasing, no flourishes ("a testament to", "embark", "journey").
+- Patterns she flags as Claude-style, so don't write them: "X, so you don't have to", "for good", "by itself" / "on its own", "Nothing fancy, nothing wrong" style pairs, punchlines like "Finally, a ... that matters", poetic lists ("photos, classrooms, hospital rooms, a lighthouse"), aphorisms ("less netting, more numbers"), and "Label. Description" lines. No quote marks around narration.
 - The Shrimp Times can be political. Stay away from the sensitive topics, like abortion and religion.
 - Influence ✦ only pays for culture projects. Public opinion has two audiences, Water and Fire.
 
@@ -159,7 +160,7 @@ When you change balance, run both bots and compare against these. Report the bef
 
 **Design**
 - **Too many new things at once.** Water care, pH and KH chips and a toast all appeared right before the first shrimp purchase. Stage reveals behind real need, and blink an existing button if an action is needed early.
-- **Explanations in card bodies, and goals that read like homework.** Both drew complaints. Move text behind ?, and keep goals about care and capacity.
+- **Explanations in card bodies, and goals that read like homework.** Both drew complaints. Move text behind ?. A goal card with one item to save for still felt linear and got removed.
 - **Overwriting the other agent's work.** Always diff before you write.
 
 ## Open work

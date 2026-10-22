@@ -11,10 +11,10 @@ if(g.opt.goalOpen!==true)throw Error('New goal panel should start expanded');g.o
 if(migrate(JSON.parse(JSON.stringify(g))).opt.goalOpen!==false)throw Error('Goal panel preference did not persist');
 var old=newGame();delete old.opt.goalOpen;if(migrate(old).opt.goalOpen!==true)throw Error('Old saves need the expanded default');
 `);
-const tankStart=html.indexOf('<section class="panel" id="p-tank">'),marketStart=html.indexOf('<section class="panel" id="p-market"'),marketEnd=html.indexOf('<!-- UPGRADES -->'),goalCard=html.indexOf('id="next-card"'),tradeColony=html.indexOf('id="trade-colcard"');
-if(!(tankStart>=0&&tankStart<goalCard&&goalCard<marketStart&&marketStart<tradeColony&&tradeColony<marketEnd))throw Error('Goal or Trade colony card is outside its intended tab');
+const tankStart=html.indexOf('<section class="panel" id="p-tank">'),marketStart=html.indexOf('<section class="panel" id="p-market"'),marketEnd=html.indexOf('<!-- UPGRADES -->'),goalCard=html.indexOf('id="ideas"'),apop=html.indexOf('id="apop"'),tradeColony=html.indexOf('id="trade-colcard"');
+if(html.includes('id="next-card"'))throw Error('The goal card should be gone from the Tank tab');if(!(apop>=0&&apop<goalCard&&goalCard<tankStart&&tankStart<marketStart&&marketStart<tradeColony&&tradeColony<marketEnd))throw Error('Ideas belong in the info popup, Trade colony card in Trade');
 if(html.includes('id="next-actions"')||html.includes('id="btn-gomarket"'))throw Error('Confusing Go-to CTA remains in the goal flow');
-console.log('PASS goal panel is Tank-only, navigation is tab-based and Trade includes the colony card');
+console.log('PASS ideas live in the info popup, navigation is tab-based and Trade includes the colony card');
 if(html.includes('data-act="milestone-continue"')||!html.includes('>Got it<')||!html.includes('function setEmphasisText'))throw Error('Milestones should use one consistent paused action with readable emphasis');
 console.log('PASS milestones use one paused next-step action and instructional text can emphasize key terms');
 const tooltipMap=html.split('var PARAM_TIPS={')[1].split('};\nfunction initParameterTooltips')[0];
@@ -26,7 +26,7 @@ console.log('PASS water care appears before the water test');
 if((html.match(/data-act="wc"/g)||[]).length!==1||html.includes('id="btn-feed"')||html.includes('id="btn-scwc"'))throw Error('Feed and water actions should live only in the top action bar');
 if(!/\.acts \.btn\{[^}]*min-height:4[4-9]px/.test(html))throw Error('Top feed, water and sell buttons should have a comfortable tap height');
 if(!html.includes('details class="card" id="feedcard"')||!html.includes('details class="card" id="wtcard" open')||!html.includes("$('wtcard').open=waterStage!=='ready'")||!html.includes("$('tb-feed').classList.toggle('first-feed'"))throw Error('Feeding and stable readings should fold while the first feed is highlighted');
-if(!html.includes("$('next-card').hidden=business||!$('milestone-card').hidden||!$('startcard').hidden"))throw Error('The task card should stay out of the way while cycling or a milestone is shown');
+if(!html.includes("$('ideas').hidden=!idl.length"))throw Error('Ideas section should hide when there are no ideas');
 if(!html.includes('id="tb-info"')||!html.includes('<div id="info-alerts"')||!html.includes('.apop .goalrow{'))throw Error('Alerts, owners and the year journal should live behind the ?/!/!! button');
 console.log('PASS duplicate details fold away, header lines align and the first feed is highlighted');
 if(!html.includes("$('vwater').innerHTML=[['no3','NO₃'],['kh','KH'],['gh','GH'],['temp','Temp']]"))throw Error('Top readings should show nitrate, KH, GH and temperature in order');
@@ -146,8 +146,8 @@ for(var i=0;i<5&&!g.korder;i++){g.day++;kitOrderDay(g);}if(g.korder)throw Error(
 g.emp.staff.tier=2;g.emp.staff.pack=2;g.emp.rawShrimp=8*400;g.korderNext=0;for(var i=0;i<5&&!g.korder;i++){g.day++;kitOrderDay(g);}if(!g.korder||g.korder.n<10)throw Error('No bulk order offered');
 var o=g.korder;o.taken=true;g.kits.stock=o.n+5;g.emp.packed=o.n*2;var cash=g.money,own=g.humans;fillKitOrder(g);if(g.korder||g.kits.stock!==5||!(g.money>cash)||!(g.humans>own))throw Error('Bulk order fills from packing and ships when full');
 g.emp.fastUnlocked=true;g.korderNext=0;g.day++;kitOrderDay(g);if(g.korder)throw Error('Bulk orders continue at 40x');
-var g2=readyGame();g2.stats.born=1;g2.tanks[0].had=1;if(phaseInfo(g2).goal!=='Auto feeder'||phaseInfo(g2).cost==null)throw Error('First care goal should be the auto feeder, with its price');
-g2.tanks[0].feeder=1;if(phaseInfo(g2).goal!=='A 40 L tank')throw Error('Goals should move on to more room');if(phaseInfo(g2).goal.indexOf(' / ')>=0)throw Error('Goals should not be counts');
+var g2=readyGame();g2.stats.born=1;g2.tanks[0].had=1;g2.ob.up=0;if(ideas(g2).length)throw Error('No ideas before the Equipment tab opens');g2.ob.up=1;var id2=ideas(g2);if(!id2.some(function(x){return x.k==='auto';})||!id2.some(function(x){return x.k==='home';}))throw Error('Early ideas should offer automation and making the tank nicer, side by side');if(id2.some(function(x){return /AED|\d+ L\b/.test(x.t);}))throw Error('Ideas should not name prices or exact items');
+g2.tanks[0].feeder=1;g2.tanks[0].autoWC=1;if(ideas(g2).some(function(x){return x.k==='auto';}))throw Error('Automation idea should go once both are automated');if(ideas(g2).length>3)throw Error('At most three ideas');
 `);
 check('speeds unlock through care, automation and profitable fulfilment', `
 var g=readyGame(),t=g.tanks[0];if(maxSpeed(g)!==4)throw Error('An empty cycling tank should allow 4x');buyPackFree(t,0);if(maxSpeed(g)!==2)throw Error('Shrimp in the tank should cap time at 2x');g.stats.born=1;t.feeder=t.autoWC=1;if(maxSpeed(g)!==2)throw Error('Tank care alone should not unlock 4x');
