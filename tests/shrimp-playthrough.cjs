@@ -38,6 +38,10 @@ extraTanks(true);checkGoals(G);if(G.story.anniversary)note('ten-year celebration
 if(kitsOpen(G)){
  note('kits unlocked');
  if(!E.staff.tier&&afford(300))buyPackTier(G);
+ var adOn=function(id){return G.ads.some(function(x){return x.id===id;});};
+ if(!G.webShop&&G.kits.sold>=10&&afford(1500))addAd(G,'web');
+ if(G.kits.sold>=300&&!adOn('yt')&&afford(15000))addAd(G,'yt');else if(G.kits.sold>=30&&!adOn('shelf')&&!adOn('yt')&&afford(1800))addAd(G,'shelf');
+ if(G.ob.eshops&&!shopCount(G)&&G.money>100000)buyShop(G,'stall');
  if(E.staff.tier===1&&G.kits.sold>=20&&afford(1800))buyPackTier(G);
  if(E.staff.tier&&G.kits.sold>=10&&packCap(G)<Math.min(farmCap(G),kitDemand(G))&&afford(2000)&&E.staff.pack<4)hire(G,'pack',1);
  for(var li=0;li<PACK_LINES.length;li++)if(lineReady(G,li)&&packCap(G)<kitDemand(G)*1.3&&afford(lineCost(G,li)+PACK_LINES[li].up*30))buyLine(G,li);

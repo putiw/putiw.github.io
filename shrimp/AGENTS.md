@@ -72,10 +72,12 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 Her messages usually name a symptom, give one example, and sketch a fix ("maybe like..."). The sketch is a guess. The principle behind it is the request. Apply it to the whole game, not just the example, and when something pushes or tells the player what to do, remove it or make it optional rather than rewording it.
 
 1. The player decides. No tasks, targets, unlock rules, prices to save for or nudges toward one route (a second tank, a specific item). Suggestions sit in the ? popup as options, only for tabs already open. Gates use room or progress the player chose, never a fixed path (kits need 60 L of stocked tanks, the farm license 120 L, any mix).
+   Marketing is a real lever: referrals run at `wordOfMouth(G)` (30% with no marketing, up to 100% with an online shop, ads and shops). Don't let demand scale without it.
 2. Show, don't tell. A glowing button or a spotlight beats a sentence. The guide bar is for events only (an order, illness, new stock to dip, QC due), everything optional is soft and goes to the popup.
 3. Little on screen, detail on tap. Explanations behind ?, cards collapsible, alerts state the problem in a line plus the one fix when it's dangerous.
 4. What's shown matches what's true. Food on screen matches "all eaten", highlights follow their target, the tank view shows the shrimp it says it has, bars read the way a glance reads them (Fed is full when they're full).
-5. Real shrimp keeping. Illness, salt dips, cycling, manual first then automated.
+5. Real shrimp keeping. The player uses their eyes: no Care card and no sickness alerts until shrimp are dying fast. Tap the tank to lock in (no page scroll), tap sick shrimp, drag to wipe glass algae. Sickness comes from a play-time clock (about 2.5 to 7 min at normal risk, faster when water, crowding, dirty glass or new stock raise `illRisk`). Treats are unlocked in Equipment and picked weekly under Feeding.
+   Was:  Illness, salt dips, cycling, manual first then automated.
 6. One thing at a time, only when needed. One spotlight, then at least 15 s of play before the next.
 7. Her voice. Short, plain, comma-spliced, no AI patterns (list below).
 

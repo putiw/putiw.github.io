@@ -132,8 +132,8 @@ var cap=packCap(g);if(cap!==50500||g.kits.stock!==123||farmSalvage(g,FARMS.find(
 migrate(g);if(packCap(g)!==cap)throw Error('Duplicate migration gift');
 `);
 check('shrimp-free ripple fires headlines in order with effects and a retraining fix', `
-var g=readyGame();g.humans=5e5;g.emp.q=0.9;var f0=g.emp.op.f.i;for(var i=0;i<400;i++){g.day++;rippleDay(g);}
-var R=g.emp.ripple;if(R.n<3||R.log[0].i!==0||R.log[1].d<R.log[0].d)throw Error('Headlines out of order');
+var g=readyGame();g.humans=5e5;g.kits.sold=2000;g.emp.q=0.9;var f0=g.emp.op.f.i;for(var i=0;i<400;i++){g.day++;rippleDay(g);}
+var R=g.emp.ripple;if(R.n<6||R.log[0].i!==0||R.log[3].i!==3||R.log[4].d<R.log[3].d)throw Error('Headlines out of order');
 if(!(g.emp.op.f.i<f0))throw Error('Trawler headline did not cool Fire');
 g.humans=4e9;R.free=2.1e6;rippleDay(g);if(!rippleHas(g,'retrain')||!projAvail(g).some(p=>p.id==='retrain'))throw Error('Retraining not offered');
 g.money=1e6;var before=g.emp.op.f.i;buyProj(g,'retrain');if(!(g.emp.op.f.i>before))throw Error('Retraining did not help Fire');
@@ -151,7 +151,7 @@ g2.tanks[0].feeder=1;g2.tanks[0].autoWC=1;if(ideas(g2).some(function(x){return x
 `);
 check('speeds unlock through care, automation and profitable fulfilment', `
 var g=readyGame(),t=g.tanks[0];if(maxSpeed(g)!==4)throw Error('An empty cycling tank should allow 4x');buyPackFree(t,0);if(maxSpeed(g)!==2)throw Error('Shrimp in the tank should cap time at 2x');g.stats.born=1;t.feeder=t.autoWC=1;if(maxSpeed(g)!==2)throw Error('Tank care alone should not unlock 4x');
-g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=1000000;g.emp.farms.barn=1;g.emp.staff.tier=2;if(maxSpeed(g)!==4)throw Error('First hatchery should unlock 4x');g.emp.proj.autopackm=1;g.emp.beta=.05;g.humans=100;g.kits.stock=0;g.kitPrice=250;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(g.emp.fastUnlocked)throw Error('Thin margins unlocked 40');g.kitPrice=600;g.humans=2000;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(g.emp.fastUnlocked||!g.emp.fastReady)throw Error('40 before a million owners');g.humans=1e6;g.day++;empireDay(g);if(!g.emp.fastUnlocked||maxSpeed(g)!==12)throw Error('Profitable business at a million owners did not unlock 12');g.emp.won=1;if(maxSpeed(g)!==40)throw Error('Everyone with a tank should unlock 40x');
+g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=1000000;g.emp.farms.barn=1;g.emp.staff.tier=2;if(maxSpeed(g)!==4)throw Error('First hatchery should unlock 4x');g.emp.proj.autopackm=1;g.emp.beta=.05;g.humans=100;g.webShop=true;g.ads=[{id:'yt',left:999,days:999,boost:6}];g.kits.stock=0;g.kitPrice=250;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(g.emp.fastUnlocked)throw Error('Thin margins unlocked 40');g.kitPrice=600;g.humans=2000;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(g.emp.fastUnlocked||!g.emp.fastReady)throw Error('40 before a million owners');g.humans=1e6;g.day++;empireDay(g);if(!g.emp.fastUnlocked||maxSpeed(g)!==12)throw Error('Profitable business at a million owners did not unlock 12');g.emp.won=1;if(maxSpeed(g)!==40)throw Error('Everyone with a tank should unlock 40x');
 `);
 check('industrial upgrades need real preceding stages and output', `
 var g=readyGame();g.money=1e12;g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.emp.proj.farmlic=1;if(farmOk(g,FARMS[2])||buyFarm(g,'hatch')||(g.emp.tools={bag:1,catch:1,o2:1,seal:1,box:1},g.emp.staff.tier=1,buyPackTier(g)))throw Error('Skipped chapter');
@@ -220,7 +220,7 @@ taps=0;do{r=handStep(g);taps++;}while(!r.kit&&taps<10);if(taps!==1)throw Error('
 t.ill={type:'molt',day:0,days:0,sev:1,sick:4};if(treatIll(g,0,'salt',1)!=='wrong'||!t.ill)throw Error('Wrong cure should not help');if(treatIll(g,0,'minerals',1)!=='cured'||t.ill)throw Error('Right cure with a good search heals');
 t.ill={type:'bact',day:0,days:0,frac:0.4};if(treatIll(g,0,'water',0.4)!=='partial'||!t.ill||!(t.ill.frac<0.4))throw Error('Missed sick shrimp should leave a smaller outbreak');
 t.ill={type:'scut',day:0,days:0,frac:0.3};if(treatIll(g,0,'salt',1,{ok:false,loss:0})!=='partial'||!t.ill)throw Error('A short salt dip leaves flatworms');if(treatIll(g,0,'salt',1,{ok:true,loss:0})!=='cured'||t.ill)throw Error('A good salt dip cures flatworms');
-if(!giveTreat(g,0,'pollen')||giveTreat(g,0,'spinach')||treatMult(t)!==1.15)throw Error('One treat at a time; pollen boosts breeding');
+if(!giveTreat(g,0,'pollen')||giveTreat(g,0,'pollen')||!giveTreat(g,0,'spinach')||Math.abs(treatMult(t)-1.15*1.05)>1e-9)throw Error('Treats stack, one of each; pollen boosts breeding');
 var w0=g.emp.op.w.i;if(!storyChoose(g,'ev_paper',0)||!(g.emp.op.w.i>w0)||!g.ads.some(function(a){return a.id==='press';}))throw Error('Story choice should apply its effect');
 ['hatch','kits','farm','million'].forEach(function(k){if(!MILESTONES[k].chapter)throw Error('Chapter missing: '+k);});
 ['tanks2','health','tools','station','bulk','worldtab','ripple'].forEach(function(k){if(!MILESTONES[k].intro)throw Error('Feature intro missing: '+k);});
@@ -235,7 +235,7 @@ var g=newGame(),t=g.tanks[0];g.stats.sold=5;buyPackFree(t,2,60);t.had=1;var g0=a
 for(var d=0;d<20;d++)illDay(g,t,0);if(!(t.ill.frac>f0*3))throw Error('Illness should spread when untreated');if(!(t.pop[0].g<g0))throw Error('Sick shrimp should lose colour');
 var n20=totalN(t);for(d=0;d<80&&t.ill;d++)illDay(g,t,0);if(t.ill||totalN(t)>=1||!t.crashed)throw Error('An untreated outbreak should crash the whole tank');
 var a=g.tanks[0];buyPackFree(a,2,40);var b=newTank(1);g.tanks.push(b);startIll(g,a,'scut');a.ill.frac=0.4;moveShrimp(g,a,b,5);if(!b.ill)throw Error('Moving sick shrimp should spread it');
-var c=newTank(2);g.tanks.push(c);g.money=500;c.had=1;buyPack(g,c,0);if(!c.fresh)throw Error('New shrimp should need a salt dip');if(dipFresh(g,2,{ok:true,loss:0})!=='clean'||c.fresh)throw Error('A good dip clears new stock');
+var c=newTank(2);g.tanks.push(c);g.money=500;c.had=1;buyPack(g,c,0);if(c.fresh||c.newStock==null)throw Error('New stock raises risk, no dip');
 var e=g.tanks[0];e.pop=[];e.ill=null;g.tanks.forEach(function(x){x.pop=[];x.ill=null;});g.money=2;g.day=500;dayRollover(g);if(totalN(g.tanks[0])<1)throw Error('Grandpa should restart a broke player with no shrimp');
 `);
 check('quality checks: manual rounds, automation in order, strictness trade-off',`
@@ -254,5 +254,48 @@ check('player decides: room-based gates, any mix of tanks',`
 var g=readyGame();g.stats.sold=KIT_UNLOCK;var t=g.tanks[0];t.had=1;t.vol=80;t.volTier=2;t.pop=[{age:100,n:20,g:60}];if(!kitsOpen(g))throw Error('One 80 L tank should be enough room for kits');
 t.vol=40;t.volTier=1;if(kitsOpen(g))throw Error('Kits still need some room');
 `);
+check('hired salespeople sell surplus without an extra toggle',`
+var g=readyGame();g.stats.sold=5;g.money=5000;var t=g.tanks[0];t.had=1;t.pop=[{age:120,n:60,g:60},{age:30,n:20,g:60}];t.set.keep=20;
+if(!hire(g,'sales',1))throw Error('Hiring failed');if(!t.set.autoSell)throw Error('Hiring sales should switch on selling');
+var n0=totalN(t);dayRollover(g);if(!(totalN(t)<n0-1))throw Error('Salesperson did not sell surplus: '+n0+' -> '+totalN(t));
+`);
+if(!html.includes("else if(activeTab!=='space'){$('tankchips').hidden=G.tanks.length<2||!!G.recipe||topAway(G);}"))throw Error('Tank buttons must come back after business tabs, until every tank is fully upgraded');
+if(!html.includes("business=open&&topAway(G)&&"))throw Error('Top bar stays on every tab until every tank is fully upgraded');
+check('consultants are paid per visit: 20% of cash, at least AED 20,000, 30 days',`
+var g=readyGame();g.emp.kitsOpened=1;g.money=50000;if(consultCost(g)!==20000)throw Error('Minimum is AED 20,000');g.money=500000;if(consultCost(g)!==100000)throw Error('20% of cash');
+if(!buyConsult(g,'visit')||g.money!==400000||!consultHas(g)||buyConsult(g,'visit'))throw Error('One paid visit at a time');g.day+=31;if(consultHas(g))throw Error('A visit lasts 30 days');
+`);
+if(html.includes('class="idea" data-tab='))throw Error('Ideas must not reuse data-tab');
+check('first ad is there as soon as Marketing opens; health check shuffles sick shrimp',`
+var g=readyGame();g.stats.sold=0;if(!adReady(g,ADS.find(a=>a.id==='fb')))throw Error('First ad should be ready before the first sale');
+`);
+if(!html.includes("for(var q=cells.length-1;q>0;q--)"))throw Error('Health check cells should be shuffled');
+check('glass algae grows and sickness risk follows tank condition',`
+var g=readyGame();var t=g.tanks[0];t.had=1;t.pop=[{age:120,n:40,g:60}];t.cycledAt=0;
+for(var d=0;d<30;d++)glassGrow(g,t);var m30=glassMean(t);if(!(m30>0.05&&m30<0.6))throw Error('Algae after a month should be visible but not full: '+m30);
+var r0=illRisk(g,t);t.glass=t.glass.map(()=>0);var rClean=illRisk(g,t);if(!(r0>rClean))throw Error('Dirty glass should raise risk');
+t.chem.gh=3;if(!(illRisk(g,t)>rClean))throw Error('Soft water should raise risk');t.chem.gh=7;
+t.leaves=1;if(!(illRisk(g,t)<rClean))throw Error('Almond leaves should lower risk');t.leaves=0;
+for(d=0;d<200;d++)illDay(g,t,0);if(t.ill)throw Error('Illness should only start from the play-time schedule');
+if(!illRandom(g)||!t.ill)throw Error('Scheduled illness should start in a stocked tank');if(illRandom(g))throw Error('Only one sick tank at a time');
+`);
+check('treats unlock once, then renew weekly from Feeding',`
+var g=readyGame();g.money=200;var t=g.tanks[0];t.had=1;t.pop=[{age:120,n:40,g:60}];
+if(unlockTreat(g,'pollen')!==true||g.money!==180||unlockTreat(g,'pollen'))throw Error('Unlock costs AED 20 once');
+unlockTreat(g,'spinach');t.set.treats={pollen:true,spinach:true};dayRollover(g);if(!treatOn(t,'pollen')||!treatOn(t,'spinach'))throw Error('Weekly treats should start the next day, together');
+for(var d=0;d<7;d++)dayRollover(g);if(!treatOn(t,'pollen'))throw Error('Weekly treat should renew');
+var o=readyGame();o.tanks[0].treat={id:'flakes',left:3};delete o.tanks[0].treats;o.tanks[0].set.treat='pollen';delete o.tanks[0].set.treats;migrate(o);if(!o.tanks[0].treats||o.tanks[0].treats.flakes!==3||!o.tanks[0].set.treats.pollen||'treat' in o.tanks[0])throw Error('Old single treat should migrate');
+`);
+{const seen={},dup=[];(html.match(/(?:^|[\n;{}])function ([A-Za-z0-9_$]+)\(/g)||[]).forEach(m=>{const n=m.replace(/^[\n;{}]?function /,'').slice(0,-1);if(seen[n])dup.push(n);seen[n]=1;});if(dup.length)throw Error('Duplicate function names override each other: '+dup.join(', '));}
+if(!html.includes('id="tv-check"')||!html.includes('id="tv-clean"'))throw Error('Tank tap should offer Check shrimp and Clean tank');
+{const scripts=html.match(/<script>([\s\S]*?)<\/script>/g)||[];scripts.forEach((x,i)=>{try{new Function(x.replace(/^<script>|<\/script>$/g,''));}catch(e){throw Error('Script '+i+' does not parse: '+e.message);}});}
+{const tp=html.slice(html.indexOf('function tips(T){'),html.indexOf('function tips(T){')+4000);if(/in debt|Cash runs out/.test(tp.slice(0,tp.indexOf('\nfunction ',10))))throw Error('Tank alerts should not include money');if(!html.includes("var ea=cashTips().concat(empTips())"))throw Error('Money alerts go with the business alerts');}
+if(!html.includes("TVM.dacc=(TVM.dacc||0)+dd/N*TVM.ag.length"))throw Error('Visible deaths should be in proportion to real ones');
+check('Shrimp Times opens with kit-count stories',`
+var g=readyGame();g.humans=30;g.kits.sold=24;rippleDay(g);if(rip(g).n!==0)throw Error('No story before 25 kits');g.kits.sold=25;rippleDay(g);if(rip(g).n!==1||!/Reddit/.test(RIPPLE[rip(g).log[0].i].t))throw Error('First story at 25 kits');
+g.kits.sold=1000;rippleDay(g);if(rip(g).n!==3)throw Error('500 and 1000 kit stories');
+var o=readyGame();o.emp.ripple={free:2e4,n:1,log:[{i:0,d:5}],seen:1};var R=rip(o);if(R.n!==4||R.log[0].i!==3||R.v!==2)throw Error('Old saves keep their place in the story list');
+`);
+if(html.includes("'Next story at '"))throw Error('No spoilers about the next story');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

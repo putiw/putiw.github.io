@@ -35,8 +35,7 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,S=G.space,budget=
   if(kitStage(G)===0){kitStep(G,'mat');kitStep(G,'catch');if(kitStep(G,'pack'))note('first hand-packed kit');}
   else if(!packCap(G)&&G.kits.stock<3&&G.money>kitMaterials(G)+100)manualPack(G,G.kits.sold<10?1:Math.min(10,Math.floor(spareKitShrimp(G)/8)));
   if(G.kits.sold>=3&&!E.staff.tier&&canSpend(300))spend('packing bench',()=>buyPackTier(G));
-  if(G.kits.sold>=5&&!consultHas(G,'diag')&&G.money>5000)spend('consultant report',()=>buyConsult(G,'diag'));
-  if(consultHas(G,'diag')&&!consultHas(G,'fix')&&G.money>15000)spend('consultant plan',()=>buyConsult(G,'fix'));
+  if(G.kits.sold>=5&&!consultHas(G)&&G.money>consultCost(G)*4&&!(G._consulted>=2))spend('consultants',()=>{var ok=buyConsult(G,'visit');if(ok)G._consulted=(G._consulted||0)+1;return ok;});
   var bn=bottleneck(G);
   if(E.staff.tier===1&&G.kits.sold>=20&&canSpend(1800))spend('packing sealer',()=>buyPackTier(G));
   if(G.kits.sold>=10&&E.staff.tier&&bn.k==='packing'&&E.staff.pack<4&&canSpend(5000))spend('hire packer',()=>hire(G,'pack',1));
