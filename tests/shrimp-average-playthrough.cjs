@@ -19,7 +19,7 @@ function extraTanks(buy){if(!G.tanks[0].had)return;var T0=G.tanks[0];
    if(safeToStock(G,t)&&totalN(T0)>=30)moveShrimp(G,T0,t,totalN(T0)/3);}
   else{if(!t.feeder)feed(G,t,.8);if(P.no3>18||t.chem.kh<2.5||t.chem.gh<5||(!t.autoWC&&G.day%7===0))waterChange(G,t,30);
    if(!t.feeder&&G.stats.born>0&&G.money>90+150+capitalReserve(G))buyUpgrade(G,t,'feeder');if(!t.fan&&G.money>60+150+capitalReserve(G))buyUpgrade(G,t,'fan');}}}
-function care(){extraTanks(false);var T=G.tanks[0],P=ppm(T);while(G.progress.queue.length){var key=G.progress.queue[0];note('milestone '+key);acknowledgeMilestone(G);}updateReveal();
+function care(){extraTanks(false);var T=G.tanks[0],P=ppm(T);if(kitsOpen(G)&&G.kits.sold>=3&&(qc(G).last==null||G.day-qc(G).last>=40))qcRound(G,{water:0.8,look:0.7,dip:G.day%3?1:0.4});var nq=nextQC(G);if(nq&&G.money>nq.cost*6+capitalReserve(G)+500)buyQC(G,nq.id);G.tanks.forEach(function(t,i){if(t.fresh&&G.day%2===0)dipFresh(G,i,{ok:G.day%3>0,loss:0.03});if(t.ill&&t.ill.days>=6)treatIll(G,i,illById(t.ill.type).cure,0.75,{ok:G.day%4>0,loss:0.05});});while(G.progress.queue.length){var key=G.progress.queue[0];note('milestone '+key);acknowledgeMilestone(G);}updateReveal();
  if(!G.ob.kit){pay(G,120,'supplies');G.ob.kit=1;}
  if(!G.ob.bottle){pay(G,40,'supplies');G.ob.bottle=1;G.ob.doses=10;}
  if(!T.had){if(T.cycledAt==null&&P.nh<.1){if(G.ob.doses<=0&&G.money>=40){pay(G,40,'supplies');G.ob.doses+=10;}addAmmonia(G,T);}if(T.chem.kh<2||P.no3>20)waterChange(G,T,50);if(safeToStock(G,T)&&buyPack(G,T,0))note('first shrimp');}

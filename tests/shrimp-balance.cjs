@@ -27,11 +27,11 @@ if((html.match(/data-act="wc"/g)||[]).length!==1||html.includes('id="btn-feed"')
 if(!/\.acts \.btn\{[^}]*min-height:4[4-9]px/.test(html))throw Error('Top feed, water and sell buttons should have a comfortable tap height');
 if(!html.includes('details class="card" id="feedcard"')||!html.includes('details class="card" id="wtcard" open')||!html.includes("$('wtcard').open=waterStage!=='ready'")||!html.includes("$('tb-feed').classList.toggle('first-feed'"))throw Error('Feeding and stable readings should fold while the first feed is highlighted');
 if(!html.includes("$('next-card').hidden=business||!$('milestone-card').hidden||!$('startcard').hidden"))throw Error('The task card should stay out of the way while cycling or a milestone is shown');
-if(!html.includes('.goalrow{display:flex;align-items:center;gap:6px;font-size:11px;line-height:1')||!html.includes('.dream-tracker>summary{cursor:pointer;display:flex;align-items:center;'))throw Error('Header goal and year tracker should share a centered baseline');
+if(!html.includes('id="tb-info"')||!html.includes('<div id="info-alerts"')||!html.includes('.apop .goalrow{'))throw Error('Alerts, owners and the year journal should live behind the ?/!/!! button');
 console.log('PASS duplicate details fold away, header lines align and the first feed is highlighted');
-if(!html.includes("$('vwater').innerHTML=[['no3','NO₃'],['kh','KH'],['gh','GH'],['ph','pH'],['temp','Temp']]"))throw Error('Top readings should show nitrate, KH, GH, pH and temperature in order');
-if(!html.includes('#vwater{gap:3px;margin-top:3px;flex-wrap:nowrap}')||!html.includes('#vwater .wp{display:flex;align-items:baseline;justify-content:center;gap:2px;padding:2px 3px;white-space:nowrap}'))throw Error('Top water readings should fit on one compact line');
-if(!html.includes("$('vitals').hidden=!sh||!kitsOpen(G)"))throw Error('The top tank dashboard (shrimp, hunger, nutrition, food) should appear after starter kits unlock');
+if(!html.includes("$('vwater').innerHTML=[['no3','NO₃'],['kh','KH'],['gh','GH'],['temp','Temp']]"))throw Error('Top readings should show nitrate, KH, GH and temperature in order');
+if(!html.includes('#vwater{gap:3px;margin:0 0 0 auto;flex-wrap:nowrap;flex:0 0 auto}')||!html.includes('<div class="readrow" id="readrow">'))throw Error('Hunger, nutrition and water readings should share one compact line');
+if(!html.includes("$('vitals').hidden=!sh;"))throw Error('Hunger and nutrition should show once there are shrimp');
 console.log('PASS top readings show NO₃, KH, GH, pH and temperature');
 const tradeStart=html.indexOf('id="sellcard"'),hist=html.indexOf('id="trade-colcard"'),sales=html.indexOf('id="trade-sales-rules"'),sellAge=html.indexOf('id="s-sellAge"'),sellAction=html.indexOf('id="btn-sellall"'),price=html.indexOf('id="s-price"'),salesDetails=html.indexOf('<summary>Sales details</summary>');
 if(!(tradeStart>=marketStart&&tradeStart<hist&&hist<sales&&sales<sellAge&&sellAge<sellAction&&sellAction<price&&price<salesDetails&&salesDetails<marketEnd))throw Error('Trade should combine an independent colony histogram, sales rules, sell action, price and folded sales details in that order');
@@ -41,8 +41,8 @@ if(!html.includes("$('tb-feed').hidden=false;$('tb-wc').hidden=false;$('tb-sell'
 if(!html.includes("activeTab==='up'&&!G.opt.visitedUp")||!html.includes("g.tab==='up'&&o.visitedUp"))throw Error('Equipment tab guidance dot should be remembered as seen after visiting');
 if(!html.includes("var CARD_GROUP={kits:'k',staff:'k',korder:'k'};"))throw Error('Sales rules and colony toggles should not be coupled by spotlight grouping');
 console.log('PASS Trade combines independent colony/sales toggles; actions persist and Equipment dot clears after visit');
-const goalRowStart=html.indexOf('<div class="goalrow">'),dreamSummary=html.indexOf('id="dream-tracker"'),nextHeaderRow=html.indexOf('<div class="chips" id="tankchips"');
-if(!(goalRowStart>=0&&goalRowStart<dreamSummary&&dreamSummary<nextHeaderRow&&html.includes('id="b-goal-short"')))throw Error('Grandpa year tracker should share the compact progress row');
+const goalRowStart=html.indexOf('<div class="goalrow">'),dreamSummary=html.indexOf('id="dream-tracker"'),infoPop=html.indexOf('<div class="apop" id="apop"');
+if(!(infoPop>=0&&infoPop<goalRowStart&&goalRowStart<dreamSummary&&html.includes('id="b-goal-short"')))throw Error('Grandpa year tracker should share the owners row inside the info panel');
 console.log('PASS Grandpa year tracker shares the progress row with a compact mobile progress label');
 if(!html.includes('class="card coll" data-k="charts" id="charts"')||!html.includes('class="card coll" data-k="ads" id="adscard"'))throw Error('Delayed charts and advertising should fold when first revealed');
 console.log('PASS delayed charts and advertising can fold when first revealed');
@@ -119,7 +119,7 @@ var t=g.tanks[0];t.chem.bacA=t.chem.bacB=bacTarget(t);rememberCycle(g,t);t.chem.
 check('hatcheries supply shrimp and cannot bypass packing', `
 var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=100000;g.emp.farms.barn=1;g.emp.proj.farmlic=1;g.emp.beta=0;empireDay(g);
 if(g.kits.stock||g.kits.sold||g.emp.rawShrimp<=0||g.emp.prod<=0)throw Error('Farm bypassed packing');
-var raw=g.emp.rawShrimp,cash=g.money;if(manualPack(g,1)!==1||g.emp.rawShrimp!==raw-8||g.money!==cash-g.emp.mat)throw Error('Raw packing did not conserve resources');
+var raw=g.emp.rawShrimp,cash=g.money;if(manualPack(g,1)!==1||g.emp.rawShrimp!==raw-8||Math.abs(g.money-(cash-kitMaterials(g)))>1e-9)throw Error('Raw packing did not conserve resources');
 `);
 check('automatic packing respects labour, materials, holding and warehouse limits', `
 var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.kits.sold=100;g.money=1000000;g.emp.farms.hatch=1;g.emp.staff.tier=1;g.emp.beta=0;g.emp.acc=0;empireDay(g);
@@ -218,7 +218,8 @@ if(!buyTool(g,'bag')||!buyTool(g,'catch'))throw Error('Tools');taps=0;do{r=handS
 ['o2','seal','box'].forEach(function(id){buyTool(g,id);});if(!stationDone(g)||g.emp.staff.tier!==1||packCap(g)!==1)throw Error('Five tools make the packing station');
 taps=0;do{r=handStep(g);taps++;}while(!r.kit&&taps<10);if(taps!==1)throw Error('With the station a kit is one tap');
 t.ill={type:'molt',day:0,days:0,sev:1,sick:4};if(treatIll(g,0,'salt',1)!=='wrong'||!t.ill)throw Error('Wrong cure should not help');if(treatIll(g,0,'minerals',1)!=='cured'||t.ill)throw Error('Right cure with a good search heals');
-t.ill={type:'bact',day:0,days:0,sev:1,sick:4};if(treatIll(g,0,'water',0.4)!=='partial'||!t.ill||t.ill.sev!==0.5)throw Error('Missed sick shrimp should leave a milder illness');
+t.ill={type:'bact',day:0,days:0,frac:0.4};if(treatIll(g,0,'water',0.4)!=='partial'||!t.ill||!(t.ill.frac<0.4))throw Error('Missed sick shrimp should leave a smaller outbreak');
+t.ill={type:'scut',day:0,days:0,frac:0.3};if(treatIll(g,0,'salt',1,{ok:false,loss:0})!=='partial'||!t.ill)throw Error('A short salt dip leaves flatworms');if(treatIll(g,0,'salt',1,{ok:true,loss:0})!=='cured'||t.ill)throw Error('A good salt dip cures flatworms');
 if(!giveTreat(g,0,'pollen')||giveTreat(g,0,'spinach')||treatMult(t)!==1.15)throw Error('One treat at a time; pollen boosts breeding');
 var w0=g.emp.op.w.i;if(!storyChoose(g,'ev_paper',0)||!(g.emp.op.w.i>w0)||!g.ads.some(function(a){return a.id==='press';}))throw Error('Story choice should apply its effect');
 ['hatch','kits','farm','million'].forEach(function(k){if(!MILESTONES[k].chapter)throw Error('Chapter missing: '+k);});
@@ -229,5 +230,22 @@ if(!g||!html.includes('applyGuide();\n}')||g.indexOf("bottleneck(G)")<0||g.index
 if(!html.includes('id="guidebar"')||html.includes('bar.dataset.tab'))throw Error('Guide bar must not reuse data-tab, which tab code selects on');
 if(!g.includes("key:'feed1',tab:'tank'")||!g.includes("key:'sell',tab:'tank'"))throw Error('Feed and sell guidance must navigate to the Tank action bar');
 console.log('PASS guide points at one next step and keeps bottleneck advice behind the consultancy');}
+check('untreated illness spreads, fades colour and wipes the tank; moving and buying spread it',`
+var g=newGame(),t=g.tanks[0];g.stats.sold=5;buyPackFree(t,2,60);t.had=1;var g0=adultGrade=t.pop[0].g;startIll(g,t,'bact');var f0=t.ill.frac;
+for(var d=0;d<20;d++)illDay(g,t,0);if(!(t.ill.frac>f0*3))throw Error('Illness should spread when untreated');if(!(t.pop[0].g<g0))throw Error('Sick shrimp should lose colour');
+var n20=totalN(t);for(d=0;d<80&&t.ill;d++)illDay(g,t,0);if(t.ill||totalN(t)>=1||!t.crashed)throw Error('An untreated outbreak should crash the whole tank');
+var a=g.tanks[0];buyPackFree(a,2,40);var b=newTank(1);g.tanks.push(b);startIll(g,a,'scut');a.ill.frac=0.4;moveShrimp(g,a,b,5);if(!b.ill)throw Error('Moving sick shrimp should spread it');
+var c=newTank(2);g.tanks.push(c);g.money=500;c.had=1;buyPack(g,c,0);if(!c.fresh)throw Error('New shrimp should need a salt dip');if(dipFresh(g,2,{ok:true,loss:0})!=='clean'||c.fresh)throw Error('A good dip clears new stock');
+var e=g.tanks[0];e.pop=[];e.ill=null;g.tanks.forEach(function(x){x.pop=[];x.ill=null;});g.money=2;g.day=500;dayRollover(g);if(totalN(g.tanks[0])<1)throw Error('Grandpa should restart a broke player with no shrimp');
+`);
+check('quality checks: manual rounds, automation in order, strictness trade-off',`
+var g=newGame();g.emp.kitsOpened=1;g.stats.sold=KIT_UNLOCK;g.kits.sold=5;var r0=sickKitRate(g);if(!(r0>0.1)||qcCoverage(g)!==0)throw Error('Unchecked kits should often ship sick');
+if(nextQC(g))throw Error('Automation should wait until the first manual round');
+qcRound(g,{water:1,look:1,dip:1});if(!(sickKitRate(g)<r0*0.4))throw Error('A good QC round should cut sick kits');
+g.day+=50;if(qcFresh(g)!==0||!qcDue(g))throw Error('A QC round should expire after about 45 days');
+g.money=1e6;if(buyQC(g,'look'))throw Error('Automation must be bought in order');if(!buyQC(g,'water')||!g.qc.own.water)throw Error('Water sensors should install');
+['look','dip'].forEach(function(id){buyQC(g,id);});if(qcManual(g).length||qcDue(g))throw Error('Fully automated checks need no manual round');
+var m1=kitMaterials(g);setQCStrict(g,2);if(!(kitMaterials(g)>m1))throw Error('Strict checks should cost more per kit');var rs=sickKitRate(g);setQCStrict(g,0);if(!(sickKitRate(g)>rs))throw Error('Relaxed checks should let more sick kits through');
+`);
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

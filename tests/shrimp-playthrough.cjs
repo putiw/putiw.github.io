@@ -14,7 +14,7 @@ function extraTanks(buy){if(!G.tanks[0].had)return;var T0=G.tanks[0];
    if(!t.feeder&&G.stats.born>0&&G.money>90+150+capitalReserve(G))buyUpgrade(G,t,'feeder');if(!t.fan&&G.money>60+150+capitalReserve(G))buyUpgrade(G,t,'fan');}}}
 function afford(c){return G.money>c+Math.max(40,staffCost(G)*14);}
 function policy(){
-while(G.progress.queue.length)acknowledgeMilestone(G);updateReveal();var T=G.tanks[0],P=ppm(T),E=G.emp;
+while(G.progress.queue.length)acknowledgeMilestone(G);updateReveal();var T=G.tanks[0],P=ppm(T),E=G.emp;if(qcDue(G))qcRound(G,{water:1,look:0.95,dip:1});var nq=nextQC(G);if(nq&&G.money>nq.cost*3+capitalReserve(G)+300)buyQC(G,nq.id);if(farmBuilt(G)&&qc(G).strict!==2)setQCStrict(G,2);G.tanks.forEach(function(t,i){if(t.fresh)dipFresh(G,i);if(t.ill&&t.ill.days>=1)treatIll(G,i,illById(t.ill.type).cure,0.9);});
 if(!G.ob.kit&&G.money>=120){pay(G,120,'supplies');G.ob.kit=1;}
 if(!G.ob.bottle&&G.money>=40){pay(G,40,'supplies');G.ob.bottle=1;G.ob.doses=10;}
 if(!T.had){
