@@ -63,7 +63,8 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 ### Systems added recently
 
 - **Tank view** (`updateTankView`, `tv*` functions, `SPR` sprites): a canvas drawn from a sample of the real colony, using art layers from Puti's Shrimp Tanks game. It runs at about 30 fps and stops off screen, on other tabs and when the app is hidden. Pellets follow `T.chem.food`.
-- **Illness** (`illDay`, `treatIll`, `startIll`): spreads until treated, stages from a few sick to a crash, and a crash wipes the whole tank. New shrimp from Trade carry a flatworm risk until salt dipped (`dipFresh`). The health check is a tap-the-sick-shrimp minigame in the tank view (`openHealth`). The salt bath is a timing minigame (`openSalt`).
+- **Illness** (`illDay`, `treatIll`, `startIll`): spreads until treated, stages from a few sick to a crash, and a crash wipes the whole tank. New shrimp from Trade carry a flatworm risk until salt dipped (`dipFresh`). The health check is a tap-the-sick-shrimp minigame in the tank view (`openHealth`). The salt bath is a timing minigame (`openSalt`). The failed-molt white ring sits where the head shell meets the body (sprite x 54–60), not behind the eye.
+- **Choices and heart** (`FORK_Q`, `forkOpts`, `addHeart`, `dealsDay`, `laterDay`, `endingLines`, `endingVerdict`): kind or cold answers to one problem, hidden heart score, delayed news, and the win card's "What the world looks like" list.
 - **Quality checks** (`QC_STEPS`, `qcRound`, `sickKitRate`, `openQC`): a manual round once a month, steps automated in order, and a strictness setting.
 - **Hand packing** (`PACK_STEPS`, `handStep`, `buyTool`): five taps a kit, automated one tool at a time.
 
@@ -141,8 +142,12 @@ Latest bot results (seed 7):
 
 | Bot | Result |
 |---|---|
-| Strong | Earth won on day 2,352 |
-| Average | Earth on day 6,657, 41.6 min of waiting at top speed (not total play time) |
+| Strong, cold answers (default) | Earth won on day 2,253 to 2,297 |
+| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 2,449 |
+| Average, kind answers (default) | Earth on day 6,143 (seed 1: 5,990), space done day 7,488 |
+| Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,825 to 6,047 |
+
+The average bot has 21 years to finish both chapters (it used to finish space on day 7,292 of 7,300).
 
 When you change balance, run both bots and compare against these. Report the before and after numbers, and add them to `tests/README-shrimp.md`.
 
@@ -171,6 +176,11 @@ When you change balance, run both bots and compare against these. Report the bef
 - **Hardcoded text that goes stale.** A toast said "Tap 4×" while only 2× was open.
 - **Visibility checks.** `IntersectionObserver` was unreliable here. Use a bounding-rect check, and stop animations off screen.
 - **Visuals out of step with the sim.** Food pellets showed after the sim said all food was eaten. Drive visuals from sim state.
+- **Card headers drifting apart.** Fold-up cards and `<details>` cards used different header rules, so heights, gaps and arrows differed. All card headers share one 30 px row, one CSS-drawn chevron and the 8 px card gap. `details{margin-top}` must not apply to cards. Long header notes cut off with … instead of wrapping the title.
+- **Spotlights during the tank lock.** A new card spotlight scrolled the page while the tank was locked for cleaning, and the player was stuck. No spotlight, card jump or tab switch while `TVLOCK` or a health check is open.
+- **Scrolling a card under the sticky header.** `scrollIntoView({block:'start'})` hid the top of story cards behind the top bar. Scroll to the card's top minus the header height.
+- **Tiny shrimp washed out.** Babies at 0.36 scale looked white from the dither and sheen. Babies get a solid body with no sheen.
+- **Caching sprites before they decode.** In a test page, shrimp bodies were cached before the images loaded on a phone, so only legs showed. Never cache a drawing until every image it uses has loaded.
 
 **Sim and tests**
 - **UI helpers in the sim.** `labMode()` inside `illDay` broke every test.
@@ -196,8 +206,10 @@ Planned and agreed with Puti, not built yet:
 **Other planned work**
 - The player chooses the next region from 2–3 options with trade-offs, instead of a fixed order.
 - Story pacing: story cards at least ~30 game days apart, plus new late-game beats with choices that last (Mira's science fair, a flatworm recall, the rival's merger offer, a letter from Iceland).
-- A proper ending: a recap of the run (timeline, choices made, ocean impact, Grandpa's last note).
+- A fuller ending: the win card already lists what the world looks like and a closing line by path. Still to add: a timeline of the run and Grandpa's last note.
+- Cure minigames, one per cure, tried out in a separate prototype page (Shrimp Cure Games artifact) and not in the game yet. Mineral pellets: tap to drop pellets, every shrimp eats, add GH+ a scoop at a time (aim 6 to 8, a big jump kills some), the ring fades on sick ones that eat. Water change: hold Drain to about half, tap the milky shrimp to net them out while the water is low, hold Refill to the full line (overfilling spills). Salt dip: hold to dip the shrimp in a cup, target 4.5 s (sped up 10×, 45 s real), no clock, 3.5 to 5.5 s cures, longer stresses, past 7 s it dies.
+- Academia vs industry (proposed, not agreed): postdoc pay slider that doesn't speed research but keeps more people in academia (rare breakthroughs later, mostly for Space) versus leaving for industry (you can hire them for applied gains now).
 
 **Known gaps**
 - Kits still unlock in the background after 200 home-bred sales and 2 stocked tanks. They could unlock from the care ladder instead.
-- The first babies trigger three spotlights in a row (Care, Colony, Recent events). They could be merged into one.
+- The first babies trigger a few spotlights in a row (Colony, Recent events). They could be merged into one.

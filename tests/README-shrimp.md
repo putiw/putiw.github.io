@@ -409,3 +409,16 @@ ammonia is only the primary button once ammonia is near zero.
 - Header notes cut off with … instead of wrapping the title onto two lines (Water test & bacteria with a long equipment list). `.two` columns are `minmax(0,1fr)` so long notes can't push cards off screen.
 - Decluttered: word of mouth only shows in Advertising once kits exist, Pack 1/Pack 10 and the spare shrimp line hide once the automatic packaging machine runs, the farm cost line and the research reserve line moved behind ?. Research buttons are green when you can afford them.
 - Checked at 360 and 390 px on 14 saves and all tabs: no sideways overflow, every gap 8 px, no script errors.
+
+## Pass 52: letter scroll, red babies, no spotlight while cleaning, Water button with Water care
+- Milestone cards scroll so their top sits just under the sticky header. The first babies letter used to open with its top hidden behind the header.
+- Babies (anything drawn smaller than an adult) get a solid, slightly deeper red body with no white sheen (`tvBody(..., juv)`). At 0.36 scale the dithered body and highlight blurred into pale pink-white.
+- No spotlight, card jump or Shrimp Times tab switch while the tank is locked for cleaning or a health check is open. Queued ones wait and show after Done.
+- When Water care is introduced, the top bar stays lit above the dim and the Water button pulses (`body.spot-wc`).
+- Babies milestone text no longer mentions the removed Care card.
+
+## Pass 53: ring of death in the right place
+- The failed-molt white ring now sits where the head shell meets the body, not behind the eye.
+
+## Docs: AGENTS.md refreshed
+- New bot results, recent systems (choices and heart), UI lessons from passes 51 to 53, cure minigame plan from the prototype, academia vs industry proposal.
