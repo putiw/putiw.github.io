@@ -6,7 +6,7 @@ let count=0;function check(name,code){const c=engine();vm.runInContext(code,c);c
 check('opening is concise and the Tank goal preference survives saves',`
 var intro=MILESTONES.intro.body,g=newGame();
 if(intro.includes('You took him seriously.')||intro.includes('A tank for everyone. Ten years to try.'))throw Error('Opening still has the removed lines');
-if(!GRANDPA_LETTERS.gift.body.includes('“Everyone on Earth?”')||!GRANDPA_LETTERS.gift.body.includes('“Well, we’d better get started. Let’s see what we can do in ten years.”')||GRANDPA_LETTERS.gift.body.includes('You laughed'))throw Error('Grandpa opening exchange is incorrect');
+if(!GRANDPA_LETTERS.gift.body.includes('“Everyone on Earth?”')||!GRANDPA_LETTERS.gift.body.includes('Well, better get started. Let’s see what we can do in ten years.')||GRANDPA_LETTERS.gift.body.includes('You laughed'))throw Error('Grandpa opening exchange is incorrect');
 if(g.opt.goalOpen!==true)throw Error('New goal panel should start expanded');g.opt.goalOpen=false;
 if(migrate(JSON.parse(JSON.stringify(g))).opt.goalOpen!==false)throw Error('Goal panel preference did not persist');
 var old=newGame();delete old.opt.goalOpen;if(migrate(old).opt.goalOpen!==true)throw Error('Old saves need the expanded default');
@@ -146,8 +146,8 @@ for(var i=0;i<5&&!g.korder;i++){g.day++;kitOrderDay(g);}if(g.korder)throw Error(
 g.emp.staff.tier=2;g.emp.staff.pack=2;g.emp.rawShrimp=8*400;g.korderNext=0;for(var i=0;i<5&&!g.korder;i++){g.day++;kitOrderDay(g);}if(!g.korder||g.korder.n<10)throw Error('No bulk order offered');
 var o=g.korder;o.taken=true;g.kits.stock=o.n+5;g.emp.packed=o.n*2;var cash=g.money,own=g.humans;fillKitOrder(g);if(g.korder||g.kits.stock!==5||!(g.money>cash)||!(g.humans>own))throw Error('Bulk order fills from packing and ships when full');
 g.emp.fastUnlocked=true;g.korderNext=0;g.day++;kitOrderDay(g);if(g.korder)throw Error('Bulk orders continue at 40x');
-var g2=readyGame();g2.stats.born=1;g2.tanks[0].had=1;if(phaseInfo(g2).goal!=='Automate feeding'||phaseInfo(g2).cost==null)throw Error('First care goal should be the auto feeder, with its price');
-g2.tanks[0].feeder=1;if(phaseInfo(g2).goal!=='Give them more room')throw Error('Goals should move on to more room');if(phaseInfo(g2).goal.indexOf(' / ')>=0)throw Error('Goals should not be counts');
+var g2=readyGame();g2.stats.born=1;g2.tanks[0].had=1;if(phaseInfo(g2).goal!=='Auto feeder'||phaseInfo(g2).cost==null)throw Error('First care goal should be the auto feeder, with its price');
+g2.tanks[0].feeder=1;if(phaseInfo(g2).goal!=='A 40 L tank')throw Error('Goals should move on to more room');if(phaseInfo(g2).goal.indexOf(' / ')>=0)throw Error('Goals should not be counts');
 `);
 check('speeds unlock through care, automation and profitable fulfilment', `
 var g=readyGame(),t=g.tanks[0];if(maxSpeed(g)!==4)throw Error('An empty cycling tank should allow 4x');buyPackFree(t,0);if(maxSpeed(g)!==2)throw Error('Shrimp in the tank should cap time at 2x');g.stats.born=1;t.feeder=t.autoWC=1;if(maxSpeed(g)!==2)throw Error('Tank care alone should not unlock 4x');
