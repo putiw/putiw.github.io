@@ -15,7 +15,7 @@ const tankStart=html.indexOf('<section class="panel" id="p-tank">'),marketStart=
 if(!(tankStart>=0&&tankStart<goalCard&&goalCard<marketStart&&marketStart<tradeColony&&tradeColony<marketEnd))throw Error('Goal or Trade colony card is outside its intended tab');
 if(html.includes('id="next-actions"')||html.includes('id="btn-gomarket"'))throw Error('Confusing Go-to CTA remains in the goal flow');
 console.log('PASS goal panel is Tank-only, navigation is tab-based and Trade includes the colony card');
-if(html.includes('data-act="milestone-continue"')||!html.includes('Next step (paused)')||!html.includes('function setEmphasisText'))throw Error('Milestones should use one consistent paused action with readable emphasis');
+if(html.includes('data-act="milestone-continue"')||!html.includes('>Got it<')||!html.includes('function setEmphasisText'))throw Error('Milestones should use one consistent paused action with readable emphasis');
 console.log('PASS milestones use one paused next-step action and instructional text can emphasize key terms');
 const tooltipMap=html.split('var PARAM_TIPS={')[1].split('};\nfunction initParameterTooltips')[0];
 for(const id of ['nh','no2','no3','ph','kh','gh','temp','dens'])if(!tooltipMap.includes(id+':{name:'))throw Error('Missing cause tooltip for water parameter '+id);
@@ -37,7 +37,7 @@ const tradeStart=html.indexOf('id="sellcard"'),hist=html.indexOf('id="trade-colc
 if(!(tradeStart>=marketStart&&tradeStart<hist&&hist<sales&&sales<sellAge&&sellAge<sellAction&&sellAction<price&&price<salesDetails&&salesDetails<marketEnd))throw Error('Trade should combine an independent colony histogram, sales rules, sell action, price and folded sales details in that order');
 if(html.includes('id="rulescard"')||html.includes('id="trade-gradebars"')||html.includes('id="trade-gradeline"')||html.includes('id="trade-berried"'))throw Error('Merged Trade card should retain only the colony histogram from the old Colony panel');
 if(!html.includes("$('sellcard').hidden=lt||!(sh&&(G.stats.born>0||G.stats.sold>0||G.opt.all))"))throw Error('Sales rules should appear as soon as the first shrimp are born');
-if(!html.includes("$('tb-feed').hidden=false;$('tb-wc').hidden=false;$('tb-sell').hidden=false;")||!html.includes("['tb-feed','tb-wc','tb-sell'].forEach(function(id){$(id).hidden=false;})"))throw Error('Top Feed, Water and Sell actions should stay visible through progression');
+if(!html.includes("$('tb-feed').hidden=!sh;$('tb-wc').hidden=!kit;$('tb-sell').hidden=!sh;")||!html.includes("['tb-feed','tb-sell'].forEach(function(id){$(id).hidden=!sh0;})"))throw Error('Top Feed, Water and Sell actions should stay visible through progression');
 if(!html.includes("activeTab==='up'&&!G.opt.visitedUp")||!html.includes("g.tab==='up'&&o.visitedUp"))throw Error('Equipment tab guidance dot should be remembered as seen after visiting');
 if(!html.includes("var CARD_GROUP={kits:'k',staff:'k',korder:'k'};"))throw Error('Sales rules and colony toggles should not be coupled by spotlight grouping');
 console.log('PASS Trade combines independent colony/sales toggles; actions persist and Equipment dot clears after visit');
@@ -146,11 +146,11 @@ for(var i=0;i<5&&!g.korder;i++){g.day++;kitOrderDay(g);}if(g.korder)throw Error(
 g.emp.staff.tier=2;g.emp.staff.pack=2;g.emp.rawShrimp=8*400;g.korderNext=0;for(var i=0;i<5&&!g.korder;i++){g.day++;kitOrderDay(g);}if(!g.korder||g.korder.n<10)throw Error('No bulk order offered');
 var o=g.korder;o.taken=true;g.kits.stock=o.n+5;g.emp.packed=o.n*2;var cash=g.money,own=g.humans;fillKitOrder(g);if(g.korder||g.kits.stock!==5||!(g.money>cash)||!(g.humans>own))throw Error('Bulk order fills from packing and ships when full');
 g.emp.fastUnlocked=true;g.korderNext=0;g.day++;kitOrderDay(g);if(g.korder)throw Error('Bulk orders continue at 40x');
-g.tanks[0].had=1;if(phaseInfo(g).goal.indexOf('·')<0)throw Error('Goal lacks progress');
-var g2=readyGame();g2.stats.born=1;g2.tanks[0].had=1;if(phaseInfo(g2).goal.indexOf('0 / '+KIT_UNLOCK)<0)throw Error('Breeder goal lacks a count');
+var g2=readyGame();g2.stats.born=1;g2.tanks[0].had=1;if(phaseInfo(g2).goal!=='Automate feeding'||phaseInfo(g2).cost==null)throw Error('First care goal should be the auto feeder, with its price');
+g2.tanks[0].feeder=1;if(phaseInfo(g2).goal!=='Give them more room')throw Error('Goals should move on to more room');if(phaseInfo(g2).goal.indexOf(' / ')>=0)throw Error('Goals should not be counts');
 `);
 check('speeds unlock through care, automation and profitable fulfilment', `
-var g=readyGame(),t=g.tanks[0];if(maxSpeed(g)!==2)throw Error('Fast start');g.stats.born=1;t.feeder=t.autoWC=1;if(maxSpeed(g)!==2)throw Error('Tank care alone should not unlock 4x');
+var g=readyGame(),t=g.tanks[0];if(maxSpeed(g)!==4)throw Error('An empty cycling tank should allow 4x');buyPackFree(t,0);if(maxSpeed(g)!==2)throw Error('Shrimp in the tank should cap time at 2x');g.stats.born=1;t.feeder=t.autoWC=1;if(maxSpeed(g)!==2)throw Error('Tank care alone should not unlock 4x');
 g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=1000000;g.emp.farms.barn=1;g.emp.staff.tier=2;if(maxSpeed(g)!==4)throw Error('First hatchery should unlock 4x');g.emp.proj.autopackm=1;g.emp.beta=.05;g.humans=100;g.kits.stock=0;g.kitPrice=250;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(g.emp.fastUnlocked)throw Error('Thin margins unlocked 40');g.kitPrice=600;g.humans=2000;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(g.emp.fastUnlocked||!g.emp.fastReady)throw Error('40 before a million owners');g.humans=1e6;g.day++;empireDay(g);if(!g.emp.fastUnlocked||maxSpeed(g)!==12)throw Error('Profitable business at a million owners did not unlock 12');g.emp.won=1;if(maxSpeed(g)!==40)throw Error('Everyone with a tank should unlock 40x');
 `);
 check('industrial upgrades need real preceding stages and output', `
@@ -226,7 +226,7 @@ var w0=g.emp.op.w.i;if(!storyChoose(g,'ev_paper',0)||!(g.emp.op.w.i>w0)||!g.ads.
 ['tanks2','health','tools','station','bulk','worldtab','ripple'].forEach(function(k){if(!MILESTONES[k].intro)throw Error('Feature intro missing: '+k);});
 `);
 {const g=html.slice(html.indexOf('function guideTarget(){'),html.indexOf('function applyGuide(){'));
-if(!g||!html.includes('applyGuide();\n}')||g.indexOf("bottleneck(G)")<0||g.indexOf("consultHas(G,'fix')")>g.indexOf("bottleneck(G)")||/bnText\(G\)/.test(g.slice(0,g.indexOf("consultHas(G,'diag')"))))throw Error('The guide must run each render and only use bottleneck advice the player has paid for');
+if(!g||!html.includes('applyGuide();spotWatch();\n}')||g.indexOf("bottleneck(G)")<0||g.indexOf("consultHas(G,'fix')")>g.indexOf("bottleneck(G)")||/bnText\(G\)/.test(g.slice(0,g.indexOf("consultHas(G,'diag')"))))throw Error('The guide must run each render and only use bottleneck advice the player has paid for');
 if(!html.includes('id="guidebar"')||html.includes('bar.dataset.tab'))throw Error('Guide bar must not reuse data-tab, which tab code selects on');
 if(!g.includes("key:'feed1',tab:'tank'")||!g.includes("key:'sell',tab:'tank'"))throw Error('Feed and sell guidance must navigate to the Tank action bar');
 console.log('PASS guide points at one next step and keeps bottleneck advice behind the consultancy');}
