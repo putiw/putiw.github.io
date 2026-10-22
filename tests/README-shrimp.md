@@ -402,3 +402,10 @@ ammonia is only the primary button once ammonia is near zero.
 ## Pass 50: space after Earth, again
 - `spaceOpen` is Earth complete only (Codex had brought back year ten). Academy test, space playthrough (now starts from the win snapshot) and README say so. AGENTS.md has a rule so it stays.
 - Space card text no longer says it opens at ten years.
+
+## Pass 51: UI review, one look for every card
+- Every card header is the same height (30 px row, 52 px closed card), whether it's a fold-up card or a details card, with or without a ? or a note. Same chevron everywhere, drawn in CSS, pointing right when closed and down when open, also on the folds inside cards (Colony age histogram, Sales rules, More numbers). The rotated ▾ sat low and looked like a different arrow.
+- Same 8 px gap between all cards. `details{margin-top:6px}` and the margin under the card before the Water care / Water test pair made uneven gaps, now `details.card` has no top margin and `.two` cards use the grid gap.
+- Header notes cut off with … instead of wrapping the title onto two lines (Water test & bacteria with a long equipment list). `.two` columns are `minmax(0,1fr)` so long notes can't push cards off screen.
+- Decluttered: word of mouth only shows in Advertising once kits exist, Pack 1/Pack 10 and the spare shrimp line hide once the automatic packaging machine runs, the farm cost line and the research reserve line moved behind ?. Research buttons are green when you can afford them.
+- Checked at 360 and 390 px on 14 saves and all tabs: no sideways overflow, every gap 8 px, no script errors.
