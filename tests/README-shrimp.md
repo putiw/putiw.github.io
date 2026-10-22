@@ -39,7 +39,7 @@ For the late-finish path, run `REQUIRE_AFTER_TEN_YEAR=1 REVIEW_KIT_PRICE=400
 node tests/shrimp-playthrough.cjs` on one line. This requires a completed game
 after the ten-year celebration, with no timely achievement awarded.
 
-Academic progression and year-ten parallel space chapter:
+Academic progression and parallel space chapter:
 
 ```sh
 node tests/shrimp-academy.cjs
@@ -49,12 +49,11 @@ ACADEMY_RUN=/private/tmp/shrimp-academy-play/run-7.json node tests/shrimp-space-
 
 The academic suite checks grant timing, idle/unfunded pauses, saved partial
 work, effects applied to actual packing and machine purchases, funded career
-requirements, teaching, old-save migration, Space opening at year ten,
-Earth archival after victory, and both heat-management routes. The space
-continuation starts from the ten-year snapshot, buys missions and habitat
-systems through simulation actions, completes new research and all four worlds,
-checks every completed habitat is sustainable at full capacity, and confirms
-Earth adoption continues during the space journey.
+requirements, teaching, old-save migration, Space opening only after Earth is
+complete, Earth archival after victory, and both heat-management routes. The space
+continuation starts from the win snapshot, buys missions and habitat systems
+through simulation actions, completes new research and all four worlds, and
+checks every completed habitat is sustainable at full capacity.
 
 The average-player replay uses the default kit price and buys one inexpensive
 starter colony. It checks weekly while cycling and monthly after opening the
@@ -394,3 +393,12 @@ ammonia is only the primary button once ammonia is near zero.
 - Fixed: World projects only showed once every tank was fully upgraded (`inBiz` vs `business`).
 - Bots: strong bot takes cold answers (`BOT_HEART=kind` flips), average bot kind ones (`BOT_HEART=cold` flips). Average bot opens new regions and the first research grant before extras. Its limit for both chapters is now 21 years (it already finished space on day 7292 of 7300).
 - Pacing: strong bot cold day 2253, kind day 2449 (was 2499). Average bot Earth seeds 7/1: kind 6143/5990, cold 6047 (seed 7), space done 7488.
+
+## Pass 49: real reasons, research in dollars
+- Every cold answer now says its logistical reason (replacing a few dead shrimp costs less than heat packs on every box, measured food pods stop overfeeding, the wetland is cheap and nobody farms it, harbor towns are broke and nobody else is buying, a hamster tax nudges people to a better pet), and kind answers say what they cost. Food pods now help owners' tanks a little, the cost is lock-in.
+- The ending no longer judges. It says how long it took and what that path cost.
+- Research priced in US dollars like a US university: postdoc USD 50k a year (about AED 184k), then a PhD student USD 150k for two years. `USD`, `usd()`.
+
+## Pass 50: space after Earth, again
+- `spaceOpen` is Earth complete only (Codex had brought back year ten). Academy test, space playthrough (now starts from the win snapshot) and README say so. AGENTS.md has a rule so it stays.
+- Space card text no longer says it opens at ten years.

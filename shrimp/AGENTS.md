@@ -113,6 +113,8 @@ These come from Puti's feedback. Treat them as requirements.
 - Influence ✦ is knowing the right people. It starts with Mira (ev_mira), nothing earns ✦ before her. Costs mix money and ✦ by what makes sense: things money can buy cost AED, things that need someone on your side cost ✦, some cost both.
 - There is one public mood (E.op.m), no audiences. Water and Fire were removed at Puti's request, don't bring them back.
 - The player picks a path, nobody pushes it. Choices come as a question with a kind answer and a cold one (PROJ items with fk, question in FORK_Q). Cold answers are cheaper or faster. A hidden heart score (E.heart) adds up kind (+) and cold (−) picks, campaigns and film stories. It is never shown as a number. It slows or speeds the good Shrimp Times stories (heartMult), and the win card shows what the world became and Grandpa's verdict. The monopoly/dictator path is allowed and valid.
+- Space opens only after everyone on Earth has a tank, never at year ten. Puti has asked for this twice, don't change it back.
+- Don't paint good and evil (不要脸谱化善恶). Every cold answer has a real logistical reason in its text, and every kind answer says what it costs. The ending says what each path cost, it doesn't judge.
 - World is split into University, Media, Politics and Nature, one thing per track at a time.
 - Films: the player picks what each film is really about. Effects are hidden, the Shrimp Times reviews it.
 

@@ -1,14 +1,14 @@
-// Continue an Earth playthrough at its ten-year anniversary, with both chapters active.
+// Continue an Earth playthrough after everyone has a tank: space opens only then.
 const fs=require('fs'),vm=require('vm'),path=require('path'),assert=require('node:assert/strict');
 const html=fs.readFileSync(path.join(__dirname,'../shrimp/index.html'),'utf8'),input=process.env.ACADEMY_RUN||'/private/tmp/shrimp-academy-play/run-7.json';
 const source=JSON.parse(fs.readFileSync(input,'utf8')),c=vm.createContext({Math,console});
-if(!source.snapshots['ten-year celebration'])throw Error('Earth replay needs a ten-year snapshot');
-vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);c.fixture=source.snapshots['ten-year celebration'];
+if(!source.snapshots['win'])throw Error('Earth replay needs a win snapshot');
+vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);c.fixture=source.snapshots['win'];
 vm.runInContext(`
 var G=migrate(fixture),events=[],snapshots={},earthStart=G.humans;G.opt.all=true;
-while(G.progress.queue.length)acknowledgeMilestone(G);if(G.emp.won||!requestSpaceDream(G)||!beginSpace(G))throw Error('Parallel start failed');
+while(G.progress.queue.length)acknowledgeMilestone(G);if(!G.emp.won||!requestSpaceDream(G)||!beginSpace(G))throw Error('Space should start after Earth');
 function record(k){if(!snapshots[k]){events.push({event:k,day:G.day,money:Math.round(G.money),owners:Math.round(G.humans),knowledge:Math.floor(G.academy.knowledge)});snapshots[k]=JSON.parse(JSON.stringify(G));}}
-record('space begins before Earth completion');G.academy.autoFund=true;
+record('space begins after Earth');G.academy.autoFund=true;
 function spacePolicy(){var A=G.academy,S=G.space;
  var research=STUDIES.find(r=>r.id!=='observe'&&!rd(G,r.id)&&r.req(G));
  if(research&&A.active&&A.active.id==='observe')pauseStudy(G);
@@ -22,7 +22,7 @@ function spacePolicy(){var A=G.academy,S=G.space;
 }
 for(var i=0;i<2500&&!G.space.won;i++){while(G.progress.queue.length)acknowledgeMilestone(G);spacePolicy();for(var q=0;q<4;q++){while(G.progress.queue.length)acknowledgeMilestone(G);stepGame(G);}if(G.money<0)throw Error('Insolvent');}
 if(!G.space.won)throw Error('Space did not finish: '+JSON.stringify(G.space));record('space dream achieved');
-if(G.humans<=earthStart)throw Error('Earth did not advance in parallel');
+if(G.humans<earthStart)throw Error('Earth owners dropped during space');
 for(var w of WORLDS)if(!habitatMetrics(G,w.id).stable)throw Error('Unstable completed habitat: '+w.id);
 `,c,{timeout:180000});
-const out=process.env.SPACE_OUTPUT||'/private/tmp/shrimp-space-play';fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'run.json'),JSON.stringify({events:c.events,snapshots:c.snapshots,final:c.G}));console.log(JSON.stringify(c.events,null,2));console.log('PASS complete space chapter with Earth advancing in parallel');
+const out=process.env.SPACE_OUTPUT||'/private/tmp/shrimp-space-play';fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'run.json'),JSON.stringify({events:c.events,snapshots:c.snapshots,final:c.G}));console.log(JSON.stringify(c.events,null,2));console.log('PASS complete space chapter after Earth');
