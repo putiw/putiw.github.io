@@ -247,5 +247,12 @@ g.money=1e6;if(buyQC(g,'look'))throw Error('Automation must be bought in order')
 ['look','dip'].forEach(function(id){buyQC(g,id);});if(qcManual(g).length||qcDue(g))throw Error('Fully automated checks need no manual round');
 var m1=kitMaterials(g);setQCStrict(g,2);if(!(kitMaterials(g)>m1))throw Error('Strict checks should cost more per kit');var rs=sickKitRate(g);setQCStrict(g,0);if(!(sickKitRate(g)>rs))throw Error('Relaxed checks should let more sick kits through');
 `);
+if(html.includes("needs '+big(nextLine.sold)")||html.includes('show up once your first three tanks')||html.includes('Bacteria starter unlocks when'))throw Error('Unlock rules should not be shown');
+if(!html.includes("if(!g||g.bar===false||!g.text||inCard||g.soft){bar.hidden=true;}"))throw Error('Soft hints belong in the popup, not the bar');
+if(!html.includes("if(SPOT||SPOTQ.length||Date.now()-(spotWatch.last||0)<15000)return;"))throw Error('One spotlight at a time');
+check('player decides: room-based gates, any mix of tanks',`
+var g=readyGame();g.stats.sold=KIT_UNLOCK;var t=g.tanks[0];t.had=1;t.vol=80;t.volTier=2;t.pop=[{age:100,n:20,g:60}];if(!kitsOpen(g))throw Error('One 80 L tank should be enough room for kits');
+t.vol=40;t.volTier=1;if(kitsOpen(g))throw Error('Kits still need some room');
+`);
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

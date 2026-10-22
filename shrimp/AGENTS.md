@@ -67,6 +67,18 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **Quality checks** (`QC_STEPS`, `qcRound`, `sickKitRate`, `openQC`): a manual round once a month, steps automated in order, and a strictness setting.
 - **Hand packing** (`PACK_STEPS`, `handStep`, `buyTool`): five taps a kit, automated one tool at a time.
 
+## How to read Puti's requests
+
+Her messages usually name a symptom, give one example, and sketch a fix ("maybe like..."). The sketch is a guess. The principle behind it is the request. Apply it to the whole game, not just the example, and when something pushes or tells the player what to do, remove it or make it optional rather than rewording it.
+
+1. The player decides. No tasks, targets, unlock rules, prices to save for or nudges toward one route (a second tank, a specific item). Suggestions sit in the ? popup as options, only for tabs already open. Gates use room or progress the player chose, never a fixed path (kits need 60 L of stocked tanks, the farm license 120 L, any mix).
+2. Show, don't tell. A glowing button or a spotlight beats a sentence. The guide bar is for events only (an order, illness, new stock to dip, QC due), everything optional is soft and goes to the popup.
+3. Little on screen, detail on tap. Explanations behind ?, cards collapsible, alerts state the problem in a line plus the one fix when it's dangerous.
+4. What's shown matches what's true. Food on screen matches "all eaten", highlights follow their target, the tank view shows the shrimp it says it has, bars read the way a glance reads them (Fed is full when they're full).
+5. Real shrimp keeping. Illness, salt dips, cycling, manual first then automated.
+6. One thing at a time, only when needed. One spotlight, then at least 15 s of play before the next.
+7. Her voice. Short, plain, comma-spliced, no AI patterns (list below).
+
 ## The owner's design rules
 
 These come from Puti's feedback. Treat them as requirements.
@@ -136,7 +148,7 @@ When you change balance, run both bots and compare against these. Report the bef
 
 **Screenshot pitfalls.** Full-page screenshots show fixed bars and toasts in odd places. The guide can scroll the page by itself. A spotlight can block clicks, so close it or stub `spotlight` in scan scripts.
 
-## Mistakes already made, so you don't repeat them
+## Mistakes already made
 
 **Editing**
 - **Unanchored replacements.** A regex meant for one text block hit the first match elsewhere and overwrote Grandpa's letters. Assert that each replacement matches exactly once.
@@ -160,6 +172,7 @@ When you change balance, run both bots and compare against these. Report the bef
 
 **Design**
 - **Too many new things at once.** Water care, pH and KH chips and a toast all appeared right before the first shrimp purchase. Stage reveals behind real need, and blink an existing button if an action is needed early.
+- **Fixing the one example instead of the rule.** Spotlight on water care only, when she meant every new section; softening the goal card three times when she wanted no push at all.
 - **Explanations in card bodies, and goals that read like homework.** Both drew complaints. Move text behind ?. A goal card with one item to save for still felt linear and got removed.
 - **Overwriting the other agent's work.** Always diff before you write.
 
