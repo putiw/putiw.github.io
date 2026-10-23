@@ -2,12 +2,18 @@
 
 Read this before you change anything in `shrimp/`. It covers what the game is, how the code is laid out, the owner's design rules, how to test, and the mistakes that have already cost time.
 
+## Names you will meet in the code
+
+- **`gp` means grandparent, and the grandparent is Grandma.** The game used to have Grandpa, so some saved fields and ids still say `gp`, `gpLoan`, `keep:'gp'`, `G.me.gp`, the story keys `gp_net`, the ad id `grandpa`, and the unused lab project id `labgrandpa`. They are saved in players' games, so do not rename them without a migration. Functions and constants were renamed (`GRANDMA_LETTERS`, `grandmaLetter`, `payGrandma`). The late spouse is Grandpa (fish soup, the Maryam boat story, "calls you in for dinner").
+- **Player name.** Typed on the first card, kept in `G.name` (and localStorage `shrimp-name` for the next game). Always read it with `nm(G)` and put it into text with `N(G,text)`: `{,name}` becomes `, Name` or nothing, `{name|fallback}` becomes the name or the fallback. `nm` strips everything except letters, digits, space, dot, hyphen and caps at 16 characters, because the name goes into `innerHTML`. Never print `G.name` directly.
+- **Staff:** Kiki (packing), Luca (sales), Gema (shops), Mimi (social), Lucy (the lab scientist).
+
 ## What the game is
 
-Universal Shrimp is a single-file HTML idle/sim game in the spirit of Universal Paperclips. You keep cherry shrimp in Abu Dhabi and sell them (prices in AED). Grandpa gives you his old tank and a dream: a shrimp tank in every home on Earth, in about ten years.
+Universal Shrimp is a single-file HTML idle/sim game in the spirit of Universal Paperclips. You keep cherry shrimp in Abu Dhabi and sell them (prices in AED). Grandma gives you her old tank and a dream: a shrimp tank in every home on Earth, in about ten years.
 
 - **Arc:** cycle a tank → breed and sell shrimp → hand-pack starter kits → automate → farms and regions → a million owners → everyone (8.2B) → Space, where shrimp are released to live free in alien waters (never kept in tanks out there).
-- **Feel:** a short sci-fi novel told through Grandpa's letters, chapters and story events, with something to do at every stage. Small minigames (health checks, salt baths, QC rounds, hand packing) fill the slow parts.
+- **Feel:** a short sci-fi novel told through Grandma's letters, chapters and story events, with something to do at every stage. Small minigames (health checks, salt baths, QC rounds, hand packing) fill the slow parts.
 - **Owner:** Puti. She plays it on her phone, mostly at 390 px wide, and reviews by screenshot. She builds it with two agents, Codex and Claude, working on the same file.
 
 ## Files
@@ -68,7 +74,7 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **Quality checks** (`QC_STEPS`, `qcRound`, `sickKitRate`, `openQC`): a manual round once a month, steps automated in order, and a strictness setting.
 - **Hand packing** (`PACK_STEPS`, `handStep`, `buyTool`): five taps a kit, automated one tool at a time.
 - **Who you become** (`TRAITS`, `trAdd`, `G.ps`, `traitVals`, `endingPick`, `ENDINGS`): nine hidden traits from choices and play style pick one of 16 endings. Every new choice should move a trait other than Means too (tag it in `TRAIT_TAGS`, `STORY_TAGS`, or the choice itself).
-- **You tab** (`G.me`, `PICKS`, `MOMENTS`, `HOUSE`): free time, Grandpa, a place of your own. Moments only show on the tab.
+- **You tab** (`G.me`, `PICKS`, `MOMENTS`, `HOUSE`): free time, Grandma, a place of your own. Moments only show on the tab.
 - **Money trouble and dirty money** (`broke`, `debtDay`, `G.dye`, fight night pick, `E.dirty`, `FAVOURS`, `E.network`, `E.turned`): the network deal is the point of no return.
 - **Trees** (`treesFor`, `TREES`, `E.trees`): each type sees its own tree, Space is the curious one's.
 - **Late cards** (`CARDS3`): data-driven story cards, `[label, result, traits, effect, ending line]`. A card only if different people would really choose differently, otherwise a headline (`HEADLINES`). Story cards and Shrimp Times stories take turns, each 30 s to 2 min of play apart, and a choice's own story comes right after it. Always use `newsLine`/`newsEvent`, never push to `R.log` directly.
@@ -119,7 +125,7 @@ These come from Puti's feedback. Treat them as requirements.
 - The Shrimp Times can be political. Stay away from the sensitive topics, like abortion and religion.
 - Influence ✦ is knowing the right people. It starts with Mira (ev_mira), nothing earns ✦ before her. Costs mix money and ✦ by what makes sense: things money can buy cost AED, things that need someone on your side cost ✦, some cost both.
 - There is one public mood (E.op.m), no audiences. Water and Fire were removed at Puti's request, don't bring them back.
-- The player picks a path, nobody pushes it. Choices come as a question with a kind answer and a cold one (PROJ items with fk, question in FORK_Q). Cold answers are cheaper or faster. A hidden heart score (E.heart) adds up kind (+) and cold (−) picks, campaigns and film stories. It is never shown as a number. It slows or speeds the good Shrimp Times stories (heartMult), and the win card shows what the world became and Grandpa's verdict. The monopoly/dictator path is allowed and valid.
+- The player picks a path, nobody pushes it. Choices come as a question with a kind answer and a cold one (PROJ items with fk, question in FORK_Q). Cold answers are cheaper or faster. A hidden heart score (E.heart) adds up kind (+) and cold (−) picks, campaigns and film stories. It is never shown as a number. It slows or speeds the good Shrimp Times stories (heartMult), and the win card shows what the world became and Grandma's verdict. The monopoly/dictator path is allowed and valid.
 - Space opens only after everyone on Earth has a tank, never at year ten. Puti has asked for this twice, don't change it back.
 - Don't paint good and evil (不要脸谱化善恶). Every cold answer has a real logistical reason in its text, and every kind answer says what it costs. The ending says what each path cost, it doesn't judge.
 - World is split into University, Media, Politics and Nature, one thing per track at a time.
@@ -164,22 +170,22 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] Story cards come one at a time, 30 s to 2 min of play apart. Money trouble, the ending and intro cards never wait (`shrimp-me`).
 - [ ] Shrimp Times stories come one at a time, 30 s to 2 min apart, never on top of a card, and a story caused by your choice comes 8 to 20 s after it (`shrimp-me`). After the first issue, news is a short toast, it doesn't switch tabs.
 - [ ] Only choices where different people really choose differently are cards, the rest are headlines (`HEADLINES`).
-- [ ] The ending page: type and variation, who you became, Mira, what the world looks like, Grandpa's letter (with the visits line), from the tank, lives you didn't live, all 16 endings. No trait bars.
+- [ ] The ending page: type and variation, who you became, Mira, what the world looks like, Grandma's letter (with the visits line), from the tank, lives you didn't live, all 16 endings. No trait bars.
 - [ ] Space opens only after Earth, and only for curious players (`spaceOpen`). Other types get their own tree in World.
 
-**You tab and Grandpa**
+**You tab and Grandma**
 - [ ] Opens once the first tank feeds itself and changes its own water, with the Your Saturdays card.
 - [ ] Free time picks repeat, 2 then 3 slots, weekly, monthly after farms, yearly after moving. Burnout after four heavy periods with no rest.
-- [ ] Grandpa moments only show on the tab and pass if nobody looks.
-- [ ] Writing letters tells Grandpa's story bit by bit. His milestone letters live in the You tab once it opens.
+- [ ] Grandma moments only show on the tab and pass if nobody looks.
+- [ ] Writing letters tells Grandma's story bit by bit. Her milestone letters live in the You tab once it opens.
 - [ ] Climbers get shorter letters, floaters get longer ones (`gpVoice`).
-- [ ] A place of your own: land, walls (for me, Grandpa or both), then the rest, offered with AED 300k spare.
+- [ ] A place of your own: land, walls (for me, Grandma or both), then the rest, offered with AED 300k spare.
 - [ ] Your own tank after the first industrial hatchery is always there, no decision. The farm takes the other tanks, the 20 L stays (treats by hand, happy treats). Late game it is irrelevant, so most people ignore it. How much you tended it (`ownLevel` 0/1/2) changes a line in the ending and nudges kin. The year-eight green-glass card only asks start again or leave it, it never removes the tank.
 - [ ] Mira shows up at 11+ moments (`mira_*` milestones plus the fisher card), each following something you did. Paths without Space get a `lastchap` card before the ending (`LASTCH`, `lastChapter`).
 
 **People and money**
-- [ ] Rosa, Imran, Dana and Leo each get a goodbye card when a machine takes their job, options change over time.
-- [ ] Out of money card: Grandpa (once), neighbours, bank, the man at the market, washing money, sell something, bankruptcy (two taps, the game ends).
+- [ ] Kiki, Luca, Gema and Mimi each get a goodbye card when a machine takes their job, options change over time.
+- [ ] Out of money card: Grandma (once), neighbours, bank, the man at the market, washing money, sell something, bankruptcy (two taps, the game ends).
 - [ ] Buyout offer after a million owners, two taps, the game ends with the Sold ending.
 - [ ] Dyed shrimp, fight nights, the investor, three favours, the routes deal is the point of no return, the police way back costs almost everything.
 - [ ] Mira reacts to dye, fight night, her scholarship, the investor, the year after the police.
@@ -226,7 +232,7 @@ When you change balance, run both bots and compare against these. Report the bef
 ## Mistakes already made
 
 **Editing**
-- **Unanchored replacements.** A regex meant for one text block hit the first match elsewhere and overwrote Grandpa's letters. Assert that each replacement matches exactly once.
+- **Unanchored replacements.** A regex meant for one text block hit the first match elsewhere and overwrote Grandma's letters. Assert that each replacement matches exactly once.
 - **Removing an element without a full search.** Dropping the pH chip left code that still read `wp-ph` and crashed `render()`. Search for every id you remove.
 - **`setT` / `textContent` on structured elements.** This wipes child markup, which is how the tab icons got lost. Target the inner label instead.
 
@@ -271,7 +277,7 @@ Planned and agreed with Puti, not built yet:
 - Cure minigames, one per cure, tried out in a separate prototype page (Shrimp Cure Games artifact) and not in the game yet. Mineral pellets: tap to drop pellets, every shrimp eats, add GH+ a scoop at a time (aim 6 to 8, a big jump kills some), the ring fades on sick ones that eat. Water change: hold Drain to about half, tap the milky shrimp to net them out while the water is low, hold Refill to the full line (overfilling spills). Salt dip: hold to dip the shrimp in a cup, target 4.5 s (sped up 10×, 45 s real), no clock, 3.5 to 5.5 s cures, longer stresses, past 7 s it dies.
 - Academia vs industry (proposed, not agreed): postdoc pay slider that doesn't speed research but keeps more people in academia (rare breakthroughs later, mostly for Space) versus leaving for industry (you can hire them for applied gains now).
 
-- Mira reacting at more moments, Grandpa letters that get shorter for climbers, the tank tab's own-tank crash at year eight only checks the glass.
+- Grandma letters that get shorter for climbers, the tank tab's own-tank crash at year eight only checks the glass.
 - Tree last chapters after Earth for non-Space players are only the tree steps in World, there's no chapter screen like Space.
 
 **Known gaps**

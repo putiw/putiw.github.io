@@ -6,7 +6,7 @@ let count=0;function check(name,code){const c=engine();vm.runInContext(code,c);c
 check('opening is concise and the Tank goal preference survives saves',`
 var intro=MILESTONES.intro.body,g=newGame();
 if(intro.includes('You took him seriously.')||intro.includes('A tank for everyone. Ten years to try.'))throw Error('Opening still has the removed lines');
-if(!GRANDPA_LETTERS.gift.body.includes('“Everyone on Earth?”')||!GRANDPA_LETTERS.gift.body.includes('Well, better get started. Let’s see what we can do in ten years.')||GRANDPA_LETTERS.gift.body.includes('You laughed'))throw Error('Grandpa opening exchange is incorrect');
+if(!GRANDMA_LETTERS.gift.body.includes('“Everyone on Earth?”')||!GRANDMA_LETTERS.gift.body.includes('Well, better get started. Let’s see what we can do in ten years.')||GRANDMA_LETTERS.gift.body.includes('You laughed'))throw Error('Grandma opening exchange is incorrect');
 if(g.opt.goalOpen!==true)throw Error('New goal panel should start expanded');g.opt.goalOpen=false;
 if(migrate(JSON.parse(JSON.stringify(g))).opt.goalOpen!==false)throw Error('Goal panel preference did not persist');
 var old=newGame();delete old.opt.goalOpen;if(migrate(old).opt.goalOpen!==true)throw Error('Old saves need the expanded default');
@@ -42,8 +42,8 @@ if(!html.includes("activeTab==='up'&&!G.opt.visitedUp")||!html.includes("g.tab==
 if(!html.includes("var CARD_GROUP={kits:'k',staff:'k',korder:'k'};"))throw Error('Sales rules and colony toggles should not be coupled by spotlight grouping');
 console.log('PASS Trade combines independent colony/sales toggles; actions persist and Equipment dot clears after visit');
 const goalRowStart=html.indexOf('<div class="goalrow">'),dreamSummary=html.indexOf('id="dream-tracker"'),infoPop=html.indexOf('<div class="apop" id="apop"');
-if(!(infoPop>=0&&infoPop<goalRowStart&&goalRowStart<dreamSummary&&html.includes('id="b-goal-short"')))throw Error('Grandpa year tracker should share the owners row inside the info panel');
-console.log('PASS Grandpa year tracker shares the progress row with a compact mobile progress label');
+if(!(infoPop>=0&&infoPop<goalRowStart&&goalRowStart<dreamSummary&&html.includes('id="b-goal-short"')))throw Error('Grandma year tracker should share the owners row inside the info panel');
+console.log('PASS Grandma year tracker shares the progress row with a compact mobile progress label');
 if(!html.includes('class="card coll" data-k="charts" id="charts"')||!html.includes('class="card coll" data-k="ads" id="adscard"'))throw Error('Delayed charts and advertising should fold when first revealed');
 console.log('PASS delayed charts and advertising can fold when first revealed');
 if(!html.includes('.coll.queued>:not(.hd){display:none!important}')||!html.includes('function promoteCardReveal(o)')||!html.includes('o.cardQueue.push({k:k,tab:activeTab})')||!html.includes('promoteCardReveal(o);render();')||!html.includes('var PROJ_SHOW=1,'))throw Error('New content should queue one at a time, focus the active card and advance when dismissed');
@@ -173,7 +173,7 @@ var g=readyGame();delete g.emp.chainVersion;g.day=2000;g.stats.sold=500;g.kits.s
 check('AI sales retain the four-person bonus with a bounded operating bill', `
 var g=readyGame();g.emp.staff.sales=4;var boost=salesBoost(g);g.money=1000000;g.emp.proj.aiconsult=g.emp.proj.drones=1;if(!goAI(g,'sales')||g.emp.staff.sales||salesBoost(g)!==boost)throw Error('Automation lost capability');g.emp.soldToday=100000000;if(staffCost(g)>300)throw Error('Token bill exceeded cap');
 `);
-check('Grandpa opening pauses a fresh run until the tank is accepted', `
+check('Grandma opening pauses a fresh run until the tank is accepted', `
 var g=newGame(),cash=g.money;if(g.progress.queue[0]!=='intro'||stepGame(g)!==false||g.money!==cash||clock(g)!==0)throw Error('Intro did not pause');
 if(acknowledgeMilestone(g)!=='intro'||!stepGame(g)||g.progress.queue.includes('intro'))throw Error('Cannot start gift');
 `);
@@ -237,7 +237,7 @@ for(var d=0;d<20;d++)illDay(g,t,0);if(!(t.ill.frac>f0*3))throw Error('Illness sh
 var n20=totalN(t);for(d=0;d<80&&t.ill;d++)illDay(g,t,0);if(t.ill||totalN(t)>=1||!t.crashed)throw Error('An untreated outbreak should crash the whole tank');
 var a=g.tanks[0];buyPackFree(a,2,40);var b=newTank(1);g.tanks.push(b);startIll(g,a,'scut');a.ill.frac=0.4;moveShrimp(g,a,b,5);if(!b.ill)throw Error('Moving sick shrimp should spread it');
 var c=newTank(2);g.tanks.push(c);g.money=500;c.had=1;buyPack(g,c,0);if(c.fresh||c.newStock==null)throw Error('New stock raises risk, no dip');
-var e=g.tanks[0];e.pop=[];e.ill=null;g.tanks.forEach(function(x){x.pop=[];x.ill=null;});g.money=2;g.day=500;dayRollover(g);if(totalN(g.tanks[0])<1)throw Error('Grandpa should restart a broke player with no shrimp');
+var e=g.tanks[0];e.pop=[];e.ill=null;g.tanks.forEach(function(x){x.pop=[];x.ill=null;});g.money=2;g.day=500;dayRollover(g);if(totalN(g.tanks[0])<1)throw Error('Grandma should restart a broke player with no shrimp');
 `);
 check('quality checks: manual rounds, automation in order, strictness trade-off',`
 var g=newGame();g.emp.kitsOpened=1;g.stats.sold=KIT_UNLOCK;g.kits.sold=5;var r0=sickKitRate(g);if(!(r0>0.1)||qcCoverage(g)!==0)throw Error('Unchecked kits should often ship sick');

@@ -98,7 +98,7 @@ Browser checks cover actual purchases, all business tabs, phone layout, legacy
 saves and the ending. Future tuning should use player behaviour as well as these
 deterministic checks.
 
-## Grandpa’s ten-year dream
+## Grandma’s ten-year dream
 
 The opening gifts an empty tank and a hopeful ten-year challenge. The tracker
 uses elapsed game time, with exact remaining days inside the journal. Opening

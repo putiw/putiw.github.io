@@ -139,7 +139,7 @@ ammonia is only the primary button once ammonia is near zero.
 ## UI tidy pass 2 (Claude)
 - Kits stats: 4 key numbers (Orders/day, In stock, Owners, Cost per kit); the rest under "More numbers".
 - Hatcheries intro is one line; Starter kits intro shortened.
-- Milestone card is compact: Grandpa's letter is folded into a "Grandpa's note" toggle (closed on each new milestone); smaller type on phones.
+- Milestone card is compact: Grandma's letter is folded into a "Grandma's note" toggle (closed on each new milestone); smaller type on phones.
 - "Max shrimp" renamed "Pack above". All-tanks table shows "594 packs >60" instead of "594/60".
 - Tried scaling the default pack threshold with tank volume (3 shrimp/L). Codex playthroughs slowed by ~480 days and seed 42 failed to finish, so the sim default stays 60. Display-only change; all balance numbers identical to before.
 
@@ -213,11 +213,11 @@ ammonia is only the primary button once ammonia is near zero.
 ## Story, hand packing, tank care (Claude)
 - Hand packing: every kit is five taps at the packing table (fill a bag, catch 8, add oxygen, seal, box). PACK_STEPS tools (AED 200/400/700/1,000/1,500) each automate one step; all five complete the packing station (staff.tier 1: 1 kit/day by itself, packers allowed). `buyPackTier` at tier 0 buys the next tool, so older code and test bots still progress. Old saves with a bench get all five tools.
 - Care card (Tank): health checks and treats. Illness (failed molts / bacterial / scutariella) appears in a stocked tank ~1/150 per day, more with low GH, nitrate or crowding, less with almond leaves; untreated −0.4%/day and breeding ×0.7 for 30 days. Health check sheet: tap the sick shrimp in a grid of 20, read the sign, pick a cure (minerals / water change / salt); right cure with ≥70% found cures, fewer found halves it for 10 days, wrong cure costs money. Treats: spinach (+nutrition, breeding +5%), bee pollen (breeding +15% 7 d), colour food (+2 grade on hatchlings 7 d); one at a time.
-- Story: chapter pages at hatch (Ch 2 Small lives), kits (Ch 3 The first box), first farm (Ch 4 Scale), a million owners (Ch 5); story decision cards (Mira next door, the local paper, a cheaper rival, the routing agent, Room 4B, the marine survey, Grandpa on the roof) with small lasting effects (storyChoose). Feature intro cards (More tanks, Health check, Automate one step, Packing station, Bulk orders, World tab, Shrimp Times) pause, explain, and "Got it · show me" opens the tab. Legacy saves skip intros they are already past (progress.v2).
+- Story: chapter pages at hatch (Ch 2 Small lives), kits (Ch 3 The first box), first farm (Ch 4 Scale), a million owners (Ch 5); story decision cards (Mira next door, the local paper, a cheaper rival, the routing agent, Room 4B, the marine survey, Grandma on the roof) with small lasting effects (storyChoose). Feature intro cards (More tanks, Health check, Automate one step, Packing station, Bulk orders, World tab, Shrimp Times) pause, explain, and "Got it · show me" opens the tab. Legacy saves skip intros they are already past (progress.v2).
 - Pacing: strong seeds 2,354–2,380 days; market+research 1,733; average Earth 6,292 days, 40.8 min waiting at top speed (+ hand packing and minigames).
 
 ## Voice pass (Claude)
-- Story chapters, intros, events, Grandpa letters, space and win texts rewritten in a plain, short, comma-spliced voice. No flowery lines.
+- Story chapters, intros, events, Grandma letters, space and win texts rewritten in a plain, short, comma-spliced voice. No flowery lines.
 - Tool notes, kit designs, world "why" texts and space equipment texts made plainer, semicolons swapped for commas.
 - Gift letter left as is (a test checks it).
 
@@ -238,7 +238,7 @@ ammonia is only the primary button once ammonia is near zero.
 - Spreads to another tank when sick shrimp are moved. Bought shrimp (after the first sale) arrive as T.fresh with a 25% flatworm risk unless salt dipped within 3 days (dipFresh, AED 3).
 - Sick share lowers owners' tank care (welfareParts care × (1 − 0.5 × sickShare)).
 - Health check happens in the tank: tap sick shrimp as they move. Salt cure and new-stock dips use the salt bath minigame: pick strength, lift the net while the timer is in the green (weak 60–80 s, right 30–45 s, strong 12–20 s, 18× time).
-- Grandpa gives 5 shrimp if every tank is empty and cash is below AED 15 (every 60 days at most, before the farm).
+- Grandma gives 5 shrimp if every tank is empty and cash is below AED 15 (every 60 days at most, before the farm).
 - Bots dip new stock and treat illness. Strong bot 2,334 days, average Earth 6,387 days and 41.1 min waiting.
 
 ## Header and tank motion (Claude)
@@ -378,15 +378,15 @@ ammonia is only the primary button once ammonia is near zero.
 ## Pass 47: plain news, AI job-loss news, space after Earth
 - Shrimp Times stories rewritten in plain words (no scampi, rutabaga, bycatch, bailout, hectares, cooperatives, blue-carbon asset, class-action lawsuit, appetizer, apocalypse), jokes kept.
 - Event stories (`NEWS_EV`, `newsEvent`): robots take over packing (first packing line), AI replaces salespeople, shop managers, technicians. The card now works off the story log, so event stories show and trigger the jump like the others. AI replacement rows say how many people lose their jobs.
-- Space opens once everyone on Earth has a tank (`spaceOpen` = won), not at year ten. Winning early still jumps to the year-ten reunion for Grandpa's dream. Average bot starts space after Earth: seeds 7/1 Earth 5961/5951, space done 7292.
-- Removed the call to prayer from Grandpa's star-gazing choice (now "until Grandma calls you in for dinner").
+- Space opens once everyone on Earth has a tank (`spaceOpen` = won), not at year ten. Winning early still jumps to the year-ten reunion for Grandma's dream. Average bot starts space after Earth: seeds 7/1 Earth 5961/5951, space done 7292.
+- Removed the call to prayer from Grandma's star-gazing choice (now "until Grandma calls you in for dinner").
 
 ## Pass 48: no more Water/Fire, kind or cold paths, influence starts with Mira
 - Water and Fire are gone. One public mood (`E.op.m`, `moodAdd`) sets how many will buy (`kitCap`) and referrals (`opMult`). Old two-faction saves migrate to their old overall appeal (`opFix`).
 - Campaigns stay. Each offer has at least one honest message and one pushy one. Pushy ones move the mood more, some aren't true and can backfire later (Shrimp Times story, mood drop).
 - Choices: 17 questions, each with a kind answer and a cold one (PROJ items with `fk`, question text in `FORK_Q`). Picking one closes the other. Cold answers are cheaper or pay every day (`dealsDay`: fish-food culls, filter cartridges, food pods, gene patent). Some cold answers come back later as news (`E.later`, `laterDay`): algae bloom, drained wetland, paid study, bribed inspector, fake reviews, bought politician. One choice shows per tab at a time.
 - World is split into University, Media, Politics and Nature, one item per track. Costs mix money and ✦ by what makes sense (`m` and `i`). New: scholarships, lab name, stress study, gene, interview or buy the Shrimp Times, welfare law, buy a politician, tax haven, hamster tax, retraining or buying harbors, almond seed in every kit, Taiwan streams, take-back, solar farms, mangroves.
-- Hidden heart (`E.heart`): kind choices, honest campaigns and kind film stories add, cold ones subtract. Never shown. It scales the good Shrimp Times stories (`heartMult`) and owners' welfare a little. The win card lists what the world looks like (`end` lines) and Grandpa's verdict (`endingVerdict`).
+- Hidden heart (`E.heart`): kind choices, honest campaigns and kind film stories add, cold ones subtract. Never shown. It scales the good Shrimp Times stories (`heartMult`) and owners' welfare a little. The win card lists what the world looks like (`end` lines) and Grandma's verdict (`endingVerdict`).
 - Films: pick what each film is really about. Hidden effects (word of mouth, how many want one, mood, heart, flop chance), a Shrimp Times review on release. Films cost money and ✦. If you bought the Shrimp Times, every review is five stars and every story ends flattering you.
 - Influence: no ✦ before Mira (`E.infOn`). Her story says what it is, every answer starts it. Old saves with ✦ keep it.
 - Research opens at 200 kits. A postdoc for a year costs AED 50,000, then a PhD student AED 150,000 a year, then the AED 1M lab and bigger grants. First study: cheaper packing machines (lines, AI setup, camera, machines 25% less via `autoDisc`).
@@ -427,13 +427,13 @@ ammonia is only the primary button once ammonia is near zero.
 - Top bar: `?` sits top right from the start, settings live inside it (`.apop-foot`), the person button `#tb-me` sits next to it once free time opens. Id selectors because render resets `#tb-info`'s class.
 - Nine hidden traits (`TRAITS`, `G.tr`, `trAdd`, `TRAIT_TAGS`, `STORY_TAGS`). Heart feeds Means. Play style (`G.ps`, counted in the UI tick and handlers: top speed, idle, hands-on feeding after automation, looks, wipes, treats, ? opens, Shrimp Times reads, You tab opens, thin or fat cash, the day of the 4th region) is half of each trait it can see (`playVal`, `traitVals`).
 - `endingPick`: Empire, Garden, Question, Network, Drift, each with variations, plus the fall (3) and Sold. Text in `ENDINGS` (UI), same words as the doc's Endings tab. The win card shows the whole ending page, no trait bars.
-- You tab (`p-me`): free time picks (`PICKS`, `mePick`, `personalPeriod`), weekly, monthly after farms, yearly after moving. Burnout after four heavy periods with no rest. Grandpa moments (`MOMENTS`, `momentAnswer`) only show on the tab and pass after about 2.5 min of play.
+- You tab (`p-me`): free time picks (`PICKS`, `mePick`, `personalPeriod`), weekly, monthly after farms, yearly after moving. Burnout after four heavy periods with no rest. Grandma moments (`MOMENTS`, `momentAnswer`) only show on the tab and pass after about 2.5 min of play.
 - Your own tank (`owntank` note at the first industrial hatchery): always kept, no choice. Treats by hand plus happy treats (`HAPPY`); `ownLevel` feeds the ending. Also: six more Mira moments, and the `lastchap` card for non-Space paths.
-- Staff goodbyes (`bye_pack`, `bye_sales`, `bye_mgr`, `bye_social`, `byeOpts`, `byeChoose`): Rosa, Imran, Dana, Leo. Human in the loop and regional managers stay on the payroll (`E.hil`). The old packer fork projects are retired (`req` false).
+- Staff goodbyes (`bye_pack`, `bye_sales`, `bye_mgr`, `bye_social`, `byeOpts`, `byeChoose`): Kiki, Luca, Gema, Mimi. Human in the loop and regional managers stay on the payroll (`E.hil`). The old packer fork projects are retired (`req` false).
 - Tester fixes: the heat alert no longer re-slows every tenth of a degree (signature without numbers, once per alert per 30 days), spotlights at least 15 s apart from every source, "Tanks get cold in ." fixed, Space buttons spaced, no "Affordable in about" nudges, first illness ever spreads at 55% speed, algae a bit see-through, Winter heater vs Summer cooling fan.
 
 ## Pass 55: money trouble and dirty money, round 2
-- Below zero, the `broke` card (`brokeOpts`, `brokePick`, repeats with a 7-day snooze): Grandpa's savings (once, small debts, he cancels the sea trip, pay back from the You tab), the neighbours (co-op or kind players), a bank loan (three missed payments and it takes a farm), the man at the market (30% in two months or a farm gets smashed), washing money, sell something, or bankruptcy (deep debt only, the game ends here, two taps).
+- Below zero, the `broke` card (`brokeOpts`, `brokePick`, repeats with a 7-day snooze): Grandma's savings (once, small debts, he cancels the sea trip, pay back from the You tab), the neighbours (co-op or kind players), a bank loan (three missed payments and it takes a farm), the man at the market (30% in two months or a farm gets smashed), washing money, sell something, or bankruptcy (deep debt only, the game ends here, two taps).
 - `buyout` after a million owners (earlier with investor dinners), `sellco` card in Kits after. `endGame`, `gameover` card shows the ending.
 - Dyed shrimp (`dye_offer`, 60% more, found out after a week or so, pet shop stops ordering, market mood capped). Fight nights (`fight_invite`, a free time pick: money, dead shrimp, raids). The logistics investor (`wash_offer`, `startWash`, `washDay`): cash every day, 9% tax on it, audits freeze accounts 30 days (`frozen` blocks buying), three favours (`fav_0..2`). The routes deal is the point of no return (`E.network`, borders open, dark news). Go to the police: 90% of cash, no kit sales for a year, half the farms (`E.inquiry`). Pay your way out keeps one dark line.
 - Mira reacts: dye, fight night, scholarship, the investor, the year after the police.
@@ -441,7 +441,7 @@ ammonia is only the primary button once ammonia is near zero.
 ## Pass 56: trees, the house, hard places, round 3
 - `treesFor`: the top ending type plus anything within 0.3 of it opens its tree, locked in once opened (`E.trees`, from 50M owners). Space only for the curious (`spaceOpen` needs the Space tree). Old saves that already won keep Space.
 - `TREES`: Shrimp Island (tax halves), Rewilding (also opens when the house is complete), The last mile, The designer lab (escape news later), The shop. Steps in World, lines in the ending.
-- `HOUSE`: land, walls (for me, Grandpa, or both), solar, wind, well, rain tank, compost, garden, shrimp room. Offered with AED 300k spare. Work on the house pick makes the next piece cheaper.
+- `HOUSE`: land, walls (for me, Grandma, or both), solar, wind, well, rain tank, compost, garden, shrimp room. Offered with AED 300k spare. Work on the house pick makes the next piece cheaper.
 - `CARDS3`: Gary, shrimp mayor, divorce, shrimp money, the river war (made-up countries), shrimp in court, water first, lab shrimp, electricity, rivers, too many shrimp, blackout, tiny jails, nobody goes outside, the one neighbour, the fishing family, your own tank going green. Each choice moves traits and can leave a line.
 - Tests: `node tests/shrimp-me.cjs` (16 checks). The average bot now plays a curious kind player (papers and shrimp club) so Space stays covered; the cold average player gets Shrimp Island and no Space, and stops at Earth.
 - Pacing: strong cold 2293 (empire_dictator), strong kind 2449 (garden_village), average kind Earth 6071 and space 7404 (garden_village, trees rewild, space, island), average cold Earth 5975 (empire_dictator, island).
@@ -459,7 +459,7 @@ ammonia is only the primary button once ammonia is near zero.
 ## Pass 58: cure minigames, white babies, letters, academia or industry, spotlights
 - The cure minigames from the prototype are in the game (`openMolt`, `openWC`, `openSalt`, `CG`, `cgTank`). Picking a cure in the health check plays it, and the result feeds `treatIll` (how many you healed or netted) and the real tank (GH, water change, leftover food). The salt dip has no salt choice anymore, hold to dip for 4.5 s, used for sick tanks, new shrimp and quality checks.
 - Newborns are drawn near-white and see-through, juveniles pale pink, adults their grade (`tvBody` juv 2/1). Pass 52 had made them red, that was the wrong way round. Chapter 2 Babies card says white dots.
-- Free time pick "Write Grandpa a letter" (`GP_STORY`), his milestone letters move into the You tab, climbers get shorter letters and floaters longer ones (`gpVoice`).
+- Free time pick "Write Grandma a letter" (`GP_STORY`), his milestone letters move into the You tab, climbers get shorter letters and floaters longer ones (`gpVoice`).
 - Academia or industry fork (`sciacad`, `sciind`), no heart either way, Wonder or Use. Industry also opens the designer lab.
 - Kept-your-tank-and-never-looked line, late cards can make their own news right after (`CARDS3[..].news`).
 - Spotlights wait for the card to open and the page to stop moving, then place the ring, and follow the card while it's up (`spotPlace`). The ring used to land on the tab bar when the smooth scroll hadn't finished.

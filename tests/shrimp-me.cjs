@@ -1,4 +1,4 @@
-// Free time, Grandpa, your own tank, staff goodbyes and the endings.
+// Free time, Grandma, your own tank, staff goodbyes and the endings.
 const fs=require('fs'),vm=require('vm'),path=require('path');
 const html=fs.readFileSync(path.join(__dirname,'../shrimp/index.html'),'utf8');
 function engine(){const c=vm.createContext({console,Math});vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);return c;}
@@ -17,7 +17,7 @@ check('working without rest burns you out',`
 var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.me.picks=['overtime','videos'];for(var d=0;d<40;d++){g.day++;personalDay(g);}
 if(!g.me.burns||!milestoneConditions(g).me_burnout)throw Error('Burnout');var v=g.me.vids;g.day++;g.me.next=g.day;personalDay(g);if(g.me.vids!==v)throw Error('Burnt weeks do nothing');
 `);
-check('Grandpa moments wait for you, pass if nobody looks, and count both ways',`
+check('Grandma moments wait for you, pass if nobody looks, and count both ways',`
 var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.ps.t=1;
 for(var d=0;d<60&&!g.me.cur;d++){g.day++;g.ps.t+=4000;personalDay(g);}if(!g.me.cur||g.me.cur.id!=='clinic')throw Error('Clinic moment '+JSON.stringify(g.me.cur));
 var c=g.tr.care||0;if(!momentAnswer(g,true)||g.me.done.clinic!==1||(g.tr.care||0)>=c||!g.me.hist.length)throw Error('Accept');
@@ -30,15 +30,15 @@ storyChoose(g,'owntank',0);if(!ownTank(g)||tankGone(g))throw Error('Kept');dayRo
 if(!giveTreat(g,0,'spinach')||!giveHappy(g,'pea')||giveHappy(g,'pea')||g.me.happy!==1)throw Error('By hand');
 var h=newGame();h.emp.farms.hatch=1;storyChoose(h,'owntank',0);if(tankGone(h)||!ownTank(h)||storyChoices(h,'owntank').length!==1)throw Error('No choice, the tank is always there');h.ps.look+=15;if(ownLevel(h)!==2||gpLines(h).join().indexOf('never stopped')<0)throw Error('Tended ending');
 `);
-check('packers, salespeople, managers and Leo each get a goodbye card',`
-var g=newGame();var E=g.emp;E.staff.pack=10;E.staff.lines=1;g.money=1e6;if(!milestoneConditions(g).bye_pack)throw Error('Rosa');
+check('packers, salespeople, managers and Mimi each get a goodbye card',`
+var g=newGame();var E=g.emp;E.staff.pack=10;E.staff.lines=1;g.money=1e6;if(!milestoneConditions(g).bye_pack)throw Error('Kiki');
 var o=byeOpts(g,'pack');if(o.length!==4||o[1][3]!==10*180*35)throw Error('Six months '+o[1][3]);var m=g.money;if(!storyChoose(g,'bye_pack',1)||E.staff.pack!==0||m-g.money!==63000)throw Error('Bonus');
 if(byeReady(g,'pack'))throw Error('Once');
-E.proj.aiconsult=1;E.proj.drones=1;E.staff.sales=4;E.regions=['auh','dxb'];g.money=1e7;goAI(g,'sales');if(!byeReady(g,'sales')||E.bye.sales!==4)throw Error('Imran');
+E.proj.aiconsult=1;E.proj.drones=1;E.staff.sales=4;E.regions=['auh','dxb'];g.money=1e7;goAI(g,'sales');if(!byeReady(g,'sales')||E.bye.sales!==4)throw Error('Luca');
 var so=byeOpts(g,'sales');if(!so.some(function(x){return x[2]==='mgr';}))throw Error('Regional manager with two regions');
-var c0=staffCost(g);storyChoose(g,'bye_sales',so.findIndex(function(x){return x[2]==='mgr';}));if(staffCost(g)-c0!==195)throw Error('Imran salary');
-E.proj.social=1;if(!byeReady(g,'social'))throw Error('Leo');var lo=byeOpts(g,'social');storyChoose(g,'bye_social',3);if(!E.later.some(function(x){return /Leo/.test(x.t);}))throw Error('Later news');
-if(gpLines(g).join(' ').indexOf('Imran')<0)throw Error('Ending line');
+var c0=staffCost(g);storyChoose(g,'bye_sales',so.findIndex(function(x){return x[2]==='mgr';}));if(staffCost(g)-c0!==195)throw Error('Luca salary');
+E.proj.social=1;if(!byeReady(g,'social'))throw Error('Mimi');var lo=byeOpts(g,'social');storyChoose(g,'bye_social',3);if(!E.later.some(function(x){return /Mimi/.test(x.t);}))throw Error('Later news');
+if(gpLines(g).join(' ').indexOf('Luca')<0)throw Error('Ending line');
 var h=newGame();h.money=0;h.emp.staff.pack=5;h.emp.staff.lines=1;if(storyChoose(h,'bye_pack',1)||!storyChoose(h,'bye_pack',0))throw Error('Letting go always works');
 var old=newGame();old.emp.staff.pack=5;old.emp.staff.lines=1;old.emp.proj.layoffpack=1;if(byeReady(old,'pack'))throw Error('Old saves that already decided');
 `);
@@ -62,9 +62,9 @@ var g=newGame();delete g.me;delete g.tr;delete g.ps;g.day=900;var m=migrate(JSON
 check('out of money offers what fits, loans come due, bankruptcy ends the game',`
 var g=newGame();g.day=40;g.money=-300;if(!milestoneConditions(g).broke)throw Error('Card');var o=brokeOpts(g).map(function(x){return x[2];});
 if(o.indexOf('gp')<0||o.indexOf('shark')<0||o.indexOf('bank')>=0||o.indexOf('wash')>=0)throw Error('Early options '+o);
-storyChoose(g,'broke',0);if(g.money!==500||!g.emp.gpLoan||!g.me.gp.noSea||milestoneConditions(g).broke)throw Error('Grandpa');
-if(brokeOpts(Object.assign(g,{money:-10})).some(function(x){return x[2]==='gp';}))throw Error('Grandpa only once');
-g.money=5000;if(!payGrandpa(g)||g.me.gp.noSea)throw Error('Pay back');
+storyChoose(g,'broke',0);if(g.money!==500||!g.emp.gpLoan||!g.me.gp.noSea||milestoneConditions(g).broke)throw Error('Grandma');
+if(brokeOpts(Object.assign(g,{money:-10})).some(function(x){return x[2]==='gp';}))throw Error('Grandma only once');
+g.money=5000;if(!payGrandma(g)||g.me.gp.noSea)throw Error('Pay back');
 var h=newGame();h.day=100;h.emp.farms.rack=2;h.emp.farmPaid.rack=[1,1];h.money=-2000;var i=brokeOpts(h).findIndex(function(x){return x[2]==='shark';});storyChoose(h,'broke',i);
 if(!h.emp.shark||h.money<=0)throw Error('Shark');h.money=0;h.day=h.emp.shark.due;debtDay(h);if(h.emp.farms.rack!==1||!h.emp.shark)throw Error('Smashed farm');
 h.money=-50000;var bi=brokeOpts(h).findIndex(function(x){return x[2]==='bankrupt';});if(bi<0)throw Error('Bankruptcy should show for deep debt');storyChoose(h,'broke',bi);
@@ -105,10 +105,10 @@ var h=newGame();h.humans=6e7;h.day=900;h.tr={drive:-8,ego:-8,care:-4};treeDay(h)
 var q=newGame();q.tr={know:8,care:6,ego:-4};q.emp.won=4000;if(!spaceOpen(q))throw Error('Space for the curious');q.tr={drive:8,ego:8,means:-6};q.emp.trees={};if(spaceOpen(q))throw Error('Not for climbers');
 var l=newGame();l.humans=6e7;l.day=900;l.tr={know:-8,kin:-8,drive:6,ego:6};treeDay(l);if(!treeHas(l,'lab'))throw Error('Designer lab for use and tool');
 `);
-check('a house that runs itself, piece by piece, for you or for Grandpa',`
+check('a house that runs itself, piece by piece, for you or for Grandma',`
 var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.money=1e6;if(!houseOffer(g))throw Error('Offer');buyHouse(g);if(!g.me.house.land)throw Error('Land');
 if(buyHouse(g))throw Error('Walls need a who');if(!buyHouse(g,'gp'))throw Error('Walls');g.me.picks=['house','nothing'];g.me.next=g.day;personalDay(g);if(!g.me.house.hp)throw Error('Working on it');
-while(houseNext(g))buyHouse(g);if(!g.me.house.complete||treesFor(g).indexOf('rewild')<0||gpLines(g).join().indexOf('Grandpa lives')<0)throw Error('Complete');
+while(houseNext(g))buyHouse(g);if(!g.me.house.complete||treesFor(g).indexOf('rewild')<0||gpLines(g).join().indexOf('Grandma lives')<0)throw Error('Complete');
 `);
 check('hard places and late cards ask once and leave a line',`
 var g=newGame();g.humans=2e9;var c=milestoneConditions(g);if(!c.c_war||!c.c_cash||c.c_water||c.c_gary!==undefined)throw Error('Thresholds');g.emp.inf=1e5;var ce=g.emp.ceil;
@@ -117,7 +117,7 @@ g.humans=3e9;g.money=0;if(storyChoose(g,'c_water',0))throw Error('Needs the mone
 var old=newGame();old.day=3000;old.humans=7e9;delete old.progress.v5;migrateProgress(old);detectMilestones(old);if(old.progress.queue.some(function(k){return /^c_/.test(k);}))throw Error('Old saves skip passed cards');
 `);
 check('the world moves on in headlines, food and big builds keep paying after Earth',`
-var g=newGame();g.emp.kitsOpened=1;g.humans=6e8;headlineDay(g);var R=rip(g);if(R.log.length!==3)throw Error('Gary, mayor, divorce '+R.log.length);headlineDay(g);if(rip(g).log.length!==3)throw Error('Once each');
+var g=newGame();g.emp.kitsOpened=1;g.humans=6e8;headlineDay(g);var R=rip(g);if(R.log.length!==5)throw Error('Gary, mayor, divorce and two about the founder '+R.log.length);headlineDay(g);if(rip(g).log.length!==5)throw Error('Once each');
 var f0=foodIncome(g);g.emp.proj.foodfactory=1;if(Math.abs(foodIncome(g)/f0-4)>1e-9)throw Error('Factory');g.emp.proj.foodopen=1;if(foodIncome(g)>=f0*4)throw Error('Recipe means less food sold');
 g.humans=8.2e9;g.emp.won=5000;g.space.started=true;g.emp.c3={c_water:0};var m=g.money;dayRollover(g);if(g.money-m<2e7)throw Error('After Earth it still earns '+(g.money-m));
 if(sideIncome(g)<3e6||!rip(g).log.some(function(x){return /desalination/.test(x.tx);}))throw Error('Water sales');
@@ -137,7 +137,7 @@ if(R.pend[0].tx!=='because of you')throw Error('Your story jumps the line');g.ps
 g.ps.t+=121000;newsTick(g);if(R.log.length!==3)throw Error('Then the rest, spaced');
 var b=newGame();newsLine(b,'bots');if(rip(b).log.length!==1)throw Error('No play clock, straight to print');
 `);
-check('academia or industry, letters to Grandpa, and choices that make the news',`
+check('academia or industry, letters to Grandma, and choices that make the news',`
 var g=newGame();g.kits.sold=1000;g.academy.level=1;g.money=1e7;if(!forkOpts('science').every(function(p){return p.req(g);}))throw Error('Science question after the first postdoc');
 var m=g.emp.mat;buyProj(g,'sciind');if(g.emp.mat!==m*0.95||treesFor(g).indexOf('lab')<0||forkOpts('science').some(function(p){return p.id==='sciacad'&&g.emp.proj[p.id];}))throw Error('Industry');
 var h=newGame();h.kits.sold=1000;h.academy.level=1;h.money=1e7;buyProj(h,'sciacad');if(!h.emp.acad||(h.tr.know||0)<2)throw Error('Academia');
@@ -162,4 +162,12 @@ var q=newGame();q.emp.won=2000;q.emp.trees={space:1};q.tr={know:6,ego:-2,care:2}
 var r=newGame();r.tr={drive:-6,ego:-4,care:-2};r.emp.won=2000;r.emp.trees={shop:1};r.progress.seen={};r.progress.queue=['win'];detectMilestones(r);if(r.progress.queue[0]!=='lastchap'||MILESTONES.lastchap.more(r).indexOf('cat')<0)throw Error('Shop chapter');
 var o=newGame();o.tr={drive:-6,ego:-4};o.emp.won=1;o.progress={seen:{},queue:[],wait:[]};o.emp.trees={shop:1};detectMilestones(o);
 `);
-console.log(count+' free time, Grandpa and ending checks passed');
+check('the player name shows up where it should and nowhere unsafe',`
+var g=newGame();g.name='  Puti<b>  ';if(nm(g)!=='Putib')throw Error('Clean '+nm(g));
+if(N(g,'Hi{,name}.')!=='Hi, Putib.'||N(newGame(),'Hi{,name}.')!=='Hi.'||N(newGame(),'{name|the founder} left')!=='the founder left')throw Error('Tokens');
+if(grandmaLetter(g,'gift').indexOf('little things, Putib,')<0)throw Error('Letter has the name');if(grandmaLetter(newGame(),'gift').indexOf('little things,”')<0)throw Error('No name, no gap');
+g.humans=3e7;g.emp.kitsOpened=1;headlineDay(g);if(!rip(g).log.some(function(x){return /Putib/.test(x.tx||'');}))throw Error('News names you');
+`);
+if(!html.includes("(nm(G)?'Dear '+nm(G)+',<br><br>':'')")||!html.includes('id="player-name"')||!html.includes("G.name=nm({name:pni.value})"))throw Error('Ending letter and name box');
+count++;
+console.log(count+' free time, Grandma and ending checks passed');
