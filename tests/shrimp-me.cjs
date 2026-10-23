@@ -195,4 +195,8 @@ var f0=distributionCost(g);g.emp.farms.hatch=2;var u0=farmOverhead(g);var r=Math
 if(!(rlFound(g,'water')>=1&&rlFound(g,'energy')>=1))throw Error('Something found in four years '+rlFound(g,'water'));if(!(distributionCost(g)<f0)||!(farmOverhead(g)<u0))throw Error('Finds help');
 var h=newGame();h.kits.sold=500;h.money=10;if(rlHire(h,'genes','pi'))throw Error('Needs cash');for(var i=0;i<20;i++){h.money=1e9;rlHire(h,'genes','phd');}if(rlines(h).genes.phd!==12)throw Error('Cap per field');
 `);
+check('the game keeps a history for the ending charts',`
+var g=newGame();g.money=1000;for(var d=0;d<60;d++){g.day++;dayRollover(g);}var C=g.chart;if(!C||C.s.length<6||!(Object.keys(C.sp).length>=0))throw Error('History '+(C&&C.s.length));
+g.kits.sold=1;g.day++;dayRollover(g);if(g.chart.ev.kit==null)throw Error('First kit marked');for(var i=0;i<2000;i++){g.day+=7;chartDay(g,{});}if(g.chart.s.length>330)throw Error('History stays small '+g.chart.s.length);
+`);
 console.log(count+' free time, Grandma and ending checks passed');

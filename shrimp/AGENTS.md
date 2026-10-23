@@ -173,6 +173,8 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] The ending page: type and variation, who you became, Mira, what the world looks like, Grandma's letter (with the visits line), from the tank, lives you didn't live, all 16 endings. No trait bars.
 - [ ] Space opens only after Earth, and only for curious players (`spaceOpen`). Other types get their own tree in World.
 
+- [ ] The ending page shows four charts under who you became: owners over time with milestone dots, cash over time, the nine traits, and where the money went (`chartDay` records `G.chart`, `endCharts` draws plain SVG with the takeaway in each title). Saves from before this only chart from the day recording began.
+- [ ] `BUILD` near `toast` changes with every release; an open game checks every 15 minutes and offers a reload when a newer one is live. Bump it when you ship.
 - [ ] Shrimp videos count as reach, not ego, so they don't push you away from Space.
 
 **Play-test fixes, Oct 23 (check these stay true)**
