@@ -284,6 +284,8 @@ When you change balance, run both bots and compare against these. Report the bef
 **Sim and tests**
 - **Screenshots in the repo.** A browser script run from the repo folder wrote `l1.png` and `l2.png` there and they got pushed. Write scratch files outside the repo and check `git status` before `git add`.
 - **Comparing `innerHTML` to a built string.** The browser rewrites SVG and attributes, so the compare never matches and the node is rebuilt every frame (charts flickered, tooltips died). Compare against a cached copy of the string instead.
+- **Spotlight on a fixed layer.** iPhone Safari has no scroll anchoring, so when something above the card grew, the page content moved and a `position:fixed` ring stayed put. The overlay now lives in page coordinates (`#spot` is absolute and as tall as the page), the ring follows its card every frame (`spotTrack`), and only header and tab-bar targets use fixed positioning. A scroll the player didn't make (no touch, wheel or key in the last 0.8 s) re-places the ring instead of closing it.
+- **Same thing spotlit twice.** Different paths (tab, intro card, card sweep) each kept their own "seen" note. Any spotlight now marks its element, its card and its tab as seen.
 - **Old text in an open tab.** A tab left open for hours keeps running old code; Puti saw a "he" that was already fixed. That is what `BUILD` and the reload prompt are for.
 - **UI helpers in the sim.** `labMode()` inside `illDay` broke every test.
 - **Unguarded UI calls in `updateReveal`.** They break the bots.
