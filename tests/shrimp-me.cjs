@@ -6,18 +6,22 @@ let count=0;function check(name,code){vm.runInContext(code,engine());console.log
 if(!html.includes('id="tb-me"')||!html.includes('id="p-me"')||html.includes('data-act="help"'))throw Error('Top bar: person button and You panel');
 if(html.indexOf('id="btn-settings"')<html.indexOf('id="apop"'))throw Error('Settings should live inside the ? popup');
 console.log('PASS the person button and the You panel sit in the top bar, settings inside ?');count++;
-check('free time opens once the first tank feeds and changes itself',`
+check('your day opens once the first tank feeds and changes itself, and the hours do things',`
 var g=newGame();g.day=10;personalDay(g);if(g.me.on)throw Error('Too early');g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);if(!g.me.on||!milestoneConditions(g).me_intro)throw Error('Should open');
-if(meSlots(g)!==2||!mePick(g,'overtime')||g.me.picks.join()!=='nothing,overtime')throw Error('Two slots, oldest pick drops '+g.me.picks);
-mePick(g,'visit');g.fin=[{shrimp:400}];var m0=g.money;for(var d=0;d<30;d++){g.day++;personalDay(g);}
-if(g.me.visits<3||g.money<=m0||g.me.n<3)throw Error('Picks repeat each Saturday '+g.me.visits+' '+g.money);
-g.emp.farms.rack=1;if(!laneOpen(g,'m')||laneOpen(g,'y'))throw Error('Monthly lane after farms');if(!mePick(g,'dinners','m')||mePick(g,'dinners','w')||mePick(g,'holiday','m'))throw Error('Dinners are monthly');
-var v0=g.me.visits;g.me.moved=1;if(!laneOpen(g,'y')||meCan(g,'visit','w')||meCan(g,'visit','m')||!meCan(g,'home','y')||meCan(g,'exercise','y')||!meCan(g,'money','w'))throw Error('Moving away changes what you can do');
-var inf0=g.emp.inf;g.emp.infOn=1;g.me.picks=['call','nothing'];mePick(g,'conference','y');for(var d=0;d<400;d++){g.day++;personalDay(g);}if(g.me.cnt.conference!==1||!(g.emp.inf>inf0))throw Error('Yearly runs once a year '+g.me.cnt.conference);if((g.me.cnt.dinners||0)<12)throw Error('Monthly runs monthly '+g.me.cnt.dinners);
+var h=dayHours(g);if(h.sleep!==8||h.work!==8||h.grandma!==1)throw Error('Default day '+JSON.stringify(h));
+setHour(g,18,'grandma');setHour(g,19,'grandma');setHour(g,20,'grandma');setHour(g,21,'work');setHour(g,22,'work');g.fin=[{shrimp:400}];var m0=g.money;for(var d=0;d<30;d++){g.day++;personalDay(g);}
+if(g.me.visits<4||g.money<=m0||g.me.n<3)throw Error('Hours turn into visits and overtime '+g.me.visits+' '+g.money);
+if(setHour(g,3,'dinners'))throw Error('Dinners need a farm');g.emp.farms.rack=1;if(!setHour(g,3,'dinners'))throw Error('Dinners with a farm');
+g.me.moved=1;if(actOk(g,'club')||!laneOpen(g,'y')||!meCan(g,'home','y')||meCan(g,'exercise','y'))throw Error('Moving away changes what you can do');var c0=g.me.calls;for(var d=0;d<14;d++){g.day++;personalDay(g);}if(!(g.me.calls>c0))throw Error('Grandma hours are calls after moving');
+var inf0=g.emp.inf;g.emp.infOn=1;mePick(g,'conference','y');for(var d=0;d<400;d++){g.day++;personalDay(g);}if(!(g.me.cnt.conference>=1)||!(g.emp.inf>inf0))throw Error('Yearly runs once a year '+g.me.cnt.conference);
 `);
-check('working without rest burns you out',`
-var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.me.picks=['overtime','videos'];for(var d=0;d<40;d++){g.day++;personalDay(g);}
-if(!g.me.burns||!milestoneConditions(g).me_burnout)throw Error('Burnout');var v=g.me.vids;g.day++;g.me.next=g.day;personalDay(g);if(g.me.vids!==v)throw Error('Burnt weeks do nothing');
+check('long days burn you out, short nights and no exercise make you ill',`
+var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);for(var h=7;h<23;h++)setHour(g,h,'work');for(var d=0;d<80&&!g.me.burns;d++){g.day++;personalDay(g);}
+if(!g.me.burns||!milestoneConditions(g).me_burnout)throw Error('Burnout '+g.me.bo);var v=g.me.vids,i0=g.emp.inf;g.emp.infOn=1;gainInf(g,10);if(g.emp.inf-i0!==5)throw Error('Half ✦ while burnt out');
+var q=newGame();q.tanks[0].feeder=1;q.tanks[0].autoWC=1;personalDay(q);for(var h=0;h<24;h++)setHour(q,h,h<4?'sleep':'work');for(var h=15;h<24;h++)setHour(q,h,'nothing');q.money=1e6;var r=Math.random,sd=5;Math.random=function(){sd=(sd*16807)%2147483647;return sd/2147483647;};
+for(var d=0;d<2500&&!q.me.ills;d++){q.day++;personalDay(q);}Math.random=r;if(!q.me.warned||!q.me.ills||sick(q)!==2||q.money>6e5||workMult(q)!==0.5)throw Error('Ill after years of four-hour nights '+q.me.hp+' '+q.money);
+var w=newGame();w.tanks[0].feeder=1;w.tanks[0].autoWC=1;personalDay(w);setHour(w,19,'exercise');for(var d=0;d<900;d++){w.day++;personalDay(w);}if(w.me.ills||w.me.hp<70)throw Error('A normal day stays well '+w.me.hp);
+var z=newGame();z.tanks[0].feeder=1;z.tanks[0].autoWC=1;personalDay(z);z.emp.infOn=1;for(var h=17;h<23;h++)setHour(z,h,'design');for(var d=0;d<200;d++){z.day++;personalDay(z);}if((z.me.dz||0)<2||!rip(z).log.some(function(x){return /Tank of the Year/.test(x.tx||'');}))throw Error('Design hours win prizes '+z.me.dz);
 `);
 check('Grandma moments wait for you, pass if nobody looks, and count both ways',`
 var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.ps.t=1;
@@ -80,7 +84,7 @@ var a=doSell(g,T,true,10).revenue;storyChoose(g,'dye_offer',0);var b=doSell(g,T,
 g.day=30;var r=Math.random;Math.random=function(){return 0;};dyeDay(g);Math.random=r;if(g.dye.on||!milestoneConditions(g).mira_dye||g.orderNext<100)throw Error('Found out');
 `);
 check('fight nights pay, cost shrimp, can be raided, and lead to the investor',`
-Math.random=function(){return 0.9;};var g=newGame();var T=g.tanks[0];T.had=1;T.pop=[{age:90,n:60,g:40,b:0}];T.feeder=1;T.autoWC=1;personalDay(g);g.emp.fight=1;g.me.picks=['fight','nothing'];g.fin=[{shrimp:100}];
+Math.random=function(){return 0.9;};var g=newGame();var T=g.tanks[0];T.had=1;T.pop=[{age:90,n:60,g:40,b:0}];T.feeder=1;T.autoWC=1;personalDay(g);g.emp.fight=1;for(var hh=17;hh<23;hh++)setHour(g,hh,'fight');g.fin=[{shrimp:100}];
 var m=g.money,n=totalN(T);for(var d=0;d<29;d++){g.day++;personalDay(g);}if(g.money<=m||totalN(T)>=n||!g.emp.fightDead)throw Error('Fight nights');
 if(!milestoneConditions(g).mira_fight)throw Error('Mira');g.emp.kitsOpened=1;if(!milestoneConditions(g).wash_offer)throw Error('Investor after four nights');
 `);
@@ -109,7 +113,7 @@ var l=newGame();l.humans=6e7;l.day=900;l.tr={know:-8,kin:-8,drive:6,ego:6};treeD
 `);
 check('a house that runs itself, piece by piece, for you or for Grandma',`
 var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.money=1e6;if(!houseOffer(g))throw Error('Offer');buyHouse(g);if(!g.me.house.land)throw Error('Land');
-if(buyHouse(g))throw Error('Walls need a who');if(!buyHouse(g,'gp'))throw Error('Walls');g.me.picks=['house','nothing'];g.me.next=g.day;personalDay(g);if(!g.me.house.hp)throw Error('Working on it');
+if(buyHouse(g))throw Error('Walls need a who');if(!buyHouse(g,'gp'))throw Error('Walls');for(var hh=17;hh<23;hh++)setHour(g,hh,'house');g.me.next=g.day;personalDay(g);if(!g.me.house.hp)throw Error('Working on it');
 while(houseNext(g))buyHouse(g);if(!g.me.house.complete||treesFor(g).indexOf('rewild')<0||gpLines(g).join().indexOf('Grandma lives')<0)throw Error('Complete');
 `);
 check('hard places and late cards ask once and leave a line',`
@@ -143,7 +147,7 @@ check('academia or industry, letters to Grandma, and choices that make the news'
 var g=newGame();g.kits.sold=1000;g.academy.level=1;g.money=1e7;if(!forkOpts('science').every(function(p){return p.req(g);}))throw Error('Science question after the first postdoc');
 var m=g.emp.mat;buyProj(g,'sciind');if(g.emp.mat!==m*0.95||treesFor(g).indexOf('lab')<0||forkOpts('science').some(function(p){return p.id==='sciacad'&&g.emp.proj[p.id];}))throw Error('Industry');
 var h=newGame();h.kits.sold=1000;h.academy.level=1;h.money=1e7;buyProj(h,'sciacad');if(!h.emp.acad||(h.tr.know||0)<2)throw Error('Academia');
-var q=newGame();q.tanks[0].feeder=1;q.tanks[0].autoWC=1;personalDay(q);q.me.picks=['letter','nothing'];for(var d=0;d<30;d++){q.day++;personalDay(q);}if(q.me.letters<3||!q.me.hist.some(function(x){return /fishing boat/.test(x);}))throw Error('His story in letters');
+var q=newGame();q.tanks[0].feeder=1;q.tanks[0].autoWC=1;personalDay(q);for(var hh=17;hh<23;hh++)setHour(q,hh,'grandma');for(var d=0;d<30;d++){q.day++;personalDay(q);}if(q.me.letters<3||!q.me.hist.some(function(x){return /fishing boat/.test(x);}))throw Error('His story in letters');
 var w=newGame();w.humans=2e9;w.emp.inf=1e5;storyChoose(w,'c_war',3);if(!rip(w).log.some(function(x){return /breeding season/.test(x.tx);}))throw Error('The war choice makes the news');
 var o=newGame();o.emp.farms.hatch=1;storyChoose(o,'owntank',0);if(gpLines(o).join().indexOf('never looked')<0)throw Error('Kept and never looked');o.ps.look+=5;if(gpLines(o).join().indexOf('never looked')>=0)throw Error('Looked after');
 `);

@@ -173,6 +173,8 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] The ending page: type and variation, who you became, Mira, what the world looks like, Grandma's letter (with the visits line), from the tank, lives you didn't live, all 16 endings. No trait bars.
 - [ ] Space opens only after Earth, and only for curious players (`spaceOpen`). Other types get their own tree in World.
 
+- [ ] Shrimp videos count as reach, not ego, so they don't push you away from Space.
+
 **Play-test fixes, Oct 23 (check these stay true)**
 - [ ] Every story choice looks the same (no green first option) and shows what it does under the text (`choiceFx` tries it on a copy of the game: ✦, AED, mood, kits, owners). A choice you can't afford is greyed with a reason.
 - [ ] Out of money before any farm talks about your shrimp, not farms.
@@ -183,7 +185,8 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] Consultants appear once you have had AED 20k.
 - [ ] The SOP project (recipe tank) opens standard tanks 4 to 12; standard tanks come with everything, decor included. Tapping a row in the All tanks table looks at that tank alone (health check, restock), Back returns to the recipe.
 - [ ] When farms take over (first hatchery, or farms ≥ 10 kits/day) the farm takes every tank but the first (`retireTanks`), so no more alerts about tanks you can't reach.
-- [ ] Free time has three lanes: every week (two picks), every month (one, after the first farm), once a year (one, after moving or three regions). Each pick says which lanes it fits (`f`). After moving, Grandma visits, the shrimp club, Mira's school and fight night are gone; a yearly trip home replaces them.
+- [ ] Your day (`ACTS`, `M.day`, `dayHours`, `lifeDay` daily, `personalWeek` weekly): 24 hours painted once, repeats daily. 3 hours a day ≈ one old weekly pick. Sleep and exercise move health (`M.hp`): under 45 a doctor card, under 40 mild illness (3 weeks, 2% of cash), under 20 serious illness (a year, half the cash, company at half speed via `workMult`). Long work days and short nights build strain (`M.bo`): at 100 you burn out for four weeks (hours do nothing, ✦ at half). Work hours nudge sales ±2% an hour around 8. Design hours win prizes at 150/500/1200 h, video hours go viral at 400 h, paper hours raise research odds after 300 h. Once a year lane stays (trips home, holidays, conference).
+- [ ] (Older) Free time had three lanes: every week (two picks), every month (one, after the first farm), once a year (one, after moving or three regions). Each pick says which lanes it fits (`f`). After moving, Grandma visits, the shrimp club, Mira's school and fight night are gone; a yearly trip home replaces them.
 - [ ] Story prices that were fixed grow with the company (`aiCost` 20% of cash plus 2% of every kit sale, `rivalCost`, `schoolKits`).
 - [ ] The spotlight ring follows its card if anything moves (`spotTrack`).
 - [ ] Once a second region is open and the tank buttons leave the top bar, the owners count (x of 8.2B) sits in the top bar instead.
