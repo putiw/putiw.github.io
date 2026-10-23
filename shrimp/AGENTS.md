@@ -134,6 +134,59 @@ These come from Puti's feedback. Treat them as requirements.
 **Weight**
 - No game engines. One canvas, small embedded assets. The file is about 430 KB, so keep additions small.
 
+## Feature checklist
+
+Run this before every push. Each line is something Puti asked for. If a line fails, fix it before anything else. Tests: `node tests/shrimp-balance.cjs`, `node tests/shrimp-academy.cjs`, `node tests/shrimp-me.cjs`, then the bots (Pacing targets). By hand means open the game in a browser at 390 px wide.
+
+**Look and layout**
+- [ ] Light mode only, Inter font, every card header the same height, 8 px between cards, no sideways scroll at 360 and 390 px (by hand, every tab).
+- [ ] Top bar: `?` top right from the start, settings inside it, the person button beside it once free time opens, both 34×30 and lined up (by hand).
+- [ ] Spotlights: the ring sits on the card the text talks about, never two within 15 s, never while cleaning or a health check is open (by hand: first babies, Water care intro).
+- [ ] When Water care is introduced the Water button pulses with it.
+- [ ] Milestone cards scroll so their top sits under the header, not the middle.
+
+**Tank and shrimp**
+- [ ] Newborn shrimp are small white dots, juveniles pale pink, adults their grade colour (by hand, tank view). The Chapter 2 Babies card says white dots that get redder with each molt.
+- [ ] Failed-molt ring sits where the head shell meets the body.
+- [ ] Health check: tap the sick ones, pick a cure, then play the cure (by hand, all three):
+  - Mineral pellets: drop pellets, everyone eats, GH+ one scoop at a time, GH ends up in the real tank, a big jump kills some, leftovers rot.
+  - Water change: hold Drain to about half, tap the sick ones to net them while it's low, hold Refill to the line, the real tank gets that change.
+  - Salt dip: no salt choice, hold to dip, aim 4.5 s (45 s real in small text), 3.5 to 5.5 s cures, past 7 s kills some. Same dip for new shrimp from Trade and for quality checks.
+- [ ] Heat alert slows the game once per alert per 30 days, not every tenth of a degree.
+- [ ] First illness ever spreads slower.
+- [ ] Heater is "Winter heater", fan is "Summer cooling fan".
+
+**Choices and who you become**
+- [ ] Every cold answer has a logistical reason, every kind answer says what it costs. No good/evil caricature.
+- [ ] Every new choice moves a trait other than Means (`TRAIT_TAGS`, `STORY_TAGS`, choice data).
+- [ ] Story cards come one at a time, 30 s to 2 min of play apart. Money trouble, the ending and intro cards never wait (`shrimp-me`).
+- [ ] Shrimp Times stories come one at a time, 30 s to 2 min apart, never on top of a card, and a story caused by your choice comes 8 to 20 s after it (`shrimp-me`). After the first issue, news is a short toast, it doesn't switch tabs.
+- [ ] Only choices where different people really choose differently are cards, the rest are headlines (`HEADLINES`).
+- [ ] The ending page: type and variation, who you became, Mira, what the world looks like, Grandpa's letter (with the visits line), from the tank, lives you didn't live, all 16 endings. No trait bars.
+- [ ] Space opens only after Earth, and only for curious players (`spaceOpen`). Other types get their own tree in World.
+
+**You tab and Grandpa**
+- [ ] Opens once the first tank feeds itself and changes its own water, with the Your Saturdays card.
+- [ ] Free time picks repeat, 2 then 3 slots, weekly, monthly after farms, yearly after moving. Burnout after four heavy periods with no rest.
+- [ ] Grandpa moments only show on the tab and pass if nobody looks.
+- [ ] Writing letters tells Grandpa's story bit by bit. His milestone letters live in the You tab once it opens.
+- [ ] Climbers get shorter letters, floaters get longer ones (`gpVoice`).
+- [ ] A place of your own: land, walls (for me, Grandpa or both), then the rest, offered with AED 300k spare.
+- [ ] Your own tank after the first industrial hatchery: keep it (treats by hand, happy treats), give it to Grandpa, or let the farm take them. Kept and never looked at is a line in the ending.
+
+**People and money**
+- [ ] Rosa, Imran, Dana and Leo each get a goodbye card when a machine takes their job, options change over time.
+- [ ] Out of money card: Grandpa (once), neighbours, bank, the man at the market, washing money, sell something, bankruptcy (two taps, the game ends).
+- [ ] Buyout offer after a million owners, two taps, the game ends with the Sold ending.
+- [ ] Dyed shrimp, fight nights, the investor, three favours, the routes deal is the point of no return, the police way back costs almost everything.
+- [ ] Mira reacts to dye, fight night, her scholarship, the investor, the year after the police.
+- [ ] Academia or industry: pay postdocs more to stay (rare discoveries, Wonder) or hire them into the company (cheaper kits, Use, opens the designer lab).
+- [ ] Shrimp food income (more with the food factory) and water, power and freight income keep paying after Earth. Space's last world is always reachable.
+- [ ] No "Affordable in about…" lines anywhere.
+
+**Text**
+- [ ] Puti's voice: short, plain, comma-spliced. No punchlines, no "not X but Y", no twist endings. Made-up countries for satire. No abortion or religion.
+
 ## Pacing targets
 
 | Player | Real time to finish Earth |
@@ -150,7 +203,7 @@ Latest bot results (seed 7):
 |---|---|
 | Strong, cold answers (default) | Earth won on day 2,293, empire_dictator |
 | Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 2,449, garden_village |
-| Average, curious and kind (default) | Earth on day 6,071, space done day 7,404 |
+| Average, curious and kind (default) | Earth on day 6,071 to 6,258, space done day 7,404 to 7,600 |
 | Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,975, no Space (Shrimp Island instead) |
 
 The average bot has 21 years to finish both chapters (it used to finish space on day 7,292 of 7,300).

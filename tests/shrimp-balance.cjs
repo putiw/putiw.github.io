@@ -312,7 +312,8 @@ var g=readyGame();g.emp.infOn=1;g.kits.sold=200;g.money=1e6;g.emp.inf=1e4;
 var ids=projAvail(g).map(p=>p.id);if(ids.indexOf('shipwarm')<0||ids.indexOf('shipcheap')<0)throw Error('Both shipping answers offered');
 var m0=kitMaterials(g);if(!buyProj(g,'shipcheap')||buyProj(g,'shipwarm')||projAvail(g).some(p=>p.fk==='ship'))throw Error('One answer per question');
 if(!(g.emp.heart<0)||!(kitMaterials(g)<m0))throw Error('Cheap shipping saves money and costs heart');
-Object.keys(FORK_Q).forEach(function(fk){var o=forkOpts(fk);if(o.length<2)throw Error('Question needs two answers: '+fk);if(!o.some(p=>(p.h||0)>0)||!o.some(p=>(p.h||0)<=0))throw Error('Needs a kind and a cold answer: '+fk);});
+// science is wonder or use, not kind or cold, so it has no heart either way
+Object.keys(FORK_Q).forEach(function(fk){var o=forkOpts(fk);if(o.length<2)throw Error('Question needs two answers: '+fk);if(fk!=='science'&&!o.some(p=>(p.h||0)>0)||!o.some(p=>(p.h||0)<=0))throw Error('Needs a kind and a cold answer: '+fk);});
 PROJ.filter(p=>p.c==='cult'||p.c==='fork').forEach(function(p){if(p.c==='cult'&&!p.t)throw Error('World project without a track: '+p.id);});
 if(!PROJ.some(p=>p.t==='uni'&&p.m>0&&p.i>0)||!PROJ.some(p=>p.t==='pol'&&!p.m&&p.i>0)||!PROJ.some(p=>p.t==='nature'&&p.m>0&&!p.i))throw Error('Costs should mix money and ✦ by item');
 `);

@@ -137,4 +137,12 @@ if(R.pend[0].tx!=='because of you')throw Error('Your story jumps the line');g.ps
 g.ps.t+=121000;newsTick(g);if(R.log.length!==3)throw Error('Then the rest, spaced');
 var b=newGame();newsLine(b,'bots');if(rip(b).log.length!==1)throw Error('No play clock, straight to print');
 `);
+check('academia or industry, letters to Grandpa, and choices that make the news',`
+var g=newGame();g.kits.sold=1000;g.academy.level=1;g.money=1e7;if(!forkOpts('science').every(function(p){return p.req(g);}))throw Error('Science question after the first postdoc');
+var m=g.emp.mat;buyProj(g,'sciind');if(g.emp.mat!==m*0.95||treesFor(g).indexOf('lab')<0||forkOpts('science').some(function(p){return p.id==='sciacad'&&g.emp.proj[p.id];}))throw Error('Industry');
+var h=newGame();h.kits.sold=1000;h.academy.level=1;h.money=1e7;buyProj(h,'sciacad');if(!h.emp.acad||(h.tr.know||0)<2)throw Error('Academia');
+var q=newGame();q.tanks[0].feeder=1;q.tanks[0].autoWC=1;personalDay(q);q.me.picks=['letter','nothing'];for(var d=0;d<30;d++){q.day++;personalDay(q);}if(q.me.letters<3||!q.me.hist.some(function(x){return /fishing boat/.test(x);}))throw Error('His story in letters');
+var w=newGame();w.humans=2e9;w.emp.inf=1e5;storyChoose(w,'c_war',3);if(!rip(w).log.some(function(x){return /breeding season/.test(x.tx);}))throw Error('The war choice makes the news');
+var o=newGame();o.emp.farms.hatch=1;storyChoose(o,'owntank',0);if(gpLines(o).join().indexOf('never looked')<0)throw Error('Kept and never looked');o.ps.look+=5;if(gpLines(o).join().indexOf('never looked')>=0)throw Error('Looked after');
+`);
 console.log(count+' free time, Grandpa and ending checks passed');
