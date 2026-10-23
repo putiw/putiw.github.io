@@ -250,11 +250,13 @@ When you change balance, run both bots and compare against these. Report the bef
 
 ## Testing checklist
 
-1. `node tests/shrimp-balance.cjs` and `node tests/shrimp-academy.cjs` pass.
-2. For balance or sim changes, also run both playthrough bots. Watch for `INSOLVENT` and for big timing shifts.
-3. Load the page at 390 px and 360 px wide and look at screenshots of every tab at several stages: the opening, first sale, kits, farm, a million owners, win. Check for console errors, overflow and cut-off text.
-4. If you changed behaviour on purpose, update the matching test, and add a test for any new mechanic.
-5. Append a short section to `tests/README-shrimp.md`.
+1. Fast checks, run every time: `node tests/shrimp-balance.cjs` (50), `node tests/shrimp-academy.cjs` (10), `node tests/shrimp-me.cjs` (28: free time, Grandma, endings, schedule, research lines, charts).
+2. For balance or sim changes, run the bots: `node tests/shrimp-playthrough.cjs` (strong cold), `BOT_HEART=kind node tests/shrimp-playthrough.cjs` (strong kind), `node tests/shrimp-average-playthrough.cjs` (average curious player, goes to Space). Watch for `INSOLVENT` and big timing shifts against Pacing targets. `REVIEW_OUTPUT=<dir>` sets where the run json with snapshots goes (default `/private/tmp/shrimp-tests`, which doesn't exist on Linux).
+3. Spotlight sweep in a real browser: `SPOT_RUN=<dir>/run-7.json node tests/shrimp-spotlights.cjs` after a strong bot run. Every spotlight on every tab at six stages.
+4. Load the page at 390 px and 360 px wide and look at screenshots of every tab at several stages: the opening, first sale, kits, farm, a million owners, win, and the ending page. Check for console errors, overflow and cut-off text. Load snapshots from the run json into the page (`G=snap;migrate(G);render()`).
+5. Sound needs a real http server (`python3 -m http.server` in `shrimp/`), `file://` can't fetch the mp3s.
+6. If you changed behaviour on purpose, update the matching test, and add a test for any new mechanic.
+7. Append a short section to `tests/README-shrimp.md`, bump `BUILD`, and keep this file's checklist true.
 
 **Screenshot pitfalls.** Full-page screenshots show fixed bars and toasts in odd places. The guide can scroll the page by itself. A spotlight can block clicks, so close it or stub `spotlight` in scan scripts.
 
@@ -280,6 +282,9 @@ When you change balance, run both bots and compare against these. Report the bef
 - **Caching sprites before they decode.** In a test page, shrimp bodies were cached before the images loaded on a phone, so only legs showed. Never cache a drawing until every image it uses has loaded.
 
 **Sim and tests**
+- **Screenshots in the repo.** A browser script run from the repo folder wrote `l1.png` and `l2.png` there and they got pushed. Write scratch files outside the repo and check `git status` before `git add`.
+- **Comparing `innerHTML` to a built string.** The browser rewrites SVG and attributes, so the compare never matches and the node is rebuilt every frame (charts flickered, tooltips died). Compare against a cached copy of the string instead.
+- **Old text in an open tab.** A tab left open for hours keeps running old code; Puti saw a "he" that was already fixed. That is what `BUILD` and the reload prompt are for.
 - **UI helpers in the sim.** `labMode()` inside `illDay` broke every test.
 - **Unguarded UI calls in `updateReveal`.** They break the bots.
 - **Story events that block the clock.** A late story event fired on the ten-year day and blocked a test. Gate new events by day and condition.
