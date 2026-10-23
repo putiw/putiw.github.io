@@ -464,3 +464,10 @@ ammonia is only the primary button once ammonia is near zero.
 - Kept-your-tank-and-never-looked line, late cards can make their own news right after (`CARDS3[..].news`).
 - Spotlights wait for the card to open and the page to stop moving, then place the ring, and follow the card while it's up (`spotPlace`). The ring used to land on the tab bar when the smooth scroll hadn't finished.
 - `shrimp/AGENTS.md` has a feature checklist to run before every push.
+
+## Pass 59: spotlights freeze, glide, then light up; header covers the top
+- Spotlights: pause and dim the whole screen first (taps and scrolls are swallowed, `SPOT.ready` 0), scroll to a spot where the card sits between the header and the tab bar with room for the tip (`spotCamera`), wait for the page to settle, then cut the ring, show the tip and vibrate 30 ms where the browser allows it (`spotPlace`). Cards inside a closed section (the folded home-tank equipment in business mode) are never spotlighted (`spotShown`).
+- Water care spotlight lights only a copy of the Water button (`#spot-btn`) over the dim, the rest of the header stays dimmed.
+- Water care opens the first time the tank needs a change, not five days after the first feeding.
+- `.top::before` paints the page colour 200 px above the sticky header, so content never shows through a gap above it (iPhone, artifact viewer).
+- Spotlight sweep (`SPOT_RUN=<strong bot run json> node tests/shrimp-spotlights.cjs`): every spotlight card on every open tab on six saves, plus every tab button and the Water button, 145 spotlights. Checks the ring is up, the target is visible between the bars, the ring top matches the card, and the tip doesn't cover the ring. All pass.

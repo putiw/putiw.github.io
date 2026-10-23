@@ -141,7 +141,9 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 **Look and layout**
 - [ ] Light mode only, Inter font, every card header the same height, 8 px between cards, no sideways scroll at 360 and 390 px (by hand, every tab).
 - [ ] Top bar: `?` top right from the start, settings inside it, the person button beside it once free time opens, both 34×30 and lined up (by hand).
-- [ ] Spotlights: the ring sits on the card the text talks about, never two within 15 s, never while cleaning or a health check is open (by hand: first babies, Water care intro).
+- [ ] Spotlights go in this order: pause and dim the whole screen so nothing can be tapped, glide the page to the thing, then cut the ring around it, show the tip and buzz (Android only, iPhone Safari has no vibration for web pages). The ring sits on the card the text talks about, the card sits between the header and the tab bar with room for the tip, never two within 15 s, never while cleaning or a health check is open, never on a card inside a closed section. Check with `node tests/shrimp-spotlights.cjs` after a strong bot run.
+- [ ] The sticky header covers everything above it, nothing scrolls through a gap at the top (by hand on a phone).
+- [ ] Water care opens the first time the tank actually needs a change (nitrate over 20, KH under 2.5, GH under 5, ammonia or nitrite showing). Its spotlight lights only the Water button in the header, not the whole header.
 - [ ] When Water care is introduced the Water button pulses with it.
 - [ ] Milestone cards scroll so their top sits under the header, not the middle.
 
