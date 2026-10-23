@@ -617,6 +617,7 @@ main details:not(.card):not(.dream-tracker):not(#next-card)[open]>summary::befor
 <div class="sheet" id="hcheck" role="dialog" aria-modal="true" aria-labelledby="hc-h" hidden><div class="sheet-in" id="hc-in"></div></div>
 <div class="sheet" id="settings" role="dialog" aria-modal="true" aria-labelledby="settings-h" hidden><div class="sheet-in">
   <div class="sheet-hd"><h2 id="settings-h">Settings</h2><button type="button" class="rst" id="settings-close" aria-label="Close settings">Close</button></div>
+  <label class="toggle"><input type="checkbox" id="t-music"> Music</label>
   <label class="toggle"><input type="checkbox" id="t-slow"> Slow to 1× when a danger alert appears</label>
   <label class="toggle"><input type="checkbox" id="t-slownew"> Slow down when something new needs a decision</label>
   <label class="toggle"><input type="checkbox" id="t-all"> Show everything (skip the guided start)</label>
@@ -2629,7 +2630,18 @@ function aed(n){if(Math.abs(n)>=1e6)return (n<0?'-':'')+'AED '+big(Math.abs(n));
 function inf(n){return '✦ '+big(Math.round(n));}
 function cost2(m,i){return (m?aed(m):'')+(m&&i?' + ':'')+(i?inf(i):'');}
 function trim(n,d){return String(+Number(n).toFixed(d));}
-var toastT=null,NF=null,BUILD='2026-10-23-icon';
+var toastT=null,NF=null,BUILD='2026-10-23-music';
+// Background music, the same track as the shrimp tanks game: a soft loop with a crossfade at the seam, started on the first tap.
+var MUS={ctx:null,buf:null,gain:null,next:0,timer:null,on:false};
+function musicOn(){try{return localStorage.getItem('shrimp-music')!=='0';}catch(e){return true;}}
+function musicStart(){if(!musicOn()||MUS.on)return;try{var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!MUS.ctx){MUS.ctx=new AC();MUS.gain=MUS.ctx.createGain();MUS.gain.gain.value=0.16;MUS.gain.connect(MUS.ctx.destination);}
+ MUS.on=true;if(MUS.ctx.state==='suspended')MUS.ctx.resume();if(MUS.buf){musicLoop();return;}
+ fetch('music.mp3').then(function(r){return r.arrayBuffer();}).then(function(a){return new Promise(function(ok,no){MUS.ctx.decodeAudioData(a,ok,no);});}).then(function(b){MUS.buf=b;if(MUS.on)musicLoop();}).catch(function(){MUS.on=false;});}catch(e){MUS.on=false;}}
+function musicLoop(){var c=MUS.ctx,b=MUS.buf;if(!c||!b)return;var fade=2.2;if(!MUS.next||MUS.next<c.currentTime)MUS.next=c.currentTime+0.1;
+ (function sched(){if(!MUS.on)return;while(MUS.next<c.currentTime+7){var src=c.createBufferSource(),g=c.createGain(),t=MUS.next,len=b.duration;src.buffer=b;src.connect(g);g.connect(MUS.gain);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(1,t+fade);g.gain.setValueAtTime(1,t+len-fade);g.gain.linearRampToValueAtTime(0,t+len);src.start(t);src.stop(t+len+0.05);(MUS.srcs=MUS.srcs||[]).push(src);MUS.next=t+len-fade;}MUS.timer=setTimeout(sched,2000);})();}
+function musicStop(){MUS.on=false;clearTimeout(MUS.timer);(MUS.srcs||[]).forEach(function(s){try{s.stop();}catch(e){}});MUS.srcs=[];MUS.next=0;}
+['pointerdown','keydown'].forEach(function(ev){document.addEventListener(ev,function first(){document.removeEventListener(ev,first,true);musicStart();},true);});
+document.addEventListener('visibilitychange',function(){if(!MUS.ctx)return;if(document.hidden)MUS.ctx.suspend();else if(MUS.on)MUS.ctx.resume();});
 // If a newer version is published while the game is open, say so, so nobody plays old text for hours.
 function checkBuild(){if(!/^https?:/.test(location.protocol))return;try{fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():'';}).then(function(t){var m=t.match(/BUILD='([^']+)'/);if(m&&m[1]!==BUILD&&!$('newbuild')){var b=document.createElement('button');b.id='newbuild';b.className='newbuild';b.textContent='A newer version of the game is out. Tap to reload, your save stays.';b.onclick=function(){save();location.reload();};document.body.appendChild(b);}}).catch(function(){});}catch(e){}}
 setTimeout(checkBuild,60000);setInterval(checkBuild,15*60000);
@@ -4316,7 +4328,7 @@ function syncControls(){
     setT('v-'+p[0],p[3](+p[1]()));
   });
   $('t-autoSell').checked=!!TK().set.autoSell;$('t-ac').checked=!!G.ac;
-  $('t-slow').checked=!!G.opt.slow;$('t-slownew').checked=G.opt.slowNew!==false;$('t-all').checked=!!G.opt.all;
+  $('t-music').checked=musicOn();$('t-slow').checked=!!G.opt.slow;$('t-slownew').checked=G.opt.slowNew!==false;$('t-all').checked=!!G.opt.all;
   $('t-autoDose').checked=!!TK().set.autoDose;
   var mv=$('s-move');setT('v-move',mv.value);
 }
@@ -4339,6 +4351,7 @@ function initControls(){
   $('t-autoSell').addEventListener('change',function(e){G.opt.autoSellTouched=1;TK().set.autoSell=e.target.checked;if(G.recipe)syncRecipe(G);});
   $('t-autoDose').addEventListener('change',function(e){TK().set.autoDose=e.target.checked;});
   $('t-slow').addEventListener('change',function(e){G.opt.slow=e.target.checked;});
+  $('t-music').addEventListener('change',function(e){try{localStorage.setItem('shrimp-music',e.target.checked?'1':'0');}catch(x){}if(e.target.checked)musicStart();else musicStop();});
   $('t-slownew').addEventListener('change',function(e){G.opt.slowNew=e.target.checked;});
   $('t-all').addEventListener('change',function(e){G.opt.all=e.target.checked;cache={};lastChips='';lastColSig='';lastChartKey='';render();});
   document.addEventListener('click',function(e){var h=e.target.closest('.coll>.hd');if(!h||e.target.closest('button,input,a'))return;var c=h.parentElement,k=c.dataset.k,o=G.opt;o.shut=o.shut||{};o.fresh=o.fresh||{};var wasShut=c.classList.contains('shut');if(k==='ripple'&&wasShut&&G.ps)G.ps.news++;

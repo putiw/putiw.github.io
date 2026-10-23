@@ -174,6 +174,7 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] Space opens only after Earth, and only for curious players (`spaceOpen`). Other types get their own tree in World.
 
 - [ ] The ending page shows four charts under who you became: owners over time with milestone dots, cash over time, the nine traits, and where the money went (`chartDay` records `G.chart`, `endCharts` draws plain SVG with the takeaway in each title). Saves from before this only chart from the day recording began.
+- [ ] Music: `shrimp/music.mp3` (copied from the shrimp tanks game), looped with a 2.2 s crossfade at volume 0.16 like there, starts on the first tap, pauses when the tab is hidden, off switch in Settings (localStorage `shrimp-music`). App icons: `favicon.ico`, `icon-32.png`, `icon-192.png`, `icon-180.png` (apple-touch), cropped from the tank art.
 - [ ] `BUILD` near `toast` changes with every release; an open game checks every 15 minutes and offers a reload when a newer one is live. Bump it when you ship.
 - [ ] Shrimp videos count as reach, not ego, so they don't push you away from Space.
 
