@@ -71,7 +71,8 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **You tab** (`G.me`, `PICKS`, `MOMENTS`, `HOUSE`): free time, Grandpa, a place of your own. Moments only show on the tab.
 - **Money trouble and dirty money** (`broke`, `debtDay`, `G.dye`, fight night pick, `E.dirty`, `FAVOURS`, `E.network`, `E.turned`): the network deal is the point of no return.
 - **Trees** (`treesFor`, `TREES`, `E.trees`): each type sees its own tree, Space is the curious one's.
-- **Late cards** (`CARDS3`): data-driven story cards, `[label, result, traits, effect, ending line]`.
+- **Late cards** (`CARDS3`): data-driven story cards, `[label, result, traits, effect, ending line]`. A card only if different people would really choose differently, otherwise a headline (`HEADLINES`). Story cards wait their turn, about two minutes of play apart.
+- **Income after Earth** (`foodIncome`, `sideIncome`): new income comes from things already built and shows as one finance line, never a new screen or button.
 
 ## How to read Puti's requests
 
@@ -218,6 +219,5 @@ Planned and agreed with Puti, not built yet:
 - Tree last chapters after Earth for non-Space players are only the tree steps in World, there's no chapter screen like Space.
 
 **Known gaps**
-- `shrimp-space-playthrough.cjs` stalls on Pelagia from the academy fixture.
 - Kits still unlock in the background after 200 home-bred sales and 2 stocked tanks. They could unlock from the care ladder instead.
 - The first babies trigger a few spotlights in a row (Colony, Recent events). They could be merged into one.

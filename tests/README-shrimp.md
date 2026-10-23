@@ -446,3 +446,11 @@ ammonia is only the primary button once ammonia is near zero.
 - Tests: `node tests/shrimp-me.cjs` (16 checks). The average bot now plays a curious kind player (papers and shrimp club) so Space stays covered; the cold average player gets Shrimp Island and no Space, and stops at Earth.
 - Pacing: strong cold 2293 (empire_dictator), strong kind 2449 (garden_village), average kind Earth 6071 and space 7404 (garden_village, trees rewild, space, island), average cold Earth 5975 (empire_dictator, island).
 - Known: `shrimp-space-playthrough.cjs` from the academy fixture stalls on Pelagia (needs terraform research), the same on the version before this round.
+
+## Pass 57: fewer cards, steady income after Earth
+- Story cards wait their turn: one at a time, about two minutes of real play apart (`STORY_GAP`, `storyClock`, `p.wait`). Out of money, the ending and intro cards never wait. Bots and tests without a play clock count 4 s per game day.
+- Six late cards became Shrimp Times headlines with no choice (`HEADLINES`): Gary, the shrimp mayor, divorce, shrimp in court, lab shrimp, nobody goes outside. Cards are kept only where different people really choose differently.
+- Shrimp food (`foodIncome`): every owner buys food, AED 0.001 a day each once kits open, four times that with the new Shrimp food factory project, a bit less with the published recipe, food pods on top. It keeps paying after Earth, so Space's AED 10B Pelagia upgrade is always reachable. Finance line "Shrimp food".
+- Big builds earn a little (`sideIncome`): desalination plants sell water, last mile trucks carry freight, Shrimp Island passports, farm solar sells power. One finance line "Water, power and freight", plus a headline when each starts (the wind farm in Inner Mongolia rides on the solar one).
+- The space test from the academy fixture finishes again (it used to run out of money at Pelagia).
+- Pacing: strong cold 2309, strong kind 2428, average curious kind Earth 6139 and space 7488, average cold Earth 5986.

@@ -111,9 +111,22 @@ if(buyHouse(g))throw Error('Walls need a who');if(!buyHouse(g,'gp'))throw Error(
 while(houseNext(g))buyHouse(g);if(!g.me.house.complete||treesFor(g).indexOf('rewild')<0||gpLines(g).join().indexOf('Grandpa lives')<0)throw Error('Complete');
 `);
 check('hard places and late cards ask once and leave a line',`
-var g=newGame();g.humans=2e9;var c=milestoneConditions(g);if(!c.c_war||!c.c_gary||c.c_water)throw Error('Thresholds');g.emp.inf=1e5;var ce=g.emp.ceil;
+var g=newGame();g.humans=2e9;var c=milestoneConditions(g);if(!c.c_war||!c.c_cash||c.c_water||c.c_gary!==undefined)throw Error('Thresholds');g.emp.inf=1e5;var ce=g.emp.ceil;
 if(!storyChoose(g,'c_war',2)||g.emp.inf!==5e4)throw Error('Peace Corps');if(card3Lines(g).join().indexOf('peace deal')<0)throw Error('Line');
 g.humans=3e9;g.money=0;if(storyChoose(g,'c_water',0))throw Error('Needs the money');if(!storyChoose(g,'c_water',4))throw Error('Free answer');
 var old=newGame();old.day=3000;old.humans=7e9;delete old.progress.v5;migrateProgress(old);detectMilestones(old);if(old.progress.queue.some(function(k){return /^c_/.test(k);}))throw Error('Old saves skip passed cards');
+`);
+check('the world moves on in headlines, food and big builds keep paying after Earth',`
+var g=newGame();g.emp.kitsOpened=1;g.humans=6e8;headlineDay(g);var R=rip(g);if(R.log.length!==3)throw Error('Gary, mayor, divorce '+R.log.length);headlineDay(g);if(rip(g).log.length!==3)throw Error('Once each');
+var f0=foodIncome(g);g.emp.proj.foodfactory=1;if(Math.abs(foodIncome(g)/f0-4)>1e-9)throw Error('Factory');g.emp.proj.foodopen=1;if(foodIncome(g)>=f0*4)throw Error('Recipe means less food sold');
+g.humans=8.2e9;g.emp.won=5000;g.space.started=true;g.emp.c3={c_water:0};var m=g.money;dayRollover(g);if(g.money-m<2e7)throw Error('After Earth it still earns '+(g.money-m));
+if(sideIncome(g)<3e6||!rip(g).log.some(function(x){return /desalination/.test(x.tx);}))throw Error('Water sales');
+`);
+check('story cards wait their turn, about two minutes of play apart',`
+var g=newGame();g.ps.t=1000;g.stats.sold=40;g.emp.kitsOpened=0;var p=ensureProgress(g);p.queue=[];p.seen.intro=true;g.tanks[0].cycledAt=null;
+p.seen.cycle=p.seen.hatch=p.seen.sale=p.seen.ev_paper=true;
+detectMilestones(g);var first=p.queue.slice();if(first.indexOf('ev_mira')<0||first.indexOf('dye_offer')>=0||p.wait.indexOf('dye_offer')<0)throw Error('Second card waits '+JSON.stringify(first)+JSON.stringify(p.wait));
+p.queue=[];g.ps.t+=60000;detectMilestones(g);if(p.queue.length)throw Error('Too soon');g.ps.t+=61000;detectMilestones(g);if(p.queue[0]!=='dye_offer')throw Error('Now');
+p.queue=[];g.money=-500;g.day=50;detectMilestones(g);if(p.queue[0]!=='broke')throw Error('Money trouble never waits');
 `);
 console.log(count+' free time, Grandpa and ending checks passed');
