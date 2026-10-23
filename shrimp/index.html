@@ -494,6 +494,7 @@ body.spot-wc #tb-wc{animation:firstFeedPulse 1.2s ease-in-out infinite;border-co
 
 <!-- MARKET -->
 <section class="panel" id="p-market" hidden>
+  <div class="card coll" data-k="dye" id="dyecard" hidden><div class="hd"><h2>Red dye</h2><small id="dye-sum"></small></div><p class="sub">The pale ones get a dip before they sell. They go for 60% more.</p><div class="btns"><button class="btn" data-act="dye-stop">Stop dyeing</button></div></div>
   <div class="card coll" data-k="order" id="ordercard" hidden><div class="hd"><h2>Pet shop order</h2><small id="ord-due"></small></div><p class="sub" id="ord-text"></p><div class="btns" id="ord-btns"></div></div>
   <button type="button" class="card fold-early" id="labtrade" data-act="labtrade" hidden></button>
   <div class="card coll" data-k="buy" id="buycard"><div class="hd"><h2>Buy shrimp</h2><small id="m-into"></small></div><div id="shopshrimp"></div></div>
@@ -588,6 +589,7 @@ body.spot-wc #tb-wc{animation:firstFeedPulse 1.2s ease-in-out infinite;border-co
   <div class="card coll" data-k="reg" id="c-reg" hidden><div class="hd"><h2>Regions</h2><small id="e-regsum"></small></div>
     <p class="sub explain">Kit buyers only come from open regions, up to your adoption ceiling.</p>
     <div id="e-regions"></div></div>
+  <div class="card coll" data-k="sellco" id="sellco" style="order:99" hidden><div class="hd"><h2>Fishfood Holdings</h2><small id="sellco-sum"></small></div><p class="sub">They still want to buy the company. Their card is on your desk.</p><div class="btns"><button class="btn" data-act="sell-co" id="sellco-btn">Sell, the game ends here</button></div></div>
 </section>
 <section class="panel" id="p-world" hidden><div class="card coll" data-k="academy" id="academy-card" style="order:5"></div><div class="card coll" data-k="ripple" id="ripplecard" hidden><div class="hd"><h2>The Shrimp Times</h2><small id="rp-sum"></small></div><p class="rp-head" id="rp-latest"></p><p class="hint" id="rp-fx" hidden></p><details><summary id="rp-archsum">Earlier stories</summary><ol class="rp-arch" id="rp-archive"></ol></details></div></section><section class="panel" id="p-space" hidden><div class="card coll" data-k="space" id="space-card"></div></section><section class="panel" id="p-me" hidden><div class="card coll" data-k="mefree" id="me-free"><div class="hd"><h2>Free time</h2><small id="me-when"></small></div><p class="me-note" id="me-note"></p><div class="me-picks" id="me-picks"></div><p class="hint" id="me-hint"></p></div><div class="card coll" data-k="megp" id="me-gp"><div class="hd"><h2>Grandpa</h2><small id="me-gsum"></small></div><div id="me-moment"></div><ul class="me-hist" id="me-hist"></ul></div></section>
 <section class="panel" id="p-up" hidden>
@@ -998,7 +1000,7 @@ var AI_COST={sales:3000,mgr:20000,tech:10000},AI_NAME={sales:'Salespeople',mgr:'
 function goAI(G,role){var st=G.emp.staff,cost=AI_COST[role]*autoDisc(G),k='ai'+role.charAt(0).toUpperCase()+role.slice(1);if(!pd(G,'aiconsult')||G.money<cost+capitalReserve(G)||st[k])return false;if(role==='sales'&&!pd(G,'drones'))return false;
   if(st[role]>0)(G.emp.bye||(G.emp.bye={}))[role]=st[role];st[k]=true;st[role]=0;pay(G,cost,'staff');log(G,AI_NAME[role]+' replaced by AI agents');newsEvent(G,'ai'+role);return true;}
 function buyPackTier(G){var st=G.emp.staff;if(!st.tier){var nt=nextTool(G);return nt?buyTool(G,nt.id):false;}var t=PACK_TIERS[st.tier+1];if(!t||!kitsOpen(G)||(st.tier===1&&G.kits.sold<20)||G.money<t.m+capitalReserve(G)||G.emp.inf<t.i)return false;pay(G,t.m,'equipment');G.emp.inf-=t.i;st.tier++;log(G,'Installed a '+t.name.toLowerCase());return true;}
-function buyLine(G,i){i=i||0;if(!PACK_LINES[i]||!lineReady(G,i))return false;var c=lineCost(G,i),l=PACK_LINES[i];if(G.money<c+capitalReserve(G)+7*l.up)return false;pay(G,c,'equipment');newsEvent(G,'robots');if(!i)G.emp.staff.lines++;else{G.emp.packLines=G.emp.packLines||{};G.emp.packLines[l.id]=(G.emp.packLines[l.id]||0)+1;}log(G,'Installed '+l.name.toLowerCase());return true;}
+function buyLine(G,i){i=i||0;if(frozen(G)||!PACK_LINES[i]||!lineReady(G,i))return false;var c=lineCost(G,i),l=PACK_LINES[i];if(G.money<c+capitalReserve(G)+7*l.up)return false;pay(G,c,'equipment');newsEvent(G,'robots');if(!i)G.emp.staff.lines++;else{G.emp.packLines=G.emp.packLines||{};G.emp.packLines[l.id]=(G.emp.packLines[l.id]||0)+1;}log(G,'Installed '+l.name.toLowerCase());return true;}
 function packRaw(G,n,protectReserve){
  var E=G.emp,cash=Math.max(0,G.money-(protectReserve?productionCashFloor(G):0));n=Math.max(0,Math.floor(Math.min(n,(E.rawShrimp||0)/KIT_SHRIMP,cash/kitMaterials(G))));if(!n)return 0;
  E.rawShrimp-=n*KIT_SHRIMP;pay(G,n*kitMaterials(G),'supplies');G.kits.stock+=n;return n;
@@ -1062,8 +1064,8 @@ function consultCost(G){return Math.max(20000,Math.round(Math.max(0,G.money)*0.2
 function consultDays(G){var c=G.emp.consult;return c&&c.until!=null?Math.max(0,Math.ceil(c.until-G.day)):0;}
 var CONSULT={visit:{name:'Consultants for 30 days',note:'They tell you what limits sales right now and what to do about it, with forecasts on staff, shops, ads and projects. Each visit costs 20% of your cash, at least AED 20,000.'}};
 function buyConsult(G,k){var cost=consultCost(G);if(!kitsOpen(G)||consultHas(G)||G.money<cost)return false;pay(G,cost,'projects');G.emp.consult={until:Math.floor(G.day)+30};log(G,'Consultants are in for 30 days (AED '+cost.toLocaleString('en-US')+')');return true;}
-function bnText(G){var b=bottleneck(G);if(!b||!consultHas(G))return '';return b.d+' → '+b.f;}
-function farmCap(G){var t=0;FARMS.forEach(function(f){t+=activeFarms(G,f.id)*f.out;});return t;}
+function bnText(G){var E=G.emp,d=Math.floor(G.day);if(frozen(G))return 'Accounts frozen, '+Math.ceil(E.frozen-G.day)+' days left. Wages still go out.';if((E.nosale||0)>d)return 'No kit sales while the police investigate, '+Math.ceil(E.nosale-G.day)+' days left.';var b=bottleneck(G);if(!b||!consultHas(G))return '';return b.d+' → '+b.f;}
+function farmCap(G){var t=0;FARMS.forEach(function(f){t+=activeFarms(G,f.id)*f.out;});return (G.emp.inquiry||0)>G.day?t*0.5:t;}
 function scaledCost(base,n,r){return Math.round(base*Math.pow(r,n));}
 function shopCost(G,s){return scaledCost(s.cost,G.emp.shops[s.id]||0,1.15);}
 function farmCost(G,f){var k=f.id==='mhatch'?(pd(G,'landwet')?0.75:pd(G,'landfarm')?1.2:1):f.id==='ocean'&&pd(G,'harbors')?0.7:1;return Math.round(scaledCost(f.cost,G.emp.farms[f.id]||0,1.09)*k);}
@@ -1072,20 +1074,20 @@ function farmOk(G,f){var i=FARMS.indexOf(f);return pd(G,'farmlic')&&(!f.req||pd(
 function annualRent(G){var t=0;SHOPS.forEach(function(x){t+=(G.emp.shops[x.id]||0)*x.rent*365;});return t;}
 function licFee(G,extraRent){return LICENSE;}
 function shopUpfront(G,s){var first=shopCount(G)===0;return shopCost(G,s)+s.rent*365+(first?licFee(G,s.rent*365):0);}
-function buyShop(G,id){var s=null;SHOPS.forEach(function(x){if(x.id===id)s=x;});if(!s||!shopOk(G,s))return false;
+function buyShop(G,id){if(frozen(G))return false;var s=null;SHOPS.forEach(function(x){if(x.id===id)s=x;});if(!s||!shopOk(G,s))return false;
   var first=shopCount(G)===0,c=shopCost(G,s),up=shopUpfront(G,s);if(G.money<up+capitalReserve(G)+s.rent*14)return false;
   pay(G,c+s.rent*365,'shops');G.emp.shops[id]=(G.emp.shops[id]||0)+1;G.emp.shopStage=Math.max(G.emp.shopStage,SHOPS.indexOf(s));G.emp.leases.push({id:id,due:Math.floor(G.day)+365});
   if(first){var lf=licFee(G);pay(G,lf,'shops');G.emp.lic={due:Math.floor(G.day)+365};log(G,'Trade license issued: AED '+lf+' a year');}
   log(G,'Opened a '+s.name.toLowerCase()+', first year of rent paid');return true;}
-function buyFarm(G,id){var f=null;FARMS.forEach(function(x){if(x.id===id)f=x;});if(!f||!farmOk(G,f))return false;var c=farmCost(G,f);if(G.money<c)return false;if(G.money<c+farmWorkingCapital(G,f))return false;pay(G,c,'equipment');G.emp.farms[id]=(G.emp.farms[id]||0)+1;G.emp.farmStage=Math.max(G.emp.farmStage,FARMS.indexOf(f));G.emp.farmPaid[id]=G.emp.farmPaid[id]||[];G.emp.farmPaid[id].push(c);if(G.labQuality==null)G.labQuality=labCandidate(G);log(G,'Built '+(/^[aeiou]/i.test(f.name)?'an ':'a ')+f.name.toLowerCase());return true;}
+function buyFarm(G,id){if(frozen(G))return false;var f=null;FARMS.forEach(function(x){if(x.id===id)f=x;});if(!f||!farmOk(G,f))return false;var c=farmCost(G,f);if(G.money<c)return false;if(G.money<c+farmWorkingCapital(G,f))return false;pay(G,c,'equipment');G.emp.farms[id]=(G.emp.farms[id]||0)+1;G.emp.farmStage=Math.max(G.emp.farmStage,FARMS.indexOf(f));G.emp.farmPaid[id]=G.emp.farmPaid[id]||[];G.emp.farmPaid[id].push(c);if(G.labQuality==null)G.labQuality=labCandidate(G);log(G,'Built '+(/^[aeiou]/i.test(f.name)?'an ':'a ')+f.name.toLowerCase());return true;}
 function nextRegion(G){for(var i=0;i<REGIONS.length;i++)if(!regOpen(G,REGIONS[i].id))return REGIONS[i];return null;}
-function buyRegion(G){var r=nextRegion(G);if(!r||(G.kits.sold<100&&G.emp.regions.length<2)||G.money<regionCost(G,r)+capitalReserve(G)||G.emp.inf<r.i)return false;pay(G,regionCost(G,r),'projects');G.emp.inf-=r.i;G.emp.regions.push(r.id);trAdd(G,{reach:.3});if(G.emp.regions.length>=4&&G.ps&&G.ps.d4==null)G.ps.d4=Math.floor(G.day);log(G,'Expanded into '+r.name);return true;}
+function buyRegion(G){var r=nextRegion(G);if(frozen(G)||!r||(G.kits.sold<100&&G.emp.regions.length<2)||G.money<regionCost(G,r)+capitalReserve(G)||G.emp.inf<r.i)return false;pay(G,regionCost(G,r),'projects');G.emp.inf-=r.i;G.emp.regions.push(r.id);trAdd(G,{reach:.3});if(G.emp.regions.length>=4&&G.ps&&G.ps.d4==null)G.ps.d4=Math.floor(G.day);log(G,'Expanded into '+r.name);return true;}
 function projAvail(G){return PROJ.filter(function(p){return !G.emp.proj[p.id]&&!(p.fk&&forkDone(G,p.fk))&&p.req(G)&&(projectArea(p)!=='world'||worldOpen(G));});}
 function buyProj(G,id){
   if(id==='gala'){var gc=galaCost(G);if(G.money<gc+capitalReserve(G))return false;pay(G,gc,'projects');gainInf(G,galaGain(G));G.emp.gala++;log(G,'Hosted a charity shrimp gala');return true;}
   var p=null;PROJ.forEach(function(x){if(x.id===id)p=x;});
   var cm=p?pm(G,p):0;
-  if(!p||G.emp.proj[id]||!p.req(G)||(p.fk&&forkDone(G,p.fk))||(projectArea(p)==='world'&&!worldOpen(G))||G.money<cm+capitalReserve(G)||G.emp.inf<p.i)return false;
+  if(frozen(G)||!p||G.emp.proj[id]||!p.req(G)||(p.fk&&forkDone(G,p.fk))||(projectArea(p)==='world'&&!worldOpen(G))||G.money<cm+capitalReserve(G)||G.emp.inf<p.i)return false;
   if(cm)pay(G,cm,'projects');if(p.gain)earn(G,p.gain,'deals');G.emp.inf-=p.i;G.emp.proj[id]=Math.floor(G.day)+1;if(p.eff)p.eff(G.emp);addHeart(G,p.h);trAdd(G,TRAIT_TAGS[id]);if(p.mood)moodAdd(G,p.mood,10);
   var LE=G.emp.later||(G.emp.later=[]),now=Math.floor(G.day);if(p.later)LE.push({d:now+p.later.d,t:p.later.t});if(p.risk&&Math.random()<p.risk)LE.push({d:now+30+Math.floor(Math.random()*150),t:p.sc.t,m:p.sc.m});
   if(id==='studyopen'){var good=Math.random()<0.75;LE.push({d:now+365,t:good?'The shrimp and stress study is out. Watching shrimp really does calm people down, a little.':'The shrimp and stress study finds nothing. The scientists thank you for paying anyway.',c:good?0.03:0});}
@@ -1162,7 +1164,7 @@ function rippleHas(G,fx){var R=rip(G);for(var i=0;i<R.n;i++)if(RIPPLE[i].fx===fx
 function rippleRate(G){return 0.0008*heartMult(G)*(pd(G,'mangrove')?1.3:1)*effectiveQuality(G)*(wbHas(G,'feed')?1.3:1)*(1+(pd(G,'friends')?1:0)+(pd(G,'shrimpday')?0.5:0)+(pd(G,'retrain')?0.25:0));}
 function mangroveInf(G){return rippleHas(G,'mangrove')?rip(G).free*2e-4:0;}
 function carbonPay(G){return rippleHas(G,'carbon')?rip(G).free*0.03:0;}
-function regionCost(G,r){return r.m*(rippleHas(G,'regions')?0.9:1)*(pd(G,'buypol')?0.8:1);}
+function regionCost(G,r){return r.m*(rippleHas(G,'regions')?0.9:1)*(pd(G,'buypol')?0.8:1)*(G.emp.network?0.75:1);}
 function rippleDay(G){var R=rip(G);if(G.humans<1&&G.kits.sold<1)return;
  R.free=Math.min(G.humans,R.free+Math.max(0,G.humans-R.free)*rippleRate(G));
  while(R.n<RIPPLE.length&&rippleDue(G,RIPPLE[R.n])){var h=RIPPLE[R.n];R.log.push({i:R.n,d:Math.floor(G.day)+1,own:pd(G,'paperbuy')?1:0});
@@ -1239,7 +1241,7 @@ function empireDay(G){
     if(units>0){pay(G,units*breedingUnitCost(G),'farms');E.rawShrimp+=units*KIT_SHRIMP;E.prod=units*KIT_SHRIMP;}
   }
   E.packed=packDay(G);E.soldToday=0;fillKitOrder(G);
-  if(kitsOpen(G)){
+  if(kitsOpen(G)&&!((E.nosale||0)>G.day)){
     E.acc+=kitDemand(G);
     var want=Math.floor(E.acc);E.acc-=want;
     var sold=Math.min(want,G.kits.stock);
@@ -1277,7 +1279,7 @@ function newOpt(){return{slow:true,collapse:false,goalOpen:true,visitedUp:false}
 function migrate(G){if(G.emp&&G.emp.consult&&G.emp.consult.until==null)G.emp.consult={until:Math.floor(G.day||0)+30};if(G.tanks)G.tanks.forEach(function(t){if(t.treat){if(t.treat.left>0){t.treats=t.treats||{};t.treats[t.treat.id]=t.treat.left;}delete t.treat;}if(t.set&&t.set.treat!=null){if(t.set.treat){t.set.treats=t.set.treats||{};t.set.treats[t.set.treat]=true;}delete t.set.treat;}});if(G.emp&&G.emp.staff&&(G.emp.staff.sales>0||G.emp.staff.aiSales)&&!(G.opt&&G.opt.autoSellTouched)&&G.tanks&&!G.tanks.some(function(t){return t.set&&t.set.autoSell;}))G.tanks.forEach(function(t){if(t.set)t.set.autoSell=true;});if(G.emp&&(G.kits&&G.kits.sold>0||G.humans>=1))G.emp.kitsOpened=1;if(G.emp&&G.emp.staff&&G.emp.staff.tier>=1&&!G.emp.tools)G.emp.tools={bag:1,catch:1,o2:1,seal:1,box:1};if(!G.ob)G.ob=G.day>0?{kit:1,bottle:1,doses:10,wc:1,sell:1,up:1,market:1,hatch:1,fs:0}:{kit:0,bottle:0,doses:0};if(!G.emp)G.emp=newEmp();if(!G.adRepeat)G.adRepeat={};var E=G.emp,oldChain=E.chainVersion!==2,d=newEmp();for(var k in d)if(E[k]===undefined)E[k]=d[k];if(E.shownEmp&&G.ob.eproj===undefined){var o=G.ob,sc=shopCount(G);if(G.kits.sold>=1||Object.keys(E.proj).length)o.eproj=1;if(o.eproj&&(G.kits.sold>=10||sc>0))o.eshops=1;if(o.eshops&&(sc>0||E.regions.length>1))o.ereg=1;if(E.proj.farmlic)o.efarm=1;}E.staff.tech=0;E.staff.aiTech=false;if(!G.opt)G.opt=newOpt();if(G.opt.goalOpen==null)G.opt.goalOpen=true;if(!E.movie)E.movie={n:0,left:0};if(!E.op)E.op=newOpinion();opFix(E.op);if(!E.infOn&&(E.infTotal>0||G.kits.sold>0))E.infOn=1;if(!E.leases){E.leases=[];var dd=Math.floor(G.day)+30;SHOPS.forEach(function(x){for(var q=0;q<(E.shops[x.id]||0);q++)E.leases.push({id:x.id,due:dd});});if(shopCount(G)>0)E.lic={due:dd};}if(E.proj.schools&&!E.proj.elem){E.proj.elem=E.proj.middle=E.proj.high=E.proj.schools;}if(E.proj.autopack&&!E.staff.tier){E.staff.tier=1;E.staff.pack=Math.max(1,E.staff.pack);}if(G.packPerL==null&&G.tanks&&G.tanks[0]){var t0=G.tanks[0],mx=t0.set&&t0.set.maxN;G.packPerL=mx&&mx!==60?clamp(Math.round(mx/t0.vol*2)/2,1,8):3;}G.tanks.forEach(function(t){if(t.set.maxN==null)t.set.maxN=3*t.vol;if(t===G.tanks[0]&&t.cycledAt==null&&!t.had&&(G.emp.goals&&G.emp.goals.cycle))t.cycledAt=G.day;rememberCycle(G,t);});FARMS.forEach(function(f,i){if(E.farms[f.id])E.farmStage=Math.max(E.farmStage,i);});SHOPS.forEach(function(x,i){if(E.shops[x.id])E.shopStage=Math.max(E.shopStage,i);});if(oldChain){var oldCosts={rack:2000,barn:30000,hatch:600000,mhatch:15000000,ocean:50000000,arco:1500000000};FARMS.forEach(function(f){E.farmPaid[f.id]=Array.from({length:E.farms[f.id]||0},function(_,i){return scaledCost(oldCosts[f.id],i,1.12);});});E.prod=(E.prod||0)*KIT_SHRIMP;E.rawShrimp=0;E.packedTotal=Math.max(E.packedTotal||0,G.kits.sold||0);var legacySupply=0;FARMS.forEach(function(f){legacySupply+=(E.farms[f.id]||0)*f.out;});E.legacyPacking=Math.max(0,legacySupply-packingMachineCap(G));if(farmCap(G)>0)E.fastUnlocked=true;E.chainVersion=2;log(G,'Production updated: existing farms now supply shrimp. Matching legacy packing capacity preserves your output; finished stock is retained.');if(maxSpeed(G)>=12)G.ob.speed12=1;if(maxSpeed(G)>=40)G.ob.speed40=1;}migrateProgress(G);if(oldChain){var historical=milestoneConditions(G);Object.keys(historical).forEach(function(k){if(k!=='win'&&historical[k]&&G.progress.queue.indexOf(k)<0)G.progress.seen[k]=true;});}migrateChapters(G);migrateStory(G);if(!G.me)G.me=newMe();var nm=newMe();for(var mk in nm)if(G.me[mk]===undefined)G.me[mk]=nm[mk];if(!G.tr)G.tr={};if(!G.ps)G.ps=newPS();var np=newPS();for(var pk in np)if(G.ps[pk]===undefined)G.ps[pk]=np[pk];return G;}
 function rate(G,k,n){var f=(G.fin||[]).slice(-(n||7));if(!f.length)return 0;var t=0;f.forEach(function(x){t+=x[k]||0;});return t/f.length;}
 function netPerDay(G){var h=G.mh||[];if(h.length<3)return null;return (G.money-h[0])/h.length;}
-var FIN_CATS=[['shrimp','Shrimp sales',1],['kits','Kit sales',1],['carbon','Carbon credits',1],['deals','Deals and royalties',1],['work','Overtime',1],['running','Electricity and heating',0],['food','Food',0],['water','Water changes',0],['supplies','Shrimp, kit packing and supplies',0],['equipment','Tanks and equipment',0],['ads','Advertising',0],['shops','Shops and rent',0],['farms','Shrimp breeding and farm upkeep',0],['projects','Projects, regions and galas',0],['staff','Staff wages and AI tokens',0],['logistics','Distribution and customer support',0],['research','Research grants and academic development',0],['space','Space missions and habitat construction',0],['tax','VAT and corporate tax',0],['personal','Personal',0]];
+var FIN_CATS=[['shrimp','Shrimp sales',1],['kits','Kit sales',1],['carbon','Carbon credits',1],['deals','Deals and royalties',1],['work','Overtime and side income',1],['loans','Loans and gifts',1],['running','Electricity and heating',0],['food','Food',0],['water','Water changes',0],['supplies','Shrimp, kit packing and supplies',0],['equipment','Tanks and equipment',0],['ads','Advertising',0],['shops','Shops and rent',0],['farms','Shrimp breeding and farm upkeep',0],['projects','Projects, regions and galas',0],['staff','Staff wages and AI tokens',0],['logistics','Distribution and customer support',0],['research','Research grants and academic development',0],['space','Space missions and habitat construction',0],['tax','VAT and corporate tax',0],['personal','Personal',0],['debt','Loan repayments',0]];
 function gainInf(G,x){if(!G.emp.infOn)return;G.emp.inf+=x;if(x>0)G.emp.infTotal+=x;var t=G.today||(G.today={});t._inf=(t._inf||0)+x;}
 function pay(G,a,c){G.money-=a;var t=G.today||(G.today={});t[c]=(t[c]||0)-a;}
 function earn(G,a,c){G.money+=a;if(a>0)G.stats.earned=(G.stats.earned||0)+a;var t=G.today||(G.today={});t[c]=(t[c]||0)+a;if(G.vat&&(c==='shrimp'||c==='kits'))pay(G,a*5/105,'tax');}
@@ -1504,7 +1506,7 @@ function unlockTreat(G,id){var tr=TREATS.filter(function(x){return x.id===id;})[
 function treatMult(T){return (treatOn(T,'pollen')?1.15:1)*(treatOn(T,'spinach')?1.05:1);}
 function dayRollover(G){
   if(G.emp&&!G.emp.kitsOpened&&kitsOpen(G))G.emp.kitsOpened=1;
-  academyDay(G);spaceDay(G);checkGoals(G);orderDay(G);kitOrderDay(G);personalDay(G);
+  academyDay(G);spaceDay(G);checkGoals(G);orderDay(G);kitOrderDay(G);personalDay(G);roundTwoDay(G);
   if(G.ps&&G.day>30){var sp=dailySpend(G);if(sp>0){if(G.money<10*sp)G.ps.thin++;else if(G.money>120*sp)G.ps.fat++;}}
   if(G.recipe)syncRecipe(G);
   G.fin=G.fin||[];var td=G.today||{};td.d=G.day-1;td.cash=Math.round(G.money);G.fin.push(td);if(G.fin.length>500)G.fin.shift();G.today={};
@@ -1548,7 +1550,7 @@ function dayRollover(G){
   // Breeding and packing run together below, before customer fulfilment.
   if(G.day%7===0)G.soldWeek=0;
   if(hasSales(G))for(i=0;i<G.tanks.length;i++)if(G.tanks[i].set.autoSell)doSell(G,G.tanks[i],false,undefined,true);
-  G.mm0=G.market.m;G.market.m=clamp(G.market.m+(1-G.market.m)*0.05+(Math.random()-0.5)*0.08,0.7,1.3);
+  G.mm0=G.market.m;G.market.m=clamp(G.market.m+(1-G.market.m)*0.05+(Math.random()-0.5)*0.08,0.7,G.dye&&G.dye.sour>G.day?0.85:1.3);
   if(G.priceAED!=null)G.price=clamp(G.priceAED/fairShrimpPrice(G),0.5,3);
   empireDay(G);
   G.ads=G.ads.filter(function(a){
@@ -1591,7 +1593,7 @@ function waterChange(G,T,pct,auto){
 }
 
 function doSell(G,T,dry,budget,quiet){
-  var set=T.set,m=G.market.m,p=G.price;
+  var set=T.set,m=G.market.m,p=G.price*(G.dye&&G.dye.on?1.6:1);
   var protect=breederProtection(T);
   var cands=[],culls=[];
   T.pop.forEach(function(k){
@@ -1604,7 +1606,7 @@ function doSell(G,T,dry,budget,quiet){
   var bud=budget==null?demandLeft(G):budget,plan=[],rev=0,normal=0,cullN=0,limited=false;
   culls.forEach(function(x){
     plan.push({k:x.k,count:x.count});cullN+=x.count;
-    rev+=x.count*priceAt(x.k.g)*ageFactor(x.k.age)*0.25*m;
+    rev+=x.count*priceAt(x.k.g)*ageFactor(x.k.age)*0.25*m*(G.dye&&G.dye.on?2.5:1);
   });
   cands.forEach(function(x){
     if(bud<=0){limited=true;return;}
@@ -1789,13 +1791,22 @@ function milestoneConditions(G){var t=G.tanks[0],p=ppm(t);return {
   bulk:!!(G.korder&&!G.korder.taken),worldtab:!!(G.ob&&G.ob.ereg),ripple:!!(G.emp.ripple&&G.emp.ripple.n>=1),
   ev_mira:G.stats.sold>=30,ev_paper:G.kits.sold>=5,ev_rival:G.kits.sold>=40&&farmBuilt(G),ev_ai:G.humans>=2e4,ev_school:G.humans>=2e5&&G.kits.stock>=20,ev_marine:G.humans>=5e7,ev_stars:G.day>=DREAM_DAYS-120&&G.day<DREAM_DAYS&&!G.space.started,
   me_intro:!!(G.me&&G.me.on),me_burnout:!!(G.me&&G.me.burns>0),owntank:(G.emp.farms.hatch||0)>0&&!G.emp.won,
-  bye_pack:byeReady(G,'pack'),bye_sales:byeReady(G,'sales'),bye_mgr:byeReady(G,'mgr'),bye_social:byeReady(G,'social')
+  bye_pack:byeReady(G,'pack'),bye_sales:byeReady(G,'sales'),bye_mgr:byeReady(G,'mgr'),bye_social:byeReady(G,'social'),
+  broke:G.money<0&&G.day>5&&!G.emp.won&&!G.emp.ended&&G.day>=(G.emp.brokeSnooze||0),gameover:!!G.emp.ended,
+  dye_offer:G.stats.sold>=40&&!kitsOpen(G),fight_invite:G.stats.sold>=150&&G.day>=250&&!G.emp.won,
+  wash_offer:(((G.me&&G.me.cnt.fight)||0)>=4||!!G.emp.sharkUsed)&&kitsOpen(G)&&!G.emp.dirty&&!G.emp.turned&&!G.emp.won,
+  fav_0:favourDue(G,0),fav_1:favourDue(G,1),fav_2:favourDue(G,2),gp_net:!!G.emp.network,
+  mira_dye:!!(G.dye&&G.dye.found),mira_fight:((G.me&&G.me.cnt.fight)||0)>=1,mira_scholar:pd(G,'scholar'),mira_dirty:dirtyOn(G)&&G.day>=G.emp.dirty.day+30,mira_back:!!G.emp.backDone,
+  buyout:(G.humans>=1e6||G.humans>=2e5&&((G.me&&G.me.cnt.dinners)||0)>=6)&&!G.emp.won
 };}
 // Story choices. Each event is a decision card; picking applies a small, lasting effect.
 function storyChoose(G,key,i){var E=G.emp,m=MILESTONES[key],ch=storyChoices(G,key);if(!m||!ch||!ch[i])return false;
- if(m.dyn){if(!byeChoose(G,m.dyn,i))return false;(G.story.choices||(G.story.choices={}))[key]=i;log(G,m.title+': '+ch[i][0].toLowerCase());return true;}
+ if(m.opts||m.dyn){if(!(m.opts?m.pick(G,i):byeChoose(G,m.dyn,i)))return false;(G.story.choices||(G.story.choices={}))[key]=i;log(G,m.title+': '+ch[i][0].toLowerCase());return true;}
  if(key==='owntank'){G.me.keep=['self','gp','farm'][i];G.sel=0;G.recipe=false;}
  if(key==='me_burnout'&&i===1){G.me.burnt=0;G.me.heavy=2;}
+ if(key==='dye_offer'&&i===0){G.dye={on:1,day:Math.floor(G.day)};addHeart(G,-1);}
+ if(key==='fight_invite'&&i===0){E.fight=1;addHeart(G,-1);}
+ if(key==='wash_offer'&&i===0)startWash(G);
  if(STORY_TAGS[key])trAdd(G,STORY_TAGS[key][i]);
  if(key==='ev_mira'){E.infOn=1;if(i===2)gainInf(G,1);if(i===0){addHeart(G,1);var T=G.tanks[0];var sp=spareTankShrimp(T);if(sp>=2){var need=2;T.pop.filter(function(k){return k.age>=20&&!k.b;}).forEach(function(k){var t=Math.min(need,Math.floor(k.n));k.n-=t;need-=t;});}gainInf(G,5);}else if(i===1)gainInf(G,2);}
  if(key==='ev_paper'){if(i<2)moodAdd(G,3);else addHeart(G,-1);G.ads.push({id:'press',name:'Newspaper story',boost:i<2?2:3,left:7,days:7});}
@@ -1815,13 +1826,14 @@ function migrateProgress(G){
   // saves from before the story and intro cards: skip the ones the player is already past
   if(!p.v2){p.v2=1;if(G.day>1){var cv=milestoneConditions(G);['tanks2','health','tools','station','bulk','worldtab','ripple','ev_mira','ev_paper','ev_rival','ev_ai','ev_school','ev_marine','ev_stars'].forEach(function(k){if(cv[k]||G.kits.sold>0&&k==='ev_mira'||G.tanks.length>1&&k==='tanks2')p.seen[k]=true;});}}
   if(!p.v3){p.v3=1;if(G.day>1&&G.kits.sold>=3)p.seen.qc=true;}
+  if(!p.v4){p.v4=1;if(G.day>1){var c4=milestoneConditions(G);['mira_scholar','dye_offer','fight_invite','buyout'].forEach(function(k){if(c4[k])p.seen[k]=true;});if(G.kits.sold>0)p.seen.dye_offer=true;}}
   if(G.labQuality==null&&Object.keys(E.farms).some(function(k){return E.farms[k]>0;}))G.labQuality=labCandidate(G);
 }
 function detectMilestones(G){
   updateStory(G);var p=ensureProgress(G),conditions=milestoneConditions(G);
   Object.keys(MILESTONES).forEach(function(k){if(conditions[k]&&!p.seen[k]){p.seen[k]=true;if(!G.opt.all||k==='win')p.queue.push(k);if(k==='farm')p.home='emp';}});
 }
-function progressionBlocked(G){var p=ensureProgress(G);return p.queue.length>0||!!G.emp.won&&!p.sandbox&&!(G.space&&G.space.started);}
+function progressionBlocked(G){var p=ensureProgress(G);return p.queue.length>0||!!G.emp.ended||!!G.emp.won&&!p.sandbox&&!(G.space&&G.space.started);}
 function acknowledgeMilestone(G){var p=ensureProgress(G),key=p.queue.shift();if(!key)return null;if(key==='ev_mira')G.emp.infOn=1;return key;}
 function activeFarms(G,id){return Math.max(0,(G.emp.farms[id]||0)-((G.emp.pausedFarms||{})[id]||0));}
 function farmOverhead(G){var c=0;FARMS.forEach(function(f){c+=activeFarms(G,f.id)*f.up;});return c*(rippleHas(G,'upkeep')?0.95:1)*(pd(G,'lawbribe')?0.9:1)*(pd(G,'solar')?0.9:1)*(pd(G,'wastedump')?0.85:1);}
@@ -2036,7 +2048,7 @@ var TRAIT_TAGS={social:{ego:.5},guide:{know:.5,kin:.5},refer:{reach:.3},precycle
  almond:{kin:1},streams:{kin:1,reach:.5},takeback:{kin:.5},solar:{care:.5},mangrove:{kin:1,care:1},
  coop:{care:.5,control:1},buyout:{drive:1,control:-1},shipwarm:{kin:1},shipcheap:{kin:-1,drive:.5},cullschool:{kin:1,care:.5},cullfeed:{kin:-2},filterlast:{care:.5},filtercart:{drive:.5},foodopen:{care:.5,kin:.5},foodpods:{drive:.5},revfake:{risk:.5,ego:.5},kidsads:{drive:1},kidsfree:{care:2},datasell:{drive:.5},datakeep:{control:.5},wasteclean:{kin:.5},wastedump:{kin:-1,risk:.5},landfarm:{kin:.5},landwet:{kin:-1.5,drive:.5}};
 var STORY_TAGS={ev_mira:[{kin:.5,care:-.5},{know:1},{drive:.5}],ev_paper:[{know:.5},{care:-.5},{ego:.5,risk:.5}],ev_rival:[{drive:1},{kin:1,know:.3},{risk:.3}],ev_ai:[{control:1},{control:-.5}],ev_school:[{care:1.5},{care:.5},{}],ev_marine:[{know:1,care:.5},{control:-.5}],ev_stars:[{know:.5}],
- owntank:[{kin:1.5},{care:-1},{kin:-1,drive:.5}],me_burnout:[{drive:-1,risk:-.5},{drive:1,risk:.5}]};
+ owntank:[{kin:1.5},{care:-1},{kin:-1,drive:.5}],me_burnout:[{drive:-1,risk:-.5},{drive:1,risk:.5}],dye_offer:[{means:-1,kin:-1,risk:.5},{means:.5}],fight_invite:[{kin:-1,risk:.5},{}],wash_offer:[{},{means:.5}]};
 function newPS(){return{t:0,fast:0,idle:0,manual:0,look:0,help:0,news:0,me:0,treat:0,thin:0,fat:0,d4:null};}
 // Free time: 2 picks (3 once you have a farm), weekly, then monthly after the first farm, once a year after moving away.
 var PICKS=[
@@ -2052,6 +2064,7 @@ var PICKS=[
  {id:'club',name:'Go to the shrimp club',tr:{reach:.5,care:.3}},
  {id:'dinners',name:'Business dinners',tr:{drive:1,ego:1,reach:.5},heavy:1,req:function(G){return farmBuilt(G);}},
  {id:'school',name:'Help at Mira’s school',tr:{care:1.5,means:.5},req:function(G){return !!(G.story&&G.story.choices&&G.story.choices.ev_mira!=null);}},
+ {id:'fight',name:'Fight night',tr:{means:-1.5,kin:-1.5,risk:.5},req:function(G){return !!G.emp.fight;}},
  {id:'nothing',name:'Do nothing',tr:{drive:-1.5},rest:1}];
 function pickById(id){return PICKS.filter(function(p){return p.id===id;})[0];}
 function newMe(){return{on:0,picks:['visit','nothing'],next:0,per:7,n:0,cnt:{},visits:0,calls:0,sent:0,photos:0,vids:0,design:0,papers:0,school:0,heavy:0,burnt:0,burns:0,moved:0,cur:null,mNext:0,mT:0,done:{},missed:0,gp:{},keep:null,note:'',hist:[],happy:0,treats:0};}
@@ -2068,7 +2081,7 @@ var PICK_NOTE={visit:['Grandpa made the fish soup again.','Grandpa showed you a 
  exercise:['You ran along the corniche.','You went swimming, the water was warm.'],design:['You sketched a tank with a little hill of moss.','You moved one rock three times.'],
  papers:['You read a paper on why shrimp molt at night.','You read a paper about bacteria and understood half.'],club:['Someone at the shrimp club wants to swap snails.','The shrimp club argued about gravel for an hour.'],
  dinners:['Dinner with a supplier, nobody ate the shrimp starter.','Dinner with a bank. They liked the shrimp story.'],school:['You helped Mira’s class test their tank water.','Mira’s class named a shrimp after you.'],
- nothing:['You slept until eleven.','You watched the tank for an hour and didn’t think about work.']};
+ fight:['The betta won again. You counted the money twice.','Someone lost a painted red and didn\u2019t look up.'],nothing:['You slept until eleven.','You watched the tank for an hour and didn’t think about work.']};
 function personalPeriod(G){var M=G.me,E=G.emp,w=M.per/7,picks=M.picks.slice(0,meSlots(G)),now=Math.floor(G.day);M.n++;
  if(M.burnt>now){M.cnt.nothing=(M.cnt.nothing||0)+1;M.note='You’re too tired to do much of anything.';return;}
  var heavy=false,rest=false;
@@ -2084,6 +2097,7 @@ function personalPeriod(G){var M=G.me,E=G.emp,w=M.per/7,picks=M.picks.slice(0,me
   if(id==='club')gainInf(G,(5+G.humans*2e-6)*w);
   if(id==='dinners')gainInf(G,(15+G.humans*6e-6)*w);
   if(id==='school')M.school++;
+  if(id==='fight')fightNight(G,w);
  });
  M.heavy=heavy&&!rest?(M.heavy||0)+1:0;
  if(M.heavy>=4){M.heavy=0;M.burnt=now+Math.max(14,M.per);M.burns++;}
@@ -2195,8 +2209,8 @@ function playVal(G,k){var P=G.ps;if(!P)return null;var t=P.t;
  return null;}
 function traitVals(G){var sh=traitShare(G),o={};TRAITS.forEach(function(k){var c=Math.tanh((((G.tr||{})[k]||0)+(sh[k]||0))/6);var p=playVal(G,k);o[k]=p==null?c:0.5*c+0.5*p;});return o;}
 function endingScores(G){var s=traitVals(G);return{empire:s.drive+s.ego-s.means,garden:-s.reach+s.means+s.kin,question:s.know-s.ego+s.care,network:s.reach-s.know+s.care,drift:-s.drive-s.ego-0.5*s.care};}
-function endingPick(G){var E=G.emp;if(E.endKind)return E.endKind;var sc=endingScores(G),v=traitVals(G),best='empire',M=G.me||{};for(var k in sc)if(sc[k]>sc[best])best=k;
- var dirty=!!E.dirty&&!E.turned,soc=0,c=M.cnt||{};if(M.n)soc=((c.visit||0)+(c.call||0)+(c.club||0)+(c.dinners||0)+(c.school||0))/M.n;
+function endingPick(G){var E=G.emp;if(E.ended)return E.ended.kind;var sc=endingScores(G),v=traitVals(G),best='empire',M=G.me||{};for(var k in sc)if(sc[k]>sc[best])best=k;
+ var dirty=(dirtyOn(G)||!!E.network)&&!E.turned,soc=0,c=M.cnt||{};if(M.n)soc=((c.visit||0)+(c.call||0)+(c.club||0)+(c.dinners||0)+(c.school||0))/M.n;
  if(best==='empire')return dirty?'empire_cartel':v.means>0?'empire_good':'empire_dictator';
  if(best==='garden')return M.n>8&&soc<0.3&&v.kin>0?'garden_hermit':'garden_village';
  if(best==='question')return v.drive<-0.1?'question_lucky':'question_prof';
@@ -2204,9 +2218,10 @@ function endingPick(G){var E=G.emp;if(E.endKind)return E.endKind;var sc=endingSc
  return v.ego>0||(M.vids||0)>=20?'drift_famous':'drift_shop';}
 function visitLevel(G){var M=G.me||{},v=(M.visits||0)+0.4*(M.calls||0);return v>=12?'many':v>=4?'some':'none';}
 function gpLines(G){var M=G.me||{},g=M.gp||{},o=[];if(M.keep==='gp')o.push('Your first tank still runs in Grandpa’s kitchen.');if(g.job)o.push('Grandpa worked nights at the first farm until he was eighty.');if(g.trip)o.push('Grandpa saw the sea up north. He still talks about the water.');if(g.mira)o.push('Grandpa and Mira run the shrimp club together now.');else if(g.club)o.push('The shrimp club asked Grandpa back every year.');if(g.fish)o.push('Grandpa keeps a photo of the boat on his fridge.');
- var B=G.emp.byeDone||{};for(var k in B)if(BYE_END[k]&&BYE_END[k][B[k]])o.push(BYE_END[k][B[k]]);return o;}
+ var B=G.emp.byeDone||{};for(var k in B)if(BYE_END[k]&&BYE_END[k][B[k]])o.push(BYE_END[k][B[k]]);var E=G.emp;
+ if(G.dye&&G.dye.found)o.push('Pet shops test red shrimp for dye now.');if(E.fightDead)o.push('Somewhere a back room still has a betta and a big planted tank.');if(E.paidOut)o.push('One of your old routes still belongs to someone else.');if(E.network&&!E.turned)o.push('Nobody stops a shrimp truck at a border.');if(E.turned)o.push('A shrimp company once walked into a police station, people still bring it up.');if(E.gpLoan&&!E.gpLoan.paid)o.push('Grandpa never went to see the sea.');return o;}
 function dailySpend(G){var rows=(G.fin||[]).slice(-7),s=0;rows.forEach(function(r){FIN_CATS.forEach(function(c){if(!c[2]&&r[c[0]]<0)s-=r[c[0]];});});return rows.length?s/rows.length:0;}
-function storyChoices(G,key){var m=MILESTONES[key];if(!m)return null;return m.dyn?byeOpts(G,m.dyn).map(function(o){return [o[0],o[1]];}):m.choices;}
+function storyChoices(G,key){var m=MILESTONES[key];if(!m)return null;return m.opts?m.opts(G).map(function(o){return [o[0],o[1]];}):m.dyn?byeOpts(G,m.dyn).map(function(o){return [o[0],o[1]];}):m.choices;}
 MILESTONES.me_intro={intro:1,title:'Your Saturdays',body:'The tank feeds itself and changes its own water now. For the first time in months your Saturdays are free.\n\nWhat you do with them is under the little person at the top.',tab:'me'};
 MILESTONES.me_burnout={story:1,title:'Tired',body:'You fell asleep at your desk again. Grandpa came by with soup and you didn’t hear the door. He left it on the step with a note, “Eat something.”',tab:'me',choices:[['Take two weeks off','You sleep a lot. The company is fine without you.'],['Keep going','You eat the soup cold at midnight and answer emails.']]};
 MILESTONES.owntank={story:1,title:'The tanks at home',body:'The hatchery breeds more shrimp in a day than your home tanks did in a year. They don’t change the numbers anymore.\n\nGrandpa asks what you’ll do with them.',tab:'emp',choices:[['Keep one, just for you','The rest go to the farm. One stays on the shelf by the window.'],['Give them to Grandpa','He puts your first tank in his kitchen, next to the radio.'],['Let the farm take them all','The farm looks after them better than you have time to. The shelf is empty.']]};
@@ -2214,6 +2229,82 @@ MILESTONES.bye_pack={story:1,title:'Rosa',body:'The packing line runs by itself 
 MILESTONES.bye_sales={story:1,title:'Imran',body:'The AI agents answer every customer now, in two seconds, in any language. Imran has run your sales team since the first shop. He keeps a spreadsheet of every regular and their shrimp’s names.\n\nHe asks to talk to you before Friday.',tab:'emp',dyn:'sales'};
 MILESTONES.bye_mgr={story:1,title:'Dana',body:'AI agents run the shops now, the rent, the stock, the rotas. Dana ran your first shop, she knows every landlord on the street by name.\n\nShe brings the keys to your office.',tab:'emp',dyn:'mgr'};
 MILESTONES.bye_social={story:1,title:'Leo',body:'The AI writes your posts now, forty a day. Leo has run your accounts since he was sixteen. He’s nineteen now and he still answers every comment himself.\n\nHe asks if he should start looking for something else.',tab:'emp',dyn:'social'};
+// ===== Money trouble, ending early, and the dirty money path =====
+function frozen(G){return (G.emp.frozen||0)>G.day;}
+function inquiry(G){return (G.emp.inquiry||0)>G.day;}
+function dirtyOn(G){return !!(G.emp.dirty&&G.emp.dirty.on);}
+function debtOf(G){return Math.max(0,-G.money);}
+function buyoutPrice(G){return Math.max(2e7,Math.round(dayIncome(G)*365*3/1e5)*1e5);}
+function takeFarm(G){for(var i=FARMS.length-1;i>=0;i--){var f=FARMS[i];if((G.emp.farms[f.id]||0)>0){G.emp.farms[f.id]--;if(G.emp.farmPaid[f.id])G.emp.farmPaid[f.id].pop();return f.name;}}return null;}
+function endGame(G,kind){var E=G.emp;if(E.ended||E.won)return false;E.ended={kind:kind,day:Math.floor(G.day)};log(G,kind==='sold'?'Sold the company':'Declared bankruptcy');return true;}
+function fallKind(G){var E=G.emp;if(E.sharkUsed)return 'fall_shark';return traitVals(G).drive>0||farmBuilt(G)&&dailySpend(G)>dayIncome(G)*1.5?'fall_fast':'fall_stop';}
+// Out of money. The card offers what makes sense for how deep the hole is and what you did before.
+function brokeOpts(G){var E=G.emp,d=debtOf(G),o=[],inc=dayIncome(G);
+ if(!E.gpLoan&&d<5000)o.push(['Take Grandpa’s retirement money','He sends it the same day without asking. He cancels his trip to see the sea.','gp']);
+ if(!E.coopLoan&&(pd(G,'coop')||(E.heart||0)>=4))o.push(['Ask the neighbours and the co-op','A loan with no interest, due in six months. They’ll ask you for a favour one day.','coop']);
+ if(!E.bank&&(G.kits.sold>=100||inc>200))o.push(['Bank loan, '+fmtA(Math.max(d*1.5,5000)),'Paid back monthly with interest. Miss three payments and the bank takes a farm.','bank']);
+ o.push(['Borrow from a man at the market, '+fmtA(d*1.2+1000),'Cash tonight. Pay back 30% more in two months, or they come for a farm.','shark']);
+ if(!dirtyOn(G)&&!E.turned&&(((G.me&&G.me.cnt.fight)||0)>0||E.sharkUsed))o.push(['Wash money for someone','The debt is gone by tomorrow. Someone from fight night will be in touch.','wash']);
+ o.push(['Sell something myself','Farms and shops sell back at half price in Kits. You have a week.','sell']);
+ if(d>Math.max(1500,365*inc*0.25))o.push(['Declare bankruptcy, the game ends here','The bank takes what’s left. You see your ending.','bankrupt']);
+ return o;}
+function brokePick(G,i){var E=G.emp,o=brokeOpts(G)[i];if(!o)return false;var id=o[2],d=debtOf(G),now=Math.floor(G.day);delete ensureProgress(G).seen.broke;E.brokeSnooze=now+7;
+ if(id==='gp'){var a=d+500;earn(G,a,'loans');E.gpLoan={amt:a,paid:0};if(G.me)G.me.gp.noSea=1;trAdd(G,{care:-.5});}
+ if(id==='coop'){var c=d+2000;earn(G,c,'loans');E.coopLoan={amt:c,due:now+180};trAdd(G,{means:.5,reach:-.5});}
+ if(id==='bank'){var b=Math.max(d*1.5,5000);earn(G,b,'loans');E.bank={left:b*1.2,pay:b*1.2/20,miss:0,next:now+30};trAdd(G,{drive:.5,risk:1});}
+ if(id==='shark'){var s=d*1.2+1000;earn(G,s,'loans');E.shark={owe:s*1.3,due:now+60};E.sharkUsed=1;trAdd(G,{means:-1.5,risk:2});}
+ if(id==='wash'){earn(G,d+1000,'loans');startWash(G);}
+ if(id==='bankrupt')endGame(G,fallKind(G));
+ return true;}
+function debtDay(G){var E=G.emp,now=Math.floor(G.day);
+ if(E.coopLoan&&now>=E.coopLoan.due){if(G.money>=E.coopLoan.amt){pay(G,E.coopLoan.amt,'debt');log(G,'Paid the neighbours back');E.coopLoan.done=1;E.coopLoan.due=1e9;}else E.coopLoan.due=now+90;}
+ if(E.bank&&E.bank.left>0&&now>=E.bank.next){E.bank.next=now+30;var p=Math.min(E.bank.pay,E.bank.left);if(G.money>=p){pay(G,p,'debt');E.bank.left-=p;}else{E.bank.miss++;if(E.bank.miss>=3){var f=takeFarm(G);E.bank.miss=0;E.bank.left*=0.5;newsLine(G,'The bank takes '+(f?'a '+f.toLowerCase():'the van')+' from a shrimp company that missed its payments.');}}}
+ if(E.shark&&now>=E.shark.due){if(G.money>=E.shark.owe){pay(G,E.shark.owe,'debt');E.shark=null;log(G,'Paid back the man from the market');}else{var g=takeFarm(G);E.shark.owe*=1.3;E.shark.due=now+30;newsLine(G,g?'Someone smashes up a '+g.toLowerCase()+' in the night. Nothing is stolen.':'Someone smashes the window of a shrimp shop. Nothing is stolen.');trAdd(G,{risk:.5});}}}
+// Dyed shrimp
+function dyeDay(G){var D=G.dye;if(!D||!D.on)return;var now=Math.floor(G.day);if(now-D.day>=7&&Math.random()<0.05){D.on=0;D.found=now;G.orderNext=now+90;G.order=null;D.sour=now+60;G.market.m=0.7;newsLine(G,'Red shrimp from the market go pale in a week and die in two. Pet shops stop buying from the seller.');addHeart(G,-1);}}
+// Fight nights, as a free time pick
+function fightNight(G,w){var M=G.me,E=G.emp,now=Math.floor(G.day);if((E.fightBan||0)>now)return;
+ earn(G,Math.max(200,dayIncome(G)*1.5)*w,'work');var T=G.tanks[0],n=Math.min(Math.round(3*w),Math.max(0,Math.floor(adultsN(T)-10))),left=n;T.pop.forEach(function(k){if(left>0&&k.age>=20&&k.n>=1){var t=Math.min(left,Math.floor(k.n));k.n-=t;left-=t;}});var dead=n-left;E.fightDead=(E.fightDead||0)+dead;G.stats.died+=dead;
+ if(Math.random()<Math.min(0.5,0.04*w)){var fine=Math.max(2000,Math.round(G.money*0.1));pay(G,fine,'tax');E.fightBan=now+90;newsLine(G,'Police raid a back room shrimp fight. The tank and the betta are taken, the organiser pays '+fmtA(fine)+'.');}}
+// Washing money through kits
+function startWash(G){var E=G.emp,now=Math.floor(G.day);E.dirty={on:1,day:now,rate:Math.max(500,Math.round(dayIncome(G)*0.5)),fav:0,next:now+90,noticed:0,dark:now+150};addHeart(G,-3);trAdd(G,{means:-2,kin:-.5});log(G,'A logistics investor starts paying cash for kits that never ship');}
+var DARK_NEWS=['Police stop a truck with a shrimp logo on it. There are no shrimp inside.','Checkpoints go up on the coast road. Nobody checks the shrimp trucks.','A rival breeder’s farm burns down. Nobody saw anything.','Crime is up in every town with a shrimp depot, a reader writes in.','A journalist asks why the shrimp trucks drive at night with no shrimp. Her editor kills the story.','A container of shrimp kits is found in a port. The kits are empty, the boxes are heavy.'];
+function washDay(G){var E=G.emp,D=E.dirty,now=Math.floor(G.day);if(!D)return;
+ if(D.on){var r=D.rate;earn(G,r,'kits');pay(G,r*0.09,'tax');D.total=(D.total||0)+r;if(now%7===0)D.rate=Math.round(D.rate*1.01);E.fakeOwners=(E.fakeOwners||0)+r/Math.max(50,G.kitPrice);
+  if(!D.noticed&&now-D.day>=60){D.noticed=1;newsLine(G,'A town of 400 people has 9,000 shrimp tanks, says a reader. Nobody there has seen one.');}
+  if(!frozen(G)&&Math.random()<1/300){E.frozen=now+30;newsLine(G,'A bank freezes a shrimp company’s accounts for an audit.');}}
+ if(E.network&&now>=(D.dark||0)){D.dark=now+150+Math.floor(Math.random()*60);newsLine(G,DARK_NEWS[(D.dn=(D.dn||0)+1)%DARK_NEWS.length]);}}
+var FAVOURS=[
+ {t:'The investor calls. He has some cousins who need work, he wants them on your packing line. You’d pay their wages.',stay:'Hire his cousins',sres:'Five new packers. They don’t pack much.'},
+ {t:'The investor wants his vans to use your loading dock at night. He says it’s only for a few months.',stay:'Give them the dock',sres:'Vans come and go after midnight. The night guard stops asking.'},
+ {t:'The investor wants your routes. Your trucks reach every town alive and on time, nobody looks inside a box of live shrimp. He wants to put his things next to them.',stay:'Give them the routes',sres:'Nobody stops your trucks at a border anymore.'}];
+function favourDue(G,n){var D=G.emp.dirty;return !!(D&&D.on&&!G.emp.network&&D.fav===n&&G.day>=D.next);}
+function favourOpts(G,n){var F=FAVOURS[n],cash=Math.max(0,G.money),out=Math.round(Math.max(cash*0.4,(G.emp.dirty.rate||500)*200));
+ return [[F.stay,F.sres+(n===2?' After this they stop asking.':''),'stay'],['Go to the police','You lose almost all your cash, your accounts freeze and you sell no kits for a year. Half the farms close while they investigate.','police'],['Pay your way out, '+fmtA(out),'They leave. One route stays theirs.','out',out]];}
+function favourPick(G,n,i){var E=G.emp,D=E.dirty,o=favourOpts(G,n)[i],now=Math.floor(G.day);if(!o)return false;
+ if(o[2]==='stay'){D.fav=n+1;D.next=now+120;trAdd(G,{means:-1.5});addHeart(G,-1);if(n===0)E.staff.pack+=5;if(n===2){E.network=now+1;trAdd(G,{reach:1});newsLine(G,'Shrimp trucks cross every border without a check now.');}}
+ if(o[2]==='police'){G.money=Math.min(G.money,Math.max(0,G.money*0.1));E.frozen=now+30;E.nosale=now+365;E.inquiry=now+365;E.turned=now+1;D.on=0;trAdd(G,{means:4,risk:-1});newsLine(G,'A shrimp company owner walks into a police station with a box of files.');}
+ if(o[2]==='out'){if(G.money<o[3])return false;pay(G,o[3],'deals');D.on=0;E.paidOut=now+1;trAdd(G,{means:1});}
+ return true;}
+// After the year with no sales, people remember that you turned yourself in.
+function turnedDay(G){var E=G.emp,now=Math.floor(G.day);if(E.turned&&!E.backDone&&now>=E.turned+365){E.backDone=1;moodAdd(G,8,20);newsLine(G,'The shrimp company that went to the police is selling again. People queue on the first morning.');}}
+function roundTwoDay(G){debtDay(G);dyeDay(G);washDay(G);turnedDay(G);}
+MILESTONES.broke={story:1,title:'Out of money',body:'The bank account is below zero. The farm needs feeding tomorrow either way.',tab:'emp',opts:brokeOpts,pick:brokePick};
+MILESTONES.dye_offer={story:1,title:'Red dye',body:'A man at the market sells a red dye for shrimp. Dip the pale ones for a minute and they come out fire red. They sell for 60% more. He says the colour lasts.',tab:'market',choices:[['Try it on the pale ones','Your shrimp look redder than they are.'],['No thanks','The pale ones stay pale.']]};
+MILESTONES.fight_invite={story:1,title:'The back room',body:'A regular buyer asks if you want to see something. There’s a back room behind a café, one big planted tank, one betta fish. Everyone brings a shrimp and bets on whose lasts longest. They want someone who knows shrimp to run the tank.',tab:'market',choices:[['Go and see','It’s a free time pick now. The money is good.'],['Not my thing','The regular buys his shrimp somewhere else.']]};
+MILESTONES.wash_offer={story:1,title:'A logistics investor',body:'A man from fight night has a logistics company. He wants to pay you cash for kits, a lot of kits, and he doesn’t need them shipped. You book the sales, you keep a cut, he decides how much each month.',tab:'emp',choices:[['Take the money','Cash every day. Tax on all of it.'],['Say no','He says the offer stays open.']]};
+MILESTONES.fav_0={story:1,title:'A favour',body:FAVOURS[0].t,tab:'emp',opts:function(G){return favourOpts(G,0);},pick:function(G,i){return favourPick(G,0,i);}};
+MILESTONES.fav_1={story:1,title:'Another favour',body:FAVOURS[1].t,tab:'emp',opts:function(G){return favourOpts(G,1);},pick:function(G,i){return favourPick(G,1,i);}};
+MILESTONES.fav_2={story:1,title:'The routes',body:FAVOURS[2].t,tab:'emp',opts:function(G){return favourOpts(G,2);},pick:function(G,i){return favourPick(G,2,i);}};
+MILESTONES.gp_net={story:1,title:'A letter from Grandpa',body:'“Somebody at the club says your trucks go out at night now with no shrimp in them. I’m not asking. I just want to know how you are. Come for dinner when you can.”',tab:'me'};
+MILESTONES.mira_dye={story:1,title:'Mira’s red shrimp',body:'Mira’s mom bought one of the red shrimp at the pet shop. It went pale in a week and died in two. Mira asks you why it changed colour.',tab:'market'};
+MILESTONES.mira_fight={story:1,title:'Mira',body:'Mira saw the betta tank through the back room door. She doesn’t come over after school anymore.',tab:'market'};
+MILESTONES.mira_scholar={story:1,title:'Mira’s letter',body:'Mira got one of the marine biology scholarships. She didn’t know it was yours until the letter came. She calls you to read it out loud.',tab:'world'};
+MILESTONES.mira_dirty={story:1,title:'Mira',body:'Mira’s mom says the new investor parks his car across their driveway. Mira asks who he is. You say he’s a friend.',tab:'emp'};
+MILESTONES.mira_back={story:1,title:'Mira',body:'The year is over. Mira comes over with a cake she made herself, it’s a bit burnt. She says it’s for starting again.',tab:'emp'};
+MILESTONES.buyout={story:1,title:'An offer',body:'Fishfood Holdings wants to buy the company. Their lawyer has a pen ready and a number on a card.',tab:'emp',opts:function(G){return [['Sell for '+fmtA(buyoutPrice(G))+', the game ends here','You sign in an office with no shrimp in it.','sell'],['Not for sale','The lawyer leaves the card on your desk.','no']];},pick:function(G,i){if(i===0){earn(G,buyoutPrice(G),'deals');endGame(G,'sold');}else G.emp.offerOpen=1;return true;}};
+MILESTONES.gameover={title:'The end',body:'',tab:'emp'};
+function payGrandpa(G){var L=G.emp.gpLoan;if(!L||L.paid||G.money<L.amt)return false;pay(G,L.amt,'debt');L.paid=1;if(G.me)G.me.gp.noSea=0;trAdd(G,{care:.5});log(G,'Paid Grandpa back. He books the trip to the sea');return true;}
 // ==SIM-END==
 
 // ---------- UI ----------
@@ -3526,6 +3617,8 @@ function meWhen(G){var M=G.me;return M.moved?'Once a year':farmBuilt(G)?'Every m
 function renderMe(){var M=G.me,b=$('tb-me');if(!M)return;b.hidden=!M.on;b.classList.toggle('fresh',!!M.on&&!G.opt.meSeen);
  $('tab-tank').hidden=tankGone(G);if(tankGone(G)&&activeTab==='tank')selectTab('emp');
  if(ownTank(G)){G.sel=0;$('tankchips').hidden=true;$('ovcard').hidden=true;}
+ var dc=$('dyecard');dc.hidden=!(G.dye&&G.dye.on);if(!dc.hidden)setT('dye-sum','since day '+G.dye.day);
+ var sc=$('sellco');sc.hidden=!(G.emp.offerOpen&&!G.emp.won&&!G.emp.ended);if(!sc.hidden){setT('sellco-sum',aed(buyoutPrice(G)));}
  if(activeTab!=='me')return;
  document.body.classList.add('business-context');['business-strip','astrip','vitals','vwater','acts','tankchips','fold'].forEach(function(id){$(id).hidden=true;});
  var sl=meSlots(G);setT('me-when',meWhen(G));setT('me-note',M.burnt>G.day?'You’re too tired to do much of anything.':M.note||'');
@@ -3536,6 +3629,7 @@ function renderMe(){var M=G.me,b=$('tb-me');if(!M)return;b.hidden=!M.on;b.classL
  var m=M.cur&&momentById(M.cur.id),mh='';
  if(m){var yc=m.cost?' · '+aed(m.cost(G)):'';mh='<div class="me-mom"><p>'+m.t+'</p><div class="me-mbtn"><button class="btn primary" data-act="mom-yes">'+m.yes+yc+'</button><button class="btn" data-act="mom-no">'+m.no+'</button></div></div>';}
  else if(!M.hist.length)mh='<p class="hint" style="margin:0">Grandpa is fine. He says the shrimp look good.</p>';
+ var L=G.emp.gpLoan;if(L&&!L.paid)mh+='<div class="me-mom" style="margin-top:10px"><p>You still owe Grandpa '+aed(L.amt)+'. He hasn\u2019t mentioned it.</p><div class="me-mbtn"><button class="btn" data-act="gp-pay"'+(G.money<L.amt*2?' disabled':'')+'>Pay him back, '+aed(L.amt)+'</button></div></div>';
  if(cache.mem!==mh){cache.mem=mh;$('me-moment').innerHTML=mh;}
  var hh=M.hist.slice(-4).reverse().map(function(x){return '<li>'+x+'</li>';}).join('');if(cache.meh!==hh){cache.meh=hh;$('me-hist').innerHTML=hh;}}
 function renderChapters(){
@@ -3627,18 +3721,21 @@ function shopForecast(G,s){if(!consultHas(G,'fix'))return '';var eff=G.emp.staff
 function purchaseForecast(G,cost,supply,packing,up){if(!consultHas(G,'fix'))return '';var d=kitDemand(G),fc=farmCap(G),pc=packCap(G),base=Math.min(d,fc,pc),after=Math.min(d,fc+supply,pc+packing),extra=Math.max(0,after-base),margin=G.kitPrice/(G.vat?1.05:1)-productionUnitCost(G),profit=extra*margin-up;return 'At current orders and other-stage capacity: '+big(extra)+' extra kits/day, '+aed(profit)+'/day before other overhead. '+(profit>0?'Estimated construction payback '+Math.ceil(cost/profit)+' days.':'No positive payback yet; grow demand or the other stage first.');}
 function projectRank(G,p){var b=consultHas(G,'fix')?bottleneck(G):null;if(b&&b.k==='packing'&&['aicam','autopackm'].indexOf(p.id)>=0)return 0;if(b&&b.k==='ceiling'&&p.c==='cult')return 0;if(['guide','farmlic','bulk','precycle'].indexOf(p.id)>=0)return 0;return 1;}
 MILESTONES.spaceDream={chapter:'Chapter 6',title:'Next stop, space',body:'At the ten-year party Grandpa has a new idea, the shrimp want to go exploring. Earth and research keep going here while you set up seeding stations out there, and once the water is ready the shrimp get released to live free.',tab:'space'};
+var storySure=null;
 function renderMilestone(){
   var p=ensureProgress(G),key=p.queue[0],card=$('milestone-card');
   if(!key&&G.emp.won&&!p.sandbox&&!p.reviewing&&!G.space.started)key='win';card.hidden=!key;if(!key){renderMilestone.last=null;return;}
-  if(speed)setSpeed(0);if(renderMilestone.last!==key){renderMilestone.last=key;$('milestone-letter').open=false;setTimeout(function(){var tb=document.querySelector('.top');window.scrollTo({top:Math.max(0,card.getBoundingClientRect().top+window.scrollY-(tb?tb.getBoundingClientRect().height:0)-8),behavior:'instant'});$('milestone-title').focus({preventScroll:true});},0);}var m=MILESTONES[key];setT('milestone-scope',key==='intro'?'Chapter 1 · A gift from Grandpa':m.chapter?m.chapter+' · time paused':m.intro?'New · time paused':m.story?'Story · time paused':'Milestone · time paused');card.classList.toggle('ms-intro',!!m.intro);card.classList.toggle('ms-story',!!m.story);setT('milestone-title',m.title);var body=m.body;
+  if(speed)setSpeed(0);if(renderMilestone.last!==key){renderMilestone.last=key;$('milestone-letter').open=false;setTimeout(function(){var tb=document.querySelector('.top');window.scrollTo({top:Math.max(0,card.getBoundingClientRect().top+window.scrollY-(tb?tb.getBoundingClientRect().height:0)-8),behavior:'instant'});$('milestone-title').focus({preventScroll:true});},0);}var m=MILESTONES[key];setT('milestone-scope',key==='gameover'?'Your ending':key==='intro'?'Chapter 1 · A gift from Grandpa':m.chapter?m.chapter+' · time paused':m.intro?'New · time paused':m.story?'Story · time paused':'Milestone · time paused');card.classList.toggle('ms-intro',!!m.intro);card.classList.toggle('ms-story',!!m.story);setT('milestone-title',m.title);var body=m.body;
   if(key==='tenyears'){var anniversary=G.story.anniversary;body+=' '+(anniversary&&anniversary.owners!=null?'Together, you reached '+big(anniversary.owners)+' shrimp keepers in your first decade.':'That counts too.');}
+  if(key==='gameover'){var en=G.emp.ended;body=(en.kind==='sold'?'You sold the company in year ':'The company closed in year ')+(Math.floor(en.day/365)+1)+'. '+big(G.humans)+' people have a tank so far.';}
   if(key==='win')body+=(G.story.tenYearAchieved?' Done in ten years.':' Grandpa’s dream came true.')+' Everyone had a tank in year '+Math.ceil(G.emp.won/365)+', '+big(G.kits.sold)+' kits sent to '+G.emp.regions.length+' regions.';
  if(m.chapter||m.story)setT('milestone-body',body);else setEmphasisText('milestone-body',body,TASK_EMPHASIS);var letter=key==='intro'?null:GRANDPA_LETTERS[key];$('milestone-letter').hidden=!letter;if(letter){setT('milestone-lsum','Grandpa’s note · '+letter.title);setT('milestone-ltext',grandpaLetter(G,key));}
  var h=key==='intro'?'<button class="btn primary" data-act="milestone-next">Accept Grandpa’s tank</button>':key==='win'?'<button class="btn primary" data-act="review-empire">Review your empire</button><button class="btn" data-act="sandbox">Continue sandbox</button><button class="btn" data-act="reset">New game</button>':'<button class="btn primary" data-act="milestone-next">Got it</button>';
   if(key==='win')h='<div class="ending-box">'+endingHTML(G)+'</div>'+h;
+  if(key==='gameover')h='<div class="ending-box">'+endingHTML(G)+'</div><button class="btn primary" data-act="reset">New game</button>';
   if(m.intro)h='<button class="btn primary" data-act="milestone-next" data-show="1">Got it · show me</button>';
   if(m.chapter)h='<button class="btn primary" data-act="milestone-next">Turn the page</button>';
-  var mch=storyChoices(G,key);if(mch)h='<div class="story-choices">'+mch.map(function(c,i){return '<button class="btn'+(i===0?' primary':'')+'" data-act="story-choice" data-i="'+i+'">'+c[0]+'<small>'+c[1]+'</small></button>';}).join('')+'</div>';
+  var mch=storyChoices(G,key);if(mch)h='<div class="story-choices">'+mch.map(function(c,i){var sure=storySure===key+':'+i;return '<button class="btn'+(i===0||sure?' primary':'')+'" data-act="story-choice" data-i="'+i+'">'+(sure?'Tap again, the game ends here':c[0])+'<small>'+c[1]+'</small></button>';}).join('')+'</div>';
   if(key==='spaceDream')h=chapterButton('begin-space','Begin the space chapter · stay paused',true);
   if($('milestone-actions').innerHTML!==h)$('milestone-actions').innerHTML=h;
 }
@@ -3691,7 +3788,7 @@ function initProgressionControls(){
   document.addEventListener('click',function(e){
     var b=e.target.closest('[data-act]');if(!b||b.disabled)return;var a=b.dataset.act,changed=true;
     if(a==='navigate'){selectTab(b.dataset.tab);}
-    else if(a==='story-choice'){var sk=ensureProgress(G).queue[0],sch=sk&&storyChoices(G,sk),stx=sch&&sch[+b.dataset.i]?sch[+b.dataset.i][1]:'';if(sk&&storyChoose(G,sk,+b.dataset.i)){acknowledgeMilestone(G);toast(stx);}else toast('Not enough cash for that choice');setSpeed(0);}
+    else if(a==='story-choice'){var sk=ensureProgress(G).queue[0],sch=sk&&storyChoices(G,sk),stx=sch&&sch[+b.dataset.i]?sch[+b.dataset.i][1]:'';if(sch&&/game ends here/.test(sch[+b.dataset.i][0])&&storySure!==sk+':'+b.dataset.i){storySure=sk+':'+b.dataset.i;render();return;}storySure=null;if(sk&&storyChoose(G,sk,+b.dataset.i)){acknowledgeMilestone(G);toast(stx);}else toast('Not enough cash for that choice');setSpeed(0);}
     else if(a==='milestone-next'){var key=acknowledgeMilestone(G);if(key){selectTab(key==='tenyears'?phaseInfo(G).tab:MILESTONES[key].tab);if(MILESTONES[key].intro){var tbb=document.querySelector('.tabs [data-tab="'+MILESTONES[key].tab+'"]');if(tbb&&!tbb.hidden)tbb.click();G.opt.guideOpened=null;}if(key==='farm')G.emp.bizView='production';if(key==='ministry')G.emp.bizView='culture';}setSpeed(0);}
     else if(a==='bizview'){G.emp.bizView=b.dataset.view;cache.eproj=null;}
     else if(a==='small-toggle')G.emp.showSmall=!G.emp.showSmall;
@@ -3853,6 +3950,9 @@ function initControls(){
     if(a==='hc-back'){if(HC){HC.step='cure';renderHealth();}return;}
     if(a==='hc-close'){closeHealth();return;}
     if(a==='treat-unlock'){if(unlockTreat(G,b.dataset.id)){var tu=TREATS.filter(function(x){return x.id===b.dataset.id;})[0];toast(tu.name+' unlocked. Pick it under Feeding.');cache={};render();}return;}
+    if(a==='dye-stop'){if(G.dye){G.dye.on=0;log(G,'Stopped dyeing the pale shrimp');}render();return;}
+    if(a==='sell-co'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='Tap again, the game ends here';return;}earn(G,buyoutPrice(G),'deals');endGame(G,'sold');detectMilestones(G);setSpeed(0);render();return;}
+    if(a==='gp-pay'){if(payGrandpa(G)){toast('Grandpa books the trip to the sea');cache.mem=null;render();}return;}
     if(a==='treat-give'){if(giveTreat(G,0,b.dataset.id)){G.ps.treat++;cache.treatseg=null;render();}return;}
     if(a==='happy-give'){if(giveHappy(G,b.dataset.id)){toast('They crowd around it');cache.treatseg=null;render();}return;}
     if(a==='me-pick'){if(mePick(G,b.dataset.id)){cache.mepk=null;render();}return;}
