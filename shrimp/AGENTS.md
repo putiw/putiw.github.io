@@ -183,6 +183,10 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] Consultants appear once you have had AED 20k.
 - [ ] The SOP project (recipe tank) opens standard tanks 4 to 12; standard tanks come with everything, decor included. Tapping a row in the All tanks table looks at that tank alone (health check, restock), Back returns to the recipe.
 - [ ] When farms take over (first hatchery, or farms ≥ 10 kits/day) the farm takes every tank but the first (`retireTanks`), so no more alerts about tanks you can't reach.
+- [ ] Free time has three lanes: every week (two picks), every month (one, after the first farm), once a year (one, after moving or three regions). Each pick says which lanes it fits (`f`). After moving, Grandma visits, the shrimp club, Mira's school and fight night are gone; a yearly trip home replaces them.
+- [ ] Story prices that were fixed grow with the company (`aiCost` 20% of cash plus 2% of every kit sale, `rivalCost`, `schoolKits`).
+- [ ] The spotlight ring follows its card if anything moves (`spotTrack`).
+- [ ] Once a second region is open and the tank buttons leave the top bar, the owners count (x of 8.2B) sits in the top bar instead.
 - [ ] Frozen accounts say why and what is blocked. New Shrimp Times stories drop in from the top as a small newspaper banner.
 
 **You tab and Grandma**

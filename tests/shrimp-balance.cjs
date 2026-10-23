@@ -261,7 +261,7 @@ if(!hire(g,'sales',1))throw Error('Hiring failed');if(!t.set.autoSell)throw Erro
 var n0=totalN(t);dayRollover(g);if(!(totalN(t)<n0-1))throw Error('Salesperson did not sell surplus: '+n0+' -> '+totalN(t));
 `);
 if(!html.includes("else if(activeTab!=='space'){$('tankchips').hidden=G.tanks.length<2||!!G.recipe||ownTank(G);}"))throw Error('Tank buttons must come back after business tabs, so every tank can be picked');
-if(!html.includes("business=inBiz&&topAway(G)"))throw Error('Top bar stays on every tab until every tank is fully upgraded');
+if(!html.includes("business=inBiz&&(topAway(G)||labMode())"))throw Error('Top bar tank buttons leave the business tabs once tanks are done or farms carry the business');
 check('consultants are paid per visit: 20% of cash, at least AED 20,000, 30 days',`
 var g=readyGame();g.emp.kitsOpened=1;g.money=50000;if(consultCost(g)!==20000)throw Error('Minimum is AED 20,000');g.money=500000;if(consultCost(g)!==100000)throw Error('20% of cash');
 if(!buyConsult(g,'visit')||g.money!==400000||!consultHas(g)||buyConsult(g,'visit'))throw Error('One paid visit at a time');g.day+=31;if(consultHas(g))throw Error('A visit lasts 30 days');

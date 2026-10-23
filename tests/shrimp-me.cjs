@@ -11,7 +11,9 @@ var g=newGame();g.day=10;personalDay(g);if(g.me.on)throw Error('Too early');g.ta
 if(meSlots(g)!==2||!mePick(g,'overtime')||g.me.picks.join()!=='nothing,overtime')throw Error('Two slots, oldest pick drops '+g.me.picks);
 mePick(g,'visit');g.fin=[{shrimp:400}];var m0=g.money;for(var d=0;d<30;d++){g.day++;personalDay(g);}
 if(g.me.visits<3||g.money<=m0||g.me.n<3)throw Error('Picks repeat each Saturday '+g.me.visits+' '+g.money);
-g.emp.farms.rack=1;if(mePer(g)!==30||meSlots(g)!==3)throw Error('Monthly after farms');g.me.moved=1;if(mePer(g)!==365)throw Error('Yearly after moving');
+g.emp.farms.rack=1;if(!laneOpen(g,'m')||laneOpen(g,'y'))throw Error('Monthly lane after farms');if(!mePick(g,'dinners','m')||mePick(g,'dinners','w')||mePick(g,'holiday','m'))throw Error('Dinners are monthly');
+var v0=g.me.visits;g.me.moved=1;if(!laneOpen(g,'y')||meCan(g,'visit','w')||meCan(g,'visit','m')||!meCan(g,'home','y')||meCan(g,'exercise','y')||!meCan(g,'money','w'))throw Error('Moving away changes what you can do');
+var inf0=g.emp.inf;g.emp.infOn=1;g.me.picks=['call','nothing'];mePick(g,'conference','y');for(var d=0;d<400;d++){g.day++;personalDay(g);}if(g.me.cnt.conference!==1||!(g.emp.inf>inf0))throw Error('Yearly runs once a year '+g.me.cnt.conference);if((g.me.cnt.dinners||0)<12)throw Error('Monthly runs monthly '+g.me.cnt.dinners);
 `);
 check('working without rest burns you out',`
 var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.me.picks=['overtime','videos'];for(var d=0;d<40;d++){g.day++;personalDay(g);}
@@ -177,5 +179,9 @@ if(wbItem('moss').m!==0||wbItem('planted').m!==0)throw Error('Kit designs cost p
 var h=newGame();h.emp.kitsOpened=1;h.kits.sold=10;h.tanks.push(newTank(1),newTank(2));if(stdUnlocked(h))throw Error('Not yet');h.emp.proj.sop=1;if(!stdUnlocked(h))throw Error('SOP opens standard tanks');h.money=1e6;buyStdTank(h);var T=h.tanks[3];if(!T.moss||!T.plants||!T.feeder||!T.autoWC)throw Error('Fully equipped');
 T.pop=[{age:90,n:40,g:50}];var raw=h.emp.rawShrimp||0;h.emp.farms.hatch=1;storyChoose(h,'owntank',0);if(h.tanks.length!==1||!((h.emp.rawShrimp||0)>raw+30))throw Error('Farm takes the other tanks '+h.tanks.length);
 var q=newGame();q.emp.frozen=40;q.emp.frozenWhy='audit';q.day=10;if(frozenText(q).indexOf('audit')<0||frozenText(q).indexOf('30 days')<0)throw Error('Frozen says why '+frozenText(q));
+`);
+check('fixed story prices grow with the company',`
+var g=newGame();g.money=1e8;if(aiCost(g)!==2e7||rivalCost(g)!==1e6)throw Error('Scaled '+aiCost(g));if(storyChoices(g,'ev_ai')[0][0].indexOf('20M')<0&&storyChoices(g,'ev_ai')[0][0].indexOf('20,000,000')<0)throw Error('Label shows it '+storyChoices(g,'ev_ai')[0][0]);
+storyChoose(g,'ev_ai',0);if(g.money!==8e7||g.emp.aiCut!==0.02)throw Error('Paid share');var h=newGame();h.money=1000;if(aiCost(h)!==50000||storyChoose(h,'ev_ai',0))throw Error('Small company still pays the base price');
 `);
 console.log(count+' free time, Grandma and ending checks passed');
