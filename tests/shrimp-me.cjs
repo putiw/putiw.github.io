@@ -26,7 +26,7 @@ var c=g.tr.care||0;if(!momentAnswer(g,true)||g.me.done.clinic!==1||(g.tr.care||0
 g.me.mNext=0;g.me.mT=0;g.me.n=10;g.day+=1;personalDay(g);if(!g.me.cur)throw Error('Next moment');var id=g.me.cur.id;g.ps.t+=200000;g.day+=20;personalDay(g);if(g.me.cur&&g.me.cur.id===id||g.me.done[id]!==3||g.me.missed!==1)throw Error('Missed');
 `);
 check('keeping your own tank makes treats hand-given, happy treats count',`
-var g=newGame();var T=g.tanks[0];T.had=1;T.pop=[{age:60,n:30,g:40,b:1}];g.money=1000;g.treatsOwned={spinach:1};T.set.treats={spinach:true};
+var g=newGame();var T=g.tanks[0];T.had=1;T.pop=[{age:60,n:30,g:40,b:1}];g.money=5000;g.treatsOwned={spinach:1};T.set.treats={spinach:true};
 dayRollover(g);if(!treatOn(T,'spinach'))throw Error('Weekly treat before');T.treats.spinach=0;g.emp.farms.hatch=1;if(!milestoneConditions(g).owntank)throw Error('Card');
 storyChoose(g,'owntank',0);if(!ownTank(g)||tankGone(g))throw Error('Kept');dayRollover(g);if(treatOn(T,'spinach'))throw Error('No auto renew once it is yours');
 if(!giveTreat(g,0,'spinach')||!giveHappy(g,'pea')||giveHappy(g,'pea')||g.me.happy!==1)throw Error('By hand');
@@ -183,5 +183,12 @@ var q=newGame();q.emp.frozen=40;q.emp.frozenWhy='audit';q.day=10;if(frozenText(q
 check('fixed story prices grow with the company',`
 var g=newGame();g.money=1e8;if(aiCost(g)!==2e7||rivalCost(g)!==1e6)throw Error('Scaled '+aiCost(g));if(storyChoices(g,'ev_ai')[0][0].indexOf('20M')<0&&storyChoices(g,'ev_ai')[0][0].indexOf('20,000,000')<0)throw Error('Label shows it '+storyChoices(g,'ev_ai')[0][0]);
 storyChoose(g,'ev_ai',0);if(g.money!==8e7||g.emp.aiCut!==0.02)throw Error('Paid share');var h=newGame();h.money=1000;if(aiCost(h)!==50000||storyChoose(h,'ev_ai',0))throw Error('Small company still pays the base price');
+`);
+check('research lines: many people in many fields at once, finds are luck',`
+var g=newGame();g.kits.sold=500;g.money=1e8;['energy','water','auto'].forEach(function(id){rlHire(g,id,'phd');rlHire(g,id,'pi');});if(rlines(g).water.pi!==1||rlines(g).energy.phd!==1)throw Error('Hired in parallel');
+var y=rlYearAll(g);if(Math.abs(y-3*(40000+1500000)*USD)>1)throw Error('Yearly cost '+y);var m0=g.money;rlDay(g);if(Math.abs(m0-g.money-y/365)>1)throw Error('Paid daily');
+var f0=distributionCost(g);g.emp.farms.hatch=2;var u0=farmOverhead(g);var r=Math.random,sd=11;Math.random=function(){sd=(sd*16807)%2147483647;return sd/2147483647;};for(var d=0;d<4*365;d++)rlDay(g);Math.random=r;
+if(!(rlFound(g,'water')>=1&&rlFound(g,'energy')>=1))throw Error('Something found in four years '+rlFound(g,'water'));if(!(distributionCost(g)<f0)||!(farmOverhead(g)<u0))throw Error('Finds help');
+var h=newGame();h.kits.sold=500;h.money=10;if(rlHire(h,'genes','pi'))throw Error('Needs cash');for(var i=0;i<20;i++){h.money=1e9;rlHire(h,'genes','phd');}if(rlines(h).genes.phd!==12)throw Error('Cap per field');
 `);
 console.log(count+' free time, Grandma and ending checks passed');

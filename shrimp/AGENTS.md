@@ -187,6 +187,12 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] Story prices that were fixed grow with the company (`aiCost` 20% of cash plus 2% of every kit sale, `rivalCost`, `schoolKits`).
 - [ ] The spotlight ring follows its card if anything moves (`spotTrack`).
 - [ ] Once a second region is open and the tank buttons leave the top bar, the owners count (x of 8.2B) sits in the top bar instead.
+- [ ] Research lines (`RLINES`, `RPOS`, `rlDay`): six fields (energy, water, automation and AI, genes, food, health), each can fund PhD students, postdocs and PI labs at the same time, paid daily, until you stop. Finds are random (`rlOdds`), a quarter of them come out as nothing. Each find is a small permanent bonus (`rlM`). Funding counts toward curiosity (know). The older academy chain (one study at a time, degrees, teaching, crew) still drives Space.
+- [ ] Big machines cost more to run: mega hatchery, ocean ranch and arcology upkeep are about 5 AED per kit; packing halls, hubs and the global network cost more per kit the bigger they are.
+- [ ] Word of mouth needs more marketing as you grow (`mktNeed`, square root of owners). The consultant and the bottleneck say "Limit: marketing" when it falls under 75%.
+- [ ] The Ministry (campaigns) opens once the farm has taken your tanks and 1,000 kits are sold, Shrimp Pictures right after; both cheaper than before.
+- [ ] Late pages stay short: all-automatic QC is one line, smaller shops and farm tiers hide behind a button.
+- [ ] Saves from the Grandpa version: the You tab history is rewritten to today's wording on load (`fixGpText`).
 - [ ] Frozen accounts say why and what is blocked. New Shrimp Times stories drop in from the top as a small newspaper banner.
 
 **You tab and Grandma**
