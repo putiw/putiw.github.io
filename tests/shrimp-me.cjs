@@ -97,4 +97,23 @@ check('the buyout offer ends the game with its own ending',`
 var g=newGame();g.humans=1e6;if(!milestoneConditions(g).buyout)throw Error('Offer');storyChoose(g,'buyout',1);if(g.emp.ended||!g.emp.offerOpen)throw Error('No');
 var h=newGame();h.humans=1e6;var m=h.money;storyChoose(h,'buyout',0);if(endingPick(h)!=='sold'||h.money-m<2e7)throw Error('Sold');
 `);
+check('only some players see each tree, and the steps add to the ending',`
+var g=newGame();g.humans=6e7;g.day=900;g.tr={drive:8,ego:8,means:-6};treeDay(g);if(!treeHas(g,'island')||treeHas(g,'shop')||!milestoneConditions(g).tree_island)throw Error('Island for climbers '+JSON.stringify(g.emp.trees));
+g.money=1e8;if(!buyTreeStep(g,'isl_buy')||buyTreeStep(g,'isl_pass'))throw Error('Steps in order');g.emp.inf=1e5;buyTreeStep(g,'isl_nation');if(taxRate(g)!==0.045)throw Error('Island tax');
+if(gpLines(g).join(' ').indexOf('Shrimp Island')<0)throw Error('Ending line');
+var h=newGame();h.humans=6e7;h.day=900;h.tr={drive:-8,ego:-8,care:-4};treeDay(h);if(!treeHas(h,'shop')||treeHas(h,'island'))throw Error('Shop for floaters');
+var q=newGame();q.tr={know:8,care:6,ego:-4};q.emp.won=4000;if(!spaceOpen(q))throw Error('Space for the curious');q.tr={drive:8,ego:8,means:-6};q.emp.trees={};if(spaceOpen(q))throw Error('Not for climbers');
+var l=newGame();l.humans=6e7;l.day=900;l.tr={know:-8,kin:-8,drive:6,ego:6};treeDay(l);if(!treeHas(l,'lab'))throw Error('Designer lab for use and tool');
+`);
+check('a house that runs itself, piece by piece, for you or for Grandpa',`
+var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.money=1e6;if(!houseOffer(g))throw Error('Offer');buyHouse(g);if(!g.me.house.land)throw Error('Land');
+if(buyHouse(g))throw Error('Walls need a who');if(!buyHouse(g,'gp'))throw Error('Walls');g.me.picks=['house','nothing'];g.me.next=g.day;personalDay(g);if(!g.me.house.hp)throw Error('Working on it');
+while(houseNext(g))buyHouse(g);if(!g.me.house.complete||treesFor(g).indexOf('rewild')<0||gpLines(g).join().indexOf('Grandpa lives')<0)throw Error('Complete');
+`);
+check('hard places and late cards ask once and leave a line',`
+var g=newGame();g.humans=2e9;var c=milestoneConditions(g);if(!c.c_war||!c.c_gary||c.c_water)throw Error('Thresholds');g.emp.inf=1e5;var ce=g.emp.ceil;
+if(!storyChoose(g,'c_war',2)||g.emp.inf!==5e4)throw Error('Peace Corps');if(card3Lines(g).join().indexOf('peace deal')<0)throw Error('Line');
+g.humans=3e9;g.money=0;if(storyChoose(g,'c_water',0))throw Error('Needs the money');if(!storyChoose(g,'c_water',4))throw Error('Free answer');
+var old=newGame();old.day=3000;old.humans=7e9;delete old.progress.v5;migrateProgress(old);detectMilestones(old);if(old.progress.queue.some(function(k){return /^c_/.test(k);}))throw Error('Old saves skip passed cards');
+`);
 console.log(count+' free time, Grandpa and ending checks passed');

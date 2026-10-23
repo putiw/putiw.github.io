@@ -422,3 +422,27 @@ ammonia is only the primary button once ammonia is near zero.
 
 ## Docs: AGENTS.md refreshed
 - New bot results, recent systems (choices and heart), UI lessons from passes 51 to 53, cure minigame plan from the prototype, academia vs industry proposal.
+
+## Pass 54: who you become, round 1
+- Top bar: `?` sits top right from the start, settings live inside it (`.apop-foot`), the person button `#tb-me` sits next to it once free time opens. Id selectors because render resets `#tb-info`'s class.
+- Nine hidden traits (`TRAITS`, `G.tr`, `trAdd`, `TRAIT_TAGS`, `STORY_TAGS`). Heart feeds Means. Play style (`G.ps`, counted in the UI tick and handlers: top speed, idle, hands-on feeding after automation, looks, wipes, treats, ? opens, Shrimp Times reads, You tab opens, thin or fat cash, the day of the 4th region) is half of each trait it can see (`playVal`, `traitVals`).
+- `endingPick`: Empire, Garden, Question, Network, Drift, each with variations, plus the fall (3) and Sold. Text in `ENDINGS` (UI), same words as the doc's Endings tab. The win card shows the whole ending page, no trait bars.
+- You tab (`p-me`): free time picks (`PICKS`, `mePick`, `personalPeriod`), weekly, monthly after farms, yearly after moving. Burnout after four heavy periods with no rest. Grandpa moments (`MOMENTS`, `momentAnswer`) only show on the tab and pass after about 2.5 min of play.
+- Your own tank (`owntank` card at the first industrial hatchery): keep it, give it to Grandpa, or let the farm take them. Kept tanks get treats by hand plus happy treats (`HAPPY`).
+- Staff goodbyes (`bye_pack`, `bye_sales`, `bye_mgr`, `bye_social`, `byeOpts`, `byeChoose`): Rosa, Imran, Dana, Leo. Human in the loop and regional managers stay on the payroll (`E.hil`). The old packer fork projects are retired (`req` false).
+- Tester fixes: the heat alert no longer re-slows every tenth of a degree (signature without numbers, once per alert per 30 days), spotlights at least 15 s apart from every source, "Tanks get cold in ." fixed, Space buttons spaced, no "Affordable in about" nudges, first illness ever spreads at 55% speed, algae a bit see-through, Winter heater vs Summer cooling fan.
+
+## Pass 55: money trouble and dirty money, round 2
+- Below zero, the `broke` card (`brokeOpts`, `brokePick`, repeats with a 7-day snooze): Grandpa's savings (once, small debts, he cancels the sea trip, pay back from the You tab), the neighbours (co-op or kind players), a bank loan (three missed payments and it takes a farm), the man at the market (30% in two months or a farm gets smashed), washing money, sell something, or bankruptcy (deep debt only, the game ends here, two taps).
+- `buyout` after a million owners (earlier with investor dinners), `sellco` card in Kits after. `endGame`, `gameover` card shows the ending.
+- Dyed shrimp (`dye_offer`, 60% more, found out after a week or so, pet shop stops ordering, market mood capped). Fight nights (`fight_invite`, a free time pick: money, dead shrimp, raids). The logistics investor (`wash_offer`, `startWash`, `washDay`): cash every day, 9% tax on it, audits freeze accounts 30 days (`frozen` blocks buying), three favours (`fav_0..2`). The routes deal is the point of no return (`E.network`, borders open, dark news). Go to the police: 90% of cash, no kit sales for a year, half the farms (`E.inquiry`). Pay your way out keeps one dark line.
+- Mira reacts: dye, fight night, scholarship, the investor, the year after the police.
+
+## Pass 56: trees, the house, hard places, round 3
+- `treesFor`: the top ending type plus anything within 0.3 of it opens its tree, locked in once opened (`E.trees`, from 50M owners). Space only for the curious (`spaceOpen` needs the Space tree). Old saves that already won keep Space.
+- `TREES`: Shrimp Island (tax halves), Rewilding (also opens when the house is complete), The last mile, The designer lab (escape news later), The shop. Steps in World, lines in the ending.
+- `HOUSE`: land, walls (for me, Grandpa, or both), solar, wind, well, rain tank, compost, garden, shrimp room. Offered with AED 300k spare. Work on the house pick makes the next piece cheaper.
+- `CARDS3`: Gary, shrimp mayor, divorce, shrimp money, the river war (made-up countries), shrimp in court, water first, lab shrimp, electricity, rivers, too many shrimp, blackout, tiny jails, nobody goes outside, the one neighbour, the fishing family, your own tank going green. Each choice moves traits and can leave a line.
+- Tests: `node tests/shrimp-me.cjs` (16 checks). The average bot now plays a curious kind player (papers and shrimp club) so Space stays covered; the cold average player gets Shrimp Island and no Space, and stops at Earth.
+- Pacing: strong cold 2293 (empire_dictator), strong kind 2449 (garden_village), average kind Earth 6071 and space 7404 (garden_village, trees rewild, space, island), average cold Earth 5975 (empire_dictator, island).
+- Known: `shrimp-space-playthrough.cjs` from the academy fixture stalls on Pelagia (needs terraform research), the same on the version before this round.

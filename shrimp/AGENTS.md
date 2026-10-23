@@ -67,6 +67,11 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **Choices and heart** (`FORK_Q`, `forkOpts`, `addHeart`, `dealsDay`, `laterDay`, `endingLines`, `endingVerdict`): kind or cold answers to one problem, hidden heart score, delayed news, and the win card's "What the world looks like" list.
 - **Quality checks** (`QC_STEPS`, `qcRound`, `sickKitRate`, `openQC`): a manual round once a month, steps automated in order, and a strictness setting.
 - **Hand packing** (`PACK_STEPS`, `handStep`, `buyTool`): five taps a kit, automated one tool at a time.
+- **Who you become** (`TRAITS`, `trAdd`, `G.ps`, `traitVals`, `endingPick`, `ENDINGS`): nine hidden traits from choices and play style pick one of 16 endings. Every new choice should move a trait other than Means too (tag it in `TRAIT_TAGS`, `STORY_TAGS`, or the choice itself).
+- **You tab** (`G.me`, `PICKS`, `MOMENTS`, `HOUSE`): free time, Grandpa, a place of your own. Moments only show on the tab.
+- **Money trouble and dirty money** (`broke`, `debtDay`, `G.dye`, fight night pick, `E.dirty`, `FAVOURS`, `E.network`, `E.turned`): the network deal is the point of no return.
+- **Trees** (`treesFor`, `TREES`, `E.trees`): each type sees its own tree, Space is the curious one's.
+- **Late cards** (`CARDS3`): data-driven story cards, `[label, result, traits, effect, ending line]`.
 
 ## How to read Puti's requests
 
@@ -142,10 +147,10 @@ Latest bot results (seed 7):
 
 | Bot | Result |
 |---|---|
-| Strong, cold answers (default) | Earth won on day 2,253 to 2,297 |
-| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 2,449 |
-| Average, kind answers (default) | Earth on day 6,143 (seed 1: 5,990), space done day 7,488 |
-| Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,825 to 6,047 |
+| Strong, cold answers (default) | Earth won on day 2,293, empire_dictator |
+| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 2,449, garden_village |
+| Average, curious and kind (default) | Earth on day 6,071, space done day 7,404 |
+| Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,975, no Space (Shrimp Island instead) |
 
 The average bot has 21 years to finish both chapters (it used to finish space on day 7,292 of 7,300).
 
@@ -206,10 +211,13 @@ Planned and agreed with Puti, not built yet:
 **Other planned work**
 - The player chooses the next region from 2–3 options with trade-offs, instead of a fixed order.
 - Story pacing: story cards at least ~30 game days apart, plus new late-game beats with choices that last (Mira's science fair, a flatworm recall, the rival's merger offer, a letter from Iceland).
-- A fuller ending: the win card already lists what the world looks like and a closing line by path. Still to add: a timeline of the run and Grandpa's last note.
 - Cure minigames, one per cure, tried out in a separate prototype page (Shrimp Cure Games artifact) and not in the game yet. Mineral pellets: tap to drop pellets, every shrimp eats, add GH+ a scoop at a time (aim 6 to 8, a big jump kills some), the ring fades on sick ones that eat. Water change: hold Drain to about half, tap the milky shrimp to net them out while the water is low, hold Refill to the full line (overfilling spills). Salt dip: hold to dip the shrimp in a cup, target 4.5 s (sped up 10×, 45 s real), no clock, 3.5 to 5.5 s cures, longer stresses, past 7 s it dies.
 - Academia vs industry (proposed, not agreed): postdoc pay slider that doesn't speed research but keeps more people in academia (rare breakthroughs later, mostly for Space) versus leaving for industry (you can hire them for applied gains now).
 
+- Mira reacting at more moments, Grandpa letters that get shorter for climbers, the tank tab's own-tank crash at year eight only checks the glass.
+- Tree last chapters after Earth for non-Space players are only the tree steps in World, there's no chapter screen like Space.
+
 **Known gaps**
+- `shrimp-space-playthrough.cjs` stalls on Pelagia from the academy fixture.
 - Kits still unlock in the background after 200 home-bred sales and 2 stocked tanks. They could unlock from the care ladder instead.
 - The first babies trigger a few spotlights in a row (Colony, Recent events). They could be merged into one.

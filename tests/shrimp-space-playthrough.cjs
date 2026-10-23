@@ -7,7 +7,7 @@ vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);
 vm.runInContext('var BOTKIND='+(false)+';var _ack=acknowledgeMilestone;acknowledgeMilestone=function(G){var k=G.progress.queue[0],m=k&&MILESTONES[k];if(m&&m.dyn){if(!(BOTKIND&&storyChoose(G,k,1)))storyChoose(G,k,0);}else if(k==="owntank")storyChoose(G,k,0);return _ack(G);};',c);c.fixture=source.snapshots['win'];
 vm.runInContext(`
 var G=migrate(fixture),events=[],snapshots={},earthStart=G.humans;G.opt.all=true;
-while(G.progress.queue.length)acknowledgeMilestone(G);if(!G.emp.won||!requestSpaceDream(G)||!beginSpace(G))throw Error('Space should start after Earth');
+G.tr={know:8,care:6,ego:-4};while(G.progress.queue.length)acknowledgeMilestone(G);if(!G.emp.won||!requestSpaceDream(G)||!beginSpace(G))throw Error('Space should start after Earth');
 function record(k){if(!snapshots[k]){events.push({event:k,day:G.day,money:Math.round(G.money),owners:Math.round(G.humans),knowledge:Math.floor(G.academy.knowledge)});snapshots[k]=JSON.parse(JSON.stringify(G));}}
 record('space begins after Earth');G.academy.autoFund=true;
 function spacePolicy(){var A=G.academy,S=G.space;

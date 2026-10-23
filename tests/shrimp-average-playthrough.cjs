@@ -75,11 +75,11 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,S=G.space,budget=
  }
 }
 for(var day=0;day<7665;day++){
- care();if(G.day%(kitsOpen(G)?28:7)===0||G.day<35)visit();if(G.emp.won&&G.space.won)break;
- waitingSeconds+=2.4/maxSpeed(G);for(var q=0;q<4;q++){while(G.progress.queue.length){note('milestone '+G.progress.queue[0]);acknowledgeMilestone(G);}if(G.emp.won&&!G.space.started&&requestSpaceDream(G)&&beginSpace(G))note('space started');if(!stepGame(G))throw Error('Clock blocked at '+G.day);}
+ care();if(G.day%(kitsOpen(G)?28:7)===0||G.day<35)visit();if(G.emp.won&&(G.space.won||!spaceOpen(G)))break;
+ waitingSeconds+=2.4/maxSpeed(G);for(var q=0;q<4;q++){while(G.progress.queue.length){note('milestone '+G.progress.queue[0]);acknowledgeMilestone(G);}if(G.me&&G.me.on&&G.me.picks.join()!=='papers,club')G.me.picks=['papers','club'];if(G.emp.won&&!spaceOpen(G))break;if(G.emp.won&&!G.space.started&&requestSpaceDream(G)&&beginSpace(G))note('space started');if(!stepGame(G))throw Error('Clock blocked at '+G.day);}
  minCash=Math.min(minCash,G.money);if(!Number.isFinite(G.money)||G.money<0)throw Error('Insolvent at '+G.day+' '+JSON.stringify(G.fin.slice(-3)));if(day%1000===0)console.log('progress',G.day,Math.round(G.money),Math.round(G.humans),farmCap(G),packCap(G));
  if(G.day%365===0){snapshots['year '+Math.floor(G.day/365)]=JSON.parse(JSON.stringify(G));}
 }
-care();var result={events:events,snapshots:snapshots,actions:actions,day:G.day,earth:G.emp.won,space:G.space.won,minCash:minCash,waitingMinutes:waitingSeconds/60,visits:visits,final:G};
+care();var result={events:events,snapshots:snapshots,actions:actions,day:G.day,earth:G.emp.won,space:G.space.won,ending:endingPick(G),trees:Object.keys(G.emp.trees||{}),minCash:minCash,waitingMinutes:waitingSeconds/60,visits:visits,final:G};
 `,c,{timeout:180000});
-const out=process.env.REVIEW_OUTPUT||'/private/tmp/shrimp-average';fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'run-'+initialSeed+'.json'),JSON.stringify(c.result));console.log(JSON.stringify(c.events,null,2));console.log('RESULT',JSON.stringify({...c.result,snapshots:undefined,actions:undefined,final:undefined}));if(!c.G.emp.won||!c.G.space.won)throw Error('Average-player scenario did not complete both chapters within 21 game years');if(c.minCash<=0)throw Error('Average-player scenario exhausted its working cash');
+const out=process.env.REVIEW_OUTPUT||'/private/tmp/shrimp-average';fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'run-'+initialSeed+'.json'),JSON.stringify(c.result));console.log(JSON.stringify(c.events,null,2));console.log('RESULT',JSON.stringify({...c.result,snapshots:undefined,actions:undefined,final:undefined}));if(!c.G.emp.won||c.spaceOpen(c.G)&&!c.G.space.won)throw Error('Average-player scenario did not complete both chapters within 21 game years');if(c.minCash<=0)throw Error('Average-player scenario exhausted its working cash');
