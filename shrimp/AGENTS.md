@@ -71,7 +71,7 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **You tab** (`G.me`, `PICKS`, `MOMENTS`, `HOUSE`): free time, Grandpa, a place of your own. Moments only show on the tab.
 - **Money trouble and dirty money** (`broke`, `debtDay`, `G.dye`, fight night pick, `E.dirty`, `FAVOURS`, `E.network`, `E.turned`): the network deal is the point of no return.
 - **Trees** (`treesFor`, `TREES`, `E.trees`): each type sees its own tree, Space is the curious one's.
-- **Late cards** (`CARDS3`): data-driven story cards, `[label, result, traits, effect, ending line]`. A card only if different people would really choose differently, otherwise a headline (`HEADLINES`). Story cards wait their turn, about two minutes of play apart.
+- **Late cards** (`CARDS3`): data-driven story cards, `[label, result, traits, effect, ending line]`. A card only if different people would really choose differently, otherwise a headline (`HEADLINES`). Story cards and Shrimp Times stories take turns, each 30 s to 2 min of play apart, and a choice's own story comes right after it. Always use `newsLine`/`newsEvent`, never push to `R.log` directly.
 - **Income after Earth** (`foodIncome`, `sideIncome`): new income comes from things already built and shows as one finance line, never a new screen or button.
 
 ## How to read Puti's requests

@@ -126,7 +126,15 @@ check('story cards wait their turn, about two minutes of play apart',`
 var g=newGame();g.ps.t=1000;g.stats.sold=40;g.emp.kitsOpened=0;var p=ensureProgress(g);p.queue=[];p.seen.intro=true;g.tanks[0].cycledAt=null;
 p.seen.cycle=p.seen.hatch=p.seen.sale=p.seen.ev_paper=true;
 detectMilestones(g);var first=p.queue.slice();if(first.indexOf('ev_mira')<0||first.indexOf('dye_offer')>=0||p.wait.indexOf('dye_offer')<0)throw Error('Second card waits '+JSON.stringify(first)+JSON.stringify(p.wait));
-p.queue=[];g.ps.t+=60000;detectMilestones(g);if(p.queue.length)throw Error('Too soon');g.ps.t+=61000;detectMilestones(g);if(p.queue[0]!=='dye_offer')throw Error('Now');
+p.queue=[];g.ps.t+=20000;detectMilestones(g);if(p.queue.length)throw Error('Too soon');g.ps.t+=101000;detectMilestones(g);if(p.queue[0]!=='dye_offer')throw Error('Within two minutes');
 p.queue=[];g.money=-500;g.day=50;detectMilestones(g);if(p.queue[0]!=='broke')throw Error('Money trouble never waits');
+`);
+check('Shrimp Times stories come one at a time, and a choice\'s story comes next',`
+var g=newGame();g.ps.t=5000;var R=rip(g),p=ensureProgress(g);p.queue=[];newsLine(g,'one');newsLine(g,'two');newsLine(g,'three');if(R.log.length)throw Error('Queued, not printed');
+g.ps.t+=1000;newsTick(g);if(R.log.length!==1||R.log[0].tx!=='one')throw Error('First goes out');newsTick(g);if(R.log.length!==1)throw Error('Then waits');
+g.emp.kitsOpened=1;g.money=1e6;g.day=500;storyChoose(g,'wash_offer',0);g.emp.dirty.noticed=0;g.emp.dirty.day=0;g.day=100;washDay(g);g._dec=1;newsLine(g,'because of you');g._dec=0;
+if(R.pend[0].tx!=='because of you')throw Error('Your story jumps the line');g.ps.t+=25000;newsTick(g);if(R.log[R.log.length-1].tx!=='because of you')throw Error('Soon after the choice');
+g.ps.t+=121000;newsTick(g);if(R.log.length!==3)throw Error('Then the rest, spaced');
+var b=newGame();newsLine(b,'bots');if(rip(b).log.length!==1)throw Error('No play clock, straight to print');
 `);
 console.log(count+' free time, Grandpa and ending checks passed');

@@ -788,7 +788,7 @@ function forkOpts(fk){return PROJ.filter(function(x){return x.fk===fk;});}
 // Heart: what kind of company you ran. Never shown as a number, the ending shows it.
 function addHeart(G,h){if(h){G.emp.heart=(G.emp.heart||0)+h;trAdd(G,{means:h});}}
 function heartMult(G){return clamp(1+0.04*(G.emp.heart||0),0.4,1.6);}
-function newsLine(G,t){var R=rip(G);R.log.push({tx:t,d:Math.floor(G.day)+1,own:pd(G,'paperbuy')?1:0});log(G,'The Shrimp Times: '+t);}
+function newsLine(G,t){newsPush(G,{tx:t},t);}
 function laterDay(G){var E=G.emp;if(!E.later||!E.later.length)return;var now=Math.floor(G.day);E.later=E.later.filter(function(x){if(now<x.d)return true;if(x.t)newsLine(G,x.t);if(x.m)moodAdd(G,x.m,5);if(x.c)E.ceil+=x.c;return false;});}
 function autoDisc(G){return rd(G,'automation')?0.75:1;}
 function matAdj(G){return (pd(G,'shipwarm')?4:0)-(pd(G,'shipcheap')?3:0)+(pd(G,'almond')?1:0);}
@@ -1158,7 +1158,7 @@ var RIPPLE=[
 function rip(G){var E=G.emp;if(!E.ripple)E.ripple={free:0,n:0,log:[],seen:0,v:2};var R=E.ripple;if(R.v!==2){if(R.n>0){R.log.forEach(function(x){x.i+=3;});R.n+=3;R.seen=(R.seen||0)+3;}R.v=2;}return R;}
 // Event stories, printed when they happen.
 var NEWS_EV={robots:'Robots now pack the kits. The old packers open a bubble tea shop next door.',aisales:'Your salespeople are replaced by AI agents. The agents never sleep and send customers shrimp memes at 3 am.',aimgr:'AI now runs every shop. The old shop managers say it keeps ordering too much glitter gravel.',aitech:'AI technicians look after the tanks now. Nobody misses the night shift.'};
-function newsEvent(G,k){if(!NEWS_EV[k])return;var R=rip(G);R.ev=R.ev||{};if(R.ev[k])return;R.ev[k]=1;R.log.push({e:k,d:Math.floor(G.day)+1,own:pd(G,'paperbuy')?1:0});log(G,'The Shrimp Times: '+NEWS_EV[k]);}
+function newsEvent(G,k){if(!NEWS_EV[k])return;var R=rip(G);R.ev=R.ev||{};if(R.ev[k])return;R.ev[k]=1;newsPush(G,{e:k},NEWS_EV[k]);}
 var FLATTER=[' Our owner is a genius.',' We love our owner.',' Our owner did nothing wrong.',' Shrimp are great, and so is our owner.',' (The Shrimp Times is proudly owned by you.)'];
 function newsText(x){var t=x.tx||(x.e?NEWS_EV[x.e]:RIPPLE[x.i].t);return x.own&&!/five stars/.test(t)?t+FLATTER[x.d%FLATTER.length]:t;}
 function rippleDue(G,h){return h.kits!=null?G.kits.sold>=h.kits:rip(G).free>=h.at;}
@@ -1169,9 +1169,9 @@ function carbonPay(G){return rippleHas(G,'carbon')?rip(G).free*0.03:0;}
 function regionCost(G,r){return r.m*(rippleHas(G,'regions')?0.9:1)*(pd(G,'buypol')?0.8:1)*(G.emp.network?0.75:1);}
 function rippleDay(G){var R=rip(G);if(G.humans<1&&G.kits.sold<1)return;
  R.free=Math.min(G.humans,R.free+Math.max(0,G.humans-R.free)*rippleRate(G));
- while(R.n<RIPPLE.length&&rippleDue(G,RIPPLE[R.n])){var h=RIPPLE[R.n];R.log.push({i:R.n,d:Math.floor(G.day)+1,own:pd(G,'paperbuy')?1:0});
+ while(R.n<RIPPLE.length&&rippleDue(G,RIPPLE[R.n])){var h=RIPPLE[R.n];newsPush(G,{i:R.n},null);
   if(h.fx==='fire'&&!pd(G,'retrain'))moodAdd(G,-5,10);
-  log(G,'The Shrimp Times: '+h.t);R.n++;}
+  R.n++;}
  var mi=mangroveInf(G);if(mi)gainInf(G,mi);var cp=carbonPay(G);if(cp)earn(G,cp,'carbon');
 }
 
@@ -1838,7 +1838,9 @@ function detectMilestones(G){
   if(!p.wait)p.wait=[];
   Object.keys(MILESTONES).forEach(function(k){if(conditions[k]&&!p.seen[k]){p.seen[k]=true;if(!G.opt.all||k==='win'){if(storyWaits(k))p.wait.push(k);else p.queue.push(k);}if(k==='farm')p.home='emp';}});
   // one story card at a time, about two minutes of play apart
-  var now=storyClock(G);if(p.wait.length&&!p.queue.length&&(p.lastStory==null||now-p.lastStory>=STORY_GAP||now<p.lastStory)){p.queue.push(p.wait.shift());p.lastStory=now;}
+  var now=storyClock(G);if(p.nextStory!=null&&p.nextStory-now>300000)p.nextStory=now;
+  if(p.wait.length&&!p.queue.length&&(p.nextStory==null||now>=p.nextStory)){p.queue.push(p.wait.shift());p.lastStory=now;p.nextStory=now+paceGap(p.wait.length);var R=rip(G);if(R.pend&&R.pend.length&&(R.nextAt==null||R.nextAt<now+10000))R.nextAt=now+10000;}
+  newsTick(G);
 }
 function progressionBlocked(G){var p=ensureProgress(G);return p.queue.length>0||!!G.emp.ended||!!G.emp.won&&!p.sandbox&&!(G.space&&G.space.started);}
 function acknowledgeMilestone(G){var p=ensureProgress(G),key=p.queue.shift();if(!key)return null;if(key==='ev_mira')G.emp.infOn=1;return key;}
@@ -2430,9 +2432,18 @@ function foodIncome(G){return G.humans*foodRate(G);}
 function sideIncome(G){var E=G.emp,h=G.humans,c3=E.c3||{},t=E.tree||{},x=0;if(c3.c_water===0)x+=h*0.0004;if(t.lm_water)x+=h*0.0002;if(t.lm_med)x+=h*0.0003;if(t.isl_pass)x+=50000;if(pd(G,'solar'))x+=farmCap(G)*0.5;return x;}
 var SIDE_NEWS=[{k:'solar',ok:function(G){return pd(G,'solar');},t:'Your farms sell their spare power to the grid. A wind farm in Inner Mongolia joins next spring.'},{k:'desal',ok:function(G){return (G.emp.c3||{}).c_water===0;},t:'Your desalination plants sell water to three coastal cities.'},{k:'freight',ok:function(G){return !!(G.emp.tree&&(G.emp.tree.lm_water||G.emp.tree.lm_med));},t:'Hospitals and water companies pay your trucks to carry their boxes.'}];
 function incomeDay(G){var f=foodIncome(G),x=sideIncome(G),E=G.emp,N=E.sideNews||(E.sideNews={});if(f>0)earn(G,f,'foodsales');if(x>0)earn(G,x,'side');SIDE_NEWS.forEach(function(n){if(!N[n.k]&&n.ok(G)){N[n.k]=1;newsLine(G,n.t);}});}
-var STORY_GAP=120000;
 function storyClock(G){return G.ps&&G.ps.t>0?G.ps.t:G.day*4000;}
 function storyWaits(k){var m=MILESTONES[k];return !!(m&&m.story&&k!=='broke'&&k!=='gameover');}
+// The Shrimp Times comes out one story at a time, 30 s to 2 min of play apart, mixed in with the choice cards.
+// A story caused by a choice you just made comes next, a little after it.
+function newsPush(G,x,t){var R=rip(G);x.own=pd(G,'paperbuy')?1:0;x.t=t;if(!(G.ps&&G.ps.t>0)){newsOut(G,x);return;}var P=R.pend||(R.pend=[]);
+ if(G._dec){x.soon=1;var i=0;while(i<P.length&&P[i].soon)i++;P.splice(i,0,x);var now=storyClock(G),at=now+8000+Math.random()*12000;if(R.nextAt==null||R.nextAt>at)R.nextAt=at;}else P.push(x);}
+function newsOut(G,x){var R=rip(G),t=x.t!=null?x.t:x.tx||(x.e?NEWS_EV[x.e]:x.i!=null?RIPPLE[x.i].t:'');delete x.t;delete x.soon;x.d=Math.floor(G.day)+1;R.log.push(x);if(t)log(G,'The Shrimp Times: '+t);}
+function paceGap(n){return (30000+Math.random()*90000)/(1+Math.max(0,n-3)/3);}
+function newsTick(G){var R=rip(G),P=R.pend;if(!P||!P.length)return;var now=storyClock(G),p=ensureProgress(G);if(now<(R.nextAt||0)&&!(R.nextAt-now>200000))return;if(p.queue.length)return;if(p.lastStory!=null&&now-p.lastStory<10000&&now>=p.lastStory)return;
+ newsOut(G,P.shift());R.nextAt=now+paceGap(P.length);if(p.nextStory==null||p.nextStory<now+10000)p.nextStory=now+10000;}
+function decide(f){return function(G){G._dec=1;try{return f.apply(null,arguments);}finally{G._dec=0;}};}
+storyChoose=decide(storyChoose);buyProj=decide(buyProj);momentAnswer=decide(momentAnswer);buyTreeStep=decide(buyTreeStep);buyHouse=decide(buyHouse);
 // ==SIM-END==
 
 // ---------- UI ----------
@@ -2893,7 +2904,7 @@ function movieHTML(){var E=G.emp,mv=E.movie;if(mv.n>=MOVIES.length)return itemHT
   return '<div class="item fork"><div><h3>Next film: '+M[0]+'</h3><p>'+M[1]+' What is it really about?</p></div><div class="hb forkb">'+CUTS[mv.n].map(function(c,k){return bbtn('movie','data-cut="'+k+'"',c[0],ok,false);}).join('')+'<small class="hint">'+cost2(mb,mc)+' · 30 days</small></div></div>';}
 function updateRipple(){
   var R=rip(G),c=$('ripplecard');c.hidden=R.log.length<1;c.style.order='2';
-  if(R.seenL==null)R.seenL=R.log.length;if(R.log.length>R.seenL){R.seenL=R.log.length;if(!G.opt.all){G.opt.spotSeen=G.opt.spotSeen||{};G.opt.spotSeen.ripplecard=1;var queued=G.progress.queue.indexOf('ripple')>=0||!!TVLOCK;if(!queued){var tw=document.querySelector('.tabs [data-tab="world"]');if(tw&&!tw.hidden&&activeTab!=='world'){tw.click();}}c.hidden=false;spotlight(c,'New issue of The Shrimp Times.');}}
+  if(R.seenL==null)R.seenL=R.log.length;if(R.log.length>R.seenL){var fresh=R.log.slice(R.seenL),firstIssue=!G.opt.rippleIntro;R.seenL=R.log.length;if(!G.opt.all){c.hidden=false;if(firstIssue){G.opt.rippleIntro=1;G.opt.spotSeen=G.opt.spotSeen||{};G.opt.spotSeen.ripplecard=1;var queued=G.progress.queue.indexOf('ripple')>=0||!!TVLOCK;if(!queued){var tw=document.querySelector('.tabs [data-tab="world"]');if(tw&&!tw.hidden&&activeTab!=='world'){tw.click();}}spotlight(c,'New issue of The Shrimp Times.');}else if(activeTab!=='world'||!$('ripplecard').getClientRects().length){var x=fresh[fresh.length-1],tt=x.tx||(x.e?NEWS_EV[x.e]:x.i!=null&&RIPPLE[x.i]?RIPPLE[x.i].t:'');if(tt)toast('The Shrimp Times · '+tt);}}}
   if(R.log.length<1)return;
   var owners=Math.max(1,G.humans);setT('rp-sum',pd(G,'paperbuy')?'owned by you':R.free>=100?big(Math.floor(R.free))+' shrimp-free':'');
   var last=R.log[R.log.length-1];setT('rp-latest','Day '+last.d+'. '+newsText(last));
