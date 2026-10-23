@@ -1,6 +1,6 @@
 // Continue an Earth playthrough after everyone has a tank: space opens only then.
 const fs=require('fs'),vm=require('vm'),path=require('path'),assert=require('node:assert/strict');
-const html=fs.readFileSync(path.join(__dirname,'../shrimp/index.html'),'utf8'),input=process.env.ACADEMY_RUN||'/private/tmp/shrimp-academy-play/run-7.json';
+const html=fs.readFileSync(path.join(__dirname,'../shrimp/index.html'),'utf8'),input=process.env.ACADEMY_RUN||require('os').tmpdir()+'/shrimp-academy-play/run-7.json';
 const source=JSON.parse(fs.readFileSync(input,'utf8')),c=vm.createContext({Math,console});
 if(!source.snapshots['win'])throw Error('Earth replay needs a win snapshot');
 vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);
@@ -26,4 +26,4 @@ if(!G.space.won)throw Error('Space did not finish: '+JSON.stringify(G.space));re
 if(G.humans<earthStart)throw Error('Earth owners dropped during space');
 for(var w of WORLDS)if(!habitatMetrics(G,w.id).stable)throw Error('Unstable completed habitat: '+w.id);
 `,c,{timeout:180000});
-const out=process.env.SPACE_OUTPUT||'/private/tmp/shrimp-space-play';fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'run.json'),JSON.stringify({events:c.events,snapshots:c.snapshots,final:c.G}));console.log(JSON.stringify(c.events,null,2));console.log('PASS complete space chapter after Earth');
+const out=process.env.SPACE_OUTPUT||require('os').tmpdir()+'/shrimp-space-play';fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'run.json'),JSON.stringify({events:c.events,snapshots:c.snapshots,final:c.G}));console.log(JSON.stringify(c.events,null,2));console.log('PASS complete space chapter after Earth');

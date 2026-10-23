@@ -4,7 +4,7 @@ Read this before you change anything in `shrimp/`. It covers what the game is, h
 
 ## Names you will meet in the code
 
-- **`gp` means grandparent, and the grandparent is Grandma.** The game used to have Grandpa, so some saved fields and ids still say `gp`, `gpLoan`, `keep:'gp'`, `G.me.gp`, the story keys `gp_net`, the ad id `grandpa`, and the unused lab project id `labgrandpa`. They are saved in players' games, so do not rename them without a migration. Functions and constants were renamed (`GRANDMA_LETTERS`, `grandmaLetter`, `payGrandma`). The late spouse is Grandpa (fish soup, the Maryam boat story, "calls you in for dinner").
+- **`gp` means grandparent, and the grandparent is Grandma.** The game used to have Grandpa, so some saved fields and ids still say `gp`, `gpLoan`, `keep:'gp'`, `G.me.gp`, the story keys `gp_net`, the ad id `grandpa`, and the unused lab project id `labgrandpa`. They are saved in players' games, so do not rename them without a migration. Functions and constants were renamed (`GRANDMA_LETTERS`, `grandmaLetter`, `payGrandma`). The late spouse is Grandpa (fish soup, the Maryam boat story, "calls you in for dinner"). Grandpa is alive in the story: he wants a well, he calls you in for dinner, Grandma writes that you write like he talks. Don't write him as dead.
 - **Player name.** Typed on the first card, kept in `G.name` (and localStorage `shrimp-name` for the next game). Always read it with `nm(G)` and put it into text with `N(G,text)`: `{,name}` becomes `, Name` or nothing, `{name|fallback}` becomes the name or the fallback. `nm` strips everything except letters, digits, space, dot, hyphen and caps at 16 characters, because the name goes into `innerHTML`. Never print `G.name` directly.
 - **Staff:** Kiki (packing), Luca (sales), Gema (shops), Mimi (social), Lucy (the lab scientist).
 
@@ -138,7 +138,7 @@ These come from Puti's feedback. Treat them as requirements.
 - Shrimp welfare matters: owners' tanks have a welfare score, and sick kits cost ✦.
 
 **Weight**
-- No game engines. One canvas, small embedded assets. The file is about 430 KB, so keep additions small.
+- No game engines. One canvas, small embedded assets. The file is about 740 KB (most of it embedded sprites and sound), so keep additions small.
 
 ## Feature checklist
 
@@ -170,12 +170,12 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] Story cards come one at a time, 30 s to 2 min of play apart. Money trouble, the ending and intro cards never wait (`shrimp-me`).
 - [ ] Shrimp Times stories come one at a time, 30 s to 2 min apart, never on top of a card, and a story caused by your choice comes 8 to 20 s after it (`shrimp-me`). After the first issue, news is a short toast, it doesn't switch tabs.
 - [ ] Only choices where different people really choose differently are cards, the rest are headlines (`HEADLINES`).
-- [ ] The ending page: type and variation, who you became, Mira, what the world looks like, Grandma's letter (with the visits line), from the tank, lives you didn't live, all 16 endings. No trait bars.
+- [ ] The ending page: type and variation, who you became, Mira, what the world looks like, Grandma's letter (with the visits line), from the tank, lives you didn't live, all 16 endings, then the charts (`endCharts`: owners over the years, cash, and where your traits sit).
 - [ ] Space opens only after Earth, and only for curious players (`spaceOpen`). Other types get their own tree in World.
 
 - [ ] The ending page shows four charts under who you became: owners over time with milestone dots, cash over time, the nine traits, and where the money went (`chartDay` records `G.chart`, `endCharts` draws plain SVG with the takeaway in each title). Saves from before this only chart from the day recording began.
 - [ ] Sound: `shrimp/water.mp3` and `shrimp/music.mp3` from the shrimp tanks game, same graph as there (master 0.82, bus 0.5, water 0.4 with 4.8 s fades, music 0.16 with 2.2 s fades). Mute button always in the top bar (`tb-mute`), starts on the first tap, pauses when the tab is hidden, off switch in Settings (localStorage `shrimp-music`). App icons: `favicon.ico`, `icon-32.png`, `icon-192.png`, `icon-180.png` (apple-touch), cropped from the tank art.
-- [ ] When shrimp are in the tank but time has never run, a spotlight points at 1× and says the game is paused; the 1× button pulses until it is pressed (`G.opt.pauseTold`, `G.opt.ranOnce`).
+- [ ] When shrimp are in the tank, kits aren't open yet and the clock is paused, a spotlight points at 1× and says the game is paused. The 1× button pulses until it is pressed (`G.opt.pauseTold`, `G.opt.nudge`). Once per save. There is no "time has never run" check: time runs during cycling, so that version never fired.
 - [ ] `BUILD` near `toast` changes with every release; an open game checks every 15 minutes and offers a reload when a newer one is live. Bump it when you ship.
 - [ ] Shrimp videos count as reach, not ego, so they don't push you away from Space.
 
@@ -190,7 +190,6 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] The SOP project (recipe tank) opens standard tanks 4 to 12; standard tanks come with everything, decor included. Tapping a row in the All tanks table looks at that tank alone (health check, restock), Back returns to the recipe.
 - [ ] When farms take over (first hatchery, or farms ≥ 10 kits/day) the farm takes every tank but the first (`retireTanks`), so no more alerts about tanks you can't reach.
 - [ ] Your day (`ACTS`, `M.day`, `dayHours`, `lifeDay` daily, `personalWeek` weekly): 24 hours painted once, repeats daily. 3 hours a day ≈ one old weekly pick. Sleep and exercise move health (`M.hp`): under 45 a doctor card, under 40 mild illness (3 weeks, 2% of cash), under 20 serious illness (a year, half the cash, company at half speed via `workMult`). Long work days and short nights build strain (`M.bo`): at 100 you burn out for four weeks (hours do nothing, ✦ at half). Work hours nudge sales ±2% an hour around 8. Design hours win prizes at 150/500/1200 h, video hours go viral at 400 h, paper hours raise research odds after 300 h. Once a year lane stays (trips home, holidays, conference).
-- [ ] (Older) Free time had three lanes: every week (two picks), every month (one, after the first farm), once a year (one, after moving or three regions). Each pick says which lanes it fits (`f`). After moving, Grandma visits, the shrimp club, Mira's school and fight night are gone; a yearly trip home replaces them.
 - [ ] Story prices that were fixed grow with the company (`aiCost` 20% of cash plus 2% of every kit sale, `rivalCost`, `schoolKits`).
 - [ ] The spotlight ring follows its card if anything moves (`spotTrack`).
 - [ ] Once a second region is open and the tank buttons leave the top bar, the owners count (x of 8.2B) sits in the top bar instead.
@@ -200,11 +199,14 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] The Ministry (campaigns) opens once the farm has taken your tanks and 1,000 kits are sold, Shrimp Pictures right after; both cheaper than before.
 - [ ] Late pages stay short: all-automatic QC is one line, smaller shops and farm tiers hide behind a button.
 - [ ] Saves from the Grandpa version: the You tab history is rewritten to today's wording on load (`fixGpText`).
-- [ ] Frozen accounts say why and what is blocked. New Shrimp Times stories drop in from the top as a small newspaper banner.
+- [ ] A tank crash gets its own card (`crash`, `G.lastCrash`), and an empty tank before kits shows a red alert. "Out of money" (`broke`) only shows when selling everything still leaves you short, and it says farm or shrimp to match where you are.
+- [ ] Fixed prices (projects, welfare, gala, crew, story choices) never fall under 0.2% of cash (`scM`, `si`). Excel is free once kits open.
+- [ ] Selling or closing the company goes straight to the ending card.
+- [ ] Frozen accounts say why and what is blocked. The reason is also in the ? popup, along with paying Grandma back. New Shrimp Times stories drop in from the top as a small newspaper banner.
 
 **You tab and Grandma**
 - [ ] Opens once the first tank feeds itself and changes its own water, with the Your Saturdays card.
-- [ ] Free time picks repeat, 2 then 3 slots, weekly, monthly after farms, yearly after moving. Burnout after four heavy periods with no rest.
+- [ ] Free time is one typical day of 24 hours (`ACTS`), painted once on the You tab. Burnout after long heavy stretches costs lost weeks, and each new burnout shows the Tired card again.
 - [ ] Grandma moments only show on the tab and pass if nobody looks.
 - [ ] Writing letters tells Grandma's story bit by bit. Her milestone letters live in the You tab once it opens.
 - [ ] Climbers get shorter letters, floaters get longer ones (`gpVoice`).
@@ -239,9 +241,9 @@ Latest bot results (seed 7):
 
 | Bot | Result |
 |---|---|
-| Strong, cold answers (default) | Earth won on day 2,293, empire_dictator |
-| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 2,449, garden_village |
-| Average, curious and kind (default) | Earth on day 6,071 to 6,258, space done day 7,404 to 7,600 |
+| Strong, cold answers (default) | Earth won on day 2,668, empire_dictator |
+| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 2,738, garden_village |
+| Average, curious and kind (default) | Earth on day 6,011, space done day 7,404 |
 | Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,975, no Space (Shrimp Island instead) |
 
 The average bot has 21 years to finish both chapters (it used to finish space on day 7,292 of 7,300).
@@ -285,7 +287,10 @@ When you change balance, run both bots and compare against these. Report the bef
 - **Screenshots in the repo.** A browser script run from the repo folder wrote `l1.png` and `l2.png` there and they got pushed. Write scratch files outside the repo and check `git status` before `git add`.
 - **Comparing `innerHTML` to a built string.** The browser rewrites SVG and attributes, so the compare never matches and the node is rebuilt every frame (charts flickered, tooltips died). Compare against a cached copy of the string instead.
 - **Spotlight on a fixed layer.** iPhone Safari has no scroll anchoring, so when something above the card grew, the page content moved and a `position:fixed` ring stayed put. The overlay now lives in page coordinates (`#spot` is absolute and as tall as the page), the ring follows its card every frame (`spotTrack`), and only header and tab-bar targets use fixed positioning. A scroll the player didn't make (no touch, wheel or key in the last 0.8 s) re-places the ring instead of closing it.
-- **Same thing spotlit twice.** Different paths (tab, intro card, card sweep) each kept their own "seen" note. Any spotlight now marks its element, its card and its tab as seen.
+- **Same thing spotlit twice.** Different paths (tab, intro card, card sweep) each kept their own "seen" note. Any spotlight now marks its element, its card and its tab as seen. A tab spotlight also carries the first card's line and marks that card, and tapping a button in a card marks it seen.
+- **Buttons rebuilt under a finger.** Writing `innerHTML` every render swapped buttons out mid-tap, so holds and fast taps got lost. Use `el.mhtml=html` (the `morph` helper): it patches the DOM in place, keeps `open` on folds and the classes in `KEEP_CLS`, and does nothing when the string hasn't changed.
+- **Prices that stop mattering.** A fixed AED 20M choice is free with AED 300B in the bank. Fixed prices go through `scM(G,m)` / `si(G,i)`: never less than 0.2% of your cash (or ✦). Story labels are rewritten with the scaled number (`needM`/`needI` carry `.cost`/`.inf`).
+- **A story choice that ends the game.** Selling or closing the company set `ended` but nothing queued the ending, so the game sat frozen. The choice handler now runs `detectMilestones` right away.
 - **Old text in an open tab.** A tab left open for hours keeps running old code; Puti saw a "he" that was already fixed. That is what `BUILD` and the reload prompt are for.
 - **UI helpers in the sim.** `labMode()` inside `illDay` broke every test.
 - **Unguarded UI calls in `updateReveal`.** They break the bots.
@@ -310,12 +315,9 @@ Planned and agreed with Puti, not built yet:
 **Other planned work**
 - The player chooses the next region from 2–3 options with trade-offs, instead of a fixed order.
 - Story pacing: story cards at least ~30 game days apart, plus new late-game beats with choices that last (Mira's science fair, a flatworm recall, the rival's merger offer, a letter from Iceland).
-- Cure minigames, one per cure, tried out in a separate prototype page (Shrimp Cure Games artifact) and not in the game yet. Mineral pellets: tap to drop pellets, every shrimp eats, add GH+ a scoop at a time (aim 6 to 8, a big jump kills some), the ring fades on sick ones that eat. Water change: hold Drain to about half, tap the milky shrimp to net them out while the water is low, hold Refill to the full line (overfilling spills). Salt dip: hold to dip the shrimp in a cup, target 4.5 s (sped up 10×, 45 s real), no clock, 3.5 to 5.5 s cures, longer stresses, past 7 s it dies.
-- Academia vs industry (proposed, not agreed): postdoc pay slider that doesn't speed research but keeps more people in academia (rare breakthroughs later, mostly for Space) versus leaving for industry (you can hire them for applied gains now).
 
-- Grandma letters that get shorter for climbers, the tank tab's own-tank crash at year eight only checks the glass.
-- Tree last chapters after Earth for non-Space players are only the tree steps in World, there's no chapter screen like Space.
+- The own tank's year-eight card (`c_mytank`) only checks the glass.
 
 **Known gaps**
-- Kits still unlock in the background after 200 home-bred sales and 2 stocked tanks. They could unlock from the care ladder instead.
+- Kits open after 200 home-bred sales and 60 L of tanks with shrimp in them (`KIT_UNLOCK`, `KIT_ROOM`). The guide says so from 100 sold. They could unlock from the care ladder instead.
 - The first babies trigger a few spotlights in a row (Colony, Recent events). They could be merged into one.

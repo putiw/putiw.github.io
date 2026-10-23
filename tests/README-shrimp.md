@@ -23,7 +23,7 @@ It uses the same World/project and preceding-tier gates as the interface, and
 fails immediately on insolvency. It must reach the
 worldwide ending within 12,000 game days. It is a deterministic strategy replay,
 not a human pacing or optimal-strategy claim. JSON results are written under
-`/private/tmp/shrimp-tests`, or `REVIEW_OUTPUT` if supplied.
+`<os tmpdir>/shrimp-tests` (/tmp on Linux), or `REVIEW_OUTPUT` if supplied.
 
 Browser QA covers fresh start, restored cycle milestone, next-step navigation,
 Kits/Operations/Marketing/World, contextual projects, purchase forecasts,
@@ -43,8 +43,8 @@ Academic progression and parallel space chapter:
 
 ```sh
 node tests/shrimp-academy.cjs
-REVIEW_ACADEMY=1 REVIEW_KIT_PRICE=250 REVIEW_OUTPUT=/private/tmp/shrimp-academy-play node tests/shrimp-playthrough.cjs
-ACADEMY_RUN=/private/tmp/shrimp-academy-play/run-7.json node tests/shrimp-space-playthrough.cjs
+REVIEW_ACADEMY=1 REVIEW_KIT_PRICE=250 REVIEW_OUTPUT=/tmp/shrimp-academy-play node tests/shrimp-playthrough.cjs
+ACADEMY_RUN=/tmp/shrimp-academy-play/run-7.json node tests/shrimp-space-playthrough.cjs
 ```
 
 The academic suite checks grant timing, idle/unfunded pauses, saved partial
@@ -63,7 +63,7 @@ space chapters without insolvency within 20 game years. This is a reproducible
 conservative scenario, not observed human play data:
 
 ```sh
-REVIEW_OUTPUT=/private/tmp/shrimp-average-monthly node tests/shrimp-average-playthrough.cjs
+REVIEW_OUTPUT=/tmp/shrimp-average-monthly node tests/shrimp-average-playthrough.cjs
 ```
 
 On seed 7, Earth completes in 18.6 game years and space in 17.6, with a lowest
