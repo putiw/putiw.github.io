@@ -260,7 +260,7 @@ var g=readyGame();g.stats.sold=5;g.money=5000;var t=g.tanks[0];t.had=1;t.pop=[{a
 if(!hire(g,'sales',1))throw Error('Hiring failed');if(!t.set.autoSell)throw Error('Hiring sales should switch on selling');
 var n0=totalN(t);dayRollover(g);if(!(totalN(t)<n0-1))throw Error('Salesperson did not sell surplus: '+n0+' -> '+totalN(t));
 `);
-if(!html.includes("else if(activeTab!=='space'){$('tankchips').hidden=G.tanks.length<2||!!G.recipe||topAway(G);}"))throw Error('Tank buttons must come back after business tabs, until every tank is fully upgraded');
+if(!html.includes("else if(activeTab!=='space'){$('tankchips').hidden=G.tanks.length<2||!!G.recipe||ownTank(G);}"))throw Error('Tank buttons must come back after business tabs, so every tank can be picked');
 if(!html.includes("business=inBiz&&topAway(G)"))throw Error('Top bar stays on every tab until every tank is fully upgraded');
 check('consultants are paid per visit: 20% of cash, at least AED 20,000, 30 days',`
 var g=readyGame();g.emp.kitsOpened=1;g.money=50000;if(consultCost(g)!==20000)throw Error('Minimum is AED 20,000');g.money=500000;if(consultCost(g)!==100000)throw Error('20% of cash');

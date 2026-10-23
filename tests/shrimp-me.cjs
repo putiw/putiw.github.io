@@ -170,4 +170,12 @@ g.humans=3e7;g.emp.kitsOpened=1;headlineDay(g);if(!rip(g).log.some(function(x){r
 `);
 if(!html.includes("(nm(G)?'Dear '+nm(G)+',<br><br>':'')")||!html.includes('id="player-name"')||!html.includes("G.name=nm({name:pni.value})"))throw Error('Ending letter and name box');
 count++;
+check('play-test fixes: broke text early, bulk order by hand, moss per kit, SOP opens standard tanks, the farm takes the tanks',`
+var g=newGame();g.money=-50;g.day=100;var o=brokeOpts(g).map(function(x){return x[0]+' '+x[1];}).join('|');if(/farm/.test(o))throw Error('No farm talk before a farm '+o);
+g.korder={n:20,price:300,who:'A school',due:200,offerEnd:110,taken:true,filled:0,i:0};g.kits.stock=8;if(putKitOrder(g)!==8||g.korder.filled!==8||g.kits.stock!==0)throw Error('Put from stock');
+if(wbItem('moss').m!==0||wbItem('planted').m!==0)throw Error('Kit designs cost per kit, not up front');
+var h=newGame();h.emp.kitsOpened=1;h.kits.sold=10;h.tanks.push(newTank(1),newTank(2));if(stdUnlocked(h))throw Error('Not yet');h.emp.proj.sop=1;if(!stdUnlocked(h))throw Error('SOP opens standard tanks');h.money=1e6;buyStdTank(h);var T=h.tanks[3];if(!T.moss||!T.plants||!T.feeder||!T.autoWC)throw Error('Fully equipped');
+T.pop=[{age:90,n:40,g:50}];var raw=h.emp.rawShrimp||0;h.emp.farms.hatch=1;storyChoose(h,'owntank',0);if(h.tanks.length!==1||!((h.emp.rawShrimp||0)>raw+30))throw Error('Farm takes the other tanks '+h.tanks.length);
+var q=newGame();q.emp.frozen=40;q.emp.frozenWhy='audit';q.day=10;if(frozenText(q).indexOf('audit')<0||frozenText(q).indexOf('30 days')<0)throw Error('Frozen says why '+frozenText(q));
+`);
 console.log(count+' free time, Grandma and ending checks passed');

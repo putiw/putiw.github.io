@@ -173,6 +173,18 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] The ending page: type and variation, who you became, Mira, what the world looks like, Grandma's letter (with the visits line), from the tank, lives you didn't live, all 16 endings. No trait bars.
 - [ ] Space opens only after Earth, and only for curious players (`spaceOpen`). Other types get their own tree in World.
 
+**Play-test fixes, Oct 23 (check these stay true)**
+- [ ] Every story choice looks the same (no green first option) and shows what it does under the text (`choiceFx` tries it on a copy of the game: ✦, AED, mood, kits, owners). A choice you can't afford is greyed with a reason.
+- [ ] Out of money before any farm talks about your shrimp, not farms.
+- [ ] Quality check runs water → look → salt dip → done without freezing.
+- [ ] The packing table keeps one size while you tap through the steps.
+- [ ] Bulk kit orders: kits can be put in from stock by hand; the card says whether packers or shrimp are the limit.
+- [ ] Moss/snail and planted kits cost per kit only, offered in Projects on the Kits tab.
+- [ ] Consultants appear once you have had AED 20k.
+- [ ] The SOP project (recipe tank) opens standard tanks 4 to 12; standard tanks come with everything, decor included. Tapping a row in the All tanks table looks at that tank alone (health check, restock), Back returns to the recipe.
+- [ ] When farms take over (first hatchery, or farms ≥ 10 kits/day) the farm takes every tank but the first (`retireTanks`), so no more alerts about tanks you can't reach.
+- [ ] Frozen accounts say why and what is blocked. New Shrimp Times stories drop in from the top as a small newspaper banner.
+
 **You tab and Grandma**
 - [ ] Opens once the first tank feeds itself and changes its own water, with the Your Saturdays card.
 - [ ] Free time picks repeat, 2 then 3 slots, weekly, monthly after farms, yearly after moving. Burnout after four heavy periods with no rest.
