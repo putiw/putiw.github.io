@@ -362,13 +362,23 @@ main details:not(.card):not(.dream-tracker):not(#next-card)[open]>summary::befor
 #tb-me[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
 #tb-me.fresh{box-shadow:0 0 0 2px var(--s2)}
 .me-note{margin:0 0 10px;font-size:13.5px;line-height:1.45}.me-note:empty{display:none}
-.rl-line{border-top:1px solid var(--line);padding:10px 0}.rl-hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.rl-hd h3{margin:0;font-size:14px}.rl-hd small{color:var(--ink-3);font-size:12px}.rl-now{font-size:12.5px;margin:0 0 6px;color:var(--ink-2)}.rl-btns{display:flex;flex-wrap:wrap;gap:6px}.rl-pos{display:inline-flex;gap:2px}.rl-btns .btn{font-size:12.5px;padding:6px 9px;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}.rl-btns .btn small{font-weight:400;opacity:.75;font-size:11px}.rl-btns .rl-x{padding:6px 10px;align-items:center;justify-content:center}
+.rl-line{border-top:1px solid var(--line);padding:10px 0}.rl-pay{display:grid;gap:4px;margin:8px 0 4px;font-size:13px}.rl-pay>span{font-weight:600}.rl-pay small{color:var(--ink-3);font-size:12px}.seg{display:flex;gap:4px}.seg .btn{flex:1;min-height:34px;font-size:12.5px;padding:4px 6px}.seg .btn[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}.rl-hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.rl-hd h3{margin:0;font-size:14px}.rl-hd small{color:var(--ink-3);font-size:12px}.rl-now{font-size:12.5px;margin:0 0 6px;color:var(--ink-2)}.rl-btns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.rl-pos{display:flex;gap:2px;min-width:0}.rl-pos>.btn:first-child{flex:1;min-width:0}.rl-btns .btn{font-size:12px;padding:6px 7px;white-space:nowrap;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}.rl-btns .btn small{font-weight:400;opacity:.75;font-size:11px}.rl-btns .rl-x{padding:6px 0;width:28px;flex:none;align-items:center;justify-content:center}
 .end-charts{margin:10px 0 4px}.end-ch{font-size:14px;margin:16px 0 2px}.end-cs{font-size:12px;color:var(--ink-3);margin:0 0 6px}.end-svg{display:block;width:100%;height:auto;overflow:visible}.end-svg .eg{stroke:var(--line);stroke-dasharray:2 3}.end-svg .ea{fill:var(--ink-3);font-size:10.5px}.end-svg .el{fill:var(--ink-2);font-size:11.5px}.end-svg .eb{fill:var(--ink);font-size:11.5px;font-weight:600}
-.me-meters{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 6px;font-size:12.5px}.me-meters span{color:var(--ink-2)}.me-meters small{color:var(--ink-3);font-size:11.5px}.me-meters .mb{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin:3px 0}.me-meters .mb i{display:block;height:100%}.me-warn{border-left:3px solid var(--bad);padding:6px 10px;background:var(--surface-2);font-size:13px;border-radius:0 8px 8px 0}.me-brush{display:flex;flex-wrap:wrap;gap:5px}.me-brush .btn{font-size:12.5px;padding:6px 9px;display:inline-flex;gap:6px;align-items:center}.me-brush .btn i{width:10px;height:10px;border-radius:3px}.me-brush .btn[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px}.me-day{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin-top:8px}.me-h{border:0;border-radius:6px;min-height:38px;color:#fff;font:700 12px var(--font-body);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;cursor:pointer}.me-h small{font-weight:500;font-size:9.5px;opacity:.95}.me-tot{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:var(--ink-2);margin:6px 0}.me-tot i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px}.me-send{display:flex;gap:6px;align-items:center;font-size:13px;margin:6px 0}
-:root{--c1:#2a78d6;--c2:#eb6834;--c3:#1baf7a;--c4:#c98500;--c5:#d55181;--c6:#6250d6;--mid:#8f887a}
+.me-meters{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 6px;font-size:12.5px}.me-meters span{color:var(--ink-2)}.me-meters small{color:var(--ink-3);font-size:11.5px}.me-meters .mb{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin:3px 0}.me-meters .mb i{display:block;height:100%}.me-warn{border-left:3px solid var(--bad);padding:6px 10px;background:var(--surface-2);font-size:13px;border-radius:0 8px 8px 0}.me-brush{display:flex;flex-wrap:wrap;gap:5px}.me-brush .btn{font-size:12.5px;padding:6px 9px;display:inline-flex;gap:6px;align-items:center}.me-brush .btn i{width:10px;height:10px;border-radius:3px}.me-brush .btn[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px}.me-day{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin-top:8px}.me-h{border:0;border-radius:6px;min-height:38px;color:#fff;font:700 12px var(--font-body);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;cursor:pointer}.me-h small{font-weight:500;font-size:9.5px;opacity:.95}.me-tl{display:flex;height:30px;border-radius:8px;overflow:hidden;gap:1px;margin:12px 0 3px}.me-tl i{display:flex;align-items:center;justify-content:center;color:#fff;font:600 11px var(--font-body);font-style:normal;min-width:0;overflow:hidden;white-space:nowrap}
+.me-ticks{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-3);margin-bottom:6px}
+.me-acts{border-top:1px solid var(--line);margin-top:6px}
+.me-act{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.me-act .sw{width:10px;height:28px;border-radius:3px}
+.me-act.off .sw{opacity:.35}
+.ma-t b{display:block;font-size:13.5px;font-weight:600}.ma-t small{display:block;font-size:12px;color:var(--ink-3);line-height:1.35;margin-top:1px}
+.ma-n{display:flex;align-items:center;gap:4px}.ma-n span{min-width:34px;text-align:center;font:600 13px var(--font-data);font-variant-numeric:tabular-nums}
+.ma-n .btn{width:34px;height:34px;min-height:34px;padding:0;font-size:17px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.me-act.rest .ma-n{padding-right:38px}
+.me-tot{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:var(--ink-2);margin:6px 0}.me-tot i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px}.me-send{display:flex;gap:8px;align-items:center;font-size:13px;margin:12px 0 4px}.me-send input{width:18px;height:18px;margin:0}
+:root{--c1:#2a78d6;--c2:#eb6834;--c3:#1baf7a;--c4:#c98500;--c5:#d55181;--c6:#6250d6;--c7:#1a93b0;--c8:#8a6440;--c9:#6f8f1f;--mid:#8f887a}
 .me-lane{font-size:13px;margin:10px 0 6px;color:var(--ink-2)}.me-lane small{font-weight:400;color:var(--ink-3)}#me-picks>.me-lane:first-child{margin-top:0}.me-picks{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px}.me-picks .btn{justify-content:flex-start;text-align:left;min-height:38px;padding:6px 10px;font-size:13px;white-space:normal}.me-picks .btn[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
 #me-hint{margin:8px 0 0}.me-mom p{margin:0 0 10px;font-size:13.5px;line-height:1.45}.me-mbtn{display:grid;gap:6px}.me-mbtn .btn{white-space:normal;text-align:left;justify-content:flex-start}
-.me-letters{margin-top:10px}.me-letters>summary{font:600 13.5px var(--font-body);cursor:pointer}.me-letters details{margin:6px 0 0 4px}.me-letters p{font-size:13.5px;line-height:1.5}.me-hist{margin:10px 0 0;padding-left:18px;font-size:13px;line-height:1.45;color:var(--ink-2)}.me-hist:empty{display:none}.me-hist li+li{margin-top:4px}
+.me-letters{margin-top:14px}.me-letters>summary{font:600 13.5px var(--font-body);cursor:pointer}.me-letters details{margin:0;border-top:1px solid var(--line);padding:8px 0}.me-letters details>summary{font-size:13px;color:var(--ink-2);cursor:pointer}.me-letters details p{margin:6px 0 0}.me-letters p{font-size:13.5px;line-height:1.5}.me-hist{margin:10px 0 0;padding:0;list-style:none;font-size:13px;line-height:1.45;color:var(--ink-2)}.me-hist li{padding:7px 0 7px 10px;border-left:2px solid var(--line)}.me-hist:empty{display:none}.me-hist li+li{margin-top:2px}
 .apop-foot{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);display:flex;justify-content:flex-end}
 </style>
 </head>
@@ -2066,17 +2076,24 @@ var RLINES=[
  {id:'genes',name:'Genes and breeding',d:'Hardier, healthier bloodlines.',fx:'kit survival +1 point',finds:['A red line that shrugs off bad water','Shrimp that handle a hot week','Babies that grow up twice as fast','A line that molts cleanly every time','A deeper red, no dye needed']},
  {id:'food',name:'Shrimp food',d:'Cheaper, better food that doesn’t come from the sea.',fx:'kit materials −4%',finds:['Algae food grown on sunlight','Insect protein pellets','Food from brewery leftovers','Slow-release food sticks for holidays','Mulberry leaves that keep for a year']},
  {id:'health',name:'Shrimp health',d:'Tests and cures for the things that kill colonies.',fx:'sick kits −8%',finds:['A five-minute flatworm test','A probiotic that keeps tanks stable','A gentle bath that protects babies','Why shrimp panic in a box, and how to stop it','A cure for muscle disease']}];
-var RPOS=[{id:'phd',name:'PhD student',few:'PhD student',many:'PhD students',usd:40000,pts:0.12,max:12},{id:'pd',name:'Postdoc',few:'postdoc',many:'postdocs',usd:65000,pts:0.25,max:6},{id:'pi',name:'PI lab',few:'PI lab',many:'PI labs',usd:1500000,pts:1.0,max:3}];
+var RPOS=[{id:'phd',name:'PhD student',few:'PhD student',many:'PhD students',usd:40000,pts:0.12,max:12,pap:0.6},{id:'pd',name:'Postdoc',few:'postdoc',many:'postdocs',usd:50000,pts:0.25,max:6,pap:1},{id:'pi',name:'PI lab',few:'PI lab',many:'PI labs',usd:1500000,pts:1.0,max:3,pap:5}];
 function rlines(G){var A=G.academy;if(!A.rl)A.rl={};RLINES.forEach(function(l){if(!A.rl[l.id])A.rl[l.id]={phd:0,pd:0,pi:0,found:0,dud:0};});return A.rl;}
 function rlFound(G,id){var A=G.academy;return A&&A.rl&&A.rl[id]?A.rl[id].found:0;}
-function rlYear(G,id){var L=rlines(G)[id],c=0;RPOS.forEach(function(p){c+=L[p.id]*p.usd*USD;});return c;}
+// Postdoc pay on top of the USD 50k base. Paying more doesn't change the odds of a find, it's how you treat people.
+var PD_PAY=[0,0.2,0.5];
+function pdPay(G){return PD_PAY[(G.academy&&G.academy.pdPay)||0]||0;}
+function posUsd(G,p){return p.usd*(p.id==='pd'?1+pdPay(G):1);}
+function setPdPay(G,i){var A=G.academy;if(!PD_PAY[i]&&i!==0)return false;var was=A.pdPay||0;if(was===i)return false;A.pdPay=i;trAdd(G,i>was?{kin:0.3*(i-was),means:-0.3*(i-was)}:{means:0.3*(was-i)});return true;}
+function rlYear(G,id){var L=rlines(G)[id],c=0;RPOS.forEach(function(p){c+=L[p.id]*posUsd(G,p)*USD;});return c;}
+function rlPapers(G,id){var L=rlines(G)[id],t=0;RPOS.forEach(function(p){t+=L[p.id]*p.pap;});return t;}
 function rlYearAll(G){var t=0;RLINES.forEach(function(l){t+=rlYear(G,l.id);});return t;}
 function rlPts(G,id){var L=rlines(G)[id],t=0;RPOS.forEach(function(p){t+=L[p.id]*p.pts;});return t*(1+0.1*Math.min(3,G.academy.level||0))*(G.me&&G.me.hrs&&G.me.hrs.papers>=300?1.15:1);}
 // chance of a find in a year, as a share
 function rlOdds(G,id){var l=RLINES.filter(function(x){return x.id===id;})[0],L=rlines(G)[id];if(!l||L.found>=l.finds.length)return 0;return 1-Math.exp(-rlPts(G,id)*Math.pow(0.85,L.found));}
-function rlHire(G,id,pos){var L=rlines(G)[id],P=RPOS.filter(function(x){return x.id===pos;})[0];if(!academyOpen(G)||!L||!P||L[pos]>=P.max||frozen(G))return false;var first=P.usd*USD/12;if(G.money<first+capitalReserve(G))return false;L[pos]++;trAdd(G,{know:pos==='pi'?0.6:0.25});if(!G.academy.level)G.academy.level=1;log(G,'Funded a '+P.name.toLowerCase()+' in '+RLINES.filter(function(x){return x.id===id;})[0].name.toLowerCase());return true;}
+function rlHire(G,id,pos){var L=rlines(G)[id],P=RPOS.filter(function(x){return x.id===pos;})[0];if(!academyOpen(G)||!L||!P||L[pos]>=P.max||frozen(G))return false;var first=posUsd(G,P)*USD/12;if(G.money<first+capitalReserve(G))return false;L[pos]++;trAdd(G,{know:pos==='pi'?0.6:0.25});if(!G.academy.level)G.academy.level=1;log(G,'Funded a '+P.name.toLowerCase()+' in '+RLINES.filter(function(x){return x.id===id;})[0].name.toLowerCase());return true;}
 function rlLet(G,id,pos){var L=rlines(G)[id];if(!L||!L[pos])return false;L[pos]--;return true;}
 function rlDay(G){var A=G.academy;if(!A.rl)return;var cost=rlYearAll(G)/365;if(cost<=0)return;if(G.money<cost){RLINES.forEach(function(l){var L=A.rl[l.id];if(L.pi){L.pi--;log(G,'Could not pay a PI lab in '+l.name.toLowerCase()+', it closed');}});return;}pay(G,cost,'research');
+ RLINES.forEach(function(l){var L=A.rl[l.id],pp=rlPapers(G,l.id)/365;if(pp>0){L.pf=(L.pf||0)+pp;while(L.pf>=1){L.pf-=1;L.papers=(L.papers||0)+1;A.papers=(A.papers||0)+1;A.knowledge+=3;}}});
  RLINES.forEach(function(l){var L=A.rl[l.id],o=rlOdds(G,l.id);if(o<=0)return;var pDay=1-Math.pow(1-o,1/365);if(Math.random()>=pDay)return;
   if(Math.random()<0.25){L.dud++;A.knowledge+=20;newsLine(G,['A study you funded finds nothing at all. The paper is very honest about it.','Your '+l.name.toLowerCase()+' people publish a careful paper that changes nothing. Their families are proud anyway.','Three years of work in '+l.name.toLowerCase()+' end in one sentence: more research is needed.'][L.dud%3]);return;}
   var f=l.finds[L.found];L.found++;A.knowledge+=60;rlApply(G,l.id);newsLine(G,'Your '+l.name.toLowerCase()+' researchers found something: '+f.charAt(0).toLowerCase()+f.slice(1)+'. '+l.fx.charAt(0).toUpperCase()+l.fx.slice(1)+'.');});}
@@ -2158,25 +2175,29 @@ var PICKS=[
 // Every week the hours turn into the same effects the old free-time picks had (3 hours a day ≈ one pick).
 // Sleep and exercise feed health, long days feed strain. Low health brings illness, too much strain brings burnout.
 var ACTS=[
- {id:'sleep',name:'Sleep',ab:'Zz',col:'--c1',d:'Under 7 hours a night for long and you get ill more often.'},
- {id:'work',name:'Work',ab:'W',col:'--c2',d:'8 hours is normal. More sells a little more, and pays overtime before the farms. Fewer and the company drifts. Past 10 a day, strain builds.'},
- {id:'tanks',name:'Your own tanks',ab:'T',col:'--c3',d:'Hand care for your tanks. Late in the game it keeps your first tank alive.'},
+ {id:'sleep',name:'Sleep',ab:'Zz',col:'--c1',d:'Under 7 a night for long and you get ill more often.'},
+ {id:'work',name:'Work',ab:'W',col:'--c2',d:'8 is normal. More sells a little more, past 10 strain builds. Fewer and the company drifts.'},
+ {id:'tanks',name:'Your own tanks',ab:'T',col:'--c3',d:'Hand care. Late in the game it keeps your first tank alive.'},
  {id:'grandma',name:'Grandma',ab:'G',col:'--c4',d:'Visits while you live nearby. Calls and letters once you move.'},
  {id:'exercise',name:'Exercise',ab:'E',col:'--c5',d:'About an hour a day keeps you well.'},
  {id:'videos',name:'Shrimp videos',ab:'V',col:'--c6',d:'People share them. Word of mouth grows a little.'},
- {id:'design',name:'Design tanks',ab:'D',col:'--c6',d:'Enough hours and your designs go into the kits, then they win prizes.'},
- {id:'papers',name:'Read shrimp papers',ab:'P',col:'--c6',d:'Knowledge for the university. After a while your researchers find things a bit more often.'},
- {id:'club',name:'Shrimp club',ab:'C',col:'--c6',d:'People who know people. ✦'},
- {id:'school',name:'Mira’s school',ab:'S',col:'--c6',d:'You help her class with their tank.'},
+ {id:'design',name:'Design tanks',ab:'D',col:'--c7',d:'Enough hours and your designs go into the kits, then win prizes.'},
+ {id:'papers',name:'Read shrimp papers',ab:'P',col:'--c8',d:'Knowledge for the university. Later, your researchers find things a bit more often.'},
+ {id:'club',name:'Shrimp club',ab:'C',col:'--c9',d:'People who know people. ✦'},
+ {id:'school',name:'Mira’s school',ab:'S',col:'--c4',d:'You help her class with their tank.'},
  {id:'dinners',name:'Business dinners',ab:'B',col:'--c2',d:'Lots of ✦. Counts as work for strain.'},
- {id:'house',name:'Work on the house',ab:'H',col:'--c6',d:'Your own hands make the house cheaper to finish.'},
- {id:'fight',name:'Fight night',ab:'F',col:'--c6',d:'Cash, and shrimp that don’t come back.'},
+ {id:'house',name:'Work on the house',ab:'H',col:'--c8',d:'Your own hands make the house cheaper to finish.'},
+ {id:'fight',name:'Fight night',ab:'F',col:'--c5',d:'Cash, and shrimp that don’t come back.'},
  {id:'nothing',name:'Rest',ab:'·',col:'--mid',d:'Nothing at all. Takes strain off.'}];
 function actById(id){return ACTS.filter(function(a){return a.id===id;})[0];}
 function actOk(G,id){var M=G.me,E=G.emp;if(!actById(id))return false;if(id==='club')return !M.moved;if(id==='fight')return !!E.fight&&!M.moved;if(id==='school')return !M.moved&&!!(G.story&&G.story.choices&&G.story.choices.ev_mira!=null);if(id==='dinners')return farmBuilt(G);if(id==='house'){var H=M.house;return !!(H&&H.land&&!H.complete);}return true;}
 function defaultDay(){var d=[];for(var h=0;h<24;h++)d.push(h<7||h===23?'sleep':h===8?'tanks':h>=9&&h<17?'work':h===17?'grandma':'nothing');return d;}
 function dayHours(G){var M=G.me,o={};ACTS.forEach(function(a){o[a.id]=0;});(M.day||defaultDay()).forEach(function(id){o[actOk(G,id)?id:'nothing']++;});return o;}
 function setHour(G,h,id){var M=G.me;if(!M||!M.on||h<0||h>23||!actById(id)||!actOk(G,id))return false;if(!M.day)M.day=defaultDay();M.day[h]=id;return true;}
+// Hours only count, not where they sit, so the day is laid out from the totals: wake at 7, sleep last.
+var DAY_ORDER=['exercise','tanks','work','dinners','videos','design','papers','club','school','house','grandma','fight','nothing'];
+function layDay(h){var d=new Array(24),t=7;DAY_ORDER.forEach(function(id){for(var i=0;i<(h[id]||0);i++){d[t%24]=id;t++;}});for(var i=0;i<(h.sleep||0);i++){d[t%24]='sleep';t++;}for(var k=0;k<24;k++)if(!d[k])d[k]='nothing';return d;}
+function addHour(G,id,dir){var M=G.me;if(!M||!M.on||id==='nothing'||!actOk(G,id))return false;var h=dayHours(G);if(dir>0){if(h.nothing<1)return false;h.nothing--;h[id]++;}else{if(h[id]<1)return false;h[id]--;h.nothing++;}M.day=layDay(h);return true;}
 function sick(G){var M=G.me;return M&&M.ill&&M.ill.until>G.day?M.ill.kind:0;}
 function workMult(G){var M=G.me;if(!M||!M.on)return 1;var k=sick(G);if(k===2)return 0.5;if(k===1)return 0.85;if(M.burnt>G.day)return 0.9;return 1+0.02*clamp(dayHours(G).work-8,-6,4);}
 var DESIGN_STEPS=[[150,'Your tank layout goes into every kit. Kit survival +1 point.'],[500,'Your tank wins Tank of the Year at the national aquascaping show. AED 25,000 and a lot of new friends.'],[1200,'You win the world aquascaping championship with a shrimp tank. People who never cared about shrimp talk about it for a week.']];
@@ -2654,7 +2675,7 @@ function cost2(m,i){return (m?aed(m):'')+(m&&i?' + ':'')+(i?inf(i):'');}
 function trim(n,d){return String(+Number(n).toFixed(d));}
 // iPhone Safari moves its toolbar while you scroll and the fixed tab bar can end up floating above the bottom. Pin it to what's really on screen.
 (function(){var vv=window.visualViewport;if(!vv)return;var fix=function(){var t=document.querySelector('.tabs');if(!t)return;var off=window.innerHeight-(vv.height+vv.offsetTop);t.style.transform=Math.abs(off)>1&&vv.scale<=1.01?'translateY('+(-off)+'px)':'';};vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);window.addEventListener('scroll',fix,{passive:true});})();
-var toastT=null,NF=null,BUILD='2026-10-23-review';
+var toastT=null,NF=null,BUILD='2026-10-24-you';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
@@ -4129,15 +4150,16 @@ function renderMe(){var M=G.me,b=$('tb-me');if(!M)return;b.hidden=!M.on;b.classL
  if(!M.day)M.day=defaultDay();var hrs=dayHours(G),now=Math.floor(G.day),ok=ACTS.filter(function(a){return actOk(G,a.id);});if(!actOk(G,BRUSH))BRUSH='work';
  var ph='<div class="me-meters"><div><span>Health</span><div class="mb"><i style="width:'+Math.round(M.hp==null?80:M.hp)+'%;background:var('+((M.hp||80)<35?'--bad':(M.hp||80)<55?'--warn':'--good')+')"></i></div><small>'+((M.hp==null?80:M.hp)>=70?'well':(M.hp||80)>=45?'run down':'getting ill')+'</small></div><div><span>Strain</span><div class="mb"><i style="width:'+Math.round(M.bo||0)+'%;background:var('+((M.bo||0)>75?'--bad':(M.bo||0)>45?'--warn':'--good')+')"></i></div><small>'+((M.bo||0)>75?'close to burning out':(M.bo||0)>45?'tired':'fine')+'</small></div></div>';
  if(sick(G))ph+='<p class="me-warn">'+(sick(G)===2?'You’re seriously ill until day '+M.ill.until+'. The company runs at half speed.':'Ill until day '+M.ill.until+'.')+'</p>';else if(M.burnt>now)ph+='<p class="me-warn">Burnt out until day '+M.burnt+'. Your hours count for nothing, ✦ comes in at half.</p>';
- ph+='<p class="hint" style="margin:8px 0 4px">Pick an activity, then tap the hours it gets.</p><div class="me-brush">'+ok.map(function(a){return '<button class="btn" data-act="brush" data-id="'+a.id+'" aria-pressed="'+(BRUSH===a.id)+'"><i style="background:var('+a.col+')"></i>'+a.name+'</button>';}).join('')+'</div>';
- ph+='<div class="me-day">'+M.day.map(function(id,h){var a=actById(actOk(G,id)?id:'nothing');return '<button class="me-h" data-act="hr" data-h="'+h+'" style="background:var('+a.col+')" aria-label="'+h+':00 '+a.name+'"><small>'+(h<10?'0':'')+h+'</small>'+a.ab+'</button>';}).join('')+'</div>';
- var b=actById(BRUSH);ph+='<p class="hint" style="margin:6px 0 2px"><b>'+b.name+'</b>, '+hrs[BRUSH]+' h a day. '+b.d+'</p>';
- ph+='<div class="me-tot">'+ACTS.filter(function(a){return hrs[a.id]>0;}).map(function(a){return '<span><i style="background:var('+a.col+')"></i>'+a.name+' '+hrs[a.id]+' h</span>';}).join('')+'</div>';
- var dz=M.dz||0,dh=Math.round((M.hrs&&M.hrs.design)||0);if(hrs.design||dh)ph+='<p class="hint">Tank design: '+dh+(dh===1?' hour':' hours')+' so far'+(dz<DESIGN_STEPS.length?', next at '+DESIGN_STEPS[dz][0]+'.':', every prize won.')+'</p>';
- ph+='<label class="me-send"><input type="checkbox" data-act="me-send"'+(M.send?' checked':'')+'> Send Grandma a little money every week</label>';
+ var lay=layDay(hrs),runs=[];for(var k=0;k<24;k++){var id=lay[(k+7)%24],r=runs[runs.length-1];if(r&&r.id===id)r.n++;else runs.push({id:id,n:1});}
+ ph+='<div class="me-tl">'+runs.map(function(r){var a=actById(r.id);return '<i style="flex:'+r.n+';background:var('+a.col+')" title="'+a.name+' '+r.n+' h">'+(r.n>=4?a.name.split(' ')[0]:r.n>=2?a.ab:'')+'</i>';}).join('')+'</div><div class="me-ticks"><span>7 am</span><span>1 pm</span><span>7 pm</span><span>1 am</span><span>7 am</span></div>';
+ var dz=M.dz||0,dh=Math.round((M.hrs&&M.hrs.design)||0);
+ ph+='<div class="me-acts">'+ok.filter(function(a){return a.id!=='nothing';}).map(function(a){var n=hrs[a.id],extra=a.id==='design'&&(n||dh)?' '+dh+' h so far'+(dz<DESIGN_STEPS.length?', next prize at '+DESIGN_STEPS[dz][0]+'.':', every prize won.'):'';
+  return '<div class="me-act'+(n?'':' off')+'"><i class="sw" style="background:var('+a.col+')"></i><div class="ma-t"><b>'+a.name+'</b><small>'+a.d+extra+'</small></div><div class="ma-n"><button class="btn" data-act="hr-sub" data-id="'+a.id+'"'+(n?'':' disabled')+' aria-label="One hour less '+a.name+'">−</button><span>'+n+' h</span><button class="btn" data-act="hr-add" data-id="'+a.id+'"'+(hrs.nothing?'':' disabled')+' aria-label="One hour more '+a.name+'">+</button></div></div>';}).join('')
+  +'<div class="me-act rest"><i class="sw" style="background:var(--mid)"></i><div class="ma-t"><b>Rest</b><small>Whatever is left. Takes strain off.</small></div><div class="ma-n"><span>'+hrs.nothing+' h</span></div></div></div>';
+ ph+='<label class="me-send"><input type="checkbox" data-act="me-send"'+(M.send?' checked':'')+'><span>Send Grandma a little money every week</span></label>';
  if(laneOpen(G,'y')){var yl=laneList(G,'y');ph+='<h3 class="me-lane">Once a year <small>pick one</small></h3><div class="me-picks">'+PICKS.filter(function(p){return meCan(G,p.id,'y');}).map(function(p){return '<button class="btn" data-act="me-pick" data-lane="y" data-id="'+p.id+'" aria-pressed="'+(yl.indexOf(p.id)>=0)+'">'+p.name+'</button>';}).join('')+'</div>';}
  if(cache.mepk!==ph){cache.mepk=ph;$('me-picks').mhtml=ph;}
- setT('me-hint',M.moved?'You live in the capital now. Grandma hours are calls and letters. Seeing her is the yearly trip home.':'Your day repeats until you change it.');
+ setT('me-hint',M.moved?'You live in the capital now. Grandma hours are calls and letters. Seeing her is the yearly trip home.':'');
  var v=Math.round(M.visits||0),c=Math.round(M.calls||0);setT('me-gsum',v||c?[v?v+(v===1?' visit':' visits'):'',c?c+(c===1?' call':' calls'):''].filter(Boolean).join(' · '):'');
  var m=M.cur&&momentById(M.cur.id),mh='';
  if(m){var yc=m.cost?' · '+aed(m.cost(G)):'';mh='<div class="me-mom"><p>'+m.t+'</p><div class="me-mbtn"><button class="btn primary" data-act="mom-yes">'+m.yes+yc+'</button><button class="btn" data-act="mom-no">'+m.no+'</button></div></div>';}
@@ -4146,12 +4168,14 @@ function renderMe(){var M=G.me,b=$('tb-me');if(!M)return;b.hidden=!M.on;b.classL
  if(cache.mem!==mh){cache.mem=mh;$('me-moment').innerHTML=mh;}
  var S=G.story,lk=S&&S.letters?Object.keys(GRANDMA_LETTERS).filter(function(k){return S.letters[k];}):[];$('dream-letters').hidden=!!M.on;$('me-letters').hidden=!lk.length;var lh=lk.map(function(k){var l=GRANDMA_LETTERS[k],r=S.letters[k];return '<details><summary>'+l.title+' · '+(r.historical?'from before':'Year '+(Math.floor(r.day/365)+1))+'</summary><p>'+grandmaLetter(G,k)+'</p></details>';}).join('');if(cache.mel!==lh){cache.mel=lh;$('me-ltext').innerHTML=lh;}
  var hh=M.hist.slice(-4).reverse().map(function(x){return '<li>'+x+'</li>';}).join('');if(cache.meh!==hh){cache.meh=hh;$('me-hist').innerHTML=hh;}}
-function renderRL(){var c=$('rl-card'),open=academyOpen(G);c.hidden=!open;if(!open||activeTab!=='world')return;var L=rlines(G),yr=rlYearAll(G);setT('rl-sum',yr?aed(yr)+' a year':'nobody funded yet');
- var h='<p class="sub">Fund people in as many fields as you like. They keep working, paid monthly, until you stop. What they find is luck: more people and bigger labs raise the odds, and some years nothing comes out.</p>';
+function renderRL(){var c=$('rl-card'),open=academyOpen(G);c.hidden=!open;if(!open||activeTab!=='world')return;var L=rlines(G),yr=rlYearAll(G);var A=G.academy,np=A.papers||0;setT('rl-sum',yr?aed(yr)+' a year':'nobody funded yet');
+ var h='<p class="sub">Fund people in six fields, paid monthly until you stop. Papers come out steadily, a postdoc about 1 a year, a PhD student about 3 in 5 years, a PI lab about 5 a year. Finds that change the business are luck, more people raise the odds.</p>';
+ h+='<div class="rl-pay"><span>Postdoc pay</span><div class="seg">'+PD_PAY.map(function(x,i){return '<button class="btn" data-act="pd-pay" data-i="'+i+'" aria-pressed="'+((A.pdPay||0)===i)+'">'+usd(50000*(1+x))+'</button>';}).join('')+'</div><small>The base is '+usd(50000)+' a year. Paying more doesn\u2019t make research faster or finds more likely.</small></div>';
+ if(np)h+='<p class="rl-now" style="margin:8px 0 0">'+np+(np===1?' paper':' papers')+' published so far.</p>';
  RLINES.forEach(function(l){var x=L[l.id],o=rlOdds(G,l.id),done=x.found>=l.finds.length,ppl=RPOS.map(function(p){return x[p.id]?x[p.id]+' '+(x[p.id]>1?p.many:p.few):'';}).filter(Boolean).join(', ');
-  h+='<div class="rl-line"><div class="rl-hd"><h3>'+l.name+'</h3><small>'+x.found+' of '+l.finds.length+' found</small></div><p class="hint" style="margin:2px 0 6px">'+l.d+' Each find: '+l.fx+'.'+(x.found?' Found: '+l.finds.slice(0,x.found).join(', ').toLowerCase()+'.':'')+'</p>';
+  h+='<div class="rl-line"><div class="rl-hd"><h3>'+l.name+'</h3><small>'+(x.papers?x.papers+(x.papers===1?' paper · ':' papers · '):'')+x.found+' of '+l.finds.length+' found</small></div><p class="hint" style="margin:2px 0 6px">'+l.d+' Each find: '+l.fx+'.'+(x.found?' Found: '+l.finds.slice(0,x.found).join(', ').toLowerCase()+'.':'')+'</p>';
   if(done)h+='<p class="hint">Everything in this field is found.</p></div>';else{
-  h+='<p class="rl-now">'+(ppl?ppl+' · '+aed(rlYear(G,l.id))+' a year · about '+Math.round(o*100)+'% chance of a find this year':'Nobody working on this yet.')+'</p><div class="rl-btns">'+RPOS.map(function(p){var full=x[p.id]>=p.max,ok=!full&&G.money>=p.usd*USD/12+capitalReserve(G)&&!frozen(G);return '<span class="rl-pos"><button class="btn" data-act="rl-hire" data-l="'+l.id+'" data-p="'+p.id+'"'+(ok?'':' disabled')+'>+ '+p.name+'<small>'+usd(p.usd)+'/yr</small></button>'+(x[p.id]?'<button class="btn rl-x" data-act="rl-let" data-l="'+l.id+'" data-p="'+p.id+'" aria-label="Stop funding one '+p.name+'">−</button>':'')+'</span>';}).join('')+'</div></div>';}});
+  h+='<p class="rl-now">'+(ppl?ppl+' · '+aed(rlYear(G,l.id))+' a year · about '+Math.round(o*100)+'% chance of a find this year':'Nobody working on this yet.')+'</p><div class="rl-btns">'+RPOS.map(function(p){var full=x[p.id]>=p.max,ok=!full&&G.money>=posUsd(G,p)*USD/12+capitalReserve(G)&&!frozen(G);return '<span class="rl-pos"><button class="btn" data-act="rl-hire" data-l="'+l.id+'" data-p="'+p.id+'"'+(ok?'':' disabled')+'>+ '+p.name+'<small>'+usd(posUsd(G,p))+'/yr</small></button>'+(x[p.id]?'<button class="btn rl-x" data-act="rl-let" data-l="'+l.id+'" data-p="'+p.id+'" aria-label="Stop funding one '+p.name+'">−</button>':'')+'</span>';}).join('')+'</div></div>';}});
  if(cache.rlh!==h){cache.rlh=h;$('rl-body').mhtml=h;}}
 function renderChapters(){renderRL();
  var A=G.academy,S=G.space,open=academyOpen(G),a=$('academy-card');a.hidden=!open;a.style.order='5';
@@ -4466,6 +4490,7 @@ function initControls(){
     if(a==='korder-take'){if(G.korder)G.korder.taken=true;render();}
     if(a==="newsflash"){b.classList.remove('on');b.hidden=true;var tw=document.querySelector('.tabs [data-tab="world"]');if(tw&&!tw.hidden)tw.click();return;}
     if(a==='rl-hire'){if(rlHire(G,b.dataset.l,b.dataset.p)){cache.rlh=null;render();}else toast('Not enough spare cash for the first month.');return;}
+    if(a==='pd-pay'){if(setPdPay(G,+b.dataset.i)){cache.rlh=null;render();}return;}
     if(a==='rl-let'){if(rlLet(G,b.dataset.l,b.dataset.p)){cache.rlh=null;render();}return;}
     if(a==='one-back'){ONE=null;G.sel=0;lastChartKey='';lastColSig='';lastAlerts='';lastChips='';cache.mvsig=cache.segsig=cache.shopsig=cache.upsig=cache.ov=null;syncControls();render();return;}
     if(a==='korder-put'){var kp=putKitOrder(G);if(kp)toast(kp+' kits set aside for the order');render();return;}
@@ -4498,6 +4523,7 @@ function initControls(){
     if(a==='happy-give'){if(giveHappy(G,b.dataset.id)){toast('They crowd around it');cache.treatseg=null;render();}return;}
     if(a==='brush'){BRUSH=b.dataset.id;cache.mepk=null;render();return;}
     if(a==='hr'){if(setHour(G,+b.dataset.h,BRUSH)){cache.mepk=null;render();}return;}
+    if(a==='hr-add'||a==='hr-sub'){if(addHour(G,b.dataset.id,a==='hr-add'?1:-1)){cache.mepk=null;render();}return;}
     if(a==='me-send'){G.me.send=b.checked?1:0;cache.mepk=null;return;}
     if(a==='me-pick'){if(mePick(G,b.dataset.id,b.dataset.lane)){cache.mepk=null;render();}return;}
     if(a==='mom-yes'||a==='mom-no'){if(momentAnswer(G,a==='mom-yes')){cache.mem=null;cache.meh=null;render();}else toast('Not enough cash for that');return;}

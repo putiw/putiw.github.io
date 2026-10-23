@@ -199,4 +199,13 @@ check('the game keeps a history for the ending charts',`
 var g=newGame();g.money=1000;for(var d=0;d<60;d++){g.day++;dayRollover(g);}var C=g.chart;if(!C||C.s.length<6||!(Object.keys(C.sp).length>=0))throw Error('History '+(C&&C.s.length));
 g.kits.sold=1;g.day++;dayRollover(g);if(g.chart.ev.kit==null)throw Error('First kit marked');for(var i=0;i<2000;i++){g.day+=7;chartDay(g,{});}if(g.chart.s.length>330)throw Error('History stays small '+g.chart.s.length);
 `);
+check('hours are set with plus and minus, Rest takes the rest',`
+var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);var h0=dayHours(g);if(!addHour(g,'exercise',1))throw Error('Add');var h=dayHours(g);if(h.exercise!==1||h.nothing!==h0.nothing-1||h.sleep!==h0.sleep)throw Error('Plus '+JSON.stringify(h));
+if(addHour(g,'nothing',1))throw Error('Rest is not set by hand');while(addHour(g,'work',1));if(dayHours(g).nothing!==0||addHour(g,'videos',1))throw Error('No hours left');if(!addHour(g,'work',-1)||dayHours(g).nothing!==1)throw Error('Minus');var n=0;g.me.day.forEach(function(x){n++;});if(n!==24)throw Error('24 hours');
+`);
+check('postdocs cost USD 50k, extra pay is not faster, papers come out steadily',`
+var g=newGame();g.money=1e9;g.kits.sold=5000;g.academy.level=1;var o=null;academyOpen=function(){return true;};if(!rlHire(g,'genes','pd')||!rlHire(g,'genes','phd'))throw Error('Hire');if(Math.round(rlYear(g,'genes')/USD)!==90000)throw Error('Cost '+rlYear(g,'genes')/USD);
+var o1=rlOdds(g,'genes');setPdPay(g,2);if(Math.round(rlYear(g,'genes')/USD)!==115000)throw Error('Extra pay '+rlYear(g,'genes')/USD);if(rlOdds(g,'genes')!==o1)throw Error('Odds must not change');
+var r=Math.random;Math.random=function(){return 0.99;};for(var d=0;d<365*5;d++)rlDay(g);Math.random=r;var p=g.academy.rl.genes.papers;if(p<7||p>9)throw Error('Papers in 5 years '+p);
+`);
 console.log(count+' free time, Grandma and ending checks passed');
