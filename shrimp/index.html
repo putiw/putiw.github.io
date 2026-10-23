@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="One empty tank. One big dream. Build a shrimp-keeping community with Grandma and try to reach the whole world in ten years.">
 <title>Universal Shrimp</title>
+<link rel="icon" href="favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="icon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"><link rel="apple-touch-icon" href="icon-180.png"><meta name="apple-mobile-web-app-title" content="Shrimp">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 <style>
@@ -2628,7 +2629,7 @@ function aed(n){if(Math.abs(n)>=1e6)return (n<0?'-':'')+'AED '+big(Math.abs(n));
 function inf(n){return '✦ '+big(Math.round(n));}
 function cost2(m,i){return (m?aed(m):'')+(m&&i?' + ':'')+(i?inf(i):'');}
 function trim(n,d){return String(+Number(n).toFixed(d));}
-var toastT=null,NF=null,BUILD='2026-10-23-end-charts';
+var toastT=null,NF=null,BUILD='2026-10-23-icon';
 // If a newer version is published while the game is open, say so, so nobody plays old text for hours.
 function checkBuild(){if(!/^https?:/.test(location.protocol))return;try{fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():'';}).then(function(t){var m=t.match(/BUILD='([^']+)'/);if(m&&m[1]!==BUILD&&!$('newbuild')){var b=document.createElement('button');b.id='newbuild';b.className='newbuild';b.textContent='A newer version of the game is out. Tap to reload, your save stays.';b.onclick=function(){save();location.reload();};document.body.appendChild(b);}}).catch(function(){});}catch(e){}}
 setTimeout(checkBuild,60000);setInterval(checkBuild,15*60000);
