@@ -28,7 +28,7 @@ var g=newGame();var T=g.tanks[0];T.had=1;T.pop=[{age:60,n:30,g:40,b:1}];g.money=
 dayRollover(g);if(!treatOn(T,'spinach'))throw Error('Weekly treat before');T.treats.spinach=0;g.emp.farms.hatch=1;if(!milestoneConditions(g).owntank)throw Error('Card');
 storyChoose(g,'owntank',0);if(!ownTank(g)||tankGone(g))throw Error('Kept');dayRollover(g);if(treatOn(T,'spinach'))throw Error('No auto renew once it is yours');
 if(!giveTreat(g,0,'spinach')||!giveHappy(g,'pea')||giveHappy(g,'pea')||g.me.happy!==1)throw Error('By hand');
-var h=newGame();h.emp.farms.hatch=1;storyChoose(h,'owntank',1);if(!tankGone(h)||gpLines(h).join().indexOf('kitchen')<0)throw Error('Grandpa keeps it');
+var h=newGame();h.emp.farms.hatch=1;storyChoose(h,'owntank',0);if(tankGone(h)||!ownTank(h)||storyChoices(h,'owntank').length!==1)throw Error('No choice, the tank is always there');h.ps.look+=15;if(ownLevel(h)!==2||gpLines(h).join().indexOf('never stopped')<0)throw Error('Tended ending');
 `);
 check('packers, salespeople, managers and Leo each get a goodbye card',`
 var g=newGame();var E=g.emp;E.staff.pack=10;E.staff.lines=1;g.money=1e6;if(!milestoneConditions(g).bye_pack)throw Error('Rosa');
@@ -144,5 +144,22 @@ var h=newGame();h.kits.sold=1000;h.academy.level=1;h.money=1e7;buyProj(h,'sciaca
 var q=newGame();q.tanks[0].feeder=1;q.tanks[0].autoWC=1;personalDay(q);q.me.picks=['letter','nothing'];for(var d=0;d<30;d++){q.day++;personalDay(q);}if(q.me.letters<3||!q.me.hist.some(function(x){return /fishing boat/.test(x);}))throw Error('His story in letters');
 var w=newGame();w.humans=2e9;w.emp.inf=1e5;storyChoose(w,'c_war',3);if(!rip(w).log.some(function(x){return /breeding season/.test(x.tx);}))throw Error('The war choice makes the news');
 var o=newGame();o.emp.farms.hatch=1;storyChoose(o,'owntank',0);if(gpLines(o).join().indexOf('never looked')<0)throw Error('Kept and never looked');o.ps.look+=5;if(gpLines(o).join().indexOf('never looked')>=0)throw Error('Looked after');
+`);
+check('Mira shows up at more moments, and each one follows something you did',`
+var g=newGame();g.day=1200;var c=milestoneConditions(g);if(c.mira_teen||c.mira_house||c.mira_net||c.mira_grown||c.mira_space||c.mira_bye)throw Error('Not before you met her');
+g.story.choices={ev_mira:1};c=milestoneConditions(g);if(!c.mira_teen||c.mira_house||c.mira_net||c.mira_grown||c.mira_space||c.mira_bye)throw Error('Only the age one at first');
+if(MILESTONES.mira_teen.more(g).indexOf('Sunday')<0)throw Error('Her answer shows');g.story.choices.ev_mira=0;if(MILESTONES.mira_teen.more(g).indexOf('jar')<0)throw Error('The jar');
+g.me={on:1,house:{complete:5},cnt:{},gp:{}};g.emp.network=1;g.humans=2e8;g.space.started=true;g.story.choices.bye_pack=0;c=milestoneConditions(g);
+['mira_house','mira_net','mira_grown','mira_space','mira_bye'].forEach(function(k){if(!c[k]||!MILESTONES[k]||!MILESTONES[k].body)throw Error(k);});
+var n=Object.keys(MILESTONES).filter(function(k){return /^mira_/.test(k);}).length;if(n<10)throw Error('Mira moments '+n);
+`);
+check('paths without Space get a last chapter before the ending',`
+var g=newGame();g.tr={drive:6,ego:4,means:-2};g.emp.won=2000;g.humans=WORLD;g.emp.trees={island:1};g.emp.tree={isl_buy:1,isl_nation:1};g.progress.seen={};g.progress.queue=['win'];
+if(spaceOpen(g)||lastChapter(g)!=='island')throw Error('Island chapter '+lastChapter(g));detectMilestones(g);
+if(g.progress.queue[0]!=='lastchap'||g.progress.queue.indexOf('win')<1)throw Error('Order '+g.progress.queue);var t=MILESTONES.lastchap.more(g);
+if(t.indexOf('Shrimp Island')<0||t.indexOf('country now')<0||t.indexOf('jetty')<0)throw Error('Text '+t);
+var q=newGame();q.emp.won=2000;q.emp.trees={space:1};q.tr={know:6,ego:-2,care:2};if(!spaceOpen(q)||lastChapter(q))throw Error('Space players keep their own last chapter');
+var r=newGame();r.tr={drive:-6,ego:-4,care:-2};r.emp.won=2000;r.emp.trees={shop:1};r.progress.seen={};r.progress.queue=['win'];detectMilestones(r);if(r.progress.queue[0]!=='lastchap'||MILESTONES.lastchap.more(r).indexOf('cat')<0)throw Error('Shop chapter');
+var o=newGame();o.tr={drive:-6,ego:-4};o.emp.won=1;o.progress={seen:{},queue:[],wait:[]};o.emp.trees={shop:1};detectMilestones(o);
 `);
 console.log(count+' free time, Grandpa and ending checks passed');

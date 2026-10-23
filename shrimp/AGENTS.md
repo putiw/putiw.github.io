@@ -174,7 +174,8 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] Writing letters tells Grandpa's story bit by bit. His milestone letters live in the You tab once it opens.
 - [ ] Climbers get shorter letters, floaters get longer ones (`gpVoice`).
 - [ ] A place of your own: land, walls (for me, Grandpa or both), then the rest, offered with AED 300k spare.
-- [ ] Your own tank after the first industrial hatchery: keep it (treats by hand, happy treats), give it to Grandpa, or let the farm take them. Kept and never looked at is a line in the ending.
+- [ ] Your own tank after the first industrial hatchery is always there, no decision. The farm takes the other tanks, the 20 L stays (treats by hand, happy treats). Late game it is irrelevant, so most people ignore it. How much you tended it (`ownLevel` 0/1/2) changes a line in the ending and nudges kin. The year-eight green-glass card only asks start again or leave it, it never removes the tank.
+- [ ] Mira shows up at 11+ moments (`mira_*` milestones plus the fisher card), each following something you did. Paths without Space get a `lastchap` card before the ending (`LASTCH`, `lastChapter`).
 
 **People and money**
 - [ ] Rosa, Imran, Dana and Leo each get a goodbye card when a machine takes their job, options change over time.

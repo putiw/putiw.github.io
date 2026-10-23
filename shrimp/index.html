@@ -1805,13 +1805,14 @@ function milestoneConditions(G){var t=G.tanks[0],p=ppm(t);return Object.assign({
   wash_offer:(((G.me&&G.me.cnt.fight)||0)>=4||!!G.emp.sharkUsed)&&kitsOpen(G)&&!G.emp.dirty&&!G.emp.turned&&!G.emp.won,
   fav_0:favourDue(G,0),fav_1:favourDue(G,1),fav_2:favourDue(G,2),gp_net:!!G.emp.network,
   mira_dye:!!(G.dye&&G.dye.found),mira_fight:((G.me&&G.me.cnt.fight)||0)>=1,mira_scholar:pd(G,'scholar'),mira_dirty:dirtyOn(G)&&G.day>=G.emp.dirty.day+30,mira_back:!!G.emp.backDone,
+  mira_teen:miraMet(G)&&G.day>=1100,mira_bye:miraMet(G)&&miraBye(G),mira_house:miraMet(G)&&!!(G.me&&G.me.house&&G.me.house.complete),mira_net:miraMet(G)&&!!G.emp.network,mira_grown:miraMet(G)&&G.humans>=1e8,mira_space:miraMet(G)&&!!(G.space&&G.space.started),
   buyout:(G.humans>=1e6||G.humans>=2e5&&((G.me&&G.me.cnt.dinners)||0)>=6)&&!G.emp.won
 },cards3Cond(G));}
 // Story choices. Each event is a decision card; picking applies a small, lasting effect.
 function storyChoose(G,key,i){var E=G.emp,m=MILESTONES[key],ch=storyChoices(G,key);if(!m||!ch||!ch[i])return false;
  if(CARDS3[key]){if(!card3Choose(G,key,i))return false;(G.story.choices||(G.story.choices={}))[key]=i;log(G,m.title+': '+ch[i][0].toLowerCase());return true;}
  if(m.opts||m.dyn){if(!(m.opts?m.pick(G,i):byeChoose(G,m.dyn,i)))return false;(G.story.choices||(G.story.choices={}))[key]=i;log(G,m.title+': '+ch[i][0].toLowerCase());return true;}
- if(key==='owntank'){G.me.keep=['self','gp','farm'][i];G.sel=0;G.recipe=false;G.me.keepBase=(G.ps?G.ps.look+G.ps.treat:0)+G.me.happy+Math.floor((G.stats.wiped||0)/30);}
+ if(key==='owntank'){G.me.keep='self';G.sel=0;G.recipe=false;G.me.keepBase=(G.ps?G.ps.look+G.ps.treat:0)+G.me.happy+Math.floor((G.stats.wiped||0)/30);}
  if(key==='me_burnout'&&i===1){G.me.burnt=0;G.me.heavy=2;}
  if(key==='dye_offer'&&i===0){G.dye={on:1,day:Math.floor(G.day)};addHeart(G,-1);}
  if(key==='fight_invite'&&i===0){E.fight=1;addHeart(G,-1);}
@@ -1835,6 +1836,8 @@ function migrateProgress(G){
   // saves from before the story and intro cards: skip the ones the player is already past
   if(!p.v2){p.v2=1;if(G.day>1){var cv=milestoneConditions(G);['tanks2','health','tools','station','bulk','worldtab','ripple','ev_mira','ev_paper','ev_rival','ev_ai','ev_school','ev_marine','ev_stars'].forEach(function(k){if(cv[k]||G.kits.sold>0&&k==='ev_mira'||G.tanks.length>1&&k==='tanks2')p.seen[k]=true;});}}
   if(!p.v3){p.v3=1;if(G.day>1&&G.kits.sold>=3)p.seen.qc=true;}
+  if(!p.v7){p.v7=1;if(G.emp.won)p.seen.lastchap=true;}
+  if(!p.v6){p.v6=1;if(G.day>1){var c6=milestoneConditions(G);['mira_teen','mira_bye','mira_house','mira_net','mira_grown','mira_space'].forEach(function(k){if(c6[k])p.seen[k]=true;});}}
   if(!p.v5){p.v5=1;if(G.day>1){var c5=milestoneConditions(G);Object.keys(CARDS3).forEach(function(k){if(c5[k])p.seen[k]=true;});}}
   if(!p.v4){p.v4=1;if(G.day>1){var c4=milestoneConditions(G);['mira_scholar','dye_offer','fight_invite','buyout'].forEach(function(k){if(c4[k])p.seen[k]=true;});if(G.kits.sold>0)p.seen.dye_offer=true;}}
   if(G.labQuality==null&&Object.keys(E.farms).some(function(k){return E.farms[k]>0;}))G.labQuality=labCandidate(G);
@@ -1846,6 +1849,7 @@ function detectMilestones(G){
   // one story card at a time, about two minutes of play apart
   var now=storyClock(G);if(p.nextStory!=null&&p.nextStory-now>300000)p.nextStory=now;
   if(p.wait.length&&!p.queue.length&&(p.nextStory==null||now>=p.nextStory)){p.queue.push(p.wait.shift());p.lastStory=now;p.nextStory=now+paceGap(p.wait.length);var R=rip(G);if(R.pend&&R.pend.length&&(R.nextAt==null||R.nextAt<now+10000))R.nextAt=now+10000;}
+  if(p.queue.indexOf('win')>=0&&!p.seen.lastchap&&lastChapter(G)){p.seen.lastchap=true;p.queue.splice(p.queue.indexOf('win'),0,'lastchap');}
   newsTick(G);
 }
 function progressionBlocked(G){var p=ensureProgress(G);return p.queue.length>0||!!G.emp.ended||!!G.emp.won&&!p.sandbox&&!(G.space&&G.space.started);}
@@ -2063,7 +2067,7 @@ var TRAIT_TAGS={social:{ego:.5},guide:{know:.5,kin:.5},refer:{reach:.3},precycle
  almond:{kin:1},streams:{kin:1,reach:.5},takeback:{kin:.5},solar:{care:.5},mangrove:{kin:1,care:1},
  coop:{care:.5,control:1},buyout:{drive:1,control:-1},shipwarm:{kin:1},shipcheap:{kin:-1,drive:.5},cullschool:{kin:1,care:.5},cullfeed:{kin:-2},filterlast:{care:.5},filtercart:{drive:.5},foodopen:{care:.5,kin:.5},foodpods:{drive:.5},revfake:{risk:.5,ego:.5},kidsads:{drive:1},kidsfree:{care:2},datasell:{drive:.5},datakeep:{control:.5},wasteclean:{kin:.5},wastedump:{kin:-1,risk:.5},landfarm:{kin:.5},landwet:{kin:-1.5,drive:.5}};
 var STORY_TAGS={ev_mira:[{kin:.5,care:-.5},{know:1},{drive:.5}],ev_paper:[{know:.5},{care:-.5},{ego:.5,risk:.5}],ev_rival:[{drive:1},{kin:1,know:.3},{risk:.3}],ev_ai:[{control:1},{control:-.5}],ev_school:[{care:1.5},{care:.5},{}],ev_marine:[{know:1,care:.5},{control:-.5}],ev_stars:[{know:.5}],
- owntank:[{kin:1.5},{care:-1},{kin:-1,drive:.5}],me_burnout:[{drive:-1,risk:-.5},{drive:1,risk:.5}],dye_offer:[{means:-1,kin:-1,risk:.5},{means:.5}],fight_invite:[{kin:-1,risk:.5},{}],wash_offer:[{},{means:.5}]};
+ owntank:[{}],me_burnout:[{drive:-1,risk:-.5},{drive:1,risk:.5}],dye_offer:[{means:-1,kin:-1,risk:.5},{means:.5}],fight_invite:[{kin:-1,risk:.5},{}],wash_offer:[{},{means:.5}]};
 function newPS(){return{t:0,fast:0,idle:0,manual:0,look:0,help:0,news:0,me:0,treat:0,thin:0,fat:0,d4:null};}
 // Free time: 2 picks (3 once you have a farm), weekly, then monthly after the first farm, once a year after moving away.
 var PICKS=[
@@ -2161,6 +2165,7 @@ function personalDay(G){var M=G.me;if(!M)return;var now=Math.floor(G.day);
  if(!M.cur&&now>=M.mNext&&rt>=M.mT){var c=MOMENTS.filter(function(m){return !M.done[m.id]&&m.req(G);});if(c.length){M.cur={id:c[0].id,t:rt,d:now};M.mNext=now+30;M.mT=rt+180000;}}}
 // Your own tank, after the industrial hatchery. Kept tanks get treats by hand, and happy treats that do nothing but make them happy.
 var HAPPY=[{id:'pea',name:'Blanched pea',cost:1,days:3},{id:'mulberry',name:'Mulberry leaf',cost:2,days:5},{id:'snow',name:'Snowflake food',cost:3,days:4}];
+function ownLevel(G){var M=G.me||{},d=(G.ps?G.ps.look+G.ps.treat:0)+(M.happy||0)+Math.floor((G.stats.wiped||0)/30)-(M.keepBase||0);return d>=12?2:d>=3?1:0;}
 function ownTank(G){return !!(G.me&&G.me.keep==='self');}
 function tankGone(G){return !!(G.me&&G.me.keep&&G.me.keep!=='self');}
 function happyOn(T,id){return !!(T&&T.happy&&T.happy[id]>0);}
@@ -2237,14 +2242,14 @@ function endingPick(G){var E=G.emp;if(E.ended)return E.ended.kind;var sc=endingS
  if(best==='network')return E.turned?'network_back':dirty?'network_dark':'network_life';
  return v.ego>0||(M.vids||0)>=20?'drift_famous':'drift_shop';}
 function visitLevel(G){var M=G.me||{},v=(M.visits||0)+0.4*(M.calls||0);return v>=12?'many':v>=4?'some':'none';}
-function gpLines(G){var M=G.me||{},g=M.gp||{},o=[];if(M.keep==='self'&&G.ps&&(G.ps.look+G.ps.treat+M.happy+Math.floor((G.stats.wiped||0)/30))-(M.keepBase||0)<3)o.push('You kept your first tank, and almost never looked at it again.');if(M.keep==='gp')o.push('Your first tank still runs in Grandpa’s kitchen.');if(g.job)o.push('Grandpa worked nights at the first farm until he was eighty.');if(g.trip)o.push('Grandpa saw the sea up north. He still talks about the water.');if(g.mira)o.push('Grandpa and Mira run the shrimp club together now.');else if(g.club)o.push('The shrimp club asked Grandpa back every year.');if(g.fish)o.push('Grandpa keeps a photo of the boat on his fridge.');
+function gpLines(G){var M=G.me||{},g=M.gp||{},o=[];if(M.keep==='self'&&G.ps){var ol=ownLevel(G);o.push(ol===2?'You never stopped looking after your first tank. The glass is still clean.':ol===1?'You went back to your first tank every so often, usually when something else was wrong.':'You kept your first tank, and almost never looked at it again.');}if(M.keep==='gp')o.push('Your first tank still runs in Grandpa’s kitchen.');if(g.job)o.push('Grandpa worked nights at the first farm until he was eighty.');if(g.trip)o.push('Grandpa saw the sea up north. He still talks about the water.');if(g.mira)o.push('Grandpa and Mira run the shrimp club together now.');else if(g.club)o.push('The shrimp club asked Grandpa back every year.');if(g.fish)o.push('Grandpa keeps a photo of the boat on his fridge.');
  var B=G.emp.byeDone||{};for(var k in B)if(BYE_END[k]&&BYE_END[k][B[k]])o.push(BYE_END[k][B[k]]);var E=G.emp;
  if(G.dye&&G.dye.found)o.push('Pet shops test red shrimp for dye now.');if(E.fightDead)o.push('Somewhere a back room still has a betta and a big planted tank.');if(E.paidOut)o.push('One of your old routes still belongs to someone else.');if(E.network&&!E.turned)o.push('Nobody stops a shrimp truck at a border.');if(E.turned)o.push('A shrimp company once walked into a police station, people still bring it up.');if(E.gpLoan&&!E.gpLoan.paid)o.push('Grandpa never went to see the sea.');return o.concat(houseLines(G),treeLines(G),card3Lines(G));}
 function dailySpend(G){var rows=(G.fin||[]).slice(-7),s=0;rows.forEach(function(r){FIN_CATS.forEach(function(c){if(!c[2]&&r[c[0]]<0)s-=r[c[0]];});});return rows.length?s/rows.length:0;}
 function storyChoices(G,key){var m=MILESTONES[key];if(!m)return null;return m.opts?m.opts(G).map(function(o){return [o[0],o[1]];}):m.dyn?byeOpts(G,m.dyn).map(function(o){return [o[0],o[1]];}):m.choices;}
 MILESTONES.me_intro={intro:1,title:'Your Saturdays',body:'The tank feeds itself and changes its own water now. For the first time in months your Saturdays are free.\n\nWhat you do with them is under the little person at the top.',tab:'me'};
 MILESTONES.me_burnout={story:1,title:'Tired',body:'You fell asleep at your desk again. Grandpa came by with soup and you didn’t hear the door. He left it on the step with a note, “Eat something.”',tab:'me',choices:[['Take two weeks off','You sleep a lot. The company is fine without you.'],['Keep going','You eat the soup cold at midnight and answer emails.']]};
-MILESTONES.owntank={story:1,title:'The tanks at home',body:'The hatchery breeds more shrimp in a day than your home tanks did in a year. They don’t change the numbers anymore.\n\nGrandpa asks what you’ll do with them.',tab:'emp',choices:[['Keep one, just for you','The rest go to the farm. One stays on the shelf by the window.'],['Give them to Grandpa','He puts your first tank in his kitchen, next to the radio.'],['Let the farm take them all','The farm looks after them better than you have time to. The shelf is empty.']]};
+MILESTONES.owntank={story:1,title:'The tank at home',body:'The hatchery breeds more shrimp in a day than your home tanks did in a year. They don’t change the numbers anymore.\n\nThe farm takes the extra tanks. Grandpa’s old 20 L stays on the shelf by the window. It is always there, and you can always go and look. Most people stop. Some don’t.',tab:'emp',choices:[['Keep it on the shelf','You can clean it and feed it whenever you like. Nobody needs you to.']]};
 MILESTONES.bye_pack={story:1,title:'Rosa',body:'The packing line runs by itself now. Rosa has packed kits since the third week, she tapes every box twice. Your packers still come in every morning and there’s nothing left for them to pack.\n\nRosa asks what happens to them.',tab:'emp',dyn:'pack'};
 MILESTONES.bye_sales={story:1,title:'Imran',body:'The AI agents answer every customer now, in two seconds, in any language. Imran has run your sales team since the first shop. He keeps a spreadsheet of every regular and their shrimp’s names.\n\nHe asks to talk to you before Friday.',tab:'emp',dyn:'sales'};
 MILESTONES.bye_mgr={story:1,title:'Dana',body:'AI agents run the shops now, the rent, the stock, the rotas. Dana ran your first shop, she knows every landlord on the street by name.\n\nShe brings the keys to your office.',tab:'emp',dyn:'mgr'};
@@ -2321,6 +2326,15 @@ MILESTONES.mira_dye={story:1,title:'Mira’s red shrimp',body:'Mira’s mom boug
 MILESTONES.mira_fight={story:1,title:'Mira',body:'Mira saw the betta tank through the back room door. She doesn’t come over after school anymore.',tab:'market'};
 MILESTONES.mira_scholar={story:1,title:'Mira’s letter',body:'Mira got one of the marine biology scholarships. She didn’t know it was yours until the letter came. She calls you to read it out loud.',tab:'world'};
 MILESTONES.mira_dirty={story:1,title:'Mira',body:'Mira’s mom says the new investor parks his car across their driveway. Mira asks who he is. You say he’s a friend.',tab:'emp'};
+function miraMet(G){return !!(G.story&&G.story.choices&&G.story.choices.ev_mira!=null);}
+function miraBye(G){var c=G.story&&G.story.choices||{};return ['bye_pack','bye_sales','bye_mgr','bye_social'].some(function(k){return c[k]!=null;});}
+function miraAns(G){return (G.story&&G.story.choices&&G.story.choices.ev_mira)|0;}
+MILESTONES.mira_teen={story:1,title:'Mira',body:'Mira is eleven. She has a school project about shrimp and she has brought the whole class’s questions in a list.',tab:'tank',more:function(G){return ['Her jar is still on the windowsill. Three shrimp, no filter, perfectly fine.','She tests her own water every Sunday and writes it in a notebook.','She says she waved goodbye to the shrimp that day, and one waved back, mostly.'][miraAns(G)]||'';}};
+MILESTONES.mira_bye={story:1,title:'Mira',body:'Mira found out the packing line is quiet now. She asks who tapes the boxes. You say the machines. She says that is a sad answer for a box.',tab:'emp'};
+MILESTONES.mira_house={story:1,title:'Mira',body:'Mira helps paint the shrimp room at your house. She gets more paint on her shoes than on the wall. She says it is the best room in the building.',tab:'me'};
+MILESTONES.mira_net={story:1,title:'Mira',body:'Mira counts your trucks from her window at night. There are more than there used to be. She doesn’t tell her mom.',tab:'emp'};
+MILESTONES.mira_grown={story:1,title:'Mira',body:'Mira turns eighteen. She asks what you would do in her place.',tab:'emp',more:function(G){return pd(G,'scholar')?'She is already studying the sea. She just wants to hear you say it is a good idea.':dirtyOn(G)?'She doesn’t ask about the investor. That says more than asking would.':'She hasn’t decided yet. She says the shrimp helped her think.';}};
+MILESTONES.mira_space={story:1,title:'Mira',body:'Mira asks if the shrimp on the other worlds get homesick. You say you will ask them.',tab:'space'};
 MILESTONES.mira_back={story:1,title:'Mira',body:'The year is over. Mira comes over with a cake she made herself, it’s a bit burnt. She says it’s for starting again.',tab:'emp'};
 MILESTONES.buyout={story:1,title:'An offer',body:'Fishfood Holdings wants to buy the company. Their lawyer has a pen ready and a number on a card.',tab:'emp',opts:function(G){return [['Sell for '+fmtA(buyoutPrice(G))+', the game ends here','You sign in an office with no shrimp in it.','sell'],['Not for sale','The lawyer leaves the card on your desk.','no']];},pick:function(G,i){if(i===0){earn(G,buyoutPrice(G),'deals');endGame(G,'sold');}else G.emp.offerOpen=1;return true;}};
 MILESTONES.gameover={title:'The end',body:'',tab:'emp'};
@@ -2363,6 +2377,10 @@ function buyTreeStep(G,id){var E=G.emp,r=treeStep(G,id);if(!r||frozen(G)||treeNe
  if(r.s.risk&&Math.random()<r.s.risk.p)(E.later||(E.later=[])).push({d:Math.floor(G.day)+60+Math.floor(Math.random()*240),t:r.s.risk.t,m:-2});log(G,r.s.name);return true;}
 function treeDay(G){var E=G.emp,now=Math.floor(G.day);if(now%30||G.humans<5e7&&!E.won)return;var t=treesFor(G);E.trees=E.trees||{};t.forEach(function(k){if(!E.trees[k]&&(TREES[k]||k==='space'||k==='underground'))E.trees[k]=now+1;});}
 function treeLines(G){var E=G.emp,o=[];if(!E.tree)return o;TREE_ORDER.forEach(function(k){TREES[k].steps.forEach(function(s){if(E.tree[s.id]&&s.line)o.push(s.line);});});return o;}
+// The last chapter, for paths that don't go to space: the place you built, shown before the ending
+var LASTCH={island:['Shrimp Island','The ferry still runs on Sundays. From the jetty you can see the whole country, it takes four minutes to walk across.'],rewild:['The streams','A ranger sends you photos on Fridays. Red shrimp in cold clear water, nobody feeding them.'],lastmile:['The Tuesday truck','The truck gets to the desert town at nine. The nurse signs for the box and doesn’t open the shrimp first.'],lab:['The lab','The lights stay on all night. Somebody is always counting something.'],shop:['The corner shop','The bell on the door rings. A kid presses her nose against forty tanks and picks one. The cat watches.']};
+function lastChapter(G){if(spaceOpen(G))return null;var E=G.emp,best=null,bn=-1;TREE_ORDER.forEach(function(k){if(!treeHas(G,k))return;var n=TREES[k].steps.filter(function(s){return E.tree&&E.tree[s.id];}).length;if(n>bn){bn=n;best=k;}});if(best)return best;var sc=endingScores(G),top=null,tv=-1e9;for(var k2 in sc)if(sc[k2]>tv){tv=sc[k2];top=k2;}var t=TYPE_TREE[top];return LASTCH[t]?t:'shop';}
+MILESTONES.lastchap={chapter:'Final chapter',title:'The last chapter',body:'Everyone has a tank. What is left is the place you built.',tab:'emp',more:function(G){var k=lastChapter(G);if(!k)return '';var T=TREES[k],E=G.emp,L=T.steps.filter(function(s){return E.tree&&E.tree[s.id]&&s.line;}).map(function(s){return s.line;});return LASTCH[k][0]+'\n'+LASTCH[k][1]+(L.length?'\n\n'+L.join(' '):'\n\nYou never built much here. That was a choice too.');}};
 // A place of your own
 var HOUSE=[{id:'land',name:'A piece of land',m:150000,d:'Outside town, near the water. Nothing on it yet.'},{id:'walls',name:'Walls and a roof',m:80000,d:'Who it’s for gets decided now.'},{id:'solar',name:'Solar panels',m:30000},{id:'wind',name:'A small wind turbine',m:40000},{id:'well',name:'A well',m:25000},{id:'rain',name:'A rainwater tank',m:10000},{id:'compost',name:'A compost heap',m:2000},{id:'garden',name:'A vegetable garden',m:5000},{id:'room',name:'A shrimp room',m:20000}];
 function houseNext(G){var H=G.me&&G.me.house;return HOUSE.filter(function(x){return !(H&&H[x.id]);})[0]||null;}
@@ -2425,7 +2443,7 @@ var CARDS3={
   ['Say you didn’t know','You didn’t, mostly.',{means:-.5},null,'']]},
  c_mytank:{title:'Your own tank',body:'Grandpa’s old 20 L, the one you kept, is green and quiet. Most of them are gone.',cond:function(G){return ownTank(G)&&G.day>=2920&&glassMean(G.tanks[0])>0.6;},ch:[
   ['Start it again','Five shrimp from Grandpa’s tank. The glass is clean.',{kin:1.5},function(G){var T=G.tanks[0];T.glass=[];buyPackFree(T,0);},'You kept your first tank going, mostly.'],
-  ['Let it go','The shelf by the window is empty.',{kin:-1},function(G){G.me.keep='farm';},'The first tank ran dry somewhere around year eight.']]}};
+  ['Leave it a while','It stays on the shelf, green. It is still yours.',{kin:-.5},null,'The first tank went green around year eight and stayed that way for a long time.']]}};
 Object.keys(CARDS3).forEach(function(k){var c=CARDS3[k];MILESTONES[k]={story:1,title:c.title,body:c.body,tab:c.tab||'world',choices:c.ch.map(function(x){return [x[0],x[1]];})};});
 Object.keys(TREES).forEach(function(k){MILESTONES['tree_'+k]={story:1,title:TREES[k].name,body:TREES[k].open,tab:'world'};});
 function cards3Cond(G){var o={};Object.keys(CARDS3).forEach(function(k){var c=CARDS3[k];o[k]=!G.emp.won&&!G.emp.ended&&(c.cond?c.cond(G):G.humans>=c.at);});Object.keys(TREES).forEach(function(k){o['tree_'+k]=treeHas(G,k);});return o;}
@@ -3997,7 +4015,7 @@ var storySure=null;
 function renderMilestone(){
   var p=ensureProgress(G),key=p.queue[0],card=$('milestone-card');
   if(!key&&G.emp.won&&!p.sandbox&&!p.reviewing&&!G.space.started)key='win';card.hidden=!key;if(!key){renderMilestone.last=null;return;}
-  if(speed)setSpeed(0);if(renderMilestone.last!==key){renderMilestone.last=key;$('milestone-letter').open=false;setTimeout(function(){var tb=document.querySelector('.top');window.scrollTo({top:Math.max(0,card.getBoundingClientRect().top+window.scrollY-(tb?tb.getBoundingClientRect().height:0)-8),behavior:'instant'});$('milestone-title').focus({preventScroll:true});},0);}var m=MILESTONES[key];setT('milestone-scope',key==='gameover'?'Your ending':key==='intro'?'Chapter 1 · A gift from Grandpa':m.chapter?m.chapter+' · time paused':m.intro?'New · time paused':m.story?'Story · time paused':'Milestone · time paused');card.classList.toggle('ms-intro',!!m.intro);card.classList.toggle('ms-story',!!m.story);setT('milestone-title',m.title);var body=m.body;
+  if(speed)setSpeed(0);if(renderMilestone.last!==key){renderMilestone.last=key;$('milestone-letter').open=false;setTimeout(function(){var tb=document.querySelector('.top');window.scrollTo({top:Math.max(0,card.getBoundingClientRect().top+window.scrollY-(tb?tb.getBoundingClientRect().height:0)-8),behavior:'instant'});$('milestone-title').focus({preventScroll:true});},0);}var m=MILESTONES[key];setT('milestone-scope',key==='gameover'?'Your ending':key==='intro'?'Chapter 1 · A gift from Grandpa':m.chapter?m.chapter+' · time paused':m.intro?'New · time paused':m.story?'Story · time paused':'Milestone · time paused');card.classList.toggle('ms-intro',!!m.intro);card.classList.toggle('ms-story',!!m.story);setT('milestone-title',m.title);var body=m.body+(m.more?'\n\n'+m.more(G):'');
   if(key==='tenyears'){var anniversary=G.story.anniversary;body+=' '+(anniversary&&anniversary.owners!=null?'Together, you reached '+big(anniversary.owners)+' shrimp keepers in your first decade.':'That counts too.');}
   if(key==='gameover'){var en=G.emp.ended;body=(en.kind==='sold'?'You sold the company in year ':'The company closed in year ')+(Math.floor(en.day/365)+1)+'. '+big(G.humans)+' people have a tank so far.';}
   if(key==='win')body+=(G.story.tenYearAchieved?' Done in ten years.':' Grandpa’s dream came true.')+' Everyone had a tank in year '+Math.ceil(G.emp.won/365)+', '+big(G.kits.sold)+' kits sent to '+G.emp.regions.length+' regions.';
