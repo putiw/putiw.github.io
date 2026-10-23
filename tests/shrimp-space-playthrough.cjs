@@ -3,7 +3,8 @@ const fs=require('fs'),vm=require('vm'),path=require('path'),assert=require('nod
 const html=fs.readFileSync(path.join(__dirname,'../shrimp/index.html'),'utf8'),input=process.env.ACADEMY_RUN||'/private/tmp/shrimp-academy-play/run-7.json';
 const source=JSON.parse(fs.readFileSync(input,'utf8')),c=vm.createContext({Math,console});
 if(!source.snapshots['win'])throw Error('Earth replay needs a win snapshot');
-vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);c.fixture=source.snapshots['win'];
+vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);
+vm.runInContext('var BOTKIND='+(false)+';var _ack=acknowledgeMilestone;acknowledgeMilestone=function(G){var k=G.progress.queue[0],m=k&&MILESTONES[k];if(m&&m.dyn){if(!(BOTKIND&&storyChoose(G,k,1)))storyChoose(G,k,0);}else if(k==="owntank")storyChoose(G,k,0);return _ack(G);};',c);c.fixture=source.snapshots['win'];
 vm.runInContext(`
 var G=migrate(fixture),events=[],snapshots={},earthStart=G.humans;G.opt.all=true;
 while(G.progress.queue.length)acknowledgeMilestone(G);if(!G.emp.won||!requestSpaceDream(G)||!beginSpace(G))throw Error('Space should start after Earth');

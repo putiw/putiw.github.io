@@ -5,6 +5,7 @@ const fs=require('fs'),vm=require('vm'),path=require('path');
 const html=fs.readFileSync(path.join(__dirname,'../shrimp/index.html'),'utf8');
 let seed=Number(process.env.REVIEW_SEED||7);const initialSeed=seed,M=Object.create(Math);M.random=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);
 const c=vm.createContext({Math:M,console});vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);
+vm.runInContext('var BOTKIND='+(process.env.BOT_HEART!=='cold')+';var _ack=acknowledgeMilestone;acknowledgeMilestone=function(G){var k=G.progress.queue[0],m=k&&MILESTONES[k];if(m&&m.dyn){if(!(BOTKIND&&storyChoose(G,k,1)))storyChoose(G,k,0);}else if(k==="owntank")storyChoose(G,k,0);return _ack(G);};',c);
 vm.runInContext('var cache={},lastChips="",lastColSig="",lastChartKey="",lastAlerts="";function toast(){};function big(n){return String(Math.round(n));};function anyHad(){return G.tanks.some(t=>t.had||totalN(t)>=1);}function updateReveal(){'+html.split('function updateReveal(){')[1].split('function applyReveal(){')[0],c);
 vm.runInContext(html.slice(html.indexOf('var PROJ_SHOW='),html.indexOf('var seenNew='))+html.slice(html.indexOf('function projectRank('),html.indexOf('MILESTONES.spaceDream=')),c);
 vm.runInContext(`
