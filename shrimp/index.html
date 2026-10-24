@@ -3389,14 +3389,17 @@ function updateReveal(){
     if(pd(G,'farmlic'))fire('efarm','Hatcheries open in Gear.');}
   if(G.stats.born>0&&!o.hatch){o.hatch=1;}
 }
+// The top Feed / Water / Sell buttons stay while they can still matter: Feed until every tank has an auto feeder, Water until every tank has an auto water changer, Sell until the shrimp all go into kits (the Trade tab closes then)
+function actNeed(G){return {feed:G.tanks.some(function(t){return !t.feeder;}),wc:G.tanks.some(function(t){return !t.autoWC;}),sell:!(labMode()&&!G.opt.all)};}
+function setActs(sh,kit){var n=actNeed(G),f=$('tb-feed'),w=$('tb-wc'),se=$('tb-sell');f.hidden=!sh||!n.feed;w.hidden=!kit||!n.wc;se.hidden=!sh||!n.sell;
+  var cols=[f,w,se].filter(function(e){return !e.hidden;}).map(function(e){return e===se?'1.3fr':'1fr';});$('acts').hidden=!cols.length;$('acts').style.gridTemplateColumns=cols.join(' ')||'1fr';}
 function applyReveal(){
   var sh=rv('shrimp'),kit=rv('kit');
   $('vitals').hidden=!sh;$('fold').hidden=!rv('wc');
   var nums=!!G.opt.waterNums;['no3','kh','gh'].forEach(function(k){$('wp-'+k).hidden=!kit||!nums;});$('wp-temp').hidden=!rv('phkh')||!nums;if($('wp-sum'))$('wp-sum').hidden=!kit;
   $('vwater').hidden=!kit||!sh;
   ['ph','gh','kh'].forEach(function(k){var e=$('gv-'+k);if(e){var g=e.closest('.g');if(g)g.hidden=!rv('phkh');}});
-  $('tb-feed').hidden=!sh;$('tb-wc').hidden=!kit;$('tb-sell').hidden=!sh;
-  $('acts').hidden=false;$('acts').style.gridTemplateColumns=sh?'1fr 1fr 1.3fr':'1fr';
+  setActs(sh,kit);
   $('astrip').hidden=true;
   $('wtcard').hidden=!(rv('wc')&&kit)||(!anyHad()&&!G.opt.all);$('wccard').hidden=!rv('wc');
   $('colcard').hidden=!rv('hatch');$('charts').hidden=!rv('charts');$('logcard').hidden=!rv('hatch');
@@ -4787,7 +4790,7 @@ function renderProgression(){
  if(false){var link=document.createElement('button');link.id='kit-market-link';link.className='btn';link.style.order='6';link.dataset.act='navigate';link.dataset.tab='market';link.textContent='Secondary market: buy or sell individual shrimp';$('p-emp').appendChild(link);}
  ['emp','up','promote','world','research'].forEach(function(tab){var parent=$('p-'+tab),children=Array.from(parent.children).sort(function(a,b){return (+a.style.order||0)-(+b.style.order||0);});children.forEach(function(el,i){if(parent.children[i]!==el)parent.insertBefore(el,parent.children[i]);});});
  placeInfo();
- if(activeTab==='tank'){var fed=allStarterAuto(G);var sh0=rv('shrimp');['tb-feed','tb-sell'].forEach(function(id){$(id).hidden=!sh0;});$('tb-wc').hidden=!rv('kit');$('acts').hidden=false;$('acts').style.gridTemplateColumns=sh0?'1fr 1fr 1.3fr':'1fr';var toggle=$('manual-feed-toggle');if(!toggle){toggle=document.createElement('button');toggle.id='manual-feed-toggle';toggle.className='btn';toggle.dataset.act='manual-feed-toggle';$('feedcard').appendChild(toggle);}toggle.hidden=!fed;toggle.textContent=E.manualOverride?'Hide emergency manual feed':'Emergency manual feed';}
+ if(activeTab==='tank'){var fed=allStarterAuto(G);setActs(rv('shrimp'),rv('kit'));var toggle=$('manual-feed-toggle');if(!toggle){toggle=document.createElement('button');toggle.id='manual-feed-toggle';toggle.className='btn';toggle.dataset.act='manual-feed-toggle';$('feedcard').appendChild(toggle);}toggle.hidden=!fed;toggle.textContent=E.manualOverride?'Hide emergency manual feed':'Emergency manual feed';}
  if((G.recipe||stdUnlocked(G))&&topAway(G)&&!ownTank(G))$('acts').hidden=true;
  if(activeTab==='market'&&open&&(topAway(G)||labMode()))['vitals','vwater','acts','tankchips','fold'].forEach(function(id){$(id).hidden=true;});
  var tg=G.emp.regions.length>=2&&!$('acts').getClientRects().length&&!G.emp.won;$('topgoal').hidden=!tg;if(tg){setT('tg-n',big(Math.floor(G.humans)));$('tg-bar').style.width=Math.max(0.5,Math.min(100,G.humans/WORLD*100))+'%';}
