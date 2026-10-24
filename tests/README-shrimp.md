@@ -553,3 +553,8 @@ ammonia is only the primary button once ammonia is near zero.
 - Regions cost more: Dubai 250k, rest of the UAE 1M, the Gulf 8M, MENA 30M, Europe 200M, Southeast Asia 300M, the Americas 800M, East Asia 2B.
 - Average bot: regions no longer compete with farm purchases for the two buys per visit. New scratch tool: a timeline probe of when each option first shows up.
 - Results: strong cold 2,676, strong kind 3,259, average Earth 6,050-6,162, average cold 5,209.
+
+## Pass 73: one research card, chiller water
+- The Lab tab has one Research card. The people you fund in the six fields are your lab: the lab works on one project at a time (progress shown as % and days left), and grows small team → university lab → research group → professor with one "Next for the lab" step at a time. Grants are gone from the UI; old saves can still use prepaid grant days. More people make projects a bit faster.
+- Water changes on a tank with a chiller come in at the setpoint, and the chiller recovers faster. The "too hot" alert after a water change on a chilled tank is a warning that says the chiller is bringing it down.
+- Results: strong cold 2,668, strong kind 3,298, strong with research 2,551, average Earth 6,134-6,189 and space by day ~7,800, average cold 5,209.

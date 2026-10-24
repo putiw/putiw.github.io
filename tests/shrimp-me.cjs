@@ -284,4 +284,8 @@ var q=newGame();q.emp.kitsOpened=1;q.humans=9000;q.money=60000;q.fin=[];for(var 
 var w=newGame();w.emp.kitsOpened=1;w.kits.sold=60;w.money=1000;if(storesOn(w))throw Error('Stores wait until one is in reach');w.money=1e6;if(!storesOn(w)||!buyStores(w,'auh',1))throw Error('Stores open');if(!closeStores(w,'auh',1)||storeN(w,'auh')!==0)throw Error('Close a store');
 if(HEAT_COST[2]!==450)throw Error('Thermostat chiller costs 450');
 `);
+check('one research system: people in the fields run lab projects, a chiller keeps water changes cool',`
+var g=newGame();g.kits.sold=ACADEMY_AT;g.money=1e8;if(!rlHire(g,'auto','pd')||g.academy.level!==1)throw Error('First person starts the lab');if(!startStudy(g,'automation'))throw Error('Start a project');for(var i=0;i<80;i++)academyDay(g);if(!rd(g,'automation'))throw Error('Project finishes without a grant');if(g.academy.funded!==0)throw Error('No grant days used');
+var h=newGame(),T=h.tanks[0];T.heater=2;T.chem.temp=24;T.set.heat=24;h.day=285;waterChange(h,T,50);if(Math.abs(T.chem.temp-24)>0.01)throw Error('Chiller-matched water '+T.chem.temp);
+`);
 console.log(count+' free time, Grandma and ending checks passed');

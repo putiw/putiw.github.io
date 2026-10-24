@@ -45,7 +45,7 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,S=G.space,budget=
   if(packingMachineCap(G)>kitDemand(G)&&E.staff.pack)hire(G,'pack',-1);
   for(var fi=0;fi<6;fi++)if(pd(G,'farmlic')&&(!farmCap(G)||bottleneck(G).k==='shrimp')){var list=FARMS.filter(f=>farmOk(G,f));var next=list.find(f=>!(E.farms[f.id]>0));var existing=list.filter(f=>E.farms[f.id]>0).slice(-1)[0];var pick=next&&canSpend(farmCost(G,next))?next:existing||list[0];if(pick&&canSpend(farmCost(G,pick)))spend('farm '+pick.id,()=>buyFarm(G,pick.id));}
   // New regions first: a player expands before spending ✦ on extras.
-  if(academyOpen(G)&&!A.level&&canSpend(200000))spend('pilot grant',()=>fundAcademy(G));
+  if(academyOpen(G)&&!rlStaff(G)&&canSpend(400000))spend('first researcher',()=>rlHire(G,'auto','pd'));
   var region=nextRegion(G);if(G.ob.ereg&&region&&canSpend(regionCost(G,region)))act('region '+region.id,()=>buyRegion(G));
   if(G.ob.eproj){for(var area of ['emp','up','promote','world'])for(var p of (area==='world'?[].concat.apply([],TRACKS.map(t=>trackProj(G,t[0]))):shownProj(G,area,'biz'))){if(canSpend(pm(G,p))&&E.inf>=p.i)spend('project '+p.id,()=>buyProj(G,p.id));}
    // Choices: this player takes the kind answer when they can afford it (BOT_HEART=cold flips it).
@@ -66,7 +66,7 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,S=G.space,budget=
   if(E.inf<500&&G.money>galaCost(G)*20)spend('community gala',()=>buyProj(G,'gala'));
  }
  if(academyOpen(G)){
-  if(!A.level&&G.money>200000+capitalReserve(G))spend('pilot grant',()=>fundAcademy(G));
+  if(!A.level&&G.money>200000+capitalReserve(G))spend('first researcher',()=>rlStaff(G)?false:rlHire(G,'auto','pd'));
   if(A.level){A.autoFund=true;A.repeat=true;if(A.level===1&&uniqueStudies(G)&&canSpend(1000000))spend('university lab',()=>academyUpgrade(G,'lab'));
    if(A.phds&&!A.postdocs&&canSpend(500000))spend('postdoc',()=>academyUpgrade(G,'postdoc'));
    if(A.postdocs&&A.level<3&&canSpend(1000000))spend('independent group',()=>academyUpgrade(G,'group'));

@@ -2,7 +2,7 @@ const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict'),pat
 const html=fs.readFileSync(path.join(__dirname,'../shrimp/index.html'),'utf8');
 function engine(){const c=vm.createContext({console,Math});vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);return c;}
 let count=0;function check(name,code){vm.runInContext(code,engine());console.log('PASS',name);count++;}
-if(html.includes('id="world-mode"')||html.includes('society-view')||html.includes('research-view')||html.includes('A.view')||!html.includes("a.hidden=!open;a.style.order='5'")||!html.includes("chapterButton('world-tab','Open World tab',true)"))throw Error('Adoption and research should share one continuous World tab, with research following adoption');
+if(html.includes('id="world-mode"')||html.includes('society-view')||html.includes('research-view')||html.includes('A.view')||!html.includes("a.hidden=!open;a.style.order='0'")||!html.includes("chapterButton('world-tab','Open World tab',true)"))throw Error('Adoption and research should share one continuous World tab, with research following adoption');
 console.log('PASS Adoption and Research share one continuous World tab');
 check('research opens during Earth and grants preserve the reserve',`
 var g=newGame();g.money=5000000;if(fundAcademy(g)||spaceOpen(g))throw Error('Early unlock');g.day=500;g.kits.sold=ACADEMY_AT;g.money=Math.round(50000*USD);if(!fundAcademy(g)||g.money!==0||g.academy.funded!==365)throw Error('Pilot');
