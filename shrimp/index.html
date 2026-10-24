@@ -4444,7 +4444,9 @@ function tabWords(t){return t;}
 var TAB_NAME={tank:'Tank',up:'Gear',market:'Trade',emp:'Kits',promote:'Ads',world:'World',research:'Lab',space:'Space'};
 function guideOk(t){return G.opt.guideSkip&&G.opt.guideSkip[t.key]?null:(t.skip=1,t);}
 function tankStep(need,urgent){var nt=G.tanks.find(function(t){return !t.had;});
-  if(nt){var ni=G.tanks.indexOf(nt);return nt.cycledAt==null?{key:'cyc'+ni,tab:'tank',text:nt.name+' needs cycling. Select it and dose ammonia, like your first tank.'}:{key:'stock'+ni,tab:'tank',text:nt.name+' is cycled. Move some shrimp from Tank 1, or buy a few in Trade.'};}
+  if(nt){var ni=G.tanks.indexOf(nt);
+    if(nt.cycledAt==null)return {key:'cyc'+ni,tab:'tank',card:G.sel===ni?'startcard':null,sel:G.sel!==ni?'.tchip[data-sel="'+ni+'"]':SC_WC?'#tb-wc':'#startcard .btn.primary',text:nt.name+' needs cycling. '+(G.sel!==ni?'Open '+nt.name+' and dose ammonia, like your first tank.':'Dose ammonia, like your first tank.')};
+    return {key:'stock'+ni,tab:'tank',card:'colcard',sel:G.sel!==0&&G.tanks.length>1?'.tchip[data-sel="0"]':'[data-act="move"][data-to="'+ni+'"]',text:nt.name+' is cycled. Move some shrimp into it from Tank 1, or buy a few in Trade.'};}
   var room=need===KIT_TANKS?KIT_ROOM:FARM_ROOM,sv=stockedVol(G),T0=G.tanks[0],what=need===KIT_TANKS?'Starter kits':'The farm license';
   // Grow the first tank before suggesting a second one.
   if(sv<room&&urgent&&!ownTank(G)&&T0&&T0.volTier<VOLS.length-1&&!tankKitted(T0)){var vc=upgradeCost(G,T0,'tank');return {key:'vol'+need+'_'+T0.volTier,tab:'up',card:'equipcard',sel:'[data-act="upg"][data-id="tank"]',soft:vc==null||G.money<vc,text:what+' need '+room+' L of tanks with shrimp in them. '+T0.name+' holds '+T0.vol+' L. A bigger tank in Gear gets you there.'};}
@@ -4503,7 +4505,7 @@ function guideTarget(){
     var st0=G.emp.staff;if(st0.tier&&!st0.pack&&kitDemand(G)>packCap(G)*0.8&&G.money>=staffPay(G,'pack')*30&&(t=guideOk({key:'packer',tab:'emp',card:'staff',sel:'[data-act="hire"][data-role="pack"][data-d="1"]',text:'Orders are coming in faster than you can pack. Hire a packer in Kits.'})))return t;
     if(G.kits.sold>=10){
       var lic=PROJ.find(function(p){return p.id==='farmlic';});
-      if(!pd(G,'farmlic')){var ts2=tankStep(FARM_TANKS,true);if(ts2&&!ts2.soft)return ts2;
+      if(!pd(G,'farmlic')){var ts2=tankStep(FARM_TANKS,true);if(ts2&&!ts2.soft&&ts2.sel&&!(pk&&/^(cyc|stock)/.test(ts2.key)))return ts2;if(ts2&&!pk&&/^(cyc|stock)/.test(ts2.key))return ts2;
         if(!lic.req(G)){var nst=G.tanks.filter(function(t){return totalN(t)>=1;}).length;if(nst<FARM_TANKS&&G.tanks.length<MAX_TANKS&&G.money>=(NEW_TANK_COST[G.tanks.length]||0)&&(t=guideOk({key:'ftank'+G.tanks.length,tab:'up',card:'tanks',sel:'[data-act="addtank"]',text:'The farm license needs '+FARM_TANKS+' tanks with shrimp in them. You have '+nst+'. Add a tank in Gear.'})))return t;}
         else if(G.money>=lic.m&&(t=guideOk({key:'lic',tab:projectArea(lic),card:'proj',sel:'[data-act="proj"][data-id="farmlic"]',text:'You can get a farm license now. It lets you build grow racks that breed shrimp for kits.'})))return t;}
       else{var f0=FARMS[0];if(G.money>=farmCost(G,f0)+farmWorkingCapital(G,f0)&&(t=guideOk({key:'rack',tab:'up',card:'farms',sel:'[data-act="farm"][data-id="'+f0.id+'"]',text:'Grow racks in Gear breed shrimp for kits, so your tanks don\u2019t have to.'})))return t;}
