@@ -73,8 +73,8 @@ ul.ending{margin:4px 0 8px;padding-left:18px}.ending-box{flex-basis:100%;width:1
 @keyframes nudge{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 45%,transparent);background:color-mix(in srgb,var(--accent) 12%,var(--surface));border-color:var(--accent);color:var(--accent)}}
 #speed button.nudge{animation:firstFeedPulse 1.2s ease-in-out infinite;border-color:var(--s2)}
 @keyframes firstFeedPulse{0%,100%{background:var(--accent);color:var(--accent-ink);box-shadow:0 0 0 0 transparent}50%{background:var(--s2);color:#fff;box-shadow:0 0 0 3px color-mix(in srgb,var(--s2) 22%,transparent)}}
-.acts #tb-feed.first-feed{animation:firstFeedPulse 1.2s ease-in-out infinite;border-color:var(--s2)}
-@media(prefers-reduced-motion:reduce){.acts #tb-feed.first-feed{animation:none;background:var(--s2);color:#fff;box-shadow:0 0 0 2px color-mix(in srgb,var(--s2) 22%,transparent)}}
+.acts #tb-feed.first-feed,.acts #tb-wc.need{animation:firstFeedPulse 1.2s ease-in-out infinite;border-color:var(--s2)}
+@media(prefers-reduced-motion:reduce){.acts #tb-wc.need{animation:none;background:var(--s2);color:#fff}.acts #tb-feed.first-feed{animation:none;background:var(--s2);color:#fff;box-shadow:0 0 0 2px color-mix(in srgb,var(--s2) 22%,transparent)}}
 @media (prefers-reduced-motion:reduce){.speed button.nudge5{animation:none}}
 .speed button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .chips{display:flex;gap:4px;flex-wrap:nowrap;overflow-x:auto;margin-top:4px;scrollbar-width:none}
@@ -3008,7 +3008,7 @@ var FT=null;
 var ONE=null,BRUSH='work';
 // Update a block of HTML in place: same nodes stay, only what changed is touched, so a button under a finger is never swapped out mid-tap.
 // Classes the UI adds on its own (guide pulse, nudges) and the open state of folds are left alone.
-var KEEP_CLS=['guide-btn','nudge','first-feed','blink','held','sure','guide'];
+var KEEP_CLS=['guide-btn','nudge','first-feed','need','blink','held','sure','guide'];
 function morphKids(a,b){var bn=Array.prototype.slice.call(b.childNodes);for(var i=0;i<bn.length;i++){var x=a.childNodes[i],y=bn[i];if(!x){a.appendChild(y);continue;}
  if(x.nodeType!==y.nodeType||x.nodeName!==y.nodeName||x.nodeName==='CANVAS'||x.nodeName==='svg'||x.nodeName==='SVG'){a.replaceChild(y,x);continue;}
  if(x.nodeType!==1){if(x.nodeValue!==y.nodeValue)x.nodeValue=y.nodeValue;continue;}
@@ -3147,14 +3147,14 @@ function tips(T){
   var out=[],P=ppm(T),c=T.chem,N=totalN(T),tg=bacTarget(T),pa=c.bacA/tg,pb=c.bacB/tg;
   var eff=P.nh*relTox(c.ph,c.temp),pre=G.tanks.length>1?T.name+': ':'';
   var np=netPerDay(G);
-  if(T.ill&&illStage(T)>=3)out.push({sev:'bad',t:pre+'Shrimp are dying fast.'});
+  if(T.ill&&illStage(T)>=3)out.push({sev:'bad',t:pre+'Shrimp are dying fast. Tap the tank, then Check shrimp.'});
   if(eff>0.25&&N>=1)out.push({sev:'bad',t:pre+'Ammonia is '+P.nh.toFixed(2)+' ppm, toxic for them. Stop feeding and change 30% of the water.',act:'wc'});
   if(P.no2>0.1&&N>=1)out.push({sev:'bad',t:pre+'Nitrite is '+P.no2.toFixed(2)+' ppm, they need zero. Change 30% of the water and feed less.',act:'wc'});
   if(c.temp>28)out.push(T.heater>=2&&T.set.heat<=27?{sev:'warn',t:pre+'Tank is '+c.temp.toFixed(1)+' °C, the chiller is bringing it down to '+T.set.heat.toFixed(0)+' °C.'}:{sev:'bad',t:pre+'Tank is '+c.temp.toFixed(1)+' °C, too hot for them.'+(T.heater>=2?' Lower the setpoint.':' Water care has quick ways to cool it.')});
-  if(c.temp<17)out.push({sev:'bad',t:pre+'Tank is '+c.temp.toFixed(1)+' °C, too cold for them.'+(T.heater>=1?' Raise the setpoint.':'')});
-  if(c.ph<6.3)out.push({sev:'bad',t:pre+'pH is '+c.ph.toFixed(1)+', KH is down to '+c.kh.toFixed(1)+'. Small water changes refill KH.'});
-  if(c.gh<3.5&&N>0)out.push({sev:'bad',t:pre+'GH is '+c.gh.toFixed(1)+', too soft for good molts.'});
-  if(N>=1&&c.nutr<0.5)out.push({sev:'bad',t:pre+'Nutrition is '+Math.round(c.nutr*100)+'%, they\u2019re starving.',act:'feed'});
+  if(c.temp<17)out.push({sev:'bad',t:pre+'Tank is '+c.temp.toFixed(1)+' °C, too cold for them.'+(T.heater>=1?' Raise the setpoint.':' A winter heater in Gear fixes it.')});
+  if(c.ph<6.3)out.push({sev:'bad',t:pre+'pH is '+c.ph.toFixed(1)+', KH is down to '+c.kh.toFixed(1)+'. Small water changes refill KH.',act:'wc'});
+  if(c.gh<3.5&&N>0)out.push({sev:'bad',t:pre+'GH is '+c.gh.toFixed(1)+', too soft for good molts. Raise New water GH under Water care, then change some water.',act:'wc'});
+  if(N>=1&&c.nutr<0.5)out.push({sev:'bad',t:pre+'Nutrition is '+Math.round(c.nutr*100)+'%, they\u2019re starving. Feed them.',act:'feed'});
   else if(N>=1&&c.nutr<0.75)out.push({sev:'warn',t:pre+'Nutrition is '+Math.round(c.nutr*100)+'%, they could eat more.',act:'feed'});
   if(N>0&&(pa<0.8||pb<0.8))out.push({sev:'warn',t:pre+'Filter bacteria only keep up with '+Math.round(Math.min(pa,pb)*100)+'% of the waste. Feed lightly for now.'});
   if(c.kh<2.5&&N>0)out.push({sev:c.kh<1?'bad':'warn',t:pre+'KH is down to '+c.kh.toFixed(1)+'. At zero the pH crashes. Water changes refill it.',act:'wc'});
@@ -3218,11 +3218,11 @@ function updateVitals(){
   setT('vv-nutr',N<1?'-':Math.round(nv)+'%');
   $('vm-nutr').className='vm '+ns;$('vb-nutr').style.width=(N<1?0:clamp(nv/160*100,0,100))+'%';
   setT('vv-food',Math.round(c.food)+' mg');
-  var hl=handLeft(G,T);setT('tb-feed',N>=1?(T.feeder?'Extra feed':hl>0?'Fed · '+hl+(hl>1?' days':' day'):'Feed · '+aed(feedCost(T,T.set.ration/100))):'Feed');$('tb-feed').title=T.feeder?'The auto feeder already feeds this tank. This adds more on top.':'One feeding covers 2 days. An auto feeder in Gear takes over for good.';$('tb-feed').disabled=N<1;$('tb-feed').classList.toggle('first-feed',N>=1&&!T.feeder&&!(G.ob.feeds||0));
+  var hl=handLeft(G,T);setT('tb-feed',N>=1?(T.feeder?'Extra feed':hl>0?'Fed · '+hl+(hl>1?' days':' day'):'Feed · '+aed(feedCost(T,T.set.ration/100))):'Feed');$('tb-feed').title=T.feeder?'The auto feeder already feeds this tank. This adds more on top.':'One feeding covers 2 days. An auto feeder in Gear takes over for good.';$('tb-feed').disabled=N<1;$('tb-feed').classList.toggle('first-feed',N>=1&&!T.feeder&&(!(G.ob.feeds||0)||hl<=0));
   setT('tb-wc','Water '+T.set.wcPct+'%');
   var sa=sellAll(G,true);setT('tb-sell',sa.count>0?'Sell '+sa.count+' · '+aed(sa.revenue):sellWhyNot(G));$('tb-sell').disabled=sa.count<=0;
   var wst='ok',tmp=null;[['no3'],['kh'],['gh'],['temp']].forEach(function(x){var g=gaugeById(x[0]),v=g.get(T),q=gstate(g,v);if(x[0]==='temp'){if(q.st!=='ok')tmp=v>25?'too warm':'too cold';}else if(q.st==='bad')wst='bad';else if(q.st==='warn'&&wst!=='bad')wst='warn';});
-  var ws=$('wp-sum');if(ws){var cl='wp wsum '+(tmp&&wst==='ok'?'warn':wst);if(ws.className!==cl)ws.className=cl;var wkd=wcWeek(G,TK())>=150;setT('wv-sum',tmp&&wst==='ok'?tmp:wkd&&wst!=='ok'?'wait a day':wst==='bad'?'change now':wst==='warn'?'change soon':'good');}
+  var ws=$('wp-sum');if(ws){var cl='wp wsum '+(tmp&&wst==='ok'?'warn':wst);if(ws.className!==cl)ws.className=cl;var wkd=wcWeek(G,TK())>=150;$('tb-wc').classList.toggle('need',rv('wc')&&!T.autoWC&&allN(G)>=1&&!wkd&&wst!=='ok');setT('wv-sum',tmp&&wst==='ok'?tmp:wkd&&wst!=='ok'?'wait a day':wst==='bad'?'change now':wst==='warn'?'change soon':'good');}
   [['no3'],['kh'],['gh'],['temp']].forEach(function(x){
     var g=gaugeById(x[0]),v=g.get(T),s=gstate(g,v);
     var e=$('wp-'+x[0]);var cls='wp '+s.st;if(e.className!==cls)e.className=cls;
@@ -4459,10 +4459,19 @@ function guideTarget(){
     return {key:'cycle',tab:'tank',card:'startcard',sel:'#startcard .btn.primary',bar:false};
   }
   // Only until the player has done one health check. After that sickness is quiet again, they use their eyes.
-  var si=G.opt.hcDone||(G.emp.healed||0)>0?-1:G.tanks.findIndex(function(t){return t.ill&&!(t.ill.checked>=G.day);});
+  // Sickness shows here until the player has done one health check, and again whenever shrimp are dying fast (the !! alert).
+  var quiet=G.opt.hcDone||(G.emp.healed||0)>0,si=G.tanks.findIndex(function(t){return t.ill&&totalN(t)>=1&&!(t.ill.checked>=G.day)&&(!quiet||illStage(t)>=3);});
   if(si>=0){var sT=G.tanks[si],tvOpen=$('tv-acts')&&!$('tv-acts').hidden;
     if(G.sel!==si&&G.tanks.length>1&&!RV())return {key:'ill'+si+'_'+sT.ill.day,tab:'tank',sel:'.tchip[data-sel="'+si+'"]',text:'Some shrimp in '+sT.name+' look sick. Open '+sT.name+', tap the tank, then Check shrimp.'};
     return {key:'ill'+si+'_'+sT.ill.day,tab:'tank',card:'tankview',sel:tvOpen?'#tv-check':null,text:'Some shrimp in '+sT.name+' look sick. '+(tvOpen?'Tap Check shrimp to find them.':'Tap the tank, then Check shrimp.')+' Left alone it spreads.'};}
+  // Too hot is a danger with a fix the player can do right now.
+  var hi=G.tanks.findIndex(function(t){return totalN(t)>=1&&t.chem.temp>28&&!(t.heater>=2&&t.set.heat<=27);});
+  if(hi>=0){var hT=G.tanks[hi],hk='hot'+hi+'_'+Math.floor(G.day/20);if(G.sel!==hi&&G.tanks.length>1&&!RV())return {key:hk,tab:'tank',sel:'.tchip[data-sel="'+hi+'"]',text:hT.name+' is '+hT.chem.temp.toFixed(1)+' °C, too hot for them. Open '+hT.name+' to cool it.'};
+    if(hT.heater>=2)return {key:hk,tab:'up',card:'equipcard',text:hT.name+' is '+hT.chem.temp.toFixed(1)+' °C. Lower the chiller setpoint.'};
+    return {key:hk,tab:'tank',card:'wccard',sel:G.ac?'#btn-ice':'#t-ac,#btn-ice',text:hT.name+' is '+hT.chem.temp.toFixed(1)+' °C, too hot for them. Cool it now: run the room AC or float a frozen bottle, under Water care.'};}
+  if(!labMode()){for(var bi=0;bi<G.tanks.length;bi++){var bT=G.tanks[bi];if(totalN(bT)<1)continue;var bad=tips(bT).filter(function(x){return x.sev==='bad';})[0];
+    if(bad){var bt=bad.t.replace(/<[^>]+>/g,'');return {key:'bad'+bi+'_'+bt.slice(0,24).replace(/[^a-z]/gi,'')+'_'+Math.floor(G.day/30),tab:'tank',sel:G.sel!==bi&&G.tanks.length>1&&!RV()?'.tchip[data-sel="'+bi+'"]':bad.act==='wc'&&!bT.autoWC?'#tb-wc':bad.act==='feed'?'#tb-feed':null,text:bt};}}}
+  if(allN(G)<1&&!kitsOpen(G))return {key:'rebuy'+(G.stats.wiped||0),tab:'market',card:'buy',sel:'[data-act="buy"]',text:'Your shrimp are gone. Buy new ones in Trade, and feed them when Feed glows.'};
   var stepMode=$('kit-steps')&&!$('kit-steps').hidden;
   if(G.kits.sold<1&&!(G.emp.handPacked||0)&&G.kits.stock<1&&stepMode)return {key:'kitstep',tab:'emp',card:'kits',sel:'#btn-handstep',text:'Starter kits are open. Pack your first kit at the packing table in Kits: five steps, one tap each.'};
   if(qcDue(G)&&G.kits.sold>=3&&(t=guideOk({key:'qc'+(qc(G).rounds||0),soft:!!qc(G).rounds,tab:'emp',card:'qccard',sel:'[data-act="qc-round"]',text:qc(G).rounds?'Time for this month\u2019s quality check in Kits.':'Kits need a quality check. Do a QC round in Kits.',skip:true})))return t;
@@ -4471,6 +4480,9 @@ function guideTarget(){
   if(!open){
     if(!(G.ob.feeds||0)&&!T.feeder)return {key:'feed1',tab:'tank',sel:'#tb-feed',text:'Your shrimp are hungry. One feeding covers 2 days.',bar:false};
     if(sellableStock(G)>0&&demandLeft(G)>0&&!T.set.autoSell)return {key:'sell',tab:'tank',sel:'#tb-sell',text:'Some shrimp are big enough to sell.',bar:false};
+    var fc=upgradeCost(G,T,'feeder'),wc=upgradeCost(G,T,'autoWC');
+    if(!T.feeder&&fc!=null&&(G.ob.feeds||0)>=4&&G.money>=fc+20&&(t=guideOk({key:'feeder',tab:'up',card:'equipcard',sel:'[data-act="upg"][data-id="feeder"]',text:'Feeding by hand is only for the start. An auto feeder in Gear feeds them every day.'})))return t;
+    if(T.feeder&&!T.autoWC&&wc!=null&&G.money>=wc+20&&(t=guideOk({key:'autowc',tab:'up',card:'equipcard',sel:'[data-act="upg"][data-id="autoWC"]',text:'An auto water changer in Gear keeps the water clean on a schedule.'})))return t;
     var ts=tankStep(KIT_TANKS,G.stats.sold>=KIT_UNLOCK*0.5);if(ts)return ts;
     if(false&&(t=guideOk({key:'tank'+G.tanks.length,tab:'up',card:'tanks',sel:'[data-act="addtank"]',text:'Another tank means more breeders and more shrimp to sell.'})))return t;
     if(sellableStock(G)>demandLeft(G)+3&&G.money>=115&&(t=guideOk({key:'ad'+Math.floor(G.day/45),tab:'promote',card:'ads',sel:'[data-act="ad"]:not([disabled])',soft:true,text:'More shrimp than buyers this week, ads in the Ads tab bring more.'})))return t;
@@ -4479,7 +4491,7 @@ function guideTarget(){
   }
   if(G.korder&&!G.korder.taken)return {key:'ko'+G.korder.i,hideHere:1,tab:'emp',card:'korder',sel:'[data-act="korder-take"]',text:G.korder.who+' wants '+big(G.korder.n)+' kits. Accept or skip in Kits.'};
   if(!farm){
-    if(G.kits.stock<1&&!packCap(G)&&spareKitShrimp(G)>=KIT_SHRIMP&&G.money>=kitMaterials(G))return {key:'pack',tab:'emp',card:'kits',sel:'#btn-handstep',soft:true,text:'No kits in stock right now.'};
+    if(G.kits.stock<1&&!packCap(G)&&spareKitShrimp(G)>=KIT_SHRIMP&&G.money>=kitMaterials(G))return {key:'pack'+Math.min(G.kits.sold,5),tab:'emp',card:'kits',sel:'#btn-handstep',soft:G.kits.sold>=5&&kitDemand(G)<0.5,text:'No kits in stock. Pack one at the packing table in Kits, orders come in as you sell.'};
     var tl=nextTool(G);if(tl&&G.kits.sold>=3&&G.money>=tl.cost+kitMaterials(G)+capitalReserve(G)&&(t=guideOk({key:'tool'+tl.id,tab:'emp',card:'kits',sel:'[data-act="tool"]',soft:true,text:'A packing tool could take over one of the steps.'})))return t;
     if(G.kits.sold<10)return wait('Kits sell as orders arrive.');
     if(!pd(G,'farmlic')){var ts2=tankStep(FARM_TANKS,true);if(ts2)return ts2;}

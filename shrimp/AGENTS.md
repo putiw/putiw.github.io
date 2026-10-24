@@ -105,7 +105,7 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 
 Her messages usually name a symptom, give one example, and sketch a fix ("maybe like..."). The sketch is a guess. The principle behind it is the request. Apply it to the whole game, not just the example, and when something pushes or tells the player what to do, remove it or make it optional rather than rewording it.
 
-1. The player decides. No tasks, targets, unlock rules, prices to save for or nudges toward one route (a second tank, a specific item). Suggestions sit in the ? popup as options, only for tabs already open. Gates use room or progress the player chose, never a fixed path (kits need two tanks with shrimp, the farm license three).
+1. The player decides. No tasks, targets, unlock rules, prices to save for or nudges toward one route (a second tank, a specific item). Suggestions sit in the ? popup as options, only for tabs already open. Gates use room or progress the player chose, never a fixed path (kits need 60 L of tanks with shrimp in them, the farm license 120 L over three tanks with shrimp).
    Marketing is a real lever: referrals run at `wordOfMouth(G)` (30% with no marketing, up to 100% with an online shop, ads and shops). Don't let demand scale without it.
 2. Show, don't tell. A glowing button or a spotlight beats a sentence. The guide bar is for events only (an order, illness, new stock to dip, QC due), everything optional is soft and goes to the popup.
 3. Little on screen, detail on tap. Explanations behind ?, cards collapsible, alerts state the problem in a line plus the one fix when it's dangerous.
@@ -369,5 +369,5 @@ Planned and agreed with Puti, not built yet:
 - A shady loan from "a guy who knows a guy": a small button next to a buy button you can't afford (with at least half the price), lends only the gap, 20% a month compounding, one at a time, repay any time, after three months he takes your newest farm or gear at half value and the news and Grandma hear. Would reuse the existing shark loan (`E.shark`).
 
 **Known gaps**
-- Kits open after 200 home-bred sales and two tanks with shrimp (`KIT_UNLOCK`, `KIT_TANKS`). The guide says so from 100 sold.
+- Kits open after 200 home-bred sales and 60 L of tanks with shrimp in them (`KIT_UNLOCK`, `KIT_ROOM`). The guide says so from 100 sold.
 - The first babies trigger a few spotlights in a row (Colony, Recent events). They could be merged into one.

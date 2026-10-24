@@ -44,7 +44,7 @@ Values come straight from `shrimp/index.html`. Check the code before quoting the
 | Ocean shrimp ranch | 300M | 50,000 | 250,000 | 300,000 + project |
 | Shrimp arcology | 7.5B | 1M | 6M | 10M + project |
 
-The farm licence needs three tanks with shrimp in them.
+The farm licence (AED 1,000) needs 10 kits sold and 120 L of stocked tanks spread over three tanks with shrimp in them. Starter kits need 200 home-bred shrimp sold and 60 L of stocked tanks.
 
 **Shops.** Weekend stall AED 1,500, pet shop corner AED 4,000, boutique AED 75,000, one tier at a time. Once the first mall store opens, no new small shops. Mall stores: fit-out AED 150k and AED 800/day each, times a regional factor (`MALL_F`). The goal is one store in five malls per region (`STORE_SHARE`). Stores raise trust in their region, which multiplies word of mouth: 85% at home and 60% elsewhere with no stores, up to 100%.
 
