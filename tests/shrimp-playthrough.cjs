@@ -1,7 +1,7 @@
 const fs=require('fs'),vm=require('vm'),path=require('path');
 const html=fs.readFileSync(process.env.SHRIMP_GAME_PATH||path.join(__dirname,'../shrimp/index.html'),'utf8');let seed=Number(process.env.REVIEW_SEED||7);const runSeed=seed;const math=Object.create(Math);math.random=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);
 const c=vm.createContext({console,Math:math});vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);
-vm.runInContext('var BOTKIND='+(process.env.BOT_HEART==='kind')+';var _ack=acknowledgeMilestone;acknowledgeMilestone=function(G){var k=G.progress.queue[0],m=k&&MILESTONES[k];if(m&&m.dyn){if(!(BOTKIND&&storyChoose(G,k,1)))storyChoose(G,k,0);}else if(k==="owntank")storyChoose(G,k,0);return _ack(G);};',c);
+vm.runInContext('var BOTKIND='+(process.env.BOT_HEART==='kind')+';var _ack=acknowledgeMilestone;acknowledgeMilestone=function(G){var k=G.progress.queue[0],m=k&&MILESTONES[k];if(m&&m.dyn){if(!(BOTKIND&&storyChoose(G,k,1)))storyChoose(G,k,0);}else if(k==="owntank")storyChoose(G,k,0);else if(k==="coin_offer")storyChoose(G,k,BOTKIND?0:1);return _ack(G);};',c);
 vm.runInContext('var cache={},lastChips="",lastColSig="",lastChartKey="",lastAlerts="";function toast(){};function anyHad(){return G.tanks.some(t=>t.had||totalN(t)>=1);}'+html.split('function updateReveal(){')[1].split('function applyReveal(){')[0].replace(/^/, 'function updateReveal(){'),c);
 vm.runInContext(`
 var G=newGame(),events=[],snapshots={},last={};
@@ -58,6 +58,11 @@ if(kitsOpen(G)){
  for(var p of PROJ.filter(p=>p.c==='cult'))if(!pd(G,p.id)&&p.req(G)&&E.inf>=p.i)buyProj(G,p.id);
  // Choices: the fast player takes the cold answer (BOT_HEART=kind flips it).
  for(var fk in FORK_Q){if(forkDone(G,fk))continue;var opts=forkOpts(fk).filter(p=>p.req(G)).sort((a,b)=>(${process.env.BOT_HEART==='kind'}?b.h-a.h:a.h-b.h));var pk=opts[0];if(pk&&afford(pm(G,pk))&&E.inf>=pk.i)buyProj(G,pk.id);}
+ if(pd(G,'ministry')&&E.op.offer&&!E.op.run&&E.inf>campCost(E.op.n)*4){var cms=E.op.offer.map(function(id){return MSGS.find(function(m){return m.id===id;});}).filter(function(m){return !BOTKIND||(m.h||0)>=0;}).sort(function(a,b){return b.e-a.e;});if(cms[0])runCampaign(G,cms[0].id);}
+ if(pd(G,'studio')&&!(E.movie.left>0)&&E.movie.n<MOVIES.length){var ct=CUTS[E.movie.n]||[];var ci=ct.length>1?(BOTKIND?((ct[1][1].h||0)>=(ct[0][1].h||0)?1:0):(ct[1][1].b>ct[0][1].b?1:0)):0;if(afford(movieBudget(E.movie.n)))greenlight(G,ci);}
+ if(academyOpen(G)&&G.academy.level){var RL=rlines(G);RLINES.forEach(function(l){if(RL[l.id].pd<1&&afford(posUsd(G,RPOS[1])*USD*3))rlHire(G,l.id,'pd');if(RL[l.id].phd<2&&afford(posUsd(G,RPOS[0])*USD*6))rlHire(G,l.id,'phd');});}
+ if(coinOn(G)&&Math.floor(G.day)%90<30){var CC=coinOf(G);if(CC.price>coinBreakEven(G)*1.5&&afford(coinPlantCost(G)*30))coinPlant(G,coinPlantCost(G));if(CC.price>COIN_FAIR*1.3&&CC.treasury>0)coinSell(G,CC.treasury*0.25);else if(CC.price<COIN_FAIR*0.7&&afford(coinPlantCost(G)*3))coinBuy(G,coinPlantCost(G));}
+ if(G.ob.eshops&&Math.floor(G.day)%30===0){var nsh=SHOPS.filter(function(x){return shopOk(G,x);}).sort(function(a,b){return a.cost-b.cost;}).find(function(x){return afford(x.cost*100)&&(G.emp.shops[x.id]||0)<3;});if(nsh)buyShop(G,nsh.id);if(shopCount(G)&&!E.staff.mgr&&!E.staff.aiMgr&&afford(5000))hire(G,'mgr',1);}
  if(hardOpen(G)&&!E.won){if(BOTKIND&&hardOf(G).goal!=='want')hardSetGoal(G,'want');HARD.forEach(function(g){g.ops.slice().sort(function(a,b){return BOTKIND?0:(b.k==='dark')-(a.k==='dark');}).forEach(function(o){if((!o.f&&o.id!=='deliver')||(BOTKIND&&o.k==='dark'))return;if(g.id==='war'&&o.id!==(BOTKIND?'pay':'fund'))return;if(afford(hardCost(G,o)))hardBuy(G,g.id,o.id);});});}
  var r=nextRegion(G);if(G.ob.ereg&&r&&afford(r.m)&&G.humans>100)buyRegion(G);
  if(farmCap(G)&&E.inf<1000&&G.money>galaCost(G)*10)buyProj(G,'gala');

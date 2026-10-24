@@ -506,3 +506,9 @@ ammonia is only the primary button once ammonia is near zero.
 - One coin per mangrove tree, offered at 100M people. Plant trees, buy and sell coins on a World card with a price chart. Honest or seedling count; the seedling count can be caught.
 - New check in shrimp-me (33). Bots don't trade the coin; their results are unchanged (strong cold 2,547, strong kind 2,938, average Earth 5,658, space 7,124).
 - Pass 66: outside planters join when the coin is worth more than a tree costs; pumping the price plants more trees (in a test, 473M vs 195M over three years) and the new supply pulls the price back. You keep 5% of every coin minted.
+
+## Pass 67: layout by stage, bots use everything
+- Measured each tab's height and cards at seven stages, and ran the strong bot with each system off. Ads and media projects each cost about 1,400 days if skipped; business and culture projects are required; shops (+55 days) and research lines (−23) barely move the win.
+- New Research tab; media, campaigns and films moved to Marketing; World went from about 5,400 px to 2,700-3,300 px late game. Trade hides once the farms run things, the money chart moves to Kits.
+- Shrimpcoin planting is capped at 8B trees (the coasts that can take mangroves).
+- Bots use campaigns, films, Shrimpcoin, shops and research lines. Strong cold 2,304, strong kind 2,956, average Earth 5,629 and space 7,180, average cold 5,321. Spotlight sweep 140, all good.
