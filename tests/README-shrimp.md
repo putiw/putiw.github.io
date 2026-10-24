@@ -533,3 +533,15 @@ ammonia is only the primary button once ammonia is near zero.
 - Play style is read from purchases: steady (small share of cash, only while profitable, first tank kitted before the next), methodical (same kind of purchase in a row, new tier or region only once the last is done), completionist (goal, store coverage, kitted tank, care goals). The strongest one adds a subtitle and a paragraph to the ending, a line in Grandma's letter, and shifts which ending you get.
 - Average bot gets 22 years (was 21) since the middle is longer.
 - Results: strong cold 2,720, strong kind 3,074, average Earth 5,798-6,273 (seeds 3, 4, 7), average cold 5,405. Spotlight sweep 139, all good. shrimp-me 40 checks.
+
+## Pass 71: review fixes
+- Pause: cards give back the speed you were playing at (chapter pages and endings stay paused). After 8 seconds paused with something alive, a "Time is paused · tap to play" pill shows under the header and 1× pulses; the tank dims and slows. The first shrimp you buy starts time at 1×.
+- Cleaning the glass dims the rest of the page; tap anywhere outside the tank to finish. Cards and spotlights wait until cleaning or a check is done. Tap the dark area around a check sheet to close it.
+- Hand feeding covers 2 days (today and tomorrow); the Feed button says "Fed · N days left" and the food line says the same. No top-up without cash.
+- Growing pains: no fixed month, Monday to Thursday shipping, refunds cost money for 120 days and the card says how much, daily wages and fines are shown before you pick, the permit text matches what happens, shell processors can get the accounts frozen later. The decent fix costs at most a third of your cash, the fast one at most 60%. The header shows "fix in N d" while one is being set up.
+- Galas respect frozen accounts; the land trip never shortens a longer freeze; one set of tab names (Tank, Gear, Trade, Kits, Ads, World, Lab) on every screen.
+- Stores show up once the first is in reach or Dubai is open; they can be closed (no refund of the fit-out). Store trust is called "Trust here".
+- Play style: starter goals no longer count; completionist uses the goal, store coverage, share of projects built and the first tank; tank upgrades don't count as runs; the ending paragraph only states what was measured.
+- Thermostat chiller AED 450 (was 1,300). The guide suggests a bigger first tank before a second one; the tanks card appears once the first tank is kitted (80 L, feeder, auto water changer).
+- Average bot sends Grandma money and takes the land trip (kind) or not (cold).
+- Results: strong cold 2,691, strong kind 3,147, average Earth 5,881-6,301, average cold 5,069. Spotlight sweep 139, all good. shrimp-me 41 checks.

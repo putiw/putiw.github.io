@@ -1,7 +1,7 @@
 const fs=require('fs'),vm=require('vm'),path=require('path');
 const html=fs.readFileSync(process.env.SHRIMP_GAME_PATH||path.join(__dirname,'../shrimp/index.html'),'utf8');let seed=Number(process.env.REVIEW_SEED||7);const runSeed=seed;const math=Object.create(Math);math.random=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);
 const c=vm.createContext({console,Math:math});vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);
-vm.runInContext('var BOTKIND='+(process.env.BOT_HEART==='kind')+';var _ack=acknowledgeMilestone;acknowledgeMilestone=function(G){var k=G.progress.queue[0],m=k&&MILESTONES[k];if(m&&m.dyn){if(!(BOTKIND&&storyChoose(G,k,1)))storyChoose(G,k,0);}else if(k==="owntank")storyChoose(G,k,0);else if(k==="coin_offer")storyChoose(G,k,BOTKIND?0:1);else if(/^pain_/.test(k)){if(!storyChoose(G,k,BOTKIND?0:2))storyChoose(G,k,2);}return _ack(G);};',c);
+vm.runInContext('var BOTKIND='+(process.env.BOT_HEART==='kind')+';var _ack=acknowledgeMilestone;acknowledgeMilestone=function(G){var k=G.progress.queue[0],m=k&&MILESTONES[k];if(m&&m.dyn){if(!(BOTKIND&&storyChoose(G,k,1)))storyChoose(G,k,0);}else if(k==="owntank")storyChoose(G,k,0);else if(k==="coin_offer")storyChoose(G,k,BOTKIND?0:1);else if(/^pain_/.test(k)){if(!storyChoose(G,k,BOTKIND?0:2))storyChoose(G,k,2);}else if(k==="gp_land")storyChoose(G,k,BOTKIND?0:1);else if(k==="gp_scam"){if(!(BOTKIND&&storyChoose(G,k,0)))storyChoose(G,k,1);}return _ack(G);};',c);
 vm.runInContext('var cache={},lastChips="",lastColSig="",lastChartKey="",lastAlerts="";function toast(){};function anyHad(){return G.tanks.some(t=>t.had||totalN(t)>=1);}'+html.split('function updateReveal(){')[1].split('function applyReveal(){')[0].replace(/^/, 'function updateReveal(){'),c);
 vm.runInContext('var NOSTORES='+(process.env.NOSTORES==='1')+';',c);
 vm.runInContext(`
@@ -33,7 +33,7 @@ if(!T.had){
  if(G.stats.born>0)note('first hatch');if(G.stats.sold>0)note('first sale');
  if(G.ob.up&&totalN(T)>T.vol*2&&upgradeCost(G,T,'tank')!=null&&afford(upgradeCost(G,T,'tank')))buyUpgrade(G,T,'tank');
  if(T.chem.temp>28&&!T.heater&&afford(60))buyUpgrade(G,T,'heater');
- if(T.chem.temp>28&&T.heater===1&&afford(1300))buyUpgrade(G,T,'heater');
+ if(T.chem.temp>28&&T.heater===1&&afford(450))buyUpgrade(G,T,"heater");
  if(G.ob.up&&T.chem.bacA<bacTarget(T)&&upgradeCost(G,T,'filter')!=null&&afford(upgradeCost(G,T,'filter')))buyUpgrade(G,T,'filter');
 }
 extraTanks(true);checkGoals(G);if(G.story.anniversary)note('ten-year celebration');

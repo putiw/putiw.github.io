@@ -240,9 +240,9 @@ var g=newGame();g.money=1e9;g.kits.sold=5000;g.academy.level=1;var o=null;academ
 var o1=rlOdds(g,'genes');setPdPay(g,2);if(Math.round(rlYear(g,'genes')/USD)!==115000)throw Error('Extra pay '+rlYear(g,'genes')/USD);if(rlOdds(g,'genes')!==o1)throw Error('Odds must not change');
 var r=Math.random;Math.random=function(){return 0.99;};for(var d=0;d<365*5;d++)rlDay(g);Math.random=r;var p=g.academy.rl.genes.papers;if(p<7||p>9)throw Error('Papers in 5 years '+p);
 `);
-check('one hand feeding lasts about three days, so the first weeks are not a clicking race',`
+check('one hand feeding covers two days, so the first weeks are not a clicking race',`
 var g=newGame(),T=g.tanks[0];T.cycledAt=0;T.had=1;T.pop=[{n:10,age:60,sex:'m'}];T.chem.nutr=0.85;T.chem.food=0;g.money=500;var run=function(n){for(var i=0;i<n;i++){while(g.progress.queue.length)acknowledgeMilestone(g);stepGame(g);}};
-var h=JSON.parse(JSON.stringify(g)),hT=h.tanks[0];feed(g,T,T.set.ration/100);if(T.hand!==2)throw Error('Hand feeding set');run(12);if(g.day<3)throw Error('Days pass '+g.day);if(!(T.chem.nutr>0.72))throw Error('Still fed after 3 days '+T.chem.nutr);if(T.hand!==0)throw Error('Three days only');
+var h=JSON.parse(JSON.stringify(g)),hT=h.tanks[0];feed(g,T,T.set.ration/100);if(handLeft(g,T)!==2)throw Error('Hand feeding covers today and tomorrow');run(8);if(g.day<2)throw Error('Days pass '+g.day);if(!(T.chem.nutr>0.75))throw Error('Still fed after 2 days '+T.chem.nutr);if(handLeft(g,T)!==0)throw Error('Two days only');var k=newGame(),K=k.tanks[0];K.cycledAt=0;K.had=1;K.pop=[{n:10,age:60,sex:'m'}];K.chem.food=0;k.money=0.001;feed(k,K,K.set.ration/100);K.chem.food=0;var m0=k.money;dayRollover(k);if(k.money<m0-1e-9&&k.money<0)throw Error('No top-up without cash');
 `);
 check('mall stores: word of mouth is slower until one in five malls has your store, batches grow with scale, rent is daily',`
 var g=newGame();g.emp.kitsOpened=1;g.kits.sold=500;g.money=1e8;g.humans=1e5;g.emp.beta=0.012;
@@ -274,5 +274,14 @@ check('play style: how you buy changes the ending',`
 var g=newGame();g.money=1e7;g.emp.won=100;g.fin=[{kits:1000}];for(var i=0;i<6;i++){g.money=1e5;addTank(g);}var v=styleVals(g);if(!(v.steady<0))throw Error('Second tank before the first is kitted, with most of the cash: all in '+v.steady);
 var h=newGame();h.fin=[{kits:1000,shrimp:100}];var T=h.tanks[0];T.volTier=VOLS.length-1;T.filter=2;T.heater=2;T.feeder=1;T.autoWC=1;for(var i=0;i<4;i++){h.money=1e8;addTank(h);h.tanks.forEach(function(t){t.volTier=VOLS.length-1;t.filter=2;t.heater=2;t.feeder=1;t.autoWC=1;});}if(!(styleVals(h).steady>0))throw Error('Kitted out first, small share of cash: steady '+styleVals(h).steady);
 h.sty.safe=40;h.sty.bold=0;h.sty.same=h.sty.sw=0;var gs=endingScores(h).garden;var t=styleTop(h);if(!t||t.k!=='steady'||t.name!=='slow and steady')throw Error('Top style '+JSON.stringify(t));h.sty.safe=0;h.sty.bold=40;if(!(endingScores(h).garden<gs))throw Error('Style moves the ending');
+`);
+check('review fixes: gala and land respect freezes, refunds end, shell processors can be caught, the decent fix is affordable, stores close',`
+var g=newGame();g.money=1e7;g.emp.infOn=1;g.emp.frozen=g.day+10;if(buyProj(g,'gala','kids'))throw Error('No gala while frozen');
+var h=newGame();h.tanks[0].feeder=1;h.tanks[0].autoWC=1;personalDay(h);h.me.on=1;h.me.sent=5e5;h.emp.frozen=200;h.emp.frozenWhy='police';storyChoose(h,'gp_land',0);if(h.emp.frozen!==200||h.emp.frozenWhy!=='police')throw Error('Land trip never shortens a police freeze');
+var k=newGame();k.emp.kitsOpened=1;k.humans=9000;k.money=1e5;k.fin=[{kits:7000}];storyChoose(k,'pain_heat',2);var d0=painDaily(k);if(!(d0>500))throw Error('Refunds cost money '+d0);k.day+=121;if(painDaily(k)!==0)throw Error('Refunds end with the summer');
+var m=newGame();m.emp.kitsOpened=1;m.humans=1.6e6;m.money=1e7;storyChoose(m,'pain_payout',2);if(!m.emp.shell)throw Error('Shell flag');var r=Math.random;Math.random=function(){return 0;};painDay(m);Math.random=r;if(!frozen(m)||m.emp.frozenWhy!=='shell')throw Error('Shell processors get caught');
+var q=newGame();q.emp.kitsOpened=1;q.humans=9000;q.money=60000;q.fin=[];for(var i=0;i<7;i++)q.fin.push({kits:9000});if(painCost(q,PAINS.pain_heat.ch[0][2],0)>20000+1)throw Error('Decent fix capped at a third of cash '+painCost(q,PAINS.pain_heat.ch[0][2],0));
+var w=newGame();w.emp.kitsOpened=1;w.kits.sold=60;w.money=1000;if(storesOn(w))throw Error('Stores wait until one is in reach');w.money=1e6;if(!storesOn(w)||!buyStores(w,'auh',1))throw Error('Stores open');if(!closeStores(w,'auh',1)||storeN(w,'auh')!==0)throw Error('Close a store');
+if(HEAT_COST[2]!==450)throw Error('Thermostat chiller costs 450');
 `);
 console.log(count+' free time, Grandma and ending checks passed');
