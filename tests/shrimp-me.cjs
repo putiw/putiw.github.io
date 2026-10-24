@@ -302,5 +302,8 @@ check('quiet spells: a long stretch with nothing happening brings an event',`
 var g=newGame(),T=g.tanks[0];T.cycledAt=0;T.had=1;T.pop=[{n:20,age:80,sex:'m'}];g.stats.born=5;g.progress.queue=[];g.progress.wait=[];markEvent(g);
 g.day+=10;quietDay(g);if(g.stats.quiet)throw Error('Not after ten days');g.day+=40;quietDay(g);if(g.stats.quiet!==1)throw Error('Something happens after a quiet month');
 if(quietFor(g).days!==0)throw Error('Clock resets');g.hot={until:g.day+5,add:3};if(Math.abs(roomT(g,clock(g))-ambient(clock(g))-3)>1e-9)throw Error('Hot spell warms the room');
+var g=newGame(),T=g.tanks[0];T.cycledAt=0;T.had=1;g.day=60;if(milestoneConditions(g).party1)throw Error('No party in the first weeks');g.day=95;if(!milestoneConditions(g).party1)throw Error('Party once things are slow');
+g.fin=[{day:94,shrimp:70,kits:0}];g.money=500;var m0=g.money;storyChoose(g,'party1',0);if(g.emp.party[1]!=='go'||g.money>m0)throw Error('Going costs a day of sales');
+if(milestoneConditions(g).party2)throw Error('Second party waits for Europe');g.emp.regions.push('eu');g.me.on=1;if(!milestoneConditions(g).party2)throw Error('Second party after Europe');storyChoose(g,'party2',1);if(g.emp.party[2]!=='busy')throw Error('Busy is remembered');
 `);
 console.log(count+' free time, Grandma and ending checks passed');

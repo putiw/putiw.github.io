@@ -256,7 +256,7 @@ th:first-child,td:first-child{text-align:left}
 @keyframes guidePulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent)}70%,100%{box-shadow:0 0 0 7px color-mix(in srgb,var(--accent) 0%,transparent)}}
 @keyframes guideDot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.55}}
 .btn.guide-btn,#speed button.guide-btn{animation:guideGlow 1.6s ease-in-out infinite;outline:2px solid var(--accent);outline-offset:-5px}.btn.primary.guide-btn{outline-color:color-mix(in srgb,var(--accent-ink) 85%,transparent)}.btn.guide-btn:not(.primary){border-color:var(--accent)}@keyframes guideGlow{0%,100%{filter:none}50%{filter:brightness(1.13) saturate(1.1)}}
-.card.guide-card{box-shadow:0 0 0 2px var(--accent)}
+.card.guide-card{box-shadow:0 0 0 2px var(--accent)}.tv.guide-card{box-shadow:0 0 0 3px var(--accent);animation:tvGuide 1.6s ease-in-out infinite}@keyframes tvGuide{50%{box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 45%,transparent)}}@media(prefers-reduced-motion:reduce){.tv.guide-card{animation:none}}
 .tabs button.guide{position:relative}.tabs button.guide .dot{display:none}.tabs button.guide::after{content:'';position:absolute;top:5px;left:calc(50% + 9px);width:8px;height:8px;border-radius:50%;background:var(--s2);animation:guideDot 1.4s ease-in-out infinite}
 @media(prefers-reduced-motion:reduce){.btn.guide-btn,#speed button.guide-btn,.tabs button.guide::after{animation:none}}
 .coll.fresh>.hd h2::after{content:'new';margin-left:6px;padding:0 5px;border:1px solid var(--accent);border-radius:8px;color:var(--accent);font:600 10px var(--font-body);vertical-align:middle}
@@ -2764,6 +2764,16 @@ function painNote(G){var P=G.emp.pains||{},d=G.day,out=[];Object.keys(PAINS).for
 Object.keys(PAINS).forEach(function(id){var P=PAINS[id];MILESTONES[id]={story:1,title:P.title,tab:'emp',body:P.body,opts:function(G){return P.ch.map(function(c){var o=c[2],dc=painDayOf(G,o);return [c[0],c[1]+(dc>0?(o.refund?' Refunds cost about ':' About ')+fmtA(dc)+' a day'+(o.refund?' at today’s sales, until the summer is over.':', growing with the business.'):''),''];});},pick:function(G,i){return painPick(G,id,i);}};});
 MILESTONES.gp_land={story:1,title:'Grandma’s land',tab:'me',body:'Grandma calls. She’s been reading land listings again, the printed ones from the newspaper.\n\n“I’m thinking of buying a piece of land,” she says. “Outside town, near the water. Somewhere I can grow things and not hear the road.” She wants you to come and look with her. Viewings, lawyers, a lot of driving. About a month.',opts:function(G){return [['Go with her','The business keeps running without you. You can’t buy anything for the business for a month.','yes'],['Not this time','She says she’ll go with her friends from the bus tour instead.','no']];},pick:function(G,i){return gpLand(G,i===0);}};
 MILESTONES.gp_scam={story:1,title:'A call from Grandma',tab:'me',body:'Grandma calls from a hotel by the sea. The man who showed her tour group the seaside plots took everyone’s deposits and disappeared. She paid with everything she had, the money you sent her too.\n\nThe same night you’re at a charity gala in a borrowed suit. In the morning your face is on every newspaper.',opts:function(G){return [['Pay back what she lost','She cries on the phone, then tells you off for spending it.','pay'],['Send a ticket home','She flies back on Thursday. She doesn’t bring it up again.','ticket']];},pick:function(G,i){return gpScam(G,i===0);}};
+// Grandma's old grad school lab still throws a birthday party about every two weeks. She asks you along twice: once early on, once after Europe.
+MILESTONES.party1={story:1,title:'Cake in the old lab',tab:'tank',body:'Grandma calls. The lab where she did her master’s, forty years ago, still has a birthday party every two weeks. Someone always has a birthday. If nobody does, they find one.\n\nToday it’s Professor Haddad. He’s eighty-one and still comes in on Tuesdays.\n\n“Come with me,” Grandma says. “There’s cake, and they want to meet the shrimp person.”',opts:function(G){return [['Go with her','You eat two slices and explain shrimp to a room of retired chemists. Nobody sells anything that day. You sleep well.','go'],['Tell her you’re busy','She goes on her own and brings you a slice wrapped in a napkin.','busy']];},pick:function(G,i){return partyGo(G,1,i===0);}};
+MILESTONES.party2={story:1,title:'Cake in the old lab, again',tab:'me',body:'Grandma calls. It’s birthday party day at the old lab again.\n\nThis time the cake is for her. Professor Haddad made the card. Everyone signed it, including two people who left in 1991 and posted their signatures.\n\n“You don’t have to come,” she says. “You’re in Europe now.” She means the shrimp.',opts:function(G){return [['Fly back for the evening','The old lab sings, badly. Grandma tells everyone you sold shrimp to a whole continent. The business runs a day without you.','go'],['Send flowers','She sends a photo of the cake. Your name is on it too, spelled wrong.','busy']];},pick:function(G,i){return partyGo(G,2,i===0);}};
+function partyGo(G,n,go){var M=G.me,E=G.emp,lost=0;E.party=E.party||{};E.party[n]=go?'go':'busy';
+ if(go){var net=operatingNet(G);lost=Math.max(0,Math.round(net||0));if(lost>0){if(G.money<lost)lost=Math.max(0,Math.floor(G.money));pay(G,lost,'personal');}
+  if(M&&M.on){M.bo=Math.max(0,(M.bo||0)-20);M.hp=Math.min(100,(M.hp||80)+3);}trAdd(G,{kin:.3,drive:-.15});
+  log(G,n===1?'Cake in Grandma’s old lab. A day off'+(lost?', about '+fmtA(lost)+' of sales missed':''):'Grandma’s birthday in the old lab. A day off'+(lost?', about '+fmtA(lost)+' of sales missed':''));
+  if(M&&M.hist)M.hist.push(n===1?'You went to a birthday party in Grandma’s old lab and ate two slices of cake.':'You flew back for Grandma’s birthday in her old lab.');}
+ else{trAdd(G,{drive:.15,kin:-.15});if(M&&M.hist)M.hist.push(n===1?'Grandma went to her old lab’s birthday party without you and saved you a slice.':'You missed Grandma’s birthday in her old lab. She sent a photo of the cake.');}
+ return true;}
 function gpLand(G,yes){var M=G.me,E=G.emp,now=Math.floor(G.day);M.landQ=yes?'yes':'no';
  if(yes){if(!((E.frozen||0)>now+30)){E.frozen=now+30;E.frozenWhy='land';}M.landTrip=now+30;trAdd(G,{kin:.6,drive:-.4});if(M.hist)M.hist.push('You spent a month driving around with Grandma looking at land.');}
  else{M.tour=now+21;trAdd(G,{drive:.3,kin:-.2});}
@@ -2917,7 +2927,7 @@ function coinDay(G){var C=coinOf(G),now=Math.floor(G.day);if(!C.on)return;
 function coinLaunch(G,honest){var C=coinOf(G);if(C.on)return false;C.on=1;C.honest=honest?1:0;C.day=Math.floor(G.day);trAdd(G,honest?{kin:1,care:.5}:{drive:1,means:-1});log(G,'Launched shrimpcoin, one coin per mangrove tree');return true;}
 function coinLines(G){var C=G.emp.coin;if(!C||!C.on)return [];var o=[];var tt=C.trees+(C.otrees||0);if(tt>=1e6)o.push(cnt(tt)+' mangrove trees were planted for shrimpcoin'+(C.otrees>C.trees?', most of them by villages and farmers who did the sums':'')+(C.honest?'.':', and a lot of them only on paper.'));if(C.caught)o.push('Shrimpcoin is a word people use for a scam now.');else if(C.earned>C.spent*2&&C.earned>1e8)o.push('Shrimpcoin paid for a lot of the company’s later years.');return o;}
 
-function cards3Cond(G){var o={};Object.keys(CARDS3).forEach(function(k){var c=CARDS3[k];o[k]=!G.emp.won&&!G.emp.ended&&(c.cond?c.cond(G):G.humans>=c.at);});Object.keys(TREES).forEach(function(k){o['tree_'+k]=treeHas(G,k);});o.hardpart=hardOpen(G)&&!G.emp.won&&!G.emp.ended;o.coin_offer=G.humans>=1e8&&!G.emp.won&&!G.emp.ended;Object.keys(PAINS).forEach(function(id){o[id]=painOpen(G,id)&&kitsOpen(G);});o.gp_land=!!(G.me&&G.me.on&&(G.me.sent||0)>=5e5&&!(G.me.gpSilent>G.day))&&!G.emp.ended;o.gp_scam=!!(G.me&&G.me.tour&&G.day>=G.me.tour)&&!G.emp.ended;o.stream=streamReady(G)&&!G.emp.won&&!G.emp.ended;return o;}
+function cards3Cond(G){var o={};Object.keys(CARDS3).forEach(function(k){var c=CARDS3[k];o[k]=!G.emp.won&&!G.emp.ended&&(c.cond?c.cond(G):G.humans>=c.at);});Object.keys(TREES).forEach(function(k){o['tree_'+k]=treeHas(G,k);});o.hardpart=hardOpen(G)&&!G.emp.won&&!G.emp.ended;o.coin_offer=G.humans>=1e8&&!G.emp.won&&!G.emp.ended;Object.keys(PAINS).forEach(function(id){o[id]=painOpen(G,id)&&kitsOpen(G);});o.gp_land=!!(G.me&&G.me.on&&(G.me.sent||0)>=5e5&&!(G.me.gpSilent>G.day))&&!G.emp.ended;o.gp_scam=!!(G.me&&G.me.tour&&G.day>=G.me.tour)&&!G.emp.ended;o.party1=qHad(G)&&G.day>=90&&G.day<900&&!G.emp.ended;o.party2=G.emp.regions.indexOf('eu')>=0&&!!(G.me&&G.me.on)&&!G.emp.won&&!G.emp.ended;o.stream=streamReady(G)&&!G.emp.won&&!G.emp.ended;return o;}
 function card3Choose(G,key,i){var c=CARDS3[key],x=c&&c.ch[i];if(!x)return false;if(x[3]&&x[3](G)===false)return false;trAdd(G,x[2]);if(c.news&&c.news[i])newsLine(G,c.news[i]);(G.emp.c3||(G.emp.c3={}))[key]=i;if(key==='c_blackout'&&i===1)G.emp.batteryKitUnlocked=true;return true;}
 function card3Lines(G){var o=[],C=G.emp.c3||{};for(var k in C){var x=CARDS3[k]&&CARDS3[k].ch[C[k]];if(x&&x[4])o.push(x[4]);}return o.concat(hardLines(G)).concat(coinLines(G));}
 // Headlines, no choice: the world moving on without asking you.
@@ -3025,7 +3035,7 @@ function cost2(m,i){return (m?aed(m):'')+(m&&i?' + ':'')+(i?inf(i):'');}
 function trim(n,d){return String(+Number(n).toFixed(d));}
 // iPhone Safari moves its toolbar while you scroll and the fixed tab bar can end up floating above the bottom. Pin it to what's really on screen.
 (function(){var vv=window.visualViewport;if(!vv)return;var fix=function(){var t=document.querySelector('.tabs');if(!t)return;var off=window.innerHeight-(vv.height+vv.offsetTop);t.style.transform=Math.abs(off)>1&&vv.scale<=1.01?'translateY('+(-off)+'px)':'';};vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);window.addEventListener('scroll',fix,{passive:true});})();
-var toastT=null,NF=null,BUILD='2026-10-24-tidy';
+var toastT=null,NF=null,BUILD='2026-10-24-party';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
@@ -3753,7 +3763,7 @@ function tvDrawShrimp(x,a,L,t){var I=TVIMG,h=L*TV_SH/TV_SW,water=a.surf==='water
   tail=water&&rear?I.t1:I.t0;
  x.save();x.translate(a.x,a.y);x.rotate(a.ang);x.scale(Math.abs(a.face)<0.08?0.08*Math.sign(a.face||1):a.face,1);var X=-L/2,Y=-h/2;
  if(a.berried)x.drawImage(I.eg,X,Y,L,h);x.drawImage(rear?I.r1:I.r0,X,Y,L,h);x.drawImage(front,X,Y,L,h);x.drawImage(tvBody(a.male,a.g,a.berried,a.sick,a.mat,a.hue,a.vg,a.sc<0.5?2:a.sc<1?1:0),X,Y,L,h);x.drawImage(tail,X,Y,L,h);x.restore();}
-function tvDraw(v){var x=v.cv.getContext('2d'),W=v.W,H=v.H,T=v.tank,t=performance.now()/1000;x.setTransform(v.dpr,0,0,v.dpr,0,0);x.clearRect(0,0,W,H);x.drawImage(tvBg(v,T),0,0,W,H);
+function tvDraw(v){var x=v.cv.getContext('2d'),W=v.W,H=v.H,T=v.tank,t=v.clk!=null?v.clk:performance.now()/1000;x.setTransform(v.dpr,0,0,v.dpr,0,0);x.clearRect(0,0,W,H);x.drawImage(tvBg(v,T),0,0,W,H);
  v.bub.forEach(function(b){x.strokeStyle='rgba(255,255,255,.8)';x.lineWidth=1;x.beginPath();x.arc(b.x,b.y,b.r,0,6.283);x.stroke();});
  x.fillStyle='#7a5230';v.food.forEach(function(f){x.globalAlpha=Math.max(0,f.a);x.beginPath();x.arc(f.x,f.y,2.2,0,6.283);x.fill();});x.globalAlpha=1;
  if(!TVREADY)return;var base=tvBase(v);
@@ -3767,7 +3777,7 @@ function tvGlass(v,T){var W=v.W,H=v.H,k=(T.glassV||0)+'|'+W+'|'+H+'|'+v.dpr;if(v
  v.glassC=c;v.glassK=k;v.glassT=T;return c;}
 function tvLoop(v,ts){v.raf=0;if(!v.on)return;if((v.fc=(v.fc||0)+1)%20===0&&!tvVisible(v)){v.on=false;return;}if(!tvSize(v)){v.on=false;return;}
  if(v.last&&ts-v.last<30&&!v.opt.frozen){v.raf=requestAnimationFrame(function(t){tvLoop(v,t);});return;}var dt=v.last?Math.min(0.1,(ts-v.last)/1000):0.016;v.last=ts;
- if(!v.opt.frozen)tvStep(v,speed===0&&!TVLOCK&&!HC&&!SB&&!QCR?dt*0.2:dt);tvDraw(v);
+ if(v.clk==null)v.clk=performance.now()/1000;if(!v.opt.frozen&&!(speed===0&&!TVLOCK&&!HC&&!SB&&!QCR)){tvStep(v,dt);v.clk+=dt;}tvDraw(v);
  if(!v.opt.frozen)v.raf=requestAnimationFrame(function(t){tvLoop(v,t);});else v.on=false;}
 var REDUCED=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
 function tvVisible(v){var r=v.cv.getBoundingClientRect();return r.width>0&&r.height>0&&r.bottom>0&&r.top<(window.innerHeight||800);}
@@ -3803,7 +3813,7 @@ function tvWipe(px,py){var T=TVM&&TVM.tank;if(!T||!T.glass)return;var cw=TVM.W/G
  if(ch2){T.glassV=(T.glassV||0)+1;G.stats.wiped=(G.stats.wiped||0)+1;}}
 function updateTankView(){var card=$('tankview');if(!card)return;var T=G.tanks[G.sel]||G.tanks[0];if(labMode())T=G.tanks[0];
  if(!TVM)TVM=tvMake($('tv-canvas'),{n:24,gate:function(){return activeTab==='tank'&&!HC&&!SB&&!QCR;}});
- var N=totalN(T);setT('tv-cap',(rv('shrimp')&&!G.ob.looked?'Tap to check or clean · ':'')+T.name+' · '+(N>=1?cnt(N)+' shrimp':T.cycledAt!=null?'empty':G.ob&&G.ob.bottle?'cycling':'new tank, no bacteria yet'));
+ var N=totalN(T);setT('tv-cap',(T.ill&&N>=1?'Some look sick · tap to check · ':rv('shrimp')&&!G.ob.looked?'Tap to check or clean · ':'')+T.name+' · '+(N>=1?cnt(N)+' shrimp':T.cycledAt!=null?'empty':G.ob&&G.ob.bottle?'cycling':'new tank, no bacteria yet'));
  tvSync(TVM,T);tvFoodSync(TVM,T);
  if(TVM.dd>T.dayDeaths)TVM.dd=0;var dd=T.dayDeaths-TVM.dd;TVM.dd=T.dayDeaths;if(dd>0&&N>=1&&TVM.W&&TVM.ag.length){TVM.dacc=(TVM.dacc||0)+dd/N*TVM.ag.length;while(TVM.dacc>=1||(TVM.dacc>0&&Math.random()<TVM.dacc)){TVM.dacc=Math.max(0,TVM.dacc-1);if(TVM.dead.length<3&&TVM.ag.length>1){var pool=TVM.ag.filter(function(a){return a.sick;});if(!pool.length)pool=TVM.ag.filter(function(a){return a.age>=75;});if(!pool.length)pool=TVM.ag;tvKill(TVM,pool[Math.floor(Math.random()*pool.length)]);}else break;}}
  tvWake(TVM);}
@@ -3839,7 +3849,7 @@ function renderHealth(){if(!HC)return;var T=G.tanks[HC.i],ill=illById(HC.type),h
   if(HC.cgLines)h+='<div class="cg-res '+(HC.cgCls||'')+'">'+HC.cgLines.map(function(l){return '<p>'+l+'</p>';}).join('')+'</div>';
   h+='<p class="sub">'+msg+'</p><div class="btns">'+(HC.result==='wrong'?'<button class="btn primary" data-act="hc-back">Try another cure</button>':'<button class="btn primary" data-act="hc-close">Back to the tank</button>')+'</div>';}
  $('hc-in').innerHTML=h;if(HC.step!=='done'&&HC.step!=='clear'){HCV=null;hcView(HC.step!=='find');var cv=$('hc-canvas');if(cv)cv.addEventListener('pointerdown',hcTap);}}
-function closeHealth(){cgStop();if(!HC&&!SB&&!QCR)return;if(HC&&!HC.qc&&G.tanks[HC.i]&&G.tanks[HC.i].ill&&HC.result!=='cured')toast('They’re still sick. Tap the tank and check again soon.');var sp=QCR?QCR.prevSpeed:HC?HC.prevSpeed:SB.prevSpeed;HC=null;SB=null;QCR=null;cache.qch=null;if(HCV){var i=TVS.indexOf(HCV);if(i>=0)TVS.splice(i,1);HCV.on=false;HCV=null;}$('hcheck').hidden=true;setSpeed(sp);render();}
+function closeHealth(){cgStop();if(!HC&&!SB&&!QCR)return;if(HC&&!HC.qc&&HC.result==='partial'&&G.tanks[HC.i]&&G.tanks[HC.i].ill)G.tanks[HC.i].ill.checked=Math.floor(G.day)+5;if(HC&&!HC.qc&&G.tanks[HC.i]&&G.tanks[HC.i].ill&&HC.result!=='cured')toast('They’re still sick. Tap the tank and check again soon.');var sp=QCR?QCR.prevSpeed:HC?HC.prevSpeed:SB.prevSpeed;HC=null;SB=null;QCR=null;cache.qch=null;if(HCV){var i=TVS.indexOf(HCV);if(i>=0)TVS.splice(i,1);HCV.on=false;HCV=null;}$('hcheck').hidden=true;setSpeed(sp);render();}
 // ----- Cure minigames: mineral pellets, a big water change with a net, a salt dip -----
 var CG=null;
 function cgBody(a){var look=a.look==='ok'?'':a.look;return tvBody(a.male,a.g||70,false,look,1,0);}
@@ -4442,6 +4452,10 @@ function guideTarget(){
     if(safeToStock(G,T0))return {key:'buy',tab:'market',card:'buy',sel:'[data-act="buy"]',text:'Water is safe. Buy some shrimp in Trade.'};
     return {key:'cycle',tab:'tank',card:'startcard',sel:'#startcard .btn.primary',bar:false};
   }
+  var si=G.tanks.findIndex(function(t){return t.ill&&!(t.ill.checked>=G.day);});
+  if(si>=0){var sT=G.tanks[si],tvOpen=$('tv-acts')&&!$('tv-acts').hidden;
+    if(G.sel!==si&&G.tanks.length>1&&!RV())return {key:'ill'+si+'_'+sT.ill.day,tab:'tank',sel:'.tchip[data-sel="'+si+'"]',text:'Some shrimp in '+sT.name+' look sick. Open '+sT.name+', tap the tank, then Check shrimp.'};
+    return {key:'ill'+si+'_'+sT.ill.day,tab:'tank',card:'tankview',sel:tvOpen?'#tv-check':null,text:'Some shrimp in '+sT.name+' look sick. '+(tvOpen?'Tap Check shrimp to find them.':'Tap the tank, then Check shrimp.')+' Left alone it spreads.'};}
   var stepMode=$('kit-steps')&&!$('kit-steps').hidden;
   if(G.kits.sold<1&&!(G.emp.handPacked||0)&&G.kits.stock<1&&stepMode)return {key:'kitstep',tab:'emp',card:'kits',sel:'#btn-handstep',text:'Starter kits are open. Pack your first kit at the packing table in Kits: five steps, one tap each.'};
   if(qcDue(G)&&G.kits.sold>=3&&(t=guideOk({key:'qc'+(qc(G).rounds||0),soft:!!qc(G).rounds,tab:'emp',card:'qccard',sel:'[data-act="qc-round"]',text:qc(G).rounds?'Time for this month\u2019s quality check in Kits.':'Kits need a quality check. Do a QC round in Kits.',skip:true})))return t;

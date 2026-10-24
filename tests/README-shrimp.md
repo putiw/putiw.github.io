@@ -586,3 +586,9 @@ ammonia is only the primary button once ammonia is near zero.
 - The NEXT card and the pop-up no longer repeat a pet shop or bulk order when you are already on the tab that shows it.
 - Smaller fixes: the sell button reads "Buyers next week" instead of a cut-off sentence; the empty space under the packing table is gone; the empty Packing & staff card waits for the five tools; "How strict" in quality checks waits for 20 kits and shows its cost per kit; Readings over time and the Trade histogram start folded; tank counts match the header; chart readouts name the day instead of "Now" (they are a day behind the header); the kit price slider follows price changes from stories; the postdoc price also shows in AED; the folded home-tank gear is called "Your home tanks".
 - Top buttons: Feed hides once every tank has an auto feeder, Water once every tank has an auto water changer, Sell once all shrimp go into kits (the Trade tab closes then). A new tank without the gear brings the button back. With all three gone the row disappears.
+
+## Pass 78: pause, sickness guide, lab parties
+- Paused means still: the tank stops moving (shrimp, legs and antennae) unless you are cleaning, checking or treating.
+- A sick tank now has its own NEXT step ("Some shrimp in Tank 1 look sick. Tap the tank, then Check shrimp.") with a ring around the tank, and the tank caption says "Some look sick · tap to check". With several tanks it first points at the right tank chip. After a partly successful cure it waits five days before asking again.
+- Easter egg: Grandma's old grad school lab throws a birthday party every two weeks. She asks you along twice, once from day 90 and once after Europe opens (the second party is for her). Going costs a day of sales and rests you; saying you're busy nudges you toward drive.
+- Bots: strong cold 2,657, average seed 7 Earth 6,162. Both parties fired.
