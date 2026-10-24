@@ -4494,15 +4494,20 @@ function guideTarget(){
   }
   if(G.korder&&!G.korder.taken)return {key:'ko'+G.korder.i,hideHere:1,tab:'emp',card:'korder',sel:'[data-act="korder-take"]',text:G.korder.who+' wants '+big(G.korder.n)+' kits. Accept or skip in Kits.'};
   if(!farm){
-    if(G.kits.stock<1&&!packCap(G)&&spareKitShrimp(G)>=KIT_SHRIMP&&G.money>=kitMaterials(G))return {key:'pack'+Math.min(G.kits.sold,5),tab:'emp',card:'kits',sel:'#btn-handstep',text:'No kits in stock. Pack one at the packing table in Kits, orders only come in when you have stock.'};
-    if(qcDue(G)&&G.kits.sold>=3&&qc(G).rounds&&(t=guideOk({key:'qc'+(qc(G).rounds||0),soft:!!qc(G).rounds,tab:'emp',card:'qccard',sel:'[data-act="qc-round"]',text:qc(G).rounds?'Time for this month\u2019s quality check in Kits.':'Kits need a quality check. Do a QC round in Kits.',skip:true})))return t;
-    var tl=nextTool(G);if(tl&&G.kits.sold>=3&&G.money>=tl.cost+kitMaterials(G)+capitalReserve(G)&&(t=guideOk({key:'tool'+tl.id,tab:'emp',card:'kits',sel:'[data-act="tool"]',soft:toolsHave(G)>0,text:toolsHave(G)?'A packing tool could take over one of the steps.':'Packing every kit by hand gets slow. A '+tl.tool.toLowerCase()+' in Kits does one of the five steps for you.'})))return t;
-    if(G.kits.sold<10)return wait('Kits sell as orders arrive.');
-    if(!pd(G,'farmlic')){var ts2=tankStep(FARM_TANKS,true);if(ts2)return ts2;}
-    var lic=PROJ.find(function(p){return p.id==='farmlic';});
-    if(!pd(G,'farmlic')&&!lic.req(G)){var nst=G.tanks.filter(function(t){return totalN(t)>=1;}).length;if(nst<FARM_TANKS&&G.tanks.length<MAX_TANKS)return {key:'ftank'+G.tanks.length,tab:'up',card:'tanks',sel:'[data-act="addtank"]',soft:G.money<(NEW_TANK_COST[G.tanks.length]||0),text:'The farm license needs '+FARM_TANKS+' tanks with shrimp in them. You have '+nst+'. Add a tank in Gear.'};return wait('Kits sell as orders arrive.');}
-    if(!pd(G,'farmlic')){var gl0={key:'lic',tab:projectArea(lic),card:'proj',sel:'[data-act="proj"][data-id="farmlic"]',skip:1,text:'You can get a farm license now. It lets you build grow racks that breed shrimp for kits.'};return G.money>=lic.m&&guideOk(gl0)?gl0:wait('Kits sell as orders arrive.');}
-    var f0=FARMS[0];var gr0={key:'rack',tab:'up',card:'farms',sel:'[data-act="farm"][data-id="'+f0.id+'"]',skip:1,text:'Grow racks in Gear breed shrimp for kits, so your tanks don\u2019t have to.'};return G.money>=farmCost(G,f0)+farmWorkingCapital(G,f0)&&guideOk(gr0)?gr0:wait('Kits sell as orders arrive.');
+    // Growth steps the player can take right now come first, then packing by hand.
+    var pk=G.kits.stock<1&&!packCap(G)&&spareKitShrimp(G)>=KIT_SHRIMP&&G.money>=kitMaterials(G)?{key:'pack'+Math.min(G.kits.sold,5),tab:'emp',card:'kits',sel:'#btn-handstep',text:'No kits in stock. Pack one at the packing table in Kits, orders only come in when you have stock.'}:null;
+    if(pk&&G.kits.sold<3)return pk;
+    if(qcDue(G)&&G.kits.sold>=3&&qc(G).rounds&&(t=guideOk({key:'qc'+(qc(G).rounds||0),soft:true,tab:'emp',card:'qccard',sel:'[data-act="qc-round"]',text:'Time for this month\u2019s quality check in Kits.',skip:true}))&&!pk)return t;
+    var tl=nextTool(G);if(tl&&G.kits.sold>=3&&G.money>=tl.cost+kitMaterials(G)+capitalReserve(G)&&(t=guideOk({key:'tool'+tl.id,tab:'emp',card:'kits',sel:'[data-act="tool"]',text:toolsHave(G)?'Another packing tool takes over the next step: '+tl.tool.toLowerCase()+'.':'Packing every kit by hand gets slow. A '+tl.tool.toLowerCase()+' in Kits does one of the five steps for you.'})))return t;
+    var st0=G.emp.staff;if(st0.tier&&!st0.pack&&kitDemand(G)>packCap(G)*0.8&&G.money>=staffPay(G,'pack')*30&&(t=guideOk({key:'packer',tab:'emp',card:'staff',sel:'[data-act="hire"][data-role="pack"][data-d="1"]',text:'Orders are coming in faster than you can pack. Hire a packer in Kits.'})))return t;
+    if(G.kits.sold>=10){
+      var lic=PROJ.find(function(p){return p.id==='farmlic';});
+      if(!pd(G,'farmlic')){var ts2=tankStep(FARM_TANKS,true);if(ts2&&!ts2.soft)return ts2;
+        if(!lic.req(G)){var nst=G.tanks.filter(function(t){return totalN(t)>=1;}).length;if(nst<FARM_TANKS&&G.tanks.length<MAX_TANKS&&G.money>=(NEW_TANK_COST[G.tanks.length]||0)&&(t=guideOk({key:'ftank'+G.tanks.length,tab:'up',card:'tanks',sel:'[data-act="addtank"]',text:'The farm license needs '+FARM_TANKS+' tanks with shrimp in them. You have '+nst+'. Add a tank in Gear.'})))return t;}
+        else if(G.money>=lic.m&&(t=guideOk({key:'lic',tab:projectArea(lic),card:'proj',sel:'[data-act="proj"][data-id="farmlic"]',text:'You can get a farm license now. It lets you build grow racks that breed shrimp for kits.'})))return t;}
+      else{var f0=FARMS[0];if(G.money>=farmCost(G,f0)+farmWorkingCapital(G,f0)&&(t=guideOk({key:'rack',tab:'up',card:'farms',sel:'[data-act="farm"][data-id="'+f0.id+'"]',text:'Grow racks in Gear breed shrimp for kits, so your tanks don\u2019t have to.'})))return t;}
+    }
+    return pk||wait('Kits sell as orders arrive.');
   }
   if(E.won)return null;
   if(consultHas(G,'fix')){var b=bottleneck(G),m={packing:['emp','staff'],shrimp:['up','farms'],ceiling:['world','reg'],demand:['promote','ads'],cash:['emp','kits'],paused:['up','farms']}[b&&b.k];
