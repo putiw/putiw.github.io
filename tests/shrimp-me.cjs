@@ -305,5 +305,8 @@ if(quietFor(g).days!==0)throw Error('Clock resets');g.hot={until:g.day+5,add:3};
 var g=newGame(),T=g.tanks[0];T.cycledAt=0;T.had=1;g.day=60;if(milestoneConditions(g).party1)throw Error('No party in the first weeks');g.day=95;if(!milestoneConditions(g).party1)throw Error('Party once things are slow');
 g.fin=[{day:94,shrimp:70,kits:0}];g.money=500;var m0=g.money;storyChoose(g,'party1',0);if(g.emp.party[1]!=='go'||g.money>m0)throw Error('Going costs a day of sales');
 if(milestoneConditions(g).party2)throw Error('Second party waits for Europe');g.emp.regions.push('eu');g.me.on=1;if(!milestoneConditions(g).party2)throw Error('Second party after Europe');storyChoose(g,'party2',1);if(g.emp.party[2]!=='busy')throw Error('Busy is remembered');
+var g=newGame(),T=g.tanks[0];T.cycledAt=0;T.had=1;T.pop=[{n:100,age:80,sex:'m'}];T.set.remGH=T.chem.gh;T.set.remKH=T.chem.kh;T.chem.temp=roomT(g,clock(g));g.day=50;
+waterChange(g,T,50);g.day++;waterChange(g,T,50);g.day++;waterChange(g,T,50);if(totalN(T)<95)throw Error('150% in a week is fine');g.day++;waterChange(g,T,50);if(totalN(T)>60)throw Error('200% in a week: half die in a mass molt');
+var h=newGame(),U=h.tanks[0];U.cycledAt=0;U.had=1;U.pop=[{n:100,age:80,sex:'m'}];U.autoWC=1;U.set.autoWCDays=2;U.set.autoWCPct=50;h.day=100;for(var i=0;i<14;i++){h.day++;if(U.autoWC&&h.day%U.set.autoWCDays===0){if(wcWeek(h,U)+U.set.autoWCPct<=WC_AUTO_MAX)waterChange(h,U,U.set.autoWCPct,true);}}if(U.moltCrash)throw Error('The auto changer never causes a molt crash');
 `);
 console.log(count+' free time, Grandma and ending checks passed');

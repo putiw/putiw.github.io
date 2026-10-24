@@ -1653,10 +1653,10 @@ function dayRollover(G){
     else if(techCover(G,i))feed(G,T,T.set.ration/100,true);
     // A hand feeding covers two days: if the food runs low on the second day, the rest of the portion goes in then.
     else if(T.handUntil>G.day&&T.chem.food<appetite(T)*0.5&&G.money>=feedCost(T,T.set.ration/100))feed(G,T,T.set.ration/100,true);
-    if(T.autoWC&&G.day%T.set.autoWCDays===0)waterChange(G,T,T.set.autoWCPct,true);
+    if(T.autoWC&&G.day%T.set.autoWCDays===0){if(wcWeek(G,T)+T.set.autoWCPct<=WC_AUTO_MAX)waterChange(G,T,T.set.autoWCPct,true);}
     else if(techCover(G,i)&&N>=1&&G.day-(T.lastWC||-99)>=2){
       var P2=ppm(T);
-      if((!T.autoWC&&G.day%7===0)||P2.no3>25||P2.nh>0.1||P2.no2>0.1||c.kh<2||c.gh<4.5){waterChange(G,T,T.set.wcPct,true);}
+      if(((!T.autoWC&&G.day%7===0)||P2.no3>25||P2.nh>0.1||P2.no2>0.1||c.kh<2||c.gh<4.5)&&wcWeek(G,T)+T.set.wcPct<=WC_AUTO_MAX){waterChange(G,T,T.set.wcPct,true);}
     }
     if(T.set.autoDose&&N<1){
       var tg=bacTarget(T);
@@ -1722,9 +1722,15 @@ function waterChange(G,T,pct,auto){
     G.stats.died+=lost;
   }
   T.lastWC=G.day;
+  // Lots of new water in one week makes them all molt at once. Past 200% in 7 days about half don't make it.
+  var wk=wcWeek(G,T);T.wcLog.push([G.day,pct]);
+  if(wk<WC_CRASH&&wk+pct>=WC_CRASH&&totalN(T)>=1){var mc=0;T.pop.forEach(function(k){if(k.age>=10){var d=k.n*0.5;k.n-=d;mc+=d;c.dead+=d*massN(k.age);}});G.stats.died+=mc;lost+=mc;T.wcLog=[];T.moltCrash=Math.floor(G.day);
+    log(G,'So much new water this week that they all molted at once. About half didn’t make it ('+Math.round(mc)+' shrimp)',T);return lost;}
   if(!auto||lost>=1)log(G,(auto?'Auto water change ':'Water change ')+pct+'%'+(lost>=1?', '+Math.round(lost)+' shrimp lost to the swing':''),T);
   return lost;
 }
+var WC_CRASH=200,WC_AUTO_MAX=150;
+function wcWeek(G,T){var L=T.wcLog||(T.wcLog=[]);while(L.length&&L[0][0]<=G.day-7)L.shift();var s=0;L.forEach(function(x){s+=x[1];});return s;}
 
 function doSell(G,T,dry,budget,quiet){
   var set=T.set,m=G.market.m,p=G.price*(G.dye&&G.dye.on?1.6:1);
@@ -2765,14 +2771,14 @@ Object.keys(PAINS).forEach(function(id){var P=PAINS[id];MILESTONES[id]={story:1,
 MILESTONES.gp_land={story:1,title:'Grandma’s land',tab:'me',body:'Grandma calls. She’s been reading land listings again, the printed ones from the newspaper.\n\n“I’m thinking of buying a piece of land,” she says. “Outside town, near the water. Somewhere I can grow things and not hear the road.” She wants you to come and look with her. Viewings, lawyers, a lot of driving. About a month.',opts:function(G){return [['Go with her','The business keeps running without you. You can’t buy anything for the business for a month.','yes'],['Not this time','She says she’ll go with her friends from the bus tour instead.','no']];},pick:function(G,i){return gpLand(G,i===0);}};
 MILESTONES.gp_scam={story:1,title:'A call from Grandma',tab:'me',body:'Grandma calls from a hotel by the sea. The man who showed her tour group the seaside plots took everyone’s deposits and disappeared. She paid with everything she had, the money you sent her too.\n\nThe same night you’re at a charity gala in a borrowed suit. In the morning your face is on every newspaper.',opts:function(G){return [['Pay back what she lost','She cries on the phone, then tells you off for spending it.','pay'],['Send a ticket home','She flies back on Thursday. She doesn’t bring it up again.','ticket']];},pick:function(G,i){return gpScam(G,i===0);}};
 // Grandma's old grad school lab still throws a birthday party about every two weeks. She asks you along twice: once early on, once after Europe.
-MILESTONES.party1={story:1,title:'Cake in the old lab',tab:'tank',body:'Grandma calls. The lab where she did her master’s, forty years ago, still has a birthday party every two weeks. Someone always has a birthday. If nobody does, they find one.\n\nToday it’s Professor Haddad. He’s eighty-one and still comes in on Tuesdays.\n\n“Come with me,” Grandma says. “There’s cake, and they want to meet the shrimp person.”',opts:function(G){return [['Go with her','You eat two slices and explain shrimp to a room of retired chemists. Nobody sells anything that day. You sleep well.','go'],['Tell her you’re busy','She goes on her own and brings you a slice wrapped in a napkin.','busy']];},pick:function(G,i){return partyGo(G,1,i===0);}};
-MILESTONES.party2={story:1,title:'Cake in the old lab, again',tab:'me',body:'Grandma calls. It’s birthday party day at the old lab again.\n\nThis time the cake is for her. Professor Haddad made the card. Everyone signed it, including two people who left in 1991 and posted their signatures.\n\n“You don’t have to come,” she says. “You’re in Europe now.” She means the shrimp.',opts:function(G){return [['Fly back for the evening','The old lab sings, badly. Grandma tells everyone you sold shrimp to a whole continent. The business runs a day without you.','go'],['Send flowers','She sends a photo of the cake. Your name is on it too, spelled wrong.','busy']];},pick:function(G,i){return partyGo(G,2,i===0);}};
+MILESTONES.party1={story:1,title:'Cake in the old lab',tab:'tank',body:'Grandma calls. The lab where she did her master’s, forty years ago, still has a birthday party every two weeks. Someone always has a birthday. If nobody does, they find one.\n\nToday it’s one of the first-year students. Grandma isn’t sure which one. Nobody is, there’s a cake either way.\n\n“Come with me,” Grandma says. “There’s cake, and they want to meet the shrimp person.”',opts:function(G){return [['Go with her','You eat two slices and explain shrimp to a room of retired chemists. Nobody sells anything that day. You sleep well.','go'],['Tell her you’re busy','She goes on her own and brings you a slice wrapped in a napkin.','busy']];},pick:function(G,i){return partyGo(G,1,i===0);}};
+MILESTONES.party2={story:1,title:'Cake in the old lab, again',tab:'me',body:'Grandma calls. It’s birthday party day at the old lab again.\n\nIt’s for someone in the lab nobody has met yet. The cake says “Happy Birthday Sam”, and there are three Sams.\n\n“You don’t have to come,” she says. “You’re in Europe now.” She means the shrimp.',opts:function(G){return [['Fly back for the evening','The old lab sings to all three Sams, badly. Grandma tells everyone you sold shrimp to a whole continent. The business runs a day without you.','go'],['Tell her you’re busy','She sends a photo of the cake. Someone added your name to it, spelled wrong.','busy']];},pick:function(G,i){return partyGo(G,2,i===0);}};
 function partyGo(G,n,go){var M=G.me,E=G.emp,lost=0;E.party=E.party||{};E.party[n]=go?'go':'busy';
  if(go){var net=operatingNet(G);lost=Math.max(0,Math.round(net||0));if(lost>0){if(G.money<lost)lost=Math.max(0,Math.floor(G.money));pay(G,lost,'personal');}
   if(M&&M.on){M.bo=Math.max(0,(M.bo||0)-20);M.hp=Math.min(100,(M.hp||80)+3);}trAdd(G,{kin:.3,drive:-.15});
-  log(G,n===1?'Cake in Grandma’s old lab. A day off'+(lost?', about '+fmtA(lost)+' of sales missed':''):'Grandma’s birthday in the old lab. A day off'+(lost?', about '+fmtA(lost)+' of sales missed':''));
-  if(M&&M.hist)M.hist.push(n===1?'You went to a birthday party in Grandma’s old lab and ate two slices of cake.':'You flew back for Grandma’s birthday in her old lab.');}
- else{trAdd(G,{drive:.15,kin:-.15});if(M&&M.hist)M.hist.push(n===1?'Grandma went to her old lab’s birthday party without you and saved you a slice.':'You missed Grandma’s birthday in her old lab. She sent a photo of the cake.');}
+  log(G,n===1?'Cake in Grandma’s old lab. A day off'+(lost?', about '+fmtA(lost)+' of sales missed':''):'Another birthday in Grandma’s old lab. A day off'+(lost?', about '+fmtA(lost)+' of sales missed':''));
+  if(M&&M.hist)M.hist.push(n===1?'You went to a birthday party in Grandma’s old lab and ate two slices of cake.':'You flew back for a birthday party in Grandma’s old lab. There were three Sams.');}
+ else{trAdd(G,{drive:.15,kin:-.15});if(M&&M.hist)M.hist.push(n===1?'Grandma went to her old lab’s birthday party without you and saved you a slice.':'You missed another party in Grandma’s old lab. She sent a photo of the cake.');}
  return true;}
 function gpLand(G,yes){var M=G.me,E=G.emp,now=Math.floor(G.day);M.landQ=yes?'yes':'no';
  if(yes){if(!((E.frozen||0)>now+30)){E.frozen=now+30;E.frozenWhy='land';}M.landTrip=now+30;trAdd(G,{kin:.6,drive:-.4});if(M.hist)M.hist.push('You spent a month driving around with Grandma looking at land.');}
@@ -3035,7 +3041,7 @@ function cost2(m,i){return (m?aed(m):'')+(m&&i?' + ':'')+(i?inf(i):'');}
 function trim(n,d){return String(+Number(n).toFixed(d));}
 // iPhone Safari moves its toolbar while you scroll and the fixed tab bar can end up floating above the bottom. Pin it to what's really on screen.
 (function(){var vv=window.visualViewport;if(!vv)return;var fix=function(){var t=document.querySelector('.tabs');if(!t)return;var off=window.innerHeight-(vv.height+vv.offsetTop);t.style.transform=Math.abs(off)>1&&vv.scale<=1.01?'translateY('+(-off)+'px)':'';};vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);window.addEventListener('scroll',fix,{passive:true});})();
-var toastT=null,NF=null,BUILD='2026-10-24-party';
+var toastT=null,NF=null,BUILD='2026-10-24-molt';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
@@ -3216,7 +3222,7 @@ function updateVitals(){
   setT('tb-wc','Water '+T.set.wcPct+'%');
   var sa=sellAll(G,true);setT('tb-sell',sa.count>0?'Sell '+sa.count+' · '+aed(sa.revenue):sellWhyNot(G));$('tb-sell').disabled=sa.count<=0;
   var wst='ok',tmp=null;[['no3'],['kh'],['gh'],['temp']].forEach(function(x){var g=gaugeById(x[0]),v=g.get(T),q=gstate(g,v);if(x[0]==='temp'){if(q.st!=='ok')tmp=v>25?'too warm':'too cold';}else if(q.st==='bad')wst='bad';else if(q.st==='warn'&&wst!=='bad')wst='warn';});
-  var ws=$('wp-sum');if(ws){var cl='wp wsum '+(tmp&&wst==='ok'?'warn':wst);if(ws.className!==cl)ws.className=cl;setT('wv-sum',tmp&&wst==='ok'?tmp:wst==='bad'?'change now':wst==='warn'?'change soon':'good');}
+  var ws=$('wp-sum');if(ws){var cl='wp wsum '+(tmp&&wst==='ok'?'warn':wst);if(ws.className!==cl)ws.className=cl;var wkd=wcWeek(G,TK())>=150;setT('wv-sum',tmp&&wst==='ok'?tmp:wkd&&wst!=='ok'?'wait a day':wst==='bad'?'change now':wst==='warn'?'change soon':'good');}
   [['no3'],['kh'],['gh'],['temp']].forEach(function(x){
     var g=gaugeById(x[0]),v=g.get(T),s=gstate(g,v);
     var e=$('wp-'+x[0]);var cls='wp '+s.st;if(e.className!==cls)e.className=cls;
@@ -3463,7 +3469,7 @@ function updateTank(){
   if(N>=1){var wl=appetite(T)*0.045/T.vol,no3w=wl*7*4.43,khw=0.4*wl*7,f=T.set.wcPct/100,P0=ppm(T);
     setT('h-waste','Per week at '+(N/T.vol).toFixed(1)+' shrimp/L: nitrate +'+no3w.toFixed(1)+' ppm, KH −'+khw.toFixed(2)+'. One '+T.set.wcPct+'% change: nitrate −'+(P0.no3*f).toFixed(1)+' ppm, KH +'+Math.max(0,(T.set.remKH-T.chem.kh)*f).toFixed(2)+'.');}
   else setT('h-waste','');
-  $('h-wc')&&($('h-wc').textContent='Swaps '+Math.round(T.vol*T.set.wcPct/100)+' L for new water at this GH and KH. Big swings stress shrimp.');
+  var wkw=wcWeek(G,T);$('h-wc')&&($('h-wc').textContent='Swaps '+Math.round(T.vol*T.set.wcPct/100)+' L for new water at this GH and KH. Big swings stress shrimp, and more than 200% in a week makes them all molt at once.'+(wkw?' This week so far: '+wkw+'%.':''));
   $('h-heat')&&($('h-heat').textContent=T.heater===0?'No heater: tank follows the room ('+roomT(G,clock(G)).toFixed(1)+' °C'+(T.fan?', −1.5 with the fan':'')+').':T.heater===1?'Heater warms to this setpoint. Cannot cool. About '+aed(dailyCost(G,T))+'/day.':'Chiller holds this setpoint, heating or cooling. About '+aed(dailyCost(G,T))+'/day.');
   var hotNow=ambient(clock(G))>26.5;if(anyHad()&&hotNow&&!G.ob.hot)G.ob.hot=1;
   var allChill=G.tanks.every(function(t){return t.heater>=2;});
@@ -4946,9 +4952,9 @@ function initControls(){
       bump(b);
     }
     if(a==='food'){T.set.food=+b.dataset.i;if(G.recipe)syncRecipe(G);cache.segsig=null;toast('Food set to '+FOODS[T.set.food].name);}
-    if(a==='wc'&&RV()){var tl=0;G.tanks.forEach(function(t){tl+=waterChange(G,t,t.set.wcPct);});toast('Changed '+T.set.wcPct+'% of the water in all '+G.tanks.length+' tanks'+(tl>=1?', '+Math.round(tl)+' shrimp stressed by the swing':''));bump(b);}
+    if(a==='wc'&&RV()){var tl=0;G.tanks.forEach(function(t){tl+=waterChange(G,t,t.set.wcPct);});var wk=wcWeek(G,T);toast('Changed '+T.set.wcPct+'% of the water in all '+G.tanks.length+' tanks'+(tl>=1?', '+Math.round(tl)+' shrimp lost':'')+(wk>=120&&wk<200?'. That’s '+wk+'% this week. Past 200% they all molt at once.':''));bump(b);}
     else if(a==='ice'){if(iceBottle(G,T)){bump(b);cache={};}}
-    else if(a==='wc'){if(T.autoWC&&G.ps)G.ps.manual++;var lost=waterChange(G,T,T.set.wcPct);toast('Changed '+T.set.wcPct+'% of the water'+(lost>=1?', but '+Math.round(lost)+' shrimp were stressed by the swing':''));bump(b);}
+    else if(a==='wc'){if(T.autoWC&&G.ps)G.ps.manual++;var lost=waterChange(G,T,T.set.wcPct),wk=wcWeek(G,T);toast(T.moltCrash===Math.floor(G.day)&&!(T.wcLog||[]).length?'Too much new water this week. They all molted at once and about half died.':'Changed '+T.set.wcPct+'% of the water'+(lost>=1?', but '+Math.round(lost)+' shrimp were stressed by the swing':'')+(wk>=120?'. That’s '+wk+'% this week. Past 200% they all molt at once.':''));bump(b);}
     if(a==='maintain'){var P=ppm(T);if(rememberCycle(G,T)&&!T.had&&totalN(T)<1&&P.nh<0.05&&P.no2<0.05&&addAmmonia(G,T,false,true))toast('Maintenance dose added. Wait for ammonia and nitrite to clear before buying shrimp.');}
     if(a==='ammonia'){if(addAmmonia(G,T))toast('Added ammonia, +1.5 ppm');bump(b);}
     if(a==='starter'){if(buyStarter(G,T))toast('Bacteria starter added to '+T.name);bump(b);}
