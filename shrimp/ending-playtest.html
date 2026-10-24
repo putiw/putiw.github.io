@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#e7efec">
+<title>Universal Shrimp — Ending Playtest</title>
+<style>
+:root{color-scheme:light;--ink:#102522;--muted:#60736e;--green:#087c68;--pale:#e7efec;--card:#fff;--line:#cfddd8;--gold:#e8b94e}*{box-sizing:border-box}body{margin:0;background:var(--pale);color:var(--ink);font:16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{width:min(900px,100%);margin:auto;padding:24px 18px 80px}header{margin-bottom:22px}h1{font-size:clamp(1.8rem,6vw,2.7rem);line-height:1.08;margin:0 0 10px;letter-spacing:-.04em}h2{font-size:1.25rem;margin:0 0 6px}p{margin:0 0 12px}.lede{color:var(--muted);max-width:68ch}.topline{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:20px 0 10px}.progress{height:9px;border-radius:20px;background:#d0ddd8;overflow:hidden}.progress>i{display:block;height:100%;width:0;background:var(--green);transition:width .2s}.section{margin:24px 0}.section>p{color:var(--muted);font-size:.94rem}.decision{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:17px;margin:12px 0;box-shadow:0 2px 8px #10252209}.decision legend{font-weight:750;padding:0 4px}.story{color:var(--muted);margin:3px 0 11px;white-space:pre-line}.choice{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin:8px 0;cursor:pointer;background:#fbfdfc}.choice:has(input:checked){border-color:var(--green);box-shadow:0 0 0 2px #087c6820;background:#f0f8f5}.choice input{accent-color:var(--green);margin-top:4px;flex:0 0 auto}.choice strong{display:block;line-height:1.3}.choice small{display:block;color:var(--muted);margin-top:3px;line-height:1.4}.skip{font-size:.9rem;color:var(--muted);padding:7px 2px}.result{position:sticky;bottom:12px;margin-top:28px;background:#102522;color:white;border-radius:16px;padding:18px;box-shadow:0 8px 30px #10252230;z-index:2}.result h2{color:#fff}.result p{color:#d7e6e1}.result .tag{display:inline-block;background:#164b40;color:#b8f3df;padding:3px 9px;border-radius:30px;font-size:.8rem;font-weight:750;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}.endingline{font-size:1.05rem;color:white!important;margin-top:12px}.scoregrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:12px 0}.score{border:1px solid #ffffff2b;border-radius:9px;padding:7px;text-align:center}.score b{display:block;font-size:.8rem}.score span{font-variant-numeric:tabular-nums;color:#b8f3df}.controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.btn,select{border:1px solid var(--line);border-radius:10px;padding:10px 13px;background:white;color:var(--ink);font:inherit;font-weight:650}.btn{cursor:pointer}.btn.primary{background:var(--green);border-color:var(--green);color:white}.override{background:#fff;border-radius:11px;padding:10px 12px;color:var(--ink);display:flex;gap:8px;align-items:center;flex-wrap:wrap}.override select{font-weight:500;max-width:100%}details{margin-top:12px;color:#d7e6e1}details summary{cursor:pointer;font-weight:700}details p{font-size:.9rem;margin:8px 0}.foot{font-size:.84rem;color:var(--muted);margin-top:18px}.mobile-actions{display:none}@media(max-width:560px){main{padding:18px 12px 90px}.decision{padding:14px}.scoregrid{grid-template-columns:repeat(3,1fr)}.result{bottom:6px;padding:14px}.topline{align-items:flex-end}.override select{width:100%}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>Ending playtest</h1>
+  <p class="lede">Play through the story decisions and see which ending they point toward. No tank care, money, waiting, or upgrades—just the choices.</p>
+  <div class="topline"><strong><span id="answered">0</span> of <span id="total">0</span> decisions answered</strong><button class="btn" id="reset" type="button">Reset choices</button></div>
+  <div class="progress" role="progressbar" aria-label="Decisions answered" aria-valuemin="0" aria-valuemax="29" aria-valuenow="0"><i id="bar"></i></div>
+</header>
+<div id="questions"></div>
+<section class="result" aria-live="polite" aria-atomic="true">
+  <span class="tag" id="family">Your ending preview</span>
+  <h2 id="endingName">Choose some decisions to begin</h2>
+  <p id="endingWho">Your choices will shape the ending family. You can answer every prompt or skip the ones you haven’t reached.</p>
+  <p id="endingMira"></p><p id="endingGrandma"></p><p id="endingNext"></p>
+  <div class="scoregrid" id="scores"></div>
+  <label class="override">Ending override <select id="override"><option value="auto">Use choice-based result</option></select></label>
+  <p class="endingline" id="endingTank"></p>
+  <details><summary>What this preview includes</summary><p>This includes the game’s 18 project and career forks, 11 one-off story choices with ending traits, and 11 later story dilemmas. Family scores use the game’s trait formula, applied to the choices you make here.</p><p>The full game also considers repeated play habits, purchases, relationships, state flags, and some optional story events. Those systems aren’t simulated here, so this is a narrative preview rather than a save-compatible or exact forecast. Use the ending override to read any specific ending.</p></details>
+</section>
+<p class="foot">Your selections stay in this page only. Nothing is saved to the game.</p>
+</main>
+<script src="ending-playtest-data.js"></script>
+<script>
+(()=>{
+const D=window.ENDING_TEST_DATA, host=document.getElementById('questions');
+if(!D){host.textContent='Could not load ending choices.';return;}
+// Other one-off story decisions also write directly to the ending traits.
+// Their copy and trait tags mirror STORY_TAGS and the corresponding milestones.
+const extras=[
+ {id:'ev_mira',title:'The girl next door',body:'Mira from next door, she’s eight, has her face pressed to your tank. She already named three of your shrimp. Her mom says sorry, Mira doesn’t. Whatever you do, her mom will tell the neighbours.',options:[['Give her two shrimp and a jar','She runs home holding the jar with both hands.',{kin:.5,care:-.5}],['Show her how to test the water','She reads the nitrite chart out loud like a spell.',{know:1}],['Not today','She waves bye to the shrimp on her way out.',{drive:.5}]]},
+ {id:'ev_paper',title:'The local paper',body:'A reporter wants to know what the shrimp kits are really about.',options:[['Talk about the science','A whole ecosystem on a shelf.',{know:.5}],['Talk about family','Grandma’s tank.',{care:-.5}],['Say they’re almost sold out','They aren’t. Orders jump.',{ego:.5,risk:.5}]]},
+ {id:'ev_rival',title:'A cheaper rival',body:'A new seller’s cheaper kits arrive with stressed shrimp. Customers blame shrimp in general.',options:[['Match their price','Your kit price drops; cheap kits bring impulse buyers.',{drive:1}],['Make a free care video','Kit survival improves.',{kin:1,know:.3}],['Ignore them','They’re gone by summer.',{risk:.3}]]},
+ {id:'ev_ai',title:'The routing agent',body:'A delivery startup offers to plan routes for a share of every sale.',options:[['Sign up','Pay now and give them 2% of kit sales.',{control:1}],['No thanks','Nothing changes.',{control:-.5}]]},
+ {id:'ev_school',title:'Room 4B',body:'A teacher’s class loves its shrimp tank, but most families can’t afford one.',options:[['Donate kits','Kits go to every class in the district.',{care:1.5}],['Send a free care poster','Teachers put it up in every classroom.',{care:.5}],['Not now','Nothing changes.',{}]]},
+ {id:'ev_marine',title:'The marine survey',body:'Marine biologists ask for anonymous data about owners who stopped eating shrimp.',options:[['Share it, no names','The study comes out next year.',{know:1,care:.5}],['Say no','They find the data somewhere else.',{control:-.5}]]},
+ {id:'ev_stars',title:'Grandma on the roof',body:'Grandma asks what the water is like among the stars.',options:[['Look up','You stay until Grandpa calls you in for dinner.',{know:.5}]]},
+ {id:'me_burnout',title:'Tired',body:'You fell asleep at your desk again. Grandma left soup and a note: “Eat something.”',options:[['Take two weeks off','You sleep. The company is fine without you.',{drive:-1,risk:-.5}],['Keep going','You eat the soup cold at midnight and answer emails.',{drive:1,risk:.5}]]},
+ {id:'dye_offer',title:'Red dye',body:'A market seller offers dye that makes pale shrimp look brighter and sell for more.',options:[['Try it','The shrimp look redder than they are.',{means:-1,kin:-1,risk:.5}],['No thanks','The pale ones stay pale.',{means:.5}]]},
+ {id:'fight_invite',title:'The back room',body:'A regular invites you to run a shrimp survival betting tank behind a café.',options:[['Go and see','The money is good.',{kin:-1,risk:.5}],['Not my thing','The regular buys elsewhere.',{}]]},
+ {id:'wash_offer',title:'A logistics investor',body:'A man from fight night offers steady cash for kits and decides where they go.',options:[['Take the money','Cash every day. Tax on all of it.',{}],['Say no','The offer stays open.',{means:.5}]]}
+];
+const groups=[{title:'Research, work & the company',note:'Choices about what the company values and what it asks of other people.',items:D.forks.slice(0,6)}, {title:'Shrimp, customers & the world',note:'Choices about care, growth, influence, and the costs of reaching more people.',items:D.forks.slice(6)}, {title:'Story decisions',note:'Other one-off story choices that also shape your ending.',items:extras}, {title:'Later in the story',note:'The larger dilemmas that arrive as shrimp spread around the world.',items:D.cards}];
+let idx=0;
+for(const g of groups){const sec=document.createElement('section');sec.className='section';const title=document.createElement('h2');title.textContent=g.title;sec.append(title);const note=document.createElement('p');note.textContent=g.note;sec.append(note);
+ for(const item of g.items){const id=item.id;const fs=document.createElement('fieldset');fs.className='decision';fs.dataset.decision=id;const legend=document.createElement('legend');legend.textContent=item.question||item.title;fs.append(legend);if(item.body){const body=document.createElement('p');body.className='story';body.textContent=item.body;fs.append(body)}
+  (item.options||[]).forEach((op,j)=>{const opLabel=Array.isArray(op)?op[0]:op.label, opDescription=Array.isArray(op)?op[1]:op.description, opTraits=Array.isArray(op)?op[2]:op.traits;const lab=document.createElement('label');lab.className='choice';const input=document.createElement('input');input.type='radio';input.name=`decision-${id}`;input.value=String(j);input.addEventListener('change',update);const copy=document.createElement('span');const strong=document.createElement('strong');strong.textContent=opLabel;copy.append(strong);if(opDescription){const small=document.createElement('small');small.textContent=opDescription;copy.append(small)}lab.append(input,copy);fs.append(lab)});
+  const skip=document.createElement('label');skip.className='choice skip';const si=document.createElement('input');si.type='radio';si.name=`decision-${id}`;si.value='skip';si.checked=true;si.addEventListener('change',update);const st=document.createElement('span');st.textContent='Skip / not reached';skip.append(si,st);fs.append(skip);sec.append(fs);idx++;
+ }host.append(sec)}
+const endings=D.endingTypes, override=document.getElementById('override');for(const [id,e] of Object.entries(endings)){const o=document.createElement('option');o.value=id;o.textContent=e.name;override.append(o)}
+function choices(){const selected={};document.querySelectorAll('.decision').forEach(fs=>{const el=fs.querySelector('input:checked');selected[fs.dataset.decision]=el&&el.value!=='skip'?Number(el.value):null});return selected}
+ function update(){const sel=choices(), raw=Object.fromEntries(D.traits.map(t=>[t,0]));let answered=0;
+ // Decisions are kept in DOM order, which matches the grouped data above.
+ for(const g of groups)for(const item of g.items){const val=sel[item.id];if(val!==null&&val!==undefined){answered++;const opt=item.options[val],tr=Array.isArray(opt)?opt[2]:opt.traits;for(const t in (tr||{}))raw[t]=(raw[t]||0)+tr[t]}}
+ const tvals=Object.fromEntries(D.traits.map(t=>[t,Math.tanh((raw[t]||0)/6)]));const sc={empire:tvals.drive+tvals.ego-tvals.means,garden:-tvals.reach+tvals.means+tvals.kin,question:tvals.know-tvals.ego+tvals.care,network:tvals.reach-tvals.know+tvals.care,drift:-tvals.drive-tvals.ego-.5*tvals.care};let best='empire';for(const k of Object.keys(sc))if(sc[k]>sc[best])best=k;
+ let variant={empire: tvals.means>0?'empire_good':'empire_dictator',garden:'garden_village',question:tvals.drive<-.1?'question_lucky':'question_prof',network:'network_life',drift:tvals.ego>0?'drift_famous':'drift_shop'}[best];
+ const forced=override.value;if(forced!=='auto')variant=forced;const e=endings[variant];document.getElementById('answered').textContent=answered;document.getElementById('total').textContent=idx;document.getElementById('bar').style.width=(idx?answered/idx*100:0)+'%';const pb=document.querySelector('[role=progressbar]');pb.setAttribute('aria-valuemax',idx);pb.setAttribute('aria-valuenow',answered);document.getElementById('family').textContent=(e.end==='fall'||e.end==='sold')?'Alternate ending':`${e.end} ending`;document.getElementById('endingName').textContent=e.name;document.getElementById('endingWho').textContent=e.who;document.getElementById('endingTank').textContent=e.tank;
+ document.getElementById('endingMira').textContent=e.mira?'Mira: '+e.mira:'';document.getElementById('endingGrandma').textContent=e.gp?'Grandma: '+e.gp:'';document.getElementById('endingNext').textContent=e.next?'Afterward: '+e.next:'';document.getElementById('scores').innerHTML=Object.entries(sc).map(([k,v])=>`<div class="score"><b>${k}</b><span>${v.toFixed(2)}</span></div>`).join('');
+}
+override.addEventListener('change',update);document.getElementById('reset').addEventListener('click',()=>{document.querySelectorAll('.decision input[value="skip"]').forEach(x=>x.checked=true);override.value='auto';update();window.scrollTo({top:0,behavior:'smooth'})});update();
+})();
+</script>
+</body>
+</html>
