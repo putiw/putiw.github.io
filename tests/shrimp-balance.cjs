@@ -155,7 +155,7 @@ var g=readyGame(),t=g.tanks[0];if(maxSpeed(g)!==4)throw Error('An empty cycling 
 g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=1000000;g.emp.farms.barn=1;g.emp.staff.tier=2;if(maxSpeed(g)!==4)throw Error('First hatchery should unlock 4x');g.emp.proj.autopackm=1;g.emp.beta=.05;g.humans=100;g.webShop=true;g.ads=[{id:'yt',left:999,days:999,boost:6}];g.kits.stock=0;g.kitPrice=250;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(g.emp.fastUnlocked)throw Error('Thin margins unlocked 40');g.kitPrice=600;g.humans=2000;for(var i=0;i<20;i++){g.day++;empireDay(g);}if(g.emp.fastUnlocked||!g.emp.fastReady)throw Error('40 before a million owners');g.humans=1.01e6;g.day++;empireDay(g);if(!g.emp.fastUnlocked||maxSpeed(g)!==12)throw Error('Profitable business at a million owners did not unlock 12');g.emp.won=1;if(maxSpeed(g)!==40)throw Error('Everyone with a tank should unlock 40x');
 `);
 check('industrial upgrades need real preceding stages and output', `
-var g=readyGame();g.money=1e12;g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.emp.proj.farmlic=1;if(farmOk(g,FARMS[2])||buyFarm(g,'hatch')||(g.emp.tools={bag:1,catch:1,o2:1,seal:1,box:1},g.emp.staff.tier=1,buyPackTier(g)))throw Error('Skipped chapter');
+var g=readyGame();g.money=1e12;g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.emp.proj.farmlic=1;if(farmOk(g,FARMS[3])||buyFarm(g,'hatch')||(g.emp.tools={bag:1,catch:1,o2:1,seal:1,box:1},g.emp.staff.tier=1,buyPackTier(g)))throw Error('Skipped chapter');
 g.emp.proj.autopackm=1;g.kits.sold=10000;g.emp.farms.hatch=1;if(lineReady(g,1))throw Error('Skipped first robotic line');g.emp.staff.lines=1;if(!lineReady(g,1)||!buyLine(g,1))throw Error('Next packing tier inaccessible');
 `);
 check('capital purchases protect accrued annual tax', `

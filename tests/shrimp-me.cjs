@@ -240,4 +240,27 @@ var g=newGame();g.money=1e9;g.kits.sold=5000;g.academy.level=1;var o=null;academ
 var o1=rlOdds(g,'genes');setPdPay(g,2);if(Math.round(rlYear(g,'genes')/USD)!==115000)throw Error('Extra pay '+rlYear(g,'genes')/USD);if(rlOdds(g,'genes')!==o1)throw Error('Odds must not change');
 var r=Math.random;Math.random=function(){return 0.99;};for(var d=0;d<365*5;d++)rlDay(g);Math.random=r;var p=g.academy.rl.genes.papers;if(p<7||p>9)throw Error('Papers in 5 years '+p);
 `);
+check('one hand feeding lasts about three days, so the first weeks are not a clicking race',`
+var g=newGame(),T=g.tanks[0];T.cycledAt=0;T.had=1;T.pop=[{n:10,age:60,sex:'m'}];T.chem.nutr=0.85;T.chem.food=0;g.money=500;var run=function(n){for(var i=0;i<n;i++){while(g.progress.queue.length)acknowledgeMilestone(g);stepGame(g);}};
+var h=JSON.parse(JSON.stringify(g)),hT=h.tanks[0];feed(g,T,T.set.ration/100);if(T.hand!==2)throw Error('Hand feeding set');run(12);if(g.day<3)throw Error('Days pass '+g.day);if(!(T.chem.nutr>0.72))throw Error('Still fed after 3 days '+T.chem.nutr);if(T.hand!==0)throw Error('Three days only');
+`);
+check('mall stores: word of mouth is slower until one in five malls has your store, batches grow with scale, rent is daily',`
+var g=newGame();g.emp.kitsOpened=1;g.kits.sold=500;g.money=1e8;g.humans=1e5;g.emp.beta=0.012;
+if(mallsEmpty(g)!==5)throw Error('Abu Dhabi needs 5 stores '+mallsEmpty(g));if(Math.abs(trust(g)-0.85)>1e-9)throw Error('Home trust 85%');
+g.emp.regions.push('dxb');if(mallsEmpty(g)!==18)throw Error('A new region adds to the count '+mallsEmpty(g));var t0=trust(g),d0=kitDemand(g);
+if(buyStores(g,'dxb',10))throw Error('Ten at once needs ten stores first');if(!buyStores(g,'dxb',1))throw Error('One store');if(storeN(g,'dxb')!==1||mallsEmpty(g)!==17)throw Error('Count');
+if(!(trust(g)>t0)||!(kitDemand(g)>d0))throw Error('A store lifts word of mouth');for(var i=0;i<4;i++)buyStores(g,'auh',1);for(var i=0;i<5;i++)buyStores(g,'dxb',1);if(storeBatchMax(g)!==10||!buyStores(g,'dxb',10)||storeN(g,'dxb')!==13)throw Error('Ten stores open batches of ten, capped at the goal '+storeN(g,'dxb'));
+var c=storeDayCost(g);if(Math.abs(c-(13*800*1.1+4*800))>1)throw Error('Rent '+c);if(Math.abs(regTrust(g,'dxb')-1)>1e-9)throw Error('Covered region has full trust');
+g.emp.frozen=g.day+5;if(buyStores(g,'auh',1))throw Error('Frozen accounts block stores');
+if(shopOk(g,SHOPS[3])||shopOk(g,SHOPS[4]))throw Error('Mall flagship and megastore are retired');
+`);
+check('Grandma asks you to look at land once you have sent her AED 500k',`
+var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.me.on=1;g.me.sent=5e5;g.money=1e6;if(!milestoneConditions(g).gp_land)throw Error('Offer at 500k');
+storyChoose(g,'gp_land',0);if(!frozen(g)||frozenText(g).indexOf('land')<0)throw Error('A month away');var d0=g.day;while(g.day<d0+31){g.day++;landDay(g);}if(!g.me.house||!g.me.house.land||!houseOffer(g))throw Error('She finds land');
+g.money=-100;if(brokeOpts(g).some(function(x){return x[2]==='save';}))throw Error('No envelope after the land');if(gpLines(g).join().indexOf('fig tree')<0)throw Error('Ending line');
+var h=newGame();h.tanks[0].feeder=1;h.tanks[0].autoWC=1;personalDay(h);h.me.on=1;h.me.sent=5e5;h.money=2e6;storyChoose(h,'gp_land',1);if(frozen(h))throw Error('No means no trip');h.day=h.me.tour;if(!milestoneConditions(h).gp_scam)throw Error('The scam call');h.emp.infOn=1;var i0=h.emp.inf,m0=h.money;storyChoose(h,'gp_scam',0);if(!(h.emp.inf>i0)||Math.abs(m0-h.money-5e5)>1)throw Error('Paid back and on every newspaper');if(gpLines(h).join().indexOf('paid back')<0)throw Error('Scam line');
+`);
+check('galas raise money for a cause you pick, and it shows up in the ending',`
+var g=newGame();g.money=1e7;g.emp.infOn=1;if(!buyProj(g,'gala','kids'))throw Error('Gala');if(!(g.emp.galaFor.kids>0))throw Error('Cause recorded');var i0=g.emp.inf;buyProj(g,'gala','own');if(!(g.emp.galaFor.own<g.emp.galaFor.kids))throw Error('Own foundation keeps most');if(gpLines(g).join().indexOf('children')<0)throw Error('Ending line '+gpLines(g).join('|'));
+`);
 console.log(count+' free time, Grandma and ending checks passed');

@@ -8,8 +8,9 @@ const c=vm.createContext({Math:M,console});vm.runInContext(html.split('// ==SIM-
 vm.runInContext('var BOTKIND='+(process.env.BOT_HEART!=='cold')+';var _ack=acknowledgeMilestone;acknowledgeMilestone=function(G){var k=G.progress.queue[0],m=k&&MILESTONES[k];if(m&&m.dyn){if(!(BOTKIND&&storyChoose(G,k,1)))storyChoose(G,k,0);}else if(k==="owntank")storyChoose(G,k,0);else if(k==="coin_offer")storyChoose(G,k,BOTKIND?0:1);return _ack(G);};',c);
 vm.runInContext('var cache={},lastChips="",lastColSig="",lastChartKey="",lastAlerts="";function toast(){};function big(n){return String(Math.round(n));};function anyHad(){return G.tanks.some(t=>t.had||totalN(t)>=1);}function updateReveal(){'+html.split('function updateReveal(){')[1].split('function applyReveal(){')[0],c);
 vm.runInContext(html.slice(html.indexOf('var PROJ_SHOW='),html.indexOf('var seenNew='))+html.slice(html.indexOf('function projectRank('),html.indexOf('MILESTONES.spaceDream=')),c);
+vm.runInContext('var NOSTORES='+(process.env.NOSTORES==='1')+';',c);
 vm.runInContext(`
-var G=newGame(),events=[],snapshots={},actions=[],seen={},minCash=G.money,waitingSeconds=0,visits=0;
+var trace=[],G=newGame(),events=[],snapshots={},actions=[],seen={},minCash=G.money,waitingSeconds=0,visits=0;
 function note(name){if(seen[name])return;seen[name]=1;events.push({event:name,day:G.day,years:+(G.day/365).toFixed(2),money:Math.round(G.money),owners:Math.round(G.humans)});snapshots[name]=JSON.parse(JSON.stringify(G));}
 function act(name,fn){var ok=fn();if(ok){actions.push({day:G.day,name:name});return true;}return false;}
 function canSpend(cost){return G.money>=cost+Math.max(200,capitalReserve(G)*1.25);}
@@ -40,9 +41,9 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,S=G.space,budget=
   var bn=bottleneck(G);
   if(E.staff.tier===1&&G.kits.sold>=20&&canSpend(1800))spend('packing sealer',()=>buyPackTier(G));
   if(G.kits.sold>=10&&E.staff.tier&&bn.k==='packing'&&E.staff.pack<4&&canSpend(5000))spend('hire packer',()=>hire(G,'pack',1));
-  for(var li=0;li<PACK_LINES.length;li++)if(lineReady(G,li)&&packCap(G)<kitDemand(G)*1.1&&canSpend(lineCost(G,li)+PACK_LINES[li].up*30))spend('packing '+PACK_LINES[li].id,()=>buyLine(G,li));
+  for(var li=0;li<PACK_LINES.length;li++)if(lineReady(G,li)&&packCap(G)<Math.min(kitDemand(G),farmCap(G)*1.3+10)*1.1&&canSpend(lineCost(G,li)+PACK_LINES[li].up*30))spend('packing '+PACK_LINES[li].id,()=>buyLine(G,li));
   if(packingMachineCap(G)>kitDemand(G)&&E.staff.pack)hire(G,'pack',-1);
-  if(pd(G,'farmlic')&&(!farmCap(G)||bn.k==='shrimp')){var list=FARMS.filter(f=>farmOk(G,f));var next=list.find(f=>!(E.farms[f.id]>0));var existing=list.filter(f=>E.farms[f.id]>0).slice(-1)[0];var pick=next&&canSpend(farmCost(G,next))?next:existing||list[0];if(pick&&canSpend(farmCost(G,pick)))spend('farm '+pick.id,()=>buyFarm(G,pick.id));}
+  for(var fi=0;fi<6;fi++)if(pd(G,'farmlic')&&(!farmCap(G)||bottleneck(G).k==='shrimp')){var list=FARMS.filter(f=>farmOk(G,f));var next=list.find(f=>!(E.farms[f.id]>0));var existing=list.filter(f=>E.farms[f.id]>0).slice(-1)[0];var pick=next&&canSpend(farmCost(G,next))?next:existing||list[0];if(pick&&canSpend(farmCost(G,pick)))spend('farm '+pick.id,()=>buyFarm(G,pick.id));}
   // New regions first: a player expands before spending ✦ on extras.
   if(academyOpen(G)&&!A.level&&canSpend(200000))spend('pilot grant',()=>fundAcademy(G));
   var region=nextRegion(G);if(G.ob.ereg&&region&&canSpend(regionCost(G,region)))spend('region '+region.id,()=>buyRegion(G));
@@ -53,6 +54,7 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,S=G.space,budget=
  if(pd(G,'studio')&&!(E.movie.left>0)&&E.movie.n<MOVIES.length){var ct=CUTS[E.movie.n]||[];var ci=ct.length>1?(BOTKIND?((ct[1][1].h||0)>=(ct[0][1].h||0)?1:0):(ct[1][1].b>ct[0][1].b?1:0)):0;if(canSpend(movieBudget(E.movie.n)))greenlight(G,ci);}
  if(academyOpen(G)&&G.academy.level){var RL=rlines(G);RLINES.forEach(function(l){if(RL[l.id].pd<1&&canSpend(posUsd(G,RPOS[1])*USD*3))rlHire(G,l.id,'pd');if(RL[l.id].phd<2&&canSpend(posUsd(G,RPOS[0])*USD*6))rlHire(G,l.id,'phd');});}
  if(coinOn(G)&&Math.floor(G.day)%90<30){var CC=coinOf(G);if(CC.price>coinBreakEven(G)*1.5&&canSpend(coinPlantCost(G)*30))coinPlant(G,coinPlantCost(G));if(CC.price>COIN_FAIR*1.3&&CC.treasury>0)coinSell(G,CC.treasury*0.25);else if(CC.price<COIN_FAIR*0.7&&canSpend(coinPlantCost(G)*3))coinBuy(G,coinPlantCost(G));}
+ if(typeof storesOn==='function'&&storesOn(G)&&!NOSTORES&&Math.floor(G.day)%7===0){var sr=null,sw=0;REGIONS.forEach(function(r){if(!regOpen(G,r.id)||storeN(G,r.id)>=storeGoal(r.id))return;var w=r.pop*(1-regTrust(G,r.id));if(w>sw){sw=w;sr=r.id;}});if(sr){var sb=[1000,100,10,1].filter(function(b){return b<=storeBatchMax(G)&&storeCanBuy(G,sr,b)&&(operatingNet(G)||0)>storeBatchN(G,sr,b)*storeDay(G,sr)*10&&canSpend(storeBatchCost(G,sr,b)*5);});if(sb.length)buyStores(G,sr,sb[0]);}}
  if(G.ob.eshops&&Math.floor(G.day)%30===0){var nsh=SHOPS.filter(function(x){return shopOk(G,x);}).sort(function(a,b){return a.cost-b.cost;}).find(function(x){return canSpend(x.cost*100)&&(G.emp.shops[x.id]||0)<3;});if(nsh)buyShop(G,nsh.id);if(shopCount(G)&&!E.staff.mgr&&!E.staff.aiMgr&&canSpend(5000))hire(G,'mgr',1);}
  if(hardOpen(G)&&!E.won){if(BOTKIND&&hardOf(G).goal!=='want')hardSetGoal(G,'want');HARD.forEach(function(g){g.ops.slice().sort(function(a,b){return BOTKIND?0:(b.k==='dark')-(a.k==='dark');}).forEach(function(o){if((!o.f&&o.id!=='deliver')||(BOTKIND&&o.k==='dark'))return;if(g.id==='war'&&o.id!==(BOTKIND?'pay':'fund'))return;if(canSpend(hardCost(G,o)))hardBuy(G,g.id,o.id);});});}
   // One modest advertising attempt; later keep referrals and distribution working.
@@ -84,8 +86,9 @@ for(var day=0;day<7665;day++){
  care();if(G.day%(kitsOpen(G)?28:7)===0||G.day<35)visit();if(G.emp.won&&(G.space.won||!spaceOpen(G)))break;
  waitingSeconds+=2.4/maxSpeed(G);for(var q=0;q<4;q++){while(G.progress.queue.length){note('milestone '+G.progress.queue[0]);acknowledgeMilestone(G);}if(G.me&&G.me.on&&!G.me.botDay){G.me.botDay=1;setHour(G,19,'papers');setHour(G,20,'papers');setHour(G,21,'club');setHour(G,18,'exercise');}if(G.emp.won&&!spaceOpen(G))break;if(G.emp.won&&!G.space.started&&requestSpaceDream(G)&&beginSpace(G))note('space started');if(!stepGame(G))throw Error('Clock blocked at '+G.day);}
  minCash=Math.min(minCash,G.money);if(!Number.isFinite(G.money)||G.money<0)throw Error('Insolvent at '+G.day+' '+JSON.stringify(G.fin.slice(-3)));if(day%1000===0)console.log('progress',G.day,Math.round(G.money),Math.round(G.humans),farmCap(G),packCap(G));
+ if(G.day%15===0){var fr=(G.fin||[]).slice(-7),inc=0;fr.forEach(function(r){for(var k in r)if(typeof r[k]==='number'&&r[k]>0)inc+=r[k];});trace.push([G.day,Math.round(G.money),Math.round(inc/Math.max(1,fr.length)),Math.round(operatingNet(G)||0),Math.round(G.humans),Math.round(G.kits.sold)]);}
  if(G.day%365===0){snapshots['year '+Math.floor(G.day/365)]=JSON.parse(JSON.stringify(G));}
 }
-care();var result={events:events,snapshots:snapshots,actions:actions,day:G.day,earth:G.emp.won,space:G.space.won,ending:endingPick(G),trees:Object.keys(G.emp.trees||{}),minCash:minCash,waitingMinutes:waitingSeconds/60,visits:visits,final:G};
+care();var result={trace:trace,events:events,snapshots:snapshots,actions:actions,day:G.day,earth:G.emp.won,space:G.space.won,ending:endingPick(G),trees:Object.keys(G.emp.trees||{}),minCash:minCash,waitingMinutes:waitingSeconds/60,visits:visits,final:G};
 `,c,{timeout:180000});
 const out=process.env.REVIEW_OUTPUT||require('os').tmpdir()+'/shrimp-average';fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'run-'+initialSeed+'.json'),JSON.stringify(c.result));console.log(JSON.stringify(c.events,null,2));console.log('RESULT',JSON.stringify({...c.result,snapshots:undefined,actions:undefined,final:undefined}));if(!c.G.emp.won||c.spaceOpen(c.G)&&!c.G.space.won)throw Error('Average-player scenario did not complete both chapters within 21 game years');if(c.minCash<=0)throw Error('Average-player scenario exhausted its working cash');

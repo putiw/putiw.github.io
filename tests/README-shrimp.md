@@ -516,3 +516,13 @@ ammonia is only the primary button once ammonia is near zero.
 ## Pass 68: Grandma's envelope, quieter cards
 - If you sent Grandma money, the out-of-money card offers her envelope once: three times everything you sent, saved in a gold fund. Ending line and a Grandma history line. New check in shrimp-me (34).
 - Explanations moved behind ?: research lines, Shrimpcoin, the hard part, the lab certificate, the recipe tank, the tank table, supplies, packing tools, open regions. The packing line drops "by you at the station" once machines do almost all of it.
+
+## Pass 69: mall stores, Grandma's land, gala causes, smoother scaling
+- Mall stores: every region has malls. Word of mouth runs at 60% in a region with none of your stores (85% at home in Abu Dhabi) and catches up as you open them. One store in five malls covers a region. Stores open one at a time, then 10, 100, 1,000 at a time once you run that many. Each costs a fit-out plus rent, license and staff every day, and brings its own orders and ✦. Mall flagship and megastore are retired from new purchases.
+- Grandma's land at AED 500k sent: go with her (no purchases for 30 days, then land for the house, which moves to the Tank tab once the farm keeps your tank) or don't (she's scammed on a tour, you're on every front page; pay her back or not). Both close the envelope.
+- Galas pick a cause (clean water, children's hospitals, mangroves, animal shelters, your own foundation). Traits, mood and an ending line follow the cause.
+- Story choices show only what they cost. What they did shows in the toast afterwards.
+- One hand feeding lasts about 3 days (the next two days top up if food runs low); the message says you only do it until the auto feeder.
+- New farm tier between the barn and the industrial hatchery: Breeding warehouse, AED 250k, 60 kits a day. Old saves shift their farm stage.
+- Average bot: farms before packing lines when breeding is the limit, up to 6 farm buys a visit. Income trace per 15 days is in the run json (`trace`).
+- Results: strong cold 2,591, strong kind 2,828-3,001, average Earth 5,377-5,770, average cold 5,321. Spotlight sweep 139, all good. shrimp-me 38 checks.
