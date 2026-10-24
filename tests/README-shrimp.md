@@ -589,7 +589,7 @@ ammonia is only the primary button once ammonia is near zero.
 
 ## Pass 78: pause, sickness guide, lab parties
 - Paused means still: the tank stops moving (shrimp, legs and antennae) unless you are cleaning, checking or treating.
-- A sick tank now has its own NEXT step ("Some shrimp in Tank 1 look sick. Tap the tank, then Check shrimp.") with a ring around the tank, and the tank caption says "Some look sick · tap to check". With several tanks it first points at the right tank chip. After a partly successful cure it waits five days before asking again.
+- Until you finish your first health check, a sick tank has its own NEXT step ("Some shrimp in Tank 1 look sick. Tap the tank, then Check shrimp.") with a ring around the tank, and the tank caption says "Some look sick · tap to check". With several tanks it first points at the right tank chip. After a partly successful cure it waits five days before asking again.
 - Easter egg: Grandma's old grad school lab throws a birthday party every two weeks. She asks you along twice, once from day 90 and once after Europe opens, each for some lab member nobody can quite place. Going costs a day of sales and rests you; saying you're busy nudges you toward drive.
 - Bots: strong cold 2,657, average seed 7 Earth 6,162. Both parties fired.
 

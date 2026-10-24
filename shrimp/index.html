@@ -3819,7 +3819,7 @@ function tvWipe(px,py){var T=TVM&&TVM.tank;if(!T||!T.glass)return;var cw=TVM.W/G
  if(ch2){T.glassV=(T.glassV||0)+1;G.stats.wiped=(G.stats.wiped||0)+1;}}
 function updateTankView(){var card=$('tankview');if(!card)return;var T=G.tanks[G.sel]||G.tanks[0];if(labMode())T=G.tanks[0];
  if(!TVM)TVM=tvMake($('tv-canvas'),{n:24,gate:function(){return activeTab==='tank'&&!HC&&!SB&&!QCR;}});
- var N=totalN(T);setT('tv-cap',(T.ill&&N>=1?'Some look sick · tap to check · ':rv('shrimp')&&!G.ob.looked?'Tap to check or clean · ':'')+T.name+' · '+(N>=1?cnt(N)+' shrimp':T.cycledAt!=null?'empty':G.ob&&G.ob.bottle?'cycling':'new tank, no bacteria yet'));
+ var N=totalN(T);setT('tv-cap',(T.ill&&N>=1&&!G.opt.hcDone&&!(G.emp.healed>0)?'Some look sick · tap to check · ':rv('shrimp')&&!G.ob.looked?'Tap to check or clean · ':'')+T.name+' · '+(N>=1?cnt(N)+' shrimp':T.cycledAt!=null?'empty':G.ob&&G.ob.bottle?'cycling':'new tank, no bacteria yet'));
  tvSync(TVM,T);tvFoodSync(TVM,T);
  if(TVM.dd>T.dayDeaths)TVM.dd=0;var dd=T.dayDeaths-TVM.dd;TVM.dd=T.dayDeaths;if(dd>0&&N>=1&&TVM.W&&TVM.ag.length){TVM.dacc=(TVM.dacc||0)+dd/N*TVM.ag.length;while(TVM.dacc>=1||(TVM.dacc>0&&Math.random()<TVM.dacc)){TVM.dacc=Math.max(0,TVM.dacc-1);if(TVM.dead.length<3&&TVM.ag.length>1){var pool=TVM.ag.filter(function(a){return a.sick;});if(!pool.length)pool=TVM.ag.filter(function(a){return a.age>=75;});if(!pool.length)pool=TVM.ag;tvKill(TVM,pool[Math.floor(Math.random()*pool.length)]);}else break;}}
  tvWake(TVM);}
@@ -3855,7 +3855,7 @@ function renderHealth(){if(!HC)return;var T=G.tanks[HC.i],ill=illById(HC.type),h
   if(HC.cgLines)h+='<div class="cg-res '+(HC.cgCls||'')+'">'+HC.cgLines.map(function(l){return '<p>'+l+'</p>';}).join('')+'</div>';
   h+='<p class="sub">'+msg+'</p><div class="btns">'+(HC.result==='wrong'?'<button class="btn primary" data-act="hc-back">Try another cure</button>':'<button class="btn primary" data-act="hc-close">Back to the tank</button>')+'</div>';}
  $('hc-in').innerHTML=h;if(HC.step!=='done'&&HC.step!=='clear'){HCV=null;hcView(HC.step!=='find');var cv=$('hc-canvas');if(cv)cv.addEventListener('pointerdown',hcTap);}}
-function closeHealth(){cgStop();if(!HC&&!SB&&!QCR)return;if(HC&&!HC.qc&&HC.result==='partial'&&G.tanks[HC.i]&&G.tanks[HC.i].ill)G.tanks[HC.i].ill.checked=Math.floor(G.day)+5;if(HC&&!HC.qc&&G.tanks[HC.i]&&G.tanks[HC.i].ill&&HC.result!=='cured')toast('They’re still sick. Tap the tank and check again soon.');var sp=QCR?QCR.prevSpeed:HC?HC.prevSpeed:SB.prevSpeed;HC=null;SB=null;QCR=null;cache.qch=null;if(HCV){var i=TVS.indexOf(HCV);if(i>=0)TVS.splice(i,1);HCV.on=false;HCV=null;}$('hcheck').hidden=true;setSpeed(sp);render();}
+function closeHealth(){cgStop();if(!HC&&!SB&&!QCR)return;if(HC&&!HC.qc&&(HC.result==='cured'||HC.result==='partial'))G.opt.hcDone=1;if(HC&&!HC.qc&&HC.result==='partial'&&G.tanks[HC.i]&&G.tanks[HC.i].ill)G.tanks[HC.i].ill.checked=Math.floor(G.day)+5;if(HC&&!HC.qc&&G.tanks[HC.i]&&G.tanks[HC.i].ill&&HC.result!=='cured')toast('They’re still sick. Tap the tank and check again soon.');var sp=QCR?QCR.prevSpeed:HC?HC.prevSpeed:SB.prevSpeed;HC=null;SB=null;QCR=null;cache.qch=null;if(HCV){var i=TVS.indexOf(HCV);if(i>=0)TVS.splice(i,1);HCV.on=false;HCV=null;}$('hcheck').hidden=true;setSpeed(sp);render();}
 // ----- Cure minigames: mineral pellets, a big water change with a net, a salt dip -----
 var CG=null;
 function cgBody(a){var look=a.look==='ok'?'':a.look;return tvBody(a.male,a.g||70,false,look,1,0);}
@@ -4458,7 +4458,8 @@ function guideTarget(){
     if(safeToStock(G,T0))return {key:'buy',tab:'market',card:'buy',sel:'[data-act="buy"]',text:'Water is safe. Buy some shrimp in Trade.'};
     return {key:'cycle',tab:'tank',card:'startcard',sel:'#startcard .btn.primary',bar:false};
   }
-  var si=G.tanks.findIndex(function(t){return t.ill&&!(t.ill.checked>=G.day);});
+  // Only until the player has done one health check. After that sickness is quiet again, they use their eyes.
+  var si=G.opt.hcDone||(G.emp.healed||0)>0?-1:G.tanks.findIndex(function(t){return t.ill&&!(t.ill.checked>=G.day);});
   if(si>=0){var sT=G.tanks[si],tvOpen=$('tv-acts')&&!$('tv-acts').hidden;
     if(G.sel!==si&&G.tanks.length>1&&!RV())return {key:'ill'+si+'_'+sT.ill.day,tab:'tank',sel:'.tchip[data-sel="'+si+'"]',text:'Some shrimp in '+sT.name+' look sick. Open '+sT.name+', tap the tank, then Check shrimp.'};
     return {key:'ill'+si+'_'+sT.ill.day,tab:'tank',card:'tankview',sel:tvOpen?'#tv-check':null,text:'Some shrimp in '+sT.name+' look sick. '+(tvOpen?'Tap Check shrimp to find them.':'Tap the tank, then Check shrimp.')+' Left alone it spreads.'};}

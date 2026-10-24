@@ -71,15 +71,22 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **The hard part** (`HARD`, `HARD_GOALS`, `hardDay`, `hardBuy`, `hardSetGoal`, `hardCap`, `hardTarget`, `streamReady`, `renderHard`): opens at 4B people with a tank at home (Chapter 6, Grandma's kitchen). From there `kitCap` is `hardEasy()` (about 4.3B) plus the people reached in ten groups (too hot, no water, too poor, war, forced from home, hard to reach, can't do it alone, can't see, said no, never met). Each group has fix, workaround, dark and money options that ramp in over their days; war takes one ending option only. "Rethink the goal" changes the target (every home, every home that wants one, 90%, 75%) or ends the game now (the spreadsheet, good enough, no number). The living-stream ending is hidden: it appears only with the Rewild tree, mangroves, clean farm water, the Taiwan streams, a river answer, and no forced option. Forced options (`direct:1`: paying ministers, national programs, Glass Hearts, credit) put tanks in homes straight over their ramp instead of waiting for orders, and once you force anything public mood no longer slows sales (`opMult`). Said no is reached through governments, not a law on people: national programs with a factory in each country, or paying the ministers. Delivering to the uncontacted village kills it and takes those people off the target, the goal bar says "People who die don't need a tank" and Grandma stops writing for a year (`G.me.gpSilent`). The old c_war, c_water and c_last cards and the "last holdouts" project are gone, the hard part replaces them.
 - **Shrimpcoin** (`coinOf`, `coinLaunch`, `coinPlant`, `coinBuy`, `coinSell`, `coinDay`, `renderCoin`): offered at 100M people. One coin per mangrove tree. Honest count mints a coin a year later for each tree that lived (60%), the seedling count mints everything at once and leaves unbacked coins that can surface on satellite photos (price crash, mood, heart). Price drifts back toward AED 12 (a tree's offset value) with hype events and noise, and your big buys and sells move it (`coinDepth`). The World card shows a one-year price chart with the takeaway in the title. When the price is above what a coin costs to make (`coinBreakEven`: AED 6.67 honest, AED 4 seedlings), outside planters plant in proportion to the gap (`otrees`), their coins add to supply and pull the price back, and you keep a 5% registry fee (`coinMintOut`). Buying coins is how a player pays the world to plant. Honest trees past 100M, yours and others', count as the mangrove step of the living-stream ending.
 - **Mall stores** (24 Oct): `MALLS`, `storeGoal` (one store in five malls), `buyStores(G,r,n)`, `trust(G)` multiplies the word-of-mouth term in `kitDemand`. 60% trust in a region with none of your stores, 85% at home. Batch size follows how many you run (`storeBatchMax`). Rent, license and staff are daily (`storeDayCost`), counted in `fixedOverhead` and `operatingNet`.
-- **Pause rules** (`CARD_HOLD`, `cardResume`, `pauseCue`, `PAUSE_T0`, `LAST_RUN`): cards restore the speed; a blocked `setSpeed` stores it in `CARD_HOLD`. `renderMilestone` waits while `TVLOCK`/`HC`/`SB`/`QCR` are active. Hand feeding: `T.handUntil`, `handLeft`.
+- **Pause rules** (`CARD_HOLD`, `cardResume`, `pauseCue`, `PAUSE_T0`, `LAST_RUN`): cards restore the speed; a blocked `setSpeed` stores it in `CARD_HOLD`. `renderMilestone` waits while `TVLOCK`/`HC`/`SB`/`QCR` are active. The game goes to 1× by itself after the first shrimp purchase. While paused the tank view is still (no movement, no leg wiggle, `v.clk` only advances while running), except during cleaning, health checks and dips. The "Time is paused · tap to play" pill sits just above the tab bar (`body.pill-on` lifts toasts above it). Hand feeding lasts two days: `T.handUntil`, `handLeft`.
+- **Top action buttons** (`actNeed`, `setActs`): Feed shows while any tank lacks an auto feeder, Water while any tank lacks an auto water changer, Sell until Trade closes (`labMode`). With none left the row hides and the owners bar takes its place.
+- **Too much new water** (`WC_CRASH` 200, `WC_AUTO_MAX` 150, `wcWeek`, `T.wcLog`, `T.moltCrash`): more than 200% changed in 7 days, all molt at once, half of everyone 10+ days old dies. Automatic changes skip rather than pass 150%. The Water toast warns from 120%, the header chip says "wait a day" from 150%.
+- **First sickness guide**: until the player finishes one health check (`G.opt.hcDone`), a sick tank is a real Next step in `guideTarget` (`ill<tank>_<day>`), with a ring on the tank view and the caption "Some look sick · tap to check". A partly successful cure sets `ill.checked` to wait five days. After the first check, sickness is quiet again (rule 5).
 - **Lab birthday parties** (`party1`, `party2`, `partyGo`): Grandma's old grad school lab, twice per game (day 90+ with shrimp, then after Europe). Going costs one day of operating net and lowers burnout.
 - **Quiet spells** (`QUIET`, `quietDay`, `markEvent`, `QUIET_MS`, `QUIET_DAYS`): story cards, illnesses and orders call `markEvent`; after a quiet stretch `quietDay` fires one eligible event and sets `G.flash` for the UI toast.
 - **Growing pains** (`PAINS`, `painMult`, `painPick`, `painNote`): story cards between 8k and 3M owners. Open or being set up: demand × `PAIN_K`, farm output × `PAIN_SHIP`. Costs are days of operating profit. Old saves mark passed pains done in `migrate`.
 - **Play style** (`STYLE_KINDS` wrappers, `styleVals`, `styleTop`): purchase functions are wrapped at the end of the sim to count steady/methodical habits. Feeds `endingScores` and adds a subtitle, paragraph and Grandma line to the ending.
 - **Grandma's land** (`gp_land`, `gp_scam`, `gpLand`, `gpScam`, `landDay`): at AED 500k sent. Yes freezes purchases 30 days (`frozenWhy='land'`) then grants the house land. The house card moves to the Tank tab when `ownTank`.
 - **Gala causes** (`GALA_FOR`, `galaLines`): `buyProj(G,'gala',cause)`.
-- **Story choice previews** (`choiceFx(key,i,all)`): before the pick only costs show; the full effect goes in the toast after.
-- **Tab layout** (24 Oct): Marketing holds ads, sales and shops, media projects (Ministry, posters, films), the campaign desk and Shrimp Pictures. A Research tab opens with the university (200 kits): Research & university, research lines (each field folds) and the school and university projects. World keeps the hard part, Shrimpcoin, the trees, owners' tanks, regions, The Shrimp Times, and the politics and nature tracks. Trade hides once the farms run things (`labMode`), and its money chart moves to Kits. The readings chart hides once the farm takes your tanks. `projTab(p)` decides where a project shows up; the sim still uses `projectArea` for gating.
+- **Story choice previews** (`choiceFx(key,i,all)`): before the pick only costs show (AED, ✦, a month away). What happened is aftermath, in the toast after. Never show +5 style effects up front.
+- **Gear scope** (`G.opt.upAll`): with several tanks one switch at the top of Equipment picks This tank / All tanks. Decor and treats sit under `h3.track` headings.
+- **Ladders** (`topIdx`, `farmBuyable`, `farmNext`, `FARM_AT`, `shopBuyable`): farms and shops open one tier at a time and the older tier stops being sold. Small shops stop once the first mall store opens.
+- **Research merge** (`rlStaff`, `academyDay`, `scienceFork`): one Research card on the Lab tab (`academy-card`). Staff raise the research rate. The "pay to keep postdocs" fork waits for two postdocs and four papers.
+- **Your day hours** (`workPer`, `HOUR_STEPS`, `hoursDay`): work hours move kit and shrimp demand, hour milestones fire events. Grandma calls with a short supply-and-demand lesson at about 3 kits a day (`M.call='lesson'`, the person button rings).
+- **Tab layout** (24 Oct): tabs are Tank, Gear, Trade, Kits, Ads, World and Lab (`TAB_NAME`), plus the You page under the person button. Ads holds ads, sales and shops, mall stores, media projects (Ministry, posters, films), the campaign desk and Shrimp Pictures. The Lab tab opens at 3,000 kits sold (`ACADEMY_AT`) with one merged Research card and the school and university projects. World keeps the hard part, Shrimpcoin, the trees, owners' tanks, regions, The Shrimp Times, and the politics and nature tracks. Trade hides once the farms run things (`labMode`), and its money chart moves to Kits. The readings chart hides once the farm takes your tanks. `projTab(p)` decides where a project shows up; the sim still uses `projectArea` for gating.
 - **Homes, not people** (`HH_AVG`, `hhDiv`, `hhPeople`, `addOwners`): one kit is one home of 1 to 4 people (2.5 on average, random per kit for small sales). Kit demand is divided by the household size once 2,000 kits are sold, so people-growth pace stays the same and kit counts are about 2.5x lower than before. Always add owners through `addOwners`.
 
 - **Tank view** (`updateTankView`, `tv*` functions, `SPR` sprites): a canvas drawn from a sample of the real colony, using art layers from Puti's Shrimp Tanks game. It runs at about 30 fps and stops off screen, on other tabs and when the app is hidden. Pellets follow `T.chem.food`.
@@ -98,7 +105,7 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 
 Her messages usually name a symptom, give one example, and sketch a fix ("maybe like..."). The sketch is a guess. The principle behind it is the request. Apply it to the whole game, not just the example, and when something pushes or tells the player what to do, remove it or make it optional rather than rewording it.
 
-1. The player decides. No tasks, targets, unlock rules, prices to save for or nudges toward one route (a second tank, a specific item). Suggestions sit in the ? popup as options, only for tabs already open. Gates use room or progress the player chose, never a fixed path (kits need 60 L of stocked tanks, the farm license 120 L, any mix).
+1. The player decides. No tasks, targets, unlock rules, prices to save for or nudges toward one route (a second tank, a specific item). Suggestions sit in the ? popup as options, only for tabs already open. Gates use room or progress the player chose, never a fixed path (kits need two tanks with shrimp, the farm license three).
    Marketing is a real lever: referrals run at `wordOfMouth(G)` (30% with no marketing, up to 100% with an online shop, ads and shops). Don't let demand scale without it.
 2. Show, don't tell. A glowing button or a spotlight beats a sentence. The guide bar is for events only (an order, illness, new stock to dip, QC due), everything optional is soft and goes to the popup.
 3. Little on screen, detail on tap. Explanations behind ?, cards collapsible, alerts state the problem in a line plus the one fix when it's dangerous.
@@ -117,7 +124,7 @@ These come from Puti's feedback. Treat them as requirements.
 - Do things by hand first, then automate one piece at a time.
 - There should always be something to do or improve, not one button and done.
 - Bottleneck advice only comes from the paid consultancy, never free.
-- The manual Feed button stays until the three starter tanks are automated.
+- The top Feed, Water and Sell buttons stay only while they can matter (see Top action buttons).
 - Bought shrimp are breeders and can never be sold.
 
 **Revealing things**
@@ -189,12 +196,12 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 
 - [ ] The ending page shows four charts under who you became: owners over time with milestone dots, cash over time, the nine traits, and where the money went (`chartDay` records `G.chart`, `endCharts` draws plain SVG with the takeaway in each title). Saves from before this only chart from the day recording began.
 - [ ] Sound: `shrimp/water.mp3` and `shrimp/music.mp3` from the shrimp tanks game, same graph as there (master 0.82, bus 0.5, water 0.4 with 4.8 s fades, music 0.16 with 2.2 s fades). Mute button always in the top bar (`tb-mute`), starts on the first tap, pauses when the tab is hidden, off switch in Settings (localStorage `shrimp-music`). App icons: `favicon.ico`, `icon-32.png`, `icon-192.png`, `icon-180.png` (apple-touch), cropped from the tank art.
-- [ ] When shrimp are in the tank, kits aren't open yet and the clock is paused, a spotlight points at 1× and says the game is paused. The 1× button pulses until it is pressed (`G.opt.pauseTold`, `G.opt.nudge`). Once per save. There is no "time has never run" check: time runs during cycling, so that version never fired.
+- [ ] The first shrimp purchase starts the clock at 1×. Any time the clock is paused with nothing to read, the pause pill shows above the tab bar and 1× pulses (`pauseCue`, `G.opt.pauseTold`, `G.opt.nudge`). The tank is still while paused.
 - [ ] `BUILD` near `toast` changes with every release; an open game checks every 15 minutes and offers a reload when a newer one is live. Bump it when you ship.
 - [ ] Shrimp videos count as reach, not ego, so they don't push you away from Space.
 
 **Play-test fixes, Oct 23 (check these stay true)**
-- [ ] Every story choice looks the same (no green first option) and shows what it does under the text (`choiceFx` tries it on a copy of the game: ✦, AED, mood, kits, owners). A choice you can't afford is greyed with a reason.
+- [ ] Every story choice looks the same (no green first option). Before the pick only costs show; effects are aftermath. A choice you can't afford is greyed with a reason.
 - [ ] Out of money before any farm talks about your shrimp, not farms.
 - [ ] Quality check runs water → look → salt dip → done without freezing.
 - [ ] The packing table keeps one size while you tap through the steps.
@@ -207,7 +214,7 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] Story prices that were fixed grow with the company (`aiCost` 20% of cash plus 2% of every kit sale, `rivalCost`, `schoolKits`).
 - [ ] The spotlight ring follows its card if anything moves (`spotTrack`).
 - [ ] Once a second region is open and the tank buttons leave the top bar, the owners count (x of 8.2B) sits in the top bar instead.
-- [ ] Research lines (`RLINES`, `RPOS`, `rlDay`): six fields (energy, water, automation and AI, genes, food, health), each can fund PhD students, postdocs and PI labs at the same time, paid daily, until you stop. Finds are random (`rlOdds`), a quarter of them come out as nothing. Each find is a small permanent bonus (`rlM`). Funding counts toward curiosity (know). The older academy chain (one study at a time, degrees, teaching, crew) still drives Space. Postdocs cost USD 50k a year base; postdoc pay can go to 60k or 75k (`PD_PAY`, `setPdPay`), which only moves traits, never the odds. Papers come out steadily per person (`RPOS.pap`: PhD 0.6, postdoc 1, PI lab 5 a year), separate from finds.
+- [ ] Research lines (`RLINES`, `RPOS`, `rlDay`): six fields (energy, water, automation and AI, genes, food, health), each can fund PhD students, postdocs and PI labs at the same time, paid daily, until you stop. Finds are random (`rlOdds`), a quarter of them come out as nothing. Each find is a small permanent bonus (`rlM`). Funding counts toward curiosity (know). The older academy chain (one study at a time, degrees, teaching, crew) still drives Space. Postdocs cost USD 50k a year base (the start line also shows AED); postdoc pay can go to 60k or 75k (`PD_PAY`, `setPdPay`), which only moves traits, never the odds. Papers come out steadily per person (`RPOS.pap`: PhD 0.6, postdoc 1, PI lab 5 a year), separate from finds.
 - [ ] Big machines cost more to run: mega hatchery, ocean ranch and arcology upkeep are about 5 AED per kit; packing halls, hubs and the global network cost more per kit the bigger they are.
 - [ ] Word of mouth needs more marketing as you grow (`mktNeed`, square root of owners). The consultant and the bottleneck say "Limit: marketing" when it falls under 75%.
 - [ ] The Ministry (campaigns) opens once the farm has taken your tanks and 1,000 kits are sold, Shrimp Pictures right after; both cheaper than before.
@@ -251,19 +258,16 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 
 In game days, best play is about 7 years and casual play about 15.
 
-Latest bot results (seed 7):
+Latest bot results (seed 7, 24 Oct):
 
 | Bot | Result |
 |---|---|
-| Strong, cold answers (default) | Earth won on day 2,720 (was 2,304 before stores and growing pains) (goal: every home, pays ministers, funds a side, the village), empire_dictator |
-| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 2,956 (goal: every home that wants one), garden_village |
-| Average, curious and kind (default) | Earth on day 5,798-6,273 depending on seed, space done by day ~7,500 |
-| Average, cold answers (`BOT_HEART=cold`) | Hard part day 4,866, Earth on day 5,321 |
+| Strong, cold answers (default) | Earth won on day 2,657, empire_dictator |
+| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 3,258, garden_village |
+| Average, curious and kind (default) | Earth on day 6,021-6,190 depending on seed, space done by day ~7,600 |
+| Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,349, no Space |
 
-All bots now use campaigns (when ✦ is plentiful), films, Shrimpcoin (plant when the price is well above cost, sell high, buy low) and shops (up to three of each). The average bot also funds research lines.
-| Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,975, no Space (Shrimp Island instead) |
-
-The average bot has 22 years to finish both chapters (it used to finish space on day 7,292 of 7,300).
+All bots use campaigns (when ✦ is plentiful), films, Shrimpcoin, shops and mall stores. The average bot also funds research lines. It has 22 years to finish both chapters.
 
 When you change balance, run both bots and compare against these. Report the before and after numbers, and add them to `tests/README-shrimp.md`.
 
@@ -279,7 +283,7 @@ Before adding or changing a feature, trace its existing state and every consumer
 4. Add or update a focused regression test for each changed rule and run every affected suite. For UI-only work, verify the actual browser at narrow phone widths and at the progression stage where the feature appears. For balance/economy work, compare the strong and average bots; for Space work, run the Space continuation too.
 5. Review adjacent features after the change, not only the target path. Report any untested path explicitly; update the feature checklist and changelog when behaviour changes.
 
-1. Fast checks, run every time: `node tests/shrimp-balance.cjs` (50), `node tests/shrimp-academy.cjs` (10), `node tests/shrimp-me.cjs` (30: free time, Grandma, endings, schedule, research lines, charts).
+1. Fast checks, run every time: `node tests/shrimp-balance.cjs` (51), `node tests/shrimp-academy.cjs` (10), `node tests/shrimp-me.cjs` (45: free time, Grandma, endings, schedule, research lines, charts, stores, pains, style, parties, quiet spells, water).
 2. For balance or sim changes, run the bots: `node tests/shrimp-playthrough.cjs` (strong cold), `BOT_HEART=kind node tests/shrimp-playthrough.cjs` (strong kind), `node tests/shrimp-average-playthrough.cjs` (average curious player, goes to Space). Watch for `INSOLVENT` and big timing shifts against Pacing targets. `REVIEW_OUTPUT=<dir>` sets where the run json with snapshots goes (default `/private/tmp/shrimp-tests`, which doesn't exist on Linux).
 3. Spotlight sweep in a real browser: `SPOT_RUN=<dir>/run-7.json node tests/shrimp-spotlights.cjs` after a strong bot run. Every spotlight on every tab at six stages.
    For Space changes, continue the academy fixture with `ACADEMY_RUN=<dir>/run-7.json node tests/shrimp-space-playthrough.cjs` and verify all planets remain sustainable.
@@ -361,6 +365,9 @@ Planned and agreed with Puti, not built yet:
 
 - The own tank's year-eight card (`c_mytank`) only checks the glass.
 
+**Proposed, waiting on Puti**
+- A shady loan from "a guy who knows a guy": a small button next to a buy button you can't afford (with at least half the price), lends only the gap, 20% a month compounding, one at a time, repay any time, after three months he takes your newest farm or gear at half value and the news and Grandma hear. Would reuse the existing shark loan (`E.shark`).
+
 **Known gaps**
-- Kits open after 200 home-bred sales and 60 L of tanks with shrimp in them (`KIT_UNLOCK`, `KIT_ROOM`). The guide says so from 100 sold. They could unlock from the care ladder instead.
+- Kits open after 200 home-bred sales and two tanks with shrimp (`KIT_UNLOCK`, `KIT_TANKS`). The guide says so from 100 sold.
 - The first babies trigger a few spotlights in a row (Colony, Recent events). They could be merged into one.
