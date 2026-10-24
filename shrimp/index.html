@@ -3406,7 +3406,8 @@ function updateReveal(){
   if(G.stats.born>0&&!o.hatch){o.hatch=1;}
 }
 // The top Feed / Water / Sell buttons stay while they can still matter: Feed until every tank has an auto feeder, Water until every tank has an auto water changer, Sell until the shrimp all go into kits (the Trade tab closes then)
-function actNeed(G){return {feed:G.tanks.some(function(t){return !t.feeder;}),wc:G.tanks.some(function(t){return !t.autoWC;}),sell:!(labMode()&&!G.opt.all)};}
+function actNeed(G){var em=function(a){return G.tanks.some(function(t){return totalN(t)>=1&&tips(t).some(function(x){return x.sev==='bad'&&x.act===a;});});};
+  return {feed:G.tanks.some(function(t){return !t.feeder;})||em('feed'),wc:G.tanks.some(function(t){return !t.autoWC;})||em('wc'),sell:!(labMode()&&!G.opt.all)};}
 function setActs(sh,kit){var n=actNeed(G),f=$('tb-feed'),w=$('tb-wc'),se=$('tb-sell');f.hidden=!sh||!n.feed;w.hidden=!kit||!n.wc;se.hidden=!sh||!n.sell;
   var cols=[f,w,se].filter(function(e){return !e.hidden;}).map(function(e){return e===se?'1.3fr':'1fr';});$('acts').hidden=!cols.length;$('acts').style.gridTemplateColumns=cols.join(' ')||'1fr';}
 function applyReveal(){
@@ -4468,13 +4469,14 @@ function guideTarget(){
   var hi=G.tanks.findIndex(function(t){return totalN(t)>=1&&t.chem.temp>28&&!(t.heater>=2&&t.set.heat<=27);});
   if(hi>=0){var hT=G.tanks[hi],hk='hot'+hi+'_'+Math.floor(G.day/20);if(G.sel!==hi&&G.tanks.length>1&&!RV())return {key:hk,tab:'tank',sel:'.tchip[data-sel="'+hi+'"]',text:hT.name+' is '+hT.chem.temp.toFixed(1)+' °C, too hot for them. Open '+hT.name+' to cool it.'};
     if(hT.heater>=2)return {key:hk,tab:'up',card:'equipcard',text:hT.name+' is '+hT.chem.temp.toFixed(1)+' °C. Lower the chiller setpoint.'};
-    return {key:hk,tab:'tank',card:'wccard',sel:G.ac?'#btn-ice':'#t-ac,#btn-ice',text:hT.name+' is '+hT.chem.temp.toFixed(1)+' °C, too hot for them. Cool it now: run the room AC or float a frozen bottle, under Water care.'};}
+    var fanC=upgradeCost(G,hT,'fan');if(!hT.fan&&fanC!=null&&G.money>=fanC)return {key:hk+'f',tab:'up',card:'equipcard',sel:'[data-act="upg"][data-id="fan"]',text:hT.name+' is '+hT.chem.temp.toFixed(1)+' °C, too hot for them. A summer cooling fan in Gear takes about 1.5 °C off for good.'};
+    return {key:hk,tab:'tank',card:'wccard',sel:'#btn-ice',text:hT.name+' is '+hT.chem.temp.toFixed(1)+' °C, too hot for them. Cool it now: run the room AC or float a frozen bottle, under Water care.'};}
   if(!labMode()){for(var bi=0;bi<G.tanks.length;bi++){var bT=G.tanks[bi];if(totalN(bT)<1)continue;var bad=tips(bT).filter(function(x){return x.sev==='bad';})[0];
-    if(bad){var bt=bad.t.replace(/<[^>]+>/g,'');return {key:'bad'+bi+'_'+bt.slice(0,24).replace(/[^a-z]/gi,'')+'_'+Math.floor(G.day/30),tab:'tank',sel:G.sel!==bi&&G.tanks.length>1&&!RV()?'.tchip[data-sel="'+bi+'"]':bad.act==='wc'&&!bT.autoWC?'#tb-wc':bad.act==='feed'?'#tb-feed':null,text:bt};}}}
+    if(bad){var bt=bad.t.replace(/<[^>]+>/g,'');return {key:'bad'+bi+'_'+bt.slice(0,24).replace(/[^a-z]/gi,'')+'_'+Math.floor(G.day/30),tab:'tank',sel:G.sel!==bi&&G.tanks.length>1&&!RV()?'.tchip[data-sel="'+bi+'"]':bad.act==='wc'?'#tb-wc':bad.act==='feed'?'#tb-feed':null,text:bt};}}}
   if(allN(G)<1&&!kitsOpen(G))return {key:'rebuy'+(G.stats.wiped||0),tab:'market',card:'buy',sel:'[data-act="buy"]',text:'Your shrimp are gone. Buy new ones in Trade, and feed them when Feed glows.'};
   var stepMode=$('kit-steps')&&!$('kit-steps').hidden;
   if(G.kits.sold<1&&!(G.emp.handPacked||0)&&G.kits.stock<1&&stepMode)return {key:'kitstep',tab:'emp',card:'kits',sel:'#btn-handstep',text:'Starter kits are open. Pack your first kit at the packing table in Kits: five steps, one tap each.'};
-  if(qcDue(G)&&G.kits.sold>=3&&(t=guideOk({key:'qc'+(qc(G).rounds||0),soft:!!qc(G).rounds,tab:'emp',card:'qccard',sel:'[data-act="qc-round"]',text:qc(G).rounds?'Time for this month\u2019s quality check in Kits.':'Kits need a quality check. Do a QC round in Kits.',skip:true})))return t;
+  if(qcDue(G)&&G.kits.sold>=3&&!qc(G).rounds&&(t=guideOk({key:'qc'+(qc(G).rounds||0),soft:!!qc(G).rounds,tab:'emp',card:'qccard',sel:'[data-act="qc-round"]',text:qc(G).rounds?'Time for this month\u2019s quality check in Kits.':'Kits need a quality check. Do a QC round in Kits.',skip:true})))return t;
   if(G.order&&!G.order.taken)return {key:'order'+(G.order.i||0),hideHere:1,tab:'market',card:'order',sel:'[data-act="order-take"]',text:'A pet shop wants shrimp. Take the order in Trade.'};
   if(G.order&&G.order.taken&&$('ord-btns')&&$('ord-btns').querySelector('[data-act="order-deliver"]:not([disabled])'))return {key:'orderd'+(G.order.i||0),tab:'market',card:'order',sel:'[data-act="order-deliver"]',text:'The pet shop order is ready. Deliver it in Trade.'};
   if(!open){
@@ -4492,6 +4494,7 @@ function guideTarget(){
   if(G.korder&&!G.korder.taken)return {key:'ko'+G.korder.i,hideHere:1,tab:'emp',card:'korder',sel:'[data-act="korder-take"]',text:G.korder.who+' wants '+big(G.korder.n)+' kits. Accept or skip in Kits.'};
   if(!farm){
     if(G.kits.stock<1&&!packCap(G)&&spareKitShrimp(G)>=KIT_SHRIMP&&G.money>=kitMaterials(G))return {key:'pack'+Math.min(G.kits.sold,5),tab:'emp',card:'kits',sel:'#btn-handstep',soft:G.kits.sold>=5&&kitDemand(G)<0.5,text:'No kits in stock. Pack one at the packing table in Kits, orders come in as you sell.'};
+    if(qcDue(G)&&G.kits.sold>=3&&qc(G).rounds&&(t=guideOk({key:'qc'+(qc(G).rounds||0),soft:!!qc(G).rounds,tab:'emp',card:'qccard',sel:'[data-act="qc-round"]',text:qc(G).rounds?'Time for this month\u2019s quality check in Kits.':'Kits need a quality check. Do a QC round in Kits.',skip:true})))return t;
     var tl=nextTool(G);if(tl&&G.kits.sold>=3&&G.money>=tl.cost+kitMaterials(G)+capitalReserve(G)&&(t=guideOk({key:'tool'+tl.id,tab:'emp',card:'kits',sel:'[data-act="tool"]',soft:true,text:'A packing tool could take over one of the steps.'})))return t;
     if(G.kits.sold<10)return wait('Kits sell as orders arrive.');
     if(!pd(G,'farmlic')){var ts2=tankStep(FARM_TANKS,true);if(ts2)return ts2;}
