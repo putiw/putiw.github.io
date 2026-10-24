@@ -497,3 +497,7 @@ ammonia is only the primary button once ammonia is near zero.
 - At 4B people the hard part opens (Chapter 6). Growth past about 4.3B only comes from the ten groups or from changing the goal. The bots pick options: cold buys the dark ones and keeps "every home", kind picks fix and workaround options and switches to "every home that wants one".
 - New checks in shrimp-me (32): the hard part opens at 4B and caps growth, one war ending, dark options, the uncontacted village, goals, the spreadsheet, the hidden stream ending, and households of 1 to 4.
 - Bots: strong cold 3,386 days, strong kind 2,864, average Earth 5,602 and space 7,124, average cold Earth 5,361. None insolvent. The strong cold bot is slower than before (2,668) because a literal every home takes the slow fixes and the law's ramp.
+
+## Pass 64: forcing is fast
+- Forced options deliver tanks straight to homes over their ramp (`direct`), and public mood stops slowing sales once you force anything. Said no is now national tank programs (a factory in each country) or paying the ministers, instead of a law that fines people. The uncontacted village comes off the target instead of counting as owners.
+- Bots: strong cold 2,547 days (was 3,386), strong kind 2,938, average Earth 5,658 and space 7,124, average cold 5,321. None insolvent.

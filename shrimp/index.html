@@ -886,7 +886,7 @@ function campCost(n){return Math.round(3e4*Math.pow(1.3,n));}
 function newOpinion(){return{m:0.5,pend:[],used:{},offer:null,n:0,run:null};}
 function opFix(o){if(o.m==null){o.m=o.w&&o.f?clamp(o.w.s*o.w.i+o.f.s*o.f.i,0.05,1):0.5;delete o.w;delete o.f;}o.pend=(o.pend||[]).filter(function(p){return p.d!=null;});if(o.recap&&o.recap.m==null)o.recap=null;return o;}
 function appeal(G){return G.emp.op.m;}
-function opMult(G){return clamp(2*appeal(G),0.3,1.8);}
+function opMult(G){if(G.emp&&G.emp.hard&&G.emp.hard.open&&hardForced(G))return Math.max(1,clamp(2*appeal(G),0.3,1.8));return clamp(2*appeal(G),0.3,1.8);}
 function moodAdd(G,pts,days){days=days||10;G.emp.op.pend.push({d:pts/100/days,left:days});}
 function drawOffer(G){
   var o=G.emp.op,pool=MSGS.filter(function(m){return m.rep||!o.used[m.id];}),out=[];
@@ -2621,7 +2621,7 @@ var HARD=[
  {id:'poor',name:'Too poor',n:7e8,body:'A kit costs a month’s pay. A jar and ten shrimp from a neighbour costs nothing.',ops:[
   {id:'breeders',k:'fix',t:'Pay local breeders',d:'People in each town breed shrimp and sell jars to their neighbours, and they earn from it. Slow.',days:30,f:1,ramp:450,tr:{means:1,kin:.5},h:2,news:'A woman in a market town sells forty jars a week from her porch.',end:'Every market town has someone who breeds shrimp and sells jars from the porch.'},
   {id:'spares',k:'work',t:'Owners give their spares',d:'Owners with hundreds of shrimp send ten to someone without. Cheap.',days:5,f:.5,ramp:365,tr:{kin:1},h:1,news:'Ten shrimp in a jar arrive with a note: “From a family in Osaka. Feed them less than you think.”',end:'Spare shrimp travel from full tanks to empty jars, with a note.'},
-  {id:'credit',k:'dark',t:'Sell on credit',d:'Kits on monthly payments, with interest. Fast, and a lot of people end up in debt.',days:0,earn:20,f:1,ramp:120,tr:{drive:1,means:-1.5},h:-3,news:'A family in a market town is still paying off a shrimp kit. The shrimp died in March.',end:'Half the jars in the market towns are still being paid off.'}]},
+  {id:'credit',k:'dark',t:'Sell on credit',d:'Kits on monthly payments, with interest. Fast, and a lot of people end up in debt.',days:0,earn:20,f:1,ramp:120,direct:1,pay:1,tr:{drive:1,means:-1.5},h:-3,news:'A family in a market town is still paying off a shrimp kit. The shrimp died in March.',end:'Half the jars in the market towns are still being paid off.'}]},
  {id:'war',name:'In a war',n:3e8,body:'Two countries have fought over the river they share for six years. Families on both banks have fled. Nothing gets in.',war:1,ops:[
   {id:'pay',k:'fix',t:'Make peace pay',d:'A shared hatchery and water plant on the river. Both governments take a share of the money, only while the guns stay quiet. The generals get seats on your board.',days:80,f:1,ramp:365,tr:{drive:.5,control:1,means:-.5},h:1,news:'The river plant opens. Both flags fly over the door. The generals sit at the same table, on your board.',end:'The river plant pays both governments every month. The war is on hold, as long as it pays.'},
   {id:'enemy',k:'fix',t:'Wait for a common enemy',d:'Wars stop when something bigger threatens both sides, a dam upstream, a plague. It might take years.',days:0,chance:1/900,f:1,ramp:365,tr:{know:.5},h:0,news:'A third country starts a dam upstream. The two armies stop fighting each other within a month.',end:'A dam upstream gave both sides the same enemy. They stopped fighting each other.'},
@@ -2637,14 +2637,15 @@ var HARD=[
   {id:'iss',k:'ego',t:'A jar on the space station',d:'Costs billions and counts for seven people.',days:20,f:0,tr:{ego:2,reach:1},h:-1,news:'Seven astronauts watch a shrimp float past the window. Two hundred million people watch the stream.',end:'A jar of shrimp went around the Earth sixteen times a day.'}]},
  {id:'care',name:'Can’t do it alone',n:1.5e8,body:'People in bed, people with dementia, kids in orphanages, people in prison. Somebody else decides what’s in the room.',ops:[
   {id:'carers',k:'fix',t:'Pay for carers',d:'A carer looks after the jar along with everything else. Expensive, and their lives get better.',days:50,f:1,ramp:365,tr:{care:2,kin:.5},h:2,news:'A care home hires two more carers. One of them knows all the shrimp’s names.',end:'Someone sits with the old man on the fourth floor every day. He tells her the shrimp’s names.'},
-  {id:'glass',k:'dark',t:'Fund a humanitarian group',d:'“Glass Hearts” campaigns for a small shatterproof jar in every prison cell, care-home room and orphanage bed. The studies they cite are real enough. They don’t say who pays them.',days:12,f:1,ramp:180,tr:{control:1,ego:.5},h:-1,news:'A new law puts a jar of shrimp in every prison cell. Glass Hearts thanks its anonymous donor.',end:'Every prison cell has a shrimp jar. The jars do help, a bit.'}]},
+  {id:'glass',k:'dark',t:'Fund a humanitarian group',d:'“Glass Hearts” campaigns for a small shatterproof jar in every prison cell, care-home room and orphanage bed. The studies they cite are real enough. They don’t say who pays them.',days:12,f:1,ramp:180,direct:1,pay:.5,tr:{control:1,ego:.5},h:-1,news:'A new law puts a jar of shrimp in every prison cell. Glass Hearts thanks its anonymous donor.',end:'Every prison cell has a shrimp jar. The jars do help, a bit.'}]},
  {id:'blind',name:'Can’t see the tank',n:4e7,body:'About 43 million people are blind. A tank is something you look at, mostly.',ops:[
   {id:'touch',k:'work',t:'Tanks you can hear and touch',d:'A bubbler you can hear, food you can feel, an app that reads the water test out loud.',days:4,f:1,ramp:240,tr:{care:1,know:.5},h:1,news:'A man who lost his sight at sixty feeds his shrimp by the sound of the bubbler.',end:'Blind owners feed their shrimp by the sound of the bubbler.'}]},
  {id:'no',name:'Said no',n:9e8,body:'They have water, a window and a month’s pay. They just don’t want one.',ops:[
   {id:'ask',k:'work',t:'Ask nicely',d:'Ads, films, the Ministry. Some of them come round, most don’t.',days:15,f:.25,ramp:540,tr:{reach:.5},h:0,news:'A man who said no for ten years buys a kit for his grandson, then keeps it.',end:'Some of the people who said no came round, in their own time.'},
-  {id:'law',k:'dark',t:'The Shrimp Ownership Act',d:'Politicians in every region pass a law that every home has a tank. Fines for the ones that don’t.',days:40,f:1,ramp:180,mood:-15,tr:{control:2,ego:1,means:-1},h:-6,news:'Inspectors check homes for tanks. Most people buy one and never feed it.',end:'A law says every home has a tank. Inspectors check.'}]},
+  {id:'gov',k:'work',t:'National tank programs, with a factory in each country',d:'You build a hatchery and a packing plant in each country, and the jobs stay there. In return the government buys a tank for every home that doesn’t have one, out of taxes. Nobody is fined. A lot of people never feed theirs.',days:60,f:1,ramp:365,direct:1,pay:.5,tr:{control:1,drive:1},h:-1,news:'A national tank program starts. The tanks arrive in a box with the flag on it. Most people put theirs on a shelf.',end:'Governments bought a tank for every home that didn’t want one. A lot of them sit on shelves.'},
+  {id:'ministers',k:'dark',t:'Pay the ministers',d:'The same programs, no factories. The ministers who sign get a share of every tank. Fast, until somebody finds the payments.',days:30,f:1,ramp:120,direct:1,pay:1,mood:-10,tr:{control:2,ego:1,means:-1.5},h:-6,scandal:'A minister’s bank statement shows a payment from a shrimp company for every tank his country bought.',news:'Twelve countries announce a tank for every home, the same week.',end:'Ministers in a lot of countries got rich on shrimp tanks.'}]},
  {id:'never',name:'Never met the outside world',n:1e4,body:'About a hundred groups in forests and on one island have never met anyone from outside, and a cold can kill them.',ops:[
-  {id:'deliver',k:'dark',t:'Deliver anyway',d:'A team walks in at night and leaves sealed jars by the huts. The jars aren’t the danger, the team is.',days:1,f:1,ramp:30,mood:-20,tr:{control:2,care:-3,kin:-2},h:-10,news:'A survey flight sees no smoke from the village.',end:'A village in the forest is empty. It counts as done.'}]}];
+  {id:'deliver',k:'dark',t:'Deliver anyway',d:'A team walks in at night and leaves sealed jars by the huts. The jars aren’t the danger, the team is.',days:1,f:0,ramp:30,mood:-20,tr:{control:2,care:-3,kin:-2},h:-10,news:'A survey flight sees no smoke from the village.',end:'A village in the forest is empty. It counts as done.'}]}];
 var HARD_GOALS=[
  {id:'home',t:'Every home',d:'Every home on Earth. That includes the ones that said no, and the villages that never met anyone.',gp:'Every home, you said. I hope you know what that means.'},
  {id:'want',t:'Every home that wants one',d:'Everyone except the ones who said no and the villages that never met anyone.',gp:'That’s what I meant, I think.'},
@@ -2665,8 +2666,9 @@ function hardReach(G,g){var H=hardOf(G),P=H.picks[g.id]||{},r=0;g.ops.forEach(fu
 function hardReached(G){var t=0;HARD.forEach(function(g){t+=g.n*hardReach(G,g);});return t;}
 function hardCap(G){return hardEasy()+hardReached(G);}
 function hardTarget(G){var H=hardOf(G),gl=HARD_GOALS.filter(function(x){return x.id===H.goal;})[0]||HARD_GOALS[0];
- if(gl.pct)return WORLD*gl.pct;if(gl.id==='want'){var t=WORLD;['no','never'].forEach(function(k){var g=hardGroup(k);t-=g.n*(1-hardReach(G,g));});return t;}return WORLD;}
-function hardForced(G){var P=hardOf(G).picks;return !!((P.no&&P.no.law)||(P.never&&P.never.deliver)||(P.war&&P.war.fund)||(P.poor&&P.poor.credit));}
+ var dead=hardOf(G).picks.never&&hardOf(G).picks.never.deliver&&!hardOf(G).picks.never.deliver.quiet?hardGroup('never').n:0;
+ if(gl.pct)return WORLD*gl.pct;if(gl.id==='want'){var t=WORLD;['no','never'].forEach(function(k){var g=hardGroup(k);t-=g.n*(1-hardReach(G,g));});return t;}return WORLD-dead;}
+function hardForced(G){var P=hardOf(G).picks;return !!((P.no&&P.no.ministers)||(P.never&&P.never.deliver)||(P.war&&P.war.fund)||(P.poor&&P.poor.credit));}
 function hardBuy(G,gid,oid){var H=hardOf(G),g=hardGroup(gid),o=g&&hardOp(g,oid);if(!H.open||!o||G.emp.won||G.emp.ended)return false;var P=H.picks[gid]||(H.picks[gid]={});if(P[oid])return false;if(o.req&&!o.req(G))return false;
  if(g.war&&o.f&&Object.keys(P).some(function(k){var x=hardOp(g,k);return x&&x.f;}))return false;
  var c=hardCost(G,o);if(c&&(frozen(G)||G.money<c+capitalReserve(G)))return false;if(c)pay(G,c,'projects');
@@ -2688,6 +2690,8 @@ function hardDay(G){var E=G.emp,H=hardOf(G),now=Math.floor(G.day);
  HARD.forEach(function(g){var P=H.picks[g.id]||{};g.ops.forEach(function(o){var p=P[o.id];if(!p)return;
   if(p.start==null&&o.chance&&Math.random()<o.chance){p.start=now;newsLine(G,o.news);}
   if(p.start==null&&o.delay&&now>=p.due){p.start=now;newsLine(G,o.news);}
+  if(o.direct&&p.start!=null){var tgt=g.n*hardOpReach(G,o,p),d=Math.min(tgt-(p.given||0),Math.max(0,Math.min(WORLD,hardCap(G))-G.humans));if(d>0){p.given=(p.given||0)+d;G.humans+=d;var kt=d/HH_AVG;G.kits.sold+=kt;if(o.pay)earn(G,kt*Math.max(0,G.kitPrice-productionUnitCost(G))*o.pay,'kits');}}
+  if(o.scandal&&p.start!=null&&!p.sc&&now-p.start>=180){p.sc=1;if(Math.random()<.5){newsLine(G,o.scandal);moodAdd(G,-8,60);}}
   if(p.quiet&&now>=p.quiet){p.quiet=0;newsLine(G,o.news);newsLine(G,'Progress steady. People who die don’t need a tank.');if(G.me){G.me.gpSilent=now+365;}}
  });});
  if(!E.won&&!E.ended&&H.goal!=='stream'&&G.humans>=hardTarget(G)-0.5)hardWin(G);}
@@ -2764,7 +2768,7 @@ function cost2(m,i){return (m?aed(m):'')+(m&&i?' + ':'')+(i?inf(i):'');}
 function trim(n,d){return String(+Number(n).toFixed(d));}
 // iPhone Safari moves its toolbar while you scroll and the fixed tab bar can end up floating above the bottom. Pin it to what's really on screen.
 (function(){var vv=window.visualViewport;if(!vv)return;var fix=function(){var t=document.querySelector('.tabs');if(!t)return;var off=window.innerHeight-(vv.height+vv.offsetTop);t.style.transform=Math.abs(off)>1&&vv.scale<=1.01?'translateY('+(-off)+'px)':'';};vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);window.addEventListener('scroll',fix,{passive:true});})();
-var toastT=null,NF=null,BUILD='2026-10-24-hardpart';
+var toastT=null,NF=null,BUILD='2026-10-24-force';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};

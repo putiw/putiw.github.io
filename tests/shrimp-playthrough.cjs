@@ -58,7 +58,7 @@ if(kitsOpen(G)){
  for(var p of PROJ.filter(p=>p.c==='cult'))if(!pd(G,p.id)&&p.req(G)&&E.inf>=p.i)buyProj(G,p.id);
  // Choices: the fast player takes the cold answer (BOT_HEART=kind flips it).
  for(var fk in FORK_Q){if(forkDone(G,fk))continue;var opts=forkOpts(fk).filter(p=>p.req(G)).sort((a,b)=>(${process.env.BOT_HEART==='kind'}?b.h-a.h:a.h-b.h));var pk=opts[0];if(pk&&afford(pm(G,pk))&&E.inf>=pk.i)buyProj(G,pk.id);}
- if(hardOpen(G)&&!E.won){if(BOTKIND&&hardOf(G).goal!=='want')hardSetGoal(G,'want');HARD.forEach(function(g){g.ops.slice().sort(function(a,b){return BOTKIND?0:(b.k==='dark')-(a.k==='dark');}).forEach(function(o){if(!o.f||(BOTKIND&&o.k==='dark'))return;if(g.id==='war'&&o.id!==(BOTKIND?'pay':'fund'))return;if(afford(hardCost(G,o)))hardBuy(G,g.id,o.id);});});}
+ if(hardOpen(G)&&!E.won){if(BOTKIND&&hardOf(G).goal!=='want')hardSetGoal(G,'want');HARD.forEach(function(g){g.ops.slice().sort(function(a,b){return BOTKIND?0:(b.k==='dark')-(a.k==='dark');}).forEach(function(o){if((!o.f&&o.id!=='deliver')||(BOTKIND&&o.k==='dark'))return;if(g.id==='war'&&o.id!==(BOTKIND?'pay':'fund'))return;if(afford(hardCost(G,o)))hardBuy(G,g.id,o.id);});});}
  var r=nextRegion(G);if(G.ob.ereg&&r&&afford(r.m)&&G.humans>100)buyRegion(G);
  if(farmCap(G)&&E.inf<1000&&G.money>galaCost(G)*10)buyProj(G,'gala');
  G.kitPrice=farmCap(G)?${process.env.REVIEW_KIT_PRICE==='market'?'bestKitPrice(G)':Number(process.env.REVIEW_KIT_PRICE||600)}:250;

@@ -68,7 +68,7 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 
 ### Systems added recently
 
-- **The hard part** (`HARD`, `HARD_GOALS`, `hardDay`, `hardBuy`, `hardSetGoal`, `hardCap`, `hardTarget`, `streamReady`, `renderHard`): opens at 4B people with a tank at home (Chapter 6, Grandma's kitchen). From there `kitCap` is `hardEasy()` (about 4.3B) plus the people reached in ten groups (too hot, no water, too poor, war, forced from home, hard to reach, can't do it alone, can't see, said no, never met). Each group has fix, workaround, dark and money options that ramp in over their days; war takes one ending option only. "Rethink the goal" changes the target (every home, every home that wants one, 90%, 75%) or ends the game now (the spreadsheet, good enough, no number). The living-stream ending is hidden: it appears only with the Rewild tree, mangroves, clean farm water, the Taiwan streams, a river answer, and no forced option. Delivering to the uncontacted village kills it, the goal bar says "People who die don't need a tank" and Grandma stops writing for a year (`G.me.gpSilent`). The old c_war, c_water and c_last cards and the "last holdouts" project are gone, the hard part replaces them.
+- **The hard part** (`HARD`, `HARD_GOALS`, `hardDay`, `hardBuy`, `hardSetGoal`, `hardCap`, `hardTarget`, `streamReady`, `renderHard`): opens at 4B people with a tank at home (Chapter 6, Grandma's kitchen). From there `kitCap` is `hardEasy()` (about 4.3B) plus the people reached in ten groups (too hot, no water, too poor, war, forced from home, hard to reach, can't do it alone, can't see, said no, never met). Each group has fix, workaround, dark and money options that ramp in over their days; war takes one ending option only. "Rethink the goal" changes the target (every home, every home that wants one, 90%, 75%) or ends the game now (the spreadsheet, good enough, no number). The living-stream ending is hidden: it appears only with the Rewild tree, mangroves, clean farm water, the Taiwan streams, a river answer, and no forced option. Forced options (`direct:1`: paying ministers, national programs, Glass Hearts, credit) put tanks in homes straight over their ramp instead of waiting for orders, and once you force anything public mood no longer slows sales (`opMult`). Said no is reached through governments, not a law on people: national programs with a factory in each country, or paying the ministers. Delivering to the uncontacted village kills it and takes those people off the target, the goal bar says "People who die don't need a tank" and Grandma stops writing for a year (`G.me.gpSilent`). The old c_war, c_water and c_last cards and the "last holdouts" project are gone, the hard part replaces them.
 - **Homes, not people** (`HH_AVG`, `hhDiv`, `hhPeople`, `addOwners`): one kit is one home of 1 to 4 people (2.5 on average, random per kit for small sales). Kit demand is divided by the household size once 2,000 kits are sold, so people-growth pace stays the same and kit counts are about 2.5x lower than before. Always add owners through `addOwners`.
 
 - **Tank view** (`updateTankView`, `tv*` functions, `SPR` sprites): a canvas drawn from a sample of the real colony, using art layers from Puti's Shrimp Tanks game. It runs at about 30 fps and stops off screen, on other tabs and when the app is hidden. Pellets follow `T.chem.food`.
@@ -244,10 +244,10 @@ Latest bot results (seed 7):
 
 | Bot | Result |
 |---|---|
-| Strong, cold answers (default) | Earth won on day 3,386 (goal: every home, forces the said-no and never-met groups), empire_dictator |
-| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 2,864 (goal: every home that wants one), garden_village |
-| Average, curious and kind (default) | Hard part day 4,718, Earth on day 5,602, space done day 7,124 |
-| Average, cold answers (`BOT_HEART=cold`) | Hard part day 4,803, Earth on day 5,361 |
+| Strong, cold answers (default) | Earth won on day 2,547 (goal: every home, pays ministers, funds a side, the village), empire_dictator |
+| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 2,938 (goal: every home that wants one), garden_village |
+| Average, curious and kind (default) | Hard part day 4,718, Earth on day 5,658, space done day 7,124 |
+| Average, cold answers (`BOT_HEART=cold`) | Hard part day 4,803, Earth on day 5,321 |
 | Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,975, no Space (Shrimp Island instead) |
 
 The average bot has 21 years to finish both chapters (it used to finish space on day 7,292 of 7,300).
