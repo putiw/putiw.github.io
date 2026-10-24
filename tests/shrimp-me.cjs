@@ -176,9 +176,9 @@ g.ps.t+=121000;newsTick(g);if(R.log.length!==3)throw Error('Then the rest, space
 var b=newGame();newsLine(b,'bots');if(rip(b).log.length!==1)throw Error('No play clock, straight to print');
 `);
 check('academia or industry, letters to Grandma, and choices that make the news',`
-var g=newGame();g.kits.sold=1000;g.academy.level=1;g.money=1e7;if(!forkOpts('science').every(function(p){return p.req(g);}))throw Error('Science question after the first postdoc');
+var g=newGame();g.kits.sold=ACADEMY_AT;g.academy.level=1;g.money=1e7;rlHire(g,'auto','pd');if(forkOpts('science').some(function(p){return p.req(g);}))throw Error('Not right after the first postdoc');rlHire(g,'water','pd');g.academy.papers=4;if(!forkOpts('science').every(function(p){return p.req(g);}))throw Error('Science question once postdocs have a track record');
 var m=g.emp.mat;buyProj(g,'sciind');if(g.emp.mat!==m*0.95||treesFor(g).indexOf('lab')<0||forkOpts('science').some(function(p){return p.id==='sciacad'&&g.emp.proj[p.id];}))throw Error('Industry');
-var h=newGame();h.kits.sold=1000;h.academy.level=1;h.money=1e7;buyProj(h,'sciacad');if(!h.emp.acad||(h.tr.know||0)<2)throw Error('Academia');
+var h=newGame();h.kits.sold=ACADEMY_AT;h.academy.level=1;h.money=1e7;rlHire(h,'auto','pd');rlHire(h,'water','pd');h.academy.papers=4;buyProj(h,'sciacad');if(!h.emp.acad||(h.tr.know||0)<2)throw Error('Academia');
 var q=newGame();q.tanks[0].feeder=1;q.tanks[0].autoWC=1;personalDay(q);for(var hh=17;hh<23;hh++)setHour(q,hh,'grandma');for(var d=0;d<30;d++){q.day++;personalDay(q);}if(q.me.letters<3||!q.me.hist.some(function(x){return /fishing boat/.test(x);}))throw Error('His story in letters');
 var w=newGame();w.humans=4e9;hardDay(w);w.money=1e12;w.fin=[{kits:1e9}];hardBuy(w,'fled','camps');if(!rip(w).log.some(function(x){return /camp school/.test(x.tx);}))throw Error('A hard-part choice makes the news');
 var o=newGame();o.emp.farms.hatch=1;storyChoose(o,'owntank',0);if(gpLines(o).join().indexOf('never looked')<0)throw Error('Kept and never looked');o.ps.look+=5;if(gpLines(o).join().indexOf('never looked')>=0)throw Error('Looked after');
@@ -281,11 +281,21 @@ var h=newGame();h.tanks[0].feeder=1;h.tanks[0].autoWC=1;personalDay(h);h.me.on=1
 var k=newGame();k.emp.kitsOpened=1;k.humans=9000;k.money=1e5;k.fin=[{kits:7000}];storyChoose(k,'pain_heat',2);var d0=painDaily(k);if(!(d0>500))throw Error('Refunds cost money '+d0);k.day+=121;if(painDaily(k)!==0)throw Error('Refunds end with the summer');
 var m=newGame();m.emp.kitsOpened=1;m.humans=1.6e6;m.money=1e7;storyChoose(m,'pain_payout',2);if(!m.emp.shell)throw Error('Shell flag');var r=Math.random;Math.random=function(){return 0;};painDay(m);Math.random=r;if(!frozen(m)||m.emp.frozenWhy!=='shell')throw Error('Shell processors get caught');
 var q=newGame();q.emp.kitsOpened=1;q.humans=9000;q.money=60000;q.fin=[];for(var i=0;i<7;i++)q.fin.push({kits:9000});if(painCost(q,PAINS.pain_heat.ch[0][2],0)>20000+1)throw Error('Decent fix capped at a third of cash '+painCost(q,PAINS.pain_heat.ch[0][2],0));
-var w=newGame();w.emp.kitsOpened=1;w.kits.sold=60;w.money=1000;if(storesOn(w))throw Error('Stores wait until one is in reach');w.money=1e6;if(!storesOn(w)||!buyStores(w,'auh',1))throw Error('Stores open');if(!closeStores(w,'auh',1)||storeN(w,'auh')!==0)throw Error('Close a store');
+var w=newGame();w.emp.kitsOpened=1;w.kits.sold=60;w.money=1e6;if(storesOn(w))throw Error('Stores wait for a boutique or Dubai');w.emp.shops.bout=1;if(!storesOn(w)||!buyStores(w,'auh',1))throw Error('Stores open');if(!closeStores(w,'auh',1)||storeN(w,'auh')!==0)throw Error('Close a store');
 if(HEAT_COST[2]!==450)throw Error('Thermostat chiller costs 450');
 `);
 check('one research system: people in the fields run lab projects, a chiller keeps water changes cool',`
 var g=newGame();g.kits.sold=ACADEMY_AT;g.money=1e8;if(!rlHire(g,'auto','pd')||g.academy.level!==1)throw Error('First person starts the lab');if(!startStudy(g,'automation'))throw Error('Start a project');for(var i=0;i<80;i++)academyDay(g);if(!rd(g,'automation'))throw Error('Project finishes without a grant');if(g.academy.funded!==0)throw Error('No grant days used');
 var h=newGame(),T=h.tanks[0];T.heater=2;T.chem.temp=24;T.set.heat=24;h.day=285;waterChange(h,T,50);if(Math.abs(T.chem.temp-24)>0.01)throw Error('Chiller-matched water '+T.chem.temp);
+`);
+check('farms and shops climb one kind at a time',`
+var g=newGame();g.money=1e9;g.emp.proj.farmlic=1;g.emp.kitsOpened=1;g.kits.sold=500;if(!buyFarm(g,'rack')||!buyFarm(g,'barn'))throw Error('Rack then barn');if(buyFarm(g,'rack'))throw Error('No more racks once you build barns');if(!buyFarm(g,'barn')||!buyFarm(g,'shed'))throw Error('Barns until the next kind');if(buyFarm(g,'barn'))throw Error('Barns close after the first warehouse');
+var h=newGame();h.money=1e8;h.emp.kitsOpened=1;h.kits.sold=2000;if(!buyShop(h,'stall')||!buyShop(h,'pet'))throw Error('Stall then pet corner');if(buyShop(h,'stall'))throw Error('Stalls close');buyShop(h,'bout');if(!storesOn(h)||!buyStores(h,'auh',1))throw Error('Boutique opens mall stores');if(buyShop(h,'bout'))throw Error('Small shops close once mall stores run');
+`);
+check('hours count: work moves orders, hour milestones happen, Grandma calls with a lesson at three kits a day',`
+var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.me.on=1;var w8=workMult(g);for(var i=0;i<2;i++)addHour(g,'work',1);if(Math.abs(workMult(g)-w8-0.1)>1e-9)throw Error('Two more hours early on: +10% '+workMult(g));
+g.me.hp=80;g.me.bo=0;g.me.hrs={videos:99};g.me.hstep={};var b0=g.emp.beta;g.me.day=layDay({sleep:8,videos:2,work:8,nothing:6});lifeDay(g);if(!(g.emp.beta>b0)||g.me.hstep.videos!==1)throw Error('100 video hours do something');
+var k=newGame();k.tanks[0].feeder=1;k.tanks[0].autoWC=1;personalDay(k);k.me.on=1;k.emp.kitsOpened=1;k.kits.sold=30;k.kitPrice=280;k.fin=[];for(var i=0;i<7;i++)k.fin.push({kits:900});personalWeek(k);if(k.me.call!=='lesson')throw Error('Grandma calls');
+var o=newGame();o.me={on:1,hrs:{videos:500,club:600}};migrate(o);if(o.me.hstep.videos!==2||o.me.hstep.club!==2)throw Error('Old saves skip milestones already passed');
 `);
 console.log(count+' free time, Grandma and ending checks passed');

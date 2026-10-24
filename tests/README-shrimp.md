@@ -558,3 +558,10 @@ ammonia is only the primary button once ammonia is near zero.
 - The Lab tab has one Research card. The people you fund in the six fields are your lab: the lab works on one project at a time (progress shown as % and days left), and grows small team → university lab → research group → professor with one "Next for the lab" step at a time. Grants are gone from the UI; old saves can still use prepaid grant days. More people make projects a bit faster.
 - Water changes on a tank with a chiller come in at the setpoint, and the chiller recovers faster. The "too hot" alert after a water change on a chilled tank is a warning that says the chiller is bringing it down.
 - Results: strong cold 2,668, strong kind 3,298, strong with research 2,551, average Earth 6,134-6,189 and space by day ~7,800, average cold 5,209.
+
+## Pass 74: ladders, tidier Gear, hours that matter
+- Farms and shops climb one kind at a time: you add to the biggest kind you own or build the next one; older kinds keep running in a folded "older farms/shops" line. Small shops close for new openings once mall stores run; mall stores open after a boutique or Dubai. A hint names the next kind and when it opens.
+- Farm license needs three tanks with shrimp (and 120 L). Gear lists auto feeder, auto water changer, fan, heater/chiller, bigger tank, filter, then decor. The shrimp count stays in the header all game.
+- The postdoc question waits for two postdocs and four papers. Leaving the Tank tab ends cleaning; the tab bar sits above the dim; Clean tank works while a spotlight is waiting.
+- You tab: Grandma's card first. At about three kits a day Grandma calls (the You button rings) with a short supply-and-demand lesson. Work hours move orders 5% an hour before farms, 3% with farms, 1% past a million owners, and the row shows the current effect. Videos, papers, club, exercise, your tanks, Mira's school and Grandma visits have hour milestones that do something.
+- Results: strong cold 2,772, strong kind 3,179, average Earth 6,050-6,274, average cold 5,237. shrimp-me 44 checks.

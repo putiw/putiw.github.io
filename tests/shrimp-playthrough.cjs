@@ -52,7 +52,7 @@ if(kitsOpen(G)){
  for(var id of ['guide','refer','precycle','farmlic','bulk','aicam','autopackm','app','brand','retention','partners','globalbrand','factory','hotline','ocean','recycle','arco']){var p=PROJ.find(x=>x.id===id);if(!pd(G,id)&&p.req(G)&&afford(pm(G,p)))buyProj(G,id);}
  if(G.kits.sold>=1)note('first kit');if(pd(G,'farmlic'))note('farm license');
  if(pd(G,'farmlic')){
-  var fc=farmCap(G),d=kitDemand(G);var best=FARMS.filter(f=>farmOk(G,f)&&G.money>farmCost(G,f)+Math.max(2000,E.mat*Math.min(f.out,d*20)+f.up*60)).sort((a,b)=>farmCost(G,a)/a.out-farmCost(G,b)/b.out)[0];
+  var fc=farmCap(G),d=kitDemand(G);var best=FARMS.filter(f=>farmBuyable(G,f)&&G.money>farmCost(G,f)+Math.max(2000,E.mat*Math.min(f.out,d*20)+f.up*60)).sort((a,b)=>farmCost(G,a)/a.out-farmCost(G,b)/b.out)[0];
   if(best&&(!fc||fc<d*1.5))buyFarm(G,best.id);
   if(fc)note('first farm');
  }
@@ -64,7 +64,7 @@ if(kitsOpen(G)){
  if(academyOpen(G)&&G.academy.level){var RL=rlines(G);RLINES.forEach(function(l){if(RL[l.id].pd<1&&afford(posUsd(G,RPOS[1])*USD*3))rlHire(G,l.id,'pd');if(RL[l.id].phd<2&&afford(posUsd(G,RPOS[0])*USD*6))rlHire(G,l.id,'phd');});}
  if(coinOn(G)&&Math.floor(G.day)%90<30){var CC=coinOf(G);if(CC.price>coinBreakEven(G)*1.5&&afford(coinPlantCost(G)*30))coinPlant(G,coinPlantCost(G));if(CC.price>COIN_FAIR*1.3&&CC.treasury>0)coinSell(G,CC.treasury*0.25);else if(CC.price<COIN_FAIR*0.7&&afford(coinPlantCost(G)*3))coinBuy(G,coinPlantCost(G));}
  if(typeof storesOn==='function'&&storesOn(G)&&!NOSTORES&&Math.floor(G.day)%7===0){var sr=null,sw=0;REGIONS.forEach(function(r){if(!regOpen(G,r.id)||storeN(G,r.id)>=storeGoal(r.id))return;var w=r.pop*(1-regTrust(G,r.id));if(w>sw){sw=w;sr=r.id;}});if(sr){var sb=[1000,100,10,1].filter(function(b){return b<=storeBatchMax(G)&&storeCanBuy(G,sr,b)&&(operatingNet(G)||0)>storeBatchN(G,sr,b)*storeDay(G,sr)*10&&afford(storeBatchCost(G,sr,b)*6);});if(sb.length)buyStores(G,sr,sb[0]);}}
- if(G.ob.eshops&&Math.floor(G.day)%30===0){var nsh=SHOPS.filter(function(x){return shopOk(G,x);}).sort(function(a,b){return a.cost-b.cost;}).find(function(x){return afford(x.cost*100)&&(G.emp.shops[x.id]||0)<3;});if(nsh)buyShop(G,nsh.id);if(shopCount(G)&&!E.staff.mgr&&!E.staff.aiMgr&&afford(5000))hire(G,'mgr',1);}
+ if(G.ob.eshops&&Math.floor(G.day)%30===0){var nsh=SHOPS.filter(function(x){return shopBuyable(G,x);}).sort(function(a,b){return a.cost-b.cost;}).find(function(x){return afford(x.cost*100)&&(G.emp.shops[x.id]||0)<3;});if(nsh)buyShop(G,nsh.id);if(shopCount(G)&&!E.staff.mgr&&!E.staff.aiMgr&&afford(5000))hire(G,'mgr',1);}
  if(hardOpen(G)&&!E.won){if(BOTKIND&&hardOf(G).goal!=='want')hardSetGoal(G,'want');HARD.forEach(function(g){g.ops.slice().sort(function(a,b){return BOTKIND?0:(b.k==='dark')-(a.k==='dark');}).forEach(function(o){if((!o.f&&o.id!=='deliver')||(BOTKIND&&o.k==='dark'))return;if(g.id==='war'&&o.id!==(BOTKIND?'pay':'fund'))return;if(afford(hardCost(G,o)))hardBuy(G,g.id,o.id);});});}
  var r=nextRegion(G);if(G.ob.ereg&&r&&afford(r.m)&&G.humans>100)buyRegion(G);
  if(farmCap(G)&&E.inf<1000&&G.money>galaCost(G)*10)buyProj(G,'gala',BOTKIND?'kids':'own');
