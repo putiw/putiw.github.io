@@ -46,7 +46,7 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,S=G.space,budget=
   for(var fi=0;fi<6;fi++)if(pd(G,'farmlic')&&(!farmCap(G)||bottleneck(G).k==='shrimp')){var list=FARMS.filter(f=>farmOk(G,f));var next=list.find(f=>!(E.farms[f.id]>0));var existing=list.filter(f=>E.farms[f.id]>0).slice(-1)[0];var pick=next&&canSpend(farmCost(G,next))?next:existing||list[0];if(pick&&canSpend(farmCost(G,pick)))spend('farm '+pick.id,()=>buyFarm(G,pick.id));}
   // New regions first: a player expands before spending ✦ on extras.
   if(academyOpen(G)&&!A.level&&canSpend(200000))spend('pilot grant',()=>fundAcademy(G));
-  var region=nextRegion(G);if(G.ob.ereg&&region&&canSpend(regionCost(G,region)))spend('region '+region.id,()=>buyRegion(G));
+  var region=nextRegion(G);if(G.ob.ereg&&region&&canSpend(regionCost(G,region)))act('region '+region.id,()=>buyRegion(G));
   if(G.ob.eproj){for(var area of ['emp','up','promote','world'])for(var p of (area==='world'?[].concat.apply([],TRACKS.map(t=>trackProj(G,t[0]))):shownProj(G,area,'biz'))){if(canSpend(pm(G,p))&&E.inf>=p.i)spend('project '+p.id,()=>buyProj(G,p.id));}
    // Choices: this player takes the kind answer when they can afford it (BOT_HEART=cold flips it).
    for(var fk in FORK_Q){if(forkDone(G,fk))continue;var opts=forkOpts(fk).filter(p=>p.req(G)).sort((a,b)=>(${process.env.BOT_HEART==='cold'}?a.h-b.h:b.h-a.h));var pk=opts[0];if(pk&&canSpend(pm(G,pk))&&E.inf>=pk.i)spend('choice '+pk.id,()=>buyProj(G,pk.id));}}

@@ -545,3 +545,11 @@ ammonia is only the primary button once ammonia is near zero.
 - Thermostat chiller AED 450 (was 1,300). The guide suggests a bigger first tank before a second one; the tanks card appears once the first tank is kitted (80 L, feeder, auto water changer).
 - Average bot sends Grandma money and takes the land trip (kind) or not (cold).
 - Results: strong cold 2,691, strong kind 3,147, average Earth 5,881-6,301, average cold 5,069. Spotlight sweep 139, all good. shrimp-me 41 checks.
+
+## Pass 72: timing of options, region prices
+- Header shows "room 26.7 °C" (it was the room temperature all along, read as the tank's).
+- Gala and store buttons wrap their text inside the button.
+- Salespeople show up after 60 shrimp sold (part-time, AED 40 a day until kits open, AED 130 after). The university opens at 3,000 kits (was 200), about year 3.2.
+- Regions cost more: Dubai 250k, rest of the UAE 1M, the Gulf 8M, MENA 30M, Europe 200M, Southeast Asia 300M, the Americas 800M, East Asia 2B.
+- Average bot: regions no longer compete with farm purchases for the two buys per visit. New scratch tool: a timeline probe of when each option first shows up.
+- Results: strong cold 2,676, strong kind 3,259, average Earth 6,050-6,162, average cold 5,209.

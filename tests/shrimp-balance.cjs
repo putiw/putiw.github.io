@@ -329,8 +329,8 @@ if(g.emp.op.w||g.emp.op.f||typeof g.emp.op.m!=='number')throw Error('Single mood
 var old=readyGame();old.emp.op={w:{s:0.5,i:0.6},f:{s:0.5,i:0.4},pend:[{w:.01,f:0,cv:0,left:3}],used:{},offer:null,n:0,run:null};old=migrate(JSON.parse(JSON.stringify(old)));if(Math.abs(old.emp.op.m-0.5)>1e-9||old.emp.op.pend.length)throw Error('Old two-faction saves migrate');
 `);
 if(/Water interest|Fire interest|Water and Fire/.test(html))throw Error('Water/Fire text left');
-check('research starts with a cheap postdoc and opens at 200 kits',`
-var g=readyGame();g.kits.sold=199;if(academyOpen(g))throw Error('Too early');g.kits.sold=200;if(!academyOpen(g))throw Error('Opens at 200 kits');
+check('research starts with a cheap postdoc and opens at 3,000 kits',`
+var g=readyGame();g.kits.sold=ACADEMY_AT-1;if(academyOpen(g))throw Error('Too early');g.kits.sold=ACADEMY_AT;if(!academyOpen(g))throw Error('Opens at '+ACADEMY_AT+' kits');
 var o=grantOffer(g);if(o.usd!==50000||o.cost!==Math.round(50000*USD)||o.days!==365)throw Error('Postdoc first, USD 50k');g.money=2e5;fundAcademy(g);if(grantOffer(g).usd!==150000)throw Error('PhD next, USD 150k');
 if(STUDIES[0].id!=='automation'||!STUDIES[0].req(g))throw Error('Automation study first');
 `);

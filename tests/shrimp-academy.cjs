@@ -5,21 +5,21 @@ let count=0;function check(name,code){vm.runInContext(code,engine());console.log
 if(html.includes('id="world-mode"')||html.includes('society-view')||html.includes('research-view')||html.includes('A.view')||!html.includes("a.hidden=!open;a.style.order='5'")||!html.includes("chapterButton('world-tab','Open World tab',true)"))throw Error('Adoption and research should share one continuous World tab, with research following adoption');
 console.log('PASS Adoption and Research share one continuous World tab');
 check('research opens during Earth and grants preserve the reserve',`
-var g=newGame();g.money=5000000;if(fundAcademy(g)||spaceOpen(g))throw Error('Early unlock');g.day=500;g.kits.sold=1000;g.money=Math.round(50000*USD);if(!fundAcademy(g)||g.money!==0||g.academy.funded!==365)throw Error('Pilot');
+var g=newGame();g.money=5000000;if(fundAcademy(g)||spaceOpen(g))throw Error('Early unlock');g.day=500;g.kits.sold=ACADEMY_AT;g.money=Math.round(50000*USD);if(!fundAcademy(g)||g.money!==0||g.academy.funded!==365)throw Error('Pilot');
 var d=g.academy.funded;academyDay(g);if(g.academy.funded!==d)throw Error('Idle funding spent');
 g.academy.autoFund=true;g.academy.funded=0;startStudy(g,'materials');g.money=0;academyDay(g);if(g.money!==0||g.academy.active.progress!==0)throw Error('Unfunded work');
 `);
 check('discoveries change actual packing costs and automation without double applying',`
-var g=newGame();g.kits.sold=1000;g.money=10000000;fundAcademy(g);startStudy(g,'materials');for(var i=0;i<60;i++)academyDay(g);if(kitMaterials(g)!==90||g.academy.knowledge!==40)throw Error('Material research');
+var g=newGame();g.kits.sold=ACADEMY_AT;g.money=10000000;fundAcademy(g);startStudy(g,'materials');for(var i=0;i<60;i++)academyDay(g);if(kitMaterials(g)!==90||g.academy.knowledge!==40)throw Error('Material research');
 g.emp.rawShrimp=80;var before=g.money;packRaw(g,10,false);if(before-g.money!==900)throw Error('Packing did not use discovery');
 g.emp.proj.autopackm=1;var cap=packingMachineCap(g),cost=lineCost(g,0);g.academy.done.automation=1;if(packingMachineCap(g)!==cap*1.2||lineCost(g,0)!==cost*.75)throw Error('Automation effect');
 var migrated=migrate(JSON.parse(JSON.stringify(g)));if(kitMaterials(migrated)!==90)throw Error('Effect stacked on load');
 `);
 check('pause resumes partial work and inactive projects do not consume grants',`
-var g=newGame();g.kits.sold=1000;g.money=10000000;fundAcademy(g);startStudy(g,'materials');for(var i=0;i<20;i++)academyDay(g);pauseStudy(g);var days=g.academy.funded;academyDay(g);if(days!==g.academy.funded)throw Error('Idle debit');startStudy(g,'materials');if(g.academy.active.progress!==20)throw Error('Lost progress');
+var g=newGame();g.kits.sold=ACADEMY_AT;g.money=10000000;fundAcademy(g);startStudy(g,'materials');for(var i=0;i<20;i++)academyDay(g);pauseStudy(g);var days=g.academy.funded;academyDay(g);if(days!==g.academy.funded)throw Error('Idle debit');startStudy(g,'materials');if(g.academy.active.progress!==20)throw Error('Lost progress');
 `);
 check('academic career requires funded research, then professors teach graduates',`
-var g=newGame();g.kits.sold=1000;g.money=100000000;fundAcademy(g);g.academy.autoFund=true;
+var g=newGame();g.kits.sold=ACADEMY_AT;g.money=100000000;fundAcademy(g);g.academy.autoFund=true;
 function work(id){if(!startStudy(g,id))throw Error('Start '+id);while(g.academy.active)academyDay(g);}
 work('materials');if(!academyUpgrade(g,'lab'))throw Error('Lab');work('automation');work('water');work('longevity');work('genes');work('algae');
 g.academy.repeat=true;startStudy(g,'observe');while(!g.academy.phds)academyDay(g);if(!academyUpgrade(g,'postdoc'))throw Error('Postdoc');while(g.academy.postdocDays<180)academyDay(g);if(!academyUpgrade(g,'group'))throw Error('Group');while(!g.academy.professors)academyDay(g);if(!openCourse(g,'systems'))throw Error('Course');var crew=g.academy.crew;academyDay(g);if(g.academy.crew!==crew+1||g.academy.graduates!==5||g.day!==0)throw Error('Teaching');
@@ -40,7 +40,7 @@ check('legacy saves acquire empty chapters without fabricated credentials',`
 var g=newGame();delete g.academy;delete g.space;delete g.emp.trees;g.day=4000;g.kits.sold=100000;g.emp.won=3900;migrate(g);if(g.academy.level||g.academy.phds||g.space.started||!spaceOpen(g)||!academyOpen(g))throw Error('Migration');
 `);
 check('research purchases protect live Earth working capital',`
-var g=newGame();g.kits.sold=1000;g.emp.farms.barn=1;g.money=Math.round(50000*USD);var cash=g.money;if(fundAcademy(g)||g.money!==cash)throw Error('Spent reserve');g.money=Math.round(50000*USD)+capitalReserve(g);if(!fundAcademy(g))throw Error('Safe grant rejected');
+var g=newGame();g.kits.sold=ACADEMY_AT;g.emp.farms.barn=1;g.money=Math.round(50000*USD);var cash=g.money;if(fundAcademy(g)||g.money!==cash)throw Error('Spent reserve');g.money=Math.round(50000*USD)+capitalReserve(g);if(!fundAcademy(g))throw Error('Safe grant rejected');
 `);
 check('space ending leaves unfinished Earth running and survives save/load',`
 var g=newGame();acknowledgeMilestone(g);g.opt.all=true;g.day=4000;g.space.started=true;g.space.won=4000;g.academy.level=2;g.academy.funded=100;g.academy.done.materials=1;startStudy(g,'water');g=migrate(JSON.parse(JSON.stringify(g)));for(var i=0;i<4;i++)stepGame(g);if(g.day!==4001||g.academy.active.progress!==1.25||progressionBlocked(g))throw Error('Space blocked Earth or research');
