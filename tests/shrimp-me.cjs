@@ -298,4 +298,9 @@ g.me.hp=80;g.me.bo=0;g.me.hrs={videos:99};g.me.hstep={};var b0=g.emp.beta;g.me.d
 var k=newGame();k.tanks[0].feeder=1;k.tanks[0].autoWC=1;personalDay(k);k.me.on=1;k.emp.kitsOpened=1;k.kits.sold=30;k.kitPrice=280;k.fin=[];for(var i=0;i<7;i++)k.fin.push({kits:900});personalWeek(k);if(k.me.call!=='lesson')throw Error('Grandma calls');
 var o=newGame();o.me={on:1,hrs:{videos:500,club:600}};migrate(o);if(o.me.hstep.videos!==2||o.me.hstep.club!==2)throw Error('Old saves skip milestones already passed');
 `);
+check('quiet spells: a long stretch with nothing happening brings an event',`
+var g=newGame(),T=g.tanks[0];T.cycledAt=0;T.had=1;T.pop=[{n:20,age:80,sex:'m'}];g.stats.born=5;g.progress.queue=[];g.progress.wait=[];markEvent(g);
+g.day+=10;quietDay(g);if(g.stats.quiet)throw Error('Not after ten days');g.day+=40;quietDay(g);if(g.stats.quiet!==1)throw Error('Something happens after a quiet month');
+if(quietFor(g).days!==0)throw Error('Clock resets');g.hot={until:g.day+5,add:3};if(Math.abs(roomT(g,clock(g))-ambient(clock(g))-3)>1e-9)throw Error('Hot spell warms the room');
+`);
 console.log(count+' free time, Grandma and ending checks passed');
