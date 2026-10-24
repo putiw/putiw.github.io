@@ -597,3 +597,16 @@ ammonia is only the primary button once ammonia is near zero.
 - More than 200% of the tank's water in 7 days makes them all molt at once and about half of everyone 10+ days old dies. The week's running total shows under Water care, the Water button warns from 120%, and the header chip says "wait a day" from 150%.
 - Automatic changes (auto water changer and staff) never take a tank past 150% in a week, so only hand changes can cause it.
 - Bots: strong cold 2,657, strong kind 3,258, average Earth 6,162–6,190.
+
+## Pass 80: a new player with nobody next to them
+- New scratch bot (a player who only does what the screen points at: spotlights, story cards, the NEXT card, glowing buttons, pulsing tabs, the pause pill, the ? ideas when stuck) played with a fake clock for hours of game time. It exposed where the game goes quiet and the colony dies.
+- What it found and what changed:
+  - Feeding was only cued once. Feed now glows whenever the hand feeding has run out, until there's an auto feeder.
+  - Water changes were never cued after cycling. Water now glows when the water needs a change and nothing changes it automatically, and during cycling when the cycle stalls or the cycled water needs clearing.
+  - Danger alerts (!!) sat behind the alert button. Any danger on a tank (ammonia, nitrite, KH, GH, too cold, starving, dying fast) is now the NEXT step in the alert's own words, glowing the button that fixes it. Alerts that lacked a fix got one.
+  - Heat killed colonies every summer. Too hot is now a NEXT step: the fan first if affordable, then the chiller, otherwise the room AC or a frozen bottle.
+  - Sickness after the first health check only shows once shrimp are dying fast (rule 5 stays).
+  - When every tank is automated and an emergency needs a hand change or feed, the Water or Feed button comes back.
+  - All shrimp gone: "Your shrimp are gone. Buy new ones in Trade" is the next step.
+  - The auto feeder and auto water changer are offered once each as a skippable NEXT step when affordable.
+  - Kits: growth steps you can afford come before "pack a kit": the first packing tool, a packer when orders outrun you, the tanks the farm license needs, the license, the first grow rack. Packing by hand stays the fallback next step whenever stock is empty. The monthly QC hint no longer hides it.

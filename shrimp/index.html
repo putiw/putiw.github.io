@@ -3222,7 +3222,7 @@ function updateVitals(){
   setT('tb-wc','Water '+T.set.wcPct+'%');
   var sa=sellAll(G,true);setT('tb-sell',sa.count>0?'Sell '+sa.count+' · '+aed(sa.revenue):sellWhyNot(G));$('tb-sell').disabled=sa.count<=0;
   var wst='ok',tmp=null;[['no3'],['kh'],['gh'],['temp']].forEach(function(x){var g=gaugeById(x[0]),v=g.get(T),q=gstate(g,v);if(x[0]==='temp'){if(q.st!=='ok')tmp=v>25?'too warm':'too cold';}else if(q.st==='bad')wst='bad';else if(q.st==='warn'&&wst!=='bad')wst='warn';});
-  var ws=$('wp-sum');if(ws){var cl='wp wsum '+(tmp&&wst==='ok'?'warn':wst);if(ws.className!==cl)ws.className=cl;var wkd=wcWeek(G,TK())>=150;$('tb-wc').classList.toggle('need',rv('wc')&&!T.autoWC&&allN(G)>=1&&!wkd&&wst!=='ok');setT('wv-sum',tmp&&wst==='ok'?tmp:wkd&&wst!=='ok'?'wait a day':wst==='bad'?'change now':wst==='warn'?'change soon':'good');}
+  var ws=$('wp-sum');if(ws){var cl='wp wsum '+(tmp&&wst==='ok'?'warn':wst);if(ws.className!==cl)ws.className=cl;var wkd=wcWeek(G,TK())>=150;$('tb-wc').classList.toggle('need',SC_WC||rv('wc')&&!T.autoWC&&allN(G)>=1&&!wkd&&wst!=='ok');setT('wv-sum',tmp&&wst==='ok'?tmp:wkd&&wst!=='ok'?'wait a day':wst==='bad'?'change now':wst==='warn'?'change soon':'good');}
   [['no3'],['kh'],['gh'],['temp']].forEach(function(x){
     var g=gaugeById(x[0]),v=g.get(T),s=gstate(g,v);
     var e=$('wp-'+x[0]);var cls='wp '+s.st;if(e.className!==cls)e.className=cls;
@@ -3447,7 +3447,7 @@ function updateTank(){
   $('cy-a').style.width=pa+'%';$('cy-b').style.width=pb+'%';setT('cy-av',pa+'%');setT('cy-bv',pb+'%');
   var PP=ppm(T),cyc=rememberCycle(G,T),clear=PP.nh<0.05&&PP.no2<0.05,dirty=PP.no3>20||T.chem.kh<2;
   var waterStage=!cyc?'cycling':!clear?'clearing':dirty?'needs-care':'ready';if($('wtcard').dataset.stage!==waterStage){$('wtcard').dataset.stage=waterStage;$('wtcard').open=waterStage!=='ready';}
-  $('startcard').hidden=RV()||!(N<1&&!T.had);
+  $('startcard').hidden=RV()||!(N<1&&!T.had);if($('startcard').hidden)SC_WC=false;
   $('feedcard').hidden=!RV()&&N<1&&!T.had;
   if(!$('startcard').hidden){var PP=ppm(T),o=G.ob,kit=rv('kit'),bot=!!o.bottle||G.opt.all,sct=$('sc-text');
     $('sc-water').hidden=!kit;$('scp-ph').hidden=!rv('phkh');$('scp-kh').hidden=!rv('phkh')&&!(T.chem.kh<2.2&&rememberCycle(G,T));$('sc-bars').hidden=!bot;
@@ -3460,6 +3460,7 @@ function updateTank(){
     else if(!clear){title='Bacteria ready, water still clearing';txt='<b>Stop dosing.</b> Wait, or change some water, until ammonia and nitrite read zero.';}
     else if(dirty){title='Cycled! Now clean the water';txt='<b>Change some water</b> with the Water button until nitrate is under 20 and KH is over 2.';}
     else{title='Cycled! Time for shrimp';txt='Water is safe. Buy your first shrimp in Trade.';}
+    SC_WC=!!(kit&&bot&&((stall&&!clear)||(cyc&&clear&&dirty)));
     if(cyc&&clear&&!dirty)$('startcard').hidden=true;
     setT('sc-title',title);sct.mhtml=txt;
     $('btn-kit').hidden=kit;$('btn-bottle').hidden=!kit||bot;$('sc-buy').hidden=kit&&bot;
@@ -4457,7 +4458,7 @@ function guideTarget(){
   function wait(text){var w=slow?{key:slow.key,sel:slow.sel,soft:true,text:text+' Try '+maxSpeed(G)+'×.'}:{key:'wait',soft:true,text:text};return w;}
   if(!anyHad()){
     if(safeToStock(G,T0))return {key:'buy',tab:'market',card:'buy',sel:'[data-act="buy"]',text:'Water is safe. Buy some shrimp in Trade.'};
-    return {key:'cycle',tab:'tank',card:'startcard',sel:'#startcard .btn.primary',bar:false};
+    return {key:'cycle',tab:'tank',card:'startcard',sel:SC_WC?'#tb-wc':'#startcard .btn.primary',bar:false};
   }
   // Only until the player has done one health check. After that sickness is quiet again, they use their eyes.
   // Sickness shows here until the player has done one health check, and again whenever shrimp are dying fast (the !! alert).
@@ -4769,7 +4770,7 @@ function choiceFx(key,i,all){var ck=(all?'a':'c')+key+':'+i+':'+Math.round(G.mon
   var q=function(t,neg){p.push(neg?'<span class="neg">'+t+'</span>':t);};if(!all){if(dM<=-1)q('Costs '+aed(-dM));if(dS<=-1)q('Uses '+big(-dS)+' kits');}else{if(Math.abs(dI)>=1)q('✦ '+(dI>0?'+':'−')+big(Math.abs(Math.round(dI))));if(Math.abs(dM)>=1)q((dM>0?'+':'−')+aed(Math.abs(dM)));if(Math.abs(dMo)>=0.5)q('mood '+(dMo>0?'up':'down'));if(dS<=-1)q('−'+big(-dS)+' kits');if(dH>=1)q('+'+big(Math.round(dH))+' owners');if(FX_NOTE[key+':'+i])q(FX_NOTE[key+':'+i]);}out=p.join(' · ');}}catch(e){out='';}
  FXC[ck]=out;return out;}
 // Cards pause the game and give the speed back when they close. Chapter pages and endings stay paused.
-var CARD_HOLD=null;
+var CARD_HOLD=null,SC_WC=false;
 function cardResume(key){if(G.progress.queue.length)return;var m=MILESTONES[key]||{},h=CARD_HOLD;CARD_HOLD=null;if(m.chapter||key==='intro'||key==='win'||key==='gameover'||key==='spaceDream')return;if(h)setSpeed(h);}
 function renderMilestone(){
   var p=ensureProgress(G),key=p.queue[0],card=$('milestone-card');
