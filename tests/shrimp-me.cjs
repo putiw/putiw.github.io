@@ -138,6 +138,13 @@ storyChoose(st,'stream',0);if(!st.emp.won||endingPick(st)!=='stream_world')throw
 var f=newGame();f.humans=5e9;hardDay(f);f.emp.tree={rw_stream:1,rw_reserve:1};f.emp.proj.mangrove=1;f.emp.proj.wasteclean=1;f.emp.proj.streams=1;f.emp.c3={c_rivers:0};f.money=1e12;f.fin=[{kits:1e9}];hardBuy(f,'no','ministers');if(streamReady(f))throw Error('Forcing closes the stream');
 var k=newGame();k.humans=4e9;hardDay(k);k.money=1e12;k.fin=[{kits:1e9}];['hot','water','poor','fled','far','care','blind'].forEach(function(id){hardGroup(id).ops.forEach(function(o){if(o.f&&!o.req)hardBuy(k,id,o.id);});});hardBuy(k,'war','pay');k.day+=800;hardSetGoal(k,'want');k.humans=hardTarget(k);hardDay(k);if(!k.emp.won)throw Error('Want can be won without forcing');
 `);
+check('shrimpcoin: one coin per mangrove tree, a market you can buy and sell in',`
+var g=newGame();g.humans=1e8;if(!milestoneConditions(g).coin_offer)throw Error('Offer at 100M');g.money=1e10;g.fin=[{kits:2e7}];storyChoose(g,'coin_offer',0);if(!coinOn(g)||!coinOf(g).honest)throw Error('Honest launch');
+var n=coinPlant(g,4e6);if(n!==1e6||coinOf(g).coins!==0)throw Error('Honest coins wait a year');for(var d=0;d<366;d++){g.day++;coinDay(g);}if(coinOf(g).coins!==6e5)throw Error('Six in ten trees live '+coinOf(g).coins);
+var m0=g.money;var got=coinSell(g,1e5);if(!(got>0)||Math.abs(g.money-m0-got)>1)throw Error('Selling earns');var p=coinOf(g).price;if(!(p>0.5&&p<300))throw Error('Price stays sane '+p);if(coinBuy(g,1e6)<1)throw Error('Buying');
+var s=newGame();s.humans=1e8;s.money=1e10;s.fin=[{kits:2e7}];storyChoose(s,'coin_offer',1);coinPlant(s,4e6);if(coinOf(s).coins!==1e6||coinOf(s).unbacked<3.9e5)throw Error('Seedling count mints now and leaves coins with no tree');
+var r=Math.random;Math.random=function(){return 0.0001;};s.day++;coinDay(s);Math.random=r;if(!coinOf(s).caught||coinOf(s).price>COIN_FAIR)throw Error('Bare mud on the satellite photos');
+`);
 check('one kit is one home of 1 to 4 people',`
 var g=newGame();var t=0,rr=Math.random,sd=11;Math.random=function(){sd=(sd*16807)%2147483647;return sd/2147483647;};for(var i=0;i<400;i++){var p=hhPeople(1);if(p<1||p>4)throw Error('1 to 4');t+=p;}Math.random=rr;if(t/400<2.2||t/400>2.8)throw Error('Average about 2.5 '+t/400);if(hhPeople(1000)!==2500)throw Error('Big batches use the average');
 g.humans=0;addOwners(g,10);if(g.humans!==25)throw Error('Ten kits, 25 people');g.kits.sold=0;if(hhDiv(g)!==1)throw Error('Early buyers are hobbyists');g.kits.sold=5000;if(hhDiv(g)!==2.5)throw Error('Later, homes');
