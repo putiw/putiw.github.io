@@ -526,3 +526,10 @@ ammonia is only the primary button once ammonia is near zero.
 - New farm tier between the barn and the industrial hatchery: Breeding warehouse, AED 250k, 60 kits a day. Old saves shift their farm stage.
 - Average bot: farms before packing lines when breeding is the limit, up to 6 farm buys a visit. Income trace per 15 days is in the run json (`trace`).
 - Results: strong cold 2,591, strong kind 2,828-3,001, average Earth 5,377-5,770, average cold 5,321. Spotlight sweep 139, all good. shrimp-me 38 checks.
+
+## Pass 70: growing pains, play style in the ending
+- Eight growing pains between 8k and 3M owners (heat deaths in transit, the packing room, the inbox, no more moss, month-three crashes, the permit, payouts on hold, copycats). Each pauses on a story card with three fixes: slow and decent, fast and expensive, or no wait with a cost to mood, quality or margin. While a fix is being set up, orders run at 35% and breeding at 70%. Kits shows the countdown.
+- 5k to 5M owners now takes about 900 days for the average player (was about 630); owners grow 1.5 to 2.5 times a season instead of about 3.
+- Play style is read from purchases: steady (small share of cash, only while profitable, first tank kitted before the next), methodical (same kind of purchase in a row, new tier or region only once the last is done), completionist (goal, store coverage, kitted tank, care goals). The strongest one adds a subtitle and a paragraph to the ending, a line in Grandma's letter, and shifts which ending you get.
+- Average bot gets 22 years (was 21) since the middle is longer.
+- Results: strong cold 2,720, strong kind 3,074, average Earth 5,798-6,273 (seeds 3, 4, 7), average cold 5,405. Spotlight sweep 139, all good. shrimp-me 40 checks.

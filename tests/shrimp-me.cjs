@@ -263,4 +263,16 @@ var h=newGame();h.tanks[0].feeder=1;h.tanks[0].autoWC=1;personalDay(h);h.me.on=1
 check('galas raise money for a cause you pick, and it shows up in the ending',`
 var g=newGame();g.money=1e7;g.emp.infOn=1;if(!buyProj(g,'gala','kids'))throw Error('Gala');if(!(g.emp.galaFor.kids>0))throw Error('Cause recorded');var i0=g.emp.inf;buyProj(g,'gala','own');if(!(g.emp.galaFor.own<g.emp.galaFor.kids))throw Error('Own foundation keeps most');if(gpLines(g).join().indexOf('children')<0)throw Error('Ending line '+gpLines(g).join('|'));
 `);
+check('growing pains slow orders and breeding until you pick a fix and it is in place',`
+var g=newGame();g.emp.kitsOpened=1;g.kits.sold=3000;g.humans=9000;g.money=1e6;g.emp.farms.barn=3;g.emp.proj.farmlic=1;
+if(!milestoneConditions(g).pain_heat)throw Error('Heat pain at 8k');var f0=farmCap(g);if(painMult(g)!==PAIN_K)throw Error('Open problem slows orders');
+if(!storyChoose(g,'pain_heat',0))throw Error('Pick');if(painMult(g)!==PAIN_K||!(farmCap(g)<farmCap(Object.assign({},g,{emp:Object.assign({},g.emp,{pains:null})}))))throw Error('Still slow while it is set up');g.day+=46;if(painMult(g)!==1)throw Error('Back to normal once in place');if(milestoneConditions(g).pain_heat)throw Error('Only once');
+var h=newGame();h.emp.kitsOpened=1;h.humans=9000;h.money=1e6;storyChoose(h,'pain_heat',2);if(painMult(h)!==1)throw Error('Refund option has no wait');if(gpLines(h).join().indexOf('refund')<0)throw Error('Ending line');
+var o=newGame();delete o.emp.pains;o.humans=5e6;migrate(o);if(Object.keys(PAINS).some(function(k){return milestoneConditions(o)[k];}))throw Error('Old saves skip pains they already passed');
+`);
+check('play style: how you buy changes the ending',`
+var g=newGame();g.money=1e7;g.emp.won=100;g.fin=[{kits:1000}];for(var i=0;i<6;i++){g.money=1e5;addTank(g);}var v=styleVals(g);if(!(v.steady<0))throw Error('Second tank before the first is kitted, with most of the cash: all in '+v.steady);
+var h=newGame();h.fin=[{kits:1000,shrimp:100}];var T=h.tanks[0];T.volTier=VOLS.length-1;T.filter=2;T.heater=2;T.feeder=1;T.autoWC=1;for(var i=0;i<4;i++){h.money=1e8;addTank(h);h.tanks.forEach(function(t){t.volTier=VOLS.length-1;t.filter=2;t.heater=2;t.feeder=1;t.autoWC=1;});}if(!(styleVals(h).steady>0))throw Error('Kitted out first, small share of cash: steady '+styleVals(h).steady);
+h.sty.safe=40;h.sty.bold=0;h.sty.same=h.sty.sw=0;var gs=endingScores(h).garden;var t=styleTop(h);if(!t||t.k!=='steady'||t.name!=='slow and steady')throw Error('Top style '+JSON.stringify(t));h.sty.safe=0;h.sty.bold=40;if(!(endingScores(h).garden<gs))throw Error('Style moves the ending');
+`);
 console.log(count+' free time, Grandma and ending checks passed');

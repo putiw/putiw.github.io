@@ -71,6 +71,8 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **The hard part** (`HARD`, `HARD_GOALS`, `hardDay`, `hardBuy`, `hardSetGoal`, `hardCap`, `hardTarget`, `streamReady`, `renderHard`): opens at 4B people with a tank at home (Chapter 6, Grandma's kitchen). From there `kitCap` is `hardEasy()` (about 4.3B) plus the people reached in ten groups (too hot, no water, too poor, war, forced from home, hard to reach, can't do it alone, can't see, said no, never met). Each group has fix, workaround, dark and money options that ramp in over their days; war takes one ending option only. "Rethink the goal" changes the target (every home, every home that wants one, 90%, 75%) or ends the game now (the spreadsheet, good enough, no number). The living-stream ending is hidden: it appears only with the Rewild tree, mangroves, clean farm water, the Taiwan streams, a river answer, and no forced option. Forced options (`direct:1`: paying ministers, national programs, Glass Hearts, credit) put tanks in homes straight over their ramp instead of waiting for orders, and once you force anything public mood no longer slows sales (`opMult`). Said no is reached through governments, not a law on people: national programs with a factory in each country, or paying the ministers. Delivering to the uncontacted village kills it and takes those people off the target, the goal bar says "People who die don't need a tank" and Grandma stops writing for a year (`G.me.gpSilent`). The old c_war, c_water and c_last cards and the "last holdouts" project are gone, the hard part replaces them.
 - **Shrimpcoin** (`coinOf`, `coinLaunch`, `coinPlant`, `coinBuy`, `coinSell`, `coinDay`, `renderCoin`): offered at 100M people. One coin per mangrove tree. Honest count mints a coin a year later for each tree that lived (60%), the seedling count mints everything at once and leaves unbacked coins that can surface on satellite photos (price crash, mood, heart). Price drifts back toward AED 12 (a tree's offset value) with hype events and noise, and your big buys and sells move it (`coinDepth`). The World card shows a one-year price chart with the takeaway in the title. When the price is above what a coin costs to make (`coinBreakEven`: AED 6.67 honest, AED 4 seedlings), outside planters plant in proportion to the gap (`otrees`), their coins add to supply and pull the price back, and you keep a 5% registry fee (`coinMintOut`). Buying coins is how a player pays the world to plant. Honest trees past 100M, yours and others', count as the mangrove step of the living-stream ending.
 - **Mall stores** (24 Oct): `MALLS`, `storeGoal` (one store in five malls), `buyStores(G,r,n)`, `trust(G)` multiplies the word-of-mouth term in `kitDemand`. 60% trust in a region with none of your stores, 85% at home. Batch size follows how many you run (`storeBatchMax`). Rent, license and staff are daily (`storeDayCost`), counted in `fixedOverhead` and `operatingNet`.
+- **Growing pains** (`PAINS`, `painMult`, `painPick`, `painNote`): story cards between 8k and 3M owners. Open or being set up: demand × `PAIN_K`, farm output × `PAIN_SHIP`. Costs are days of operating profit. Old saves mark passed pains done in `migrate`.
+- **Play style** (`STYLE_KINDS` wrappers, `styleVals`, `styleTop`): purchase functions are wrapped at the end of the sim to count steady/methodical habits. Feeds `endingScores` and adds a subtitle, paragraph and Grandma line to the ending.
 - **Grandma's land** (`gp_land`, `gp_scam`, `gpLand`, `gpScam`, `landDay`): at AED 500k sent. Yes freezes purchases 30 days (`frozenWhy='land'`) then grants the house land. The house card moves to the Tank tab when `ownTank`.
 - **Gala causes** (`GALA_FOR`, `galaLines`): `buyProj(G,'gala',cause)`.
 - **Story choice previews** (`choiceFx(key,i,all)`): before the pick only costs show; the full effect goes in the toast after.
@@ -250,15 +252,15 @@ Latest bot results (seed 7):
 
 | Bot | Result |
 |---|---|
-| Strong, cold answers (default) | Earth won on day 2,304 (goal: every home, pays ministers, funds a side, the village), empire_dictator |
+| Strong, cold answers (default) | Earth won on day 2,720 (was 2,304 before stores and growing pains) (goal: every home, pays ministers, funds a side, the village), empire_dictator |
 | Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 2,956 (goal: every home that wants one), garden_village |
-| Average, curious and kind (default) | Hard part day 4,707, Earth on day 5,629, space done day 7,180 |
+| Average, curious and kind (default) | Earth on day 5,798-6,273 depending on seed, space done by day ~7,500 |
 | Average, cold answers (`BOT_HEART=cold`) | Hard part day 4,866, Earth on day 5,321 |
 
 All bots now use campaigns (when ✦ is plentiful), films, Shrimpcoin (plant when the price is well above cost, sell high, buy low) and shops (up to three of each). The average bot also funds research lines.
 | Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,975, no Space (Shrimp Island instead) |
 
-The average bot has 21 years to finish both chapters (it used to finish space on day 7,292 of 7,300).
+The average bot has 22 years to finish both chapters (it used to finish space on day 7,292 of 7,300).
 
 When you change balance, run both bots and compare against these. Report the before and after numbers, and add them to `tests/README-shrimp.md`.
 
