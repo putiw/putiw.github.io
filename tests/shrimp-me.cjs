@@ -146,6 +146,10 @@ var s=newGame();s.humans=1e8;s.money=1e10;s.fin=[{kits:2e7}];storyChoose(s,'coin
 var o=newGame();o.humans=2e8;o.money=1e11;o.fin=[{kits:2e7}];coinLaunch(o,1);coinOf(o).x=0.7;coinOf(o).price=COIN_FAIR*Math.exp(0.7);o.day++;coinDay(o);if(!(coinOf(o).otrees>0))throw Error('A high price brings other planters');var q=newGame();q.humans=2e8;coinLaunch(q,1);coinOf(q).x=-1;coinOf(q).price=COIN_FAIR*Math.exp(-1);q.day++;coinDay(q);if(coinOf(q).otrees>0)throw Error('Below break-even nobody plants');
 var r=Math.random;Math.random=function(){return 0.0001;};s.day++;coinDay(s);Math.random=r;if(!coinOf(s).caught||coinOf(s).price>COIN_FAIR)throw Error('Bare mud on the satellite photos');
 `);
+check('Grandma saved the money you sent and gives it back three times over when you are broke',`
+var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.me.sent=2000;g.money=-500;var o=brokeOpts(g);var i=o.findIndex(function(x){return x[2]==='save';});if(i<0)throw Error('The envelope is offered');var m0=g.money;brokePick(g,i);if(Math.abs(g.money-m0-6000)>1||!g.emp.gpSaved)throw Error('Three times what you sent');if(brokeOpts(g).some(function(x){return x[2]==='save';}))throw Error('Only once');if(gpLines(g).join().indexOf('every dirham')<0)throw Error('Ending line');
+var n=newGame();n.money=-500;if(brokeOpts(n).some(function(x){return x[2]==='save';}))throw Error('Nothing sent, nothing saved');
+`);
 check('one kit is one home of 1 to 4 people',`
 var g=newGame();var t=0,rr=Math.random,sd=11;Math.random=function(){sd=(sd*16807)%2147483647;return sd/2147483647;};for(var i=0;i<400;i++){var p=hhPeople(1);if(p<1||p>4)throw Error('1 to 4');t+=p;}Math.random=rr;if(t/400<2.2||t/400>2.8)throw Error('Average about 2.5 '+t/400);if(hhPeople(1000)!==2500)throw Error('Big batches use the average');
 g.humans=0;addOwners(g,10);if(g.humans!==25)throw Error('Ten kits, 25 people');g.kits.sold=0;if(hhDiv(g)!==1)throw Error('Early buyers are hobbyists');g.kits.sold=5000;if(hhDiv(g)!==2.5)throw Error('Later, homes');
