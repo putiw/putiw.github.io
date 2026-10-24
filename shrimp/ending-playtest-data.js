@@ -17,8 +17,8 @@ window.ENDING_TEST_DATA = {
       "options": [
         {
           "id": "sciacad",
-          "label": "Pay them more to stay",
-          "description": "Research doesn’t go faster. More of them stay at the university to ask the big questions, and once in a while one finds something nobody was looking for.",
+          "label": "Let them go, wish them luck",
+          "description": "They take what they learned with you to other companies. The ones who stay ask the big questions, and once in a while one finds something nobody was looking for.",
           "traits": {
             "know": 2,
             "care": 0.5
@@ -46,7 +46,7 @@ window.ENDING_TEST_DATA = {
         {
           "id": "labgrandpa",
           "label": "Name it after Grandma",
-          "description": "She says she doesn’t care, then visits every Sunday. Donors don’t know who she is.",
+          "description": "She says she doesn’t care, then visits every Sunday. The university warns her name may bring fewer donors.",
           "traits": {
             "ego": -1,
             "care": -0.5
@@ -57,7 +57,7 @@ window.ENDING_TEST_DATA = {
         {
           "id": "labyou",
           "label": "Name it after you",
-          "description": "A known name brings donors and partners. ✦ every day.",
+          "description": "Donors recognize your name and back the lab. ✦ every day.",
           "traits": {
             "ego": 2
           },
@@ -83,13 +83,13 @@ window.ENDING_TEST_DATA = {
         {
           "id": "studybuy",
           "label": "Fund it, and tell them what you need",
-          "description": "You already know watching shrimp calms people, this just says it sooner. Out next month. Scientists who agree in advance are expensive, three times the price. Looks bad if anyone checks.",
+          "description": "You already know watching shrimp calms people, this just says it sooner. Out next month. Scientists who agree in advance are expensive, three times the price.",
           "traits": {
             "know": -1,
             "ego": 0.5
           },
           "heart": -3,
-          "endingLine": "A study that says what you paid for."
+          "endingLine": "A rushed study shaped around a launch."
         }
       ]
     },
@@ -110,8 +110,8 @@ window.ENDING_TEST_DATA = {
         },
         {
           "id": "genepatent",
-          "label": "Patent it",
-          "description": "If you don’t, someone else will. Royalties every day pay for more research.",
+          "label": "License the line",
+          "description": "You can’t own the gene, you can own the line you bred. Breeders pay to use it, money every day for more research.",
           "traits": {
             "know": -0.5,
             "drive": 1
@@ -144,7 +144,7 @@ window.ENDING_TEST_DATA = {
             "ego": 1
           },
           "heart": -2,
-          "endingLine": "A newspaper that only says nice things about you."
+          "endingLine": "A newsletter that only says nice things about you."
         }
       ]
     },
@@ -176,7 +176,7 @@ window.ENDING_TEST_DATA = {
     },
     {
       "id": "fish",
-      "question": "Shrimp boats sit in every harbor, the crews have no work.",
+      "question": "Fishing towns lose work as more people keep shrimp as pets. The crews need new jobs.",
       "options": [
         {
           "id": "retrain",
@@ -190,13 +190,13 @@ window.ENDING_TEST_DATA = {
         },
         {
           "id": "harbors",
-          "label": "Buy their harbors",
-          "description": "The towns are broke and nobody else is buying. Ocean ranches 30% cheaper. Some people will call it a takeover.",
+          "label": "Lease the empty docks",
+          "description": "The towns need the rent. Ocean ranches 30% cheaper, and the old fishing ports smell of shrimp feed now.",
           "traits": {
             "drive": 1
           },
           "heart": -2,
-          "endingLine": "Old harbors with your logo on them."
+          "endingLine": "Old fishing docks turned into shrimp farms."
         }
       ]
     },
@@ -239,8 +239,7 @@ window.ENDING_TEST_DATA = {
           "traits": {
             "kin": 1
           },
-          "heart": 1,
-          "endingLine": ""
+          "heart": 1
         },
         {
           "id": "shipcheap",
@@ -250,8 +249,7 @@ window.ENDING_TEST_DATA = {
             "kin": -1,
             "drive": 0.5
           },
-          "heart": -2,
-          "endingLine": ""
+          "heart": -2
         }
       ]
     },
@@ -262,13 +260,13 @@ window.ENDING_TEST_DATA = {
         {
           "id": "cullschool",
           "label": "Give them to schools",
-          "description": "Teachers set up class tanks. You lose the sales, ✦ every day.",
+          "description": "Healthy, just not red enough to sell. Teachers set up class tanks. You lose the sales, ✦ every day.",
           "traits": {
             "kin": 1,
             "care": 0.5
           },
           "heart": 1,
-          "endingLine": "Class tanks full of shrimp nobody wanted."
+          "endingLine": "Class tanks full of healthy young shrimp."
         },
         {
           "id": "cullfeed",
@@ -288,18 +286,17 @@ window.ENDING_TEST_DATA = {
       "options": [
         {
           "id": "filterlast",
-          "label": "Make it last forever",
-          "description": "Costs more to build, and owners never buy another. Kit survival up a little.",
+          "label": "A sponge filter that lasts for years",
+          "description": "Costs more to build, a rinse now and then, owners never buy another. Kit survival up a little.",
           "traits": {
             "care": 0.5
           },
-          "heart": 1,
-          "endingLine": ""
+          "heart": 1
         },
         {
           "id": "filtercart",
           "label": "Monthly cartridges",
-          "description": "A fresh filter every month means none clog. Money every day. Some owners forget and their tanks crash.",
+          "description": "Money every day. Each swap throws away the bacteria living in the old one, and some tanks crash after a change.",
           "traits": {
             "drive": 0.5
           },
@@ -315,13 +312,12 @@ window.ENDING_TEST_DATA = {
         {
           "id": "foodopen",
           "label": "Publish a simple recipe",
-          "description": "Spinach, pollen, a pinch of algae. Some owners will overfeed. Word of mouth up a little.",
+          "description": "Blanched spinach, pollen, a pinch of algae. Some owners will overfeed. Word of mouth up a little.",
           "traits": {
             "care": 0.5,
             "kin": 0.5
           },
-          "heart": 1,
-          "endingLine": ""
+          "heart": 1
         },
         {
           "id": "foodpods",
@@ -352,8 +348,7 @@ window.ENDING_TEST_DATA = {
           "label": "Let them go",
           "description": "The robots do the work now. Two weeks’ pay each, the rest goes into more kits.",
           "traits": {},
-          "heart": -2,
-          "endingLine": ""
+          "heart": -2
         }
       ]
     },
@@ -366,8 +361,7 @@ window.ENDING_TEST_DATA = {
           "label": "Ask happy owners for photos",
           "description": "Slow, most people never post. Word of mouth up a little.",
           "traits": {},
-          "heart": 1,
-          "endingLine": ""
+          "heart": 1
         },
         {
           "id": "revfake",
@@ -377,19 +371,18 @@ window.ENDING_TEST_DATA = {
             "risk": 0.5,
             "ego": 0.5
           },
-          "heart": -2,
-          "endingLine": ""
+          "heart": -2
         }
       ]
     },
     {
       "id": "kids",
-      "question": "A kids’ TV channel offers you ad time.",
+      "question": "A children’s TV channel wants your ads. The same money would buy kits for schools.",
       "options": [
         {
           "id": "kidsads",
           "label": "Ads between cartoons",
-          "description": "Kids are the ones who keep a tank going for years. +3% want one.",
+          "description": "Kids are the ones who keep a tank going for years, and they ask until the parents give in. +3% want one.",
           "traits": {
             "drive": 1
           },
@@ -398,8 +391,8 @@ window.ENDING_TEST_DATA = {
         },
         {
           "id": "kidsfree",
-          "label": "Free kits for schools in poor areas",
-          "description": "AED 400,000 for kits that sell nothing. +2% want one.",
+          "label": "Kits for poor schools, no ads to kids",
+          "description": "AED 400,000 for class tanks that sell nothing. Slower, +2% want one.",
           "traits": {
             "care": 2
           },
@@ -410,7 +403,7 @@ window.ENDING_TEST_DATA = {
     },
     {
       "id": "data",
-      "question": "An ad company wants your list of owners.",
+      "question": "An ad company wants to buy your owner data.",
       "options": [
         {
           "id": "datasell",
@@ -429,8 +422,7 @@ window.ENDING_TEST_DATA = {
           "traits": {
             "control": 0.5
           },
-          "heart": 1,
-          "endingLine": ""
+          "heart": 1
         }
       ]
     },
@@ -472,8 +464,7 @@ window.ENDING_TEST_DATA = {
           "traits": {
             "kin": 0.5
           },
-          "heart": 1,
-          "endingLine": ""
+          "heart": 1
         },
         {
           "id": "landwet",
@@ -484,7 +475,7 @@ window.ENDING_TEST_DATA = {
             "drive": 0.5
           },
           "heart": -3,
-          "endingLine": "A drained wetland, and birds that don’t stop anymore."
+          "endingLine": "A filled wetland, and birds that don’t stop anymore."
         }
       ]
     }
@@ -492,38 +483,41 @@ window.ENDING_TEST_DATA = {
   "cards": [
     {
       "id": "c_cash",
-      "title": "Shrimp money",
-      "body": "A small country, Pelagonia, starts using shrimp as cash. Money that breeds means prices double every month. Their central bank wants to buy your best tank.",
+      "title": "The hatchery bust",
+      "body": "Pelagonia lent money to anyone who wanted to start a shrimp hatchery. Most of them failed. The bank wants to sell you the good ones cheap, the taxpayers cover the rest.",
       "options": [
         {
-          "label": "Sell them the tank",
-          "description": "They pay in dollars, thankfully.",
+          "label": "Buy the good ones",
+          "description": "Most of the workers keep their jobs. The taxpayers still pay for the ones that failed.",
           "traits": {
             "means": -0.5,
             "drive": 1
-          }
+          },
+          "endingLine": "You bought Pelagonia’s best hatcheries and kept most of the crews."
         },
         {
-          "label": "Say no",
-          "description": "Pelagonia goes back to coins.",
+          "label": "Let the bank sell them off",
+          "description": "Some workers lose their jobs. No public money goes into a failed boom.",
           "traits": {
             "means": 0.5
-          }
+          },
+          "endingLine": "Pelagonia’s bank sold the failed hatcheries for parts."
         }
       ]
     },
     {
       "id": "c_war",
       "title": "The river war",
-      "body": "Varnistan and Oskeria have fought over the same river for six years. Both armies want kits for the barracks.",
+      "body": "Varnistan and Oskeria have fought over a river for six years. Families on both banks have fled their homes. Both armies want to buy your kits.",
       "options": [
         {
-          "label": "Sell kits to both sides",
+          "label": "Sell kits to both armies",
           "description": "Double the orders there. Both armies like the same shrimp.",
           "traits": {
             "means": -1.5,
             "care": -1
-          }
+          },
+          "endingLine": "Varnistan and Oskeria both bought your kits. The war went on a while."
         },
         {
           "label": "Refuse both sides",
@@ -531,47 +525,52 @@ window.ENDING_TEST_DATA = {
           "traits": {
             "means": 1,
             "reach": -0.5
-          }
+          },
+          "endingLine": "You sold nothing to either army. The war ended without you."
         },
         {
-          "label": "Shrimp Peace Corps, ✦ 50,000",
-          "description": "Free kits to both armies. Soldiers start trading baby shrimp across the river at night.",
+          "label": "Free kits to both armies, ✦ 50,000",
+          "description": "Soldiers on both banks compare shrimp over the radio. It doesn’t end the war.",
           "traits": {
             "ego": 1.5,
             "reach": 1
-          }
+          },
+          "endingLine": "Soldiers on both banks kept your shrimp. The war ended the usual way, slowly."
         },
         {
-          "label": "A kit for each leader’s kid",
-          "description": "Small and quiet, nobody knows it was you.",
+          "label": "Pay for water points for families who fled, AED 5M",
+          "description": "A relief agency runs them. You don’t choose who gets water.",
           "traits": {
             "ego": -1.5,
             "know": 0.5
-          }
+          },
+          "endingLine": "A relief agency ran water points on both banks of the river, paid for by you."
         }
       ]
     },
     {
       "id": "c_water",
       "title": "Water first",
-      "body": "About one in four people on Earth don’t have safe water at home. A tank needs water changes, so before they get a tank they need water.",
+      "body": "A lot of the people who still want a tank don’t have water at home they can trust. A tank needs a bucket of clean water every week.",
       "options": [
         {
           "label": "Desalination plants, AED 200M",
-          "description": "Big plants on the coast. They work, they burn a lot of power, and you own the water now.",
+          "description": "They work, they burn a lot of power, and you own the water now.",
           "traits": {
             "drive": 1,
             "know": -1,
             "ego": 1
-          }
+          },
+          "endingLine": "Your desalination plants run day and night on the coast."
         },
         {
-          "label": "Sealed jar tanks, ✦ 100,000",
-          "description": "A tank that never needs a water change, plants clean it and shrimp eat the algae.",
+          "label": "Low-water jar tanks, AED 100M",
+          "description": "Plants do most of the cleaning. A cup of water a week instead of a bucket.",
           "traits": {
             "know": 1.5,
             "means": 0.5
-          }
+          },
+          "endingLine": "The driest towns got jar tanks that need a cup of water a week."
         },
         {
           "label": "Fog nets on the hills, AED 20M",
@@ -580,7 +579,8 @@ window.ENDING_TEST_DATA = {
             "drive": -1,
             "reach": -1,
             "means": 0.5
-          }
+          },
+          "endingLine": "Fog nets on the hills catch water for whole villages."
         },
         {
           "label": "Cloud seeding, AED 50M",
@@ -588,7 +588,8 @@ window.ENDING_TEST_DATA = {
           "traits": {
             "means": -1,
             "reach": 1
-          }
+          },
+          "endingLine": "You made it rain once. It was the wrong country."
         },
         {
           "label": "Leave it to the governments",
@@ -603,71 +604,77 @@ window.ENDING_TEST_DATA = {
     {
       "id": "c_power",
       "title": "The electricity bill",
-      "body": "Billions of tanks with a filter and a light use about 3 to 4% of the world’s electricity.",
+      "body": "Five billion tanks with a pump, a light and sometimes a heater use about 1% of the world’s electricity, dozens of power stations’ worth.",
       "options": [
         {
-          "label": "Solar kits that cost more",
-          "description": "A small panel on every kit box.",
+          "label": "Low-power kits, AED 5 more a kit",
+          "description": "LED on a timer, a 1-watt pump, a heater only where it gets cold.",
           "traits": {
             "care": 1,
             "means": 0.5
-          }
+          },
+          "endingLine": "Every new kit has a light on a timer and a pump that uses a watt."
         },
         {
-          "label": "Low-power filters, ✦ 50,000",
-          "description": "The research team gets it down to 4 watts.",
+          "label": "Fund the engineers, AED 50M",
+          "description": "A pump that uses less than a phone charger.",
           "traits": {
             "know": 1
-          }
+          },
+          "endingLine": "Shrimp pumps use less power than a phone charger now."
         },
         {
           "label": "The grid is someone else’s problem",
-          "description": "Power companies build two more plants.",
+          "description": "Power companies build more plants, mostly gas.",
           "traits": {
             "care": -1.5
-          }
+          },
+          "endingLine": "Power companies built more plants for shrimp tanks, mostly gas."
         }
       ]
     },
     {
       "id": "c_rivers",
       "title": "Shrimp in the rivers",
-      "body": "People get bored and dump their shrimp. There are red shrimp in warm rivers now, eating what the local ones eat.",
+      "body": "Some owners dump their shrimp when they get bored. Red shrimp breed in a few warm rivers now, one in Germany runs below a power plant.",
       "options": [
         {
-          "label": "A take-back program, AED 50M",
-          "description": "Any shop takes unwanted shrimp, no questions.",
+          "label": "Shops take them back, AED 50M",
+          "description": "Any shop that sells your kits takes unwanted shrimp back, no questions asked.",
           "traits": {
             "kin": 1,
             "care": 0.5
-          }
+          },
+          "endingLine": "Unwanted shrimp go back to the shop, not the river."
         },
         {
-          "label": "Pay for a river clean-up, AED 20M",
-          "description": "Volunteers with nets every weekend.",
+          "label": "Pay river teams, AED 20M",
+          "description": "They catch a lot of them, never all.",
           "traits": {
             "kin": 0.5,
             "reach": -0.5
-          }
+          },
+          "endingLine": "River teams catch the red shrimp they can find."
         },
         {
           "label": "Do nothing",
-          "description": "They’re everywhere now.",
+          "description": "They spread to warm rivers on four continents.",
           "traits": {
             "care": -1,
             "kin": -0.5
-          }
+          },
+          "endingLine": "Red shrimp live in warm rivers on four continents."
         }
       ]
     },
     {
       "id": "c_many",
       "title": "Too many shrimp",
-      "body": "Every tank breeds. Owners have hundreds. People give shrimp out at weddings.",
+      "body": "Every tank breeds. Owners have hundreds and give them to friends, so fewer people buy kits.",
       "options": [
         {
-          "label": "Buy them back",
-          "description": "Shops pay a little for spares.",
+          "label": "Buy spares back for new kits",
+          "description": "Shops pay owners a little per shrimp, you pack them into kits.",
           "traits": {
             "kin": 1
           }
@@ -678,51 +685,56 @@ window.ENDING_TEST_DATA = {
           "traits": {
             "kin": -2,
             "drive": 0.5
-          }
+          },
+          "endingLine": "Spare pet shrimp end up as fish food."
         },
         {
           "label": "Let the price crash",
           "description": "It was never about money.",
           "traits": {
             "drive": -1
-          }
+          },
+          "endingLine": "A shrimp costs nothing now, people give them away at weddings."
         }
       ]
     },
     {
       "id": "c_blackout",
       "title": "Blackout",
-      "body": "A city loses power for two days. A million tanks go quiet at once.",
+      "body": "A summer blackout, two days, no air conditioning. Rooms reach 38 °C. Cherry shrimp start dying above 30.",
       "options": [
         {
-          "label": "Battery air pumps in every kit",
-          "description": "Next time the bubbles keep going.",
+          "label": "Battery pumps and a cooling guide, AED 30M",
+          "description": "Every owner in the city gets a battery air pump and the frozen-bottle trick.",
           "traits": {
             "care": 1,
             "risk": -1
-          }
+          },
+          "endingLine": "Owners in hot cities keep a battery pump and a frozen bottle for the next blackout."
         },
         {
-          "label": "Free replacements for the city, AED 30M",
-          "description": "Trucks with shrimp the next morning.",
+          "label": "Free replacements, AED 30M",
+          "description": "New shrimp for everyone who lost theirs. Kits can now come with a battery pump.",
           "traits": {
             "means": 1,
             "kin": 0.5
-          }
+          },
+          "endingLine": "Everyone who lost shrimp in the blackout got new ones, and kits can come with a battery pump."
         },
         {
-          "label": "A hotline",
-          "description": "People call, you tell them to wait.",
+          "label": "A 24-hour help line",
+          "description": "Move the tank to the floor, float a frozen bottle, skip feeding.",
           "traits": {
             "control": 1
-          }
+          },
+          "endingLine": "A help line talked owners through the next blackout."
         }
       ]
     },
     {
       "id": "c_prison",
       "title": "Tiny jails",
-      "body": "A shrimp liberation group says every tank is a tiny jail. They have a point.",
+      "body": "A shrimp liberation group says every tank is a tiny jail. They’re not all wrong, a 20 L tank is small.",
       "options": [
         {
           "label": "Argue with them",
@@ -737,7 +749,8 @@ window.ENDING_TEST_DATA = {
           "description": "A valley where shrimp live free.",
           "traits": {
             "kin": 1.5
-          }
+          },
+          "endingLine": "There’s a valley where shrimp live with no glass around them."
         },
         {
           "label": "Agree with them",
@@ -746,65 +759,71 @@ window.ENDING_TEST_DATA = {
             "know": 1,
             "care": 1.5,
             "kin": 1
-          }
+          },
+          "endingLine": "You agreed that tanks are tiny jails, and started thinking about where else shrimp could live."
         }
       ]
     },
     {
       "id": "c_last",
       "title": "The one neighbour",
-      "body": "The last person on Earth without a tank is the man next door. He says he doesn’t like things that need feeding.",
+      "body": "About four million people still don’t have a tank. One of them is the man next door. He says he doesn’t like things that need feeding.",
       "options": [
         {
-          "label": "Wait for him",
-          "description": "He buys one himself in the spring. He says it was his idea.",
+          "label": "Leave him be",
+          "description": "Everyone who wanted one has one.",
           "traits": {
             "drive": -1,
             "means": 1
-          }
+          },
+          "endingLine": "The man next door never got a tank. You left him alone."
         },
         {
-          "label": "Pay him",
-          "description": "He takes the money and the tank.",
+          "label": "Invite him over to see yours",
+          "description": "No pressure. He watches them eat for twenty minutes and goes home.",
           "traits": {
-            "means": -1
-          }
+            "means": 0.5
+          },
+          "endingLine": "The man next door came over once and watched your shrimp eat."
         },
         {
-          "label": "Install one while he’s at work",
-          "description": "He comes home and sits down in front of it.",
+          "label": "Get his daughter to give him one for his birthday",
+          "description": "He keeps it on the counter. She feeds it.",
           "traits": {
-            "control": -1,
+            "control": 1,
             "means": -1
-          }
+          },
+          "endingLine": "The man next door has a tank. His daughter feeds it."
         }
       ]
     },
     {
       "id": "c_fisher",
       "title": "The fishing family",
-      "body": "Mira’s other grandpa was a shrimp fisherman. He lost his boat the year people stopped buying shrimp to eat. Mira asks if you knew.",
+      "body": "Mira’s other grandpa fished shrimp for a living. People who keep shrimp stopped eating them, the price fell, and he sold his boat. Mira asks if you knew.",
       "options": [
         {
-          "label": "Give him a job at the farm",
-          "description": "He says shrimp were easier when they were food.",
+          "label": "Offer him work at the hatchery",
+          "description": "Steady pay. He’s still raising shrimp, just not catching them.",
           "traits": {
             "means": 1,
             "care": -0.5
-          }
+          },
+          "endingLine": "Mira’s other grandpa works at your hatchery. He still calls them prawns."
         },
         {
-          "label": "Pay for a new boat, for fish",
-          "description": "He goes back out on the water.",
+          "label": "Help him start reef tours, AED 200,000",
+          "description": "A small boat, visitors, the same coast. He’s back on the water.",
           "traits": {
             "means": 1
-          }
+          },
+          "endingLine": "Mira’s other grandpa takes visitors out to the reef."
         },
         {
-          "label": "Say you didn’t know",
-          "description": "You didn’t, mostly.",
+          "label": "Tell her you hadn’t thought about it",
+          "description": "She tells you what the boat meant to him.",
           "traits": {
-            "means": -0.5
+            "means": 0.5
           }
         }
       ]
@@ -812,21 +831,23 @@ window.ENDING_TEST_DATA = {
     {
       "id": "c_mytank",
       "title": "Your own tank",
-      "body": "Grandma’s old tank, the one you kept, is green and quiet. Most of them are gone.",
+      "body": "Grandma’s old tank, the one you kept, is green and quiet. A few shrimp may still be hiding in the moss.",
       "options": [
         {
           "label": "Start it again",
-          "description": "Five shrimp from Grandma’s tank. The glass is clean.",
+          "description": "You clean the glass and restock it from the farm.",
           "traits": {
             "kin": 1.5
-          }
+          },
+          "endingLine": "You kept your first tank going, mostly."
         },
         {
           "label": "Leave it a while",
           "description": "It stays on the shelf, green. It is still yours.",
           "traits": {
             "kin": -0.5
-          }
+          },
+          "endingLine": "The first tank went green around year eight and stayed that way for a long time."
         }
       ]
     }
@@ -847,7 +868,7 @@ window.ENDING_TEST_DATA = {
       "name": "The Empire, the dictator",
       "who": "You wanted it done, and you got it done faster than anyone thought possible. You bought what you couldn't build, you said what needed saying, and the people in the way didn't keep you up at night. Most rules turned out to be someone who hadn't been paid yet.",
       "mira": "She started her own company. It does things the slow way and it does fine. She doesn't call.",
-      "gp": "I saw your statue on the news. It doesn't look like you, it looks taller. You did it, every home has a tank, I said you couldn't and you did. I keep my old 20 L in the bedroom. It's the only tank in the building without your logo on it. [visit]",
+      "gp": "I saw your statue on the news. It doesn't look like you, it looks taller. You did it, every home has a tank, faster than I ever thought. I keep a little jar in the bedroom. It's the only tank in the building without your logo on it. [visit]",
       "tank": "The water was always perfect. The machine fed us, the machine cleaned us, the machine counted us. We were counted many times a day. Nobody came close to the glass.",
       "last": "Everyone has a tank, most of them have your name on it, and nobody says no to you anymore."
     },
@@ -920,7 +941,7 @@ window.ENDING_TEST_DATA = {
       "name": "The Network, the one who turned back",
       "who": "You went everywhere, you talked to everyone, and for a few years you said yes to people you shouldn't have. Then one night you went to the police. It cost you almost everything and a year of nothing. You rebuilt from the same trucks, and you made them carry the right things this time.",
       "mira": "She helped you through that year and didn't take any money. She runs your water routes now.",
-      "gp": "I've been to forty countries on your postcard money and in every one of them somebody knew your trucks. Not the shrimp, the trucks, they said the water came on them. I know about the bad years, Mira told me. I won't say anything about it, you already know. What you did after is the part I tell people about. [visit]",
+      "gp": "I've been to forty countries since, and in every one of them somebody knew your trucks. Not the shrimp, the trucks, they said the water came on them. I know about the bad years, Mira told me. I won't say anything about it, you already know. What you did after is the part I tell people about. [visit]",
       "tank": "We travelled a lot, always cold and always on time. Next to us there were boxes of other things, medicine sometimes, and for a long time things that weren't medicine. Then the boxes changed again."
     },
     "drift_shop": {
@@ -948,14 +969,14 @@ window.ENDING_TEST_DATA = {
       "who": "You bought the next farm before the last one paid for itself, every time. It worked until it didn't. The bank took the hatcheries in the spring and the shops in the summer. You were three months from turning it around, or you were never going to, you'll think about that for a while.",
       "mira": "She came to the auction and bought one tank, the first one you ever sold her family.",
       "next": "Someone bought your farms cheap and finished the job. Everyone has a tank eleven years after you stopped.",
-      "gp": "I've lost a boat once, it's not the end. You tried hard, you tried too hard, both are true. [visit] The old 20 L is still here. It's yours if you want to start again.",
+      "gp": "I've lost a boat once, it's not the end. You tried hard, you tried too hard, both are true. [visit] Your first tank is still on your shelf. Start again if you want.",
       "tank": "One day the lights didn't come on. Then new people came, and the lights came back on, different lights."
     },
     "fall_shark": {
       "id": "fall_shark",
       "end": "fall",
       "name": "The fall, the loan shark",
-      "who": "It was supposed to be one loan, for one bad month. Then it was the interest on the loan, then a loan for the interest. They smashed the first farm in October. You declared bankruptcy because it was the only way out they couldn't follow you into.",
+      "who": "It was supposed to be one loan, for one bad month. Then it was the interest on the loan, then a loan for the interest. They smashed the first farm in October. You went to the police, then you declared bankruptcy.",
       "mira": "She doesn't know the whole story. Her mom told her not to ask.",
       "next": "Your trucks belong to someone else now. Nobody's sure who. Everyone has a tank eventually, the trucks never stop at borders.",
       "gp": "Why didn't you ask me, I would have given you all of it. I know why. I'd have done the same at your age. [visit] Come home for a bit. Nobody needs to know where you are.",

@@ -69,7 +69,7 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 ### Systems added recently
 
 - **Tank view** (`updateTankView`, `tv*` functions, `SPR` sprites): a canvas drawn from a sample of the real colony, using art layers from Puti's Shrimp Tanks game. It runs at about 30 fps and stops off screen, on other tabs and when the app is hidden. Pellets follow `T.chem.food`.
-- **Illness** (`illDay`, `treatIll`, `startIll`): spreads until treated, stages from a few sick to a crash, and a crash wipes the whole tank. New shrimp from Trade carry a flatworm risk until salt dipped (`dipFresh`). The health check is a tap-the-sick-shrimp minigame in the tank view (`openHealth`). The salt bath is a timing minigame (`openSalt`). The failed-molt white ring sits where the head shell meets the body (sprite x 54–60), not behind the eye.
+- **Illness and danger alerts** (`illDay`, `treatIll`, `startIll`, `tips`, `updateAlerts`): sickness is intentionally quiet at first. At illness stage 3 (“Shrimp are dying fast”), `tips()` adds a bad alert; `updateAlerts()` turns the top-right `?` into red `!!`, shows the message when tapped, and (with the default slow-danger setting) drops speed to 1× once for that alert. Stage 4 is “About to crash”; a crash wipes the tank. This alert is late by design, not the first-symptom warning, so keep the stage and UI contract in sync if changing illness timing. New shrimp from Trade carry a flatworm risk until salt dipped (`dipFresh`). The health check is a tap-the-sick-shrimp minigame in the tank view (`openHealth`). The salt bath is a timing minigame (`openSalt`). The failed-molt white ring sits where the head shell meets the body (sprite x 54–60), not behind the eye.
 - **Choices and heart** (`FORK_Q`, `forkOpts`, `addHeart`, `dealsDay`, `laterDay`, `endingLines`, `endingVerdict`): kind or cold answers to one problem, hidden heart score, delayed news, and the win card's "What the world looks like" list.
 - **Quality checks** (`QC_STEPS`, `qcRound`, `sickKitRate`, `openQC`): a manual round once a month, steps automated in order, and a strictness setting.
 - **Hand packing** (`PACK_STEPS`, `handStep`, `buyTool`): five taps a kit, automated one tool at a time.
@@ -252,13 +252,35 @@ When you change balance, run both bots and compare against these. Report the bef
 
 ## Testing checklist
 
-1. Fast checks, run every time: `node tests/shrimp-balance.cjs` (50), `node tests/shrimp-academy.cjs` (10), `node tests/shrimp-me.cjs` (28: free time, Grandma, endings, schedule, research lines, charts).
+### Cross-system change protocol
+
+Before adding or changing a feature, trace its existing state and every consumer; do not stop at the new button or card. In this single-file game, changes commonly cross simulation, save migration, progression, alerts, story pacing, and UI rendering.
+
+1. Search for the state field, action/function, unlock flag, rendered IDs, and tests before editing. Read the owning functions and current working-tree diff first.
+2. Check the full lifecycle: new game defaults → old-save migration → unlock/reveal → player action → simulation update → alert/story/ending → save/load. Preserve the player's existing accordion/tab state unless the feature is a newly revealed item.
+3. Check neighbouring systems explicitly: tank care ↔ illness ↔ alerts/health check; breeding ↔ sales ↔ kits/packing ↔ farms/economy; research ↔ costs/reserves ↔ Earth/Space gates; milestones ↔ spotlights ↔ story/news pacing; header controls ↔ all tabs/mobile layouts.
+4. Add or update a focused regression test for each changed rule and run every affected suite. For UI-only work, verify the actual browser at narrow phone widths and at the progression stage where the feature appears. For balance/economy work, compare the strong and average bots; for Space work, run the Space continuation too.
+5. Review adjacent features after the change, not only the target path. Report any untested path explicitly; update the feature checklist and changelog when behaviour changes.
+
+1. Fast checks, run every time: `node tests/shrimp-balance.cjs` (50), `node tests/shrimp-academy.cjs` (10), `node tests/shrimp-me.cjs` (30: free time, Grandma, endings, schedule, research lines, charts).
 2. For balance or sim changes, run the bots: `node tests/shrimp-playthrough.cjs` (strong cold), `BOT_HEART=kind node tests/shrimp-playthrough.cjs` (strong kind), `node tests/shrimp-average-playthrough.cjs` (average curious player, goes to Space). Watch for `INSOLVENT` and big timing shifts against Pacing targets. `REVIEW_OUTPUT=<dir>` sets where the run json with snapshots goes (default `/private/tmp/shrimp-tests`, which doesn't exist on Linux).
 3. Spotlight sweep in a real browser: `SPOT_RUN=<dir>/run-7.json node tests/shrimp-spotlights.cjs` after a strong bot run. Every spotlight on every tab at six stages.
+   For Space changes, continue the academy fixture with `ACADEMY_RUN=<dir>/run-7.json node tests/shrimp-space-playthrough.cjs` and verify all planets remain sustainable.
 4. Load the page at 390 px and 360 px wide and look at screenshots of every tab at several stages: the opening, first sale, kits, farm, a million owners, win, and the ending page. Check for console errors, overflow and cut-off text. Load snapshots from the run json into the page (`G=snap;migrate(G);render()`).
 5. Sound needs a real http server (`python3 -m http.server` in `shrimp/`), `file://` can't fetch the mp3s.
 6. If you changed behaviour on purpose, update the matching test, and add a test for any new mechanic.
 7. Append a short section to `tests/README-shrimp.md`, bump `BUILD`, and keep this file's checklist true.
+
+### Before signing off any game change
+
+Do not report a feature as finished just because its new path works once. Check the change against the game around it:
+
+- Read the final diff and confirm every changed file belongs to the request; check `git status` for accidental screenshots, logs, or other scratch files.
+- Trace the feature from new-game defaults and old-save migration through unlock, UI, player action, simulation, alerts/stories, and save/load. Confirm it does not bypass a progression gate or reveal several unrelated things at once.
+- Check the neighboring game loops listed in the cross-system protocol above. In particular, make sure new choices or purchases do not silently change shrimp welfare, breeder stock, kit output, cash reserves, story pacing, ending state, or Earth/Space access.
+- Verify the visible player path at the stage where it unlocks, including the narrow phone layout. Check that the button, message, alert, tab, and follow-up action agree with the underlying state.
+- Run the tests required by the testing checklist and state which ones passed. If a required browser or playthrough check was skipped, say so plainly; do not imply it passed.
+- Update the feature notes, changelog, tests, and `BUILD` when the shipped behavior changes. Leave the next agent a clear note for any unresolved issue or known edge case.
 
 **Screenshot pitfalls.** Full-page screenshots show fixed bars and toasts in odd places. The guide can scroll the page by itself. A spotlight can block clicks, so close it or stub `spotlight` in scan scripts.
 
@@ -288,6 +310,9 @@ When you change balance, run both bots and compare against these. Report the bef
 - **Comparing `innerHTML` to a built string.** The browser rewrites SVG and attributes, so the compare never matches and the node is rebuilt every frame (charts flickered, tooltips died). Compare against a cached copy of the string instead.
 - **Spotlight on a fixed layer.** iPhone Safari has no scroll anchoring, so when something above the card grew, the page content moved and a `position:fixed` ring stayed put. The overlay now lives in page coordinates (`#spot` is absolute and as tall as the page), the ring follows its card every frame (`spotTrack`), and only header and tab-bar targets use fixed positioning. A scroll the player didn't make (no touch, wheel or key in the last 0.8 s) re-places the ring instead of closing it.
 - **Same thing spotlit twice.** Different paths (tab, intro card, card sweep) each kept their own "seen" note. Any spotlight now marks its element, its card and its tab as seen. A tab spotlight also carries the first card's line and marks that card, and tapping a button in a card marks it seen.
+- **Story text rewritten as policy memos.** One pass made every late card "grounded" by turning it into explainer prose: semicolons, "sovereignty", "(+3% adoption ceiling)", and the jokes removed. Grounded means the premise holds up (scale, facts, cause and effect), not that the voice goes flat. Keep Puti's voice and fix the logic.
+- **Satire that doesn't fit the scale.** News like "cocktail sales drop 12%" at 10,000 owners, or "the last person on Earth" with 4 million left, reads as bad writing. Match every news line and card to the owner count where it fires.
+- **The ending preview drifting from the game.** `shrimp/ending-playtest-data.js` is built from the game now: run `node tests/build-ending-playtest.cjs` after changing forks, late cards or endings. The `extras` list in `ending-playtest.html` is still hand-written.
 - **Buttons rebuilt under a finger.** Writing `innerHTML` every render swapped buttons out mid-tap, so holds and fast taps got lost. Use `el.mhtml=html` (the `morph` helper): it patches the DOM in place, keeps `open` on folds and the classes in `KEEP_CLS`, and does nothing when the string hasn't changed.
 - **Prices that stop mattering.** A fixed AED 20M choice is free with AED 300B in the bank. Fixed prices go through `scM(G,m)` / `si(G,i)`: never less than 0.2% of your cash (or ✦). Story labels are rewritten with the scaled number (`needM`/`needI` carry `.cost`/`.inf`).
 - **A story choice that ends the game.** Selling or closing the company set `ended` but nothing queued the ending, so the game sat frozen. The choice handler now runs `detectMilestones` right away.

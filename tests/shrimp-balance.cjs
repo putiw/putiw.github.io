@@ -293,7 +293,7 @@ if(!html.includes('id="tv-check"')||!html.includes('id="tv-clean"'))throw Error(
 {const tp=html.slice(html.indexOf('function tips(T){'),html.indexOf('function tips(T){')+4000);if(/in debt|Cash runs out/.test(tp.slice(0,tp.indexOf('\nfunction ',10))))throw Error('Tank alerts should not include money');if(!html.includes("var ea=cashTips().concat(empTips())"))throw Error('Money alerts go with the business alerts');}
 if(!html.includes("TVM.dacc=(TVM.dacc||0)+dd/N*TVM.ag.length"))throw Error('Visible deaths should be in proportion to real ones');
 check('Shrimp Times opens with kit-count stories',`
-var g=readyGame();g.humans=30;g.kits.sold=24;rippleDay(g);if(rip(g).n!==0)throw Error('No story before 25 kits');g.kits.sold=25;rippleDay(g);if(rip(g).n!==1||!/Reddit/.test(RIPPLE[rip(g).log[0].i].t))throw Error('First story at 25 kits');
+var g=readyGame();g.humans=30;g.kits.sold=24;rippleDay(g);if(rip(g).n!==0)throw Error('No story before 25 kits');g.kits.sold=25;rippleDay(g);if(rip(g).n!==1||!/Shrimp Times/.test(RIPPLE[rip(g).log[0].i].t))throw Error('First story at 25 kits');
 g.kits.sold=1000;rippleDay(g);if(rip(g).n!==3)throw Error('500 and 1000 kit stories');
 var o=readyGame();o.emp.ripple={free:2e4,n:1,log:[{i:0,d:5}],seen:1};var R=rip(o);if(R.n!==4||R.log[0].i!==3||R.v!==2)throw Error('Old saves keep their place in the story list');
 `);
@@ -337,6 +337,18 @@ if(STUDIES[0].id!=='automation'||!STUDIES[0].req(g))throw Error('Automation stud
 check('the ending reads the path you took',`
 if(PROJ.filter(p=>p.end).length<20)throw Error('Ending lists what you did');
 `);
+check('blackout replacements unlock an optional kit battery with a real cost and survival effect',`
+var g=readyGame();g.money=1e10;g.emp.infOn=1;g.emp.inf=1e8;var q=effectiveQuality(g),c=productionUnitCost(g);
+if(!card3Choose(g,'c_blackout',1)||!g.emp.batteryKitUnlocked)throw Error('Replacement choice should unlock the kit add-on');
+g.emp.batteryKit=true;if(Math.abs(productionUnitCost(g)-c-35)>1e-7)throw Error('Battery should add AED 35 to each kit');
+if(Math.abs(effectiveQuality(g)-q-0.02)>1e-7)throw Error('Battery should add two survival points');
+g.emp.q=1.11;if(effectiveQuality(g)!==0.98)throw Error('Survival stays capped at 98% with the battery');
+`);
+if(!html.includes('id="battery-kit-upgrade"')||!html.includes('data-act="battery-kit"'))throw Error('Optional battery needs a control in Starter kits');
+if(/;\s[a-z]/.test(JSON.stringify(eval('('+fs.readFileSync(path.join(__dirname,'../shrimp/ending-playtest-data.js'),'utf8').replace(/^window\.ENDING_TEST_DATA = /,'').replace(/;\s*$/,'')+')').cards)))throw Error('No semicolons in late-game card text');
 if(!html.includes('function endingVerdict(G)')||!html.includes('What the world looks like'))throw Error('Ending shows what the world became');
+const storyData={window:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../shrimp/ending-playtest-data.js'),'utf8'),storyData);
+{const D=storyData.window.ENDING_TEST_DATA,cash=D.cards.find(x=>x.id==='c_cash'),war=D.cards.find(x=>x.id==='c_war');if(!cash||/shrimp as cash|legal tender/.test(cash.body)||!war||/river pact/.test(JSON.stringify(war))||!/fled/.test(war.body))throw Error('Ending preview should match the game text');}
+if(!storyData.window.ENDING_TEST_DATA.forks.find(x=>x.id==='kids').options[1].label.includes('no ads to kids'))throw Error('Kids sponsorship choice should make its distinction clear');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

@@ -471,3 +471,23 @@ ammonia is only the primary button once ammonia is near zero.
 - Water care opens the first time the tank needs a change, not five days after the first feeding.
 - `.top::before` paints the page colour 200 px above the sticky header, so content never shows through a gap above it (iPhone, artifact viewer).
 - Spotlight sweep (`SPOT_RUN=<strong bot run json> node tests/shrimp-spotlights.cjs`): every spotlight card on every open tab on six saves, plus every tab button and the Water button, 145 spotlights. Checks the ring is up, the target is visible between the bars, the ring top matches the card, and the tip doesn't cover the ring. All pass.
+
+## Pass 60: grounded ending choices and optional battery kits
+- The ending choices were first revised to use grounded voucher and conflict scenarios; Pass 61 replaces the voucher premise entirely and makes the river conflict about water infrastructure and commercial terms. Children's TV makes the trade-off explicit: commercial ads to children or a school science sponsorship with no ads.
+- Clarified the other choice wording where ownership, animal welfare, ecology, or consequences were hard to follow: sponsored research, dock leases, healthy school shrimp, long-life filters, wastewater, wetlands, water access, grid demand, and river releases. The last-neighbour choice now makes consent explicit.
+- After the player funds free replacements following a blackout, the Kits tab unlocks an optional battery-pump add-on. It adds AED 35 to production per kit and up to two percentage points to kit survival, including raising the survival cap to 100%; it can be switched on or off.
+- Added focused checks for the unlock, cost, survival effect, and the ending-preview copy. Run `node tests/shrimp-balance.cjs`, `node tests/shrimp-academy.cjs`, `node tests/shrimp-me.cjs`, then the playthrough bots.
+
+## Pass 61: trade finance replaces shrimp-backed money
+- Replaced Pelagonia's shrimp-backed voucher story with a development-bank hatchery bailout. The buyout-versus-restructure fork preserves the original `drive` and `means` trait scores.
+- Reframed the river-war choices around waterworks contracts, a treaty-backed AED 10B first-phase investment in waterworks and ports, or emergency water aid. The treaty preserves both countries' sovereignty and agreed water shares, opens civilian river trade, and gives the company a 30-year operating concession whose fees grow with the owner base. This is an infrastructure and peace settlement, not a literal purchase of a river.
+- Updated the ending preview and added regression checks for the unchanged hatchery-bailout trait signals and river-pact cost/outcome.
+- Paid study and children's TV/school-kit decisions remain unchanged.
+
+## Pass 62: story review fixes (Claude, on top of Codex's passes 60-61)
+- Late cards keep Codex's battery-pump kit option but go back to Puti's voice. River war: sell to both armies, refuse, free kits for ✦, or pay for water points for families who fled. The river pact is gone. Pelagonia is a hatchery bust (no shrimp currency).
+- Facts fixed: blackout is about heat (shrimp die above 30 °C), electricity is about 1% of world power, insulin rides in a cold box next to the warm shrimp box, monthly cartridges throw away bacteria, genes are licensed as a bred line rather than patented. Battery kits no longer raise survival past 98%.
+- Scale: Shrimp Times lines match the owner count where they fire. The last neighbour card says about four million are left, and "Leave him be" changes the win text.
+- Continuity: Mira's age is tracked from the day you met her (`miraAge`), so the scholarship and "turns eighteen" wait until she is 18. Grandma's letters no longer have her keeping the 20 L you kept. The doctor no longer calls Grandma.
+- Choices: newspaper answers have their own lines, ignoring the rival costs some mood, the school donation goes to families and can't fire after the win.
+- `tests/build-ending-playtest.cjs` rebuilds the ending preview data from the game.

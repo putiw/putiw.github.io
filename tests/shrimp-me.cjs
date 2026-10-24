@@ -117,8 +117,10 @@ if(buyHouse(g))throw Error('Walls need a who');if(!buyHouse(g,'gp'))throw Error(
 while(houseNext(g))buyHouse(g);if(!g.me.house.complete||treesFor(g).indexOf('rewild')<0||gpLines(g).join().indexOf('Grandma lives')<0)throw Error('Complete');
 `);
 check('hard places and late cards ask once and leave a line',`
-var g=newGame();g.humans=2e9;var c=milestoneConditions(g);if(!c.c_war||!c.c_cash||c.c_water||c.c_gary!==undefined)throw Error('Thresholds');g.emp.inf=1e5;var ce=g.emp.ceil;
-if(!storyChoose(g,'c_war',2)||g.emp.inf!==5e4)throw Error('Peace Corps');if(card3Lines(g).join().indexOf('peace deal')<0)throw Error('Line');
+var g=newGame();g.humans=2e9;var c=milestoneConditions(g);if(!c.c_war||!c.c_cash||c.c_water||c.c_gary!==undefined)throw Error('Thresholds');g.money=1e12;var before=g.money;
+g.emp.inf=1e5;if(!storyChoose(g,'c_war',2)||g.emp.inf!==5e4)throw Error('Free kits to both armies cost ✦');if(card3Lines(g).join().indexOf('both banks kept your shrimp')<0)throw Error('Line');
+var bail=newGame();bail.humans=1e9;var b0=bail.tr.means||0;storyChoose(bail,'c_cash',0);if((bail.tr.drive||0)!==1||(bail.tr.means||0)!==b0-.5)throw Error('Hatchery acquisition keeps the former drive/means scores');
+var decline=newGame();decline.humans=1e9;storyChoose(decline,'c_cash',1);if((decline.tr.means||0)!==.5)throw Error('Restructuring keeps the former fairness score');
 g.humans=3e9;g.money=0;if(storyChoose(g,'c_water',0))throw Error('Needs the money');if(!storyChoose(g,'c_water',4))throw Error('Free answer');
 var old=newGame();old.day=3000;old.humans=7e9;delete old.progress.v5;migrateProgress(old);detectMilestones(old);if(old.progress.queue.some(function(k){return /^c_/.test(k);}))throw Error('Old saves skip passed cards');
 `);
@@ -148,14 +150,14 @@ var g=newGame();g.kits.sold=1000;g.academy.level=1;g.money=1e7;if(!forkOpts('sci
 var m=g.emp.mat;buyProj(g,'sciind');if(g.emp.mat!==m*0.95||treesFor(g).indexOf('lab')<0||forkOpts('science').some(function(p){return p.id==='sciacad'&&g.emp.proj[p.id];}))throw Error('Industry');
 var h=newGame();h.kits.sold=1000;h.academy.level=1;h.money=1e7;buyProj(h,'sciacad');if(!h.emp.acad||(h.tr.know||0)<2)throw Error('Academia');
 var q=newGame();q.tanks[0].feeder=1;q.tanks[0].autoWC=1;personalDay(q);for(var hh=17;hh<23;hh++)setHour(q,hh,'grandma');for(var d=0;d<30;d++){q.day++;personalDay(q);}if(q.me.letters<3||!q.me.hist.some(function(x){return /fishing boat/.test(x);}))throw Error('His story in letters');
-var w=newGame();w.humans=2e9;w.emp.inf=1e5;storyChoose(w,'c_war',3);if(!rip(w).log.some(function(x){return /breeding season/.test(x.tx);}))throw Error('The war choice makes the news');
+var w=newGame();w.humans=2e9;w.emp.inf=1e5;w.money=1e7;storyChoose(w,'c_war',3);if(!rip(w).log.some(function(x){return /families who fled/.test(x.tx);}))throw Error('The relief choice makes the news');
 var o=newGame();o.emp.farms.hatch=1;storyChoose(o,'owntank',0);if(gpLines(o).join().indexOf('never looked')<0)throw Error('Kept and never looked');o.ps.look+=5;if(gpLines(o).join().indexOf('never looked')>=0)throw Error('Looked after');
 `);
 check('Mira shows up at more moments, and each one follows something you did',`
 var g=newGame();g.day=1200;var c=milestoneConditions(g);if(c.mira_teen||c.mira_house||c.mira_net||c.mira_grown||c.mira_space||c.mira_bye)throw Error('Not before you met her');
 g.story.choices={ev_mira:1};c=milestoneConditions(g);if(!c.mira_teen||c.mira_house||c.mira_net||c.mira_grown||c.mira_space||c.mira_bye)throw Error('Only the age one at first');
 if(MILESTONES.mira_teen.more(g).indexOf('Sunday')<0)throw Error('Her answer shows');g.story.choices.ev_mira=0;if(MILESTONES.mira_teen.more(g).indexOf('jar')<0)throw Error('The jar');
-g.me={on:1,house:{complete:5},cnt:{},gp:{}};g.emp.network=1;g.humans=2e8;g.space.started=true;g.story.choices.bye_pack=0;c=milestoneConditions(g);
+g.me={on:1,house:{complete:5},cnt:{},gp:{}};g.emp.network=1;g.humans=2e8;g.space.started=true;g.story.choices.bye_pack=0;c=milestoneConditions(g);if(c.mira_grown)throw Error('Mira is not eighteen yet');g.day=3700;c=milestoneConditions(g);
 ['mira_house','mira_net','mira_grown','mira_space','mira_bye'].forEach(function(k){if(!c[k]||!MILESTONES[k]||!MILESTONES[k].body)throw Error(k);});
 var n=Object.keys(MILESTONES).filter(function(k){return /^mira_/.test(k);}).length;if(n<10)throw Error('Mira moments '+n);
 `);
@@ -163,7 +165,7 @@ check('paths without Space get a last chapter before the ending',`
 var g=newGame();g.tr={drive:6,ego:4,means:-2};g.emp.won=2000;g.humans=WORLD;g.emp.trees={island:1};g.emp.tree={isl_buy:1,isl_nation:1};g.progress.seen={};g.progress.queue=['win'];
 if(spaceOpen(g)||lastChapter(g)!=='island')throw Error('Island chapter '+lastChapter(g));detectMilestones(g);
 if(g.progress.queue[0]!=='lastchap'||g.progress.queue.indexOf('win')<1)throw Error('Order '+g.progress.queue);var t=MILESTONES.lastchap.more(g);
-if(t.indexOf('Shrimp Island')<0||t.indexOf('country now')<0||t.indexOf('jetty')<0)throw Error('Text '+t);
+if(t.indexOf('Shrimp Island')<0||t.indexOf('calls itself a country')<0||t.indexOf('jetty')<0)throw Error('Text '+t);
 var q=newGame();q.emp.won=2000;q.emp.trees={space:1};q.tr={know:6,ego:-2,care:2};if(!spaceOpen(q)||lastChapter(q))throw Error('Space players keep their own last chapter');
 var r=newGame();r.tr={drive:-6,ego:-4,care:-2};r.emp.won=2000;r.emp.trees={shop:1};r.progress.seen={};r.progress.queue=['win'];detectMilestones(r);if(r.progress.queue[0]!=='lastchap'||MILESTONES.lastchap.more(r).indexOf('cat')<0)throw Error('Shop chapter');
 var o=newGame();o.tr={drive:-6,ego:-4};o.emp.won=1;o.progress={seen:{},queue:[],wait:[]};o.emp.trees={shop:1};detectMilestones(o);
