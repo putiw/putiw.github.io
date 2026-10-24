@@ -68,6 +68,9 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 
 ### Systems added recently
 
+- **The hard part** (`HARD`, `HARD_GOALS`, `hardDay`, `hardBuy`, `hardSetGoal`, `hardCap`, `hardTarget`, `streamReady`, `renderHard`): opens at 4B people with a tank at home (Chapter 6, Grandma's kitchen). From there `kitCap` is `hardEasy()` (about 4.3B) plus the people reached in ten groups (too hot, no water, too poor, war, forced from home, hard to reach, can't do it alone, can't see, said no, never met). Each group has fix, workaround, dark and money options that ramp in over their days; war takes one ending option only. "Rethink the goal" changes the target (every home, every home that wants one, 90%, 75%) or ends the game now (the spreadsheet, good enough, no number). The living-stream ending is hidden: it appears only with the Rewild tree, mangroves, clean farm water, the Taiwan streams, a river answer, and no forced option. Delivering to the uncontacted village kills it, the goal bar says "People who die don't need a tank" and Grandma stops writing for a year (`G.me.gpSilent`). The old c_war, c_water and c_last cards and the "last holdouts" project are gone, the hard part replaces them.
+- **Homes, not people** (`HH_AVG`, `hhDiv`, `hhPeople`, `addOwners`): one kit is one home of 1 to 4 people (2.5 on average, random per kit for small sales). Kit demand is divided by the household size once 2,000 kits are sold, so people-growth pace stays the same and kit counts are about 2.5x lower than before. Always add owners through `addOwners`.
+
 - **Tank view** (`updateTankView`, `tv*` functions, `SPR` sprites): a canvas drawn from a sample of the real colony, using art layers from Puti's Shrimp Tanks game. It runs at about 30 fps and stops off screen, on other tabs and when the app is hidden. Pellets follow `T.chem.food`.
 - **Illness and danger alerts** (`illDay`, `treatIll`, `startIll`, `tips`, `updateAlerts`): sickness is intentionally quiet at first. At illness stage 3 (“Shrimp are dying fast”), `tips()` adds a bad alert; `updateAlerts()` turns the top-right `?` into red `!!`, shows the message when tapped, and (with the default slow-danger setting) drops speed to 1× once for that alert. Stage 4 is “About to crash”; a crash wipes the tank. This alert is late by design, not the first-symptom warning, so keep the stage and UI contract in sync if changing illness timing. New shrimp from Trade carry a flatworm risk until salt dipped (`dipFresh`). The health check is a tap-the-sick-shrimp minigame in the tank view (`openHealth`). The salt bath is a timing minigame (`openSalt`). The failed-molt white ring sits where the head shell meets the body (sprite x 54–60), not behind the eye.
 - **Choices and heart** (`FORK_Q`, `forkOpts`, `addHeart`, `dealsDay`, `laterDay`, `endingLines`, `endingVerdict`): kind or cold answers to one problem, hidden heart score, delayed news, and the win card's "What the world looks like" list.
@@ -241,9 +244,10 @@ Latest bot results (seed 7):
 
 | Bot | Result |
 |---|---|
-| Strong, cold answers (default) | Earth won on day 2,668, empire_dictator |
-| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 2,738, garden_village |
-| Average, curious and kind (default) | Earth on day 6,011, space done day 7,404 |
+| Strong, cold answers (default) | Earth won on day 3,386 (goal: every home, forces the said-no and never-met groups), empire_dictator |
+| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 2,864 (goal: every home that wants one), garden_village |
+| Average, curious and kind (default) | Hard part day 4,718, Earth on day 5,602, space done day 7,124 |
+| Average, cold answers (`BOT_HEART=cold`) | Hard part day 4,803, Earth on day 5,361 |
 | Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,975, no Space (Shrimp Island instead) |
 
 The average bot has 21 years to finish both chapters (it used to finish space on day 7,292 of 7,300).

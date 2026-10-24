@@ -491,3 +491,9 @@ ammonia is only the primary button once ammonia is near zero.
 - Continuity: Mira's age is tracked from the day you met her (`miraAge`), so the scholarship and "turns eighteen" wait until she is 18. Grandma's letters no longer have her keeping the 20 L you kept. The doctor no longer calls Grandma.
 - Choices: newspaper answers have their own lines, ignoring the rival costs some mood, the school donation goes to families and can't fire after the win.
 - `tests/build-ending-playtest.cjs` rebuilds the ending preview data from the game.
+
+## Pass 63: the hard part and homes
+- One kit is one home of 1 to 4 people. The counter still counts people (x of 8.2B with a tank at home). Kit demand divides by the household size after 2,000 kits, so pacing in people stays the same.
+- At 4B people the hard part opens (Chapter 6). Growth past about 4.3B only comes from the ten groups or from changing the goal. The bots pick options: cold buys the dark ones and keeps "every home", kind picks fix and workaround options and switches to "every home that wants one".
+- New checks in shrimp-me (32): the hard part opens at 4B and caps growth, one war ending, dark options, the uncontacted village, goals, the spreadsheet, the hidden stream ending, and households of 1 to 4.
+- Bots: strong cold 3,386 days, strong kind 2,864, average Earth 5,602 and space 7,124, average cold Earth 5,361. None insolvent. The strong cold bot is slower than before (2,668) because a literal every home takes the slow fixes and the law's ramp.

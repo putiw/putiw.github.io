@@ -116,13 +116,30 @@ var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.money=1
 if(buyHouse(g))throw Error('Walls need a who');if(!buyHouse(g,'gp'))throw Error('Walls');for(var hh=17;hh<23;hh++)setHour(g,hh,'house');g.me.next=g.day;personalDay(g);if(!g.me.house.hp)throw Error('Working on it');
 while(houseNext(g))buyHouse(g);if(!g.me.house.complete||treesFor(g).indexOf('rewild')<0||gpLines(g).join().indexOf('Grandma lives')<0)throw Error('Complete');
 `);
-check('hard places and late cards ask once and leave a line',`
-var g=newGame();g.humans=2e9;var c=milestoneConditions(g);if(!c.c_war||!c.c_cash||c.c_water||c.c_gary!==undefined)throw Error('Thresholds');g.money=1e12;var before=g.money;
-g.emp.inf=1e5;if(!storyChoose(g,'c_war',2)||g.emp.inf!==5e4)throw Error('Free kits to both armies cost ✦');if(card3Lines(g).join().indexOf('both banks kept your shrimp')<0)throw Error('Line');
-var bail=newGame();bail.humans=1e9;var b0=bail.tr.means||0;storyChoose(bail,'c_cash',0);if((bail.tr.drive||0)!==1||(bail.tr.means||0)!==b0-.5)throw Error('Hatchery acquisition keeps the former drive/means scores');
-var decline=newGame();decline.humans=1e9;storyChoose(decline,'c_cash',1);if((decline.tr.means||0)!==.5)throw Error('Restructuring keeps the former fairness score');
-g.humans=3e9;g.money=0;if(storyChoose(g,'c_water',0))throw Error('Needs the money');if(!storyChoose(g,'c_water',4))throw Error('Free answer');
+check('late cards ask once and leave a line',`
+var g=newGame();g.humans=2e9;var c=milestoneConditions(g);if(!c.c_cash||c.c_war!==undefined||c.c_water!==undefined||c.c_last!==undefined)throw Error('Thresholds');
+var bail=newGame();bail.humans=1e9;var b0=bail.tr.means||0;storyChoose(bail,'c_cash',0);if((bail.tr.drive||0)!==1||(bail.tr.means||0)!==b0-.5)throw Error('Hatchery buy keeps its trait scores');if(card3Lines(bail).join().indexOf('best hatcheries')<0)throw Error('Line');
 var old=newGame();old.day=3000;old.humans=7e9;delete old.progress.v5;migrateProgress(old);detectMilestones(old);if(old.progress.queue.some(function(k){return /^c_/.test(k);}))throw Error('Old saves skip passed cards');
+`);
+check('the hard part opens at 4 billion, caps growth, and every way out works',`
+var g=newGame();g.money=1e12;g.humans=3.9e9;hardDay(g);if(hardOpen(g))throw Error('Too early');g.humans=4e9;hardDay(g);if(!hardOpen(g)||!milestoneConditions(g).hardpart)throw Error('Opens at 4B');
+var sum=0;HARD.forEach(function(x){sum+=x.n;});if(Math.abs(hardEasy()-(WORLD-sum))>1||hardEasy()<4.2e9)throw Error('Easy room above 4B');if(Math.abs(hardCap(g)-hardEasy())>1)throw Error('Nothing reached yet');
+g.fin=[{kits:1e9}];if(!hardBuy(g,'hot','clay'))throw Error('Buy');if(hardBuy(g,'hot','clay'))throw Error('Once');var d0=g.day;g.day+=240;if(Math.abs(hardReach(g,hardGroup('hot'))-0.6)>1e-9)throw Error('Clay gets 60%');
+if(hardBuy(g,'hot','gene'))throw Error('Heat line needs genes research');
+if(!hardBuy(g,'war','pay')||hardBuy(g,'war','fund'))throw Error('One way to end the war');
+var w=newGame();w.money=1e12;w.humans=4e9;hardDay(w);w.fin=[{kits:1e9}];hardBuy(w,'war','fund');if(!hardForced(w)||(w.emp.heart||0)>-4)throw Error('Funding a side is dark');
+var n=newGame();n.money=1e12;n.humans=4e9;hardDay(n);n.fin=[{kits:1e9}];var h0=n.emp.heart||0;hardBuy(n,'never','deliver');n.day+=31;hardDay(n);if(!n.me||!(n.me.gpSilent>n.day))throw Error('Grandma goes quiet');if(!rip(n).log.some(function(x){return /need a tank/.test(x.tx);}))throw Error('The goal bar line');
+var t=newGame();t.humans=4e9;hardDay(t);hardSetGoal(t,'want');var tw=hardTarget(t);if(Math.abs(tw-(WORLD-9e8-1e4))>1)throw Error('Want excludes said no and never met '+tw);
+var e=newGame();e.humans=4.1e9;hardDay(e);if(!hardSetGoal(e,'enough')||!e.emp.won)throw Error('Good enough ends it');if(hardWinTitle(e)!=='Good enough')throw Error('Title');
+var sh=newGame();sh.humans=4.1e9;sh.kits.sold=1.6e9;hardDay(sh);hardSetGoal(sh,'sheet');if(!sh.emp.won||sh.kits.sold<WORLD/2.5-1)throw Error('Spreadsheet');
+var st=newGame();st.humans=5e9;hardDay(st);if(streamReady(st))throw Error('Stream is hidden');st.emp.tree={rw_stream:1,rw_reserve:1};st.emp.proj.mangrove=1;st.emp.proj.wasteclean=1;st.emp.proj.streams=1;st.emp.c3={c_rivers:0};if(!streamReady(st)||!milestoneConditions(st).stream)throw Error('Stream shows up');
+storyChoose(st,'stream',0);if(!st.emp.won||endingPick(st)!=='stream_world')throw Error('Stream ending');
+var f=newGame();f.humans=5e9;hardDay(f);f.emp.tree={rw_stream:1,rw_reserve:1};f.emp.proj.mangrove=1;f.emp.proj.wasteclean=1;f.emp.proj.streams=1;f.emp.c3={c_rivers:0};f.money=1e12;f.fin=[{kits:1e9}];hardBuy(f,'no','law');if(streamReady(f))throw Error('Forcing closes the stream');
+var k=newGame();k.humans=4e9;hardDay(k);k.money=1e12;k.fin=[{kits:1e9}];['hot','water','poor','fled','far','care','blind'].forEach(function(id){hardGroup(id).ops.forEach(function(o){if(o.f&&!o.req)hardBuy(k,id,o.id);});});hardBuy(k,'war','pay');k.day+=800;hardSetGoal(k,'want');k.humans=hardTarget(k);hardDay(k);if(!k.emp.won)throw Error('Want can be won without forcing');
+`);
+check('one kit is one home of 1 to 4 people',`
+var g=newGame();var t=0,rr=Math.random,sd=11;Math.random=function(){sd=(sd*16807)%2147483647;return sd/2147483647;};for(var i=0;i<400;i++){var p=hhPeople(1);if(p<1||p>4)throw Error('1 to 4');t+=p;}Math.random=rr;if(t/400<2.2||t/400>2.8)throw Error('Average about 2.5 '+t/400);if(hhPeople(1000)!==2500)throw Error('Big batches use the average');
+g.humans=0;addOwners(g,10);if(g.humans!==25)throw Error('Ten kits, 25 people');g.kits.sold=0;if(hhDiv(g)!==1)throw Error('Early buyers are hobbyists');g.kits.sold=5000;if(hhDiv(g)!==2.5)throw Error('Later, homes');
 `);
 check('the world moves on in headlines, food and big builds keep paying after Earth',`
 var g=newGame();g.emp.kitsOpened=1;g.humans=6e8;headlineDay(g);var R=rip(g);if(R.log.length!==5)throw Error('Gary, mayor, divorce and two about the founder '+R.log.length);headlineDay(g);if(rip(g).log.length!==5)throw Error('Once each');
@@ -150,7 +167,7 @@ var g=newGame();g.kits.sold=1000;g.academy.level=1;g.money=1e7;if(!forkOpts('sci
 var m=g.emp.mat;buyProj(g,'sciind');if(g.emp.mat!==m*0.95||treesFor(g).indexOf('lab')<0||forkOpts('science').some(function(p){return p.id==='sciacad'&&g.emp.proj[p.id];}))throw Error('Industry');
 var h=newGame();h.kits.sold=1000;h.academy.level=1;h.money=1e7;buyProj(h,'sciacad');if(!h.emp.acad||(h.tr.know||0)<2)throw Error('Academia');
 var q=newGame();q.tanks[0].feeder=1;q.tanks[0].autoWC=1;personalDay(q);for(var hh=17;hh<23;hh++)setHour(q,hh,'grandma');for(var d=0;d<30;d++){q.day++;personalDay(q);}if(q.me.letters<3||!q.me.hist.some(function(x){return /fishing boat/.test(x);}))throw Error('His story in letters');
-var w=newGame();w.humans=2e9;w.emp.inf=1e5;w.money=1e7;storyChoose(w,'c_war',3);if(!rip(w).log.some(function(x){return /families who fled/.test(x.tx);}))throw Error('The relief choice makes the news');
+var w=newGame();w.humans=4e9;hardDay(w);w.money=1e12;w.fin=[{kits:1e9}];hardBuy(w,'fled','camps');if(!rip(w).log.some(function(x){return /camp school/.test(x.tx);}))throw Error('A hard-part choice makes the news');
 var o=newGame();o.emp.farms.hatch=1;storyChoose(o,'owntank',0);if(gpLines(o).join().indexOf('never looked')<0)throw Error('Kept and never looked');o.ps.look+=5;if(gpLines(o).join().indexOf('never looked')>=0)throw Error('Looked after');
 `);
 check('Mira shows up at more moments, and each one follows something you did',`

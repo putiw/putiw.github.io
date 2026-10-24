@@ -49,6 +49,7 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,S=G.space,budget=
   if(G.ob.eproj){for(var area of ['emp','up','promote','world'])for(var p of (area==='world'?[].concat.apply([],TRACKS.map(t=>trackProj(G,t[0]))):shownProj(G,area,'biz'))){if(canSpend(pm(G,p))&&E.inf>=p.i)spend('project '+p.id,()=>buyProj(G,p.id));}
    // Choices: this player takes the kind answer when they can afford it (BOT_HEART=cold flips it).
    for(var fk in FORK_Q){if(forkDone(G,fk))continue;var opts=forkOpts(fk).filter(p=>p.req(G)).sort((a,b)=>(${process.env.BOT_HEART==='cold'}?a.h-b.h:b.h-a.h));var pk=opts[0];if(pk&&canSpend(pm(G,pk))&&E.inf>=pk.i)spend('choice '+pk.id,()=>buyProj(G,pk.id));}}
+   if(hardOpen(G)&&!E.won){if(BOTKIND&&hardOf(G).goal!=='want')hardSetGoal(G,'want');HARD.forEach(function(g){g.ops.slice().sort(function(a,b){return BOTKIND?0:(b.k==='dark')-(a.k==='dark');}).forEach(function(o){if(!o.f||(BOTKIND&&o.k==='dark'))return;if(g.id==='war'&&o.id!==(BOTKIND?'pay':'fund'))return;if(canSpend(hardCost(G,o)))hardBuy(G,g.id,o.id);});});}
   // One modest advertising attempt; later keep referrals and distribution working.
   if(G.ob.sell&&G.kits.sold<100&&!G.webShop&&canSpend(1500)&&G.kits.sold>=10)spend('online shop',()=>addAd(G,'web'));
   if(G.ob.eshops&&!shopCount(G)&&G.money>100000)spend('market stall',()=>buyShop(G,'stall'));

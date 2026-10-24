@@ -506,102 +506,6 @@ window.ENDING_TEST_DATA = {
       ]
     },
     {
-      "id": "c_war",
-      "title": "The river war",
-      "body": "Varnistan and Oskeria have fought over a river for six years. Families on both banks have fled their homes. Both armies want to buy your kits.",
-      "options": [
-        {
-          "label": "Sell kits to both armies",
-          "description": "Double the orders there. Both armies like the same shrimp.",
-          "traits": {
-            "means": -1.5,
-            "care": -1
-          },
-          "endingLine": "Varnistan and Oskeria both bought your kits. The war went on a while."
-        },
-        {
-          "label": "Refuse both sides",
-          "description": "No sales there until it ends.",
-          "traits": {
-            "means": 1,
-            "reach": -0.5
-          },
-          "endingLine": "You sold nothing to either army. The war ended without you."
-        },
-        {
-          "label": "Free kits to both armies, ✦ 50,000",
-          "description": "Soldiers on both banks compare shrimp over the radio. It doesn’t end the war.",
-          "traits": {
-            "ego": 1.5,
-            "reach": 1
-          },
-          "endingLine": "Soldiers on both banks kept your shrimp. The war ended the usual way, slowly."
-        },
-        {
-          "label": "Pay for water points for families who fled, AED 5M",
-          "description": "A relief agency runs them. You don’t choose who gets water.",
-          "traits": {
-            "ego": -1.5,
-            "know": 0.5
-          },
-          "endingLine": "A relief agency ran water points on both banks of the river, paid for by you."
-        }
-      ]
-    },
-    {
-      "id": "c_water",
-      "title": "Water first",
-      "body": "A lot of the people who still want a tank don’t have water at home they can trust. A tank needs a bucket of clean water every week.",
-      "options": [
-        {
-          "label": "Desalination plants, AED 200M",
-          "description": "They work, they burn a lot of power, and you own the water now.",
-          "traits": {
-            "drive": 1,
-            "know": -1,
-            "ego": 1
-          },
-          "endingLine": "Your desalination plants run day and night on the coast."
-        },
-        {
-          "label": "Low-water jar tanks, AED 100M",
-          "description": "Plants do most of the cleaning. A cup of water a week instead of a bucket.",
-          "traits": {
-            "know": 1.5,
-            "means": 0.5
-          },
-          "endingLine": "The driest towns got jar tanks that need a cup of water a week."
-        },
-        {
-          "label": "Fog nets on the hills, AED 20M",
-          "description": "Nets catch water out of the fog. Cheap, local, slow.",
-          "traits": {
-            "drive": -1,
-            "reach": -1,
-            "means": 0.5
-          },
-          "endingLine": "Fog nets on the hills catch water for whole villages."
-        },
-        {
-          "label": "Cloud seeding, AED 50M",
-          "description": "It rained. In the wrong country.",
-          "traits": {
-            "means": -1,
-            "reach": 1
-          },
-          "endingLine": "You made it rain once. It was the wrong country."
-        },
-        {
-          "label": "Leave it to the governments",
-          "description": "Some of them get to it.",
-          "traits": {
-            "care": -1,
-            "drive": -0.5
-          }
-        }
-      ]
-    },
-    {
       "id": "c_power",
       "title": "The electricity bill",
       "body": "Five billion tanks with a pump, a light and sometimes a heater use about 1% of the world’s electricity, dozens of power stations’ worth.",
@@ -761,39 +665,6 @@ window.ENDING_TEST_DATA = {
             "kin": 1
           },
           "endingLine": "You agreed that tanks are tiny jails, and started thinking about where else shrimp could live."
-        }
-      ]
-    },
-    {
-      "id": "c_last",
-      "title": "The one neighbour",
-      "body": "About four million people still don’t have a tank. One of them is the man next door. He says he doesn’t like things that need feeding.",
-      "options": [
-        {
-          "label": "Leave him be",
-          "description": "Everyone who wanted one has one.",
-          "traits": {
-            "drive": -1,
-            "means": 1
-          },
-          "endingLine": "The man next door never got a tank. You left him alone."
-        },
-        {
-          "label": "Invite him over to see yours",
-          "description": "No pressure. He watches them eat for twenty minutes and goes home.",
-          "traits": {
-            "means": 0.5
-          },
-          "endingLine": "The man next door came over once and watched your shrimp eat."
-        },
-        {
-          "label": "Get his daughter to give him one for his birthday",
-          "description": "He keeps it on the counter. She feeds it.",
-          "traits": {
-            "control": 1,
-            "means": -1
-          },
-          "endingLine": "The man next door has a tank. His daughter feeds it."
         }
       ]
     },
@@ -1001,6 +872,15 @@ window.ENDING_TEST_DATA = {
       "next": "They finished the job their way, faster in some places, worse in others. Everyone has a tank seven years after you sold. Your name isn't on any of them.",
       "gp": "So now you're rich and you're bored, I can tell from your letters. [visit] Buy a small tank, a 20 L, start again for fun. That's how it started last time.",
       "tank": "The logo on the box changed. Nothing else did."
+    },
+    "stream_world": {
+      "id": "stream_world",
+      "end": "stream",
+      "name": "The Stream",
+      "who": "You set out to put a tank in every home and somewhere along the way you stopped counting tanks. You cleaned the farm water, you planted the mangroves, you put native shrimp back in streams where they used to live. The tank was the small version. You built the big one, and people walk past it every day.",
+      "mira": "She runs the river surveys. She sends you a photo every Friday, a different stream each time, always with shrimp in it.",
+      "gp": "I walked down to the stream behind the school today. Kids with nets, catching shrimp and letting them go. Nobody had to sell them anything. [visit] That's all I wanted, for people to stop and look.",
+      "tank": "One day the glass wasn't there anymore. There was cold water and stones and a lot of others like us, and a child's face very close, looking."
     }
   }
 };
