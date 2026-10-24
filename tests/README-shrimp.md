@@ -578,3 +578,10 @@ ammonia is only the primary button once ammonia is near zero.
 ## Pass 76: quiet spells
 - If nothing has happened for 75 seconds of play and at least 45 game days (no story card, illness, pet shop or bulk order), a random event fires: a few sick shrimp, a hot spell (+3 °C for 6 days), an algae bloom on the glass or a pet shop order in the tank stage; a bulk kit order, a sick rack, a good review (up to 6) or a supplier shortage (kit materials +15% for 30 days) later. It shows as a toast and in the log.
 - Results: strong cold 2,714, strong kind 3,232, average Earth 6,021-6,105, average cold 5,349. Bots see about 6 a year because their clock runs slower than a real player's.
+
+## Pass 77: clutter pass
+- Screenshotted every tab at ten stages (first sale to the win) on a phone and on a laptop, and replayed a beginner in real time.
+- The "Time is paused" pill moved from under the header, where it covered the first card's title, to just above the tab bar. Pop-up messages move up while it shows.
+- Gear: with several tanks, one switch at the top ("Tank 1 / All 3 tanks") replaces the extra "Next level on all tanks" button under every item. Decor and treats sit under small headings.
+- The NEXT card and the pop-up no longer repeat a pet shop or bulk order when you are already on the tab that shows it.
+- Smaller fixes: the sell button reads "Buyers next week" instead of a cut-off sentence; the empty space under the packing table is gone; the empty Packing & staff card waits for the five tools; "How strict" in quality checks waits for 20 kits and shows its cost per kit; Readings over time and the Trade histogram start folded; tank counts match the header; chart readouts name the day instead of "Now" (they are a day behind the header); the kit price slider follows price changes from stories; the postdoc price also shows in AED; the folded home-tank gear is called "Your home tanks".
