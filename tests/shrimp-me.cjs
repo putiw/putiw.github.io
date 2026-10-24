@@ -140,9 +140,10 @@ var k=newGame();k.humans=4e9;hardDay(k);k.money=1e12;k.fin=[{kits:1e9}];['hot','
 `);
 check('shrimpcoin: one coin per mangrove tree, a market you can buy and sell in',`
 var g=newGame();g.humans=1e8;if(!milestoneConditions(g).coin_offer)throw Error('Offer at 100M');g.money=1e10;g.fin=[{kits:2e7}];storyChoose(g,'coin_offer',0);if(!coinOn(g)||!coinOf(g).honest)throw Error('Honest launch');
-var n=coinPlant(g,4e6);if(n!==1e6||coinOf(g).coins!==0)throw Error('Honest coins wait a year');for(var d=0;d<366;d++){g.day++;coinDay(g);}if(coinOf(g).coins!==6e5)throw Error('Six in ten trees live '+coinOf(g).coins);
+var n=coinPlant(g,4e6);if(n!==1e6||coinOf(g).coins!==0)throw Error('Honest coins wait a year');for(var d=0;d<366;d++){g.day++;coinDay(g);}if(coinOf(g).cohorts.length||coinOf(g).treasury<6e5||coinOf(g).treasury>6e5+coinOf(g).otrees*COIN_FEE+1)throw Error('Six in ten trees live '+coinOf(g).treasury);
 var m0=g.money;var got=coinSell(g,1e5);if(!(got>0)||Math.abs(g.money-m0-got)>1)throw Error('Selling earns');var p=coinOf(g).price;if(!(p>0.5&&p<300))throw Error('Price stays sane '+p);if(coinBuy(g,1e6)<1)throw Error('Buying');
 var s=newGame();s.humans=1e8;s.money=1e10;s.fin=[{kits:2e7}];storyChoose(s,'coin_offer',1);coinPlant(s,4e6);if(coinOf(s).coins!==1e6||coinOf(s).unbacked<3.9e5)throw Error('Seedling count mints now and leaves coins with no tree');
+var o=newGame();o.humans=2e8;o.money=1e11;o.fin=[{kits:2e7}];coinLaunch(o,1);coinOf(o).x=0.7;coinOf(o).price=COIN_FAIR*Math.exp(0.7);o.day++;coinDay(o);if(!(coinOf(o).otrees>0))throw Error('A high price brings other planters');var q=newGame();q.humans=2e8;coinLaunch(q,1);coinOf(q).x=-1;coinOf(q).price=COIN_FAIR*Math.exp(-1);q.day++;coinDay(q);if(coinOf(q).otrees>0)throw Error('Below break-even nobody plants');
 var r=Math.random;Math.random=function(){return 0.0001;};s.day++;coinDay(s);Math.random=r;if(!coinOf(s).caught||coinOf(s).price>COIN_FAIR)throw Error('Bare mud on the satellite photos');
 `);
 check('one kit is one home of 1 to 4 people',`
