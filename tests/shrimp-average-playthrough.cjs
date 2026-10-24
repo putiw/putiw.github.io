@@ -35,7 +35,7 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,S=G.space,budget=
  if(G.ob.up&&!earthArchived(G))for(var id of ['fan','feeder','autoWC','heater','tank','filter']){var cost=upgradeCost(G,T,id);if(cost==null)continue;if(id==='heater'&&T.chem.temp<28)continue;if(id==='tank'&&totalN(T)<T.vol*2)continue;if(id==='filter'&&T.chem.bacA>=bacTarget(T))continue;if(canSpend(cost))spend('tank '+id,()=>buyUpgrade(G,T,id));}
  if(kitsOpen(G)&&!E.won){
   if(kitStage(G)===0){kitStep(G,'mat');kitStep(G,'catch');if(kitStep(G,'pack'))note('first hand-packed kit');}
-  else if(!packCap(G)&&G.kits.stock<3&&G.money>kitMaterials(G)+100)manualPack(G,G.kits.sold<10?1:Math.min(10,Math.floor(spareKitShrimp(G)/8)));
+  else if(!packCap(G)&&G.kits.stock<3&&G.money>kitMaterials(G)+100)manualPack(G,Math.max(1,Math.min(G.kits.sold<10?1:10,Math.floor(spareKitShrimp(G)/8),Math.floor((G.money-150)/kitMaterials(G)))));
   if(G.kits.sold>=3&&!E.staff.tier&&canSpend(300))spend('packing bench',()=>buyPackTier(G));
   if(G.kits.sold>=5&&!consultHas(G)&&G.money>consultCost(G)*4&&!(G._consulted>=2))spend('consultants',()=>{var ok=buyConsult(G,'visit');if(ok)G._consulted=(G._consulted||0)+1;return ok;});
   var bn=bottleneck(G);

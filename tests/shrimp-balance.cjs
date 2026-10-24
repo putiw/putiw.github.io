@@ -29,7 +29,7 @@ if(!html.includes('details class="card" id="feedcard"')||!html.includes('details
 if(!html.includes("$('ideas').hidden=!idl.length"))throw Error('Ideas section should hide when there are no ideas');
 if(!html.includes('id="tb-info"')||!html.includes('<div id="info-alerts"')||!html.includes('.apop .goalrow{'))throw Error('Alerts, owners and the year journal should live behind the ?/!/!! button');
 console.log('PASS duplicate details fold away, header lines align and the first feed is highlighted');
-if(!html.includes("$('vwater').innerHTML=[['no3','NO₃'],['kh','KH'],['gh','GH'],['temp','Temp']]"))throw Error('Top readings should show nitrate, KH, GH and temperature in order');
+if(!html.includes("+[['no3','NO₃'],['kh','KH'],['gh','GH'],['temp','Temp']]"))throw Error('Top readings should show nitrate, KH, GH and temperature in order');
 if(!html.includes('#vwater{gap:3px;margin:0 0 0 auto;flex-wrap:nowrap;flex:0 0 auto}')||!html.includes('<div class="readrow" id="readrow">'))throw Error('Hunger, nutrition and water readings should share one compact line');
 if(!html.includes("$('vitals').hidden=!sh;"))throw Error('Hunger and nutrition should show once there are shrimp');
 console.log('PASS top readings show NO₃, KH, GH, pH and temperature');
@@ -232,7 +232,8 @@ if(!html.includes('id="guidebar"')||html.includes('bar.dataset.tab'))throw Error
 if(!g.includes("key:'feed1',tab:'tank'")||!g.includes("key:'sell',tab:'tank'"))throw Error('Feed and sell guidance must navigate to the Tank action bar');
 console.log('PASS guide points at one next step and keeps bottleneck advice behind the consultancy');}
 check('untreated illness spreads, fades colour and wipes the tank; moving and buying spread it',`
-var g=newGame(),t=g.tanks[0];g.stats.sold=5;buyPackFree(t,2,60);t.had=1;var g0=adultGrade=t.pop[0].g;startIll(g,t,'bact');var f0=t.ill.frac;
+var f1=newGame(),t1=f1.tanks[0];buyPackFree(t1,2,60);t1.had=1;startIll(f1,t1,'bact');for(var d=0;d<90&&t1.ill;d++)illDay(f1,t1,0);if(t1.crashed||totalN(t1)<1||t1.ill)throw Error('The first illness passes without wiping the tank');
+var g=newGame(),t=g.tanks[0];g.emp.healed=1;g.stats.sold=5;buyPackFree(t,2,60);t.had=1;var g0=adultGrade=t.pop[0].g;startIll(g,t,'bact');var f0=t.ill.frac;
 for(var d=0;d<20;d++)illDay(g,t,0);if(!(t.ill.frac>f0*3))throw Error('Illness should spread when untreated');if(!(t.pop[0].g<g0))throw Error('Sick shrimp should lose colour');
 var n20=totalN(t);for(d=0;d<80&&t.ill;d++)illDay(g,t,0);if(t.ill||totalN(t)>=1||!t.crashed)throw Error('An untreated outbreak should crash the whole tank');
 var a=g.tanks[0];buyPackFree(a,2,40);var b=newTank(1);g.tanks.push(b);startIll(g,a,'scut');a.ill.frac=0.4;moveShrimp(g,a,b,5);if(!b.ill)throw Error('Moving sick shrimp should spread it');

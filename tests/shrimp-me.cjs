@@ -164,7 +164,7 @@ check('story cards wait their turn, about two minutes of play apart',`
 var g=newGame();g.ps.t=1000;g.stats.sold=40;g.emp.kitsOpened=0;var p=ensureProgress(g);p.queue=[];p.seen.intro=true;g.tanks[0].cycledAt=null;
 p.seen.cycle=p.seen.hatch=p.seen.sale=p.seen.ev_paper=true;
 detectMilestones(g);var first=p.queue.slice();if(first.indexOf('ev_mira')<0||first.indexOf('dye_offer')>=0||p.wait.indexOf('dye_offer')<0)throw Error('Second card waits '+JSON.stringify(first)+JSON.stringify(p.wait));
-p.queue=[];g.ps.t+=20000;detectMilestones(g);if(p.queue.length)throw Error('Too soon');g.ps.t+=101000;detectMilestones(g);if(p.queue[0]!=='dye_offer')throw Error('Within two minutes');
+p.queue=[];g.ps.t+=20000;detectMilestones(g);if(p.queue.length)throw Error('Too soon');g.ps.t+=101000;detectMilestones(g);if(p.queue.length)throw Error('Year one waits a month between story cards too');g.day+=31;detectMilestones(g);if(p.queue[0]!=='dye_offer')throw Error('Within two minutes and a month');
 p.queue=[];g.money=-500;g.day=50;detectMilestones(g);if(p.queue[0]!=='broke')throw Error('Money trouble never waits');
 `);
 check('Shrimp Times stories come one at a time, and a choice\'s story comes next',`

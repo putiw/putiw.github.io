@@ -565,3 +565,12 @@ ammonia is only the primary button once ammonia is near zero.
 - The postdoc question waits for two postdocs and four papers. Leaving the Tank tab ends cleaning; the tab bar sits above the dim; Clean tank works while a spotlight is waiting.
 - You tab: Grandma's card first. At about three kits a day Grandma calls (the You button rings) with a short supply-and-demand lesson. Work hours move orders 5% an hour before farms, 3% with farms, 1% past a million owners, and the row shows the current effect. Videos, papers, club, exercise, your tanks, Mira's school and Grandma visits have hour milestones that do something.
 - Results: strong cold 2,772, strong kind 3,179, average Earth 6,050-6,274, average cold 5,237. shrimp-me 44 checks.
+
+## Pass 75: beginner pass
+- First sale around day 115 (was 147): tanks keep 12 breeders by default (was 30). Before any income, the header says "costs AED 0.22/d" in grey instead of a red loss.
+- Spotlights only for things you act on; panels like the log, colony table, charts, readings and gear lists explain themselves behind ?. No more doubled sentences when a tab opens.
+- The first illness can't wipe the tank: it tops out and passes after two months. The first danger alert points at the alert button, which now shows a count. Closing a health check with sick shrimp says they're still sick.
+- Header: one "Water good / change soon / change now" chip, tap it for the numbers; shrimp change reads "53/d to kits" once farms run; tap ✦ for what it means. Sell button says why it can't sell ("Ready in ~8 d", "No buyers till next week"). Sales rules folded with "the defaults work fine". "Pack above" is "Keep in tanks".
+- Kits: kit price fixed for the first 50 kits; bulk order is one line about spare kits; "offer ends today"; consultants, operating controls and the money table fold.
+- Year one: at most one story decision a month.
+- Results: strong cold 2,778, strong kind 3,263, average Earth 6,021-6,134, average cold 5,405. Spotlight sweep 139, all good.
