@@ -630,3 +630,9 @@ ammonia is only the primary button once ammonia is near zero.
 - Gear groups (Runs itself, Temperature, Room and filter, Decor and plants, Treats) are separate boxes now.
 - The tank view re-checks its shrimp whenever the count changes, so an emptied tank shows empty right away instead of waiting for the next day.
 - Bots: strong cold 2,893, average Earth 6,189 (unchanged).
+
+## Pass 84: biofilm, one-day feeding
+- Shrimp can live on biofilm. Without food, hunger climbs fast to 50%, then about 10% a day, and stops at 90%. Nutrition sinks toward 10%: breeding falls off (zero only near the floor), babies come out up to 4 grade points paler, and deaths from poor food only start below about 12% and stay small. Fed shrimp are unchanged.
+- A hand feeding covers one day again, with no automatic top-up.
+- The ? on Feeding and the Hunger and Nutrition readings explain the biofilm floor.
+- Bots: strong cold 2,729, strong kind 3,233, average Earth 5,938–5,994.

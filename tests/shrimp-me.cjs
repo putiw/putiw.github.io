@@ -242,7 +242,7 @@ var r=Math.random;Math.random=function(){return 0.99;};for(var d=0;d<365*5;d++)r
 `);
 check('one hand feeding covers two days, so the first weeks are not a clicking race',`
 var g=newGame(),T=g.tanks[0];T.cycledAt=0;T.had=1;T.pop=[{n:10,age:60,sex:'m'}];T.chem.nutr=0.85;T.chem.food=0;g.money=500;var run=function(n){for(var i=0;i<n;i++){while(g.progress.queue.length)acknowledgeMilestone(g);stepGame(g);}};
-var h=JSON.parse(JSON.stringify(g)),hT=h.tanks[0];feed(g,T,T.set.ration/100);if(handLeft(g,T)!==2)throw Error('Hand feeding covers today and tomorrow');run(8);if(g.day<2)throw Error('Days pass '+g.day);if(!(T.chem.nutr>0.75))throw Error('Still fed after 2 days '+T.chem.nutr);if(handLeft(g,T)!==0)throw Error('Two days only');var k=newGame(),K=k.tanks[0];K.cycledAt=0;K.had=1;K.pop=[{n:10,age:60,sex:'m'}];K.chem.food=0;k.money=0.001;feed(k,K,K.set.ration/100);K.chem.food=0;var m0=k.money;dayRollover(k);if(k.money<m0-1e-9&&k.money<0)throw Error('No top-up without cash');
+var h=JSON.parse(JSON.stringify(g)),hT=h.tanks[0];feed(g,T,T.set.ration/100);if(handLeft(g,T)!==1)throw Error('Hand feeding covers a day');run(4);if(g.day<1)throw Error('Days pass '+g.day);if(!(T.chem.nutr>0.75))throw Error('Still fed after a day '+T.chem.nutr);if(handLeft(g,T)!==0)throw Error('One day only');var k=newGame(),K=k.tanks[0];K.cycledAt=0;K.had=1;K.pop=[{n:10,age:60,sex:'m'}];K.chem.food=0;k.money=0.001;feed(k,K,K.set.ration/100);K.chem.food=0;var m0=k.money;dayRollover(k);if(k.money<m0-1e-9&&k.money<0)throw Error('No top-up without cash');
 `);
 check('mall stores: word of mouth is slower until one in five malls has your store, batches grow with scale, rent is daily',`
 var g=newGame();g.emp.kitsOpened=1;g.kits.sold=500;g.money=1e8;g.humans=1e5;g.emp.beta=0.012;
@@ -313,5 +313,6 @@ var h=newGame();h.stats.sold=10;h.money=100;h.day=200;if(!sharkLend(h,500)||h.mo
 h.day=230;debtDay(h);if(h.emp.shark.owe!==600)throw Error('20% after a month');h.day=260;debtDay(h);if(h.emp.shark.owe!==720)throw Error('Compounds');
 h.tanks[0].feeder=1;h.tanks[0].autoWC=1;h.day=290;debtDay(h);if(h.tanks[0].autoWC&&h.tanks[0].feeder)throw Error('After three months he takes gear');if(!h.emp.sharkUsed)throw Error('Collected loans count');
 var k=newGame();k.stats.sold=10;k.money=0;sharkLend(k,300);k.money=1000;if(!sharkPay(k)||k.emp.shark)throw Error('Pay back any time');
+var bf=newGame(),BT=bf.tanks[0];BT.cycledAt=0;BT.had=1;BT.pop=[{n:20,age:90,sex:'m'}];BT.chem.food=0;bf.progress.queue=[];for(var i=0;i<160;i++){bf.progress.queue=[];stepGame(bf);}if(totalN(BT)<14)throw Error('They live on biofilm '+totalN(BT));if(BT.chem.nutr>0.2||BT.chem.nutr<0.09)throw Error('Nutrition sinks to about 10% '+BT.chem.nutr);if(BT.chem.fed<0.45)throw Error('Biofilm keeps them half full');
 `);
 console.log(count+' free time, Grandma and ending checks passed');
