@@ -85,7 +85,7 @@ ul.ending{margin:4px 0 8px;padding-left:18px}.ending-box{flex-basis:100%;width:1
 .tchip[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .tchip .d{font:600 11px var(--font-data)}
 .tchip .d.bad{color:var(--bad)} .tchip .d.warn{color:var(--warn)}
-.readrow{display:flex;align-items:stretch;gap:6px;margin-top:5px}.readrow[hidden]{display:none}.vitals{display:flex;gap:7px;flex:1 1 auto;min-width:0;align-items:center}.vitals .vm .l{font-size:10.5px}.vitals .vm .l b{font-size:10.5px}@media(max-width:400px){#vwater .wp{min-width:37px;padding:1px 2px}}.vitals[hidden]{display:none}.vitals .vm{flex:1 1 0;min-width:0}.infob{font:800 17px/1 var(--font-body)!important;padding:0!important;min-width:0}.infob.warn{background:var(--zone-warn);color:var(--warn);border-color:var(--warn)}.infob.bad{background:var(--bad);color:#fff;border-color:var(--bad);letter-spacing:-.04em}.apop .goalrow{flex-wrap:wrap;white-space:normal;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:12.5px;line-height:1.35;gap:6px 8px}.apop .goalrow .goal-bar{flex:0 0 72px}.apop #b-goal-wide{display:inline!important}.apop #b-goal-short{display:none!important}.apop .dream-tracker{flex:1 1 100%}.apop .dream-tracker>summary{max-width:none}.apop .dream-tracker small{display:inline!important;max-width:none}.apop .dream-inner{position:static;max-height:none;box-shadow:none;border:0;padding:6px 0 0;background:transparent}#info-alerts .alert:last-child{margin-bottom:0}
+.readrow{display:flex;align-items:stretch;gap:6px;margin-top:5px}.readrow[hidden]{display:none}.vitals{display:flex;gap:7px;flex:1 1 auto;min-width:0;align-items:center}.vitals .vm .l{font-size:10.5px}.vitals .vm .l b{font-size:10.5px}@media(max-width:400px){#vwater .wp{min-width:37px;padding:1px 2px}}.vitals[hidden]{display:none}.vitals.stack{flex-direction:column;align-items:stretch;justify-content:center;gap:5px}.vitals.stack .vm{flex:0 0 auto}.vitals.stack .vm .l{display:none}.vitals.stack .vm .mb{height:9px;margin:0}.vitals .vm{flex:1 1 0;min-width:0}.infob{font:800 17px/1 var(--font-body)!important;padding:0!important;min-width:0}.infob.warn{background:var(--zone-warn);color:var(--warn);border-color:var(--warn)}.infob.bad{background:var(--bad);color:#fff;border-color:var(--bad);letter-spacing:-.04em}.apop .goalrow{flex-wrap:wrap;white-space:normal;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:12.5px;line-height:1.35;gap:6px 8px}.apop .goalrow .goal-bar{flex:0 0 72px}.apop #b-goal-wide{display:inline!important}.apop #b-goal-short{display:none!important}.apop .dream-tracker{flex:1 1 100%}.apop .dream-tracker>summary{max-width:none}.apop .dream-tracker small{display:inline!important;max-width:none}.apop .dream-inner{position:static;max-height:none;box-shadow:none;border:0;padding:6px 0 0;background:transparent}#info-alerts .alert:last-child{margin-bottom:0}
 .vn{line-height:1}
 .vn b{font:700 19px var(--font-body);letter-spacing:-.01em}
 .vn small{display:block;font-size:11px;margin-top:1px}
@@ -132,7 +132,10 @@ hr{border:0;border-top:1px solid var(--line);margin:8px 0}
 .astrip.bad b{background:var(--zone-bad);color:var(--bad)} .astrip.warn b{background:var(--zone-warn);color:var(--warn)} .astrip.info b,.astrip.ok b{background:var(--surface-2);color:var(--ink-2)}
 .astrip.bad{border-color:var(--bad)} .astrip.warn{border-color:var(--warn)}
 .astrip .btn,.apop .btn{min-height:26px;padding:2px 9px;font-size:12px;flex:0 0 auto}
-.apop .ideas{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}.meanwhile{margin:0 0 8px;font-size:13px;color:var(--ink-2)}.ideas-k{font:600 10.5px var(--font-body);text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin:0 0 4px}.idea{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;border:0;background:none;padding:5px 0;font:400 13.5px/1.4 var(--font-body);color:var(--ink);cursor:pointer}.idea span{flex:1}.idea small{flex:0 0 auto;color:var(--accent);font-weight:600;font-size:12px}.apop{position:absolute;left:0;right:0;top:100%;z-index:11;background:var(--bg);border:1px solid var(--line);border-radius:0 0 11px 11px;padding:8px;box-shadow:0 8px 20px rgba(0,0,0,.18);max-height:60vh;overflow:auto}
+.apop .ideas{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}.meanwhile{margin:0 0 8px;font-size:13px;color:var(--ink-2)}.ideas-k{font:600 10.5px var(--font-body);text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin:0 0 4px}.idea{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;border:0;background:none;padding:5px 0;font:400 13.5px/1.4 var(--font-body);color:var(--ink);cursor:pointer}.idea span{flex:1}.idea small{flex:0 0 auto;color:var(--accent);font-weight:600;font-size:12px}.apop{position:fixed;left:50%;transform:translateX(-50%);width:min(560px,calc(100vw - 16px));top:70px;z-index:31;background:var(--surface);border:1px solid color-mix(in srgb,var(--ink) 25%,transparent);border-top:4px solid var(--ink);border-radius:12px;padding:10px 12px 12px;box-shadow:0 14px 34px rgba(0,0,0,.32);max-height:64vh;overflow:auto}.apop-hd{display:flex;align-items:center;justify-content:space-between;margin:0 0 8px}.apop-hd b{font:700 15px var(--font-body)}.apop .btn.apop-x{min-height:32px;padding:4px 14px;font-size:13px}.apop-dim{position:fixed;inset:0;z-index:30;background:color-mix(in srgb,var(--ink) 45%,transparent)}.apop-dim[hidden]{display:none}
+.infob.c-food{--cc:#c99700;--ct:#2a2000}.infob.c-water{--cc:#2f6fb3;--ct:#fff}.infob.c-money{--cc:#2d6a4f;--ct:#fff}.infob.c-sick{--cc:#b23a2e;--ct:#fff}.infob.c-heat{--cc:#d0631f;--ct:#fff}.infob.c-other{--cc:#4a4438;--ct:#fff}
+.infob.bad[class*=" c-"]{background:var(--cc);color:var(--ct);border-color:var(--cc)}.infob.warn[class*=" c-"]{background:color-mix(in srgb,var(--cc) 16%,var(--surface));color:var(--cc);border-color:var(--cc)}.infob.warn.c-food{color:#7a5a00}
+.alert.c-food{border-left:4px solid #c99700}.alert.c-water{border-left:4px solid #2f6fb3}.alert.c-money{border-left:4px solid #2d6a4f}.alert.c-sick{border-left:4px solid #b23a2e}.alert.c-heat{border-left:4px solid #d0631f}.alert.c-other{border-left:4px solid #8a8070}
 .apop[hidden]{display:none}
 .alert{display:flex;gap:8px;align-items:flex-start;padding:7px 10px;border-radius:9px;margin-bottom:6px;background:var(--surface);border:1px solid var(--line);font-size:13px}
 .alert b{flex:0 0 auto;font:600 10.5px var(--font-data);text-transform:uppercase;letter-spacing:.06em;padding:2px 5px;border-radius:5px;margin-top:1px}
@@ -401,8 +404,8 @@ main details:not(.card):not(.dream-tracker):not(#next-card)[open]>summary::befor
   <div class="chips" id="tankchips" hidden></div>
   <div class="readrow" id="readrow">
     <div class="vitals" id="vitals">
-      <div class="vm" id="vm-hunger"><div class="l"><span>Fed</span><b id="vv-hunger">-</b></div><div class="mb"><i id="vb-hunger" style="width:0"></i></div></div>
-      <div class="vm" id="vm-nutr"><div class="l"><span>Nutrition</span><b id="vv-nutr">0%</b></div><div class="mb"><i id="vb-nutr" style="width:0"></i></div></div>
+      <div class="vm" id="vm-hunger" title="Fed"><div class="l"><span>Fed</span><b id="vv-hunger">-</b></div><div class="mb"><i id="vb-hunger" style="width:0"></i></div></div>
+      <div class="vm" id="vm-nutr" title="Nutrition"><div class="l"><span>Nutrition</span><b id="vv-nutr">0%</b></div><div class="mb"><i id="vb-nutr" style="width:0"></i></div></div>
       <span hidden><b id="vt-n">0</b><b id="vv-food">0 mg</b></span>
     </div>
     <div class="water" id="vwater"></div>
@@ -411,7 +414,7 @@ main details:not(.card):not(.dream-tracker):not(#next-card)[open]>summary::befor
   <div class="topgoal" id="topgoal" hidden><div class="tg-l"><b id="tg-n" class="mono"></b><small>of 8.2B people have a shrimp tank at home</small><small id="tg-r" class="mono"></small></div><div class="goal-bar"><i id="tg-bar" style="width:0"></i></div></div>
   <div class="business-strip" id="business-strip" hidden></div>
   <div class="astrip" id="astrip" hidden></div>
-  <div class="apop" id="apop" hidden><div id="info-alerts" aria-live="polite"></div><div class="ideas" id="ideas" hidden><p class="hint meanwhile" id="ideas-now" hidden></p><div class="ideas-k" id="ideas-k">Ideas</div><div id="ideas-list"></div></div>
+  <div class="apop" id="apop" hidden><div class="apop-hd"><b>What needs you</b><button type="button" class="btn apop-x" id="apop-x">Close</button></div><div id="info-alerts" aria-live="polite"></div><div class="ideas" id="ideas" hidden><p class="hint meanwhile" id="ideas-now" hidden></p><div class="ideas-k" id="ideas-k">Ideas</div><div id="ideas-list"></div></div>
   <div class="goalrow"><div class="goal-bar"><i id="b-goalbar" style="width:0"></i></div><span id="b-goal"><span id="b-goal-wide"></span><span id="b-goal-short"></span></span><details class="dream-tracker" id="dream-tracker"><summary><span id="dream-year"></span><small id="dream-badge"></small></summary><div class="dream-inner"><p>A tank for everyone. Ten years to try.</p><p class="hint" id="dream-time"></p><p class="hint" id="dream-progress"></p><p class="hint">The tenth year is a celebration. You can keep growing the dream afterward.</p><p class="hint">Opening this journal pauses time. Resume whenever you’re ready.</p><h3>Letters from Grandma</h3><div id="dream-letters"></div></div></details><button class="fold" id="fold" aria-expanded="true">readings ▴</button></div>
   <div class="apop-foot"><button class="btn" id="btn-settings" type="button" aria-haspopup="dialog" aria-controls="settings">Settings</button></div>
   </div>
@@ -630,7 +633,7 @@ main details:not(.card):not(.dream-tracker):not(#next-card)[open]>summary::befor
 </section>
 </main>
 <div id="spot" hidden><div id="spot-ring"></div><div id="spot-tip" role="status"><span id="spot-text"></span><small>Tap anywhere to go on</small></div></div>
-<div class="sheet" id="hcheck" role="dialog" aria-modal="true" aria-labelledby="hc-h" hidden><div class="sheet-in" id="hc-in"></div></div><div class="sheet" id="tsheet" role="dialog" aria-modal="true" aria-labelledby="ts-h" hidden><div class="sheet-in" id="ts-in"></div></div>
+<div class="apop-dim" id="apop-dim" hidden></div><div class="sheet" id="hcheck" role="dialog" aria-modal="true" aria-labelledby="hc-h" hidden><div class="sheet-in" id="hc-in"></div></div><div class="sheet" id="tsheet" role="dialog" aria-modal="true" aria-labelledby="ts-h" hidden><div class="sheet-in" id="ts-in"></div></div>
 <div class="sheet" id="settings" role="dialog" aria-modal="true" aria-labelledby="settings-h" hidden><div class="sheet-in">
   <div class="sheet-hd"><h2 id="settings-h">Settings</h2><button type="button" class="rst" id="settings-close" aria-label="Close settings">Close</button></div>
   <label class="toggle"><input type="checkbox" id="t-music"> Music and water sounds</label>
@@ -1597,7 +1600,8 @@ function dipFresh(G,i,bath){var T=G.tanks[i];if(!T||!T.fresh||G.money<DIP_COST)r
  if(bath.ok){T.fresh=null;log(G,'Salt dipped the new shrimp. No flatworms',T);return 'clean';}
  T.fresh.risk*=0.5;log(G,'The dip was too short. Some flatworms may still be on them',T);return 'short';}
 // found: share of the sick shrimp the player spotted (0..1)
-function treatIll(G,i,cure,found,bath){var T=G.tanks[i];if(!T||!T.ill)return false;var cu=CURES.filter(function(x){return x.id===cure;})[0];if(!cu||G.money<cu.cost)return false;pay(G,cu.cost,'supplies');
+function gmPaysCure(G,cost){return !G.opt.hcDone&&!(G.emp.healed>0)&&G.money<cost;}
+function treatIll(G,i,cure,found,bath){var T=G.tanks[i];if(!T||!T.ill)return false;var cu=CURES.filter(function(x){return x.id===cure;})[0];if(!cu)return false;if(gmPaysCure(G,cu.cost))log(G,'Grandma paid for the cure this time');else{if(G.money<cu.cost)return false;pay(G,cu.cost,'supplies');}
  var ill=illById(T.ill.type);if(ill.cure!==cure){T.ill.tried=(T.ill.tried||0)+1;log(G,cu.name+' did not help',T);return 'wrong';}
  if(bath&&bath.loss>0){var lost=0;T.pop.forEach(function(k){var d=k.n*bath.loss;k.n-=d;lost+=d;});G.stats.died+=lost;}
  if(bath&&!bath.ok){T.ill.frac=Math.max(0.02,illFrac(T)*0.6);log(G,'The salt dip was too short. Some flatworms are still there',T);return 'partial';}
@@ -3062,7 +3066,7 @@ function cost2(m,i){return (m?aed(m):'')+(m&&i?' + ':'')+(i?inf(i):'');}
 function trim(n,d){return String(+Number(n).toFixed(d));}
 // iPhone Safari moves its toolbar while you scroll and the fixed tab bar can end up floating above the bottom. Pin it to what's really on screen.
 (function(){var vv=window.visualViewport;if(!vv)return;var fix=function(){var t=document.querySelector('.tabs');if(!t)return;var off=window.innerHeight-(vv.height+vv.offsetTop);t.style.transform=Math.abs(off)>1&&vv.scale<=1.01?'translateY('+(-off)+'px)':'';};vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);window.addEventListener('scroll',fix,{passive:true});})();
-var toastT=null,NF=null,BUILD='2026-10-25-loan';
+var toastT=null,NF=null,BUILD='2026-10-25-alerts';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
@@ -3094,7 +3098,7 @@ var GAUGES=[
  {id:'gh',scope:'w',name:'GH',unit:'°dH',min:0,max:16,ok:[5,10],warn:[3.5,12.5],dec:1,get:function(T){return T.chem.gh;}},
  {id:'temp',scope:'w',name:'Temperature',unit:'°C',min:12,max:36,ok:[21,26],warn:[17,28],dec:1,get:function(T){return T.chem.temp;}},
  {id:'dens',scope:'w',name:'Stocking',unit:'per L',min:0,max:12,ok:[0,5],warn:[0,8],dec:1,tip:'shrimp per liter. More shrimp means more waste',get:function(T){return totalN(T)/T.vol;}},
- {id:'hunger',scope:'f',name:'Hunger',unit:'%',min:0,max:100,ok:[0,40],warn:[0,65],dec:0,tip:'how empty their stomachs are right now',get:function(T){return totalN(T)<1?0:(1-T.chem.fed)*100;}},
+ {id:'hunger',scope:'f',name:'Hunger',unit:'%',min:0,max:100,ok:[0,40],warn:[0,65],dec:0,tip:'how empty their stomachs are right now. Biofilm on the glass and plants only ever fills them halfway, so 100% means they live on that alone',get:function(T){return totalN(T)<1?0:clamp((1-T.chem.fed)*200,0,100);}},
  {id:'nutr',scope:'f',name:'Nutrition',unit:'%',min:0,max:160,ok:[75,115],warn:[55,130],dec:0,tip:'average intake over the last week. Drives growth, breeding and color',get:function(T){return T.chem.nutr*100;}}
 ];
 function gstate(g,v){
@@ -3192,6 +3196,9 @@ function tips(T){
   return out;
 }
 var lastAlerts='',lastBadSig='',lastChips='';
+// What kind of trouble: sickness red, water blue, food yellow, temperature orange, money green, anything else dark.
+var CAT_ORDER=['sick','water','food','heat','money','other'];
+function alertCat(list){var best='other';list.forEach(function(x){var t=(x.t||'').replace(/<[^>]+>/g,''),c=x.cat||(/sick|dying|tank crashed|illness|flatworm|molts|died|health check/i.test(t)?'sick':/°C|too hot|too cold|warm|chill/i.test(t)?'heat':/ammonia|nitrite|nitrate|\bKH\b|\bGH\b|pH|water/i.test(t)?'water':/nutrition|starv|hungr|food|feed/i.test(t)?'food':/AED|owe|money|cash|bank|loan|frozen|debt|pay|tax/i.test(t)?'money':'other');if(CAT_ORDER.indexOf(c)<CAT_ORDER.indexOf(best))best=c;});return best;}
 function updateAlerts(){
   var worst=[];
   var ea=cashTips().concat(empTips()),rank={bad:0,warn:1,info:2};
@@ -3213,8 +3220,8 @@ function updateAlerts(){
     var lab={bad:'Danger',warn:'Watch',info:'Note',ok:'OK'};
     var btnFor=function(x){return x.btn||'';};
     var top=all[0]||{sev:'ok'},ib=$('tb-info'),urgent=top.sev==='bad',watch=top.sev==='warn';
-    var nBad=all.filter(function(x){return x.sev==='bad';}).length;ib.textContent=urgent?'!! '+nBad:watch?'!':'?';if(urgent&&!G.opt.alertTold&&anyHad()&&!G.opt.all){G.opt.alertTold=1;spotlight(ib,'Something needs you. Tap here to see what, and what to do about it.');}ib.className='btn infob'+(urgent?' bad':watch?' warn':'');ib.setAttribute('aria-label',(urgent?'Urgent: ':watch?'Alert: ':'')+'alerts, owners and the ten-year journal');
-    $('info-alerts').innerHTML=all.length?all.map(function(x){return '<div class="alert '+x.sev+'"><b>'+lab[x.sev]+'</b><span>'+x.t+'</span>'+btnFor(x)+'</div>';}).join(''):'<p class="hint" style="margin:0">All clear. Nothing needs attention.</p>';
+    var tc=!(urgent||watch)?'':alertCat(all.filter(function(x){return x.sev===top.sev;}));ib.textContent=urgent?'!!':watch?'!':'?';if(urgent&&!G.opt.alertTold&&anyHad()&&!G.opt.all){G.opt.alertTold=1;spotlight(ib,'Something needs you. Tap here to see what, and what to do about it.');}ib.className='btn infob'+(urgent?' bad':watch?' warn':'')+(tc?' c-'+tc:'');ib.setAttribute('aria-label',(urgent?'Urgent: ':watch?'Alert: ':'')+'alerts, owners and the ten-year journal');
+    $('info-alerts').innerHTML=all.length?all.map(function(x){return '<div class="alert '+x.sev+' c-'+alertCat([x])+'"><b>'+lab[x.sev]+'</b><span>'+x.t+'</span>'+btnFor(x)+'</div>';}).join(''):'<p class="hint" style="margin:0">All clear. Nothing needs attention.</p>';
   }
   var csig=G.tanks.length+'|'+G.sel+'|'+worst.join(',')+'|'+RV();
   if(csig!==lastChips){
@@ -3240,8 +3247,8 @@ function updateVitals(){
   setT('vv-nutr',N<1?'-':Math.round(nv)+'%');
   $('vm-nutr').className='vm '+ns;$('vb-nutr').style.width=(N<1?0:clamp(nv/160*100,0,100))+'%';
   setT('vv-food',Math.round(c.food)+' mg');
-  var hl=handLeft(G,T);setT('tb-feed',N>=1?(T.feeder?'Extra feed':hl>0?'Fed · '+hl+(hl>1?' days':' day'):'Feed · '+aed(feedCost(T,T.set.ration/100))):'Feed');$('tb-feed').title=T.feeder?'The auto feeder already feeds this tank. This adds more on top.':'One feeding covers 2 days. An auto feeder in Gear takes over for good.';$('tb-feed').disabled=N<1;$('tb-feed').classList.toggle('first-feed',N>=1&&!T.feeder&&(!(G.ob.feeds||0)||hl<=0));
-  setT('tb-wc','Water '+T.set.wcPct+'%');
+  var hl=handLeft(G,T);setT('tb-feed','Feed');$('tb-feed').title=T.feeder?'The auto feeder already feeds this tank. This adds more on top.':'One feeding covers 2 days. An auto feeder in Gear takes over for good.';$('tb-feed').disabled=N<1;$('tb-feed').classList.toggle('first-feed',N>=1&&!T.feeder&&(!(G.ob.feeds||0)||hl<=0));
+  setT('tb-wc','Water');
   var sa=sellAll(G,true);setT('tb-sell',sa.count>0?'Sell '+sa.count+' · '+aed(sa.revenue):sellWhyNot(G));$('tb-sell').disabled=sa.count<=0;
   var wst='ok',tmp=null;[['no3'],['kh'],['gh'],['temp']].forEach(function(x){var g=gaugeById(x[0]),v=g.get(T),q=gstate(g,v);if(x[0]==='temp'){if(q.st!=='ok')tmp=v>25?'too warm':'too cold';}else if(q.st==='bad')wst='bad';else if(q.st==='warn'&&wst!=='bad')wst='warn';});
   var ws=$('wp-sum');if(ws){var cl='wp wsum '+(tmp&&wst==='ok'?'warn':wst);if(ws.className!==cl)ws.className=cl;var wkd=wcWeek(G,TK())>=150;$('tb-wc').classList.toggle('need',SC_WC||rv('wc')&&!T.autoWC&&allN(G)>=1&&!wkd&&wst!=='ok');setT('wv-sum',tmp&&wst==='ok'?tmp:wkd&&wst!=='ok'?'wait a day':wst==='bad'?'change now':wst==='warn'?'change soon':'good');}
@@ -3435,7 +3442,7 @@ function setActs(sh,kit){var n=actNeed(G),f=$('tb-feed'),w=$('tb-wc'),se=$('tb-s
 function applyReveal(){
   var sh=rv('shrimp'),kit=rv('kit');
   $('vitals').hidden=!sh;$('fold').hidden=!rv('wc');
-  var nums=!!G.opt.waterNums;['no3','kh','gh'].forEach(function(k){$('wp-'+k).hidden=!kit||!nums;});$('wp-temp').hidden=!rv('phkh')||!nums;if($('wp-sum'))$('wp-sum').hidden=!kit;
+  var nums=!!G.opt.waterNums;['no3','kh','gh'].forEach(function(k){$('wp-'+k).hidden=!kit||!nums;});$('vitals').classList.toggle('stack',nums&&kit);$('wp-temp').hidden=!rv('phkh')||!nums;if($('wp-sum'))$('wp-sum').hidden=!kit;
   $('vwater').hidden=!kit||!sh;
   ['ph','gh','kh'].forEach(function(k){var e=$('gv-'+k);if(e){var g=e.closest('.g');if(g)g.hidden=!rv('phkh');}});
   setActs(sh,kit);
@@ -3872,7 +3879,7 @@ function renderHealth(){if(!HC)return;var T=G.tanks[HC.i],ill=illById(HC.type),h
  if(HC.step==='find'){h+='<p class="sub">'+(HC.qc?'Look over the shrimp you\u2019re about to pack. Tap any that look unwell, there may be none.':'Watch them for a bit and tap every shrimp that looks unwell. Healthy ones are an even colour, no white marks.')+'</p><div class="tv hc-tv"><canvas id="hc-canvas" aria-label="Your tank. Tap the shrimp that look sick."></canvas></div><div class="btns"><button class="btn primary" data-act="'+(HC.qc?'qc-look-done':'hc-done')+'">Done looking <small id="hc-n">'+HC.cells.filter(function(c){return c.picked;}).length+' picked</small></button></div>';}
  else if(HC.step==='cure'){HC.found=clamp(got/sickN-wrong*0.15,0,1);
   h+='<p class="sub">You found <b>'+got+' of '+sickN+'</b> sick shrimp'+(wrong?' and picked '+wrong+' healthy one'+(wrong>1?'s':''):'')+'. They all show <b>'+ill.sign+'</b>.</p><div class="tv hc-tv small"><canvas id="hc-canvas"></canvas></div>'+
-   '<details class="hc-guide"><summary>Field guide</summary>'+ILLS.map(function(x){return '<p><b>'+x.sign.charAt(0).toUpperCase()+x.sign.slice(1)+'</b> → '+x.name.toLowerCase()+'. '+x.why+'</p>';}).join('')+'</details><p class="sub">What do you do?</p><div class="hc-cures">'+CURES.map(function(c){return '<button class="btn" data-act="hc-cure" data-c="'+c.id+'"'+(G.money<c.cost?' disabled':'')+'>'+c.name+'<small>'+aed(c.cost)+'</small></button>';}).join('')+'</div>';}
+   '<details class="hc-guide"><summary>Field guide</summary>'+ILLS.map(function(x){return '<p><b>'+x.sign.charAt(0).toUpperCase()+x.sign.slice(1)+'</b> → '+x.name.toLowerCase()+'. '+x.why+'</p>';}).join('')+'</details><p class="sub">What do you do?</p><div class="hc-cures">'+CURES.map(function(c){return '<button class="btn" data-act="hc-cure" data-c="'+c.id+'"'+(G.money<c.cost&&!gmPaysCure(G,c.cost)?' disabled':'')+'>'+c.name+'<small>'+(gmPaysCure(G,c.cost)?'This costs '+aed(c.cost)+', Grandma pays for you this time':aed(c.cost))+'</small></button>';}).join('')+'</div>';}
  else if(HC.step==='clear'){h+='<p class="sub">'+(wrong?'Those '+wrong+' look fine up close, even colour and no white marks. Everyone is healthy.':'Everyone looks healthy.')+'</p><div class="btns"><button class="btn primary" data-act="hc-close">Back to the tank</button></div>';}
  else{var msg=HC.result==='cured'?'Good call. '+ill.name+': '+ill.why+' The colony recovers.':HC.result==='partial'?(HC.bath&&!HC.bath.ok?'The dip was too short, some flatworms held on. It will spread again, check back soon.':'Right cure, but you missed some sick shrimp. It will spread again, check back soon.'):HC.result==='wrong'?'That did not help. Look at the sign again and try another cure.':'';
   if(HC.bath&&HC.bath.loss>0.02)msg+=' The salt was hard on them, about '+Math.round(HC.bath.loss*100)+'% died.';
@@ -4404,7 +4411,7 @@ function updateUpgrades(){
   $('auto-feed').hidden=!T.feeder;$('auto-wc1').hidden=!T.autoWC;$('auto-wc2').hidden=!T.autoWC;
 }
 function updateHeader(){
-  var np=operatingNet(G),noInc=rate(G,'shrimp',7)+rate(G,'kits',7)<=0;setT('b-net',np==null?'':noInc&&np<0?'costs '+aed(-np)+'/d':(np>=0?'+':'−')+big(Math.abs(np))+'/d');$('b-net').style.color=np==null?'':noInc&&np<0?'var(--ink-3)':np>=0?'var(--good)':'var(--bad)';
+  var np=operatingNet(G),noInc=rate(G,'shrimp',7)+rate(G,'kits',7)<=0;$('b-net').title=noInc&&np<0?'Tank bills: electricity for the filter and lights, plus food when you feed them':'';setT('b-net',np==null?'':noInc&&np<0?'bills '+aed(-np)+'/d':(np>=0?'+':'−')+big(Math.abs(np))+'/d');$('b-net').style.color=np==null?'':noInc&&np<0?'var(--ink-3)':np>=0?'var(--good)':'var(--bad)';
   setT('b-money',Math.abs(G.money)>=1e4?(G.money<0?'-':'')+'AED '+big(Math.abs(G.money)):aed(G.money));$('b-money').classList.toggle('neg',G.money<0);
   var d=new Date(2026,9,20+Math.floor(G.day));
   setT('b-day','D'+Math.floor(G.day));setT('b-date','Day '+(Math.floor(G.day)+1).toLocaleString('en-US')+' · '+d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' · room '+roomT(G,clock(G)).toFixed(1)+' °C'+(G.ac?' AC':''));
@@ -4885,7 +4892,7 @@ function initProgressionControls(){
     var b=e.target.closest('[data-act]');if(!b||b.disabled)return;var a=b.dataset.act,changed=true;
     if(a==='navigate'){selectTab(b.dataset.tab);}
     else if(a==='story-choice'){var sk=ensureProgress(G).queue[0],sch=sk&&storyChoices(G,sk),stx=sch&&sch[+b.dataset.i]?sch[+b.dataset.i][1]:'';if(sch&&/game ends here/.test(sch[+b.dataset.i][0])&&storySure!==sk+':'+b.dataset.i){storySure=sk+':'+b.dataset.i;render();return;}storySure=null;var aft=sk?choiceFx(sk,+b.dataset.i,true):'';if(sk&&storyChoose(G,sk,+b.dataset.i)){acknowledgeMilestone(G);detectMilestones(G);toast(aft||stx);cardResume(sk);}else{toast('Not enough cash for that choice');setSpeed(0);}}
-    else if(a==='milestone-next'){if(G.progress.queue[0]==='intro'){var pni=$('player-name');if(pni){G.name=nm({name:pni.value});try{localStorage.setItem('shrimp-name',G.name);}catch(e){}}}var key=acknowledgeMilestone(G);if(key){selectTab(key==='tenyears'?phaseInfo(G).tab:MILESTONES[key].tab);if(MILESTONES[key].intro){var tbb=document.querySelector('.tabs [data-tab="'+MILESTONES[key].tab+'"]');if(tbb&&!tbb.hidden)tbb.click();G.opt.guideOpened=null;}if(key==='farm')G.emp.bizView='production';if(key==='ministry')G.emp.bizView='culture';}if(key)cardResume(key);else setSpeed(0);}
+    else if(a==='milestone-next'){if(G.progress.queue[0]==='intro'){var pni=$('player-name');if(pni){G.name=nm({name:pni.value});try{localStorage.setItem('shrimp-name',G.name);}catch(e){}}}var key=acknowledgeMilestone(G);if(key){selectTab(key==='tenyears'?phaseInfo(G).tab:MILESTONES[key].tab);if(MILESTONES[key].intro){var tbb=document.querySelector('.tabs [data-tab="'+MILESTONES[key].tab+'"]');if(tbb&&!tbb.hidden)tbb.click();G.opt.guideOpened=null;}if(key==='health')setTimeout(function(){var tv=$('tankview');if(tv&&typeof SPOTQ!=='undefined'){SPOTQ.unshift({t:tv,text:'Tap the tank, then Check shrimp to find the sick ones.',now:1});if(!SPOT||SPOT.wait){SPOT=null;spotNext();}}},450);if(key==='farm')G.emp.bizView='production';if(key==='ministry')G.emp.bizView='culture';}if(key)cardResume(key);else setSpeed(0);}
     else if(a==='bizview'){G.emp.bizView=b.dataset.view;cache.eproj=null;}
     else if(a==='small-toggle')G.emp.showSmall=!G.emp.showSmall;
     else if(a==='earlier-packing'){G.emp.showEarlierPacking=!G.emp.showEarlierPacking;cache.estaff=null;}
@@ -4982,6 +4989,7 @@ function initControls(){
   tvLockInit();
   initHelp();$('b-inf').addEventListener('click',function(){toast('✦ is influence: people who owe you a favour. Some things cost ✦ instead of money.');});$('b-inf').style.cursor='pointer';$('spot').addEventListener('click',function(e){e.stopPropagation();e.preventDefault();if(SPOT&&SPOT.ready)spotClose();});['touchmove','wheel'].forEach(function(ev){$('spot').addEventListener(ev,function(e){if(SPOT&&!SPOT.ready){if(e.cancelable)e.preventDefault();return;}if(SPOT&&SPOT.y!=null)spotClose();},{passive:false});});
   $('tb-me').addEventListener('click',function(e){e.stopPropagation();$('apop').hidden=true;$('tb-info').setAttribute('aria-expanded','false');if(activeTab==='me'){selectTab(meBack||'tank');}else{meBack=activeTab;G.opt.meSeen=1;G.ps.me++;selectTab('me');scrollTo(0,0);}render();});
+  (function(){var p=$('apop'),d=$('apop-dim');document.body.appendChild(p);var sync=function(){d.hidden=p.hidden;if(!p.hidden){var tb=document.querySelector('.top'),y=tb?Math.max(8,tb.getBoundingClientRect().top+12):12;p.style.top=y+'px';p.style.maxHeight='calc(100vh - '+(y+90)+'px)';}};new MutationObserver(sync).observe(p,{attributes:true,attributeFilter:['hidden']});sync();d.addEventListener('click',function(){p.hidden=true;$('tb-info').setAttribute('aria-expanded','false');});$('apop-x').addEventListener('click',function(e){e.stopPropagation();p.hidden=true;$('tb-info').setAttribute('aria-expanded','false');});})();
   $('tb-info').addEventListener('click',function(e){e.stopPropagation();var p=$('apop');p.hidden=!p.hidden;if(!p.hidden)G.ps.help++;$('tb-info').setAttribute('aria-expanded',String(!p.hidden));});
   document.addEventListener('click',function(e){var p=$('apop');if(!p.hidden&&!e.target.closest('#apop,#tb-info'))
     {p.hidden=true;$('tb-info').setAttribute('aria-expanded','false');}});
@@ -5049,7 +5057,7 @@ function initControls(){
     if(a==='inspect'){openHealth(+b.dataset.i);return;}
     if(a==='hc-pick'){var cj=HC&&HC.cells[+b.dataset.j];if(cj){cj.picked=!cj.picked;renderHealth();}return;}
     if(a==='hc-done'){if(HC){HC.step=HC.cells.some(function(c){return c.sick;})?'cure':'clear';renderHealth();}return;}
-    if(a==='hc-cure'){if(HC){var cc=b.dataset.c,cu=CURES.filter(function(x){return x.id===cc;})[0];if(!cu||G.money<cu.cost)return;if(cc==='minerals')openMolt();else if(cc==='water')openWC();else openSalt(HC.i,'ill');}return;}
+    if(a==='hc-cure'){if(HC){var cc=b.dataset.c,cu=CURES.filter(function(x){return x.id===cc;})[0];if(!cu||G.money<cu.cost&&!gmPaysCure(G,cu.cost))return;if(cc==='minerals')openMolt();else if(cc==='water')openWC();else openSalt(HC.i,'ill');}return;}
     if(a==='dip'){openSalt(+b.dataset.i,'fresh');return;}
     if(a==='salt-done'){if(SB){if(SB.mode==='qc'){QCR.i++;qcNext();}else if(SB.mode==='fresh')closeHealth();else{SB=null;renderHealth();}}return;}
     if(a==='qc-round'){openQC();return;}

@@ -615,3 +615,11 @@ ammonia is only the primary button once ammonia is near zero.
 - Shady loan: next to a purchase you can't quite afford (you have at least half), a dashed "Know a guy? Borrow AED X" button lends exactly the gap. One loan at a time, 20% a month compounding, pay back any time from the alert (!!) popup. A NEXT step offers to pay once you can (from a week in). After three months unpaid he collects: your newest farm, or else your best gear (chiller, auto water changer, auto feeder, fan, heater), counted at half its price against the debt, a Shrimp Times line, and Grandma hears. Then again every month until it's paid. Collected loans count as the old market shark (`sharkUsed`) for the money-trouble path and endings. Reuses `E.shark` with `deal:1` (`sharkLend`, `sharkPay`, `sharkTake`, `loanRow`); the out-of-money card's market loan only shows when you don't already owe him.
 - Tanks 2 and 3 need no cycling: they're seeded from Tank 1. Buying one opens a sheet: why there's no cycling, auto feeder and auto water changer for the new tank with buy buttons, then "Got it, show me" spotlights the tank switcher.
 - Bots: strong cold 2,893, strong kind 3,219, average Earth 5,994–6,189.
+
+## Pass 82: alert colours, a clearer popup, plain buttons
+- The alert button shows "!!" (danger) or "!" (watch) with no count, coloured by the most urgent kind of trouble: red sickness, blue water, yellow food, orange temperature, green money, dark for anything else (`alertCat`). Each row in the popup has the same colour stripe.
+- The popup now sits over a dimmed page as its own card, with a "What needs you" title and a Close button. Tapping outside also closes it. `#apop` moves to `body` on load so the dim can cover the header.
+- Feed and Water buttons say just Feed and Water.
+- First health check: after "Got it · show me" the tank is spotlit with the rest dimmed. If you can't afford the cure, it says what it costs and that Grandma pays this time.
+- With the water readings open, Fed and Nutrition become two plain stacked bars.
+- Fed bar: biofilm alone keeps them half fed, so the bar now runs from that floor (empty means living on biofilm). The header's "costs" line is now "bills" (electricity, plus food when you feed), so it doesn't read as food being bought without feeding.
