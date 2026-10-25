@@ -24,3 +24,13 @@
 .tc small{font-size:10.5px;line-height:1.2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .tc.find{background:var(--surface)}
 .landwrap canvas{-webkit-touch-callout:none}
+/* pixel home */
+.landwrap.pixland{background:#efe9dc}
+.landwrap.pixland canvas{image-rendering:pixelated;image-rendering:crisp-edges}
+.llbl{position:absolute;z-index:4;transform:translate(-50%,-100%);background:#fbf8f1;border:1px solid #21181b;border-radius:6px;padding:1px 7px;font:600 11px/1.4 var(--font-body);color:#21181b;pointer-events:none;white-space:nowrap;animation:llbl 2.2s ease-out forwards}
+@keyframes llbl{0%{opacity:0;margin-top:0}10%{opacity:1}80%{opacity:1}100%{opacity:0;margin-top:-10px}}
+/* wrap rather than cut off (the game never truncates) */
+.hcard .hd>small{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}
+.hmove span{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}
+.lpal button b{white-space:normal;line-height:1.15;overflow:visible;text-overflow:clip}
+.lstat span{white-space:normal;overflow:visible;text-overflow:clip}

@@ -1,25 +1,25 @@
 // ===== Try: every idea with Keep / Maybe / Drop and a note, plus dev controls =====
 var GROUPS={vac:'In the tank',toymode:'Two ways to do it',breed:'Breeding and the book',home:'Home',company:'The big picture'};
 var PROPS=[
- {id:'vac',t:'Gravel vacuum',d:'Drag the tube over the gravel. The water drops as the bucket fills, then check the bucket for babies.',go:function(){devMess('vac');goTank(S.sel);toyStart('vac');}},
- {id:'sponge',t:'Filter sponge',d:'Pick a bucket and squeeze. Try tap water once to see what happens.',go:function(){devMess('sponge');goTank(S.sel);toyStart('sponge');}},
+ {id:'vac',t:'Gravel vacuum',d:'Drag anywhere and the tube moves with your finger, so your thumb can stay below it and you can see the mouth. The water drops as the bucket fills, then check the bucket for babies.',go:function(){devMess('vac');goTank(S.sel);toyStart('vac');}},
+ {id:'sponge',t:'Filter sponge',d:'Squeeze the dirty sponge in a bucket of old tank water. The good bacteria in it stay alive.',go:function(){devMess('sponge');goTank(S.sel);toyStart('sponge');}},
  {id:'trim',t:'Trim moss and stems',d:'Cut what grew out, scoop the bits, drag a stem top into the sand to plant it.',go:function(){devMess('trim');goTank(S.sel);toyStart('trim');}},
- {id:'pests',t:'Pick off pests',d:'Tap snails and flatworms off the glass. Flatworms eat babies.',go:function(){devMess('pests');goTank(S.sel);toyStart('pests');}},
+ {id:'pests',t:'Pick off pests',d:'Tap bladder snails and flatworms off the glass. Flatworms eat babies.',go:function(){devMess('pests');goTank(S.sel);toyStart('pests');}},
  {id:'sort',t:'Sort shrimp into cups',d:'Drag each shrimp from the white tray into a tank cup or the pet shop.',go:function(){goTank(S.sel);toyStart('sort');}},
  {id:'scape',t:'Aquascape a tank',d:'Set up an empty tank with wood, stones, plants and moss. Hiding spots help babies.',go:function(){var i=S.tanks.findIndex(function(t){return !t.scape.length;});if(i<0&&S.tanks.length<STAGES[S.stage].tanks){var T=newTank('Tank '+(S.tanks.length+1),20,[]);S.tanks.push(T);i=S.tanks.length-1;}goTank(i<0?S.sel:i);toyStart('scape');}},
  {id:'toymode',t:'Jobs show when needed, or always',d:'When needed: a job appears and glows only when the tank needs it. Always: all six sit in a tray.',sw:{k:'toys',v:[['need','When needed'],['tray','Always']]}},
- {id:'effects',t:'Jobs change the water, or just for fun',d:'On: dirty gravel raises nitrate, flatworms eat babies, tap water kills the filter bacteria. Off: the jobs are only for the look.',sw:{k:'effects',v:[['on','On'],['off','Off']]}},
- {id:'breed',t:'Colour breeding',d:'Wild shrimp carry hidden colours. Breed them, sort the colours apart, keep the best. Two colours mixed make brown babies.',go:function(){var T=S.tanks[1]||null;if(!T&&S.tanks.length<STAGES[S.stage].tanks){T=newTank('Tank 2',20,grandmaScape());S.tanks.push(T);whenArt(function(){scapeNeedsMoss(T);});}T=T||S.tanks[0];var l=[];for(var k=0;k<10;k++)l.push(breedWild());addToTank(T,l,'stream');goTank(S.tanks.indexOf(T));toast('10 wild shrimp in '+T.name+'. Skip ahead a few months under Dev to see their babies.');}},
+ {id:'effects',t:'Wellbeing score, each thing, or just for fun',d:'Score: one wellbeing number from the water, filter, gravel, plants, space and pests. About 50 is enough; above that the shrimp are happier and busier, and it never touches money. Each thing: nitrate, ammonia and flatworms count on their own. Off: the jobs are only for the look.',sw:{k:'effects',v:[['score','Score'],['on','Each thing'],['off','Off']]}},
+ {id:'breed',t:'Colour breeding',d:'Your Shrimp Tanks genetics: eight colour genes, a grade from G1 to G8, and rili. Close colours blend, far ones pull the grade down. Keep the best of each generation and a line climbs, or slowly walks to a new colour.',go:function(){var T=S.tanks[1]||null;if(!T&&S.tanks.length<STAGES[S.stage].tanks){T=newTank('Tank 2',20,grandmaScape());S.tanks.push(T);whenArt(function(){scapeNeedsMoss(T);});}T=T||S.tanks[0];var l=[];for(var k=0;k<10;k++)l.push(breedWild());addToTank(T,l,'stream');goTank(S.tanks.indexOf(T));toast('10 wild shrimp in '+T.name+'. Skip ahead a few months under Dev to see their babies.');}},
  {id:'book',t:'The collection book',d:'Every colour and grade, birds, fish, stream finds, chickens and eggs. Empty slots show what’s left.',go:function(){setTab('book');}},
- {id:'home',t:'The home grows',d:'Grandma’s flat, a balcony, a house with a garden, then land with a stream. Move up from the card above the map.',go:function(){setTab('home');}},
- {id:'mow',t:'Mow the lawn',d:'Drag the mower. Passes in the same direction make stripes. Short lawn brings the hoopoe, long grass the bee-eater.',go:function(){landTry(2,'mow');}},
- {id:'birds',t:'Bird feeder',d:'Fill it, wait, then press and hold on a bird to watch it. It goes in the book.',go:function(){landTry(Math.max(S.stage,0),'look');}},
- {id:'hens',t:'Chickens and eggs',d:'Hens lay every day, tap the eggs to collect them. At the land, scatter grain for wild chickens and catch one while it pecks.',go:function(){landTry(Math.max(2,S.stage),'look');}},
- {id:'fish',t:'Fishing',d:'Tap the water to cast, wait for the bobber to dip, tap fast.',go:function(){landTry(3,'rod');}},
- {id:'trap',t:'Shrimp trap in the stream',d:'Set a trap, come back later, lift it. Take the wild shrimp home and see what colours they hide.',go:function(){landTry(3,'look');}},
+ {id:'home',t:'The home grows',d:'Grandma’s flat, a balcony, a house with a garden, then land with a stream. Tap where Millie should go and the dog comes too. Move up from the card above the map.',go:function(){setTab('home');}},
+ {id:'mow',t:'Mow the lawn',d:'Pick Mow and walk Millie over the grass. Short lawn brings the hoopoe, long grass the bee-eater.',go:function(){landTry(2,'mow');}},
+ {id:'birds',t:'Bird feeder',d:'Fill it, then sit on the bench or keep still and the birds come closer. Tap one and stay still while the ring fills. It goes in the book.',go:function(){landTry(Math.max(S.stage,0),'walk');}},
+ {id:'hens',t:'Chickens and eggs',d:'Hens lay every day. Tap the eggs in the coop to collect them. On the land, throw grain, step back, and tap a wild chicken while it pecks.',go:function(){landTry(Math.max(2,S.stage),'walk');}},
+ {id:'fish',t:'Fishing',d:'Tap the stream or the lake to cast. Tap again when the float goes under. Let your fish go in the pond.',go:function(){landTry(3,'rod');}},
+ {id:'trap',t:'Shrimp trap in the stream',d:'Tap the stream to set a trap. Come back after a few hours and lift it. Take the wild shrimp home and see what colours they hide.',go:function(){landTry(3,'walk');}},
  {id:'build',t:'Decorate',d:'Place flowers, trees, a bird bath, a bench. Some things bring birds.',go:function(){landTry(Math.max(S.stage,1),'build');}},
- {id:'company',t:'The company runs itself',d:'While you’re at home, the consultants run things and send a report every week. Or you sold it and retired.',sw:{k:'company',v:[['running','Running'],['sold','Sold']]}},
- {id:'pace',t:'Time',d:'One day is 20 seconds at 1×. Does it feel slow and calm, or too slow?'},
+ {id:'company',t:'The company runs itself',d:'While you’re at home, the consultants run things. Weekly reports wait in this card, no pop-ups. Or you sold it and retired.',sw:{k:'company',v:[['running','Running'],['sold','Sold']]}},
+ {id:'pace',t:'Time',d:'One day is 20 seconds at 1×, and home always runs at 1×. Does it feel slow and calm, or too slow?'},
  {id:'overall',t:'Overall',d:'Would you spend time here between the big decisions? What would make you come back?'}];
 function landTool(t){if(window.LAND&&LAND.setTool)LAND.setTool(t);}
 function landTry(stage,tool){if(typeof landSetStage==='function'&&S.stage<stage)landSetStage(stage);setTab('home');if(tool&&typeof landTool==='function')landTool(tool);}
@@ -41,7 +41,8 @@ function noteOf(id){return NOTES.data.items[id]||(NOTES.data.items[id]={r:'',t:'
 var CONSULT=['opened a new region','hired four packers','added a packing line','ran a summer ad campaign','got freight 6% cheaper','fixed a QC problem before you heard about it','signed two mall stores','built a hatchery wing','raised the kit price a little','moved the call centre'];
 function companyWeek(){var C=S.company;C.week++;var g=Math.pow(1.045,C.week),net=Math.round(820000*g*(0.8+Math.random()*0.4)),homes=Math.round(11000*g*(0.8+Math.random()*0.4)),share=Math.min(45000,Math.round(900*Math.pow(1.07,C.week)));
   var r={week:C.week,net:net,homes:homes,share:share,did:pick(CONSULT)};C.last=r;C.reports=[r].concat(C.reports||[]).slice(0,6);earn(share,'company');
-  var now=Date.now();if(!companyWeek.t||now-companyWeek.t>45000){companyWeek.t=now;toast('Week '+C.week+' report: the company made '+fmtA(net)+', '+fmtN(homes)+' new homes. Consultants '+r.did+'. Your share: '+fmtA(share)+'.',4200);}}
+  // Puti: not needed here, the game already runs the company. Reports stay in the Try card, no toasts.
+  }
 var tryMod={name:'try',
  stageChanged:function(){if(activeTab==='try')tryMod.render();},
  day:function(d){if(S.opt.company==='running'&&d%7===0)companyWeek();},

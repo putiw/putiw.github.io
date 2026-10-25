@@ -41,6 +41,7 @@ button:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-
 .speed button{position:relative;border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:2px 6px;font:500 11.5px var(--font-body);min-height:32px;min-width:34px;cursor:pointer}
 .speed button::after{content:'';position:absolute;inset:-7px -2px}
 .speed button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.speed button:disabled{opacity:.32;cursor:not-allowed}
 
 /* cards and buttons */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:10px 12px;margin-bottom:8px}
@@ -80,7 +81,7 @@ h3.track{margin:12px 0 4px;font-size:11.5px;letter-spacing:.07em;text-transform:
 
 /* toast, sheet, popover */
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:70;background:var(--ink);color:var(--surface);font:500 13px/1.35 var(--font-body);padding:9px 14px;border-radius:10px;max-width:calc(100vw - 32px);width:max-content;box-shadow:0 6px 18px rgba(0,0,0,.2);pointer-events:none}
-body.sheet-on .toast{top:calc(env(safe-area-inset-top,0px) + 12px);bottom:auto}
+body.sheet-on .toast,body.on-home .toast{top:calc(env(safe-area-inset-top,0px) + 12px);bottom:auto}
 .sheet{position:fixed;inset:0;z-index:60;background:var(--dim);display:flex;align-items:flex-end;justify-content:center}
 .sheet-in{background:var(--surface);width:100%;max-width:560px;border-radius:16px 16px 0 0;padding:14px max(16px,env(safe-area-inset-left,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-right,0px));box-shadow:0 -6px 24px rgba(0,0,0,.18);max-height:92vh;overflow:auto;overscroll-behavior:contain}
 .sheet-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.sheet-hd h2{font-size:17px}
@@ -124,6 +125,10 @@ body.locked .tabs{z-index:42}
 .bub{position:absolute;z-index:5;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;box-shadow:0 8px 20px rgba(0,0,0,.18);width:min(250px,calc(100% - 12px));font-size:12.5px;line-height:1.35}
 .bub b{font-size:13px}.bub .btns{margin-top:6px;gap:6px}.bub .btn{min-height:30px;padding:3px 9px;font-size:12px}
 .bub .gene{font-size:11px;color:var(--plum);margin-top:3px}
+.genome{font:9.5px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;letter-spacing:.3px;color:var(--ink);margin:2px 0 3px}
+.genome .gs{padding:0 1px;border-radius:2px}.genome .gs0{background:rgba(220,139,121,.22)}.genome .gs36{background:rgba(68,107,125,.16)}.genome .gs52{background:rgba(248,216,117,.45)}.genome .gs56{background:rgba(74,166,62,.16)}.genome .gs64{background:rgba(191,188,175,.35)}
+.wheelrow{display:flex;gap:12px;align-items:flex-start}.wheelrow canvas{flex:0 0 auto}.wheeltxt{min-width:0;font-size:12.5px;line-height:1.4}.wheeltxt p{margin:0 0 6px}
+.wheeltxt details{border-top:1px solid var(--line);padding-top:6px}.wheeltxt summary{cursor:pointer;font-weight:600;font-size:12.5px;margin-bottom:4px}
 
 /* sort tray and cups */
 .sortcv{display:block;width:100%;border-radius:10px;border:1px solid var(--line);touch-action:none;user-select:none;-webkit-user-select:none;background:#f6f3ec}
@@ -160,3 +165,21 @@ body.locked .tabs{z-index:42}
 .ltools .btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 @media (prefers-reduced-motion:reduce){.btn.glow{animation:none}}
 @media (max-width:374px){#b-money{font-size:17px}.speed{gap:3px}.speed button{min-width:30px;padding:2px 4px}.devtag{display:none}}
+
+
+.wbar{position:relative;height:8px;border-radius:99px;background:var(--line);margin:2px 0 8px;overflow:visible}.wbar i{display:block;height:100%;border-radius:99px}.wbar b{position:absolute;top:-3px;width:2px;height:14px;background:var(--ink-2);border-radius:1px}
+
+/* collapsible cards and ? help, the same as the game's */
+.coll>.hd{cursor:pointer;user-select:none;margin-bottom:0}
+.coll>.hd h2::before{content:'▾';display:inline-block;width:16px;color:var(--ink-3);transition:transform .15s}
+.coll.shut>.hd h2::before{transform:rotate(-90deg)}
+.coll:not(.shut)>.hd{margin-bottom:6px}
+.coll.shut>:not(.hd){display:none!important}
+.qhelp{flex:0 0 auto;width:26px;height:26px;margin-left:6px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2);font:700 13px/1 var(--font-body);cursor:pointer;padding:0;align-self:center}
+.qhelp[aria-expanded="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.helpbox{margin:6px 0 4px;padding:9px 11px;border-radius:9px;background:var(--surface-2);font-size:13px;line-height:1.45;color:var(--ink-2)}.helpbox p{margin:6px 0 0}
+.wbar{height:6px}.wbar b{top:-4px;height:14px}
+.coll>.hd{align-items:center}.coll>.hd small{margin-left:auto;text-align:right}
+.bent b{white-space:normal;line-height:1.2;overflow:visible;text-overflow:clip}
+
+.tv.fadein{animation:tvIn .28s ease-out}@keyframes tvIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}@media(prefers-reduced-motion:reduce){.tv.fadein{animation:none}}

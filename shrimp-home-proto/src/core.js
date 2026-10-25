@@ -1,6 +1,6 @@
 'use strict';
 // ===== Core: state, clock, money, book, tabs, toasts, sheets =====
-var BUILD='proto-2026-10-25b';
+var BUILD='proto-2026-10-26a';
 var $=function(id){return document.getElementById(id);};
 function clamp(v,a,b){return v<a?a:v>b?b:v;}
 function lerp(a,b,t){return a+(b-a)*t;}
@@ -26,7 +26,7 @@ var STAGES=[
  {id:'house',name:'A house with a garden',tanks:5,cost:40000},
  {id:'land',name:'Land with a stream',tanks:6,cost:250000}];
 function newState(){return {v:1,build:BUILD,day:0,lastDay:0,speed:1,cash:3000,stage:0,
-  opt:{toys:'need',effects:'on',company:'running',genes:false,sound:true},
+  opt:{toys:'need',effects:'score',company:'running',genes:false,sound:true},
   tanks:[],sel:0,book:{shrimp:{},birds:{},fish:{},finds:{}},land:{},company:{week:0,last:null,reports:[]},
   stats:{earned:0,spent:0},nextId:1,tab:'try',seen:{}};}
 var saveT=0;
@@ -56,7 +56,10 @@ function loop(ts){var dtSec=lastTs?Math.min(0.1,(ts-lastTs)/1000):0.016;lastTs=t
 function advance(dd){S.day+=dd;var guard=0;while(Math.floor(S.day)>S.lastDay&&guard++<400){S.lastDay++;dayRoll(S.lastDay);}}
 function dayRoll(d){modCall('day',d);save();}
 function skipDays(n){for(var i=0;i<n;i++){S.day=Math.floor(S.day)+1;S.lastDay=Math.floor(S.day);dayRoll(S.lastDay);}modCall('render');updateHeader();}
-function setSpeed(v){S.speed=v;document.querySelectorAll('#speed button').forEach(function(b){b.setAttribute('aria-pressed',String(+b.dataset.speed===v));});updateHeader();save();}
+function setSpeed(v){if(activeTab==='home'&&v>1){toast('At home time runs at 1×.');sfx('nope');v=1;}S.speed=v;document.querySelectorAll('#speed button').forEach(function(b){b.setAttribute('aria-pressed',String(+b.dataset.speed===v));});speedLock();updateHeader();save();}
+// Puti: at home it's always 1×, no speed-ups. Leaving home gives back the speed you had.
+function speedLock(){var home=activeTab==='home';document.querySelectorAll('#speed button').forEach(function(b){b.hidden=home&&+b.dataset.speed>1;});}
+function homeSpeed(){if(activeTab==='home'){if(S.speed>1){S.speedAway=S.speed;setSpeed(1);}}else if(S.speedAway){var v=S.speedAway;S.speedAway=0;setSpeed(v);}speedLock();}
 
 // ----- money -----
 function spend(n,what){if(n<=0)return true;if(S.cash<n){toast('Not enough cash for '+what+'. Add some under Try › Dev.');sfx('nope');return false;}S.cash-=n;S.stats.spent+=n;updateHeader();save();return true;}
@@ -67,12 +70,15 @@ var BOOK={};               // cat -> {title, entries:[{id,name,draw(ctx,w,h),hin
 function bookCat(cat,def){BOOK[cat]=def;}
 function bookHas(cat,id){return !!(S.book[cat]&&S.book[cat][id]);}
 function bookAdd(cat,id,info){if(!S.book[cat])S.book[cat]={};if(S.book[cat][id])return false;var e={day:Math.floor(S.day)};for(var k in info||{})e[k]=info[k];S.book[cat][id]=e;
-  var def=BOOK[cat],ent=def&&def.entries.find(function(x){return x.id===id;});toast('New in the book: '+(ent?ent.name:id));sfx('book');save();modCall('bookChanged',cat,id);return true;}
+  var def=BOOK[cat],ent=def&&def.entries.find(function(x){return x.id===id;});bookNews(ent?ent.name:id);save();modCall('bookChanged',cat,id);return true;}
+// several finds at once (a trap full of shrimp) make one message, not a queue of them
+var BOOKQ=[],BOOKT=0;
+function bookNews(n){BOOKQ.push(n);if(BOOKT)return;BOOKT=setTimeout(function(){var q=BOOKQ.splice(0);BOOKT=0;var t=q.length===1?q[0]:q.length===2?q[0]+' and '+q[1]:q.slice(0,-1).join(', ')+' and '+q[q.length-1];toast('New in the book: '+t,q.length>2?3600:2600);sfx('book');},350);}
 
 // ----- header -----
 function updateHeader(){if(!S)return;var d=Math.floor(S.day);$('b-date').textContent='Day '+d+' · '+seasonOf(d);
   $('b-money').textContent=fmtA(S.cash);
-  var sub=LOCK?'Time stops while you work':S.speed===0?'Paused':'';if(!sub&&S.opt.company==='running'&&S.company.last)sub='Company last week '+(S.company.last.net>=0?'+':'')+fmtA(S.company.last.net);
+  var sub=LOCK?'Time stops while you work':S.speed===0?'Paused':'';if(!sub&&S.opt.company==='running'&&S.company.last)sub='Your share last week +'+fmtA(S.company.last.share);
   if(!sub&&S.opt.company==='sold')sub='Company sold · retired';
   $('b-sub').textContent=sub;}
 
@@ -92,9 +98,9 @@ function closePop(){$('pop').hidden=true;$('pop-dim').hidden=true;}
 
 // ----- tabs -----
 var activeTab='home';
-function setTab(t,arg){if(!TABMOD[t])t='home';if(activeTab!==t&&TABMOD[activeTab]&&TABMOD[activeTab].hide)TABMOD[activeTab].hide();activeTab=t;S.tab=t;
+function setTab(t,arg){if(!TABMOD[t])t='home';if(t!==activeTab)toastQ.length=0;document.body.classList.toggle('on-home',t==='home');if(activeTab!==t&&TABMOD[activeTab]&&TABMOD[activeTab].hide)TABMOD[activeTab].hide();activeTab=t;S.tab=t;
   document.querySelectorAll('.tabs [data-tab]').forEach(function(b){b.setAttribute('aria-selected',String(b.dataset.tab===t));});
-  ['home','tank','book','try'].forEach(function(n){$('p-'+n).hidden=n!==t;});
+  ['home','tank','book','try'].forEach(function(n){$('p-'+n).hidden=n!==t;});homeSpeed();
   if(TABMOD[t].show)TABMOD[t].show(arg);window.scrollTo(0,0);sfxAmbient();save();}
 function goTank(i){if(i!=null&&S.tanks[i])S.sel=i;setTab('tank');}
 

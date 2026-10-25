@@ -13,7 +13,7 @@ The point Puti is testing: does this give the game a slow, creative, no-rush pla
 
 ## Source layout
 
-`build.py` concatenates `src/` into `dist/index.html` (with a local skeleton, for testing) and `dist/artifact.html` (raw, for publishing). Order: `sprites.js, core.js, ink.js, sound.js, shrimpart.js, breed.js, tank.js, toys.js, land.js, book.js, try.js, main.js`. Extra `src/*.css` files are appended after `style.css`.
+`build.py` concatenates `src/` into `dist/index.html` (with a local skeleton, for testing) and `dist/artifact.html` (raw, for publishing). Order: `sprites.js, pixart.js, core.js, ink.js, sound.js, shrimpart.js, genetics.js, breed.js, tank.js, toys.js, land.js, book.js, try.js, main.js`. `pixart.js` holds Puti's pixel art (Millie, the dog, tiles, trees) as data URIs. Extra `src/*.css` files are appended after `style.css`.
 
 Test: `./test/serve.sh` (serves dist on :8765), then `node test/shot.js out.png "js to eval" waitMs width height fullPage`. Put screenshots in `/tmp/claude-0/`, never in the repo.
 
@@ -32,14 +32,18 @@ State is one object `S`, saved to localStorage (`save()` throttled, `save(true)`
 - Helpers: `clamp, lerp, rnd, pick, gauss, mulberry32(seed), hash2(x,y,seed), esc, fmtN, plural, seasonOf(day), fitCanvas(canvas, w, h)` (sets the dpr transform, returns ctx), `miniCanvas(w,h,draw)`.
 - Ink (hand-drawn look): `INK` (outline colour), `inkPath(ctx, pts, {closed, w, col, seed, amp, fill})`, `blobPts`, `inkBlob(ctx, cx, cy, rx, ry, {fill, seed, irr, w, wash})`, `washSpots`, `inkTick`, `grain(ctx, x, y, w, h, alpha)`, colour utils `mixC, shadeC, rgba, hexRGB`.
 - Sound: `sfx(name, {v})` for one-shots (`click nope snip pop plip plop drip squelch suck scoop egg coin book chirp splash cast cluck flap reel thud pour`), `sfxLoop(name)` returns `{set(level), stop()}` for held sounds (`siphon mower bubbles wind`). Outdoor wind plays on Home from the balcony on.
-- Shrimp art: `bodyCanvas(spec)`, `drawShrimp(ctx, agent, L, t)`, `shrimpStill(ctx, spec, cx, cy, L, face)`, `shrimpIconCanvas(spec, w, h)`, `COLOURS`, `DECOR`.
+- Shrimp art: `bodyCanvas(spec)` where spec is `{male, h, s, l, vg (grade 0-7), mat (colour maturity), juv, rili, legend, sick}`, `drawShrimp(ctx, agent, L, t)` (legs pre-joined, tail joined to the body, 2-3 drawImage calls), `shrimpStill(ctx, spec, cx, cy, L, face)`, `shrimpIconCanvas(spec, w, h)`, `COLOURS` (labels per line), `DECOR`.
+- Speed: on the Home tab time is always 1× (`speedLock`, `homeSpeed` in core.js); leaving Home gives back the earlier speed.
 
-## Breeding API (breed.js, used by the land's shrimp trap)
+## Breeding API (breed.js on genetics.js; see GENETICS.md)
 
-- `breedWild()` returns one wild-caught shrimp (an individual object).
-- `specOf(ind)` returns the draw spec for `shrimpIconCanvas`.
-- `colourName(ind)` gives "Wild", "Blue rili", etc.
-- `takeHome(list, from)` opens a sheet to pick a tank and puts the shrimp in it.
+- `breedWild()` returns one wild-caught shrimp. `grandmaStock()` makes Grandma's red line (seeded).
+- `phOf(ind)` decodes the genome (cached, not saved): `{h, s, l, grade, rili, line, legend, vig, body}`. Helpers `gradeOf`, `lineOf`, `riliOf`, `colOf` (same as lineOf).
+- `specOf(ind)` returns the draw spec for `bodyCanvas` / `shrimpIconCanvas`. `shrimpRGB(ind)` gives a flat `rgb()` colour.
+- `colourName(ind, full)` gives "Wild", "Blue rili", "Red · G5".
+- `takeHome(list, from)` opens a sheet to pick a tank and puts the shrimp in it. `addToTank(T, list, from)` records them in the book.
+- `bookShrimpSeen(ind, info, silent)` keeps the book's best grade per line and the colour wheel (`S.book.hue`, `S.book.hueR`).
+- `wellbeing(T)` (tank.js) returns `{total 0-100, parts}`; `scoreMode()` when `S.opt.effects === 'score'`.
 
 Guard calls with `typeof takeHome === 'function'` in case breed.js isn't loaded.
 
@@ -118,3 +122,50 @@ Each one should be satisfying on its own.
 - Fits 360 and 390 px wide, with no sideways page scroll. The map pans inside its own box.
 - 30+ fps on a phone: pre-render the ground to an offscreen canvas and redraw only changed tiles; draw animals and effects each frame.
 - Expose `landSetStage(n)` globally for the Dev controls.
+
+## Round 2: the home in Puti's pixel style, Millie and the dog
+
+Puti tested round 1 (notes in the artifact db, `notes/<her id>`). For the home she wants her own art style (Haven, Echoing End) and to **walk around Grandma's place as Millie with the dog following**.
+
+**Assets** (`src/pixart.js`, from her Aseprite exports; keep them out of the public repo until she says OK):
+- `PIXSRC`: data URIs, frame layout in `PIXMETA`.
+- `millie`: 51 frames of 128×128 in a row.
+  - 0 idle facing down; 1–12 run right; 13–24 run left; 26–37 run down (toward the camera); 38 back idle; 39–50 run up.
+- `dog`: 14 frames of 128×128.
+  - 0–12 run cycle facing right (mirror for left), 13 sitting facing front.
+- Tiles, 64×64: `grass`, `dirt`, `water`.
+  - `terrain`: Haven atlas, 10×3 tiles of 64, grass-on-dirt transitions.
+  - `gdw`: Echoing End autotile set, 64-px tiles: grass, dirt and water edges.
+- Trees:
+  - `olive`: 7-frame sway, each 420×200, base at bottom centre.
+  - `olive2`: one frame, 235×196.
+  - `oak`: a small chunky pixel tree, 74×90.
+- `post` (log wall post, 32×128), `bench` (workbench, 64×64), `logs` (32×32).
+
+**Style** (from Haven's `docs/art/style-guide.md`):
+- Pixel art, hand-drawn, warm colours.
+- Top-down ground tiles (Stardew style), side-view characters and objects.
+- Natural earthy palette: greens with blue-green grass strokes, warm tan dirt, light cyan water with scribbly lines.
+- Characters have dark outlines; trees and tiles are painterly with no outline.
+- Draw everything else you need (house walls and floor, furniture, Grandma, tank stands, coop, hens, birds, fish, feeder, fences, flowers, pond banks, bench to sit on) as pixel sprites in code at the same scale: a 64-px tile, 2–4 tone shading, brushy texture. Draw at native resolution on offscreen canvases and scale with `imageSmoothingEnabled=false`.
+
+**Play:**
+- Millie is the player. Tap a tile and she walks there by a short path (A* on the tile grid around water and solid objects), animated in 4 directions, with idle or back-idle when she stops.
+- The camera follows her smoothly.
+- The dog follows a breadcrumb trail about 1.5 tiles behind:
+  - runs when she moves, sits when she stops;
+  - sometimes wanders and sniffs nearby;
+  - tap the dog to pet it (a hop and a little heart).
+- Things happen where Millie is. Tap a thing and she walks next to it, then does it:
+  - fill the feeder;
+  - collect eggs;
+  - lift the trap;
+  - open a tank (`goTank(i)`);
+  - sit on the bench.
+- **Mowing:** with Mow on she pushes the mower along her path and every grass tile she passes is cut. No stripes. Make sure every grass tile changes; Puti saw some grass background that didn't.
+- **Birds:** sit on the bench (or stand still) and birds come close. Tap a bird once to watch it. A ring fills above it for about 1.5 s while Millie stays still, then it goes in the Book. No holding: Puti's finger was covering the bird.
+- **Fishing:** catch fish in the stream or lake and bring them home to stock your pond. Kept fish swim in the pond.
+- **Hens and wild chickens:** Puti asked how to catch them, so make it obvious. Grain shows a short hint. A wild chicken pecking near the grain can be caught by walking up and tapping it.
+- Keep: the four stages and the Move card, decorating (Build), the trap → `takeHome` flow, tank stands, `landSetStage`, `LAND.setTool`, and the Book categories.
+
+**Status after round 2 (26 October):** done as above. Pierre lives only in the house (Puti didn't want him in the tank view). The home renders one canvas pixel per art pixel and scales up crisp, and holds 60 fps at 4× CPU slowdown on a 390 px phone. The camera keeps to the part of the map with something on it.

@@ -5,6 +5,10 @@ var MULM_N=48;
 function newTank(name,vol,scape){return {id:uid(),name:name,vol:vol||20,born:Math.floor(S.day),scape:scape||[],moss:{},stems:[],mulm:new Array(MULM_N).fill(0),flow:1,pests:[],no3:6,nh:0,level:1,shrimp:[],log:[],newCol:0,lastWC:null,lastClean:{}};}
 function grandmaScape(){var sq=function(cx){return 466+(cx-466)*0.8;};var order=['wood','sword','lotus','rockpile','mossrock','rocks','pebble'];
   return order.map(function(k){var d=DECOR_SIZE[k];return {id:uid(),k:k,x:sq(d.x+d.w/2),y:d.y+d.h,s:1,f:1};});}
+function starterScape(){return [['rockpile',300,0.8,1],['mossrock',560,0.9,-1],['pebble',660,1,1],['leaf',420,1,1]].map(function(q){var d=DECOR_SIZE[q[0]];return {id:uid(),k:q[0],x:q[1],y:q[0]==='leaf'?ART_H*0.9:d.y+d.h,s:q[2],f:q[3],r:q[0]==='leaf'?0.2:0};});}
+function setupTank(name){if(S.tanks.length>=STAGES[S.stage].tanks){toast('No room for another tank here yet.');sfx('nope');return null;}if(!spend(300,'a new tank'))return null;
+  var n=name||'Tank '+(S.tanks.length+1),k=2;while(S.tanks.some(function(t){return t.name===n;}))n=(name||'Tank')+' '+(k++);
+  var T=newTank(n,20,starterScape());for(var i=0;i<MULM_N;i++)T.mulm[i]=0;S.tanks.push(T);whenArt(function(){scapeNeedsMoss(T);TV.L={};});save();modCall('render');return T;}
 function defaultStems(T,cx,n){for(var i=0;i<n;i++)T.stems.push({id:uid(),x:cx+(i-(n-1)/2)*13+rnd(-3,3),h:rnd(120,170),seed:Math.floor(Math.random()*1e6),lean:rnd(-0.12,0.12)});}
 // moss grows from the top edge of driftwood and stones
 var TOPS={};
@@ -32,11 +36,12 @@ function tankDay(T,d){var n=T.shrimp.length,eff=effectsOn();
   if(eff&&pl===0&&mulmMean(T)>0.7&&Math.random()<0.02)addPests(T,'planaria',1+Math.floor(Math.random()*2));
   if(pl>0&&pl<12&&Math.random()<(mulmMean(T)>0.5?0.12:0.05))addPests(T,'planaria',1);
   // water
-  T.no3=clamp(T.no3+0.3+0.03*n-plantMass(T)*0.4,2,90);
-  T.nh=Math.max(0,T.nh-0.14)+(T.flow<0.3?0.04:0);
+  // dirty gravel feeds nitrate, plants soak some up; a clogged filter lets ammonia build
+  T.no3=clamp(T.no3+0.3+0.03*n+mulmMean(T)*1.5-Math.min(plantMass(T),4)*0.25,2,90);
+  T.nh=Math.max(0,T.nh*0.8-0.02)+(T.flow<0.3?0.06+0.002*n:0);
   if(T.level<1)T.level=1;
   breedDay(T,d);}
-function addPests(T,k,n){for(var i=0;i<n;i++){var onGlass=k==='planaria'?Math.random()<0.8:Math.random()<0.55;T.pests.push({id:uid(),k:k,kind:k==='snail'?(Math.random()<0.5?'ramshorn':'bladder'):'',x:rnd(0.08,0.92),y:onGlass?rnd(0.3,0.68):rnd(0.77,0.9),glass:onGlass,a:Math.random()*6.28,sz:rnd(0.8,1.2)});}}
+function addPests(T,k,n){for(var i=0;i<n;i++){var onGlass=k==='planaria'?Math.random()<0.8:Math.random()<0.55;T.pests.push({id:uid(),k:k,kind:k==='snail'?(Math.random()<0.8?'bladder':'ramshorn'):'',x:rnd(0.08,0.92),y:onGlass?rnd(0.3,0.68):rnd(0.77,0.9),glass:onGlass,a:Math.random()*6.28,sz:rnd(0.8,1.2)});}}
 function needs(T){var o=[],mm=mulmMean(T),og=overgrowth(T),sn=T.pests.filter(function(p){return p.k==='snail';}).length,pl=T.pests.length-sn;
   if(!T.scape.length)o.push({id:'scape',t:'Empty tank'});
   if(mm>0.4)o.push({id:'vac',t:mm>0.65?'Very dirty':'Gravel dirty'});
@@ -46,6 +51,13 @@ function needs(T){var o=[],mm=mulmMean(T),og=overgrowth(T),sn=T.pests.filter(fun
   if(T.newCol>0)o.push({id:'sort',t:'New colours'});
   return o;}
 function anyNeeds(){return S.tanks.some(function(T){return needs(T).length;});}
+// ---- Wellbeing: one number for how the shrimp are doing (Puti: about 50 is enough, more is happiness) ----
+function wellbeing(T){var n=T.shrimp.length,cap=tankCap(T),pl=T.pests.filter(function(p){return p.k==='planaria';}).length,sn=T.pests.length-pl;
+  // the three jobs carry most of it, so a neglected tank drops well under 50
+  var parts=[['Water',25*(1-clamp((T.no3-20)/60,0,1))+10*(1-clamp(T.nh/0.5,0,1)),35],['Filter',20*clamp((T.flow-0.2)/0.6,0,1),20],['Gravel',20*(1-clamp((mulmMean(T)-0.15)/0.6,0,1)),20],
+   ['Plants and hiding',5*Math.min(1,hideScore(T)/0.5)+5*Math.min(1,plantMass(T)/0.9),10],['Space',n<=cap?10:10*cap/n,10],['Pests',Math.max(0,5-2*pl-(sn>8?2:0)),5]];
+  var t=0;parts.forEach(function(q){q[1]=Math.round(q[1]);t+=q[1];});return {total:clamp(t,0,100),parts:parts};}
+function moodOf(w){return w>=75?'Happy':w>=50?'Fine':'Needs care';}
 // ---- the view ----
 var TV={cv:null,W:0,H:0,dpr:1,ag:[],dead:[],bub:[],t:0,T:null,sig:'',L:{},on:false,bubbleFor:null};
 function tvGeom(){var s=TV.H/ART_H;return {s:s,ox:(TV.W-ART_W*s)/2,sand:TV.H*0.8};}
@@ -80,8 +92,13 @@ function drawStem(x,st,g,alpha){var pts=stemPts(st,g),r=mulberry32(st.seed);x.sa
   for(var i=2;i<pts.length;i+=2){var p=pts[i],q=pts[i-1],ang=Math.atan2(p[1]-q[1],p[0]-q[0]),lw=(4.2+r()*1.6)*Math.max(0.7,g.s/0.48);
     [-1,1].forEach(function(sd){var a=ang+sd*1.15,ex=p[0]+Math.cos(a)*lw,ey=p[1]+Math.sin(a)*lw;x.beginPath();x.ellipse((p[0]+ex)/2,(p[1]+ey)/2,lw/2,lw*0.24,a,0,6.283);x.fillStyle=i>pts.length-7?'#9fd06a':'#7cbf4f';x.fill();x.lineWidth=0.7;x.strokeStyle='#3d6e2a';x.stroke();});}
   x.restore();return pts;}
-function drawPlants(x,T,g){T.stems.forEach(function(st){drawStem(x,st,g);});
-  T.scape.forEach(function(it){var ms=T.moss[it.id];if(!ms)return;ms.forEach(function(m){var a0=mossAnchor(it,m);drawPuffs(x,mossPuffs([g.ox+a0[0]*g.s,a0[1]*g.s],m,g));});});}
+// Everything planted, back to front: stem plants at the back, then each piece in its order with
+// its own moss, so a stone in front covers the moss on the wood behind it.
+function drawScapeAll(x,T,g){T.stems.forEach(function(st){drawStem(x,st,g);});
+  T.scape.forEach(function(it){drawItem(x,it);var ms=T.moss[it.id];if(!ms)return;ms.forEach(function(m){var a0=mossAnchor(it,m);drawPuffs(x,mossPuffs([g.ox+a0[0]*g.s,a0[1]*g.s],m,g));});});}
+function scapeLayer(T,g){return layer('scape',plantsKey(T)+TV.W+(ART_READY?1:0),function(c){drawScapeAll(c,T,g);});}
+// A piece that was moved or added goes in front of everything that sits further back on the sand.
+function scapeResort(T,it){var k=T.scape.indexOf(it);if(k<0)return;T.scape.splice(k,1);var at=T.scape.length;for(var i=0;i<T.scape.length;i++){if(T.scape[i].y>it.y){at=i;break;}}T.scape.splice(at,0,it);}
 function plantsKey(T){var k=scapeKey(T)+'#';T.stems.forEach(function(s){k+=s.x.toFixed(0)+':'+s.h.toFixed(0)+',';});for(var id in T.moss)T.moss[id].forEach(function(m){k+=m.len.toFixed(1)+',';});return k;}
 // mulm: brown fluff on the sand, more in the corners and behind the decor
 function drawMulm(x,T){var W=TV.W,H=TV.H;for(var i=0;i<MULM_N;i++){var a=T.mulm[i];if(a<0.03)continue;var n=Math.round(a*15),cx0=i/MULM_N*W,cw=W/MULM_N;
@@ -101,14 +118,14 @@ function tvSpot(kind){var W=TV.W||300,H=TV.H||150,sand=TV.H*0.8,L=tvBase();
   return {surf:'sand',x:W*(0.06+Math.random()*0.86),y:sand+H*(0.02+Math.random()*0.08)};}
 function newAgent(ind,near){var r=Math.random(),sp=tvSpot(r<0.12?'glassL':r<0.2?'glassR':r<0.32?'wood':'sand');if(near){sp={surf:'sand',x:clamp(near.x+rnd(-14,14),8,TV.W-8),y:TV.H*0.8+TV.H*rnd(0.02,0.1)};}
   var a={id:ind.id,ind:ind,x:sp.x,y:sp.y,surf:sp.surf,tx:sp.x,ty:sp.y,ang:0,av:0,face:Math.random()<0.5?1:-1,faceT:1,intent:'graze',left:Math.random()*3,ph:Math.random()*10,rp:0,sp:0,speed:0};a.faceT=a.face;a.ang=restAngle(a);agentSpec(a);return a;}
-function agentSpec(a){var i=a.ind;a.spec=specOf(i);a.berried=!!i.eggs;a.sc=a.spec.juv===2?0.36:a.spec.juv===1?0.62:1;}
+function agentSpec(a){var i=a.ind;a.spec=specOf(i);a.berried=!!i.eggs;a.sc=(a.spec.juv===2?0.36:a.spec.juv===1?0.62:1)*(a.spec.size||1);}
 function restAngle(a){return a.surf==='glassL'||a.surf==='glassR'?(a.face>0?Math.PI/2:-Math.PI/2):a.surf==='wood'?-0.12*a.face:0;}
 function angDelta(a,b){var d=(b-a)%(2*Math.PI);if(d>Math.PI)d-=2*Math.PI;if(d<-Math.PI)d+=2*Math.PI;return d;}
 function turn(a,des,dt){var d=angDelta(a.ang,des);if(Math.abs(d)<0.0001){a.av=0;a.ang=des;return;}var dv=clamp(d*5.2,-2.8,2.8);a.av+=clamp(dv-a.av,-7.5*dt,7.5*dt);a.av=clamp(a.av,-2.8,2.8);var st=a.av*dt;if(Math.sign(st)===Math.sign(d)&&Math.abs(st)>=Math.abs(d)){st=d;a.av=0;}a.ang+=st;}
-function agentPick(a){var L=tvBase()*a.sc,r=Math.random(),sand=TV.H*0.8,W=TV.W,H=TV.H;
+function agentPick(a){var L=tvBase()*a.sc,r=Math.random(),sand=TV.H*0.8,W=TV.W,H=TV.H,swim=TV.happy?0.68:0.84;
   if(r<0.12){a.intent='idle';a.left=1+Math.random()*2.5;a.speed=0;return;}
   if(r<0.38){a.intent='graze';a.left=1.2+Math.random()*3;a.speed=0;return;}
-  if(r<0.84||a.surf==='water'){a.intent='crawl';a.speed=L*0.3*(0.8+Math.random()*0.4);a.left=8;
+  if(r<swim||a.surf==='water'){a.intent='crawl';a.speed=L*0.3*(0.8+Math.random()*0.4);a.left=8;
     if(a.surf==='glassL'||a.surf==='glassR'){a.tx=a.x;a.ty=clamp(a.y+(Math.random()<0.5?-1:1)*L*(1+Math.random()*1.5),H*0.18,sand-L*0.2);}
     else if(a.surf==='wood'){var wsp=tvSpot('wood');a.tx=wsp.surf==='wood'?wsp.x:a.x;a.ty=wsp.surf==='wood'?wsp.y:a.y;}
     else if(a.surf==='water'){a.tx=clamp(a.x+(Math.random()-0.5)*L*2.5,8,W-8);a.ty=clamp(a.y+(Math.random()-0.5)*L,H*0.3,H*0.9);}
@@ -126,12 +143,15 @@ function agentsStep(dt){var W=TV.W,H=TV.H,sand=H*0.8,L0=tvBase();
     a.face+=clamp(a.faceT-a.face,-6*dt,6*dt);a.rp+=dt*Math.min(12,a.sp/Math.max(1,L)*13.7);a.x=clamp(a.x,6,W-6);a.y=clamp(a.y,H*0.27,H*0.95);});
   var gap=L0*0.5;for(var i=0;i<TV.ag.length;i++)for(var j=i+1;j<TV.ag.length;j++){var p=TV.ag[i],q=TV.ag[j];if(p.surf!==q.surf||(p.surf!=='sand'&&p.surf!=='water'))continue;var dx=q.x-p.x;if(Math.abs(dx)<gap&&Math.abs(q.y-p.y)<gap*0.4){var push=(gap-Math.abs(dx))*dt*1.2*(dx>=0?1:-1);p.x-=push;q.x+=push;}}
   TV.dead.forEach(function(d){d.ms+=dt*1000;});TV.dead=TV.dead.filter(function(d){return d.ms<d.sinkMs+2100;});
+  if(TV.happy&&!TOY&&TV.ag.length&&Math.random()<dt*0.5){var ha=pick(TV.ag);if(!ha.hidden)(TV.hearts=TV.hearts||[]).push({x:ha.x,y:ha.y-tvBase()*ha.sc*0.3,t:0});}
+  if(TV.hearts){TV.hearts.forEach(function(h){h.t+=dt;h.y-=dt*14;});TV.hearts=TV.hearts.filter(function(h){return h.t<2;});}
   TV.bub.forEach(function(b){b.y-=dt*H*0.35*(b.sp||1);b.x+=Math.sin(b.y*0.08)*0.3;});TV.bub=TV.bub.filter(function(b){return b.y>H*WATER_TOP+3+(1-(TV.T?TV.T.level:1))*H*(SAND_TOP-WATER_TOP);});
   var T=TV.T;if(T){var fb=filterBox(),rate=0.6+T.flow*5.5;if(Math.random()<dt*rate)TV.bub.push({x:fb.x+fb.w/2+rnd(-2,2),y:H*0.17+6,r:0.8+T.flow*1.6*Math.random()+0.4,sp:0.6+T.flow*0.7});}}
-var MAX_AG=45;
-function sampleInds(T){var list=T.shrimp;if(list.length<=MAX_AG)return list;var main=tankMainColour(T),pri=list.filter(function(i){return i.eggs||i.name||colOf(i)!==main||i.id===TV.bubbleFor;}),rest=list.filter(function(i){return pri.indexOf(i)<0;});
+// how many shrimp are drawn at once (the rest are counted in the colony): fewer on a phone-sized tank
+var MAX_AG=45;function maxAg(){return TV.W&&TV.W<420?32:MAX_AG;}
+function sampleInds(T){var list=T.shrimp,MAX_AG=maxAg();if(list.length<=MAX_AG)return list;var main=tankMainColour(T),pri=list.filter(function(i){return i.eggs||i.name||lineOf(i)!==main||i.id===TV.bubbleFor;}),rest=list.filter(function(i){return pri.indexOf(i)<0;});
   var r=mulberry32(Math.floor(S.day)*13+T.id);rest=rest.map(function(i){return [r(),i];}).sort(function(a,b){return a[0]-b[0];}).map(function(p){return p[1];});return pri.slice(0,MAX_AG).concat(rest).slice(0,MAX_AG);}
-function tvSync(force){var T=S.tanks[S.sel];if(!T||!TV.cv)return;if(!TV.W&&!tvSize())return;if(TV.T!==T){TV.ag=[];TV.dead=[];TV.T=T;}var sig=T.id+'|'+T.shrimp.length+'|'+Math.floor(S.day);if(!force&&TV.sig===sig)return;TV.sig=sig;
+function tvSync(force){var T=S.tanks[S.sel];if(!T||!TV.cv)return;if(!TV.W&&!tvSize())return;if(TV.T!==T){TV.ag=[];TV.dead=[];TV.T=T;}var sig=T.id+'|'+T.shrimp.length+'|'+Math.floor(S.day);if(!force&&TV.sig===sig)return;TV.sig=sig;TV.happy=scoreMode()&&wellbeing(T).total>=75;
   var want=sampleInds(T),ids={};want.forEach(function(i){ids[i.id]=1;});var alive={};T.shrimp.forEach(function(i){alive[i.id]=1;});
   TV.ag=TV.ag.filter(function(a){if(ids[a.id])return true;if(!alive[a.id]&&TV.W)killAgent(a);return false;});
   var have={};TV.ag.forEach(function(a){have[a.id]=a;});
@@ -140,27 +160,42 @@ function killAgent(a){var sand=TV.H*0.8,ty=Math.max(a.y,sand+TV.H*(-0.02+Math.ra
 function tankEvent(T,kind){if(T===TV.T)tvSync(true);if(kind==='hatch'&&T===TV.T&&activeTab==='tank')sfx('plip');}
 function tvDraw(){var x=TV.cv.getContext('2d'),W=TV.W,H=TV.H,T=TV.T,t=TV.t,g=tvGeom();x.setTransform(TV.dpr,0,0,TV.dpr,0,0);x.clearRect(0,0,W,H);
   var edit=TOY&&TOY.id==='scape';
-  x.drawImage(layer('bg',W+'x'+H+(ART_READY?1:0),drawBg),0,0,W,H);
-  if(edit)TOY.drawScape(x,g);else x.drawImage(layer('scape',scapeKey(T)+W+(ART_READY?1:0),function(c){T.scape.forEach(function(it){drawItem(c,it);});}),0,0,W,H);
-  if(!(TOY&&TOY.id==='trim'))x.drawImage(layer('plants',plantsKey(T)+W,function(c){drawPlants(c,T,g);}),0,0,W,H);else TOY.drawPlants(x,g);
-  drawFilter(x,T);
-  x.drawImage(layer('mulm',mulmKey(T)+W,function(c){drawMulm(c,T);}),0,0,W,H);
+  // One cached picture for everything that only changes now and then (water, decor, moss, filter, mulm),
+  // so a frame is one big drawImage plus the shrimp. While vacuuming, the mulm stays its own layer.
+  var vac=TOY&&TOY.id==='vac',bgk=W+'x'+H+(ART_READY?1:0);
+  if(edit){x.drawImage(layer('bg',bgk,drawBg),0,0,W,H);TOY.drawScape(x,g);drawFilter(x,T);x.drawImage(layer('mulm',mulmKey(T)+W,function(c){drawMulm(c,T);}),0,0,W,H);}
+  else{x.drawImage(layer('base',bgk+'|'+plantsKey(T)+'|'+Math.round(T.flow*40)+(vac?'':'|'+mulmKey(T)),function(c){c.drawImage(layer('bg',bgk,drawBg),0,0,W,H);drawScapeAll(c,T,g);drawFilter(c,T);if(!vac)drawMulm(c,T);}),0,0,W,H);
+   if(vac)x.drawImage(layer('mulm',mulmKey(T)+W,function(c){drawMulm(c,T);}),0,0,W,H);}
   TV.bub.forEach(function(b){x.strokeStyle='rgba(255,255,255,.8)';x.lineWidth=1;x.beginPath();x.arc(b.x,b.y,b.r,0,6.283);x.stroke();});
   drawPests(x,T,t);
   if(!ART_READY)return;var base=tvBase();
   TV.dead.forEach(function(d){var raw=clamp((d.ms-320)/d.sinkMs,0,1),flip=clamp(d.ms/320,0,1),vs=1-flip*flip*(3-2*flip)*2,sink=1-Math.pow(1-raw,3),wave=Math.sin(raw*Math.PI*4)*d.dir,alpha=1-clamp((d.ms-d.sinkMs-1000)/700,0,1),a=d.a,w=base*a.sc,h=w*SH/SW;
     x.save();x.globalAlpha=alpha;x.translate(d.x0+wave*d.amp,d.y0+(d.ty-d.y0)*sink);x.rotate(-wave*0.085);x.scale(d.face,vs);x.drawImage(IMG.ld,-w/2,-h/2,w,h);x.drawImage(bodyCanvas(a.spec),-w/2,-h/2,w,h);x.drawImage(IMG.t0,-w/2,-h/2,w,h);x.restore();});
   TV.ag.slice().sort(function(a,b){return a.y-b.y;}).forEach(function(a){if(a.hidden)return;var L=base*a.sc;drawShrimp(x,a,L,t);if(a.id===TV.bubbleFor){x.save();x.lineWidth=2;x.strokeStyle='#2d6a4f';x.beginPath();x.arc(a.x,a.y,L*0.55,0,6.283);x.stroke();x.restore();}});
+  if(TV.hearts)TV.hearts.forEach(function(h){var a=1-h.t/2,s2=3.4;x.save();x.globalAlpha=a*0.85;x.fillStyle='#e0607a';x.translate(h.x,h.y);x.beginPath();x.moveTo(0,s2*0.9);x.bezierCurveTo(-s2*1.6,-s2*0.2,-s2*0.6,-s2*1.5,0,-s2*0.5);x.bezierCurveTo(s2*0.6,-s2*1.5,s2*1.6,-s2*0.2,0,s2*0.9);x.fill();x.restore();});
   if(TOY&&TOY.draw)TOY.draw(x,g,t);
   // water level (vacuum lowers it)
   if(T.level<0.999){var wy=H*WATER_TOP+(1-T.level)*H*(SAND_TOP-WATER_TOP);var gr=x.createLinearGradient(0,0,0,wy);gr.addColorStop(0,'#e8f4f4');gr.addColorStop(1,'#d5ebee');x.fillStyle=gr;x.fillRect(0,0,W,wy);
     x.strokeStyle='rgba(90,150,170,.8)';x.lineWidth=1.4;x.beginPath();for(var px=0;px<=W;px+=6)x.lineTo(px,wy+Math.sin(px*0.08+t*2)*1.2);x.stroke();}
   if(TOY&&TOY.drawTop)TOY.drawTop(x,g,t);}
-function drawPests(x,T,t){var W=TV.W,H=TV.H;T.pests.forEach(function(p){var px=p.x*W,py=p.y*H;if(p.k==='snail'){var r=4.8*p.sz*Math.max(1,W/420);
-   if(p.kind==='ramshorn'){x.fillStyle='#8a4a30';x.beginPath();x.arc(px,py,r,0,6.283);x.fill();x.strokeStyle=INK;x.lineWidth=0.9;x.stroke();x.beginPath();x.arc(px+0.5,py,r*0.55,0,5.2);x.stroke();x.beginPath();x.arc(px+0.6,py,r*0.22,0,6.283);x.stroke();}
-   else{x.fillStyle='rgba(196,168,112,.95)';x.beginPath();x.ellipse(px,py,r*0.75,r*1.1,p.a,0,6.283);x.fill();x.strokeStyle=INK;x.lineWidth=0.8;x.stroke();x.beginPath();x.moveTo(px-r*0.3,py-r*0.2);x.lineTo(px+r*0.3,py+r*0.4);x.stroke();}}
+function drawPests(x,T,t){var W=TV.W,H=TV.H;T.pests.forEach(function(p){var px=p.x*W,py=p.y*H;if(p.k==='snail'){var r=6*p.sz*Math.max(1,W/420);
+   if(p.kind==='ramshorn')drawRamshorn(x,px,py,r*0.85,p.a);else drawBladder(x,px,py,r,p.a,t+p.id);}
   else{var len=11*p.sz*Math.max(1,W/420),ang=p.a;x.save();x.translate(px,py);x.rotate(ang);x.fillStyle='rgba(245,240,232,.92)';x.beginPath();x.moveTo(len/2,0);x.lineTo(len/2-2.6,-1.6);x.quadraticCurveTo(-len/3,-1.6,-len/2,0);x.quadraticCurveTo(-len/3,1.6,len/2-2.6,1.6);x.closePath();x.fill();x.strokeStyle='rgba(120,110,96,.9)';x.lineWidth=0.6;x.stroke();
    x.fillStyle=INK;x.beginPath();x.arc(len/2-2.4,-0.6,0.45,0,6.283);x.arc(len/2-2.4,0.6,0.45,0,6.283);x.fill();x.restore();}});}
+// Physella, the bladder snail: a glossy amber shell that coils to the left, mottled, with a short
+// pointed spire at the back; the grey foot shows in front with two thin feelers.
+function drawBladder(x,px,py,r,ang,t){x.save();x.translate(px,py);x.rotate(ang);var w=Math.sin(t*2.2)*0.12;
+  x.fillStyle='rgba(120,118,110,.55)';x.beginPath();x.ellipse(r*0.55,0,r*0.95,r*0.42,0,0,6.283);x.fill();
+  x.strokeStyle='rgba(90,88,80,.8)';x.lineWidth=0.7;x.beginPath();x.moveTo(r*1.35,-r*0.15);x.quadraticCurveTo(r*1.75,-r*(0.45+w),r*2.0,-r*(0.55+w));x.moveTo(r*1.35,r*0.15);x.quadraticCurveTo(r*1.75,r*(0.45-w),r*2.0,r*(0.55-w));x.stroke();
+  var g=x.createLinearGradient(-r,-r,r,r);g.addColorStop(0,'rgba(222,184,120,.95)');g.addColorStop(1,'rgba(160,112,58,.95)');x.fillStyle=g;
+  x.beginPath();x.moveTo(-r*1.45,-r*0.05);x.quadraticCurveTo(-r*1.05,-r*0.62,-r*0.2,-r*0.78);x.quadraticCurveTo(r*0.95,-r*0.82,r*0.92,-r*0.05);x.quadraticCurveTo(r*0.85,r*0.78,-r*0.1,r*0.74);x.quadraticCurveTo(-r*1.0,r*0.55,-r*1.45,-r*0.05);x.closePath();x.fill();
+  x.strokeStyle=INK;x.lineWidth=0.8;x.stroke();
+  x.strokeStyle='rgba(90,60,30,.55)';x.lineWidth=0.6;x.beginPath();x.moveTo(-r*0.95,-r*0.42);x.quadraticCurveTo(-r*0.7,r*0.1,-r*1.05,r*0.42);x.moveTo(-r*0.45,-r*0.66);x.quadraticCurveTo(-r*0.1,0,-r*0.4,r*0.66);x.stroke();
+  x.fillStyle='rgba(105,70,35,.5)';[[0.1,-0.35,0.13],[0.45,0.2,0.1],[-0.2,0.32,0.11],[0.5,-0.4,0.08],[-0.55,-0.1,0.09]].forEach(function(d){x.beginPath();x.arc(r*d[0],r*d[1],r*d[2],0,6.283);x.fill();});
+  x.fillStyle='rgba(255,255,255,.65)';x.beginPath();x.ellipse(r*0.15,-r*0.45,r*0.32,r*0.12,-0.25,0,6.283);x.fill();x.restore();}
+function drawRamshorn(x,px,py,r,ang){x.save();x.translate(px,py);x.rotate(ang*0.2);x.fillStyle='#8a4a30';x.beginPath();x.arc(0,0,r,0,6.283);x.fill();x.strokeStyle=INK;x.lineWidth=0.9;x.stroke();
+  x.strokeStyle='rgba(44,26,16,.7)';x.lineWidth=0.7;x.beginPath();for(var a=0;a<5*Math.PI;a+=0.25){var rr=r*(0.92-a/(5*Math.PI)*0.85);var X=Math.cos(a)*rr,Y=Math.sin(a)*rr;if(a===0)x.moveTo(X,Y);else x.lineTo(X,Y);}x.stroke();
+  x.fillStyle='rgba(255,220,190,.35)';x.beginPath();x.arc(-r*0.35,-r*0.4,r*0.25,0,6.283);x.fill();x.restore();}
 function pestsStep(T,dt){var W=TV.W,H=TV.H;T.pests.forEach(function(p){if(p.held)return;var sp=p.k==='snail'?0.006:0.03;p.a+=(Math.random()-0.5)*dt*(p.k==='snail'?0.8:2.4);p.x+=Math.cos(p.a)*sp*dt*(p.glass?1:0.6);p.y+=Math.sin(p.a)*sp*dt*(p.glass?1:0.25)*(W/H);
   if(p.glass){if(p.y<0.26||p.y>0.72)p.a=-p.a;p.y=clamp(p.y,0.25,0.73);}else{p.y=clamp(p.y,0.77,0.92);}if(p.x<0.04||p.x>0.96)p.a=Math.PI-p.a;p.x=clamp(p.x,0.03,0.97);});}
 function tvLoop(){if(!TV.on)return;requestAnimationFrame(tvLoop);if(!tvSize())return;var now=performance.now(),dt=TV.last?Math.min(0.1,(now-TV.last)/1000):0.016;TV.last=now;
@@ -170,12 +205,12 @@ function tvStop(){TV.on=false;}
 // ---- the Tank tab ----
 var tankMod={name:'tank',
  stageChanged:function(){if(activeTab==='tank')tankMod.renderSide();},
- init:function(fresh){if(fresh||!S.tanks.length){var T=newTank('Grandma’s tank',20,grandmaScape());T.shrimp=grandmaStock();defaultStems(T,705,5);T.stems.forEach(function(st){st.h=rnd(60,105);});S.tanks.push(T);S.sel=0;
+ init:function(fresh){if(!S.seen.wb){S.seen.wb=1;if(S.opt.effects==='on')S.opt.effects='score';}if(fresh||!S.tanks.length){var T=newTank('Grandma’s tank',20,grandmaScape());T.shrimp=grandmaStock();defaultStems(T,705,5);T.stems.forEach(function(st){st.h=rnd(60,105);});S.tanks.push(T);S.sel=0;
     for(var i=0;i<T.mulm.length;i++)T.mulm[i]=0.12+Math.random()*0.1;T.flow=0.72;addPests(T,'snail',2);
-    S.book.shrimp=S.book.shrimp||{};T.shrimp.forEach(function(i){if(i.age>=JUV_DAYS)S.book.shrimp[bookKey(i)]={day:0,tank:T.name,from:'grandma'};});}
+    S.book.shrimp=S.book.shrimp||{};S.book.v2=1;T.shrimp.forEach(function(i){bookShrimpSeen(i,{tank:T.name,from:'grandma'},true);});}
    whenArt(function(){S.tanks.forEach(function(T){scapeNeedsMoss(T);if(T.shrimp.some(function(i){return i.from==='grandma';})&&!T.mossGrown){T.mossGrown=1;for(var k in T.moss)T.moss[k].forEach(function(m){m.len=rnd(30,50);});}});TV.L={};if(activeTab==='tank')tankMod.render();});},
  day:function(d){S.tanks.forEach(function(T){tankDay(T,d);});if(activeTab==='tank'){tvSync();tankMod.renderSide();}var dot=$('tankdot');if(dot)dot.hidden=!(S.opt.toys==='need'&&anyNeeds());},
- show:function(){tankMod.render();tvStart();},
+ show:function(){tankMod.render();tvStart();if(S.fromHome){S.fromHome=0;var tv=$('tv');if(tv){tv.classList.remove('fadein');void tv.offsetWidth;tv.classList.add('fadein');}}},
  hide:function(){tvStop();closeBubble();if(TOY)toyEnd();},
  render:function(){if(activeTab!=='tank')return;var el=$('p-tank');if(!el.querySelector('#tv-canvas')){el.innerHTML='<div class="tchips" id="tchips"></div><div class="lockzone" id="lockzone"><div class="lockbar" id="lockbar" hidden></div><div class="tv" id="tv"><canvas id="tv-canvas"></canvas><span class="tv-cap" id="tv-cap"></span></div><div id="toypanel"></div></div><div id="tankside"></div>';
    TV.cv=$('tv-canvas');TV.L={};bindTv();}
@@ -185,25 +220,32 @@ var tankMod={name:'tank',
   var slots=STAGES[S.stage].tanks,ch='';S.tanks.forEach(function(t,i){var nd=S.opt.toys==='need'&&needs(t).length;ch+='<button class="tchip" data-sel="'+i+'" aria-pressed="'+(i===S.sel)+'">'+esc(t.name)+(nd&&i!==S.sel?' <i class="dot" style="position:static;display:inline-block;width:7px;height:7px;border:0;border-radius:50%;background:var(--shrimp)"></i>':'')+'</button>';});
   if(S.tanks.length<slots)ch+='<button class="tchip" data-newtank>+ New tank</button>';$('tchips').innerHTML=ch;$('tchips').hidden=S.tanks.length<2&&S.tanks.length>=slots;
   $('tv-cap').textContent=T.name+' · '+(T.shrimp.length?plural(T.shrimp.length,'shrimp','shrimp')+(S.seen.tapShrimp?'':' · tap one to look closer'):'empty');
-  var side='';
-  // jobs
+  var side='',shut=S.opt.shut||(S.opt.shut={recent:true});
+  var card=function(k,title,small,body,extra){return '<div class="card coll'+(shut[k]?' shut':'')+'" data-k="'+k+'"><div class="hd"><h2>'+title+'</h2><small>'+small+'</small>'+(extra||'')+'</div>'+body+'</div>';};
+  // jobs: only the most pressing one glows
   var nd=needs(T),ids=nd.map(function(n){return n.id;}),tray=S.opt.toys==='tray';var show=tray?TOYS.map(function(t){return t.id;}):ids;
-  if(!TOY){side+='<div class="card"><div class="hd"><h2>'+(tray?'Jobs':'Needs doing')+'</h2><small>'+(tray?'any time':'shows up when the tank needs it')+'</small></div>';
-   if(show.length){side+='<div class="toys">';TOYS.forEach(function(t){if(show.indexOf(t.id)<0)return;var n=nd.find(function(z){return z.id===t.id;});side+='<button class="btn'+(n?' need':'')+(n&&!tray?' glow':'')+'" data-toy="'+t.id+'"><canvas data-icon="'+t.id+'" width="56" height="44"></canvas>'+t.name+'<small>'+(n?n.t:t.idle(T))+'</small></button>';});side+='</div>';}
-   else side+='<p class="hint">Nothing needs doing. The tank is fine for now.</p>';side+='</div>';}
-  // water
-  if(effectsOn()){var no=Math.round(T.no3),nh=T.nh;side+='<div class="card"><div class="hd"><h2>Water</h2><small>'+(T.lastWC!=null?'changed '+(Math.floor(S.day)-T.lastWC===0?'today':plural(Math.floor(S.day)-T.lastWC,'day')+' ago'):'not changed yet')+'</small></div><div class="chips">'+
+  if(!TOY){var jb='';
+   if(show.length){jb+='<div class="toys">';TOYS.forEach(function(t){if(show.indexOf(t.id)<0)return;var n=nd.find(function(z){return z.id===t.id;});jb+='<button class="btn'+(n?' need':'')+(n&&n===nd[0]?' glow':'')+'" data-toy="'+t.id+'"><canvas data-icon="'+t.id+'" width="56" height="44"></canvas>'+t.name+'<small>'+(n?n.t:t.idle(T))+'</small></button>';});jb+='</div>';}
+   else jb+='<p class="hint">Nothing needs doing. The tank is fine for now.</p>';
+   side+=card('jobs',tray?'Jobs':'Needs doing',nd.length?plural(nd.length,'job'):'all good',jb);}
+  // wellbeing: one bar and a word; the parts are behind ?
+  if(scoreMode()){var wb=wellbeing(T),wt=wb.total,low=wt<50,open=!!TV.wbHelp;
+   var bar='<div class="wbar"><i style="width:'+wt+'%;background:'+(wt>=75?'#2f7a45':wt>=50?'#7d9b53':'#b23a2e')+'"></i><b style="left:50%"></b></div>';
+   var help='<div class="helpbox" id="wb-help"'+(open?'':' hidden')+'><div class="chips">'+wb.parts.map(function(q){var f=q[1]/q[2];return '<span class="chip '+(f>=0.75?'ok':low&&f<0.4?'bad':'warn')+'">'+q[0]+' '+q[1]+'/'+q[2]+'</span>';}).join('')+'</div><p>About 50 is enough. Under 50 they breed slower and more babies die; above it they get happier and busier.</p></div>';
+   side+=card('wb','Wellbeing',wt+' · '+moodOf(wt),bar+help+(low?'<p class="hint">The jobs above bring it back up.</p>':''),'<button class="qhelp" data-wbhelp aria-expanded="'+open+'" aria-label="What goes into it">?</button>');}
+  else if(effectsOn()){var no=Math.round(T.no3),nh=T.nh;side+=card('water','Water',(T.lastWC!=null?'changed '+(Math.floor(S.day)-T.lastWC===0?'today':plural(Math.floor(S.day)-T.lastWC,'day')+' ago'):'not changed yet'),'<div class="chips">'+
    '<span class="chip '+(no>40?'bad':no>20?'warn':'ok')+'">Nitrate '+no+' ppm</span>'+(nh>0.05?'<span class="chip bad">Ammonia '+nh.toFixed(2)+'</span>':'<span class="chip ok">Ammonia 0</span>')+
    '<span class="chip '+(T.flow<0.35?'bad':T.flow<0.55?'warn':'ok')+'">Filter '+Math.round(T.flow*100)+'%</span><span class="chip '+(mulmMean(T)>0.65?'bad':mulmMean(T)>0.4?'warn':'ok')+'">Gravel '+(mulmMean(T)>0.65?'very dirty':mulmMean(T)>0.4?'dirty':mulmMean(T)>0.2?'a bit dirty':'clean')+'</span></div>'+
-   (no>40?'<p class="hint">High nitrate slows breeding. The vacuum changes water as it cleans.</p>':'')+(nh>0.3?'<p class="hint">Ammonia is up. The filter bacteria are recovering.</p>':'')+'</div>';}
+   (no>40?'<p class="hint">High nitrate slows breeding. The vacuum changes water as it cleans.</p>':'')+(nh>0.3?'<p class="hint">Ammonia is up. The filter bacteria are recovering.</p>':''));}
   // colony
-  var c=tankCounts(T);side+='<div class="card"><div class="hd"><h2>Colony</h2><small>'+c.n+' of '+tankCap(T)+' comfy · '+c.adults+' adults · '+(c.young+c.babies)+' young'+(c.berried?' · '+c.berried+' carrying eggs':'')+'</small></div>';
-  var groups=Object.keys(c.by).map(function(k){return c.by[k];}).sort(function(a,b){return b.n-a.n;});
-  if(groups.length){side+='<div class="colony">';groups.forEach(function(g){side+='<div class="cl"><canvas data-cl="'+g.ex.id+'" width="88" height="44"></canvas><div><b>'+esc(COLOURS[g.col].name+(g.rili?' rili':''))+' · '+g.n+'</b><small>'+(g.col==='wild'?'Wild type':'Best '+Math.round(g.best)+' · '+TIER_NAMES[tierOf(g.best)])+'</small></div></div>';});side+='</div>';}
-  else side+='<p class="hint">'+(T.scape.length?'No shrimp yet. Move some in with Sort, or take wild ones home from the stream.':'Set up the tank with Aquascape first.')+'</p>';
-  if(c.babies)side+='<p class="hint">'+plural(c.babies,'baby','babies')+' still too small to show a colour.</p>';
-  side+='<div class="btns"><button class="btn sm" data-dev="wild">Dev: add 6 wild shrimp</button>'+(S.tanks.length>1?'<button class="btn sm" data-rename>Rename</button>':'<button class="btn sm" data-rename>Rename</button>')+'</div></div>';
-  if(T.log&&T.log.length){side+='<div class="card"><div class="hd"><h2>Recent</h2></div>';T.log.slice(0,5).forEach(function(l){side+='<p class="hint">Day '+l.d+' · '+esc(l.t)+'</p>';});side+='</div>';}
+  var c=tankCounts(T),cb='<p class="hint" style="margin:0 0 6px">'+c.adults+' adults · '+(c.young+c.babies)+' young'+(c.berried?' · '+c.berried+' carrying eggs':'')+'</p>';
+  var groups=Object.keys(c.by).map(function(k){return c.by[k];}).sort(function(a,b){return b.n-a.n||lineRank(a.col)-lineRank(b.col);});
+  if(groups.length){cb+='<div class="colony">';groups.forEach(function(g){cb+='<div class="cl"><canvas data-cl="'+g.ex.id+'" width="88" height="44"></canvas><div><b>'+esc((LINE_NAMES[g.col]||'Wild')+(g.rili?' rili':''))+' · '+g.n+'</b><small>Best '+GRADE_NAMES[Math.max(0,g.best)]+(g.col==='wild'?' · wild type':'')+'</small></div></div>';});cb+='</div>';}
+  else cb+='<p class="hint">'+(T.scape.length?'No shrimp yet. Move some in with Sort, or take wild ones home from the stream.':'Set up the tank with Aquascape first.')+'</p>';
+  if(c.babies)cb+='<p class="hint">'+plural(c.babies,'baby','babies')+' still too small to show a colour.</p>';
+  cb+='<div class="btns"><button class="btn sm" data-rename>Rename</button></div>';
+  side+=card('colony','Colony',c.n+' of '+tankCap(T)+' comfy',cb);
+  if(T.log&&T.log.length){side+=card('recent','Recent','day '+T.log[0].d,T.log.slice(0,5).map(function(l){return '<p class="hint">Day '+l.d+' · '+esc(l.t)+'</p>';}).join(''));}
   $('tankside').innerHTML=side;
   $('tankside').querySelectorAll('canvas[data-icon]').forEach(function(cv){var t=TOYS.find(function(z){return z.id===cv.dataset.icon;});var x=fitCanvas(cv,28,22);cv.style.width='28px';cv.style.height='22px';t.icon(x,28,22);});
   $('tankside').querySelectorAll('canvas[data-cl]').forEach(function(cv){var ind=T.shrimp.find(function(i){return i.id===+cv.dataset.cl;});if(!ind)return;var x=fitCanvas(cv,44,22);cv.style.width='44px';cv.style.height='22px';whenArt(function(){x.clearRect(0,0,44,22);shrimpStill(x,specOf(ind),22,11,42,1);});});},
@@ -211,13 +253,17 @@ var tankMod={name:'tank',
 registerMod(tankMod);registerTab('tank',tankMod);
 function bindTv(){var cv=TV.cv,down=null;
   cv.addEventListener('pointerdown',function(e){var r=cv.getBoundingClientRect(),p=[e.clientX-r.left,e.clientY-r.top];if(TOY){e.preventDefault();try{cv.setPointerCapture(e.pointerId);}catch(_){}TOY.down&&TOY.down(p,e);return;}down={p:p,t:performance.now()};});
-  cv.addEventListener('pointermove',function(e){var r=cv.getBoundingClientRect(),p=[e.clientX-r.left,e.clientY-r.top];if(TOY){TOY.move&&TOY.move(p,e);return;}});
+  cv.addEventListener('pointermove',function(e){var r=cv.getBoundingClientRect(),p=[e.clientX-r.left,e.clientY-r.top];if(TOY){if(!TOY.move)return;
+    // the trim scissors take every in-between point, so a fast swipe still cuts what it crosses
+    var evs=TOY.fine&&e.getCoalescedEvents?e.getCoalescedEvents():null;if(evs&&evs.length>1){evs.forEach(function(ev){TOY.move([ev.clientX-r.left,ev.clientY-r.top],ev);});return;}TOY.move(p,e);return;}});
   cv.addEventListener('pointerup',function(e){var r=cv.getBoundingClientRect(),p=[e.clientX-r.left,e.clientY-r.top];if(TOY){TOY.up&&TOY.up(p,e);return;}if(down&&Math.hypot(p[0]-down.p[0],p[1]-down.p[1])<12)tvTap(p);down=null;});
   cv.addEventListener('pointercancel',function(e){if(TOY&&TOY.up)TOY.up(null,e);down=null;});
   document.addEventListener('touchmove',function(e){if(TOY&&e.target&&e.target.closest&&e.target.closest('#tv,.sortcv'))e.preventDefault();},{passive:false});
-  $('p-tank').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+  $('p-tank').addEventListener('click',function(e){var hd=e.target.closest('.coll>.hd');if(hd&&!e.target.closest('button')){var cd=hd.parentNode,k=cd.dataset.k;S.opt.shut=S.opt.shut||{};S.opt.shut[k]=!cd.classList.contains('shut');cd.classList.toggle('shut',S.opt.shut[k]);sfx('click');save();return;}
+    var b=e.target.closest('button');if(!b)return;
+    if(b.dataset.wbhelp!=null){TV.wbHelp=!TV.wbHelp;var hb=$('wb-help');if(hb)hb.hidden=!TV.wbHelp;b.setAttribute('aria-expanded',String(TV.wbHelp));sfx('click');return;}
     if(b.dataset.sel!=null){S.sel=+b.dataset.sel;closeBubble();sfx('click');tankMod.render();}
-    else if(b.dataset.newtank!=null){if(spend(300,'a new tank')){var T=newTank('Tank '+(S.tanks.length+1),20,[]);for(var i=0;i<MULM_N;i++)T.mulm[i]=0;S.tanks.push(T);S.sel=S.tanks.length-1;toast(T.name+' is set up and seeded from Grandma’s filter. Aquascape it, then move shrimp in.');sfx('plop');tankMod.render();}}
+    else if(b.dataset.newtank!=null){var T=setupTank();if(T){S.sel=S.tanks.length-1;toast(T.name+' is set up and seeded from Grandma’s filter. Move shrimp in with Sort, or add more with Aquascape.',3600);sfx('plop');tankMod.render();}}
     else if(b.dataset.toy){sfx('click');toyStart(b.dataset.toy);}
     else if(b.dataset.dev==='wild'){var T2=S.tanks[S.sel];var list=[];for(var k=0;k<6;k++)list.push(breedWild());addToTank(T2,list,'stream');toast('6 wild shrimp added to '+T2.name);tvSync(true);tankMod.renderSide();}
     else if(b.dataset.rename!=null)renameTank();});}
@@ -230,13 +276,15 @@ function closeBubble(){TV.bubbleFor=null;var b=document.querySelector('.bub');if
 function openBubble(a){closeBubble();var i=a.ind,T=TV.T;TV.bubbleFor=i.id;var el=document.createElement('div');el.className='bub';
   var age=i.age,ageT=age<JUV_DAYS?age+' days, colour shows at '+JUV_DAYS:age<ADULT_DAYS?age+' days, grown at '+ADULT_DAYS:age+' days';
   var from={grandma:'Grandma’s line',stream:'From the stream',bred:'Born here',shop:'From the shop'}[i.from]||'';
-  var h='<b>'+esc(i.name?i.name+' · ':'')+esc(colourName(i,true))+(colOf(i)!=='wild'&&age>=JUV_DAYS?' · grade '+Math.round(i.g):'')+'</b><br>'+(i.sex==='f'?'Female':'Male')+' · '+ageT+(i.eggs?'<br>Carrying '+i.eggs.n+' eggs, hatching in '+Math.max(0,i.eggs.due-Math.floor(S.day))+' days':'')+(from?' · <small>'+from+'</small>':'');
+  var par=i.mum?'<br><small>Mum '+esc((LINE_NAMES[i.mum.l]||'')+(i.mum.r?' rili':'')+' '+GRADE_NAMES[i.mum.g])+(i.dad?' · dad '+esc((LINE_NAMES[i.dad.l]||'')+(i.dad.r?' rili':'')+' '+GRADE_NAMES[i.dad.g]):'')+'</small>':'';
+  var h='<b>'+esc(i.name?i.name+' · ':'')+esc(colourName(i,true))+'</b><br>'+(i.sex==='f'?'Female':'Male')+' · '+ageT+(i.eggs?'<br>Carrying '+i.eggs.n+' eggs, hatching in '+Math.max(0,i.eggs.due-Math.floor(S.day))+' days':'')+(from?' · <small>'+from+'</small>':'')+par;
   if(S.opt.genes)h+='<div class="gene">'+geneStr(i)+'</div>';
   h+='<div class="btns">'+(S.tanks.length>1?'<button class="btn" data-b="move">Move</button>':'')+'<button class="btn" data-b="sell">Pet shop · '+fmtA(shopPrice(i))+'</button><button class="btn" data-b="name">'+(i.name?'Rename':'Name')+'</button></div><div data-b-extra></div>';
   el.innerHTML=h;$('tv').appendChild(el);var W=TV.W,H=TV.H,bw=el.offsetWidth,bh=el.offsetHeight;var left=clamp(a.x-bw/2,6,W-bw-6),top=a.y-bh-18;if(top<6)top=a.y+18;if(top+bh>H-4)top=Math.max(4,H-bh-4);el.style.left=left+'px';el.style.top=top+'px';
   if(bh>H-8){el.style.top='4px';el.style.maxHeight=(H-8)+'px';el.style.overflow='auto';}
   el.addEventListener('pointerdown',function(e){e.stopPropagation();});
   el.addEventListener('click',function(e){var b=e.target.closest('[data-b]');if(!b)return;var k=b.dataset.b,ex=el.querySelector('[data-b-extra]');
+    if(k==='sell'&&!b.dataset.sure){b.dataset.sure='1';b.textContent='Tap again to sell · '+fmtA(shopPrice(i));setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent='Pet shop · '+fmtA(shopPrice(i));}},3000);return;}
     if(k==='sell'){var pr=sellShrimp(T,i);sfx('coin');toast('Sold to the pet shop for '+fmtA(pr));closeBubble();tvSync(true);tankMod.renderSide();}
     else if(k==='move'){ex.innerHTML='<div class="btns">'+S.tanks.map(function(t,ti){return t===T?'':'<button class="btn" data-mv="'+ti+'">'+esc(t.name)+'</button>';}).join('')+'</div>';}
     else if(k==='name'){ex.innerHTML='<div class="btns"><input maxlength="14" style="flex:1;min-width:0;font:14px var(--font-body);padding:6px 8px;border:1px solid var(--line);border-radius:8px" value="'+esc(i.name||'')+'"><button class="btn" data-nm>Save</button></div>';ex.querySelector('input').focus();}
