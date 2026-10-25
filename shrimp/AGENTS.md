@@ -12,7 +12,7 @@ Read this before you change anything in `shrimp/`. It covers what the game is, h
 
 Universal Shrimp is a single-file HTML idle/sim game in the spirit of Universal Paperclips. You keep cherry shrimp in Abu Dhabi and sell them (prices in AED). Grandma gives you her old tank and a dream: a shrimp tank in every home on Earth, in about ten years.
 
-- **Arc:** cycle a tank → breed and sell shrimp → hand-pack starter kits → automate → farms and regions → a million owners → everyone (8.2B) → Space, where shrimp are released to live free in alien waters (never kept in tanks out there).
+- **Arc:** cycle a tank → breed and sell shrimp → hand-pack starter kits → automate → farms and regions → a million owners → everyone (8.2B, or the goal you changed it to) → Space: a search program finds planets with water, you gene edit the shrimp or terraform the planet to fit, a seed ship sets up a base, then the shrimp are let go to live free (never kept in tanks out there). Space opens after any finished goal, for curious players only (`spaceOpen`).
 - **Feel:** a short sci-fi novel told through Grandma's letters, chapters and story events, with something to do at every stage. Small minigames (health checks, salt baths, QC rounds, hand packing) fill the slow parts.
 - **Owner:** Puti. She plays it on her phone, mostly at 390 px wide, and reviews by screenshot. She builds it with two agents, Codex and Claude, working on the same file.
 

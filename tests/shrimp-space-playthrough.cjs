@@ -9,12 +9,12 @@ vm.runInContext(`
 var G=migrate(fixture),events=[],snapshots={},earthStart=G.humans;G.opt.all=true;
 G.tr={know:8,care:6,ego:-4};while(G.progress.queue.length)acknowledgeMilestone(G);if(!G.emp.won||!requestSpaceDream(G)||!beginSpace(G))throw Error('Space should start after Earth');
 function record(k){if(!snapshots[k]){events.push({event:k,day:G.day,money:Math.round(G.money),owners:Math.round(G.humans),knowledge:Math.floor(G.academy.knowledge)});snapshots[k]=JSON.parse(JSON.stringify(G));}}
-record('space begins after Earth');G.academy.autoFund=true;
+record('space begins after Earth');G.academy.autoFund=true;RLINES.forEach(function(l){for(var k=0;k<3;k++)rlHire(G,l.id,'pd');});G.academy.level=Math.max(G.academy.level||0,3);
 function spacePolicy(){var A=G.academy,S=G.space;
  var research=STUDIES.find(r=>r.id!=='observe'&&!rd(G,r.id)&&r.req(G));
  if(research&&A.active&&A.active.id==='observe')pauseStudy(G);
  if(!A.active)startStudy(G,research?research.id:'observe');
- for(var w of WORLDS){if(canSurvey(G,w.id))surveyWorld(G,w.id);if(canLaunch(G,w.id))launchColony(G,w.id);
+ for(var w of WORLDS){if(canSurvey(G,w.id))surveyWorld(G,w.id);if(canLaunch(G,w.id)){while(G.academy.crew<w.crew&&buyMissionCrew(G));launchColony(G,w.id);}
  var p=S.colonies[w.id];if(!p)continue;
  var upgrades=w.id==='orbit'?[]:['solar','recycler','conditioner','algaefarm'];if(w.id==='ember')upgrades.push('cooler');if(w.id==='pelagia')upgrades.push('biosphere');
  for(var u of upgrades)if(!p.up[u])buyHabitatUpgrade(G,w.id,u);

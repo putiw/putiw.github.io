@@ -661,3 +661,9 @@ ammonia is only the primary button once ammonia is near zero.
 - "Your tank is cycled" has one button, "Buy shrimp in Trade", and the Trade tab spotlight is skipped.
 - River war (the hard part): "Make peace pay" with generals on the board became "Pay for a river treaty": a jointly run water plant, written water and revenue shares, an outside authority checking the meters, each country keeps its side, slow. "Wait for a common enemy" and "Sell kits to both armies" are retired (old saves that picked them keep them). "Wait it out" is now "Stay out of it".
 - Bots: strong cold 2,706, strong kind 3,312, average Earth 6,217–6,245.
+
+## Pass 88: space is a search for a planet
+- Space starts with a search program: telescopes find the first planet (AED 30M + 60 knowledge, about six weeks), probes find each next one. Nothing launches before its planet is found. No more moon.
+- Each planet's problem has two ways: change the shrimp (Lab research: "Gene edit: heat-tolerant shrimp", new "Gene edit: hard-water shrimp" for Brine, +2 water a day there) or change the planet (Terraform: cool the lakes, filter the rivers, restore the ocean). Lake sunshades work only with heat-tolerant shrimp.
+- A seed ship carries algae, biofilm and a small base. Once it's stable, the shrimp are let go.
+- Space test fixture now hires postdocs, contracts crew and assumes a research group, since the strong bot doesn't fund the old academy chain. Average bot: Earth 6,217–6,245, space done by 7,628–7,656.

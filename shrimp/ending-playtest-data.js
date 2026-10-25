@@ -774,7 +774,7 @@ window.ENDING_TEST_DATA = {
       "id": "question_prof",
       "end": "question",
       "name": "The Question, the professor",
-      "who": "Somewhere around the first research grant the shrimp stopped being a business and became a question. Why do they molt when they do. How a jar of water stays alive for years. Whether a moon could hold them. You didn't get rich. You trained a lot of people who went further than you did.",
+      "who": "Somewhere around the first research grant the shrimp stopped being a business and became a question. Why do they molt when they do. How a jar of water stays alive for years. Whether another planet could hold them. You didn't get rich. You trained a lot of people who went further than you did.",
       "mira": "A marine biologist. She was one of your first scholarship students. She calls you her old professor even though you never taught her a class.",
       "gp": "I don't understand half of what you write to me now. I read it anyway, out loud, to the shrimp. You were always like this, you took the radio apart when you were six. [visit] Find out what the water is like out there, then come tell me.",
       "tank": "People watched us very carefully. They wrote things down. Some of us went up, very far, in a small dark box, and then there was a lake with no one in it, and then there was a lake with us in it."
