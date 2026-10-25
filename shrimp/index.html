@@ -1857,7 +1857,7 @@ function addTank(G){
   if(G.tanks.some(function(t){return t.cycledAt!=null;})){var tg=bacTarget(T);T.chem.bacA=T.chem.bacB=tg*1.05;T.cycledAt=G.day;T.seeded=1;}
   if(hasSales(G))T.set.autoSell=G.tanks.some(function(t){return t.set.autoSell;});G.tanks.push(T);log(G,'Set up '+T.name,T);return true;
 }
-function addAd(G,id){
+function addAd(G,id){if(G.opt&&kitsOpen(G))G.opt.mktTaught=1;
   var a=null;for(var i=0;i<ADS.length;i++)if(ADS[i].id===id)a=ADS[i];
   if(!a||!adReady(G,a)||G.money<a.cost+capitalReserve(G))return false;
   if(id==='web'){if(G.webShop)return false;G.webShop=1;pay(G,a.cost,'ads');log(G,'Opened an online shop');return true;}
@@ -2087,13 +2087,13 @@ function ideas(G){
   if(miss.length)add('Make '+T.name+' nicer for them, add some '+ideaList(miss.slice(0,3))+'.','up','home');
   if(T.vol>=40&&T.filter<2)add('A stronger filter lets '+T.name+' carry more shrimp.','up','filter');
   // Once the farms run things, the home tank ideas don't matter. Ideas are about the business instead.
-  if(farmBuilt(G)&&(farmCap(G)>=10||G.humans>=5000)){out=[];var E=G.emp,fc=farmCap(G),pc=packCap(G),dem=kitDemand(G);
-    if(dem>fc*0.7&&FARMS.some(function(f){return farmBuyable(G,f);}))add('Orders are outrunning your farms, a bigger farm in Gear breeds more.','up','farmup');
-    if(pc<Math.min(fc,dem)*0.9)add('Your farms breed more than you can pack, a packing machine in Kits would keep up.','emp','packup');
-    var nr=nextRegion(G);if(nr&&(typeof rv!=='function'||rv('ereg'))&&kitCap(G)-G.humans<Math.max(50,dem*60))add('Most people who want a tank here have one. World has new regions to open.','world','region');
-    if(wordOfMouth(G)<0.75)add('Word of mouth is slowing, ads and shops in Ads bring it back.','promote','mkt');
-    if(storesOn(G)&&mallsEmpty(G)>0)add('Mall stores make people trust you, and word spreads faster where you have one. Shops in Ads.','promote','stores');
-    if(academyOpen(G)&&!rlStaff(G))add('The Lab can make kits cheaper and farms better, a postdoc is the start.','research','lab');
+  if(farmBuilt(G)&&(farmCap(G)>=10||G.humans>=5000)){out=[];
+    if(FARMS.some(function(f){return farmBuyable(G,f);}))add('Bigger farms in Gear breed more shrimp for kits.','up','farmup');
+    if(projAvail(G).some(function(p){return p.id==='aicam'||p.id==='autopackm';})||PACK_LINES.some(function(l,i){return lineReady(G,i)&&!lineCount(G,i);}))add('Packing machines in Kits pack more kits a day.','emp','packup');
+    if(nextRegion(G)&&(typeof rv!=='function'||rv('ereg')))add('New regions in World open more of the world.','world','region');
+    add('Ads, shops and mall stores in Ads spread the word.','promote','mkt');
+    if(academyOpen(G)&&!rlStaff(G))add('The Lab can make kits cheaper and farms better.','research','lab');
+    if(G.emp.consultSeen)add('Not sure what holds you back? Consultants in Kits read the business for you.','emp','consult');
     return out.slice(0,3);}
   var base=out.length;if(kitsOpen(G)){var tankIdeas=out.splice(Math.min(base,2));
     if(!stationDone(G))add('Packing kits by hand is slow, packing tools take over one step each.','emp','station');
@@ -3084,7 +3084,7 @@ function cost2(m,i){return (m?aed(m):'')+(m&&i?' + ':'')+(i?inf(i):'');}
 function trim(n,d){return String(+Number(n).toFixed(d));}
 // iPhone Safari moves its toolbar while you scroll and the fixed tab bar can end up floating above the bottom. Pin it to what's really on screen.
 (function(){var vv=window.visualViewport;if(!vv)return;var fix=function(){var t=document.querySelector('.tabs');if(!t)return;var off=window.innerHeight-(vv.height+vv.offsetTop);t.style.transform=Math.abs(off)>1&&vv.scale<=1.01?'translateY('+(-off)+'px)':'';};vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);window.addEventListener('scroll',fix,{passive:true});})();
-var toastT=null,NF=null,BUILD='2026-10-25-replay';
+var toastT=null,NF=null,BUILD='2026-10-25-consult';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
@@ -4523,6 +4523,8 @@ function markNewCards(){
 function tabWords(t){return t;}
 var TAB_NAME={tank:'Tank',up:'Gear',market:'Trade',emp:'Kits',promote:'Ads',world:'World',research:'Lab',space:'Space'};
 function guideOk(t){return G.opt.guideSkip&&G.opt.guideSkip[t.key]?null:(t.skip=1,t);}
+// Which business levers the player has already used once: then free hints stop pointing at them.
+function leversTaught(G){var E=G.emp;return {pack:pd(G,'autopackm')||lineCount(G,0)>0,mkt:!!(G.webShop||G.opt.mktTaught),farm:topIdx(FARMS,E.farms)>=1,region:E.regions.length>=2};}
 function tankStep(need,urgent){var nt=G.tanks.find(function(t){return !t.had;});
   if(nt){var ni=G.tanks.indexOf(nt);
     if(nt.cycledAt==null)return {key:'cyc'+ni,tab:'tank',card:G.sel===ni?'startcard':null,sel:G.sel!==ni?'.tchip[data-sel="'+ni+'"]':SC_WC?'#tb-wc':'#startcard .btn.primary',text:nt.name+' needs cycling. '+(G.sel!==ni?'Open '+nt.name+' and dose ammonia, like your first tank.':'Dose ammonia, like your first tank.')};
@@ -4599,20 +4601,27 @@ function guideTarget(){
   }
   if(E.won)return null;
   if(consultHas(G,'fix')){var b=bottleneck(G),m={packing:['emp','staff'],shrimp:['up','farms'],ceiling:['world','reg'],demand:['promote','ads'],cash:['emp','kits'],paused:['up','farms']}[b&&b.k];
-    if(m)return {key:'bn'+b.k,tab:m[0],card:m[1],text:b.d+' → '+b.f,label:'Advice'};}
-  // Money piling up with nothing to spend it on makes growth steps real next steps instead of quiet ideas.
-  var idle=G.money>Math.max(20000,dayIncome(G)*45)+capitalReserve(G),tf=null;for(var fi=FARMS.length-1;fi>=0;fi--){if(farmBuyable(G,FARMS[fi])){tf=FARMS[fi];break;}}
-  // Packing can't keep up with the farms and the orders: the next packing step, whatever it is.
-  var pcap=packCap(G),want=Math.min(farmCap(G),kitDemand(G));if(pcap<want*0.85&&G.kits.stock<want*2){var pj=projAvail(G).find(function(p){return (p.id==='aicam'||p.id==='autopackm')&&G.money>=pm(G,p)+capitalReserve(G);});
-    if(pj&&(t=guideOk({key:'pk'+pj.id,tab:projTab(pj),card:'proj',sel:'[data-act="proj"][data-id="'+pj.id+'"]',text:'Orders are waiting on packing. The '+pj.name.toLowerCase()+' in Kits packs faster.'})))return t;
-    for(var lj=0;lj<PACK_LINES.length;lj++){if(lineReady(G,lj)&&G.money>=lineCost(G,lj)+capitalReserve(G)&&(lj===0||lineCount(G,lj-1)>0)&&(t=guideOk({key:'pkl'+lj+'_'+lineCount(G,lj),tab:'emp',card:'staff',sel:'[data-act="line"][data-tier="'+lj+'"]',text:'Orders are waiting on packing. A '+PACK_LINES[lj].name.toLowerCase()+' in Kits packs '+big(PACK_LINES[lj].out)+' kits a day.'})))return t;}
-    var stp=G.emp.staff;if(stp.tier&&!packingMachineCap(G)&&G.money>=staffPay(G,'pack')*60&&(t=guideOk({key:'pkh'+stp.pack,tab:'emp',card:'staff',sel:'[data-act="hire"][data-role="pack"][data-d="1"]',text:'Orders are waiting on packing. Hire a packer in Kits.'})))return t;}
-  // Kits piling up because not enough people hear about you: point at marketing.
-  var wom=wordOfMouth(G),sup=Math.min(packCap(G),farmCap(G)+tankSurplusKits(G));if(wom<0.75&&kitDemand(G)<sup*0.8&&G.kits.sold>=30){var adOk=!G.webShop||ADS.some(function(x){return adReady(G,x)&&G.money>=x.cost+capitalReserve(G);});
-    if((t=guideOk({key:'mkt'+Math.floor(G.day/120),tab:'promote',card:adOk?'ads':'shops',sel:adOk?'[data-act="ad"]:not([disabled])':null,soft:!idle&&wom>0.6,text:'You can make more kits than people order. Word of mouth is at '+Math.round(wom*100)+'%: ads, an online shop and shops in Ads tell more people.'})))return t;}
-  if(tf&&G.money>=farmCost(G,tf)+farmWorkingCapital(G,tf)+capitalReserve(G)&&packCap(G)>=farmCap(G)*0.8&&kitDemand(G)>farmCap(G)*0.7&&(t=guideOk({key:'farm'+tf.id+(G.emp.farms[tf.id]||0),tab:'up',card:'farms',sel:'[data-act="farm"][data-id="'+tf.id+'"]',soft:!idle,text:'Orders are outrunning your farms. A '+tf.name.toLowerCase()+' in Gear breeds more shrimp for kits.'})))return t;
-  for(var li=0;li<PACK_LINES.length;li++)if(lineReady(G,li)&&!lineCount(G,li)&&G.money>=lineCost(G,li)+capitalReserve(G)&&(t=guideOk({key:'line'+li,tab:'emp',card:'staff',sel:'[data-act="line"][data-tier="'+li+'"]',soft:!idle,text:'A new packing machine is available in Kits.'})))return t;
-  var nr=nextRegion(G);if(rv('ereg')&&nr&&G.money>=nr.m+capitalReserve(G)&&kitCap(G)-G.humans<Math.max(50,kitDemand(G)*30)&&(t=guideOk({key:'reg'+nr.id,tab:'world',card:'reg',sel:'[data-act="region"]',soft:!idle,text:'Most willing people here already have a tank. World has new regions.'})))return t;
+    if(m){var bsel=null;
+      if(b.k==='shrimp'){var bf=null;for(var bi2=FARMS.length-1;bi2>=0;bi2--){if(farmBuyable(G,FARMS[bi2])){bf=FARMS[bi2];break;}}if(bf)bsel='[data-act="farm"][data-id="'+bf.id+'"]';}
+      else if(b.k==='packing'){var bp=projAvail(G).find(function(p){return p.id==='aicam'||p.id==='autopackm';});if(bp){m=[projTab(bp),'proj'];bsel='[data-act="proj"][data-id="'+bp.id+'"]';}else{for(var bl=PACK_LINES.length-1;bl>=0;bl--)if(lineReady(G,bl)){bsel='[data-act="line"][data-tier="'+bl+'"]';break;}if(!bsel)bsel='[data-act="hire"][data-role="pack"][data-d="1"]';}}
+      else if(b.k==='demand')bsel='[data-act="ad"]:not([disabled])';
+      else if(b.k==='ceiling')bsel='[data-act="region"]';
+      else if(b.k==='paused')bsel='[data-act="farm-resume"]';
+      return {key:'bn'+b.k,tab:m[0],card:m[1],sel:bsel,text:b.d+' → '+b.f,label:'Advice'};}}
+  // Free hints teach each business lever once. After that, reading the bottleneck is the player's job, or the consultants'.
+  var tg=leversTaught(G),idle=G.money>Math.max(20000,dayIncome(G)*45)+capitalReserve(G),tf=null;for(var fi=FARMS.length-1;fi>=0;fi--){if(farmBuyable(G,FARMS[fi])){tf=FARMS[fi];break;}}
+  var pcap=packCap(G),want=Math.min(farmCap(G),kitDemand(G));
+  if(!tg.pack&&pcap<want*0.85&&G.kits.stock<want*2){var pj=projAvail(G).find(function(p){return (p.id==='aicam'||p.id==='autopackm')&&G.money>=pm(G,p)+capitalReserve(G);});
+    if(pj&&(t=guideOk({key:'pk'+pj.id,tab:projTab(pj),card:'proj',sel:'[data-act="proj"][data-id="'+pj.id+'"]',text:'Orders are waiting on packing. Machines pack for you: the '+pj.name.toLowerCase()+' in Kits is the next one.'})))return t;}
+  var wom=wordOfMouth(G),sup=Math.min(packCap(G),farmCap(G)+tankSurplusKits(G));
+  if(!tg.mkt&&wom<0.75&&kitDemand(G)<sup*0.8&&G.kits.sold>=30){var adOk=!G.webShop||ADS.some(function(x){return adReady(G,x)&&G.money>=x.cost+capitalReserve(G);});
+    if((t=guideOk({key:'mkt',tab:'promote',card:adOk?'ads':'shops',sel:adOk?'[data-act="ad"]:not([disabled])':null,text:'You can make more kits than people order. Ads, an online shop and shops in Ads tell more people about you.'})))return t;}
+  if(!tg.farm&&tf&&FARMS.indexOf(tf)>=1&&G.money>=farmCost(G,tf)+farmWorkingCapital(G,tf)+capitalReserve(G)&&packCap(G)>=farmCap(G)*0.8&&kitDemand(G)>farmCap(G)*0.7&&(t=guideOk({key:'farmtier',tab:'up',card:'farms',sel:'[data-act="farm"][data-id="'+tf.id+'"]',text:'Orders are outrunning your grow racks. Bigger farms in Gear breed more shrimp for kits: a '+tf.name.toLowerCase()+' is next.'})))return t;
+  var nr=nextRegion(G);if(!tg.region&&rv('ereg')&&nr&&G.money>=nr.m+capitalReserve(G)&&kitCap(G)-G.humans<Math.max(50,kitDemand(G)*30)&&(t=guideOk({key:'reg1',tab:'world',card:'reg',sel:'[data-act="region"]',text:'Most people who want a tank here have one. New regions in World open more of the world to you.'})))return t;
+  // Money sitting idle: point at the people who read the business for a living.
+  if(idle&&G.emp.consultSeen&&!consultHas(G)&&(t=guideOk({key:'idle'+Math.floor(G.day/120),tab:'emp',card:'consultcard',sel:'[data-act="consult"][data-k="visit"]',text:big(Math.round(G.money))+' AED is sitting idle. Not sure where it should go? Consultants in Kits can tell you what\u2019s holding you back.'})))return t;
+  for(var li=0;li<PACK_LINES.length;li++)if(lineReady(G,li)&&!lineCount(G,li)&&G.money>=lineCost(G,li)+capitalReserve(G)&&(t=guideOk({key:'line'+li,tab:'emp',card:'staff',sel:'[data-act="line"][data-tier="'+li+'"]',soft:true,text:'A new packing machine is available in Kits.'})))return t;
+  if(rv('ereg')&&nr&&G.money>=nr.m+capitalReserve(G)&&kitCap(G)-G.humans<Math.max(50,kitDemand(G)*30)&&(t=guideOk({key:'reg'+nr.id,tab:'world',card:'reg',sel:'[data-act="region"]',soft:true,text:'World has new regions.'})))return t;
   var cp=projAvail(G).find(function(p){return p.c==='cult'&&E.inf>=p.i&&G.money>=pm(G,p)&&p.id!=='gala';});if(cp&&(t=guideOk({key:'cult'+cp.id,tab:projTab(cp),card:'proj',sel:'[data-act="proj"]:not([data-id="gala"])',soft:true,text:'Something new you could do in World.'})))return t;
   if(rv('ereg')){var mix=regionMix(G),nx2=nextRegion(G),wi=wbItem('winter');
     if(E.hw&&!wbHas(G,'alerts')&&wbItem('alerts').req(G)&&G.money>=wbItem('alerts').m+capitalReserve(G)&&(t=guideOk({key:'alerts',tab:'world',card:'owners',sel:'[data-act="wb"][data-id="alerts"]',text:'Heat wave in '+E.hw.name+'. Heat-wave alerts protect owners\u2019 tanks.'})))return t;
@@ -4854,7 +4863,7 @@ function projectImpact(G,p){if(!consultHas(G,'fix'))return '';
 }
 function shopForecast(G,s){if(!consultHas(G,'fix'))return '';var eff=G.emp.staff.aiMgr?1:(G.emp.staff.mgr*4>shopCount(G)?1:.5),sat=Math.max(0,(kitCap(G)-G.humans)/kitCap(G)),orders=s.kits*eff*sat*Math.pow(KIT_REF/G.kitPrice,2)*(1+salesBoost(G)),spare=Math.max(0,kitSupply(G)-kitDemand(G)+G.kits.stock/7),extra=Math.min(orders,spare),margin=G.kitPrice/(G.vat?1.05:1)-productionUnitCost(G),daily=extra*margin-s.rent-(shopCount(G)?0:licFee(G)/365);return 'At current kit price and spare supply: up to '+trim(extra,2)+' extra kits/day, '+aed(daily)+'/day after added rent and first-license accrual, before extra staff. '+(daily>0?'Opening cash payback about '+Math.ceil(shopUpfront(G,s)/daily)+' days.':'Kit sales alone do not cover this opening yet.')+' Shrimp sales and influence are separate benefits.';}
 function purchaseForecast(G,cost,supply,packing,up){if(!consultHas(G,'fix'))return '';var d=kitDemand(G),fc=farmCap(G),pc=packCap(G),base=Math.min(d,fc,pc),after=Math.min(d,fc+supply,pc+packing),extra=Math.max(0,after-base),margin=G.kitPrice/(G.vat?1.05:1)-productionUnitCost(G),profit=extra*margin-up;return 'At current orders and other-stage capacity: '+big(extra)+' extra kits/day, '+aed(profit)+'/day before other overhead. '+(profit>0?'Estimated construction payback '+Math.ceil(cost/profit)+' days.':'No positive payback yet. Grow demand or the other stage first.');}
-function projectRank(G,p){var gk=$('guidebar')&&$('guidebar').dataset.key||'';if(gk==='pk'+p.id||gk==='biz'+p.id||gk==='cult'+p.id)return -1;if(['aicam','autopackm'].indexOf(p.id)>=0&&packCap(G)<Math.min(farmCap(G),kitDemand(G))*0.85)return 0;var b=consultHas(G,'fix')?bottleneck(G):null;if(b&&b.k==='packing'&&['aicam','autopackm'].indexOf(p.id)>=0)return 0;if(b&&b.k==='ceiling'&&p.c==='cult')return 0;if(['guide','farmlic','bulk','precycle'].indexOf(p.id)>=0)return 0;return 1;}
+function projectRank(G,p){var gk=$('guidebar')&&$('guidebar').dataset.key||'';if(gk==='pk'+p.id||gk==='biz'+p.id||gk==='cult'+p.id)return -1;if(['aicam','autopackm'].indexOf(p.id)>=0&&!leversTaught(G).pack&&packCap(G)<Math.min(farmCap(G),kitDemand(G))*0.85)return 0;var b=consultHas(G,'fix')?bottleneck(G):null;if(b&&b.k==='packing'&&['aicam','autopackm'].indexOf(p.id)>=0)return 0;if(b&&b.k==='ceiling'&&p.c==='cult')return 0;if(['guide','farmlic','bulk','precycle'].indexOf(p.id)>=0)return 0;return 1;}
 MILESTONES.spaceDream={chapter:'Chapter 6',title:'Next stop, space',body:'At the ten-year party Grandma has a new idea, the shrimp want to go exploring. Earth and research keep going here while you set up seeding stations out there, and once the water is ready the shrimp get released to live free.',tab:'space'};
 var storySure=null;
 // What a choice does, worked out by trying it on a copy of the game

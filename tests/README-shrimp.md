@@ -647,3 +647,10 @@ ammonia is only the primary button once ammonia is near zero.
 - Tooltips: tap a slider's label (New water GH, Cull below...) for what it does.
 - Grandma money: pick Nothing, A little (1% of cash), Some (3%) or A lot (10%) each week.
 - Bots: strong cold 2,706, strong kind 3,238, average Earth 6,134–6,162.
+
+## Pass 86: free hints teach once, consultants advise
+- Puti's rule stands: bottleneck advice is the consultants' job. The free NEXT hints for business levers (packing machines, marketing, bigger farm tiers, the first new region) fire only until you've used that lever once (`leversTaught`). After that they're quiet.
+- When a lot of cash sits idle, the hint points at the consultants ("AED X is sitting idle. Not sure where it should go? Consultants in Kits can tell you"), every 120 days at most.
+- Consultant advice now glows the button it means (next farm, next packing machine or packer, ads, regions, restart farms).
+- The ? ideas after the farm list options (bigger farms, packing machines, regions, ads and shops, the Lab, consultants) without saying which one is the problem.
+- Farm-stage replay (cue-only player): 100k owners by day ~2,500 with consultants, 38k without the advice buttons, 173k when free hints diagnosed everything.
