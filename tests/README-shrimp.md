@@ -623,3 +623,10 @@ ammonia is only the primary button once ammonia is near zero.
 - First health check: after "Got it · show me" the tank is spotlit with the rest dimmed. If you can't afford the cure, it says what it costs and that Grandma pays this time.
 - With the water readings open, Fed and Nutrition become two plain stacked bars.
 - Fed bar: biofilm alone keeps them half fed, so the bar now runs from that floor (empty means living on biofilm). The header's "costs" line is now "bills" (electricity, plus food when you feed), so it doesn't read as food being bought without feeding.
+
+## Pass 83: shared settings, no room AC, a day-long bottle
+- All tanks share one set of settings (feeding, food, water change, new water GH/KH, heater setpoint, automation, treats, sales rules). Change it on any tank and every tank follows. The "Copy settings" button is gone.
+- The room AC is gone, it made the fan and chiller pointless. The frozen bottle now cools for about a day (you can add another once it's half melted) and floats in the tank view, drawn from Puti's sketch.
+- Gear groups (Runs itself, Temperature, Room and filter, Decor and plants, Treats) are separate boxes now.
+- The tank view re-checks its shrimp whenever the count changes, so an emptied tank shows empty right away instead of waiting for the next day.
+- Bots: strong cold 2,893, average Earth 6,189 (unchanged).
