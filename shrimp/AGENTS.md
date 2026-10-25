@@ -331,6 +331,9 @@ Do not report a feature as finished just because its new path works once. Check 
 - **Spotlights during the tank lock.** A new card spotlight scrolled the page while the tank was locked for cleaning, and the player was stuck. No spotlight, card jump or tab switch while `TVLOCK` or a health check is open.
 - **Scrolling a card under the sticky header.** `scrollIntoView({block:'start'})` hid the top of story cards behind the top bar. Scroll to the card's top minus the header height.
 - **Tiny shrimp washed out.** Babies at 0.36 scale looked white from the dither and sheen. Babies get a solid body with no sheen.
+- **Locked sliders with live steppers.** The − and + buttons next to a slider kept changing a locked kit price. Steppers check `inp.disabled` and fade with it; any new locked control must disable its steppers too.
+- **The guide jumping the page.** Centring the guided card on every cue pulled the page away from what the player was reading. The guide scrolls once per cue (`applyGuide.scrolled`), to the glowing button, only if it's off screen.
+- **A step that can't happen while Sell drains what it needs.** The first kit waited for 8 spare shrimp while the header Sell sold them. When a step waits for shrimp, say so in NEXT and hide the action that undoes it (`firstKitWaits`).
 - **Caching sprites before they decode.** In a test page, shrimp bodies were cached before the images loaded on a phone, so only legs showed. Never cache a drawing until every image it uses has loaded.
 
 **Sim and tests**

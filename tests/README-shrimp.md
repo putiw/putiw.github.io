@@ -667,3 +667,20 @@ ammonia is only the primary button once ammonia is near zero.
 - Each planet's problem has two ways: change the shrimp (Lab research: "Gene edit: heat-tolerant shrimp", new "Gene edit: hard-water shrimp" for Brine, +2 water a day there) or change the planet (Terraform: cool the lakes, filter the rivers, restore the ocean). Lake sunshades work only with heat-tolerant shrimp.
 - A seed ship carries algae, biofilm and a small base. Once it's stable, the shrimp are let go.
 - Space test fixture now hires postdocs, contracts crew and assumes a research group, since the strong bot doesn't fund the old academy chain. Average bot: Earth 6,217–6,245, space done by 7,628–7,656.
+
+## Pass 89: the outside UI review (site/ui-review.md, 28 issues)
+- NEXT stays near the button it glows: the guide scrolls once per cue to the glowing button (or the card if no button), only when it's off screen, and never while a spotlight or the tank view is up. The card-centring jump is gone.
+- A blocked story card can't be run past: a tick that finds progression blocked pauses and remembers the speed for after.
+- First health check: the dim, the tank-view cue and "Tap the tank" work in order, and tapping the tank while sick only opens the check sheet on the first check.
+- Spotlights click through: tapping the lit button closes the spotlight and presses that button.
+- Room before Sell: once sales are halfway to kits, a real "make room" tank step comes before the Sell cue.
+- 4× is offered at the first ammonia dose, not at the bottle purchase. The first purchase holds the next story card for ~40 s. The speed glow lasts 30 s. The hatch card waits for 3 babies.
+- The shady loan row shows only on rows the guide is pointing at. The sales-rules fold opens for the sell spotlight. Salt dip result says "Put them in the tank". Grandma's Close/See-it buttons and the guide bar stay out of the health check.
+- Heat: the frozen-bottle hint shows once per hot spell (30-day key, not while one is melting); if a bottle was used in the last 30 days and a chiller is in reach, the hint points at the chiller.
+- Locked kit price: − and + do nothing and fade while the slider is locked (all steppers follow their slider's `disabled`).
+- First kit: once the bag is filled and the kit needs 8 spare shrimp, NEXT says so, and the header Sell hides until it's packed (`firstKitWaits`).
+- Done packing/QC steps are a green outline, not a filled button. Online shop says Running. Lab field buttons are a flex row with 8 px gaps. Speed buttons are 32 px with 5 px gaps and a taller hit area. Card header notes never wrap (…).
+- "Your time · Got it · show me" opens Your day and scrolls to it.
+- Shrimpcoin: you can't buy more coins than others hold (Held by others never goes negative), and "nobody else plants" says "others have stopped planting" once they had.
+- Negative income reads "income is −AED X a day". Start over unwraps "Your home tanks" back into Gear. Reload reopens the tab you were on (`G.opt.lastTab`, falls back to Tank if that tab is hidden).
+- Bots: strong cold 2,694, strong kind 3,312, average Earth 6,245, space 7,656. Spotlight sweep 137 checks clean.

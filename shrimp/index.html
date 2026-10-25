@@ -67,8 +67,8 @@ ul.ending{margin:4px 0 8px;padding-left:18px}.ending-box{flex-basis:100%;width:1
 .cash{font:500 14.5px var(--font-data);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .cash.neg{color:var(--bad)}
 .clock{display:none}
-.speed{display:flex;gap:2px;flex:0 0 auto}
-.speed button{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:2px 6px;font:500 11.5px var(--font-data);min-height:28px;min-width:30px;cursor:pointer}
+.speed{display:flex;gap:5px;flex:0 0 auto}
+.speed button{position:relative;border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:2px 6px;font:500 11.5px var(--font-data);min-height:32px;min-width:32px;cursor:pointer}.speed button::after{content:'';position:absolute;inset:-7px -2px}
 .speed button.nudge5{animation:nudge 1s ease-in-out 5}
 @keyframes nudge{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 45%,transparent);background:color-mix(in srgb,var(--accent) 12%,var(--surface));border-color:var(--accent);color:var(--accent)}}
 #speed button.nudge{animation:firstFeedPulse 1.2s ease-in-out infinite;border-color:var(--s2)}
@@ -161,7 +161,7 @@ hr{border:0;border-top:1px solid var(--line);margin:8px 0}
 .seg button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:var(--surface)}
 .ctl{display:grid;grid-template-columns:96px 30px minmax(0,1fr) 30px 66px;gap:4px;align-items:center;padding:2px 0}
 .ctl .stp{border:1px solid var(--line);background:var(--surface-2);border-radius:7px;min-height:30px;width:30px;padding:0;font:600 16px var(--font-body);color:var(--ink-2);cursor:pointer;line-height:1}
-.ctl .stp:active{transform:scale(.94)}
+.ctl .stp:active{transform:scale(.94)}.ctl input:disabled~.stp,.ctl .stp:has(~input:disabled){opacity:.35;cursor:default;pointer-events:none}
 .ctl input[type=range]{min-width:0}
 .ctl label{font-weight:500;font-size:13px}
 .ctl .v{font:500 12px var(--font-data);text-align:right;white-space:nowrap}
@@ -216,7 +216,7 @@ th:first-child,td:first-child{text-align:left}
 .item .hb{display:flex;gap:4px;min-width:0;max-width:100%}.item .hb .btn{overflow-wrap:anywhere}
 [hidden]{display:none!important}
 .mini{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;grid-column:1/-1}.mini .btn{padding:4px 10px;min-height:30px;font-size:12px;font-weight:500}
-.up-scope{display:flex;gap:6px;margin:0 0 8px}.ctl>label[for^="s-"]{cursor:help;text-decoration:underline dotted color-mix(in srgb,var(--ink-3) 70%,transparent);text-underline-offset:3px}.ugroup{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:2px 12px 4px;margin:10px 0}.ugroup>h3.track{margin:10px 0 2px;color:var(--ink)}.ugroup>.item:last-child{border-bottom:0}.loan-row{grid-column:1/-1;margin:2px 0 0}.btn.loan-btn{min-height:30px;padding:3px 10px;font-size:12px;font-weight:500;background:transparent;border-style:dashed;color:var(--ink-2)}.btn.seg{flex:1 1 0}.btn.seg.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.up-scope{display:flex;gap:6px;margin:0 0 8px}.ctl>label[for^="s-"]{cursor:help;text-decoration:underline dotted color-mix(in srgb,var(--ink-3) 70%,transparent);text-underline-offset:3px}.ugroup{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:2px 12px 4px;margin:10px 0}.ugroup>h3.track{margin:10px 0 2px;color:var(--ink)}.ugroup>.item:last-child{border-bottom:0}.loan-row{grid-column:1/-1;margin:2px 0 0;display:none}.item:has(.guide-btn) .loan-row,.chapter-row:has(.guide-btn) .loan-row{display:block}.btn.loan-btn{min-height:30px;padding:3px 10px;font-size:12px;font-weight:500;background:transparent;border-style:dashed;color:var(--ink-2)}.btn.seg{flex:1 1 0}.btn.seg.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 .rp-head{font:600 15px/1.35 var(--font-display);margin:2px 0 8px}.rp-bar{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden;margin:4px 0}.rp-bar i{display:block;height:100%;background:var(--accent);border-radius:3px}.rp-arch{margin:6px 0 0;padding-left:18px;font-size:13px;display:grid;gap:4px}
 .sellsum{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:6px 0 10px}.sellsum b{display:block;font:700 16px var(--font-body)}.sellsum small{display:block;margin-top:2px}.sellsum .btn{min-width:96px}
 .pricefoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 6px}.pricefoot .hint{margin:0;flex:1}.btn.chip{padding:6px 10px;font-size:12.5px;min-height:0;white-space:nowrap}
@@ -243,7 +243,7 @@ th:first-child,td:first-child{text-align:left}
 .sheet-in{background:var(--surface);width:100%;max-width:560px;border-radius:16px 16px 0 0;padding:16px 18px 24px;box-shadow:0 -6px 24px color-mix(in srgb,var(--ink) 20%,transparent)}
 .sheet-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.sheet-hd h2{font-size:17px}
 .ptable{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface-2);margin:6px 0}.ptop{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}.ptop small{color:var(--ink-3);font-size:12px}
-.psteps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-bottom:8px}.pstep{text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;flex-direction:column;align-items:center;line-height:1.2}.pstep .pk{font-size:10px;height:12px;opacity:.85}.ptop b{flex:none;white-space:nowrap}.ptop small{flex:1 1 auto;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}.ptable .pneed{margin:6px 0 0}#btn-handstep{width:100%}.psteps i{color:var(--ink-3);font-style:normal;font-size:12px}.pstep{font:500 12px var(--font-body);padding:3px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2)}.pstep.done{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}.pstep.auto{color:var(--accent);border-color:var(--accent);border-style:dashed}.pstep small{font-size:10px;opacity:.85}.pstep.off{opacity:.5;border-style:dotted}.qcw{padding:8px 0;border-top:1px solid var(--line)}.qcw p{margin:2px 0 6px;font-size:12.5px;color:var(--ink-2)}.qcw .seg{display:flex;gap:6px}.qcw .seg .btn{flex:1}.pstep.now{box-shadow:inset 0 0 0 1.5px var(--accent);border-color:var(--accent);color:var(--ink)}.psteps .pstep{padding:3px 1px;font-size:11.5px;border-radius:9px;letter-spacing:-.1px}@media (max-width:360px){.psteps .pstep{font-size:10.5px}.psteps{gap:3px}}
+.psteps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-bottom:8px}.pstep{text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;flex-direction:column;align-items:center;line-height:1.2}.pstep .pk{font-size:10px;height:12px;opacity:.85}.ptop b{flex:none;white-space:nowrap}.ptop small{flex:1 1 auto;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}.ptable .pneed{margin:6px 0 0}#btn-handstep{width:100%}.psteps i{color:var(--ink-3);font-style:normal;font-size:12px}.pstep{font:500 12px var(--font-body);padding:3px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2)}.pstep.done{background:color-mix(in srgb,var(--good) 10%,var(--surface));color:var(--good);border-color:var(--good)}.pstep.auto{color:var(--accent);border-color:var(--accent);border-style:dashed}.pstep small{font-size:10px;opacity:.85}.pstep.off{opacity:.5;border-style:dotted}.qcw{padding:8px 0;border-top:1px solid var(--line)}.qcw p{margin:2px 0 6px;font-size:12.5px;color:var(--ink-2)}.qcw .seg{display:flex;gap:6px}.qcw .seg .btn{flex:1}.pstep.now{box-shadow:inset 0 0 0 1.5px var(--accent);border-color:var(--accent);color:var(--ink)}.psteps .pstep{padding:3px 1px;font-size:11.5px;border-radius:9px;letter-spacing:-.1px}@media (max-width:360px){.psteps .pstep{font-size:10.5px}.psteps{gap:3px}}
 #btn-handstep{width:100%}
 .hc-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0}.hc-grid.small{gap:3px}.hc-cell{display:block;padding:4px;border:2px solid var(--line);border-radius:10px;background:color-mix(in srgb,var(--s1) 13%,var(--surface));cursor:pointer;min-height:44px}.hc-cell svg{width:100%;height:auto;display:block}.hc-cell.flip svg{transform:scaleX(-1)}
 .hc-cell.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,var(--surface))}.hc-cell.good{border-color:var(--good)}.hc-cell.missed{border-color:var(--warn);border-style:dashed}.hc-cell.bad{border-color:var(--bad)}.hc-grid.small .hc-cell{cursor:default;min-height:0}
@@ -317,7 +317,7 @@ th:first-child,td:first-child{text-align:left}
 .goal-summary .scope-label{flex:1 0 100%}.goal-title{font-size:17px;font-weight:700;line-height:1.25}.goalcard .hd{margin-bottom:2px}.gc-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.gc-cost{font:600 13px var(--font-body);color:var(--ink-2);white-space:nowrap}.goalcard .gbar{margin:7px 0 6px}.goalcard #next-body{margin:0}.goalcard .next-step{margin-top:8px}
 .biznav{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.biznav button{flex:1;min-height:40px}
 .biznav [aria-pressed=true]{background:var(--ink);color:var(--bg)}
-.item>.btns,.item>.impact{grid-column:1/-1}.store-btns{display:flex;flex-direction:column;gap:4px}.item>.store-row{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}.field-row{gap:8px!important;margin-top:6px}.field-row .btn{margin:0!important}.store-row .btn{min-width:0;flex:1 1 30%;padding:6px 6px;font-size:12.5px;white-space:normal;line-height:1.25}.store-head{margin:4px 0 2px;font-size:14px}.item>.hb{grid-column:auto;justify-self:end}.item .hb .btn{min-height:40px}
+.item>.btns,.item>.impact{grid-column:1/-1}.store-btns{display:flex;flex-direction:column;gap:4px}.item>.store-row{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}.field-row{display:flex;flex-wrap:wrap;gap:8px!important;margin-top:6px}.field-row .btn{margin:0!important}.store-row .btn{min-width:0;flex:1 1 30%;padding:6px 6px;font-size:12.5px;white-space:normal;line-height:1.25}.store-head{margin:4px 0 2px;font-size:14px}.item>.hb{grid-column:auto;justify-self:end}.item .hb .btn{min-height:40px}
 .impact{display:block;margin-top:5px;font-size:12px;color:var(--ink-2)}
 .dream-tracker{position:static;flex:0 0 auto;margin:0;font-size:11px;border:0;padding:0}
 .dream-tracker>summary{cursor:pointer;display:flex;align-items:center;gap:4px;list-style:revert;white-space:nowrap;min-height:24px;padding:0;max-width:175px;overflow:hidden;line-height:1}
@@ -354,7 +354,7 @@ main details:not(.card):not(.dream-tracker):not(#next-card)>summary::before{cont
 main details:not(.card):not(.dream-tracker):not(#next-card)[open]>summary::before{transform:rotate(45deg);margin-bottom:4px}
 
 .card>.hd h2,.card>summary h2{white-space:nowrap}
-.card>.hd>small,.card>summary>small{min-width:0;flex:1 1 auto;text-align:right;white-space:normal;line-height:1.25}
+.card>.hd>small,.card>summary>small{min-width:0;flex:1 1 auto;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25}
 
 .two{grid-template-columns:minmax(0,1fr)}.two>*{min-width:0}
 @media (min-width:660px){.two{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
@@ -962,7 +962,7 @@ var AC_SET=24,AC_KWH=3.5;
 function roomT(G,t){var a=ambient(t)+(G.hot&&G.hot.until>G.day?G.hot.add:0);return G.ac?Math.min(a,AC_SET):a;}
 function acKWh(G,t){return G.ac?AC_KWH*Math.max(0,ambient(t==null?G.day:t)-AC_SET):0;}
 function iceDrop(T){return Math.min(3,60/T.vol);}
-function iceBottle(G,T){if(G.money<1||T.heater>=2||(T.ice||0)>0.5)return false;pay(G,1,'supplies');T.ice=(T.ice||0)+1;log(G,'Floated a frozen water bottle',T);return true;}
+function iceBottle(G,T){if(G.money<1||T.heater>=2||(T.ice||0)>0.5)return false;pay(G,1,'supplies');T.ice=(T.ice||0)+1;T.iceDay=Math.floor(G.day);log(G,'Floated a frozen water bottle',T);return true;}
 function phEq(kh){return clamp(6.4+0.3*kh,6.4,8.2);}
 function capA(T){return 18*FILT_MULT[T.filter]*Math.sqrt(T.vol/20);}
 function needMg(a){return a<10?0.04:a<30?0.15:a<75?0.6:1.2;}
@@ -1942,7 +1942,7 @@ var MILESTONES={
 };
 function milestoneConditions(G){var t=G.tanks[0],p=ppm(t);return Object.assign({
   cycle:t.cycledAt!=null&&p.nh<0.05&&p.no2<0.05&&p.no3<=20&&t.chem.kh>=2,
-  hatch:G.stats.born>0,sale:G.stats.sold>0,kits:kitsOpen(G),kit:G.kits.sold>0,
+  hatch:G.stats.born>=3,sale:G.stats.sold>0,kits:kitsOpen(G),kit:G.kits.sold>0,
   farm:Object.keys(G.emp.farms).some(function(k){return G.emp.farms[k]>0;}),
   ministry:pd(G,'ministry'),million:G.humans>=1e6,tenyears:G.day>=DREAM_DAYS&&!G.emp.won,win:!!G.emp.won,
   tanks2:false,health:G.tanks.some(function(x){return !!x.ill;}),tools:(G.emp.handPacked||0)>=3&&!stationDone(G),qc:G.kits.sold>=3,station:stationDone(G)&&(G.emp.handPacked||0)>0,
@@ -2952,7 +2952,7 @@ function coinPlant(G,aed){var C=coinOf(G);if(!C.on||frozen(G)||G.money<aed+capit
  log(G,'Planted '+cnt(n)+' mangrove trees');return n;}
 function coinMintOut(G,n,unb){var C=coinOf(G);if(n<1)return;var fee=Math.floor(n*COIN_FEE);C.coins+=n;C.treasury+=fee;C.unbacked+=unb;C.x-=(n-fee)/coinDepth(G);C.price=COIN_FAIR*Math.exp(C.x);}
 function coinSell(G,q){var C=coinOf(G);q=Math.min(Math.floor(q),C.treasury);if(!C.on||q<1)return 0;var D=coinDepth(G),avg=C.price*Math.exp(-q/D/2),aed=q*avg;C.x-=q/D;C.treasury-=q;C.sold+=q;C.earned+=aed;earn(G,aed,'deals');C.price=COIN_FAIR*Math.exp(C.x);return aed;}
-function coinBuy(G,aed){var C=coinOf(G);if(!C.on||frozen(G)||G.money<aed+capitalReserve(G))return 0;var D=coinDepth(G),q=Math.floor(aed/(C.price*Math.exp(aed/C.price/D/2)));if(q<1)return 0;pay(G,aed,'deals');C.x+=q/D;C.treasury+=q;C.bought+=q;C.spent+=aed;C.price=COIN_FAIR*Math.exp(C.x);return q;}
+function coinBuy(G,aed){var C=coinOf(G);if(!C.on||frozen(G)||G.money<aed+capitalReserve(G))return 0;var D=coinDepth(G),q=Math.floor(aed/(C.price*Math.exp(aed/C.price/D/2))),av=Math.max(0,Math.floor(C.coins-C.treasury));if(q>av){q=av;aed=Math.ceil(q*C.price*Math.exp(q/D/2));}if(q<1)return 0;pay(G,aed,'deals');C.x+=q/D;C.treasury+=q;C.bought+=q;C.spent+=aed;C.price=COIN_FAIR*Math.exp(C.x);return q;}
 var COIN_EVENTS=[
  {p:1/500,h:.5,t:'A pop star buys two million shrimpcoins to cover her world tour. Her fans buy more.'},
  {p:1/600,h:.3,t:'An airline prints the shrimpcoin badge on every ticket. One tree per passenger.'},
@@ -3075,7 +3075,7 @@ function buildFT(){
   return {id:-1,name:'All tanks',vol:vol,volTier:t0.volTier,filter:t0.filter,heater:t0.heater,fan:t0.fan,feeder:t0.feeder,autoWC:t0.autoWC,chem:c,pop:pop,clutches:cl,set:t0.set,hist:hist.slice(-200),had:1,fleet:ts.length};
 }
 var cache={};
-function setT(id,txt){var e=cache[id]||(cache[id]=$(id));if(e&&e.textContent!==txt)e.textContent=txt;}
+function setT(id,txt){var e=cache[id];if(!e||!e.isConnected)e=cache[id]=$(id);if(e&&e.textContent!==txt)e.textContent=txt;}
 function setEmphasisText(id,txt,terms){var e=cache[id]||(cache[id]=$(id));if(!e||e.dataset.emphasisText===txt)return;e.dataset.emphasisText=txt;while(e.firstChild)e.removeChild(e.firstChild);var at=0,lower=txt.toLowerCase(),used=0;while(at<txt.length&&used++<64){var best=-1,word='';terms.forEach(function(term){var tl=term.toLowerCase(),i=lower.indexOf(tl,at);while(i>=0&&((i>0&&/[a-z0-9]/i.test(lower.charAt(i-1)))||/[a-z0-9]/i.test(lower.charAt(i+tl.length))))i=lower.indexOf(tl,i+1);if(i>=0&&(best<0||i<best||i===best&&term.length>word.length)){best=i;word=term;}});if(best<0)break;if(best>at)e.appendChild(document.createTextNode(txt.slice(at,best)));var strong=document.createElement('strong');strong.textContent=txt.slice(best,best+word.length);e.appendChild(strong);at=best+word.length;}if(at<txt.length)e.appendChild(document.createTextNode(txt.slice(at)));}
 function fmt(n,d){return Number(n).toLocaleString('en-US',{minimumFractionDigits:d||0,maximumFractionDigits:d||0});}
 function sig3(x){return trim(x,x>=100?0:x>=10?1:2);}
@@ -3086,7 +3086,7 @@ function cost2(m,i){return (m?aed(m):'')+(m&&i?' + ':'')+(i?inf(i):'');}
 function trim(n,d){return String(+Number(n).toFixed(d));}
 // iPhone Safari moves its toolbar while you scroll and the fixed tab bar can end up floating above the bottom. Pin it to what's really on screen.
 (function(){var vv=window.visualViewport;if(!vv)return;var fix=function(){var t=document.querySelector('.tabs');if(!t)return;var off=window.innerHeight-(vv.height+vv.offsetTop);t.style.transform=Math.abs(off)>1&&vv.scale<=1.01?'translateY('+(-off)+'px)':'';};vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);window.addEventListener('scroll',fix,{passive:true});})();
-var toastT=null,NF=null,BUILD='2026-10-25-space';
+var toastT=null,NF=null,BUILD='2026-10-25-uireview';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
@@ -3472,8 +3472,9 @@ function updateReveal(){
   if(G.stats.born>0&&!o.hatch){o.hatch=1;}
 }
 // The top Feed / Water / Sell buttons stay while they can still matter: Feed until every tank has an auto feeder, Water until every tank has an auto water changer, Sell until the shrimp all go into kits (the Trade tab closes then)
+function firstKitWaits(G){return kitsOpen(G)&&!(G.emp.handPacked||0)&&G.kits.sold<1&&G.kits.stock<1&&!(G.emp.kitWip&&G.emp.kitWip.shrimp)&&spareKitShrimp(G)<KIT_SHRIMP;}
 function actNeed(G){var em=function(a){return G.tanks.some(function(t){return totalN(t)>=1&&tips(t).some(function(x){return x.sev==='bad'&&x.act===a;});});};
-  return {feed:G.tanks.some(function(t){return !t.feeder;})||em('feed'),wc:G.tanks.some(function(t){return !t.autoWC;})||em('wc'),sell:!(labMode()&&!G.opt.all)};}
+  return {feed:G.tanks.some(function(t){return !t.feeder;})||em('feed'),wc:G.tanks.some(function(t){return !t.autoWC;})||em('wc'),sell:!(labMode()&&!G.opt.all)&&!firstKitWaits(G)};}
 function setActs(sh,kit){var n=actNeed(G),f=$('tb-feed'),w=$('tb-wc'),se=$('tb-sell');f.hidden=!sh||!n.feed;w.hidden=!kit||!n.wc;se.hidden=!sh||!n.sell;
   var cols=[f,w,se].filter(function(e){return !e.hidden;}).map(function(e){return e===se?'1.3fr':'1fr';});$('acts').hidden=!cols.length;$('acts').style.gridTemplateColumns=cols.join(' ')||'1fr';}
 function applyReveal(){
@@ -3707,7 +3708,7 @@ function spotWatch(){var o=G.opt;if(o.all||G.progress.queue[0]==='intro'||TVLOCK
  if(SPOT||SPOTQ.length||Date.now()-(spotWatch.last||0)<15000)return;
  var t=tabs.find(function(t){return !o.spotSeen['tab-'+t.dataset.tab];});if(t){o.spotSeen['tab-'+t.dataset.tab]=1;var msg=SPOT_TAB[t.dataset.tab],pn=$('p-'+t.dataset.tab),fc=pn&&Array.from(pn.querySelectorAll('.card[id]')).find(function(c){return SPOT_INFO[c.id]&&SPOT_QUIET.indexOf(c.id)<0&&!o.spotSeen[c.id]&&!c.hidden&&!c.closest('[hidden]:not(.panel)');});if(fc){o.spotSeen[fc.id]=1;msg+=' '+SPOT_INFO[fc.id];}spotlight(t,msg);return;}
  var c=cards.find(function(c){return !o.spotSeen[c.id]&&spotShown(c);});if(c){o.spotSeen[c.id]=1;spotlight(c,SPOT_INFO[c.id]);}}
-function spotOpenCard(el){if(el.tagName==='DETAILS'&&!el.classList.contains('coll')){el.open=true;return;}if(!el.classList||!el.classList.contains('coll'))return;var o=G.opt,k=el.dataset.k;el.classList.remove('queued','shut');if(o.shut)o.shut[k]=false;o.cardQueue=(o.cardQueue||[]).filter(function(x){return x.k!==k;});o.activeCard={k:k,tab:activeTab};if(el.tagName==='DETAILS')el.open=true;}
+function spotOpenCard(el){if(el.id==='sellcard'){var sr=$('trade-sales-rules');if(sr)sr.open=true;}if(el.tagName==='DETAILS'&&!el.classList.contains('coll')){el.open=true;return;}if(!el.classList||!el.classList.contains('coll'))return;var o=G.opt,k=el.dataset.k;el.classList.remove('queued','shut');if(o.shut)o.shut[k]=false;o.cardQueue=(o.cardQueue||[]).filter(function(x){return x.k!==k;});o.activeCard={k:k,tab:activeTab};if(el.tagName==='DETAILS')el.open=true;}
 function spotClose(){if(SPOT&&SPOT.on&&!SPOT.ready)return;$('spot').hidden=true;var wc=$('spot-btn');if(wc)wc.remove();spotWatch.last=Date.now();var p=SPOT&&SPOT.on?SPOT.prev:null;SPOT=null;if(p!=null)setSpeed(p);if(SPOTQ.length)setTimeout(spotNext,250);}
 
 // ----- Care card: health checks and treats -----
@@ -3872,7 +3873,7 @@ function tvLockOff(){if(!TVLOCK)return;var p=TVLOCK.prev;TVLOCK=null;$('tankview
 function tvLockInit(){var cv=$('tv-canvas'),st=null;
  cv.addEventListener('pointerdown',function(e){if(!TVLOCK)return;e.preventDefault();try{cv.setPointerCapture(e.pointerId);}catch(_){}st={r:cv.getBoundingClientRect()};tvWipe(e.clientX-st.r.left,e.clientY-st.r.top);});
  cv.addEventListener('pointermove',function(e){if(TVLOCK&&st)tvWipe(e.clientX-st.r.left,e.clientY-st.r.top);});
- cv.addEventListener('pointerup',function(){if(!TVLOCK){tvActs();return;}st=null;});
+ cv.addEventListener('pointerup',function(){if(!TVLOCK){var T0=G.tanks[G.sel];if(T0&&T0.ill&&!$('tv-acts').hidden&&!G.opt.hcDone)return;tvActs();return;}st=null;});
  cv.addEventListener('pointercancel',function(){st=null;});
  $('tv-check').addEventListener('click',function(e){e.stopPropagation();tvActs(false);openHealth(G.sel);});
  $('tv-clean').addEventListener('click',function(e){e.stopPropagation();tvLockOn();});
@@ -3889,7 +3890,7 @@ function tvWipe(px,py){var T=TVM&&TVM.tank;if(!T||!T.glass)return;var cw=TVM.W/G
  if(ch2){T.glassV=(T.glassV||0)+1;G.stats.wiped=(G.stats.wiped||0)+1;}}
 function updateTankView(){var card=$('tankview');if(!card)return;var T=G.tanks[G.sel]||G.tanks[0];if(labMode())T=G.tanks[0];
  if(!TVM)TVM=tvMake($('tv-canvas'),{n:24,gate:function(){return activeTab==='tank'&&!HC&&!SB&&!QCR;}});
- var N=totalN(T);setT('tv-cap',(T.ill&&N>=1&&!G.opt.hcDone&&!(G.emp.healed>0)?'Some look sick · tap to check · ':rv('shrimp')&&!G.ob.looked?'Tap to check or clean · ':'')+T.name+' · '+(N>=1?cnt(N)+' shrimp':T.cycledAt!=null?'empty':G.ob&&G.ob.bottle?'cycling':'new tank, no bacteria yet'));
+ var N=totalN(T);setT('tv-cap',(T.ill&&N>=1&&!G.opt.hcDone&&!(G.emp.healed>0)&&$('tv-acts').hidden?'Some look sick · tap to check · ':rv('shrimp')&&!G.ob.looked?'Tap to check or clean · ':'')+T.name+' · '+(N>=1?cnt(N)+' shrimp':T.cycledAt!=null?'empty':G.ob&&G.ob.bottle?'cycling':'new tank, no bacteria yet'));
  tvSync(TVM,T);tvFoodSync(TVM,T);
  if(TVM.dd>T.dayDeaths)TVM.dd=0;var dd=T.dayDeaths-TVM.dd;TVM.dd=T.dayDeaths;if(dd>0&&N>=1&&TVM.W&&TVM.ag.length){TVM.dacc=(TVM.dacc||0)+dd/N*TVM.ag.length;while(TVM.dacc>=1||(TVM.dacc>0&&Math.random()<TVM.dacc)){TVM.dacc=Math.max(0,TVM.dacc-1);if(TVM.dead.length<3&&TVM.ag.length>1){var pool=TVM.ag.filter(function(a){return a.sick;});if(!pool.length)pool=TVM.ag.filter(function(a){return a.age>=75;});if(!pool.length)pool=TVM.ag;tvKill(TVM,pool[Math.floor(Math.random()*pool.length)]);}else break;}}
  tvWake(TVM);}
@@ -3951,7 +3952,9 @@ function cgTank(cv){var T={cv:cv,ctx:cv.getContext('2d'),W:0,H:0,lvl:1,ag:[],foo
   if(W&&W!==T.W){var rx=T.W?W/T.W:1;T.ag.forEach(function(a){a.x*=rx;a.y*=rx;a.tx*=rx;a.ty*=rx;});T.W=W;T.H=H;cv.width=W*d;cv.height=H*d;cv.style.height=H+'px';T.ctx.setTransform(d,0,0,d,0,0);}};
  T.L=function(){return clamp(T.W*0.17,44,80);};T.top=function(){return T.H*0.215;};T.floor=function(){return T.H*0.80;};T.surf=function(){return T.floor()-(T.floor()-T.top())*T.lvl;};
  T.add=function(cells,look){cells.forEach(function(c){T.ag.push({x:0,y:0,tx:0,ty:0,face:Math.random()<.5?1:-1,ph:Math.random()*9,male:c.male,g:c.g,look:c.sick?look:'ok',heal:0,sick:!!c.sick,sp:0,wait:Math.random()*2,init:1});});};
- T.pick=function(a){var L=T.L(),s=T.surf();a.tx=clamp(L*0.6+Math.random()*(T.W-L*1.2),L*0.6,T.W-L*0.6);a.ty=clamp(s+L*0.35+Math.random()*(T.floor()-s-L*0.3),s+L*0.3,T.floor());a.wait=0.6+Math.random()*2.4;};
+ T.pick=function(a){var L=T.L(),s=T.surf();a.tx=clamp(L*0.6+Math.random()*(T.W-L*1.2),L*0.6,T.W-L*0.6);
+  // In shallow water everyone gets their own spot along the bottom, so you can tell them apart.
+  if(T.lvl<0.75){var live=T.ag.filter(function(x){return !x.gone;}),i=live.indexOf(a),n=Math.max(1,live.length);if(i>=0)a.tx=clamp(L*0.6+(i+0.5)/n*(T.W-L*1.2)+(Math.random()-0.5)*L*0.2,L*0.6,T.W-L*0.6);}a.ty=clamp(s+L*0.35+Math.random()*(T.floor()-s-L*0.3),s+L*0.3,T.floor());a.wait=0.6+Math.random()*2.4;};
  T.step=function(dt){T.t+=dt;var L=T.L(),s=T.surf(),fl=T.floor();
   T.ag.forEach(function(a){if(a.gone)return;if(a.init){a.init=0;T.pick(a);a.x=a.tx;a.y=a.ty;}
    var live=T.food.filter(function(p){return p.left>0&&p.landed;});if(a.pf&&!(a.pf.left>0))a.pf=null;if(!a.pf&&live.length)a.pf=live[Math.floor(Math.random()*live.length)];var f=a.pf;
@@ -4029,7 +4032,7 @@ function renderSalt(){if(!SB)return;var T=G.tanks[SB.i],h='<div class="sheet-hd"
  if(SB.step==='dip'){h+='<p class="sub">'+(SB.mode==='qc'?'Dip the batch before it goes into kits, so no flatworms ride along. ':SB.mode==='fresh'?'Flatworms often ride in on new shrimp. ':'Flatworms let go in salty water, the shrimp handle it for a short while. ')+'Dip them for <b>4.5 seconds</b>.<span class="cg-fine">Sped up 10×, it’s really 45 seconds. A tablespoon of salt in a cup of tank water, no clock, count in your head.</span></p><div class="cg-tv"><canvas id="salt-cv" aria-label="A net with a shrimp above a cup of salty water."></canvas></div><div class="btns"><button class="btn primary salthold" type="button" id="salt-go">Hold to dip</button></div>';}
  else{if(!SB.res){SB.step='dip';SB.down=false;SB.net=0;SB.inT=0;SB.t=0;return renderSalt();}var r=SB.res,s=r.t,pct=function(v){return clamp(v/9*100,0,100);},msg=s<3.5?'Out after '+s.toFixed(1)+' s ('+Math.round(s*10)+' s real). Too short, some flatworms are still holding on.':s<=5.5?'Out after '+s.toFixed(1)+' s ('+Math.round(s*10)+' s real). The flatworms let go and the shrimp are fine.':s<=7?'Out after '+s.toFixed(1)+' s ('+Math.round(s*10)+' s real). The worms are gone, but they’re stressed and lie still for a bit.':'Out after '+s.toFixed(1)+' s ('+Math.round(s*10)+' s real). Too long, the salt was too much for some of them.';
   h+='<div class="cg-bar" aria-hidden="true"><i style="left:'+pct(3.5)+'%;width:'+(pct(5.5)-pct(3.5))+'%;background:var(--zone-ok,#cfe0cc)"></i><i style="left:'+pct(5.5)+'%;width:'+(pct(7)-pct(5.5))+'%;background:var(--zone-warn,#efdcaa)"></i><b style="left:'+pct(s)+'%"></b></div><div class="cg-scale"><span>0 s</span><span>4.5 s</span><span>9 s</span></div>';
-  h+='<p class="sub">'+msg+'</p><div class="btns"><button class="btn primary" data-act="salt-done">'+(SB.mode==='qc'?'Next':SB.mode==='fresh'?'Put them in the tank':'Back to the tank')+'</button></div>';}
+  h+='<p class="sub">'+msg+'</p><div class="btns"><button class="btn primary" data-act="salt-done">'+(SB.mode==='fresh'?'Put them in the tank':'Next')+'</button></div>';}
  $('hc-in').innerHTML=h;if(SB.step==='dip')saltGame();}
 function saltGame(){var cv=$('salt-cv'),x=cv.getContext('2d'),W=0,H=0,a={x:0,y:0,face:-1,ph:1,male:false,g:70,look:SB.mode==='ill'?'scut':'ok',heal:0,sp:6},b=$('salt-go');
  function size(){var r=cv.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1),w=Math.round(r.width);if(w&&w!==W){W=w;H=Math.round(w*0.62);cv.width=W*d;cv.height=H*d;cv.style.height=H+'px';x.setTransform(d,0,0,d,0,0);}}
@@ -4124,7 +4127,7 @@ function updateMarket(){
       var act=null;for(var i=0;i<G.ads.length;i++)if(G.ads[i].id===a.id)act=G.ads[i];
       var running=a.id==='web'?G.webShop:!!act;
       var eff=a.id==='web'?'Reach +'+Math.round(a.boost*100)+'% permanently':'Reach +'+Math.round(a.boost*100)+'% for '+a.days+' days';
-      var btn=running?'<button class="btn" disabled>'+(a.id==='web'?'Open':act.left+' d left')+'</button>':'<button class="btn primary" data-act="ad" data-id="'+a.id+'"'+(G.money<a.cost+capitalReserve(G)?' disabled':'')+'>'+aed(a.cost)+'</button>';
+      var btn=running?'<button class="btn" disabled>'+(a.id==='web'?'Running':act.left+' d left')+'</button>':'<button class="btn primary" data-act="ad" data-id="'+a.id+'"'+(G.money<a.cost+capitalReserve(G)?' disabled':'')+'>'+aed(a.cost)+'</button>';
       var bar=act&&a.days>1?'<div class="bar"><i style="width:'+(act.left/act.days*100).toFixed(0)+'%"></i></div>':'';
       var rp=pd(G,'social')&&a.id!=='web'?'<label class="toggle" style="grid-column:1/-1;padding:0"><input type="checkbox" data-adrep="'+a.id+'"'+(G.adRepeat[a.id]?' checked':'')+'> Repeat automatically ('+aed(a.cost)+' every '+(a.days>1?a.days+' days':'day')+')</label>':'';
       return '<div class="item"><div><h3>'+a.name+'</h3><p>'+eff+'. '+a.note+'<span class="impact">'+adImpact(G,a.boost)+'</span></p></div>'+btn+bar+rp+'</div>';
@@ -4161,7 +4164,7 @@ var UPG=[
 function updateFinance(){
   var r=finRows(),n=r.length,t4,t5;
   if(n<1){t4='Income and spending appear after day 1';t5='Cash balance';}
-  else{var L=r[n-1];t4=L.inc>=L.sp?'Earning '+aed(L.inc)+' a day, spending '+aed(L.sp)+'. You are in profit':'Spending '+aed(L.sp)+' a day but earning only '+aed(L.inc)+'. You are losing money';
+  else{var L=r[n-1];t4=L.inc>=L.sp?'Earning '+aed(L.inc)+' a day, spending '+aed(L.sp)+'. You are in profit':(L.inc<0?'Spending '+aed(L.sp)+' a day and income is −'+aed(-L.inc)+' a day. You are losing money':'Spending '+aed(L.sp)+' a day but earning only '+aed(L.inc)+'. You are losing money');
     var p0=r[Math.max(0,n-31)].cash,dc=L.cash-p0;t5='Cash is '+aed(L.cash)+', '+(dc>=0?'up ':'down ')+aed(Math.abs(dc))+' in 30 days';}
   $('c4').querySelector('h3').textContent=t4;$('c5').querySelector('h3').textContent=t5;
   FCH.forEach(function(c){c.hover=null;drawChart(c);});
@@ -4551,16 +4554,17 @@ function guideTarget(){
   var quiet=G.opt.hcDone||(G.emp.healed||0)>0,si=G.tanks.findIndex(function(t){return t.ill&&totalN(t)>=1&&!(t.ill.checked>=G.day)&&(!quiet||illStage(t)>=3);});
   if(si>=0){var sT=G.tanks[si],tvOpen=$('tv-acts')&&!$('tv-acts').hidden;
     if(G.sel!==si&&G.tanks.length>1&&!RV())return {key:'ill'+si+'_'+sT.ill.day,tab:'tank',sel:'.tchip[data-sel="'+si+'"]',text:'Some shrimp in '+sT.name+' look sick. Open '+sT.name+', tap the tank, then Check shrimp.'};
-    return {key:'ill'+si+'_'+sT.ill.day,tab:'tank',card:'tankview',sel:tvOpen?'#tv-check':null,text:'Some shrimp in '+sT.name+' look sick. '+(tvOpen?'Tap Check shrimp to find them.':'Tap the tank, then Check shrimp.')+' Left alone it spreads.'};}
+    return {key:'ill'+si+'_'+sT.ill.day,tab:'tank',card:tvOpen?null:'tankview',sel:tvOpen?'#tv-check':null,text:'Some shrimp in '+sT.name+' look sick. '+(tvOpen?'Tap Check shrimp to find them.':'Tap the tank, then Check shrimp.')+' Left alone it spreads.'};}
   var skd=G.emp.shark;if(skd&&skd.deal&&G.money>=skd.owe&&G.day>=skd.due-SHARK_DAYS+7&&(t=guideOk({key:'shark'+skd.due,tab:activeTab,sel:'#tb-info',text:'You have enough to pay back the man from the market, '+big(skd.owe)+' AED. It grows 20% a month. Tap !! to pay.'})))return t;
   // Too hot is a danger with a fix the player can do right now.
-  var hi=G.tanks.findIndex(function(t){return totalN(t)>=1&&t.chem.temp>28&&!(t.heater>=2&&t.set.heat<=27);});
-  if(hi>=0){var hT=G.tanks[hi],hk='hot'+hi+'_'+Math.floor(G.day/20);if(G.sel!==hi&&G.tanks.length>1&&!RV())return {key:hk,tab:'tank',sel:'.tchip[data-sel="'+hi+'"]',text:hT.name+' is '+hT.chem.temp.toFixed(1)+' °C, too hot for them. Open '+hT.name+' to cool it.'};
+  var hi=G.tanks.findIndex(function(t){return totalN(t)>=1&&t.chem.temp>28&&!(t.heater>=2&&t.set.heat<=27)&&!(t.ice>0);});
+  if(hi>=0){var hT=G.tanks[hi],hk='hot'+hi+'_'+Math.floor(G.day/30);if(G.sel!==hi&&G.tanks.length>1&&!RV())return {key:hk,tab:'tank',sel:'.tchip[data-sel="'+hi+'"]',text:hT.name+' is '+hT.chem.temp.toFixed(1)+' °C, too hot for them. Open '+hT.name+' to cool it.'};
     var htC=hT.heater===0?upgradeCost(G,hT,'heater'):null;if(hT.fan&&htC!=null&&G.money>=htC+HEAT_COST[2]+20)return {key:hk+'h',tab:'up',card:'equipcard',sel:'[data-act="upg"][data-id="heater"]',text:hT.name+' is '+hT.chem.temp.toFixed(1)+' °C even with the fan. Get the winter heater in Gear, then the thermostat chiller (AED '+HEAT_COST[2]+') can hold it where you set it.'};
     if(hT.heater>=2)return {key:hk,tab:'up',card:'equipcard',text:hT.name+' is '+hT.chem.temp.toFixed(1)+' °C. Lower the chiller setpoint.'};
     var fanC=upgradeCost(G,hT,'fan'),chC=hT.heater===1?upgradeCost(G,hT,'heater'):null;if(hT.fan&&chC!=null&&G.money>=chC+20)return {key:hk+'c',tab:'up',card:'equipcard',sel:'[data-act="upg"][data-id="heater"]',text:hT.name+' is '+hT.chem.temp.toFixed(1)+' °C even with the fan. A thermostat chiller in Gear holds it where you set it.'};
     if(!hT.fan&&fanC!=null&&G.money>=fanC)return {key:hk+'f',tab:'up',card:'equipcard',sel:'[data-act="upg"][data-id="fan"]',text:hT.name+' is '+hT.chem.temp.toFixed(1)+' °C, too hot for them. A summer cooling fan in Gear takes about 1.5 °C off for good.'};
-    return {key:hk,tab:'tank',card:'wccard',sel:'#btn-ice',text:hT.name+' is '+hT.chem.temp.toFixed(1)+' °C, too hot for them. Float a frozen water bottle under Water care, it cools the tank for about a day.'};}
+    if((hT.iceDay||-99)>G.day-30){var chC2=hT.heater===1?upgradeCost(G,hT,'heater'):null;if(chC2!=null&&(t=guideOk({key:hk+'c2',tab:'up',card:'equipcard',sel:'[data-act="upg"][data-id="heater"]',soft:G.money<chC2,text:'Summer keeps coming back. A thermostat chiller in Gear holds the tank where you set it, no more bottles.'})))return t;}
+    else if((t=guideOk({key:hk,tab:'tank',card:'wccard',sel:'#btn-ice',text:hT.name+' is over 28 °C, too hot for them. For now, float a frozen water bottle under Water care, it cools the tank for about a day.'})))return t;}
   if(!labMode()){for(var bi=0;bi<G.tanks.length;bi++){var bT=G.tanks[bi];if(totalN(bT)<1)continue;var bad=tips(bT).filter(function(x){return x.sev==='bad';})[0];
     if(bad){var bt=bad.t.replace(/<[^>]+>/g,''),awc=upgradeCost(G,bT,'autoWC');
       // A water problem on a tank with no auto water changer: offer the changer once it's affordable, so it stops coming back.
@@ -4568,12 +4572,14 @@ function guideTarget(){
       return {key:'bad'+bi+'_'+bt.slice(0,24).replace(/[^a-z]/gi,'')+'_'+Math.floor(G.day/30),tab:'tank',sel:G.sel!==bi&&G.tanks.length>1&&!RV()?'.tchip[data-sel="'+bi+'"]':bad.act==='wc'?'#tb-wc':bad.act==='feed'?'#tb-feed':null,text:bt};}}}
   if(allN(G)<1&&!kitsOpen(G))return {key:'rebuy'+(G.stats.wiped||0),tab:'market',card:'buy',sel:'[data-act="buy"]',text:'Your shrimp are gone. Buy new ones in Trade, and feed them when Feed glows.'};
   var stepMode=$('kit-steps')&&!$('kit-steps').hidden;
+  if(stepMode&&firstKitWaits(G)&&G.emp.kitWip&&G.emp.kitWip.mat)return {key:'kitwait',tab:'emp',card:'kits',text:'Your first kit is waiting for '+KIT_SHRIMP+' spare shrimp aged 20+ days (you have '+Math.floor(spareKitShrimp(G))+'). Keep them, don\u2019t sell. Selling is paused until this kit is packed.'};
   if(G.kits.sold<1&&!(G.emp.handPacked||0)&&G.kits.stock<1&&stepMode)return {key:'kitstep',tab:'emp',card:'kits',sel:'#btn-handstep',text:'Starter kits are open. Pack your first kit at the packing table in Kits: five steps, one tap each.'};
   if(qcDue(G)&&G.kits.sold>=3&&!qc(G).rounds&&(t=guideOk({key:'qc'+(qc(G).rounds||0),soft:!!qc(G).rounds,tab:'emp',card:'qccard',sel:'[data-act="qc-round"]',text:qc(G).rounds?'Time for this month\u2019s quality check in Kits.':'Kits need a quality check. Do a QC round in Kits.',skip:true})))return t;
   if(G.order&&!G.order.taken)return {key:'order'+(G.order.i||0),hideHere:1,tab:'market',card:'order',sel:'[data-act="order-take"]',text:'A pet shop wants shrimp. Take the order in Trade.'};
   if(G.order&&G.order.taken&&$('ord-btns')&&$('ord-btns').querySelector('[data-act="order-deliver"]:not([disabled])'))return {key:'orderd'+(G.order.i||0),tab:'market',card:'order',sel:'[data-act="order-deliver"]',text:'The pet shop order is ready. Deliver it in Trade.'};
   if(!open){
     if(!(G.ob.feeds||0)&&!T.feeder)return {key:'feed1',tab:'tank',sel:'#tb-feed',text:'Your shrimp are hungry. One feeding covers a day.',bar:false};
+    var ts0=G.stats.sold>=KIT_UNLOCK*0.5?tankStep(KIT_TANKS,true):null;if(ts0&&!ts0.soft)return ts0;
     if(sellableStock(G)>0&&demandLeft(G)>0&&!T.set.autoSell)return {key:'sell',tab:'tank',sel:'#tb-sell',text:'Some shrimp are big enough to sell.',bar:false};
     var fc=upgradeCost(G,T,'feeder'),wc=upgradeCost(G,T,'autoWC');
     if(!T.feeder&&fc!=null&&(G.ob.feeds||0)>=4&&G.money>=fc+20&&(t=guideOk({key:'feeder',tab:'up',card:'equipcard',sel:'[data-act="upg"][data-id="feeder"]',text:'Feeding by hand is only for the start. An auto feeder in Gear feeds them every day.'})))return t;
@@ -4649,12 +4655,14 @@ function applyGuide(){
   var inCard=!!(g&&g.hideHere&&g.tab===activeTab);
   if(g){bar.dataset.key=g.key;bar.dataset.gtab=g.tab||'';bar.dataset.card=g.card||'';}
   var soft=!!(g&&g.soft&&g.text&&g.bar!==false),nw=soft?tabWords(g.text):'';$('ideas-now').hidden=!soft;setT('ideas-now',nw);$('ideas').hidden=$('ideas-k').hidden&&!soft;
-  if(!g||g.bar===false||!g.text||inCard||g.soft){bar.hidden=true;}
+  if(!g||g.bar===false||!g.text||inCard||g.soft||!$('hcheck').hidden||(typeof TS!=='undefined'&&TS)){bar.hidden=true;}
   else{bar.hidden=false;bar.classList.toggle('soft',!!g.soft);setT('gb-k',g.label||(g.soft?'Meanwhile':'Next'));setT('gb-text',tabWords(g.text));
     var go=g.tab&&g.tab!==activeTab?tabWords(TAB_NAME[g.tab])+' ›':'';setT('gb-go',go);$('gb-x').hidden=!g.skip;}
   if(!g)return;
   if(g.tab&&g.tab!==activeTab){var tb=document.querySelector('.tabs [data-tab="'+g.tab+'"]');if(tb&&!tb.hidden&&!g.soft&&!(g.tab==='up'&&o.visitedUp))tb.classList.add('guide');return;}
   if(g.soft&&!/^speed/.test(g.key))return;
+  // A faster speed only pulses for its first half minute.
+  if(/^speed/.test(g.key)){var sg=o.spdGlow||(o.spdGlow={});if(!sg[g.key])sg[g.key]=Date.now();if(Date.now()-sg[g.key]>30000)return;}
   var c=g.card&&document.querySelector('.coll[data-k="'+g.card+'"],#'+g.card);
   if(c&&c.getClientRects().length){
     if(!g.soft)c.classList.add('guide-card');
@@ -4663,11 +4671,15 @@ function applyGuide(){
       o.cardQueue=(o.cardQueue||[]).filter(function(x){return x.k!==k;});c.classList.remove('queued');
       if(c.classList.contains('shut')){c.classList.remove('shut');o.shut[k]=false;if(o.fresh)delete o.fresh[k];}
       o.activeCard={k:k,tab:activeTab};markNewCards.lastActive=k+'@'+activeTab;
-      var r=c.getBoundingClientRect();if(r.top>innerHeight*0.8||r.bottom<0)try{c.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}}
+      }
   }
   if(g.sel){var all=Array.from(document.querySelectorAll(g.sel)),b=all.find(function(e){return e.getClientRects().length&&!e.disabled;});
     if(!b){var hid=all.find(function(e){return !e.disabled&&e.closest('details:not([open])');});if(hid){var dd=hid.closest('details:not([open])');dd.open=true;if(dd.classList.contains('treatbox'))G.opt.treatsOpen=1;b=hid;}}
     if(b&&!b.classList.contains('first-feed'))b.classList.add('guide-btn');}
+  // Bring the thing to tap into view once, just under the sticky header.
+  var tgt=(g.sel&&b&&b.getClientRects().length)?b:c;
+  var gsk=g.key+'@'+activeTab;if(!g.soft&&applyGuide.scrolled!==gsk&&tgt&&tgt.getClientRects().length&&!(SPOT&&SPOT.on)&&!TVLOCK){applyGuide.scrolled=gsk;var top=document.querySelector('.top'),hb=top?top.getBoundingClientRect().bottom:0,tabs=document.querySelector('.tabs'),fb=tabs&&tabs.getClientRects().length?tabs.getBoundingClientRect().top:innerHeight,rr=tgt.getBoundingClientRect();
+    if(rr.top<hb+8||rr.bottom>fb-8){var y=tgt===c&&rr.height>fb-hb?rr.top-hb-12:rr.top-hb-Math.max(12,(fb-hb-rr.height)/3);try{window.scrollBy({top:y,behavior:'smooth'});}catch(e){}}}
 }
 // Sections used together stay open together.
 var CARD_GROUP={kits:'k',staff:'k',korder:'k'};
@@ -4758,9 +4770,9 @@ function coinChart(C){var h=C.hist.slice(-365);if(h.length<2)return '<p class="h
  return '<p class="coin-t">'+title+'</p><svg class="coin-ch" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+title+'"><line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-6)+'" y2="'+(H-B)+'" class="ax"/><line x1="'+L+'" y1="6" x2="'+L+'" y2="'+(H-B)+'" class="ax"/><text x="'+(L-4)+'" y="'+(Y(mx)+4)+'" text-anchor="end">'+mx.toFixed(1)+'</text><text x="'+(L-4)+'" y="'+(Y(mn)+4)+'" text-anchor="end">'+mn.toFixed(1)+'</text><text x="'+L+'" y="'+(H-3)+'">'+(h.length-1)+' days ago</text><text x="'+(W-6)+'" y="'+(H-3)+'" text-anchor="end">today</text><text x="4" y="'+(H/2)+'" transform="rotate(-90 8 '+(H/2)+')" text-anchor="middle">AED per coin</text><path d="'+d+'" class="ln"/></svg>';}
 function renderCoin(){var c=$('coin-card');if(!c)return;var C=G.emp.coin,on=!!(C&&C.on);c.hidden=!on;if(!on||activeTab!=='world')return;
  var h1=C.hist.length>1?C.hist[C.hist.length-2]:C.price,ch=C.price/h1-1;setT('coin-sum','AED '+C.price.toFixed(2)+' '+(ch>=0?'▲':'▼')+Math.abs(ch*100).toFixed(1)+'%');
- var pc=coinPlantCost(G),ppl=Math.floor(Math.min(G.humans*0.05,(C.coins-C.treasury)/50));
+ var pc=coinPlantCost(G),ppl=Math.floor(Math.min(G.humans*0.05,Math.max(0,C.coins-C.treasury)/50));
  var h='<p class="sub">One coin for every mangrove tree'+(C.honest?' alive after a year':', counted as seedlings')+'.</p>'+coinChart(C);
- h+='<div class="coin-kv"><span>Trees you planted</span><b>'+cnt(C.trees)+'</b><span>Trees others planted</span><b>'+cnt(C.otrees||0)+'</b><span>A coin costs to make</span><b>AED '+coinBreakEven(G).toFixed(2)+(C.price>coinBreakEven(G)?', others are planting':', nobody else plants')+'</b><span>Coins in the world</span><b>'+cnt(C.coins)+'</b><span>Your company holds</span><b>'+cnt(C.treasury)+' · '+aed(C.treasury*C.price)+'</b><span>Held by others</span><b>'+cnt(C.coins-C.treasury)+(ppl>1e5?', '+big(ppl)+' people and a few countries':'')+'</b>'+(C.cohorts.length||(C.ocohorts||[]).length?'<span>Waiting for their first year</span><b>'+cnt(C.cohorts.concat(C.ocohorts||[]).reduce(function(a,x){return a+x.n;},0))+' trees</b>':'')+'</div>';
+ h+='<div class="coin-kv"><span>Trees you planted</span><b>'+cnt(C.trees)+'</b><span>Trees others planted</span><b>'+cnt(C.otrees||0)+'</b><span>A coin costs to make</span><b>AED '+coinBreakEven(G).toFixed(2)+(C.price>coinBreakEven(G)?', others are planting':(C.otrees>0?', others have stopped planting':', nobody else plants'))+'</b><span>Coins in the world</span><b>'+cnt(C.coins)+'</b><span>Your company holds</span><b>'+cnt(C.treasury)+' · '+aed(C.treasury*C.price)+'</b><span>Held by others</span><b>'+cnt(Math.max(0,C.coins-C.treasury))+(ppl>1e5?', '+big(ppl)+' people and a few countries':'')+'</b>'+(C.cohorts.length||(C.ocohorts||[]).length?'<span>Waiting for their first year</span><b>'+cnt(C.cohorts.concat(C.ocohorts||[]).reduce(function(a,x){return a+x.n;},0))+' trees</b>':'')+'</div>';
  var ok=!frozen(G);
  h+=coinRoom(G)<1?itemHTML('Plant trees','The coasts are full. Every place that can hold mangroves has them.','<button class="btn" disabled>Full</button>'):itemHTML('Plant trees','About AED '+COIN_TREE+' a seedling, on the old shrimp-pond coasts. '+cnt(Math.min(Math.floor(pc/COIN_TREE),coinRoom(G)))+' trees. Room left for '+big(coinRoom(G))+'.',bbtn('coin-plant','',aed(pc),ok&&G.money>=pc+capitalReserve(G),true));
  h+=itemHTML('Buy coins','From the market, at today’s price. Big buys push the price up.',bbtn('coin-buy','',aed(pc),ok&&G.money>=pc+capitalReserve(G)));
@@ -4842,7 +4854,7 @@ function selectTab(tab){
   if(['tank','up','market','promote','emp','world','research','space','me'].indexOf(tab)<0)tab='tank';
   if(tab==='tank'&&typeof G!=='undefined'&&G&&tankGone(G))tab='emp';
 
-  activeTab=tab;
+  activeTab=tab;if(typeof G!=='undefined'&&G&&G.opt)G.opt.lastTab=tab;
   document.querySelectorAll('.tabs button').forEach(function(b){b.setAttribute('aria-selected',String(b.dataset.tab===tab));});
   ['tank','up','market','promote','emp','world','research','space','me'].forEach(function(t){$('p-'+t).hidden=t!==tab;});
   var mb=$('tb-me');if(mb)mb.setAttribute('aria-pressed',String(tab==='me'));
@@ -4938,6 +4950,7 @@ function renderProgression(){
  $('inventory-days').value=String(E.inventoryDays);$('reserve-days').value=String(E.reserveDays);setT('operating-plan','Overhead '+aed(fixedOverhead(G))+'/day · reserve '+aed(operatingReserve(G))+' · '+aed(productionUnitCost(G))+'/kit');
  var lq=G.labQuality||0,lc=labCandidate(G),better=lc>lq+.001;setT('lab-score',Math.round(lq*100)+' certified');setT('lab-description','Certified: '+Math.round(lq*100)+', +'+(lq*4).toFixed(1)+' kit survival. Your tanks today: '+Math.round(lc*100)+(better?', certify to lock it in.':'.'));$('lab-certify').disabled=!better;setT('lab-certify',better?'Certify at '+Math.round(lc*100)+', +'+((lc-lq)*4).toFixed(1)+' survival':'Certified, nothing better yet');
  var order={'kordercard':0,'consultcard':7,'c-kits':1,'c-staff':2,'c-proj':3,'operations-card':4,'kit-market-link':6,'c-farms':1,'lab-card':4,'adscard':1,'c-shops':4,'c-reg':1,'c-op':4};Object.keys(order).forEach(function(id){if($(id))$(id).style.order=order[id];});
+ if(!hasFarm&&$('legacy-equipment')){var lw=$('legacy-equipment');Array.from(lw.children).forEach(function(el){if(el.tagName!=='SUMMARY')$('p-up').insertBefore(el,lw);});lw.remove();}
  if(hasFarm&&!$('legacy-equipment')){var wrap=document.createElement('details');wrap.id='legacy-equipment';wrap.className='card';wrap.innerHTML='<summary class="hd"><h2>Your home tanks</h2><small>gear, supplies, automation</small></summary>';$('p-up').appendChild(wrap);Array.from($('p-up').children).forEach(function(el){if(el!==wrap&&['c-farms','lab-card','c-proj','business-guide'].indexOf(el.id)<0)wrap.appendChild(el);});wrap.style.order='5';}
  $('wincard').hidden=true;
  if(false){var link=document.createElement('button');link.id='kit-market-link';link.className='btn';link.style.order='6';link.dataset.act='navigate';link.dataset.tab='market';link.textContent='Secondary market: buy or sell individual shrimp';$('p-emp').appendChild(link);}
@@ -4955,7 +4968,7 @@ function initProgressionControls(){
     var b=e.target.closest('[data-act]');if(!b||b.disabled)return;var a=b.dataset.act,changed=true;
     if(a==='navigate'){selectTab(b.dataset.tab);}
     else if(a==='story-choice'){var sk=ensureProgress(G).queue[0],sch=sk&&storyChoices(G,sk),stx=sch&&sch[+b.dataset.i]?sch[+b.dataset.i][1]:'';if(sch&&/game ends here/.test(sch[+b.dataset.i][0])&&storySure!==sk+':'+b.dataset.i){storySure=sk+':'+b.dataset.i;render();return;}storySure=null;var aft=sk?choiceFx(sk,+b.dataset.i,true):'';if(sk&&storyChoose(G,sk,+b.dataset.i)){acknowledgeMilestone(G);detectMilestones(G);toast(aft||stx);cardResume(sk);}else{toast('Not enough cash for that choice');setSpeed(0);}}
-    else if(a==='milestone-next'){if(G.progress.queue[0]==='intro'){var pni=$('player-name');if(pni){G.name=nm({name:pni.value});try{localStorage.setItem('shrimp-name',G.name);}catch(e){}}}var key=acknowledgeMilestone(G);if(key){selectTab(key==='tenyears'?phaseInfo(G).tab:MILESTONES[key].tab);if(MILESTONES[key].intro){var tbb=document.querySelector('.tabs [data-tab="'+MILESTONES[key].tab+'"]');if(tbb&&!tbb.hidden)tbb.click();G.opt.guideOpened=null;}if(key==='health')setTimeout(function(){var tv=$('tankview');if(tv&&typeof SPOTQ!=='undefined'){SPOTQ.unshift({t:tv,text:'Tap the tank, then Check shrimp to find the sick ones.',now:1});if(!SPOT||SPOT.wait){SPOT=null;spotNext();}}},450);if(key==='farm')G.emp.bizView='production';if(key==='ministry')G.emp.bizView='culture';}if(key)cardResume(key);else setSpeed(0);}
+    else if(a==='milestone-next'){if(G.progress.queue[0]==='intro'){var pni=$('player-name');if(pni){G.name=nm({name:pni.value});try{localStorage.setItem('shrimp-name',G.name);}catch(e){}}}var key=acknowledgeMilestone(G);if(key){selectTab(key==='tenyears'?phaseInfo(G).tab:MILESTONES[key].tab);if(MILESTONES[key].intro){var tbb=document.querySelector('.tabs [data-tab="'+MILESTONES[key].tab+'"]');if(tbb&&!tbb.hidden)tbb.click();G.opt.guideOpened=null;}if(key==='health')setTimeout(function(){var tv=$('tankview');if(tv&&typeof SPOTQ!=='undefined'){SPOTQ.unshift({t:tv,text:'Tap the tank, then Check shrimp to find the sick ones.',now:1});if(!SPOT||SPOT.wait){SPOT=null;spotNext();}}},450);if(key==='me_intro')setTimeout(function(){var mf=$('me-free');if(mf&&!mf.hidden){spotOpenCard(mf);render();var r=mf.getBoundingClientRect();if(r.top<80||r.top>innerHeight*0.6)window.scrollBy({top:r.top-90,behavior:'smooth'});}},350);if(key==='farm')G.emp.bizView='production';if(key==='ministry')G.emp.bizView='culture';}if(key)cardResume(key);else setSpeed(0);}
     else if(a==='bizview'){G.emp.bizView=b.dataset.view;cache.eproj=null;}
     else if(a==='small-toggle')G.emp.showSmall=!G.emp.showSmall;
     else if(a==='earlier-packing'){G.emp.showEarlierPacking=!G.emp.showEarlierPacking;cache.estaff=null;}
@@ -5011,7 +5024,7 @@ function addSteppers(){
   document.querySelectorAll('.ctl input[type=range]').forEach(function(inp){
     if(inp.dataset.stp)return;inp.dataset.stp=1;
     var mk=function(dir){var b=document.createElement('button');b.type='button';b.className='stp';b.textContent=dir<0?'−':'+';b.setAttribute('aria-label',(dir<0?'Decrease ':'Increase ')+(inp.closest('.ctl').querySelector('label')||{}).textContent);
-      b.addEventListener('click',function(){var st=parseFloat(inp.step)||1,v=parseFloat(inp.value)+dir*st,mn=parseFloat(inp.min),mx=parseFloat(inp.max);v=Math.max(mn,Math.min(mx,Math.round(v/st)*st));inp.value=v;inp.dispatchEvent(new Event('input',{bubbles:true}));});return b;};
+      b.addEventListener('click',function(){if(inp.disabled)return;var st=parseFloat(inp.step)||1,v=parseFloat(inp.value)+dir*st,mn=parseFloat(inp.min),mx=parseFloat(inp.max);v=Math.max(mn,Math.min(mx,Math.round(v/st)*st));inp.value=v;inp.dispatchEvent(new Event('input',{bubbles:true}));});return b;};
     inp.parentNode.insertBefore(mk(-1),inp);inp.parentNode.insertBefore(mk(1),inp.nextSibling);
   });
 }
@@ -5051,7 +5064,9 @@ function initControls(){
   document.addEventListener('toggle',function(e){if(e.target.classList&&e.target.classList.contains('treatbox'))G.opt.treatsOpen=e.target.open?1:0;},true);
   
   tvLockInit();
-  initHelp();$('b-inf').addEventListener('click',function(){toast('✦ is influence: people who owe you a favour. Some things cost ✦ instead of money.');});$('b-inf').style.cursor='pointer';$('spot').addEventListener('click',function(e){e.stopPropagation();e.preventDefault();if(!(SPOT&&SPOT.ready))return;var el=SPOT.el,r=el&&el.getBoundingClientRect(),hit=r&&e.clientX>=r.left-6&&e.clientX<=r.right+6&&e.clientY>=r.top-6&&e.clientY<=r.bottom+6&&(el.tagName==='BUTTON'||el.id==='tankview');spotClose();if(hit)setTimeout(function(){if(el.id==='tankview')tvActs(true);else el.click();},30);});['touchmove','wheel'].forEach(function(ev){$('spot').addEventListener(ev,function(e){if(SPOT&&!SPOT.ready){if(e.cancelable)e.preventDefault();return;}if(SPOT&&SPOT.y!=null)spotClose();},{passive:false});});
+  initHelp();$('b-inf').addEventListener('click',function(){toast('✦ is influence: people who owe you a favour. Some things cost ✦ instead of money.');});$('b-inf').style.cursor='pointer';$('spot').addEventListener('click',function(e){e.stopPropagation();e.preventDefault();if(!(SPOT&&SPOT.ready))return;var el=SPOT.el,r=el&&el.getBoundingClientRect(),hit=r&&e.clientX>=r.left-6&&e.clientX<=r.right+6&&e.clientY>=r.top-6&&e.clientY<=r.bottom+6&&(el.tagName==='BUTTON'||el.id==='tankview');spotClose();var cx=e.clientX,cy=e.clientY;setTimeout(function(){if(hit){if(el.id==='tankview')tvActs(true);else el.click();return;}
+   // A tap on a button inside the spotlit card presses that button.
+   var at=document.elementFromPoint(cx,cy),bt=at&&at.closest&&at.closest('button,.btn');if(bt&&el.contains(bt)&&!bt.disabled)bt.click();},30);});['touchmove','wheel'].forEach(function(ev){$('spot').addEventListener(ev,function(e){if(SPOT&&!SPOT.ready){if(e.cancelable)e.preventDefault();return;}if(SPOT&&SPOT.y!=null)spotClose();},{passive:false});});
   $('tb-me').addEventListener('click',function(e){e.stopPropagation();$('apop').hidden=true;$('tb-info').setAttribute('aria-expanded','false');if(activeTab==='me'){selectTab(meBack||'tank');}else{meBack=activeTab;G.opt.meSeen=1;G.ps.me++;selectTab('me');scrollTo(0,0);}render();});
   (function(){var p=$('apop'),d=$('apop-dim');document.body.appendChild(p);var sync=function(){d.hidden=p.hidden;if(!p.hidden){var tb=document.querySelector('.top'),y=tb?Math.max(8,tb.getBoundingClientRect().top+12):12;p.style.top=y+'px';p.style.maxHeight='calc(100vh - '+(y+90)+'px)';}};new MutationObserver(sync).observe(p,{attributes:true,attributeFilter:['hidden']});sync();d.addEventListener('click',function(){p.hidden=true;$('tb-info').setAttribute('aria-expanded','false');});$('apop-x').addEventListener('click',function(e){e.stopPropagation();p.hidden=true;$('tb-info').setAttribute('aria-expanded','false');});})();
   $('tb-info').addEventListener('click',function(e){e.stopPropagation();var p=$('apop');p.hidden=!p.hidden;if(!p.hidden)G.ps.help++;$('tb-info').setAttribute('aria-expanded',String(!p.hidden));});
@@ -5091,19 +5106,19 @@ function initControls(){
     else if(a==='ice'){if(iceBottle(G,T)){bump(b);cache={};}}
     else if(a==='wc'){if(T.autoWC&&G.ps)G.ps.manual++;var lost=waterChange(G,T,T.set.wcPct),wk=wcWeek(G,T);toast(T.moltCrash===Math.floor(G.day)&&!(T.wcLog||[]).length?'Too much new water this week. They all molted at once and about half died.':'Changed '+T.set.wcPct+'% of the water'+(lost>=1?', but '+Math.round(lost)+' shrimp were stressed by the swing':'')+(wk>=120?'. That’s '+wk+'% this week. Past 200% they all molt at once.':''));bump(b);}
     if(a==='maintain'){var P=ppm(T);if(rememberCycle(G,T)&&!T.had&&totalN(T)<1&&P.nh<0.05&&P.no2<0.05&&addAmmonia(G,T,false,true))toast('Maintenance dose added. Wait for ammonia and nitrite to clear before buying shrimp.');}
-    if(a==='ammonia'){if(addAmmonia(G,T))toast('Added ammonia, +1.5 ppm');bump(b);}
+    if(a==='ammonia'){if(addAmmonia(G,T)){toast('Added ammonia, +1.5 ppm');if(!G.ob.sp4c){G.ob.sp4c=1;var b4=document.querySelector('#speed [data-speed="4"]');if(b4){b4.classList.remove('nudge5');void b4.offsetWidth;b4.classList.add('nudge5');}spotlight(function(){return document.querySelector('#speed [data-speed="4"]');},'Bacteria take weeks to grow. Tap 4× to speed time up, nothing can die in an empty tank.');}}bump(b);}
     if(a==='starter'){if(buyStarter(G,T))toast('Bacteria starter added to '+T.name);bump(b);}
     if(a==='seed'){if(seedFilter(G,T,G.tanks[+b.dataset.from]))toast('Filter seeded from '+G.tanks[+b.dataset.from].name);bump(b);}
     if(a==='sell'){var r1=doSell(G,T,false);if(r1.count)toast('Sold '+r1.count+' shrimp for '+aed(r1.revenue));bump(b);}
     if(a==='sellall'){var r2=sellAll(G,true);if(r2.count){var rr=0,nn=0;G.tanks.forEach(function(t){var q=doSell(G,t,false,demandLeft(G));rr+=q.revenue;nn+=q.count;});toast('Sold '+nn+' shrimp for '+aed(rr));}bump(b);}
     if(a==='matchprice'){G.priceAED=null;G.price=1;syncControls();}
-    if(a==='buy'){var bt=T,first=!anyHad();if(RV()){bt=G.tanks[0];G.tanks.forEach(function(t){if(totalN(t)<totalN(bt))bt=t;});}if(buyPack(G,bt,+b.dataset.i)){toast('Added '+PACKS[+b.dataset.i].name+' to '+bt.name+(first?'. Time is running at 1×, they eat, grow and breed while it runs.':''));if(first){G.opt.pauseTold=1;if(SPOT&&SPOT.on)SPOT.prev=1;else if(progressionBlocked(G)||!$('milestone-card').hidden)CARD_HOLD=1;else setSpeed(1);}}bump(b);}
+    if(a==='buy'){var bt=T,first=!anyHad();if(RV()){bt=G.tanks[0];G.tanks.forEach(function(t){if(totalN(t)<totalN(bt))bt=t;});}if(buyPack(G,bt,+b.dataset.i)){toast('Added '+PACKS[+b.dataset.i].name+' to '+bt.name+(first?'. Time is running at 1×, they eat, grow and breed while it runs.':''));if(first){G.opt.pauseTold=1;var pq=ensureProgress(G);pq.nextStory=Math.max(pq.nextStory||0,storyClock(G)+40000);if(SPOT&&SPOT.on)SPOT.prev=1;else if(progressionBlocked(G)||!$('milestone-card').hidden)CARD_HOLD=1;else setSpeed(1);}}bump(b);}
     if(a==='order-take'){takeOrder(G);render();}
     if(a==='korder-take'){if(G.korder)G.korder.taken=true;render();}
     if(a==="newsflash"){b.classList.remove('on');b.hidden=true;var tw=document.querySelector('.tabs [data-tab="world"]');if(tw&&!tw.hidden)tw.click();return;}
     if(a==='rl-hire'){if(rlHire(G,b.dataset.l,b.dataset.p)){cache.rlh=null;render();}else toast('Not enough spare cash for the first month.');return;}
     if(a==='coin-plant'){if(coinPlant(G,coinPlantCost(G)))render();else toast('Not enough spare cash.');return;}
-    if(a==='coin-buy'){if(coinBuy(G,coinPlantCost(G)))render();else toast('Not enough spare cash.');return;}
+    if(a==='coin-buy'){if(coinBuy(G,coinPlantCost(G)))render();else toast(coinOf(G).coins-coinOf(G).treasury<1?'Nobody is selling coins right now. Your company holds them all.':'Not enough spare cash.');return;}
     if(a==='coin-sell'){var cs=coinOf(G),got=coinSell(G,cs.treasury*(+b.dataset.f));if(got)toast('Sold for '+aed(got));render();return;}
     if(a==='coin-honest'){coinOf(G).honest=1;render();return;}
     if(a==='hard-buy'){if(hardBuy(G,b.dataset.g,b.dataset.o)){render();}else toast('Not enough spare cash, or not possible yet.');return;}
@@ -5164,7 +5179,7 @@ function initControls(){
     if(a==='upgall'){var id=b.dataset.id,n=0;G.tanks.forEach(function(t){if(buyUpgrade(G,t,id))n++;});toast(n?'Upgraded '+n+' tanks':'Not enough money');cache.upsig=null;}
     if(a==='camp'){if(runCampaign(G,b.dataset.id))toast('Campaign launched');cache.opd=null;}
     if(a==='testkit'){if(!G.ob.kit&&G.money>=120){pay(G,120,'supplies');G.ob.kit=1;log(G,'Bought a liquid test kit');toast('Test kit bought. Your readings are now visible.');}}
-    if(a==='bottle'){if(G.money>=40){pay(G,40,'supplies');G.ob.bottle=1;G.ob.doses+=10;log(G,'Bought a bottle of ammonia');setSpeed(1);var b4=document.querySelector('#speed [data-speed="4"]');b4.classList.remove('nudge5');void b4.offsetWidth;b4.classList.add('nudge5');if(!G.ob.sp4c){G.ob.sp4c=1;spotlight(function(){return document.querySelector('#speed [data-speed="4"]');},'Bacteria take weeks to grow. Tap 4× to speed time up, nothing can die in an empty tank.');};}}
+    if(a==='bottle'){if(G.money>=40){pay(G,40,'supplies');G.ob.bottle=1;G.ob.doses+=10;log(G,'Bought a bottle of ammonia');setSpeed(1);}}
     if(a==='excel'){if(!G.excel&&G.money>=100){pay(G,100,'supplies');G.excel=1;log(G,'Finished an online Excel course. Your books are in order.');toast('Finance tracking unlocked');cache.fink=null;}}
     if(a==='movie'){if(greenlight(G,+b.dataset.cut||0))toast('Greenlit '+MOVIES[G.emp.movie.n][0]+'. Premiere in 30 days.');cache.eproj=null;}
     if(a==='consult'){if(buyConsult(G,b.dataset.k)){toast(CONSULT[b.dataset.k].name+' bought');render();}}
@@ -5216,7 +5231,7 @@ function tick(now){
     acc+=dt/600*speed;
     var n=Math.min(Math.floor(acc),400);acc-=Math.floor(acc);
     for(var i=0;i<n;i++){if(!stepGame(G)||progressionBlocked(G))break;}
-    if(!document.hidden&&!SPOT&&!TVLOCK){var rk=0;G.tanks.forEach(function(t){rk=Math.max(rk,illRisk(G,t));});G.stats.illClock=(G.stats.illClock||0)+dt*rk;if(G.illAt==null)G.illAt=G.stats.illClock+(150+Math.random()*270)*1000;if(G.stats.illClock>=G.illAt)G.illAt=G.stats.illClock+(illRandom(G)?(150+Math.random()*270)*1000:30000);}if(progressionBlocked(G)){acc=0;setSpeed(0);render();}
+    if(!document.hidden&&!SPOT&&!TVLOCK){var rk=0;G.tanks.forEach(function(t){rk=Math.max(rk,illRisk(G,t));});G.stats.illClock=(G.stats.illClock||0)+dt*rk;if(G.illAt==null)G.illAt=G.stats.illClock+(150+Math.random()*270)*1000;if(G.stats.illClock>=G.illAt)G.illAt=G.stats.illClock+(illRandom(G)?(150+Math.random()*270)*1000:30000);}if(progressionBlocked(G)){acc=0;if(speed>0&&CARD_HOLD==null)CARD_HOLD=speed;setSpeed(0);render();}
   }
   requestAnimationFrame(tick);
 }
@@ -5240,10 +5255,10 @@ function start(data){
     }
   }
   if(fromStore&&G.savedSpeed!=null)speed=Math.min(G.savedSpeed,maxSpeed(G));
-  if(!G.ob.bottle&&!G.opt.all)speed=0;if(G.progress&&G.progress.home)activeTab=G.progress.home;
+  if(!G.ob.bottle&&!G.opt.all)speed=0;if(G.progress&&G.progress.home)activeTab=G.progress.home;if(fromStore&&G.opt.lastTab&&G.ob.bottle)activeTab=G.opt.lastTab;
   buildGauges();initParameterTooltips();initControls();initProgressionControls();initChartEvents();syncControls();setSpeed(speed);
   if(window.claude&&window.claude.hot&&window.claude.hot.snapshot)window.claude.hot.snapshot(function(){return{G:G};});
-  detectMilestones(G);if(progressionBlocked(G))setSpeed(0);selectTab(activeTab);render();requestAnimationFrame(tick);
+  detectMilestones(G);if(progressionBlocked(G))setSpeed(0);selectTab(activeTab);render();var ltb=document.querySelector('.tabs [data-tab="'+activeTab+'"]');if(activeTab!=='me'&&activeTab!=='tank'&&(!ltb||ltb.hidden)){selectTab('tank');render();}requestAnimationFrame(tick);
   if(away)toast(away);
   setInterval(render,250);setInterval(save,5000);
   window.addEventListener('pagehide',save);
