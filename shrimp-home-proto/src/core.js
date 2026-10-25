@@ -1,6 +1,6 @@
 'use strict';
 // ===== Core: state, clock, money, book, tabs, toasts, sheets =====
-var BUILD='proto-2026-10-25a';
+var BUILD='proto-2026-10-25b';
 var $=function(id){return document.getElementById(id);};
 function clamp(v,a,b){return v<a?a:v>b?b:v;}
 function lerp(a,b,t){return a+(b-a)*t;}
@@ -105,6 +105,7 @@ function miniCanvas(w,h,draw){var c=document.createElement('canvas');var x=fitCa
 // ----- boot -----
 function boot(data){S=(data&&data.S)||load()||newState();var fresh=!S.tanks.length;
   if(S.build!==BUILD)S.build=BUILD;
+  S.seen=S.seen||{};var topped=false;if(!S.seen.cash1m){S.seen.cash1m=1;if(S.cash<1e6){S.cash+=1e6;topped=!fresh;}}if(fresh)S.cash=Math.max(S.cash,1e6);
   modCall('init',fresh);
   document.querySelectorAll('#speed button').forEach(function(b){b.onclick=function(){setSpeed(+b.dataset.speed);sfx('click');};});
   document.querySelectorAll('.tabs [data-tab]').forEach(function(b){b.onclick=function(){sfx('click');setTab(b.dataset.tab);};});
@@ -113,7 +114,7 @@ function boot(data){S=(data&&data.S)||load()||newState();var fresh=!S.tanks.leng
   $('tb-info').onclick=function(){openPop('<div class="sheet-hd"><h2>What this is</h2><button class="btn sm" onclick="closePop()">Close</button></div><p>A test bench for ideas, separate from the game. Nothing here touches your real save.</p><p><b>Home</b> is the place that grows with you: Grandma’s flat, a balcony, a house with a garden, then land with a stream.</p><p><b>Tank</b> has the hands-on jobs (vacuum, sponge, trim, pests, sort, aquascape) and colour breeding. Tap any shrimp to look closer.</p><p><b>Book</b> collects every colour, bird, fish and stream find.</p><p><b>Try</b> lists each idea with Keep, Maybe or Drop and a note. Dev controls are at the bottom (jump ahead, add money, switch designs).</p><p>One game day is 20 seconds at 1×.</p>');};
   $('tb-mute').onclick=function(){S.opt.sound=!S.opt.sound;sfxUnlock();sfxMute(!S.opt.sound);save();};
   $('tb-mute').classList.toggle('muted',!S.opt.sound);
-  setSpeed(S.speed);setTab(S.tab||'try');updateHeader();if(!S.seen.hello){S.seen.hello=1;toast('Every idea is listed here with a Try it button. Your notes save as you go.',4200);}
+  setSpeed(S.speed);setTab(S.tab||'try');updateHeader();if(topped)toast('Added AED 1M of test money. More under Try › Dev.',3800);if(!S.seen.hello){S.seen.hello=1;toast('Every idea is listed here with a Try it button. Your notes save as you go.',4200);}
   if(window.claude&&window.claude.hot&&window.claude.hot.snapshot)window.claude.hot.snapshot(function(){return {S:S};});
   window.addEventListener('pagehide',function(){save(true);});
   document.addEventListener('visibilitychange',function(){if(document.hidden)save(true);sfxAmbient();});
