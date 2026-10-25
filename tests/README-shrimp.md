@@ -654,3 +654,10 @@ ammonia is only the primary button once ammonia is near zero.
 - Consultant advice now glows the button it means (next farm, next packing machine or packer, ads, regions, restart farms).
 - The ? ideas after the farm list options (bigger farms, packing machines, regions, ads and shops, the Lab, consultants) without saying which one is the problem.
 - Farm-stage replay (cue-only player): 100k owners by day ~2,500 with consultants, 38k without the advice buttons, 173k when free hints diagnosed everything.
+
+## Pass 87: text pass, cycling colours, one action when cycled, the river war
+- Merged the text reviewer's 38 edits (AGENTS writing rules narrowed, letters, endings, Ten years, million, the hard part, house lines). Ending preview rebuilt.
+- During cycling with no shrimp, ammonia and nitrite in the cycle card no longer show red danger arrows, they're the bacteria's food then. The ammonia and nitrite alerts already only fire with shrimp in the tank.
+- "Your tank is cycled" has one button, "Buy shrimp in Trade", and the Trade tab spotlight is skipped.
+- River war (the hard part): "Make peace pay" with generals on the board became "Pay for a river treaty": a jointly run water plant, written water and revenue shares, an outside authority checking the meters, each country keeps its side, slow. "Wait for a common enemy" and "Sell kits to both armies" are retired (old saves that picked them keep them). "Wait it out" is now "Stay out of it".
+- Bots: strong cold 2,706, strong kind 3,312, average Earth 6,217–6,245.

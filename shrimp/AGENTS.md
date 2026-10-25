@@ -149,7 +149,7 @@ These come from Puti's feedback. Treat them as requirements.
 
 **Writing**
 - Write all player-facing text in Puti's voice: short, plain, comma-spliced, no build-up. No "AI vibe" phrasing, no flourishes ("a testament to", "embark", "journey").
-- Patterns she flags as Claude-style, so don't write them: "X, so you don't have to", "for good", "by itself" / "on its own", "Nothing fancy, nothing wrong" style pairs, punchlines like "Finally, a ... that matters", poetic lists ("photos, classrooms, hospital rooms, a lighthouse"), aphorisms ("less netting, more numbers"), and "Label. Description" lines. No quote marks around narration.
+- Patterns she flags as Claude-style, so don't write them: "X, so you don't have to", "for good", "by itself" / "on its own", "Nothing fancy, nothing wrong" style pairs, feel-good punchlines like "Finally, a ... that matters", poetic lists ("photos, classrooms, hospital rooms, a lighthouse"), slogan or life-lesson aphorisms ("less netting, more numbers"), chicken-soup-for-the-soul morals tied onto the end, and "Label. Description" lines. No quote marks around narration. A good line people would repeat is fine, she likes quotes, it just can't be the uplifting life-lesson kind.
 - The Shrimp Times can be political. Stay away from the sensitive topics, like abortion and religion.
 - Influence ✦ is knowing the right people. It starts with Mira (ev_mira), nothing earns ✦ before her. Costs mix money and ✦ by what makes sense: things money can buy cost AED, things that need someone on your side cost ✦, some cost both.
 - There is one public mood (E.op.m), no audiences. Water and Fire were removed at Puti's request, don't bring them back.
@@ -253,7 +253,7 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] No "Affordable in about…" lines anywhere.
 
 **Text**
-- [ ] Puti's voice: short, plain, comma-spliced. No punchlines, no "not X but Y", no twist endings. Made-up countries for satire. No abortion or religion.
+- [ ] Puti's voice: short, plain, comma-spliced. No feel-good or life-lesson punchlines (a sharp or funny line is fine), no "not X but Y", no twist endings. Made-up countries for satire. No abortion or religion.
 
 ## Pacing targets
 
