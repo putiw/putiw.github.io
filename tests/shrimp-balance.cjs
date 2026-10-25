@@ -300,7 +300,7 @@ var o=readyGame();o.emp.ripple={free:2e4,n:1,log:[{i:0,d:5}],seen:1};var R=rip(o
 `);
 if(html.includes("'Next story at '"))throw Error('No spoilers about the next story');
 check('robots and AI replacing staff make the news, once',`
-var g=readyGame();g.humans=50;newsEvent(g,'aisales');newsEvent(g,'aisales');var R=rip(g);if(R.log.length!==1||newsText(R.log[0]).indexOf('AI agents')<0)throw Error('One AI story');
+var g=readyGame();g.humans=50;g.kits.sold=100;newsEvent(g,'aisales');newsEvent(g,'aisales');var R=rip(g);if(R.log.length!==1||newsText(R.log[0]).indexOf('AI agents')<0)throw Error('One AI story');var g0=readyGame();g0.humans=50;newsEvent(g0,'aisales');newsLine(g0,'Something happens.');if(rip(g0).log.length!==0||!g0.notes||g0.notes.list.length!==2||g0.notes.list[0].k!=='word')throw Error('No Shrimp Times before the World tab opens, news becomes word of mouth');
 `);
 check('influence starts with Mira, never before',`
 var g=readyGame();gainInf(g,50);if(g.emp.inf!==0||g.emp.infTotal!==0)throw Error('No influence before Mira');
@@ -320,7 +320,7 @@ if(!PROJ.some(p=>p.t==='uni'&&p.m>0&&p.i>0)||!PROJ.some(p=>p.t==='pol'&&!p.m&&p.
 `);
 check('cold deals pay every day, bad deeds can surface later in the news',`
 var g=readyGame();g.emp.infOn=1;g.humans=2e6;g.money=1e7;g.emp.proj.filtercart=1;var m=g.money;dealsDay(g);if(!(g.money>m))throw Error('Cartridges pay daily');
-g.emp.later=[{d:Math.floor(g.day),t:'An algae bloom turns the river green.',m:-6}];var n=rip(g).log.length;laterDay(g);if(rip(g).log.length!==n+1||g.emp.later.length)throw Error('Delayed story prints once');
+g.kits.sold=Math.max(g.kits.sold,100);g.emp.later=[{d:Math.floor(g.day),t:'An algae bloom turns the river green.',m:-6}];var n=rip(g).log.length;laterDay(g);if(rip(g).log.length!==n+1||g.emp.later.length)throw Error('Delayed story prints once');
 g.emp.proj.paperbuy=1;newsLine(g,'Something happened.');if(!/owner/.test(newsText(rip(g).log[rip(g).log.length-1])))throw Error('An owned paper flatters you');
 `);
 check('one public mood, honest and pushy campaigns, no Water or Fire left',`

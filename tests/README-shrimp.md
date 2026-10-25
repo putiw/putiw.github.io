@@ -684,3 +684,10 @@ ammonia is only the primary button once ammonia is near zero.
 - Shrimpcoin: you can't buy more coins than others hold (Held by others never goes negative), and "nobody else plants" says "others have stopped planting" once they had.
 - Negative income reads "income is −AED X a day". Start over unwraps "Your home tanks" back into Gear. Reload reopens the tab you were on (`G.opt.lastTab`, falls back to Tank if that tab is hidden).
 - Bots: strong cold 2,694, strong kind 3,312, average Earth 6,245, space 7,656. Spotlight sweep 137 checks clean.
+
+## Pass 90: notes, not news (hot fix)
+- Shrimp Times banners showed up long before the World tab, and personal things (running 10 km, the shrimp club, Grandma's fish soup) came out as news.
+- The paper now only prints once its tab is open (`paperOpen`). Before that, a news line is a "Word gets around" note.
+- Personal things are notes with their own masthead and never go in the paper: Your day milestones ("Your day"), Grandma ("Grandma"), small buzz about the kits ("Word gets around"). Same banner look as the newsflash, one at a time, 12 s apart, not over cards, spotlights, cleaning or checks. Tapping a Your day or Grandma note opens the You page.
+- Old saves: a paper backlog from before the World tab stays quiet until the tab opens.
+- Tests: no Shrimp Times before the World tab, running and Grandma never make the paper. Bots: strong cold 2,562, average Earth 6,245, space 7,656.

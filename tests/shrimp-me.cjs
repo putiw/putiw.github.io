@@ -21,7 +21,7 @@ if(!g.me.burns||!milestoneConditions(g).me_burnout)throw Error('Burnout '+g.me.b
 var q=newGame();q.tanks[0].feeder=1;q.tanks[0].autoWC=1;personalDay(q);for(var h=0;h<24;h++)setHour(q,h,h<4?'sleep':'work');for(var h=15;h<24;h++)setHour(q,h,'nothing');q.money=1e6;var r=Math.random,sd=5;Math.random=function(){sd=(sd*16807)%2147483647;return sd/2147483647;};
 for(var d=0;d<2500&&!q.me.ills;d++){q.day++;personalDay(q);}Math.random=r;if(!q.me.warned||!q.me.ills||sick(q)!==2||q.money>6e5||workMult(q)!==0.5)throw Error('Ill after years of four-hour nights '+q.me.hp+' '+q.money);
 var w=newGame();w.tanks[0].feeder=1;w.tanks[0].autoWC=1;personalDay(w);setHour(w,19,'exercise');for(var d=0;d<900;d++){w.day++;personalDay(w);}if(w.me.ills||w.me.hp<70)throw Error('A normal day stays well '+w.me.hp);
-var z=newGame();z.tanks[0].feeder=1;z.tanks[0].autoWC=1;personalDay(z);z.emp.infOn=1;for(var h=17;h<23;h++)setHour(z,h,'design');for(var d=0;d<200;d++){z.day++;personalDay(z);}if((z.me.dz||0)<2||!rip(z).log.some(function(x){return /Tank of the Year/.test(x.tx||'');}))throw Error('Design hours win prizes '+z.me.dz);
+var z=newGame();z.tanks[0].feeder=1;z.tanks[0].autoWC=1;personalDay(z);z.emp.infOn=1;for(var h=17;h<23;h++)setHour(z,h,'design');for(var d=0;d<200;d++){z.day++;personalDay(z);}if((z.me.dz||0)<2||!((z.notes&&z.notes.list.some(function(x){return /Tank of the Year/.test(x.t);}))||rip(z).log.some(function(x){return /Tank of the Year/.test(x.tx||'');})))throw Error('Design hours win prizes '+z.me.dz);if(!z.notes.list.some(function(x){return x.k==='day'&&/tank layout/.test(x.t);})||rip(z).log.some(function(x){return /tank layout/.test(x.tx||'');}))throw Error('Personal milestones are notes, not news');var zr=newGame();zr.kits.sold=500;zr.me.hrs={exercise:250,grandma:350};zr.me.on=1;hoursDay(zr);if(rip(zr).log.some(function(x){return /10 km|fish soup/.test(x.tx||'');})||!zr.notes.list.some(function(x){return x.k==='day'&&/10 km/.test(x.t);})||!zr.notes.list.some(function(x){return x.k==='grandma'&&/fish soup/.test(x.t);}))throw Error('Running and Grandma never make the paper');
 `);
 check('Grandma moments wait for you, pass if nobody looks, and count both ways',`
 var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.ps.t=1;
@@ -168,12 +168,12 @@ p.queue=[];g.ps.t+=20000;detectMilestones(g);if(p.queue.length)throw Error('Too 
 p.queue=[];g.money=-500;g.day=50;detectMilestones(g);if(p.queue[0]!=='broke')throw Error('Money trouble never waits');
 `);
 check('Shrimp Times stories come one at a time, and a choice\'s story comes next',`
-var g=newGame();g.ps.t=5000;var R=rip(g),p=ensureProgress(g);p.queue=[];newsLine(g,'one');newsLine(g,'two');newsLine(g,'three');if(R.log.length)throw Error('Queued, not printed');
+var g=newGame();g.kits.sold=100;g.ps.t=5000;var R=rip(g),p=ensureProgress(g);p.queue=[];newsLine(g,'one');newsLine(g,'two');newsLine(g,'three');if(R.log.length)throw Error('Queued, not printed');
 g.ps.t+=1000;newsTick(g);if(R.log.length!==1||R.log[0].tx!=='one')throw Error('First goes out');newsTick(g);if(R.log.length!==1)throw Error('Then waits');
 g.emp.kitsOpened=1;g.money=1e6;g.day=500;storyChoose(g,'wash_offer',0);g.emp.dirty.noticed=0;g.emp.dirty.day=0;g.day=100;washDay(g);g._dec=1;newsLine(g,'because of you');g._dec=0;
 if(R.pend[0].tx!=='because of you')throw Error('Your story jumps the line');g.ps.t+=25000;newsTick(g);if(R.log[R.log.length-1].tx!=='because of you')throw Error('Soon after the choice');
 g.ps.t+=121000;newsTick(g);if(R.log.length!==3)throw Error('Then the rest, spaced');
-var b=newGame();newsLine(b,'bots');if(rip(b).log.length!==1)throw Error('No play clock, straight to print');
+var b=newGame();b.kits.sold=100;newsLine(b,'bots');if(rip(b).log.length!==1)throw Error('No play clock, straight to print');
 `);
 check('academia or industry, letters to Grandma, and choices that make the news',`
 var g=newGame();g.kits.sold=ACADEMY_AT;g.academy.level=1;g.money=1e7;rlHire(g,'auto','pd');if(forkOpts('science').some(function(p){return p.req(g);}))throw Error('Not right after the first postdoc');rlHire(g,'water','pd');g.academy.papers=4;if(!forkOpts('science').every(function(p){return p.req(g);}))throw Error('Science question once postdocs have a track record');
