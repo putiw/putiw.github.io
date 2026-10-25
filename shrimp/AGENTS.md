@@ -75,6 +75,8 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **Top action buttons** (`actNeed`, `setActs`): Feed shows while any tank lacks an auto feeder, Water while any tank lacks an auto water changer, Sell until Trade closes (`labMode`). With none left the row hides and the owners bar takes its place.
 - **Too much new water** (`WC_CRASH` 200, `WC_AUTO_MAX` 150, `wcWeek`, `T.wcLog`, `T.moltCrash`): more than 200% changed in 7 days, all molt at once, half of everyone 10+ days old dies. Automatic changes skip rather than pass 150%. The Water toast warns from 120%, the header chip says "wait a day" from 150%.
 - **New-player cues** (`guideTarget`, `SC_WC`, `#tb-wc.need`, `#tb-feed.first-feed`): the screen should carry a player with nobody guiding them. Feed glows when hand feeding runs out, Water glows when water needs changing (and during a stalled cycle), any danger tip on a tank is the NEXT step with its fix button glowing, heat suggests fan, chiller, then AC or ice, kits put affordable growth steps ahead of hand packing. Check with a cue-only bot (see Pass 80) after changing the guide.
+- **Shady loan** (`sharkLend`, `sharkPay`, `sharkTake`, `loanRow`, `E.shark.deal`, `SHARK_RATE`, `SHARK_DAYS`): pass the money threshold as the 6th `bbtn` argument and a "Know a guy?" button appears when the player has at least half. One loan, 20% a month, collects after 90 days. See Pass 81.
+- **Seeded tanks** (`T.seeded`, `openTankSheet`, `#tsheet`, `TS`): tanks 2 and 3 copy Tank 1's bacteria, no cycling. The sheet blocks cards and spotlights like the health check does.
 - **First sickness guide**: until the player finishes one health check (`G.opt.hcDone`), a sick tank is a real Next step in `guideTarget` (`ill<tank>_<day>`), with a ring on the tank view and the caption "Some look sick · tap to check". A partly successful cure sets `ill.checked` to wait five days. After the first check, sickness is quiet again (rule 5).
 - **Lab birthday parties** (`party1`, `party2`, `partyGo`): Grandma's old grad school lab, twice per game (day 90+ with shrimp, then after Europe). Going costs one day of operating net and lowers burnout.
 - **Quiet spells** (`QUIET`, `quietDay`, `markEvent`, `QUIET_MS`, `QUIET_DAYS`): story cards, illnesses and orders call `markEvent`; after a quiet stretch `quietDay` fires one eligible event and sets `G.flash` for the UI toast.
@@ -263,9 +265,9 @@ Latest bot results (seed 7, 24 Oct):
 
 | Bot | Result |
 |---|---|
-| Strong, cold answers (default) | Earth won on day 2,657, empire_dictator |
-| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 3,258, garden_village |
-| Average, curious and kind (default) | Earth on day 6,021-6,190 depending on seed, space done by day ~7,600 |
+| Strong, cold answers (default) | Earth won on day 2,893, empire_dictator |
+| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 3,219, question_prof |
+| Average, curious and kind (default) | Earth on day 5,994-6,190 depending on seed, space done by day ~7,600 |
 | Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,349, no Space |
 
 All bots use campaigns (when ✦ is plentiful), films, Shrimpcoin, shops and mall stores. The average bot also funds research lines. It has 22 years to finish both chapters.
@@ -365,9 +367,6 @@ Planned and agreed with Puti, not built yet:
 - Story pacing: story cards at least ~30 game days apart, plus new late-game beats with choices that last (Mira's science fair, a flatworm recall, the rival's merger offer, a letter from Iceland).
 
 - The own tank's year-eight card (`c_mytank`) only checks the glass.
-
-**Proposed, waiting on Puti**
-- A shady loan from "a guy who knows a guy": a small button next to a buy button you can't afford (with at least half the price), lends only the gap, 20% a month compounding, one at a time, repay any time, after three months he takes your newest farm or gear at half value and the news and Grandma hear. Would reuse the existing shark loan (`E.shark`).
 
 **Known gaps**
 - Kits open after 200 home-bred sales and 60 L of tanks with shrimp in them (`KIT_UNLOCK`, `KIT_ROOM`). The guide says so from 100 sold.

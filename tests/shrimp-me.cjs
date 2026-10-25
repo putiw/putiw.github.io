@@ -308,5 +308,10 @@ if(milestoneConditions(g).party2)throw Error('Second party waits for Europe');g.
 var g=newGame(),T=g.tanks[0];T.cycledAt=0;T.had=1;T.pop=[{n:100,age:80,sex:'m'}];T.set.remGH=T.chem.gh;T.set.remKH=T.chem.kh;T.chem.temp=roomT(g,clock(g));g.day=50;
 waterChange(g,T,50);g.day++;waterChange(g,T,50);g.day++;waterChange(g,T,50);if(totalN(T)<95)throw Error('150% in a week is fine');g.day++;waterChange(g,T,50);if(totalN(T)>60)throw Error('200% in a week: half die in a mass molt');
 var h=newGame(),U=h.tanks[0];U.cycledAt=0;U.had=1;U.pop=[{n:100,age:80,sex:'m'}];U.autoWC=1;U.set.autoWCDays=2;U.set.autoWCPct=50;h.day=100;for(var i=0;i<14;i++){h.day++;if(U.autoWC&&h.day%U.set.autoWCDays===0){if(wcWeek(h,U)+U.set.autoWCPct<=WC_AUTO_MAX)waterChange(h,U,U.set.autoWCPct,true);}}if(U.moltCrash)throw Error('The auto changer never causes a molt crash');
+var g=newGame();g.tanks[0].cycledAt=0;g.money=5000;if(!addTank(g))throw Error('Second tank bought');var T2=g.tanks[1];if(T2.cycledAt==null||!T2.seeded)throw Error('A new tank is seeded from Tank 1, no cycling');if(!safeToStock(g,T2))throw Error('Seeded tank is safe for shrimp');
+var h=newGame();h.stats.sold=10;h.money=100;h.day=200;if(!sharkLend(h,500)||h.money!==600)throw Error('He lends the gap');if(sharkLend(h,100))throw Error('One loan at a time');
+h.day=230;debtDay(h);if(h.emp.shark.owe!==600)throw Error('20% after a month');h.day=260;debtDay(h);if(h.emp.shark.owe!==720)throw Error('Compounds');
+h.tanks[0].feeder=1;h.tanks[0].autoWC=1;h.day=290;debtDay(h);if(h.tanks[0].autoWC&&h.tanks[0].feeder)throw Error('After three months he takes gear');if(!h.emp.sharkUsed)throw Error('Collected loans count');
+var k=newGame();k.stats.sold=10;k.money=0;sharkLend(k,300);k.money=1000;if(!sharkPay(k)||k.emp.shark)throw Error('Pay back any time');
 `);
 console.log(count+' free time, Grandma and ending checks passed');

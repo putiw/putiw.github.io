@@ -610,3 +610,8 @@ ammonia is only the primary button once ammonia is near zero.
   - All shrimp gone: "Your shrimp are gone. Buy new ones in Trade" is the next step.
   - The auto feeder and auto water changer are offered once each as a skippable NEXT step when affordable.
   - Kits: growth steps you can afford come before "pack a kit": the first packing tool, a packer when orders outrun you, the tanks the farm license needs, the license, the first grow rack. Packing by hand stays the fallback next step whenever stock is empty. The monthly QC hint no longer hides it.
+
+## Pass 81: a guy who knows a guy, seeded tanks
+- Shady loan: next to a purchase you can't quite afford (you have at least half), a dashed "Know a guy? Borrow AED X" button lends exactly the gap. One loan at a time, 20% a month compounding, pay back any time from the alert (!!) popup. A NEXT step offers to pay once you can (from a week in). After three months unpaid he collects: your newest farm, or else your best gear (chiller, auto water changer, auto feeder, fan, heater), counted at half its price against the debt, a Shrimp Times line, and Grandma hears. Then again every month until it's paid. Collected loans count as the old market shark (`sharkUsed`) for the money-trouble path and endings. Reuses `E.shark` with `deal:1` (`sharkLend`, `sharkPay`, `sharkTake`, `loanRow`); the out-of-money card's market loan only shows when you don't already owe him.
+- Tanks 2 and 3 need no cycling: they're seeded from Tank 1. Buying one opens a sheet: why there's no cycling, auto feeder and auto water changer for the new tank with buy buttons, then "Got it, show me" spotlights the tank switcher.
+- Bots: strong cold 2,893, strong kind 3,219, average Earth 5,994–6,189.
