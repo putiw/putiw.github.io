@@ -636,3 +636,14 @@ ammonia is only the primary button once ammonia is near zero.
 - A hand feeding covers one day again, with no automatic top-up.
 - The ? on Feeding and the Hunger and Nutrition readings explain the biofilm floor.
 - Bots: strong cold 2,729, strong kind 3,233, average Earth 5,938–5,994.
+
+## Pass 85: a full new-player replay
+- Replayed from a fresh game with a cue-only player (taps spotlights, cards, NEXT and glowing buttons), plus runs from the farm stage and from 10k owners.
+- Start: tapping the spotlit button itself now presses it (it used to just close the tip). Counts round instead of floor (5 bought shrimp no longer reads 4). Feed glows when they're actually hungry or underfed, not the moment a portion runs out. Nutrition falls slower on biofilm, and under 50% it's a watch, not a danger, until 20%.
+- Kits: the first kit's materials are on Grandma if you can't afford them. "The farm license needs" grammar.
+- Water trouble on a tank with no auto water changer offers the changer once you can afford it. Heat with a fan suggests the heater then the chiller.
+- Mid game stalled: a cue-only player sat on AED 3–80M with packing stuck at 8 kits a day and word of mouth under 60%. Now: packing shortfalls point at the next packing step (camera, packaging machine, robotic line, packer) and that project jumps to the top of its list; kits piling up point at ads and shops; idle money makes farm tiers, packing machines and regions real next steps; the ? ideas switch from home-tank chores to the business once farms run things. Farm-stage replay went from 27k to 173k owners by day ~2,500.
+- Smaller: story-card costs show in grey, the bulk-order toast is gone (the NEXT card says it), Consultants moved to the bottom of Kits, chevrons on Operating controls, Consultants and Your home tanks, the Lab tab opens with Research unfolded while nobody is hired, the field buttons have room, the market loan caps at AED 250k.
+- Tooltips: tap a slider's label (New water GH, Cull below...) for what it does.
+- Grandma money: pick Nothing, A little (1% of cash), Some (3%) or A lot (10%) each week.
+- Bots: strong cold 2,706, strong kind 3,238, average Earth 6,134–6,162.
