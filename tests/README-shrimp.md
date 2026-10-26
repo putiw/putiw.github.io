@@ -807,3 +807,8 @@ Bots after: strong 2,651 (dictator ending), kind 3,301 (garden village), average
 - Grandma / Your day / Word gets around notes and newspaper flashes appear just below the top bar (fade in, untappable while hidden), never over the speed buttons; they clear when a tank job starts.
 - Tank chips get a visible ring when guided. Pause pill hides behind the What happened popup. Card header notes wrap instead of cutting off numbers. Fed and Nutrition keep small labels when water readings show. The gravel job's button says "Check for babies". Mouse drags in tank jobs don't select text.
 - Mangrove one tree per tap is intentional (the designer's call).
+
+## Pass 106: one tight button grid under the tank
+
+- Check shrimp and Clean glass no longer hide behind a tap on the tank; they sit under it in the same grid as the own-tank jobs (Gravel, Sponge, Trim, Pests). 2 buttons in one row, 6 in two rows of three, no empty cells. Check shrimp is still where sick shrimp are found and treated or culled; Clean glass is still the algae wipe.
+- Cull button is the same plain style as Treat.
