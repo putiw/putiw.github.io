@@ -366,5 +366,13 @@ var reset=migrate(newGame());if(!reset.progress.v8)throw Error('A fresh migrated
 if(!html.includes('G=migrate(newGame());seenNew=null;'))throw Error('Start over must build the game the same way a first load does');
 if(!html.includes("['pointerup','touchend','click','keydown'].forEach(function(ev){document.addEventListener(ev,musicKick,true);});"))throw Error('Sound must unlock on finger-up taps and retry on every tap');
 if(!/function save\(force\)\{if\(document\.hidden&&!force\)return;/.test(html)||!html.includes('catchUp(G,(Date.now()-at)/1000,speed)'))throw Error('No saving while hidden, and coming back from the background catches up');
+check('Grandma helps a player who spent everything before the first shrimp',`
+var g=readyGame(),T=g.tanks[0];g.progress.queue=[];T.cycledAt=1;safeToStock=function(){return true;};g.money=5;g.stats.giftDay=null;T.had=0;
+for(var i=0;i<12;i++){g.progress.queue=[];g.money=5;stepGame(g);}
+if(totalN(T)<1||!g.log.some(function(l){return /these are on me/.test(l.t);}))throw Error('Grandma should drop off shrimp once the water is ready and money is short');
+`);
+if(!html.includes(".opsrow select{font:500 16px")||!html.includes("#speed button,.tabs button,#guidebar,.newsflash,.top button{touch-action:manipulation}"))throw Error('iPhone should not zoom on the Operating dropdowns or on fast taps');
+if(!html.includes("localStorage.setItem(saveKey+'-bak-'+Date.now(),r)")||!html.includes("function checkBuild(){if(!/^https?:/.test(location.protocol)||document.hidden)return;"))throw Error('A save that fails to load is kept, and a hidden tab skips update checks');
+if(!html.includes("renderMilestone.last==='tenyears'&&$('milestone-card')"))throw Error('Nothing pops over the ten-year ending');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

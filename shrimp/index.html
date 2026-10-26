@@ -233,7 +233,7 @@ th:first-child,td:first-child{text-align:left}
 #wtcard>summary,#feedcard>summary{color:var(--ink);font-size:inherit;min-height:0}#wtcard>summary h2::before,#feedcard>summary h2::before{content:'▾';display:inline-block;width:16px;color:var(--ink-3);transition:transform .15s}#wtcard:not([open])>summary h2::before,#feedcard:not([open])>summary h2::before{transform:rotate(-90deg)}
 
 #wtcard>summary h2,#feedcard>summary h2{flex:1}
-.opsrow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:6px 0;font-size:13.5px}.opsrow small{display:block;color:var(--ink-3);font-size:11.5px}.opsrow select{font:500 13px var(--font-body);padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);min-height:34px}
+.opsrow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:6px 0;font-size:13.5px}.opsrow small{display:block;color:var(--ink-3);font-size:11.5px}.opsrow select{font:500 16px var(--font-body);padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);min-height:34px}
 .ow-parts{margin:8px 0;border-top:1px solid var(--line)}.ow-line{display:grid;grid-template-columns:1fr auto;gap:0 10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}.ow-line b{font-weight:600}.ow-line span{font:500 13px var(--font-data);text-align:right}.ow-line small{grid-column:1/-1;color:var(--ink-3);font-size:12px}.ow-line.bad span{color:var(--bad)}
 .ow-design{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0;font-size:13px}.packrow{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:4px 0 2px}.packrow .btn{display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 8px;min-height:0}.packrow .btn small{font:500 11px var(--font-body);opacity:.8}.packrow #btn-kitprice{grid-column:1/-1}#c-kits .kv{margin:6px 0}#c-kits #h-maxN{margin:0 0 4px}#c-kits #kit-margin{margin:2px 0}.ow-design .seg{display:flex;gap:4px;flex-wrap:wrap}.btn.mini-seg{min-height:32px;padding:4px 10px;font-size:12.5px;line-height:1.2}.mini-seg small{display:block;font-weight:400;font-size:11px;opacity:.8}.btn.mini-seg.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .labtrade-folded #sellcard{display:none!important}
@@ -335,7 +335,7 @@ th:first-child,td:first-child{text-align:left}
 @media(max-width:520px){#milestone-card{padding:10px 12px}#milestone-card h2{font-size:16px}#milestone-card .sub{font-size:13.5px;line-height:1.4}}
 .scope-label{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
 .coll>.hd:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
-.btn,.stp{touch-action:manipulation}.ctl .stp{min-height:36px}
+.btn,.stp,#speed button,.tabs button,#guidebar,.newsflash,.top button{touch-action:manipulation}.ctl .stp{min-height:36px}
 @media(max-width:400px){.tabs .tl-l{display:none}.tabs .tl-s{display:inline}}@media(max-width:480px){.st-l{display:none}#btn-settings{min-width:34px;font-size:14px;padding:3px 8px}.tabs button{font-size:10.5px;letter-spacing:-.01em;padding:5px 1px}.speed button.nx:not([aria-pressed="true"]){display:none}.btns{flex-wrap:wrap}.item{grid-template-columns:minmax(0,1fr) auto}.ctl{grid-template-columns:82px 30px minmax(0,1fr) 30px 58px}.brand{flex-wrap:wrap}.business-strip b{font-size:12px}.business-strip div:nth-child(n+4){display:none}}
 @media(max-width:480px){#space-card .item{grid-template-columns:1fr}#p-space .btn{white-space:normal}}
 @media(max-width:520px){.goalrow{gap:4px}.goalrow .goal-bar{flex-basis:36px}#b-goal-wide{display:none}#b-goal-short{display:inline}.dream-tracker>summary{max-width:132px}.dream-tracker small{display:none}}
@@ -1656,7 +1656,7 @@ function dayRollover(G){
   if(G.recipe)syncRecipe(G);
   G.fin=G.fin||[];var td=G.today||{};td.d=G.day-1;td.cash=Math.round(G.money);G.fin.push(td);if(G.fin.length>500)G.fin.shift();G.today={};chartDay(G,td);
   if(earthArchived(G))return;
-  if(!farmBuilt(G)&&G.tanks[0].had&&G.money<PACKS[0].cost&&G.tanks.every(function(t){return totalN(t)<1;})&&G.day-(G.stats.giftDay==null?-999:G.stats.giftDay)>=60){buyPackFree(G.tanks[0],0);G.stats.giftDay=G.day;log(G,'Grandma drops off 5 shrimp from her own tank. “Start again, it happens to everyone.”');}
+  if(!farmBuilt(G)&&(G.tanks[0].had||safeToStock(G,G.tanks[0]))&&G.money<PACKS[0].cost&&G.tanks.every(function(t){return totalN(t)<1;})&&G.day-(G.stats.giftDay==null?-999:G.stats.giftDay)>=60){var hadS=G.tanks[0].had;buyPackFree(G.tanks[0],0);G.stats.giftDay=G.day;log(G,hadS?'Grandma drops off 5 shrimp from her own tank. “Start again, it happens to everyone.”':'Grandma drops off 5 shrimp from her own tank. “Your water’s ready, these are on me.”');}
   var i,T,total=0,anyClutch=false;
   if(G.ac)pay(G,acKWh(G)*ELEC,'running');
   for(i=0;i<G.tanks.length;i++){
@@ -3131,7 +3131,7 @@ function musicKick(){if(!musicOn())return;if(!MUS.on){musicStart();return;}if(MU
 ['pointerup','touchend','click','keydown'].forEach(function(ev){document.addEventListener(ev,musicKick,true);});
 document.addEventListener('visibilitychange',function(){if(!MUS.ctx)return;if(document.hidden)MUS.ctx.suspend();else if(MUS.on){try{var r=MUS.ctx.resume();if(r&&r.catch)r.catch(function(){});}catch(e){}}});
 // If a newer version is published while the game is open, say so, so nobody plays old text for hours.
-function checkBuild(){if(!/^https?:/.test(location.protocol))return;try{fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():'';}).then(function(t){var m=t.match(/BUILD='([^']+)'/);if(m&&m[1]!==BUILD&&!$('newbuild')){var b=document.createElement('button');b.id='newbuild';b.className='newbuild';b.textContent='A newer version of the game is out. Tap to reload, your save stays.';b.onclick=function(){save();location.reload();};document.body.appendChild(b);}}).catch(function(){});}catch(e){}}
+function checkBuild(){if(!/^https?:/.test(location.protocol)||document.hidden)return;try{fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():'';}).then(function(t){var m=t.match(/BUILD='([^']+)'/);if(m&&m[1]!==BUILD&&!$('newbuild')){var b=document.createElement('button');b.id='newbuild';b.className='newbuild';b.textContent='A newer version of the game is out. Tap to reload, your save stays.';b.onclick=function(){save();location.reload();};document.body.appendChild(b);}}).catch(function(){});}catch(e){}}
 setTimeout(checkBuild,60000);setInterval(checkBuild,15*60000);
 var NOTE_LAST=0,NOTE_T=null;
 function updateNotes(){var Q=G&&G.notes;if(!Q||Q.seen>=Q.list.length)return;var e=$('noteflash');if(!e||!e.hidden||!$('newsflash').hidden)return;
@@ -3141,7 +3141,7 @@ function updateNotes(){var Q=G&&G.notes;if(!Q||Q.seen>=Q.list.length)return;var 
  e.hidden=false;e.classList.remove('on');void e.offsetWidth;e.classList.add('on');clearTimeout(NOTE_T);NOTE_T=setTimeout(function(){e.classList.remove('on');setTimeout(function(){if(!e.classList.contains('on'))e.hidden=true;},400);},8500);}
 function newsFlash(t){var e=$('newsflash');if(!e)return;var ne=$('noteflash');if(ne&&!ne.hidden){ne.classList.remove('on');ne.hidden=true;}setT('nf-head',t);e.hidden=false;e.classList.remove('on');void e.offsetWidth;e.classList.add('on');clearTimeout(NF);NF=setTimeout(function(){e.classList.remove('on');setTimeout(function(){if(!e.classList.contains('on'))e.hidden=true;},400);},9000);}
 var noticeQueue=[];function toast(msg){if(noticeQueue[noticeQueue.length-1]!==msg)noticeQueue.push(msg);if(!toastT)showNotice();}
-function showNotice(){if(!noticeQueue.length){toastT=null;return;}var msg=noticeQueue.shift(),e=$('toast');e.textContent=msg;e.classList.add('on');toastT=setTimeout(function(){e.classList.remove('on');toastT=null;showNotice();},msg.length>70?6000:2400);}
+function showNotice(){if(!noticeQueue.length||(renderMilestone.last==='tenyears'&&$('milestone-card')&&!$('milestone-card').hidden)){noticeQueue=[];toastT=null;return;}var msg=noticeQueue.shift(),e=$('toast');e.textContent=msg;e.classList.add('on');toastT=setTimeout(function(){e.classList.remove('on');toastT=null;showNotice();},msg.length>70?6000:2400);}
 
 var GAUGES=[
  {id:'nh',scope:'w',name:'Ammonia',unit:'ppm',min:0,max:1,ok:[0,0.05],warn:[0,0.25],dec:2,get:function(T){return ppm(T).nh;}},
@@ -5289,7 +5289,10 @@ document.addEventListener('visibilitychange',function(){
   if(msg){if(progressionBlocked(G)){if(CARD_HOLD==null)CARD_HOLD=speed;setSpeed(0);}render();toast(msg);save();}
 });
 function load(){
-  try{var r=localStorage.getItem(saveKey);if(r){var g=JSON.parse(r);if(g&&g.v===2&&g.tanks&&g.tanks.length)return migrate(g);}}catch(e){}
+  var r=null;try{r=localStorage.getItem(saveKey);}catch(e){}
+  if(r){try{var g=JSON.parse(r);if(g&&g.v===2&&g.tanks&&g.tanks.length)return migrate(g);}catch(e){if(window.console)console.error('Save did not load',e);}
+    // A save that fails to load is kept aside before the new game's autosave writes over it, so it can be recovered.
+    try{localStorage.setItem(saveKey+'-bak-'+Date.now(),r);}catch(e){}}
   return null;
 }
 function start(data){
