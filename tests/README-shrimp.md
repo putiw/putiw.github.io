@@ -769,6 +769,6 @@ Bots after: strong 2,651 (dictator ending), kind 3,301 (garden village), average
 
 ## Pass 101: racks open with 3 self-running tanks, first rack brings the own tank
 
-- Farm license now needs 10 kits sold and Tanks 1-3 each stocked with an auto feeder and auto water changer (no litre requirement). The guide points at whichever tank still needs automating.
+- Farm license now needs 50 kits sold and Tanks 1-3 each stocked with an auto feeder and auto water changer (no litre requirement). The guide points at whichever tank still needs automating.
 - The own-tank card ("The tank at home") comes with the first farm of any kind, not the first hatchery: extra tanks go to the farm, Tank 1 keeps its 20 best.
 - New balance check (59).
