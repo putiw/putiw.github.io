@@ -779,3 +779,4 @@ Bots after: strong 2,651 (dictator ending), kind 3,301 (garden village), average
 - Others plant too: people copy what they see (0.2% of all trees planted, a day; doubled by the Mangrove restoration project), a mangrove gala spends its money on seedlings (AED 4 each), and once shrimpcoin launches and pays more than a seedling costs, anyone with a coast plants for the coin as before. The card shows how fast others are planting.
 - Your trees planted before the coin earn honest coins a year after planting once it launches.
 - Balance checks updated (59).
+- Bots (they now fit auto water changers to every starter tank, since the license needs it): strong 2,648 (dictator), kind 3,305 (garden village), average first farm day 785 and Earth complete day 6,161; Space completes; spotlight sweep 127 clean.
