@@ -406,6 +406,14 @@ g.me=g.me||newMe();g.me.keep='self';for(var d=0;d<50;d++)careDay(g);var C=careOf
 var h=readyGame(),U=h.tanks[0];U.pop=[{n:5,age:120,g:30,b:1},{n:5,age:120,g:70}];var m0=h.money,r=cullPick(h,U,[{age:120,g:30,b:1},{age:120,g:70}]);if(r.n!==2||r.gave!==0||Math.round(totalN(U))!==8||U.pop.filter(function(k){return k.b;})[0].n!==4)throw Error('A bought one can be taken out');
 if(Math.abs(h.money-m0-(priceAt(30)+priceAt(70))*0.25)>0.01)throw Error('Bought and bred ones are both sold as culls');var V=readyGame().tanks[0];V.pop=[{n:10,age:90,g:50,b:1}];if(cullSample(V,12).length!==10)throw Error('Look over works from the first shrimp you buy');
 `);
+check('a cull look stands for the tank: 5 rounds to go through it, then once a month covers it all',`
+var g=readyGame(),T=g.tanks[0];T.pop=[{n:300,age:120,g:30},{n:500,age:120,g:70}];
+if(Math.round(cullEach(g,T,16))!==10)throw Error('Each of 16 stands for a fifth of 800 over 16: '+cullEach(g,T,16));
+var r=cullPick(g,T,[{age:120,g:30}],cullEach(g,T,16));if(r.n!==10||Math.round(T.pop[0].n)!==290)throw Error('One pick takes out about ten like it: '+r.n);
+for(var i=0;i<4;i++){if(cullState(g,T).done)throw Error('Not done before 5 rounds');cullRound(g,T);}if(cullState(g,T).round!==5)throw Error('Round 5 of 5');cullRound(g,T);
+var st=cullState(g,T);if(!st.done||st.share!==0.2||st.next!==30)throw Error('Gone through after 5, next full check in 30 days');
+g.day+=30;st=cullState(g,T);if(!st.monthly||st.share!==1)throw Error('After a month one look covers the whole tank');cullRound(g,T);if(!cullState(g,T).done)throw Error('Monthly check resets the clock');
+`);
 if(!html.includes('data-act="hc-cull"')||!html.includes("a==='hc-cull'")||!html.includes('function openCull(i)')||!html.includes("careBack(v,x,T,t);"))throw Error('Cull is a choice in Check shrimp, and the care jobs live in the tank');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

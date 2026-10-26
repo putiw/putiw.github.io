@@ -744,3 +744,9 @@ ammonia is only the primary button once ammonia is near zero.
 - The separate Cull button under the tank is gone; the care row (Gravel, Sponge, Trim, Pests) stays for the own-tank stage.
 - Short guide: a one-time spotlight on the tank once tank 1 has an auto feeder and water changer, plus a 3-step note inside the sheet until the first Treat or Cull.
 - Checked in Playwright: healthy pick then Cull (money up, colony colour shown), sick pick then Treat (cure screen), sick pick then Cull (illness note, Treat the tank works), tutorial spotlight fires. Balance 56, academy 10, me 45 pass.
+
+## Pass 98: cull looks stand for the whole tank
+
+- The 16 shrimp in Check shrimp stand for the tank. Going through a tank from scratch takes 5 looks, each covering a fifth of the adults, so each pick takes out about adults/5/16 shrimp of that colour and age. After the fifth look the tank is gone through; 30 days later one look covers all of it again (monthly maintenance). A look with nothing picked, or ending in Treat, still counts as a round.
+- The sheet shows "Round 2 of 5 to go through Tank 1. Each shrimp here stands for about 35 like it", or the monthly / gone-through note. Treat's subtitle now reads "If they're sick, find a cure".
+- New balance check (57). On the 5,590-shrimp save, 3 picks took out 104 for AED 95.
