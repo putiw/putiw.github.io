@@ -209,6 +209,7 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] Shrimp videos count as reach, not ego, so they don't push you away from Space.
 
 **Your own tank, Oct 26 (check these stay true)**
+- The header shrimp count is everyShrimp(G): tanks plus farmStock (shrimp waiting + about 60 days of hatchery output on the racks). Tap-hold title splits it. Farms can only be bought or sold, no mothball/restart (old saves with paused farms restart on load).
 - Culling lives inside Check shrimp: pick shrimp, tap Done looking, then choose Treat or Cull (with a ? that explains culling). The 16 you see stand for the tank: from scratch it takes 5 looks (CULL_ROUNDS), each covering a fifth, so each pick removes about adults/5/16 like it (cullEach). Once gone through, one look a month (CULL_MONTH) covers the whole tank. State is T.cull {cov, full}. Works from the first shrimp you buy. A one-time spotlight points at it once tank 1 has an auto feeder and auto water changer (G.opt.cullTour); the in-sheet 3-step guide shows until the first Treat or Cull (G.opt.cullGuided). Anything taken out there, bought or bred, sells as a cull. Normal selling never touches bought breeders.
 - From the first hatchery: one home tank with 20 shrimp, and Gravel, Sponge, Trim and Pests are optional. No alerts, guide steps or glowing buttons for them, ever. The mess shows in the tank, that's all.
 

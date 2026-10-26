@@ -750,3 +750,8 @@ ammonia is only the primary button once ammonia is near zero.
 - The 16 shrimp in Check shrimp stand for the tank. Going through a tank from scratch takes 5 looks, each covering a fifth of the adults, so each pick takes out about adults/5/16 shrimp of that colour and age. After the fifth look the tank is gone through; 30 days later one look covers all of it again (monthly maintenance). A look with nothing picked, or ending in Treat, still counts as a round.
 - The sheet shows "Round 2 of 5 to go through Tank 1. Each shrimp here stands for about 35 like it", or the monthly / gone-through note. Treat's subtitle now reads "If they're sick, find a cure".
 - New balance check (57). On the 5,590-shrimp save, 3 picks took out 104 for AED 95.
+
+## Pass 99: one shrimp count, no mothballing
+
+- The header count is every shrimp you own: tanks plus hatcheries (shrimp waiting to be packed and about 60 days of each running farm's output on the racks). Its title splits tanks and hatcheries. The +/day history restarts once on old saves so it doesn't jump.
+- Farms only have Buy and Sell now. Mothball and Restart are gone; an old save with mothballed farms restarts them on load. The end-of-game and sandbox notes say to sell farms you don't need.
