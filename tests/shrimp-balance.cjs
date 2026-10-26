@@ -397,5 +397,15 @@ var s=readyGame();s.emp.won=1;s.academy=s.academy||{};s.academy.papers=45;if(!sp
 `);
 if(!html.includes('id="after"')||!html.includes("showAfter(slab,stx,aft)")||!html.includes("if(pp&&pp.fk){showAfter(pp.name,pp.d,'');}"))throw Error('Decisions show what happened afterwards, in a popup');
 if(!html.includes("var renderInner=render;render=function(){var a=anchorGet();renderInner.apply(this,arguments);anchorFix(a);settleScan();};")||!html.includes('SETTLE_MS=500'))throw Error('The screen holds still under the finger and fresh decisions ignore taps for half a second');
+check('own tank keeps 20 shrimp, care builds up only then, culls never take bought breeders',`
+var g=readyGame(),T=g.tanks[0];T.pop=[{n:80,age:120,g:40},{n:30,age:120,g:80},{n:10,age:20,g:90}];g.emp.rawShrimp=0;
+careDay(g);if(T.care&&T.care.mulm>0)throw Error('No care chores before your own tank');
+var moved=keepTwenty(g);if(Math.round(totalN(T))!==20||Math.round(moved)!==100||g.emp.rawShrimp<99)throw Error('Twenty stay home, the rest go to the farm: '+totalN(T)+' '+moved);
+if(T.pop.some(function(k){return k.g===40;}))throw Error('The best coloured adults stay');
+g.me=g.me||newMe();g.me.keep='self';for(var d=0;d<50;d++)careDay(g);var C=careOf(T);if(C.mulm<0.9||C.grow<0.9||C.sponge<0.6)throw Error('Mulm, growth and sponge build up by themselves');
+var h=readyGame(),U=h.tanks[0];U.pop=[{n:5,age:120,g:30,b:1},{n:5,age:120,g:70}];var r=cullPick(h,U,[{age:120,g:30},{age:120,g:30}]);if(r.n!==2||Math.round(totalN(U))!==8||U.pop.filter(function(k){return k.b;})[0].n!==5)throw Error('Culls come from your own shrimp, never the bought ones');
+if(cullSample(U,12).length>3)throw Error('Only your own grown shrimp are looked over');
+`);
+if(!html.includes('data-care="look"')||!html.includes('function openCull(i)')||!html.includes("careBack(v,x,T,t);"))throw Error('Look over, and the care jobs live in the tank');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

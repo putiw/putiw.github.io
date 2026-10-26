@@ -286,7 +286,7 @@ th:first-child,td:first-child{text-align:left}
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:9;background:var(--surface);border-top:1px solid var(--line);
   padding:5px max(10px,env(safe-area-inset-right,0px)) calc(5px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
 .tabs-in{display:flex;gap:4px;width:100%;max-width:760px;margin:0 auto}
-.tabs button{flex:1 1 0;min-width:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:0;background:transparent;border-radius:9px;padding:5px 2px;font:600 12px var(--font-body);color:var(--ink-2);min-height:50px;cursor:pointer}.tabs svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}.tv{position:relative;border-radius:11px;overflow:hidden;border:1px solid var(--line);background:#a9d1d3;margin-bottom:8px;aspect-ratio:2.15/1;max-height:250px;width:100%}.tv canvas{display:block;width:100%;height:100%;touch-action:manipulation;cursor:default}.hc-tv canvas{cursor:pointer}.tv-cap{position:absolute;left:8px;bottom:6px;font:500 11px var(--font-body);background:rgba(251,248,241,.88);color:var(--ink-2);padding:2px 8px;border-radius:999px;pointer-events:none}.hc-tv{aspect-ratio:1.45/1;max-height:none;margin:8px 0}.hc-tv.small{aspect-ratio:2.4/1}body.story-intro #tankview{display:none}#tankview{cursor:zoom-in}#tankview.locked{cursor:grab;box-shadow:0 0 0 3px var(--accent)}#tankview.locked canvas{touch-action:none}body.tv-locked{overflow:hidden;overscroll-behavior:none}#tankview.locked .tv-cap{display:none}.tv-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:-2px 0 10px}.tv-acts[hidden]{display:none}.tv-acts .btn{display:flex;align-items:center;justify-content:center;gap:7px;min-height:42px;font-weight:600}
+.tabs button{flex:1 1 0;min-width:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:0;background:transparent;border-radius:9px;padding:5px 2px;font:600 12px var(--font-body);color:var(--ink-2);min-height:50px;cursor:pointer}.tabs svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}.tv{position:relative;border-radius:11px;overflow:hidden;border:1px solid var(--line);background:#a9d1d3;margin-bottom:8px;aspect-ratio:2.15/1;max-height:250px;width:100%}.tv canvas{display:block;width:100%;height:100%;touch-action:manipulation;cursor:default}.hc-tv canvas{cursor:pointer}.tv-cap{position:absolute;left:8px;bottom:6px;font:500 11px var(--font-body);background:rgba(251,248,241,.88);color:var(--ink-2);padding:2px 8px;border-radius:999px;pointer-events:none}.hc-tv{aspect-ratio:1.45/1;max-height:none;margin:8px 0}.hc-tv.small{aspect-ratio:2.4/1}body.story-intro #tankview{display:none}#tankview{cursor:zoom-in}#tankview.locked{cursor:grab;box-shadow:0 0 0 3px var(--accent)}#tankview.locked canvas{touch-action:none}body.tv-locked{overflow:hidden;overscroll-behavior:none}#tankview.locked .tv-cap{display:none}.tv-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:-2px 0 10px}.tv-acts[hidden]{display:none}.tv-care{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.tv-care .btn{min-height:36px;font-size:13px;font-weight:500}.tv-care .btn[hidden]{display:none}.tv-acts .btn{display:flex;align-items:center;justify-content:center;gap:7px;min-height:42px;font-weight:600}
 .pause-pill{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:30;border:1px solid var(--accent);background:var(--surface);color:var(--accent);font:600 13.5px var(--font-body);padding:8px 16px;border-radius:999px;white-space:nowrap;max-width:calc(100vw - 32px);box-shadow:0 4px 14px rgba(0,0,0,.15);cursor:pointer;animation:firstFeedPulse 1.6s ease-in-out infinite}.pause-pill[hidden]{display:none}body.pill-on #toast{bottom:calc(122px + env(safe-area-inset-bottom,0px))}body.paused-view #tankview canvas{filter:saturate(.55) brightness(.93);transition:filter .4s}
 .tv-dim{position:fixed;inset:0;z-index:40;background:color-mix(in srgb,var(--ink) 45%,transparent)}.tv-dim[hidden]{display:none}body.tv-locked #tankview,body.tv-locked #tv-lockbar{position:relative;z-index:41}body.tv-locked .tabs{z-index:42}body.tv-locked #tv-lockbar{background:var(--surface);border-radius:10px;padding:6px 8px}
 .tv-lockbar{display:flex;gap:6px;align-items:center;margin:-2px 0 10px}.tv-lockbar[hidden]{display:none}.tv-lockbar span{flex:1;font:500 12.5px/1.3 var(--font-body);color:var(--ink-2)}.tv-lockbar .btn{min-height:34px;padding:4px 12px}#tv-done{margin-left:auto}.treatrow{border-top:1px solid var(--line);margin-top:8px;padding-top:4px}#treatseg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}#treatseg .treat-t{position:relative;display:flex;flex-direction:column;align-items:center;padding:7px 4px;min-height:52px;text-align:center}#treatseg .treat-t b{font:600 13px/1.2 var(--font-body)}#treatseg .treat-t.on{background:var(--accent);border-color:var(--accent);color:#fff}#treatseg .treat-t.on small{color:rgba(255,255,255,.85)}#treatseg .btn small{display:block;font-size:11px;font-weight:400;color:var(--ink-2)}
@@ -428,7 +428,7 @@ main details:not(.card):not(.dream-tracker):not(#next-card)[open]>summary::befor
 </section>
 <!-- TANK -->
 <section class="panel" id="p-tank">
-  <div class="tv-dim" id="tv-dim" hidden></div><div class="tv" id="tankview"><canvas id="tv-canvas" aria-label="Your tank. Tap to look closer."></canvas><span class="tv-cap" id="tv-cap"></span></div><div class="tv-acts" id="tv-acts" hidden><button type="button" class="btn" id="tv-check"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15 15l5.5 5.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>Check shrimp</button><button type="button" class="btn" id="tv-clean"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="3" fill="#f2d35b" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="10" r="1.2" fill="currentColor"/><circle cx="13" cy="13.5" r="1.3" fill="currentColor"/><circle cx="17" cy="9.5" r="1" fill="currentColor"/><circle cx="9" cy="15" r=".9" fill="currentColor"/></svg>Clean tank</button></div><div class="tv-lockbar" id="tv-lockbar" hidden><span id="tv-lockhint">Drag on the glass to wipe the algae off.</span><button type="button" class="btn primary" id="tv-done">Done</button></div>
+  <div class="tv-dim" id="tv-dim" hidden></div><div class="tv" id="tankview"><canvas id="tv-canvas" aria-label="Your tank. Tap to look closer."></canvas><span class="tv-cap" id="tv-cap"></span></div><div class="tv-acts" id="tv-acts" hidden><button type="button" class="btn" id="tv-check"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15 15l5.5 5.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>Check shrimp</button><button type="button" class="btn" id="tv-clean"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="3" fill="#f2d35b" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="10" r="1.2" fill="currentColor"/><circle cx="13" cy="13.5" r="1.3" fill="currentColor"/><circle cx="17" cy="9.5" r="1" fill="currentColor"/><circle cx="9" cy="15" r=".9" fill="currentColor"/></svg>Clean tank</button><div class="tv-care" id="tv-care"><button type="button" class="btn" data-care="look">Look over</button><button type="button" class="btn" data-care="vac">Gravel</button><button type="button" class="btn" data-care="sponge">Sponge</button><button type="button" class="btn" data-care="trim">Trim</button><button type="button" class="btn" data-care="pest">Pests</button></div></div><div class="tv-lockbar" id="tv-lockbar" hidden><span id="tv-lockhint">Drag on the glass to wipe the algae off.</span><button type="button" class="btn primary" id="tv-done">Done</button></div>
   <div class="card coll" data-k="care" id="carecard" hidden><div class="hd"><h2>Care</h2><small id="care-sum"></small></div><div id="care-body"></div></div>
   <div class="card" id="recipecard" hidden><div class="hd"><h2>Recipe tank</h2><small id="recipe-n"></small></div>
     <p class="sub explain">One recipe for every tank. Changes below apply to all. Numbers are fleet totals or averages. Check the table for a single tank going wrong.</p><div id="recipe-one"></div></div>
@@ -1655,7 +1655,7 @@ function quietDay(G){if(G.emp.won||G.emp.ended||progressionBlocked(G)||earthArch
  markEvent(G);}
 function dayRollover(G){
   if(G.emp&&!G.emp.kitsOpened&&kitsOpen(G))G.emp.kitsOpened=1;
-  academyDay(G);rlDay(G);hardDay(G);coinDay(G);spaceDay(G);checkGoals(G);orderDay(G);kitOrderDay(G);personalDay(G);roundTwoDay(G);quietDay(G);
+  academyDay(G);rlDay(G);hardDay(G);careDay(G);coinDay(G);spaceDay(G);checkGoals(G);orderDay(G);kitOrderDay(G);personalDay(G);roundTwoDay(G);quietDay(G);
   if(G.ps&&G.day>30){var sp=dailySpend(G);if(sp>0){if(G.money<10*sp)G.ps.thin++;else if(G.money>120*sp)G.ps.fat++;}}
   if(G.recipe)syncRecipe(G);
   G.fin=G.fin||[];var td=G.today||{};td.d=G.day-1;td.cash=Math.round(G.money);G.fin.push(td);if(G.fin.length>500)G.fin.shift();G.today={};chartDay(G,td);
@@ -1973,7 +1973,7 @@ function milestoneConditions(G){var t=G.tanks[0],p=ppm(t);return Object.assign({
 function storyChoose(G,key,i){var E=G.emp,m=MILESTONES[key],ch=storyChoices(G,key);if(!m||!ch||!ch[i])return false;
  if(CARDS3[key]){if(!card3Choose(G,key,i))return false;(G.story.choices||(G.story.choices={}))[key]=i;log(G,m.title+': '+ch[i][0].toLowerCase());return true;}
  if(m.opts||m.dyn){if(!(m.opts?m.pick(G,i):byeChoose(G,m.dyn,i)))return false;(G.story.choices||(G.story.choices={}))[key]=i;log(G,m.title+': '+ch[i][0].toLowerCase());return true;}
- if(key==='owntank'){G.me.keep='self';retireTanks(G);G.sel=0;G.recipe=false;G.me.keepBase=(G.ps?G.ps.look+G.ps.treat:0)+G.me.happy+Math.floor((G.stats.wiped||0)/30);}
+ if(key==='owntank'){G.me.keep='self';retireTanks(G);keepTwenty(G);G.sel=0;G.recipe=false;G.me.keepBase=(G.ps?G.ps.look+G.ps.treat:0)+G.me.happy+Math.floor((G.stats.wiped||0)/30);}
  if(key==='me_burnout'&&i===1){G.me.burnt=0;G.me.heavy=2;G.me.bo=80;}
  if(key==='dye_offer'&&i===0){G.dye={on:1,day:Math.floor(G.day)};addHeart(G,-1);}
  if(key==='fight_invite'&&i===0){E.fight=1;addHeart(G,-1);}
@@ -2478,7 +2478,7 @@ function personalDay(G){var M=G.me;if(!M)return;var now=Math.floor(G.day);
  if(!M.cur&&now>=M.mNext&&rt>=M.mT&&!(M.gpSilent>now)){var c=MOMENTS.filter(function(m){return !M.done[m.id]&&m.req(G);});if(c.length){M.cur={id:c[0].id,t:rt,d:now};M.mNext=now+30;M.mT=rt+180000;}}}
 // Your own tank, after the industrial hatchery. Kept tanks get treats by hand, and happy treats that do nothing but make them happy.
 var HAPPY=[{id:'pea',name:'Blanched pea',cost:1,days:3},{id:'mulberry',name:'Mulberry leaf',cost:2,days:5},{id:'snow',name:'Snowflake food',cost:3,days:4}];
-function ownLevel(G){var M=G.me||{},d=(G.ps?G.ps.look+G.ps.treat:0)+(M.happy||0)+Math.floor((M.tq||0)*2)+Math.floor((G.stats.wiped||0)/30)-(M.keepBase||0);return d>=12?2:d>=3?1:0;}
+function ownLevel(G){var M=G.me||{},d=(G.ps?G.ps.look+G.ps.treat+Math.floor((G.ps.care||0)/2):0)+(M.happy||0)+Math.floor((M.tq||0)*2)+Math.floor((G.stats.wiped||0)/30)-(M.keepBase||0);return d>=12?2:d>=3?1:0;}
 function retireTanks(G){if(G.tanks.length<2)return 0;var n=0;G.tanks.slice(1).forEach(function(t){n+=totalN(t);});G.emp.rawShrimp=(G.emp.rawShrimp||0)+n;G.tanks=[G.tanks[0]];G.sel=0;G.recipe=false;log(G,'The farm takes the extra tanks and '+Math.round(n)+' shrimp. Your first tank stays on the shelf');return n;}
 function ownTank(G){return !!(G.me&&G.me.keep==='self');}
 function tankGone(G){return !!(G.me&&G.me.keep&&G.me.keep!=='self');}
@@ -3085,6 +3085,24 @@ function awayRun(G,sec,spd){
   if(G.day-d0<0.25&&!why)return null;
   return {days:G.day-d0,why:why,m0:m0,h0:h0,n0:n0};
 }
+// ----- Looking after your own tank by hand (from the first hatchery on, one tank at home) -----
+// Mulm settles in the gravel, the sponge clogs, plants and moss grow out, snails and flatworms turn up. Nothing
+// nags about it: you see it in the tank and do it if you want to. Every job done counts toward how the tank feels.
+function careOn(G){return !!(G.me&&G.me.keep==='self');}
+function careOf(T){if(!T.care)T.care={mulm:0,sponge:0,grow:0,pests:[],seed:Math.floor(Math.random()*1e6)};return T.care;}
+function careDay(G){if(!careOn(G))return;var T=G.tanks[0];if(!T)return;var C=careOf(T);
+ C.mulm=Math.min(1,C.mulm+1/45);C.sponge=Math.min(1,C.sponge+1/70);C.grow=Math.min(1,C.grow+1/35);
+ if(C.pests.length<10&&Math.random()<1/12)C.pests.push({k:Math.random()<0.6?'snail':'flat',x:0.06+Math.random()*0.8,y:0.3+Math.random()*0.62,s:Math.floor(Math.random()*1e6)});}
+function careDone(G,kind){if(G.ps)G.ps.care=(G.ps.care||0)+1;G.stats.care=(G.stats.care||0)+1;}
+// At the first hatchery the farm takes the other tanks; your own tank keeps 20 shrimp, the best coloured ones.
+function keepTwenty(G){var T=G.tanks[0];if(!T)return 0;var N=totalN(T);if(N<=20)return 0;var keep=20,pop=T.pop.slice().sort(function(a,b){return (b.age>=60)-(a.age>=60)||b.g-a.g;}),out=[];
+ pop.forEach(function(k){var n=Math.min(k.n,keep);if(n>=1){var c={};for(var q in k)c[q]=k[q];c.n=Math.floor(n);keep-=c.n;out.push(c);}});
+ var moved=N-out.reduce(function(t,k){return t+k.n;},0);T.pop=out;G.emp.rawShrimp=(G.emp.rawShrimp||0)+moved;T.clutches=[];log(G,'You keep 20 shrimp at home. The other '+Math.round(moved)+' go to the farm.');return moved;}
+// Look over a few shrimp and take out the ones you don't want. Shrimp you bought are breeders and stay.
+function cullSample(T,n){var pool=T.pop.filter(function(k){return !k.b&&k.age>=30&&k.n>=1;}),tot=pool.reduce(function(t,k){return t+k.n;},0),out=[];if(tot<1)return out;n=Math.min(n,Math.floor(tot));
+ for(var i=0;i<n;i++){var r=Math.random()*tot,acc=0,pick=pool[0];for(var j=0;j<pool.length;j++){acc+=pool[j].n;if(r<acc){pick=pool[j];break;}}out.push({age:pick.age,g:clamp(pick.g+(Math.random()-0.5)*8,0,100),male:Math.random()<0.5});}return out;}
+function cullPick(G,T,picks){var rev=0,n=0;picks.forEach(function(p){var best=null,bd=1e9;T.pop.forEach(function(k){if(k.b||k.n<1||k.age<30)return;var d=Math.abs(k.g-p.g)+Math.abs(k.age-p.age)/20;if(d<bd){bd=d;best=k;}});if(!best)return;best.n-=1;n++;rev+=priceAt(best.g)*ageFactor(best.age)*0.25;});
+ T.pop=T.pop.filter(function(k){return k.n>=0.01;});if(n){earn(G,rev,'shrimp');G.stats.sold+=n;G.stats.culled=(G.stats.culled||0)+n;if(G.ps)G.ps.look++;log(G,'Took out '+n+' shrimp you didn’t want'+(rev>=1?', sold as culls for AED '+Math.round(rev):''),T);}return {n:n,rev:rev};}
 // ==SIM-END==
 
 // ---------- UI ----------
@@ -3127,7 +3145,7 @@ function cost2(m,i){return (m?aed(m):'')+(m&&i?' + ':'')+(i?inf(i):'');}
 function trim(n,d){return String(+Number(n).toFixed(d));}
 // iPhone Safari moves its toolbar while you scroll and the fixed tab bar can end up floating above the bottom. Pin it to what's really on screen.
 (function(){var vv=window.visualViewport;if(!vv)return;var fix=function(){var t=document.querySelector('.tabs');if(!t)return;var off=window.innerHeight-(vv.height+vv.offsetTop);t.style.transform=Math.abs(off)>1&&vv.scale<=1.01?'translateY('+(-off)+'px)':'';};vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);window.addEventListener('scroll',fix,{passive:true});})();
-var toastT=null,NF=null,BUILD='2026-10-26-aftermath';
+var toastT=null,NF=null,BUILD='2026-10-26-owntank';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
@@ -3909,10 +3927,11 @@ function tvDrawShrimp(x,a,L,t){var I=TVIMG,h=L*TV_SH/TV_SW,water=a.surf==='water
 function tvDraw(v){var x=v.cv.getContext('2d'),W=v.W,H=v.H,T=v.tank,t=v.clk!=null?v.clk:performance.now()/1000;x.setTransform(v.dpr,0,0,v.dpr,0,0);x.clearRect(0,0,W,H);x.drawImage(tvBg(v,T),0,0,W,H);
  v.bub.forEach(function(b){x.strokeStyle='rgba(255,255,255,.8)';x.lineWidth=1;x.beginPath();x.arc(b.x,b.y,b.r,0,6.283);x.stroke();});
  x.fillStyle='#7a5230';v.food.forEach(function(f){x.globalAlpha=Math.max(0,f.a);x.beginPath();x.arc(f.x,f.y,2.2,0,6.283);x.fill();});x.globalAlpha=1;
- if(!TVREADY)return;var base=tvBase(v);
+ careBack(v,x,T,t);if(!TVREADY)return;var base=tvBase(v);
  v.dead.forEach(function(d){var P=d.pose||tvDeathPose(d.ms,d.sinkMs,d.dir),a=d.a,w=base*a.sc,h=w*TV_SH/TV_SW;x.save();x.globalAlpha=Math.max(0,P.alpha);x.translate(d.x0+P.sway*d.amp,d.y0+(d.ty-d.y0)*P.sink);x.rotate(d.ang+P.rot);x.scale(d.face,P.vs);x.drawImage(TVIMG.ld,-w/2,-h/2,w,h);x.drawImage(tvBody(a.male,a.g,false,'',1,a.hue,a.vg,a.sc<1),-w/2,-h/2,w,h);x.drawImage(TVIMG.t0,-w/2,-h/2,w,h);x.restore();});
  v.ag.slice().sort(function(a,b){return a.y-b.y;}).forEach(function(a){var L=base*a.sc;tvDrawShrimp(x,a,L,t);if(a.tapT&&t-a.tapT<0.8){x.save();x.globalAlpha=1-(t-a.tapT)/0.8;x.lineWidth=2;x.strokeStyle='#8a8170';x.beginPath();x.arc(a.x,a.y,L*0.5,0,6.283);x.stroke();x.restore();}
   if(a.mark){var h=L*TV_SH/TV_SW;x.save();x.lineWidth=2.5;x.strokeStyle=a.mark==='good'?'#2f7a45':a.mark==='bad'?'#b23a2e':a.mark==='missed'?'#b5651d':'#2d6a4f';if(a.mark==='missed')x.setLineDash([4,3]);x.beginPath();x.arc(a.x,a.y,L*0.52,0,6.283);x.stroke();x.restore();}});
+ careFront(v,x,T,t);
  if(T&&T.ice>0&&!v.opt.slow&&TVIMG.bottle){var bw=Math.min(W*0.3,150),bh=bw*91/220;x.save();x.globalAlpha=0.55+0.45*Math.min(1,T.ice);x.translate(W*0.32,H*0.22+bh*0.12+Math.sin(t*1.1)*1.5);x.rotate(Math.sin(t*0.7)*0.04);x.drawImage(TVIMG.bottle,-bw/2,-bh/2,bw,bh);x.restore();}
  if(T&&T.glass&&T.glass.length&&!v.opt.slow)x.drawImage(tvGlass(v,T),0,0,W,H);}
 function tvGlass(v,T){var W=v.W,H=v.H,k=(T.glassV||0)+'|'+W+'|'+H+'|'+v.dpr;if(v.glassC&&v.glassK===k&&v.glassT===T)return v.glassC;var c=v.glassC||document.createElement('canvas');c.width=W*v.dpr;c.height=H*v.dpr;var x=c.getContext('2d');x.setTransform(v.dpr,0,0,v.dpr,0,0);x.clearRect(0,0,W,H);
@@ -3932,18 +3951,20 @@ window.addEventListener('scroll',function(){tvAll(tvWake);if(SPOT&&SPOT.on&&SPOT
 window.addEventListener('resize',function(){tvAll(function(v){v.bgKey='';tvWake(v);});});
 // Main view on the Tank tab
 var TVM=null,TVLOCK=null;
-function tvActs(show){var el=$('tv-acts');if(!el)return;if(show==null)show=el.hidden;var T=G.tanks[G.sel];if(show&&(TVLOCK||(SPOT&&SPOT.on)||HC||SB||QCR||!T||(totalN(T)<1&&!(T.glass&&glassMean(T)>0.01))))show=false;el.hidden=!show;if(show){G.ob.looked=1;$('tv-check').disabled=totalN(T)<1;}}
-function tvLockOn(){if(TVLOCK||(SPOT&&SPOT.on)||HC||SB||QCR||!TVM)return;tvActs(false);
- TVLOCK={prev:speed};setSpeed(0);var tv=$('tankview');tv.classList.add('locked');document.body.classList.add('tv-locked');$('tv-lockbar').hidden=false;$('tv-dim').hidden=false;
+function tvActs(show){var el=$('tv-acts');if(!el)return;if(show==null)show=el.hidden;var T=G.tanks[G.sel];if(show&&(TVLOCK||(SPOT&&SPOT.on)||HC||SB||QCR||!T||(totalN(T)<1&&!(T.glass&&glassMean(T)>0.01))))show=false;el.hidden=!show;if(show){G.ob.looked=1;$('tv-check').disabled=totalN(T)<1;var own=careOn(G)&&G.sel===0,adults=T.pop.filter(function(k){return !k.b&&k.age>=30;}).reduce(function(t,k){return t+k.n;},0);document.querySelectorAll('#tv-care [data-care]').forEach(function(b){var k=b.dataset.care;b.hidden=k==='look'?adults<4:!own;});$('tv-care').hidden=adults<4&&!own;}}
+var CARE_HINT={glass:'Drag on the glass to wipe the algae off.',vac:'Drag along the gravel, the tube pulls up the dirt.',sponge:'Tap the sponge filter to squeeze it out.',trim:'Drag across anything that has grown too long.',pest:'Tap the snails and flatworms to pick them out.'};
+function tvLockOn(mode){if(TVLOCK||(SPOT&&SPOT.on)||HC||SB||QCR||!TVM)return;tvActs(false);mode=typeof mode==='string'?mode:'glass';
+ TVLOCK={prev:speed,mode:mode,gone:{},cuts:[],puffs:[],pops:[],did:0};setT('tv-lockhint',CARE_HINT[mode]||CARE_HINT.glass);setSpeed(0);var tv=$('tankview');tv.classList.add('locked');document.body.classList.add('tv-locked');$('tv-lockbar').hidden=false;$('tv-dim').hidden=false;
  setTimeout(function(){var r=tv.getBoundingClientRect(),top=(($('acts')&&$('acts').getBoundingClientRect().bottom)||80)+8;if(r.top<top||r.bottom>innerHeight-90)scrollBy({top:r.top-top,behavior:'auto'});tvAll(tvWake);},30);}
-function tvLockOff(){if(!TVLOCK)return;var p=TVLOCK.prev;TVLOCK=null;$('tankview').classList.remove('locked');document.body.classList.remove('tv-locked');$('tv-lockbar').hidden=true;$('tv-dim').hidden=true;setSpeed(p);tvAll(tvWake);}
+function tvLockOff(){if(!TVLOCK)return;var p=TVLOCK.prev;careFinish(TVLOCK);TVLOCK=null;$('tankview').classList.remove('locked');document.body.classList.remove('tv-locked');$('tv-lockbar').hidden=true;$('tv-dim').hidden=true;setSpeed(p);tvAll(tvWake);}
 function tvLockInit(){var cv=$('tv-canvas'),st=null;
- cv.addEventListener('pointerdown',function(e){if(!TVLOCK)return;e.preventDefault();try{cv.setPointerCapture(e.pointerId);}catch(_){}st={r:cv.getBoundingClientRect()};tvWipe(e.clientX-st.r.left,e.clientY-st.r.top);});
- cv.addEventListener('pointermove',function(e){if(TVLOCK&&st)tvWipe(e.clientX-st.r.left,e.clientY-st.r.top);});
- cv.addEventListener('pointerup',function(){if(!TVLOCK){var T0=G.tanks[G.sel];if(T0&&T0.ill&&!$('tv-acts').hidden&&!G.opt.hcDone)return;tvActs();return;}st=null;});
+ cv.addEventListener('pointerdown',function(e){if(!TVLOCK)return;e.preventDefault();try{cv.setPointerCapture(e.pointerId);}catch(_){}st={r:cv.getBoundingClientRect()};careAt(e.clientX-st.r.left,e.clientY-st.r.top,true);});
+ cv.addEventListener('pointermove',function(e){if(TVLOCK&&st)careAt(e.clientX-st.r.left,e.clientY-st.r.top,false);});
+ cv.addEventListener('pointerup',function(){if(TVLOCK)TVLOCK.prevPt=null;if(!TVLOCK){var T0=G.tanks[G.sel];if(T0&&T0.ill&&!$('tv-acts').hidden&&!G.opt.hcDone)return;tvActs();return;}st=null;});
  cv.addEventListener('pointercancel',function(){st=null;});
  $('tv-check').addEventListener('click',function(e){e.stopPropagation();tvActs(false);openHealth(G.sel);});
- $('tv-clean').addEventListener('click',function(e){e.stopPropagation();tvLockOn();});
+ $('tv-clean').addEventListener('click',function(e){e.stopPropagation();tvLockOn('glass');});
+ document.querySelectorAll('#tv-care [data-care]').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var k=b.dataset.care;if(k==='look'){tvActs(false);openCull(G.sel);}else tvLockOn(k);});});
  $('tv-done').addEventListener('click',function(e){e.stopPropagation();tvLockOff();});
  // Tap anywhere outside the tank to finish cleaning.
  $('tv-dim').addEventListener('click',function(e){e.stopPropagation();tvLockOff();});
@@ -3981,7 +4002,7 @@ function hcView(frozen){var cv=$('hc-canvas');if(!cv)return;if(!HCV||HCV.cv!==cv
 function hcTap(e){if(!HC||HC.step!=='find'||!HCV)return;var r=HCV.cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,base=tvBase(HCV),best=null,bd=1e9;
  HCV.ag.forEach(function(a){var w=base*a.sc,dx=px-a.x,dy=py-a.y,d=Math.sqrt(dx*dx+dy*dy)/(w*0.55);if(d<1&&d<bd){bd=d;best=a;}});
  if(best){best.cell.picked=!best.cell.picked;best.mark=best.cell.picked?'on':'';setT('hc-n',HC.cells.filter(function(c){return c.picked;}).length+' picked');}}
-function renderHealth(){if(!HC)return;var T=G.tanks[HC.i],ill=illById(HC.type),h='<div class="sheet-hd"><h2 id="hc-h">'+(HC.qc?'Quality check · look':'Health check · '+T.name)+'</h2><button type="button" class="rst" data-act="hc-close">Close</button></div>';
+function renderHealth(){if(!HC)return;if(HC.cull){renderCull();return;}var T=G.tanks[HC.i],ill=illById(HC.type),h='<div class="sheet-hd"><h2 id="hc-h">'+(HC.qc?'Quality check · look':'Health check · '+T.name)+'</h2><button type="button" class="rst" data-act="hc-close">Close</button></div>';
  var sickN=HC.cells.filter(function(c){return c.sick;}).length,got=HC.cells.filter(function(c){return c.sick&&c.picked;}).length,wrong=HC.cells.filter(function(c){return !c.sick&&c.picked;}).length;
  if(HC.step==='find'){h+='<p class="sub">'+(HC.qc?'Look over the shrimp you\u2019re about to pack. Tap any that look unwell, there may be none.':'Watch them for a bit and tap every shrimp that looks unwell. Healthy ones are an even colour, no white marks.')+'</p><div class="tv hc-tv"><canvas id="hc-canvas" aria-label="Your tank. Tap the shrimp that look sick."></canvas></div><div class="btns"><button class="btn primary" data-act="'+(HC.qc?'qc-look-done':'hc-done')+'">Done looking <small id="hc-n">'+HC.cells.filter(function(c){return c.picked;}).length+' picked</small></button></div>';}
  else if(HC.step==='cure'){HC.found=clamp(got/sickN-wrong*0.15,0,1);
@@ -4004,7 +4025,45 @@ function renderTankSheet(){if(!TS)return;var T=G.tanks[TS.i];if(!T){closeTankShe
  $('ts-in').innerHTML=h;}
 function closeTankSheet(){if(!TS)return;var i=TS.i,pv=TS.prev;TS=null;$('tsheet').hidden=true;setSpeed(Math.min(pv,maxSpeed(G)));lastChips='';render();
  setTimeout(function(){var ch=document.querySelector('#tankchips .tchip[data-sel="'+i+'"]')||$('tankchips');if(ch&&ch.getClientRects().length&&typeof spotlight==='function'){spotWatch.last=0;spotlight(ch,'Your tanks live here. Tap one to switch, everything below is for the tank you picked.');}},300);}
-function closeHealth(){cgStop();if(!HC&&!SB&&!QCR)return;if(HC&&!HC.qc&&(HC.result==='cured'||HC.result==='partial'))G.opt.hcDone=1;if(HC&&!HC.qc&&HC.result==='partial'&&G.tanks[HC.i]&&G.tanks[HC.i].ill)G.tanks[HC.i].ill.checked=Math.floor(G.day)+5;if(HC&&!HC.qc&&G.tanks[HC.i]&&G.tanks[HC.i].ill&&HC.result!=='cured')toast('They’re still sick. Tap the tank and check again soon.');var sp=QCR?QCR.prevSpeed:HC?HC.prevSpeed:SB.prevSpeed;HC=null;SB=null;QCR=null;cache.qch=null;if(HCV){var i=TVS.indexOf(HCV);if(i>=0)TVS.splice(i,1);HCV.on=false;HCV=null;}$('hcheck').hidden=true;setSpeed(sp);render();}
+function closeHealth(){cgStop();if(!HC&&!SB&&!QCR)return;if(HC&&!HC.qc&&!HC.cull&&(HC.result==='cured'||HC.result==='partial'))G.opt.hcDone=1;if(HC&&!HC.qc&&HC.result==='partial'&&G.tanks[HC.i]&&G.tanks[HC.i].ill)G.tanks[HC.i].ill.checked=Math.floor(G.day)+5;if(HC&&!HC.qc&&!HC.cull&&G.tanks[HC.i]&&G.tanks[HC.i].ill&&HC.result!=='cured')toast('They’re still sick. Tap the tank and check again soon.');var sp=QCR?QCR.prevSpeed:HC?HC.prevSpeed:SB.prevSpeed;HC=null;SB=null;QCR=null;cache.qch=null;if(HCV){var i=TVS.indexOf(HCV);if(i>=0)TVS.splice(i,1);HCV.on=false;HCV=null;}$('hcheck').hidden=true;setSpeed(sp);render();}
+
+// ----- Hands-on care in your own tank: the things you see, and the jobs that fix them -----
+function careH(i,s){var h=((i+1)*2654435761^(s+7)*40503)>>>0;h^=h>>>13;h=Math.imul(h,1274126177)>>>0;return (h%100000)/100000;}
+// fluff in the gravel, the long strands, as lists of things in tank coordinates (0..1)
+function careSpecks(C){var n=Math.round(C.mulm*80),o=[];for(var i=0;i<n;i++)o.push({i:i,x:0.03+careH(i,C.seed)*0.86,y:0.83+careH(i+500,C.seed)*0.14,r:1.6+careH(i+900,C.seed)*2.2});return o;}
+function careStrands(C){var n=Math.round(C.grow*12),o=[];for(var i=0;i<n;i++)o.push({i:i,x:0.05+careH(i+50,C.seed)*0.82,h:0.18+C.grow*0.36+careH(i+70,C.seed)*0.12,w:careH(i+90,C.seed)*6.28});return o;}
+function careBack(v,x,T,t){if(v!==TVM||!careOn(G)||G.tanks[0]!==T||!T.care)return;var C=T.care,W=v.W,H=v.H,L=TVLOCK&&TVLOCK.gone||{};
+ careStrands(C).forEach(function(s){if(L['s'+s.i])return;var bx=s.x*W,by=H*0.82,top=by-s.h*H;x.strokeStyle='#3f7a32';x.lineWidth=2;x.beginPath();x.moveTo(bx,by);for(var k=1;k<=8;k++){var f=k/8;x.lineTo(bx+Math.sin(t*0.8+s.w+f*3)*6*f,by-(by-top)*f);}x.stroke();
+  for(var k2=2;k2<=8;k2+=2){var f2=k2/8,lx=bx+Math.sin(t*0.8+s.w+f2*3)*6*f2,ly=by-(by-top)*f2;x.fillStyle=k2%4?'#5aa64a':'#4a943c';x.beginPath();x.ellipse(lx+4,ly,5,2.2,0.5,0,6.283);x.fill();x.beginPath();x.ellipse(lx-4,ly-2,5,2.2,-0.5,0,6.283);x.fill();}});
+ careSpecks(C).forEach(function(p){if(L['m'+p.i])return;x.fillStyle='rgba(92,66,38,.75)';x.beginPath();x.ellipse(p.x*W,p.y*H,p.r*1.6,p.r,0,0,6.283);x.fill();});
+ // the sponge goes brown as it clogs
+ if(C.sponge>0.05){x.fillStyle='rgba(110,78,40,'+(0.15+C.sponge*0.6).toFixed(2)+')';x.fillRect(W*0.905,H*0.6,W*0.06,H*0.18);}}
+function careFront(v,x,T,t){if(v!==TVM||!careOn(G)||G.tanks[0]!==T||!T.care)return;var C=T.care,W=v.W,H=v.H,M=TVLOCK;
+ C.pests.forEach(function(p,i){var px=p.x*W+Math.sin(t*0.2+i)*3,py=p.y*H;if(p.k==='snail'){x.fillStyle='#8a6a48';x.beginPath();x.arc(px,py,4.2,0,6.283);x.fill();x.strokeStyle='#5a3f26';x.lineWidth=1;x.beginPath();x.arc(px,py,2.2,0,5);x.stroke();x.fillStyle='#c9b38c';x.fillRect(px+3,py+1,4,2);}
+  else{x.strokeStyle='#e8e2d6';x.lineWidth=2.4;x.lineCap='round';x.beginPath();x.moveTo(px-5,py);x.quadraticCurveTo(px,py-2+Math.sin(t*3+i)*1.5,px+5,py);x.stroke();x.lineCap='butt';}});
+ if(!M||M.mode==='glass')return;
+ M.puffs=M.puffs.filter(function(p){p.a-=0.02;p.y-=0.5;p.r+=0.25;return p.a>0;});M.puffs.forEach(function(p){x.fillStyle='rgba(110,78,40,'+p.a.toFixed(2)+')';x.beginPath();x.arc(p.x,p.y,p.r,0,6.283);x.fill();});
+ M.cuts=M.cuts.filter(function(c){c.a-=0.012;c.y-=0.6;return c.a>0;});M.cuts.forEach(function(c){x.globalAlpha=c.a;x.strokeStyle='#4a943c';x.lineWidth=2;x.beginPath();x.moveTo(c.x,c.y);x.lineTo(c.x+8,c.y-10);x.stroke();x.globalAlpha=1;});
+ M.pops=M.pops.filter(function(c){c.a-=0.05;c.r+=0.8;return c.a>0;});M.pops.forEach(function(c){x.strokeStyle='rgba(255,255,255,'+c.a.toFixed(2)+')';x.lineWidth=1.5;x.beginPath();x.arc(c.x,c.y,c.r,0,6.283);x.stroke();});
+ if(M.pt&&M.mode==='vac'){x.fillStyle='rgba(220,235,240,.55)';x.strokeStyle='rgba(60,70,80,.6)';x.lineWidth=1.5;x.fillRect(M.pt[0]-7,0,14,M.pt[1]);x.strokeRect(M.pt[0]-7,0,14,M.pt[1]);}
+ if(M.pt&&M.mode==='trim'){x.strokeStyle='#555';x.lineWidth=2;x.beginPath();x.moveTo(M.pt[0]+4,M.pt[1]-14);x.lineTo(M.pt[0]-2,M.pt[1]);x.moveTo(M.pt[0]-6,M.pt[1]-14);x.lineTo(M.pt[0]+2,M.pt[1]);x.stroke();}}
+function careAt(px,py,down){var M=TVLOCK;if(!M)return;if(M.mode==='glass'){tvWipe(px,py);return;}var T=G.tanks[0],C=T&&careOf(T),W=TVM.W,H=TVM.H;if(!C)return;M.pt=[px,py];
+ if(M.mode==='vac'){careSpecks(C).forEach(function(p){if(M.gone['m'+p.i])return;if(Math.hypot(p.x*W-px,p.y*H-py)<Math.max(16,W*0.05)){M.gone['m'+p.i]=1;M.did++;M.puffs.push({x:p.x*W,y:p.y*H,r:3,a:0.6});}});}
+ else if(M.mode==='trim'){var a=M.prevPt||[px,py];careStrands(C).forEach(function(s){if(M.gone['s'+s.i])return;var bx=s.x*W,top=H*0.82-s.h*H;if(Math.min(a[0],px)-8<=bx&&Math.max(a[0],px)+8>=bx&&Math.max(a[1],py)>=top&&Math.min(a[1],py)<=H*0.8){M.gone['s'+s.i]=1;M.did++;M.cuts.push({x:bx,y:Math.min(Math.max(top,py),H*0.78),a:1});}});M.prevPt=[px,py];}
+ else if(M.mode==='sponge'&&down){if(px>W*0.88&&py>H*0.5){C.sponge=Math.max(0,C.sponge-0.2);M.did++;for(var k=0;k<5;k++)M.puffs.push({x:W*0.93+(Math.random()-0.5)*20,y:H*0.65+(Math.random()-0.5)*20,r:3+Math.random()*3,a:0.7});}}
+ else if(M.mode==='pest'&&down){var best=-1,bd=24;C.pests.forEach(function(p,i){var d=Math.hypot(p.x*W-px,p.y*H-py);if(d<bd){bd=d;best=i;}});if(best>=0){var q=C.pests.splice(best,1)[0];M.did++;M.pops.push({x:q.x*W,y:q.y*H,r:4,a:1});}}
+ tvWake(TVM);}
+function careFinish(M){if(!M||M.mode==='glass'||!M.did)return;var T=G.tanks[0],C=T&&careOf(T);if(!C)return;
+ if(M.mode==='vac'){var all=careSpecks(C).length,left=all-Object.keys(M.gone).filter(function(k){return k[0]==='m';}).length;C.mulm=all?C.mulm*left/all:0;}
+ if(M.mode==='trim'){var al=careStrands(C).length,lf=al-Object.keys(M.gone).filter(function(k){return k[0]==='s';}).length;C.grow=al?C.grow*lf/al:0;}
+ careDone(G,M.mode);}
+// Look over a few shrimp and take out the ones you don't want. Uses the health-check sheet.
+function openCull(i){var T=G.tanks[i];if(!T||HC||SB||QCR)return;var cells=cullSample(T,12).map(function(c){return {age:Math.max(75,c.age),g:c.g,male:c.male,sick:''};});if(cells.length<4){toast('Not enough grown shrimp to look over yet.');return;}
+ HC={i:i,cull:1,step:'find',prevSpeed:speed,cells:cells};setSpeed(0);$('hcheck').hidden=false;renderHealth();}
+function renderCull(){var T=G.tanks[HC.i],n=HC.cells.filter(function(c){return c.picked;}).length,h='<div class="sheet-hd"><h2 id="hc-h">Look over · '+T.name+'</h2><button type="button" class="rst" data-act="hc-close">Close</button></div>';
+ if(HC.step==='find')h+='<p class="sub">A few of your shrimp up close. Tap any you don’t want to keep, paler ones, odd ones out. They go to a shop as culls. Shrimp you bought stay.</p><div class="tv hc-tv"><canvas id="hc-canvas" aria-label="Some of your shrimp. Tap the ones you want to take out."></canvas></div><div class="btns"><button class="btn primary" data-act="cull-done">Take them out <small id="hc-n">'+n+' picked</small></button></div>';
+ else{var r=HC.res||{n:0,rev:0},avg=T.pop.reduce(function(t,k){return t+k.g*k.n;},0)/Math.max(1,totalN(T));h+='<p class="sub">'+(r.n?'You took out '+r.n+(r.n===1?' shrimp':' shrimp')+(r.rev>=1?', sold as culls for '+aed(r.rev):'')+'.':'You kept them all.')+' The colony’s colour is '+Math.round(avg)+' on average now.</p><div class="btns"><button class="btn primary" data-act="hc-close">Back to the tank</button></div>';}
+ $('hc-in').innerHTML=h;if(HC.step==='find'){HCV=null;hcView(false);var cv=$('hc-canvas');if(cv)cv.addEventListener('pointerdown',hcTap);}}
 // ----- Cure minigames: mineral pellets, a big water change with a net, a salt dip -----
 var CG=null;
 function cgBody(a){var look=a.look==='ok'?'':a.look;return tvBody(a.male,a.g||70,false,look,1,0);}
@@ -5232,6 +5291,7 @@ function initControls(){
     if(a==='kitstep'){if(kitStep(G,b.dataset.s))render();}
     if(a==='inspect'){openHealth(+b.dataset.i);return;}
     if(a==='hc-pick'){var cj=HC&&HC.cells[+b.dataset.j];if(cj){cj.picked=!cj.picked;renderHealth();}return;}
+    if(a==='cull-done'){if(HC&&HC.cull){var T0=G.tanks[HC.i],pk=HC.cells.filter(function(c){return c.picked;});HC.res=cullPick(G,T0,pk);HC.step='res';HC.result='cull';renderHealth();lastColSig='';}return;}
     if(a==='hc-done'){if(HC){HC.step=HC.cells.some(function(c){return c.sick;})?'cure':'clear';renderHealth();}return;}
     if(a==='hc-cure'){if(HC){var cc=b.dataset.c,cu=CURES.filter(function(x){return x.id===cc;})[0];if(!cu||G.money<cu.cost&&!gmPaysCure(G,cu.cost))return;if(cc==='minerals')openMolt();else if(cc==='water')openWC();else openSalt(HC.i,'ill');}return;}
     if(a==='dip'){openSalt(+b.dataset.i,'fresh');return;}

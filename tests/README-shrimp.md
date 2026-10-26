@@ -719,3 +719,8 @@ ammonia is only the primary button once ammonia is near zero.
 - Shrimpcoin: a tap plants 1.6M trees (AED 6.4M), about 5,000 taps for every coast (`COIN_BATCH`). Other planters go ten times slower (0.02% of people a day at most), so the coasts take years. Sell coins says why it's off (first coins in n days, or plant or buy first) and sells at least one coin.
 - Space opens after Earth for the curious path as before, and now also for anyone with 40+ papers or a research group (`spaceResearch`).
 - Bots: strong cold 2,703, strong kind 3,299, average Earth 6,217, Space 7,684, waiting 39 min. Spotlight sweep 135 clean, Space playthrough passes.
+
+## Pass 94: look over your shrimp, and your own tank by hand
+- Look over (any time, from the tank's buttons, once there are 4+ grown shrimp of your own): 12 of your shrimp, drawn from the real colony with their real colour, swim in the check sheet. Tap the ones you don't want and take them out. They're sold as culls (a quarter price), shrimp you bought never come up (`cullSample`, `cullPick`, `openCull`, `renderCull`, `HC.cull`).
+- At the first hatchery your own tank keeps 20 shrimp, the best coloured adults, and the rest go to the farm (`keepTwenty`, after `retireTanks`).
+- From then on mulm settles in the gravel, the sponge goes brown, plants and moss grow out and snails and flatworms turn up (`careDay`, `T.care`). You see it in the tank, nothing tells you to fix it: no alert, no guide, no glow. Gravel, Sponge, Trim and Pests sit next to Look over under the tank. Gravel: drag along the bottom, a tube pulls up the fluff. Sponge: tap it to squeeze it out. Trim: drag across what's grown long. Pests: tap them. Each job done counts toward how your own tank feels (`G.ps.care`, `ownLevel`).

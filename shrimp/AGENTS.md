@@ -208,6 +208,10 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] `BUILD` near `toast` changes with every release; an open game checks every 15 minutes and offers a reload when a newer one is live. Bump it when you ship.
 - [ ] Shrimp videos count as reach, not ego, so they don't push you away from Space.
 
+**Your own tank, Oct 26 (check these stay true)**
+- Look over is always there under the tank (4+ grown shrimp of your own). Bought shrimp never come up.
+- From the first hatchery: one home tank with 20 shrimp, and Gravel, Sponge, Trim and Pests are optional. No alerts, guide steps or glowing buttons for them, ever. The mess shows in the tank, that's all.
+
 **Last chapter and late game, Oct 26 (check these stay true)**
 - Decisions show what happened after, in a popup you have to close. The screen holds still under the finger when content above changes (`anchorGet`/`anchorFix` wrap `render`), and a decision button ignores taps for half a second after it appears or moves (`SETTLE`).
 - Shrimpcoin plants one stretch of coast per tap (`COIN_BATCH`, about 5,000 taps for every coast), others plant ten times slower, and Sell says why it's off. Space also opens for anyone with 40+ papers or a research group (`spaceResearch`).
