@@ -406,6 +406,6 @@ g.me=g.me||newMe();g.me.keep='self';for(var d=0;d<50;d++)careDay(g);var C=careOf
 var h=readyGame(),U=h.tanks[0];U.pop=[{n:5,age:120,g:30,b:1},{n:5,age:120,g:70}];var m0=h.money,r=cullPick(h,U,[{age:120,g:30,b:1},{age:120,g:70}]);if(r.n!==2||r.gave!==0||Math.round(totalN(U))!==8||U.pop.filter(function(k){return k.b;})[0].n!==4)throw Error('A bought one can be taken out');
 if(Math.abs(h.money-m0-(priceAt(30)+priceAt(70))*0.25)>0.01)throw Error('Bought and bred ones are both sold as culls');var V=readyGame().tanks[0];V.pop=[{n:10,age:90,g:50,b:1}];if(cullSample(V,12).length!==10)throw Error('Look over works from the first shrimp you buy');
 `);
-if(!html.includes('data-care="look"')||!html.includes('function openCull(i)')||!html.includes("careBack(v,x,T,t);"))throw Error('Look over, and the care jobs live in the tank');
+if(!html.includes('data-act="hc-cull"')||!html.includes("a==='hc-cull'")||!html.includes('function openCull(i)')||!html.includes("careBack(v,x,T,t);"))throw Error('Cull is a choice in Check shrimp, and the care jobs live in the tank');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

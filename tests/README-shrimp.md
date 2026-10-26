@@ -737,3 +737,10 @@ ammonia is only the primary button once ammonia is near zero.
 ## Pass 96: Cull button easier to find
 
 - "Look over" is renamed "Cull shrimp" and moved to sit directly under the tank, above the Check shrimp / Clean tank row that opens on a tap, so it can't end up below the fold under that row.
+
+## Pass 97: Cull moves into Check shrimp
+
+- Check shrimp now samples real shrimp. Pick any, tap Done looking, then choose Treat (the old cure flow, or "everyone is healthy") or Cull (sells them as culls). A ? next to Cull says how culling lifts the colony's colour over time. Culling sick ones leaves the illness in the tank and offers Treat after.
+- The separate Cull button under the tank is gone; the care row (Gravel, Sponge, Trim, Pests) stays for the own-tank stage.
+- Short guide: a one-time spotlight on the tank once tank 1 has an auto feeder and water changer, plus a 3-step note inside the sheet until the first Treat or Cull.
+- Checked in Playwright: healthy pick then Cull (money up, colony colour shown), sick pick then Treat (cure screen), sick pick then Cull (illness note, Treat the tank works), tutorial spotlight fires. Balance 56, academy 10, me 45 pass.
