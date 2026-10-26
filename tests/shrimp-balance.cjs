@@ -353,11 +353,12 @@ const storyData={window:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirna
 if(!storyData.window.ENDING_TEST_DATA.forks.find(x=>x.id==='kids').options[1].label.includes('no ads to kids'))throw Error('Kids sponsorship choice should make its distinction clear');
 check('time away stops when a tank gets sicker or loses shrimp, and pain cards always leave one way out',`
 var g=readyGame(),T=g.tanks[0];g.emp.won=0;T.pop=[{n:100,age:60,sex:'f'}];T.ill=null;
-var day=0,mode='sick';stepGame=function(G){G.day+=0.25;day++;if(mode==='sick'&&day===8)T.ill={type:'bact',day:G.day,days:0,frac:0.2,st:2};if(mode==='die')T.pop[0].n-=2;if(mode==='sell'){T.pop[0].n-=2;G.stats.sold=(G.stats.sold||0)+2;}return true;};
+var day=0,mode='sick';stepGame=function(G){G.day+=0.25;day++;if(mode==='sick'&&day===8)T.ill={type:'bact',day:G.day,days:0,frac:0.2,st:2};if(mode==='die'){T.pop[0].n-=2;G.stats.died=(G.stats.died||0)+2;}if(mode==='pack')T.pop[0].n-=2;if(mode==='again'&&day===4)T.ill={type:'bact',day:G.day,days:0,frac:0.2,st:2};return true;};
 maxSpeed=function(){return 4;};
 var r=awayRun(g,3600,4);if(!r||!r.why||!/got sick/.test(r.why)||r.days>3)throw Error('Away time should stop when a tank gets sick: '+JSON.stringify(r));
 mode='die';day=0;T.ill=null;T.pop=[{n:100,age:60,sex:'f'}];r=awayRun(g,3600,4);if(!r||!/dying/.test(r.why)||totalN(T)<80)throw Error('Away time should stop when shrimp die: '+JSON.stringify(r));
-mode='sell';day=0;T.pop=[{n:100,age:60,sex:'f'}];var d0=g.day;r=awayRun(g,3600,4);if(!r||r.why||Math.round(g.day-d0)!==30)throw Error('A quiet tank gets the full 30 days: '+JSON.stringify(r));
+mode='pack';day=0;T.pop=[{n:100,age:60,sex:'f'}];var d0=g.day;r=awayRun(g,3600,4);if(!r||r.why||Math.round(g.day-d0)!==30)throw Error('A quiet tank gets the full 30 days: '+JSON.stringify(r));
+mode='again';day=0;T.pop=[{n:100,age:60,sex:'f'}];T.ill={type:'bact',day:-50,days:9,frac:0.2,st:2};r=awayRun(g,3600,4);if(!r||!/got sick /.test(r.why))throw Error('A new illness at the same stage should stop away time: '+JSON.stringify(r));
 if(awayRun(g,30,4)!==null||awayRun(g,3600,0)!==null)throw Error('Short gaps and a paused game get no away time');
 var h=readyGame();h.money=-1;var ids=Object.keys(PAINS);ids.forEach(function(id){var ok=PAINS[id].ch.some(function(c,i){var x=JSON.parse(JSON.stringify(h));return painPick(x,id,i);});if(!ok)throw Error('Pain card '+id+' has no choice at AED -1');});
 h.money=1e9;if(!painPick(JSON.parse(JSON.stringify(h)),ids[0],PAINS[ids[0]].ch.length-1))throw Error('Pain choices still work with money');
@@ -366,6 +367,7 @@ var reset=migrate(newGame());if(!reset.progress.v8)throw Error('A fresh migrated
 if(!html.includes('G=migrate(newGame());seenNew=null;'))throw Error('Start over must build the game the same way a first load does');
 if(!html.includes("['pointerup','touchend','click','keydown'].forEach(function(ev){document.addEventListener(ev,musicKick,true);});"))throw Error('Sound must unlock on finger-up taps and retry on every tap');
 if(!/function save\(force\)\{if\(document\.hidden&&!force\)return;/.test(html)||!html.includes('catchUp(G,(Date.now()-at)/1000,speed)'))throw Error('No saving while hidden, and coming back from the background catches up');
+if(!html.includes("else if(c.stop)setSpeed(0);")||!html.includes('if(cu.stop)G.savedSpeed=0;')||!html.includes('if(document.hidden)HIDDEN_AT=Date.now();')||!html.includes('Date.now()-MUS.fail>60000'))throw Error('A stopped catch-up pauses the game, a page loaded hidden still catches up, and failed sound loads back off');
 check('Grandma helps a player who spent everything before the first shrimp',`
 var g=readyGame(),T=g.tanks[0];g.progress.queue=[];T.cycledAt=1;safeToStock=function(){return true;};g.money=5;g.stats.giftDay=null;T.had=0;
 for(var i=0;i<12;i++){g.progress.queue=[];g.money=5;stepGame(g);}

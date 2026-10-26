@@ -3058,13 +3058,14 @@ function styleTop(G){var v=styleVals(G),best=null;['complete','method','steady']
 function awayRun(G,sec,spd){
   spd=Math.min(spd||0,maxSpeed(G));if(!(spd>0)||!(sec>60))return null;
   var steps=Math.floor(Math.min(30,sec*spd/(0.6*4))*4),m0=G.money,h0=G.humans,n0=allN(G),d0=G.day,why=null;
-  var st0=G.tanks.map(function(T){return illStage(T);}),so0=G.stats.sold||0;
+  var st0=G.tanks.map(function(T){return illStage(T);}),id0=G.tanks.map(function(T){return T.ill?T.ill.day:null;}),dd0=G.stats.died||0;
   for(var i=0;i<steps&&!why;i++){
     if(!stepGame(G)||progressionBlocked(G))break;
     for(var k=0;k<st0.length&&k<G.tanks.length;k++){var T=G.tanks[k],s1=illStage(T);
-      if(s1>=2&&s1>st0[k]){why=T.name+(st0[k]?' got sicker':' got sick')+' while you were away, so time stopped there.';break;}
+      if(s1>=2&&(s1>st0[k]||(T.ill&&T.ill.day!==id0[k]))){why=T.name+(st0[k]&&T.ill&&T.ill.day===id0[k]?' got sicker':' got sick')+' while you were away, so time stopped there.';break;}
 }
-    if(!why&&n0>=10&&allN(G)+(G.stats.sold||0)-so0<n0*0.85)why='Shrimp were dying, so time stopped there.';
+    // dying = many deaths and fewer shrimp than before (babies die and old shrimp go all the time in a healthy tank, and packing kits takes shrimp out)
+    if(!why&&n0>=10&&(G.stats.died||0)-dd0>n0*0.15&&allN(G)<n0*0.9)why='Shrimp were dying, so time stopped there.';
   }
   if(G.day-d0<0.25&&!why)return null;
   return {days:G.day-d0,why:why,m0:m0,h0:h0,n0:n0};
@@ -3115,7 +3116,7 @@ var toastT=null,NF=null,BUILD='2026-10-26-prelaunch';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
-function setMute(off){try{localStorage.setItem('shrimp-music',off?'0':'1');}catch(e){}if(off)musicStop();else musicStart();syncMute();}
+function setMute(off){try{localStorage.setItem('shrimp-music',off?'0':'1');}catch(e){}if(off)musicStop();else{MUS.fail=0;musicStart();}syncMute();}
 function syncMute(){var b=document.getElementById('tb-mute');if(!b)return;var on=musicOn();b.classList.toggle('muted',!on);b.setAttribute('aria-pressed',String(!on));b.setAttribute('aria-label',on?'Sound on, tap to mute':'Muted, tap for sound');var t=document.getElementById('t-music');if(t)t.checked=on;}
 function musicOn(){try{return localStorage.getItem('shrimp-music')!=='0';}catch(e){return true;}}
 function musLoad(c,url){return fetch(url).then(function(r){return r.arrayBuffer();}).then(function(a){return new Promise(function(ok,no){c.decodeAudioData(a,ok,no);});});}
@@ -3123,11 +3124,11 @@ function musPlay(c,b,dest,at,off,vol,fade){var len=Math.max(0.4,b.duration-off),
 function musLoop(c,b,dest,o){var stop=false,timer=0,at=c.currentTime+0.05,off=o.start%b.duration;var tick=function(){if(stop)return;while(at<c.currentTime+o.ahead){var len=musPlay(c,b,dest,at,off,o.vol,o.fade);at+=Math.max(1,len-o.fade);off=0;}timer=setTimeout(tick,Math.max(500,o.fade*350));};tick();return {stop:function(){stop=true;clearTimeout(timer);}};}
 function musicStart(){if(!musicOn()||MUS.on)return;try{var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!MUS.ctx){var c=new AC(),m=c.createGain(),bus=c.createGain();m.gain.value=0.82;bus.gain.value=0.5;bus.connect(m);m.connect(c.destination);MUS.ctx=c;MUS.bus=bus;}
  MUS.on=true;var c2=MUS.ctx;if(c2.state==='suspended')c2.resume();
- (MUS.bufs?Promise.resolve(MUS.bufs):Promise.all([musLoad(c2,'water.mp3'),musLoad(c2,'music.mp3')]).then(function(b){MUS.bufs=b;return b;})).then(function(b){if(!MUS.on)return;MUS.loops.push(musLoop(c2,b[0],MUS.bus,{vol:0.4,fade:4.8,start:1.7,ahead:14}),musLoop(c2,b[1],MUS.bus,{vol:0.16,fade:2.2,start:0.6,ahead:7}));}).catch(function(){MUS.on=false;});}catch(e){MUS.on=false;}}
+ (MUS.bufs?Promise.resolve(MUS.bufs):Promise.all([musLoad(c2,'water.mp3'),musLoad(c2,'music.mp3')]).then(function(b){MUS.bufs=b;return b;})).then(function(b){if(!MUS.on)return;MUS.loops.push(musLoop(c2,b[0],MUS.bus,{vol:0.4,fade:4.8,start:1.7,ahead:14}),musLoop(c2,b[1],MUS.bus,{vol:0.16,fade:2.2,start:0.6,ahead:7}));}).catch(function(){MUS.on=false;MUS.fail=Date.now();});}catch(e){MUS.on=false;MUS.fail=Date.now();}}
 function musicStop(){MUS.on=false;MUS.loops.forEach(function(l){l.stop();});MUS.loops=[];if(MUS.ctx){MUS.ctx.close();MUS.ctx=null;}}
 // iPhone Safari only unlocks audio when a finger lifts (touchend/click), not when it lands, and refuses resume() outside
 // a tap. So every tap checks: start the sound if it should be on, or wake a context the phone left suspended.
-function musicKick(){if(!musicOn())return;if(!MUS.on){musicStart();return;}if(MUS.ctx&&MUS.ctx.state!=='running'&&!document.hidden){try{var r=MUS.ctx.resume();if(r&&r.catch)r.catch(function(){});}catch(e){}}}
+function musicKick(){if(!musicOn())return;if(!MUS.on){if(!MUS.fail||Date.now()-MUS.fail>60000)musicStart();return;}if(MUS.ctx&&MUS.ctx.state!=='running'&&!document.hidden){try{var r=MUS.ctx.resume();if(r&&r.catch)r.catch(function(){});}catch(e){}}}
 ['pointerup','touchend','click','keydown'].forEach(function(ev){document.addEventListener(ev,musicKick,true);});
 document.addEventListener('visibilitychange',function(){if(!MUS.ctx)return;if(document.hidden)MUS.ctx.suspend();else if(MUS.on){try{var r=MUS.ctx.resume();if(r&&r.catch)r.catch(function(){});}catch(e){}}});
 // If a newer version is published while the game is open, say so, so nobody plays old text for hours.
@@ -5277,16 +5278,16 @@ function save(force){if(document.hidden&&!force)return;try{G.savedAt=Date.now();
 // tank gets sicker or loses shrimp, so nobody comes back to a tank that died while nothing could warn them.
 function catchUp(G,sec,spd){
   var r=awayRun(G,sec,spd);if(!r)return null;
-  var msg='While you were away, '+Math.round(r.days)+' days passed. Cash '+(G.money>=r.m0?'+':'−')+aed(Math.abs(G.money-r.m0))+(G.humans>r.h0?', +'+big(G.humans-r.h0)+' owners':'')+', shrimp '+Math.round(r.n0)+' → '+Math.round(allN(G))+'.'+(r.why?' '+r.why:'');
-  log(G,msg);return msg;
+  var msg='While you were away, '+Math.round(r.days)+' days passed. Cash '+(G.money>=r.m0?'+':'−')+aed(Math.abs(G.money-r.m0))+(G.humans>r.h0?', +'+big(G.humans-r.h0)+' owners':'')+', shrimp '+Math.round(r.n0)+' → '+Math.round(allN(G))+'.'+(r.why?' '+r.why+' The game is paused so you can look.':'');
+  log(G,msg);return {msg:msg,stop:!!r.why};
 }
 var HIDDEN_AT=null;
 document.addEventListener('visibilitychange',function(){
   if(!G)return;
   if(document.hidden){HIDDEN_AT=Date.now();save(true);return;}
   var at=HIDDEN_AT;HIDDEN_AT=null;if(at==null||!speed)return;
-  var msg=catchUp(G,(Date.now()-at)/1000,speed);lastT=0;acc=0;
-  if(msg){if(progressionBlocked(G)){if(CARD_HOLD==null)CARD_HOLD=speed;setSpeed(0);}render();toast(msg);save();}
+  var c=catchUp(G,(Date.now()-at)/1000,speed);lastT=0;acc=0;checkBuild();
+  if(c){if(progressionBlocked(G)){if(CARD_HOLD==null)CARD_HOLD=speed;setSpeed(0);}else if(c.stop)setSpeed(0);render();toast(c.msg);save();}
 });
 function load(){
   var r=null;try{r=localStorage.getItem(saveKey);}catch(e){}
@@ -5302,14 +5303,14 @@ function start(data){
   var away=null;
   if(fromStore&&G.savedAt&&G.savedSpeed>0){
     var sec=(Date.now()-G.savedAt)/1000;
-    if(sec>60)away=catchUp(G,sec,G.savedSpeed);
+    if(sec>60){var cu=catchUp(G,sec,G.savedSpeed);if(cu){away=cu.msg;if(cu.stop)G.savedSpeed=0;}}
   }
   if(fromStore&&G.savedSpeed!=null)speed=Math.min(G.savedSpeed,maxSpeed(G));
   if(!G.ob.bottle&&!G.opt.all)speed=0;if(G.progress&&G.progress.home)activeTab=G.progress.home;if(fromStore&&G.opt.lastTab&&G.ob.bottle)activeTab=G.opt.lastTab;
   buildGauges();initParameterTooltips();initControls();initProgressionControls();initChartEvents();syncControls();setSpeed(speed);
   if(window.claude&&window.claude.hot&&window.claude.hot.snapshot)window.claude.hot.snapshot(function(){return{G:G};});
   detectMilestones(G);if(progressionBlocked(G))setSpeed(0);selectTab(activeTab);render();var ltb=document.querySelector('.tabs [data-tab="'+activeTab+'"]');if(activeTab!=='me'&&activeTab!=='tank'&&(!ltb||ltb.hidden)){selectTab('tank');render();}requestAnimationFrame(tick);
-  if(away)toast(away);
+  if(away)toast(away);if(document.hidden)HIDDEN_AT=Date.now();
   setInterval(render,250);setInterval(save,5000);
   window.addEventListener('pagehide',function(){save(true);});
 }
