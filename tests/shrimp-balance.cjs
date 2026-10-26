@@ -403,8 +403,8 @@ careDay(g);if(T.care&&T.care.mulm>0)throw Error('No care chores before your own 
 var moved=keepTwenty(g);if(Math.round(totalN(T))!==20||Math.round(moved)!==100||g.emp.rawShrimp<99)throw Error('Twenty stay home, the rest go to the farm: '+totalN(T)+' '+moved);
 if(T.pop.some(function(k){return k.g===40;}))throw Error('The best coloured adults stay');
 g.me=g.me||newMe();g.me.keep='self';for(var d=0;d<50;d++)careDay(g);var C=careOf(T);if(C.mulm<0.9||C.grow<0.9||C.sponge<0.6)throw Error('Mulm, growth and sponge build up by themselves');
-var h=readyGame(),U=h.tanks[0];U.pop=[{n:5,age:120,g:30,b:1},{n:5,age:120,g:70}];var m0=h.money,r=cullPick(h,U,[{age:120,g:30,b:1},{age:120,g:70}]);if(r.n!==2||r.gave!==1||Math.round(totalN(U))!==8||U.pop.filter(function(k){return k.b;})[0].n!==4)throw Error('A bought one can be taken out, and it is given away');
-if(h.money-m0>priceAt(70)*0.3)throw Error('Only the bred one is sold');var V=readyGame().tanks[0];V.pop=[{n:10,age:90,g:50,b:1}];if(cullSample(V,12).length!==10)throw Error('Look over works from the first shrimp you buy');
+var h=readyGame(),U=h.tanks[0];U.pop=[{n:5,age:120,g:30,b:1},{n:5,age:120,g:70}];var m0=h.money,r=cullPick(h,U,[{age:120,g:30,b:1},{age:120,g:70}]);if(r.n!==2||r.gave!==0||Math.round(totalN(U))!==8||U.pop.filter(function(k){return k.b;})[0].n!==4)throw Error('A bought one can be taken out');
+if(Math.abs(h.money-m0-(priceAt(30)+priceAt(70))*0.25)>0.01)throw Error('Bought and bred ones are both sold as culls');var V=readyGame().tanks[0];V.pop=[{n:10,age:90,g:50,b:1}];if(cullSample(V,12).length!==10)throw Error('Look over works from the first shrimp you buy');
 `);
 if(!html.includes('data-care="look"')||!html.includes('function openCull(i)')||!html.includes("careBack(v,x,T,t);"))throw Error('Look over, and the care jobs live in the tank');
 console.log(count+' focused balance and migration checks passed');
