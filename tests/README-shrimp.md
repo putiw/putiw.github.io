@@ -772,3 +772,10 @@ Bots after: strong 2,651 (dictator ending), kind 3,301 (garden village), average
 - Farm license now needs 50 kits sold and Tanks 1-3 each stocked with an auto feeder and auto water changer (no litre requirement). The guide points at whichever tank still needs automating.
 - The own-tank card ("The tank at home") comes with the first farm of any kind, not the first hatchery: extra tanks go to the farm, Tank 1 keeps its 20 best.
 - New balance check (59).
+
+## Pass 102: mangroves from 10,000 kits, one tree a tap
+
+- The Shrimpcoin card now opens as "Mangroves" at 10,000 kits sold (about year 3-4), long before the coin. A tap plants one seedling for AED 4.
+- Others plant too: people copy what they see (0.2% of all trees planted, a day; doubled by the Mangrove restoration project), a mangrove gala spends its money on seedlings (AED 4 each), and once shrimpcoin launches and pays more than a seedling costs, anyone with a coast plants for the coin as before. The card shows how fast others are planting.
+- Your trees planted before the coin earn honest coins a year after planting once it launches.
+- Balance checks updated (59).

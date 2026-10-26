@@ -389,10 +389,10 @@ var n=readyGame();n.emp.hard={open:1,goal:'home',picks:{}};migrate(n);if(n.emp.h
 `);
 if(!html.includes("data-act=\"hard-next\"")||!html.includes("Before the groups, decide what “everyone” means.")||!html.includes("move('lab-card','up',false);")||!html.includes("wrap.hidden=true;$('p-up').appendChild(wrap)")||!html.includes("salesOpen(G)&&!salesDone(G)"))throw Error('Hard part walk-through, no lab certification, no home-tank gear after hatcheries, no idle Sales card');
 if(/' of '\+l\.finds\.length\+' found/.test(html))throw Error('Research has no total to find');
-check('Shrimpcoin plants a stretch of coast per tap and others plant slowly, research opens Space',`
+check('one tree a tap, others plant slowly for the coin, research opens Space',`
 var g=readyGame();g.humans=4e9;var C=coinOf(g);C.on=1;C.honest=1;C.price=30;g.money=1e12;
-if(coinPlantBatch(g)!==COIN_BATCH*COIN_TREE||COIN_COAST/COIN_BATCH<4900)throw Error('About 5,000 taps to fill the coasts');
-for(var d=0;d<30;d++){g.day+=1;coinDay(g);}if((C.otrees||0)>0.0002*3*g.humans*30+1)throw Error('Others plant at most 0.06% of people a day');
+if(coinPlantBatch(g)!==COIN_TREE)throw Error('One tree a tap');
+for(var d=0;d<30;d++){g.day+=1;coinDay(g);}if((C.otrees||0)>0.0002*3*g.humans*30*1.2+1)throw Error('Others plant at most 0.06% of people a day');
 var s=readyGame();s.emp.won=1;s.academy=s.academy||{};s.academy.papers=45;if(!spaceOpen(s))throw Error('Years of research should open Space after Earth');s.academy.papers=3;s.academy.level=1;treesFor=function(){return [];};if(spaceOpen(s))throw Error('Without research or the curious path, no Space');
 `);
 if(!html.includes('id="after"')||!html.includes("showAfter(slab,stx,aft)")||!html.includes("if(pp&&pp.fk){showAfter(pp.name,pp.d,'');}"))throw Error('Decisions show what happened afterwards, in a popup');
@@ -423,7 +423,9 @@ storyChoose(g,'owntank',0);if(g.tanks.length!==1||Math.round(totalN(g.tanks[0]))
 check('old mothballed farms are sold at salvage, tree planting fits spare cash',`
 var g=readyGame();g.emp.farms={rack:3};g.emp.farmPaid={rack:[2000,2200,2400]};g.emp.pausedFarms={rack:2};var m0=g.money;migrate(g);
 if(g.emp.farms.rack!==1||Object.keys(g.emp.pausedFarms).length||!(g.money>m0))throw Error('Two mothballed racks sold, one keeps running: '+g.emp.farms.rack);
-var h=readyGame();h.money=1000+capitalReserve(h);if(coinPlantBatch(h)>1000||coinPlantBatch(h)<COIN_TREE)throw Error('A tap plants what spare cash can pay for: '+coinPlantBatch(h));
+var h=readyGame();h.money=1e6;h.kits.sold=9999;if(treesOpen(h)||coinPlant(h,COIN_TREE))throw Error('Mangroves wait for 10,000 kits');h.kits.sold=1e4;if(!treesOpen(h)||coinPlant(h,coinPlantBatch(h))!==1)throw Error('Then one tree a tap, before any coin');
+var C=coinOf(h);C.trees=1000;for(var d=0;d<100;d++){h.day++;coinDay(h);}if(C.otrees<150||C.otrees>300||C.coins)throw Error('People copy what they see, about 0.2% a day, no coins before shrimpcoin: '+C.otrees);
+var o0=C.otrees;treesFromGala(h,4e6);if(C.otrees-o0!==1e6)throw Error('A mangrove gala pays for seedlings');
 `);
 if(!html.includes("$('legacy-equipment').hidden=hasFarm&&G.tanks.every(function(t){return t.feeder&&t.autoWC;})")||!html.includes("if(gc&&gc.closest('[hidden]:not(.panel)'))g=null;"))throw Error('Home gear stays until every tank runs itself, and the guide never points at a hidden card');
 if(!html.includes('data-act="hc-cull"')||!html.includes("a==='hc-cull'")||!html.includes('function openCull(i)')||!html.includes("careBack(v,x,T,t);"))throw Error('Cull is a choice in Check shrimp, and the care jobs live in the tank');
