@@ -691,3 +691,13 @@ ammonia is only the primary button once ammonia is near zero.
 - Personal things are notes with their own masthead and never go in the paper: Your day milestones ("Your day"), Grandma ("Grandma"), small buzz about the kits ("Word gets around"). Same banner look as the newsflash, one at a time, 12 s apart, not over cards, spotlights, cleaning or checks. Tapping a Your day or Grandma note opens the You page.
 - Old saves: a paper backlog from before the World tab stays quiet until the tab opens.
 - Tests: no Shrimp Times before the World tab, running and Grandma never make the paper. Bots: strong cold 2,562, average Earth 6,245, space 7,656.
+
+## Pass 91: before friends play (bug review)
+- Time away: closing the app or leaving it in the background both give up to 30 game days at the speed you left at (`awayRun`, `catchUp`). It stops early when a tank gets sicker (stage 2+) or shrimp are dying (more than 15% down, sales don't count), and the toast says so. Before, a sick tank could die off during the catch-up with no warning, and a backgrounded tab got no time at all.
+- No saving while the page is hidden: one save when it hides, then nothing until it's back, so `savedAt` stays honest. `pagehide` still saves.
+- Sound on iPhone: unlocks on finger-up taps (`pointerup`, `touchend`, `click`) and every tap wakes a context the phone left suspended (`musicKick`).
+- Start over builds `migrate(newGame())`, like a first load. Before, the next reload treated it as an old save and marked story cards seen.
+- Pain cards: the cheapest choice is always open, into debt if it has to be, so a card can't hold the clock with every button off.
+- Smaller: Operating dropdowns are 16 px so iPhone doesn't zoom; speed, tab, guide and top buttons get `touch-action:manipulation`; a save that fails to load is kept as `universal-shrimp-v2-bak-<time>`; Grandma's 5 free shrimp also come before the first purchase once the water is ready; no update checks from a hidden tab; no toasts over the ten-year ending.
+- Not changed: the market man smashing a farm without lowering the debt is a threat, not a repossession (the bank and the other loan take assets as payment).
+- Tests: away time stops on sickness and deaths and runs the full 30 days when the tank is fine, pain cards have a choice at AED −1, Grandma helps before the first shrimp, plus string checks for the UI fixes.

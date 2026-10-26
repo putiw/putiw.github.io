@@ -208,6 +208,10 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] `BUILD` near `toast` changes with every release; an open game checks every 15 minutes and offers a reload when a newer one is live. Bump it when you ship.
 - [ ] Shrimp videos count as reach, not ego, so they don't push you away from Space.
 
+**Before friends play, Oct 26 (check these stay true)**
+- Coming back after closing or backgrounding the app catches up to 30 days, and stops early if a tank gets sicker or shrimp are dying.
+- Nothing saves while the page is hidden. Sound starts on the first tap on an iPhone. Start over is a migrated new game. Every pain card has a choice you can take with no money.
+
 **Play-test fixes, Oct 23 (check these stay true)**
 - [ ] Every story choice looks the same (no green first option). Before the pick only costs show; effects are aftermath. A choice you can't afford is greyed with a reason.
 - [ ] Out of money before any farm talks about your shrimp, not farms.
