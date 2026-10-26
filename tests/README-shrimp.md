@@ -710,3 +710,4 @@ ammonia is only the primary button once ammonia is near zero.
 - Consultants: once every region is open, the reach limit points at the hard part, never at more regions.
 - Dark projects on their own (not one side of a choice), like Fund a politician, get "Turn it down". It's gone after that (`projDecline`, `E.no`).
 - Removed: the Breeding laboratory card (farms keep the best bloodline your tanks ever reached by themselves, daily), the "Your home tanks" gear section once hatcheries are up, and the Sales & shop card once AI agents sell, every region is open and every mall has a store (`salesDone`).
+- Bots: strong cold 2,701 (was 2,562), strong kind 3,299 (was 3,361), average Earth 6,160 (was 6,245), Space 7,628 (was 7,656), average waiting 39 min (was 42). Spotlight sweep 135 clean (the two removed cards no longer need one). Space playthrough passes.
