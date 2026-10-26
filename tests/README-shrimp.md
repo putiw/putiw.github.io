@@ -798,3 +798,12 @@ Bots after: strong 2,651 (dictator ending), kind 3,301 (garden village), average
 - New tags: Grandma's land, both lab parties, the scam, the buyout, out of money (bank loan careful, market lender risky, selling shrimp careful), the old tank, the layoff fork, the slow pain fixes (drive −0.2, risk −0.3 on payouts and permits), small moss farms (stays local), children's hospital galas (people close), selling data and shipping cheap (means).
 - New balance check: a ruthless and a kind run through the same cards end apart on drive, ego, kin, care, risk and means (60).
 - Bots, seed 7, before → after: strong 2,679 → 2,681 days (empire_dictator both); kind 3,652 → 3,658 (garden_village both); average Earth 6,608 → 6,580, ending garden_village → question_prof, Space completes. Final traits strong: drive .99→.63, ego 1→.74, means −1→−.49, know .72→.22, kin .44→−.32, reach .69→.33, care .78→.18, risk .45→.26, control .29→.65. Kind: drive .79→.20, ego .87→.32, means 1→.70, know .92→.63, kin 1→.62, reach .62→.26, care .99→.26, risk .13→−.08, control .29→.29. Spotlight sweep 125 clean.
+
+## Pass 105: second outside UI review
+
+- Farm license hint points at what is actually missing (automate the stocked tanks first, then add a tank) and counts "Ready: N of 3" only for tanks that meet every requirement.
+- Tapping the Next bar scrolls to the glowing button, not the middle of a tall card.
+- Kits card says when the packing station is idle because of Keep in tanks, and how many shrimp it can use.
+- Grandma / Your day / Word gets around notes and newspaper flashes appear just below the top bar (fade in, untappable while hidden), never over the speed buttons; they clear when a tank job starts.
+- Tank chips get a visible ring when guided. Pause pill hides behind the What happened popup. Card header notes wrap instead of cutting off numbers. Fed and Nutrition keep small labels when water readings show. The gravel job's button says "Check for babies". Mouse drags in tank jobs don't select text.
+- Mangrove one tree per tap is intentional (the designer's call).
