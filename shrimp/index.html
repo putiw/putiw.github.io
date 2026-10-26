@@ -1119,11 +1119,11 @@ function wordOfMouth(G){return 0.3+0.7*(1-Math.exp(-marketingLevel(G)/mktNeed(G)
 var HH_AVG=2.5;
 function hhDiv(G){return 1+(HH_AVG-1)*clamp(G.kits.sold/2000,0,1);}
 function hhPeople(kits){var w=Math.floor(kits);if(w>8)return kits*HH_AVG;var t=0;for(var i=0;i<w;i++)t+=1+Math.floor(Math.random()*4);return t+(kits-w)*HH_AVG;}
-function addOwners(G,happyKits){var ppl=hhPeople(happyKits),cap=hardOpen(G)?Math.min(WORLD,hardCap(G)):WORLD;G.humans=Math.min(cap,G.humans+ppl);return ppl;}
+function addOwners(G,happyKits){var ppl=hhPeople(happyKits)*kindMult(G),cap=hardOpen(G)?Math.min(WORLD,hardCap(G)):WORLD;G.humans=Math.min(cap,G.humans+ppl);return ppl;}
 function kitDemand(G){
   var K=kitCap(G),room=K-G.humans;if(room<=0.5)return 0;
   var sat=Math.max(room/K,0.03);
-  return Math.min((kitAware(G)+G.emp.beta*opMult(G)*welfareMult(G)*wordOfMouth(G)*trust(G)*G.humans)*painMult(G)*kindMult(G)*(1+salesBoost(G))*sat*Math.pow(KIT_REF/G.kitPrice,2)*workMult(G)/hhDiv(G),room/(effectiveQuality(G)*HH_AVG)+1);
+  return Math.min((kitAware(G)+G.emp.beta*opMult(G)*welfareMult(G)*wordOfMouth(G)*trust(G)*G.humans)*painMult(G)*(1+salesBoost(G))*sat*Math.pow(KIT_REF/G.kitPrice,2)*workMult(G)/hhDiv(G),room/(effectiveQuality(G)*HH_AVG)+1);
 }
 function kitSupply(G){return Math.min(packCap(G),farmCap(G)+tankSurplusKits(G)+(G.emp.rawShrimp||0)/KIT_SHRIMP);}
 function tankSurplusKits(G){var t=0;G.tanks.forEach(function(T){t+=Math.max(0,Math.floor((totalN(T)-packAbove(G,T))/KIT_SHRIMP));});return t;}
