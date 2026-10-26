@@ -133,7 +133,7 @@ Puti tested round 1 (notes in the artifact db, `notes/<her id>`). For the home s
   - 0 idle facing down; 1–12 run right; 13–24 run left; 26–37 run down (toward the camera); 38 back idle; 39–50 run up.
 - `dog`: 32 frames of 128×128.
   - 0–12 run cycle facing right (mirror for left), 13 sitting facing front. These are hers.
-  - 14–21 trotting toward the camera and 22–29 trotting away, 8 frames each; 30 standing toward, 31 standing away. Added in round 3 to match her sheet: the front view uses her own head and front legs from frame 13, the back view her head outline and ear lines with the dark saddle over the back and a tan-feathered tail. Her 14 frames are unchanged.
+  - 14–21 trotting toward the camera and 22–29 trotting away, 8 frames each; 30 standing toward, 31 standing away. Added in round 3 to match her sheet, seen a little from above like the home. Toward you: her face made symmetric (her sitting head is turned a little, so its right half is mirrored), with the dark back and the tail showing behind the head. Away: the back of the head, the back and the top of the tail dark; under the tail and the thighs yellow (her colours). Her 14 frames are unchanged.
 - Tiles, 64×64: `grass`, `dirt`, `water`.
   - `terrain`: Haven atlas, 10×3 tiles of 64, grass-on-dirt transitions.
   - `gdw`: Echoing End autotile set, 64-px tiles: grass, dirt and water edges.
@@ -200,6 +200,6 @@ Code: in tank.js, `netCatch`, `netReturn`, `netMoveTo`, `netToCull`, `cullTank`,
 ## Round 3: the dog walks up and down (26 October)
 
 Puti asked for walking up and down: the dog only had side, standing and sitting frames.
-- New frames 14–31 on the dog sheet (see Assets above), drawn to match hers.
+- New frames 14–31 on the dog sheet (see Assets above), drawn to match hers. Her notes on the first try: from behind, the back of the head, the back and the top of the tail are dark, the face, belly and under the tail yellow; walking down must not look tilted (her sitting frame is turned a little to the side); and walking down should show some of the back or at least the tail.
 - The home picks the view from the way he's going (`dogDir` in land.js, with a little stickiness so diagonals don't flicker): side frames for sideways, 14–21 toward you, 22–29 away.
 - When he stops he stands facing that way (30, 31), then sits facing you (13) as before.
