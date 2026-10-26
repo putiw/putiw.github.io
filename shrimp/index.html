@@ -818,10 +818,13 @@ var FORK_Q={science:'Companies are offering your postdocs three times their pay.
 function forkDone(G,fk){return PROJ.some(function(x){return x.fk===fk&&G.emp.proj[x.id];});}
 function forkOpts(fk){return PROJ.filter(function(x){return x.fk===fk;});}
 // Heart: what kind of company you ran. Never shown as a number, the ending shows it.
-function addHeart(G,h){if(h){G.emp.heart=(G.emp.heart||0)+h;trAdd(G,{means:h});}if(h>0&&!G.emp.won){var E=G.emp,d=Math.floor(G.day||0);E.kind=(E.kind||[]).filter(function(k){return k.u>d;});E.kind.push({u:d+KIND_DAYS*h,f:KIND_F});E.kindNew=(E.kindNew||0)+h;}}
-// Doing it the kind way takes time: for a while after each kind choice, fewer new people get a tank.
-// An always-kind player still gets there, years later. Money can't buy the time back.
-var KIND_DAYS=120,KIND_F=0.35,KIND_FLOOR=0.3;
+function addHeart(G,h){if(h){G.emp.heart=(G.emp.heart||0)+h;trAdd(G,{means:h});}}
+// Some kind choices cost time, not money: for a while fewer new people get a tank. Only where that is what would
+// really happen (a rival keeps the bargain hunters, a newspaper keeps joking, paperwork holds up every batch).
+// Others cost in their own way: per-kit costs, a lost licence income, waiting a year, weaker campaigns.
+var KIND_F=0.35,KIND_FLOOR=0.3;
+var KIND_PROJ={paperfree:[120,'The jokes keep coming, and some new buyers stay away.'],lawback:[90,'The new paperwork holds up every batch for a while.'],retrain:[90,'Your ranch plans wait while the crews learn kelp farming.'],geneshare:[150,'Rival breeders sell your line cheaper than you do.'],labgrandpa:[0,'']};
+function kindSlow(G,days,why){var E=G.emp,d=Math.floor(G.day||0);if(E.won||!days)return;E.kind=(E.kind||[]).filter(function(k){return k.u>d;});E.kind.push({u:d+days,f:KIND_F});E.kindNew=why||'Growth slows for a while.';}
 function kindMult(G){var E=G.emp,d=Math.floor(G.day||0),m=1;if(!E.kind||E.won)return 1;E.kind.forEach(function(k){if(k.u>d)m*=1-k.f;});return Math.max(KIND_FLOOR,m);}
 function kindLeft(G){var E=G.emp,d=Math.floor(G.day||0),u=0;(E.kind||[]).forEach(function(k){if(k.u>u)u=k.u;});return Math.max(0,u-d);}
 function heartMult(G){return clamp(1+0.04*(G.emp.heart||0),0.4,1.6);}
@@ -1209,7 +1212,7 @@ function buyProj(G,id,cause){
   var p=null;PROJ.forEach(function(x){if(x.id===id)p=x;});
   var cm=p?pm(G,p):0;
   if(frozen(G)||!p||G.emp.proj[id]||!p.req(G)||(p.fk&&forkDone(G,p.fk))||(projectArea(p)==='world'&&!worldOpen(G))||G.money<cm+capitalReserve(G)||G.emp.inf<p.i)return false;
-  if(cm)pay(G,cm,'projects');if(p.gain)earn(G,p.gain,'deals');G.emp.inf-=p.i;G.emp.proj[id]=Math.floor(G.day)+1;if(p.eff)p.eff(G.emp);addHeart(G,p.h);trAdd(G,TRAIT_TAGS[id]);if(p.mood)moodAdd(G,p.mood,10);
+  if(cm)pay(G,cm,'projects');if(p.gain)earn(G,p.gain,'deals');G.emp.inf-=p.i;G.emp.proj[id]=Math.floor(G.day)+1;if(p.eff)p.eff(G.emp);addHeart(G,p.h);if(KIND_PROJ[id])kindSlow(G,KIND_PROJ[id][0],KIND_PROJ[id][1]);trAdd(G,TRAIT_TAGS[id]);if(p.mood)moodAdd(G,p.mood,10);
   var LE=G.emp.later||(G.emp.later=[]),now=Math.floor(G.day);if(p.later)LE.push({d:now+p.later.d,t:p.later.t});if(p.risk&&Math.random()<p.risk)LE.push({d:now+30+Math.floor(Math.random()*150),t:p.sc.t,m:p.sc.m});
   if(id==='studyopen'){var good=Math.random()<0.75;LE.push({d:now+365,t:good?'The shrimp and stress study is out. Watching shrimp really does calm people down, a little.':'The shrimp and stress study finds nothing. The scientists thank you for paying anyway.',c:good?0.03:0});}
   if(id==='studybuy')LE.push({d:now+30,t:'A new study says shrimp tanks cut stress by half. The study was paid for by a shrimp company.'});
@@ -1992,10 +1995,10 @@ function storyChoose(G,key,i){var E=G.emp,m=MILESTONES[key],ch=storyChoices(G,ke
  if(STORY_TAGS[key])trAdd(G,STORY_TAGS[key][i]);
  if(key==='ev_mira'){E.infOn=1;G.story.miraDay=Math.floor(G.day);if(i===2)gainInf(G,1);if(i===0){addHeart(G,1);var T=G.tanks[0];var sp=spareTankShrimp(T);if(sp>=2){var need=2;T.pop.filter(function(k){return k.age>=20&&!k.b;}).forEach(function(k){var t=Math.min(need,Math.floor(k.n));k.n-=t;need-=t;});}gainInf(G,5);}else if(i===1)gainInf(G,2);}
  if(key==='ev_paper'){if(i<2)moodAdd(G,3);else addHeart(G,-1);G.ads.push({id:'press',name:'Newspaper story',boost:i<2?2:3,left:7,days:7});}
- if(key==='ev_rival'){if(i===0)G.kitPrice=Math.max(100,Math.round(G.kitPrice*0.8/10)*10);else if(i===1){var rc=rivalCost(G);if(G.money<rc)return false;pay(G,rc,'projects');E.q+=0.02;addHeart(G,1);}else moodAdd(G,-3,30);}
+ if(key==='ev_rival'){if(i===0)G.kitPrice=Math.max(100,Math.round(G.kitPrice*0.8/10)*10);else if(i===1){var rc=rivalCost(G);if(G.money<rc)return false;pay(G,rc,'projects');E.q+=0.02;addHeart(G,1);kindSlow(G,120,'The cheap seller keeps the bargain hunters while you make the video.');}else moodAdd(G,-3,30);}
  if(key==='ev_ai'&&i===0){var ac=aiCost(G);if(G.money<ac)return false;pay(G,ac,'projects');E.aiRoute=2;E.aiCut=0.02;}
  if(key==='ev_school'){if(i===0){var sk=schoolKits(G);if(G.kits.stock<sk)return false;addHeart(G,1);G.kits.stock-=sk;G.kits.sold+=sk;addOwners(G,sk*effectiveQuality(G));gainInf(G,Math.max(500,sk*25));E.ceil+=0.005;}else if(i===1)gainInf(G,Math.max(100,sk0(G)));}
- if(key==='ev_marine'&&i===0){moodAdd(G,4);addHeart(G,1);}
+ if(key==='ev_marine'&&i===0){moodAdd(G,4);addHeart(G,1);kindSlow(G,30,'Some customers don’t like getting a survey from a shrimp shop and unsubscribe.');}
  (G.story.choices||(G.story.choices={}))[key]=i;log(G,m.title+': '+ch[i][0].toLowerCase());return true;}
 function ensureProgress(G){if(!G.progress)G.progress={version:1,seen:{},queue:[],sandbox:false};var p=G.progress;if(!p.seen)p.seen={};if(!Array.isArray(p.queue))p.queue=[];return p;}
 function migrateProgress(G){
@@ -5086,7 +5089,7 @@ var CARD_HOLD=null,SC_WC=false;
 
 // What a decision did, after it's made. A popup the player has to close, the game waits under it.
 var AFTER_HOLD=null;
-function kindNote(){var E=G.emp,n=E.kindNew||0;E.kindNew=0;var d=kindLeft(G);return n&&d>0?'Doing it properly takes time. For about '+d+' days, fewer new people get a tank.':'';}
+function kindNote(){var E=G.emp,w=E.kindNew;E.kindNew=0;var d=kindLeft(G);return w&&d>0?w+' For about '+d+' days, fewer new people get a tank.':'';}
 function showAfter(title,body,fx){if(!body&&!fx)return;var el=$('after');if(!el)return;setT('after-t',title||'');$('after-b').textContent=body||'';$('after-b').hidden=!body;$('after-fx').textContent=fx||'';$('after-fx').hidden=!fx;
  if(el.hidden){AFTER_HOLD=speed||AFTER_HOLD;if(speed)setSpeed(0);}el.hidden=false;AFTER_AT=Date.now();setTimeout(function(){try{$('after-ok').focus({preventScroll:true});}catch(e){}},50);}
 var AFTER_AT=0;
