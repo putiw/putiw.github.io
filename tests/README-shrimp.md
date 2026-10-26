@@ -780,3 +780,10 @@ Bots after: strong 2,651 (dictator ending), kind 3,301 (garden village), average
 - Your trees planted before the coin earn honest coins a year after planting once it launches.
 - Balance checks updated (59).
 - Bots (they now fit auto water changers to every starter tank, since the license needs it): strong 2,648 (dictator), kind 3,305 (garden village), average first farm day 785 and Earth complete day 6,161; Space completes; spotlight sweep 127 clean.
+
+## Pass 103: prototype tank jobs, kindness costs time where it makes sense, lab party
+
+- Own-tank jobs now look and play like the Shrimp Home Prototype's (vacuum with bucket and babies, sponge scene with flow meter, scissors trim with cuttings, tweezers for pests). Care row is one row.
+- Kind choices: six cost time (fewer new owners for 2-8 months) where that is what would happen: free care video vs the cheap rival, the marine survey, the Shrimp Times interview, backing the welfare law, the retraining fund, sharing the breeding line. The popup says why. Problem-card fixes done properly take about twice as long (3-6 months). Bots: ruthless 2,679 days, always-kind 3,652 (misses ten years), average 6,608.
+- Grandma's lab party waits for 500 shrimp; going means a hungover day with no sales.
+- Space note names only the missing Lab project studies and lists them first after Earth.
