@@ -88,7 +88,7 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **Play style** (`STYLE_KINDS` wrappers, `styleVals`, `styleTop`): purchase functions are wrapped at the end of the sim to count steady/methodical habits. Feeds `endingScores` and adds a subtitle, paragraph and Grandma line to the ending.
 - **Grandma's land** (`gp_land`, `gp_scam`, `gpLand`, `gpScam`, `landDay`): at AED 500k sent. Yes freezes purchases 30 days (`frozenWhy='land'`) then grants the house land. The house card moves to the Tank tab when `ownTank`.
 - **Gala causes** (`GALA_FOR`, `galaLines`): `buyProj(G,'gala',cause)`.
-- **Story choice previews** (`choiceFx(key,i,all)`): before the pick only costs show (AED, ✦, a month away). What happened is aftermath, in the toast after. Never show +5 style effects up front.
+- **Story choice previews** (`choiceFx(key,i,all)`, `showAfter`, `storyShowDesc`): before the pick only the label and its cost show (AED, ✦, a month away), not the description. What happened (the description and the effects) comes after, in a popup the player has to close (`#after`, the game waits under it). Fork projects work the same way (name and cost, then `p.d` in the popup), and hard-part options show their news line after. Chapters, the intro, the space dream, win, game over and broke keep their text up front.
 - **Gear scope** (`G.opt.upAll`): with several tanks one switch at the top of Equipment picks This tank / All tanks. Decor and treats sit under `h3.track` headings.
 - **Ladders** (`topIdx`, `farmBuyable`, `farmNext`, `FARM_AT`, `shopBuyable`): farms and shops open one tier at a time and the older tier stops being sold. Small shops stop once the first mall store opens.
 - **Research merge** (`rlStaff`, `academyDay`, `scienceFork`): one Research card on the Lab tab (`academy-card`). Staff raise the research rate. The "pay to keep postdocs" fork waits for two postdocs and four papers.
@@ -209,6 +209,8 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] Shrimp videos count as reach, not ego, so they don't push you away from Space.
 
 **Last chapter and late game, Oct 26 (check these stay true)**
+- Decisions show what happened after, in a popup you have to close. The screen holds still under the finger when content above changes (`anchorGet`/`anchorFix` wrap `render`), and a decision button ignores taps for half a second after it appears or moves (`SETTLE`).
+- Shrimpcoin plants one stretch of coast per tap (`COIN_BATCH`, about 5,000 taps for every coast), others plant ten times slower, and Sell says why it's off. Space also opens for anyone with 40+ papers or a research group (`spaceResearch`).
 - The hard part asks for the goal first, then shows one group at a time. Story cards are at least a minute apart. 40× opens with the hard part.
 - No "x of y found" anywhere in research. Consultants never suggest regions once all are open. Dark single projects can be turned down.
 - No Breeding laboratory card, no home-tank gear once hatcheries are up, no Sales & shop card once there's nothing left in it.

@@ -389,5 +389,13 @@ var n=readyGame();n.emp.hard={open:1,goal:'home',picks:{}};migrate(n);if(n.emp.h
 `);
 if(!html.includes("data-act=\"hard-next\"")||!html.includes("Before the groups, decide what “everyone” means.")||!html.includes("move('lab-card','up',false);")||!html.includes("wrap.hidden=true;$('p-up').appendChild(wrap)")||!html.includes("salesOpen(G)&&!salesDone(G)"))throw Error('Hard part walk-through, no lab certification, no home-tank gear after hatcheries, no idle Sales card');
 if(/' of '\+l\.finds\.length\+' found/.test(html))throw Error('Research has no total to find');
+check('Shrimpcoin plants a stretch of coast per tap and others plant slowly, research opens Space',`
+var g=readyGame();g.humans=4e9;var C=coinOf(g);C.on=1;C.honest=1;C.price=30;g.money=1e12;
+if(coinPlantBatch(g)!==COIN_BATCH*COIN_TREE||COIN_COAST/COIN_BATCH<4900)throw Error('About 5,000 taps to fill the coasts');
+for(var d=0;d<30;d++){g.day+=1;coinDay(g);}if((C.otrees||0)>0.0002*3*g.humans*30+1)throw Error('Others plant at most 0.06% of people a day');
+var s=readyGame();s.emp.won=1;s.academy=s.academy||{};s.academy.papers=45;if(!spaceOpen(s))throw Error('Years of research should open Space after Earth');s.academy.papers=3;s.academy.level=1;treesFor=function(){return [];};if(spaceOpen(s))throw Error('Without research or the curious path, no Space');
+`);
+if(!html.includes('id="after"')||!html.includes("showAfter(slab,stx,aft)")||!html.includes("if(pp&&pp.fk){showAfter(pp.name,pp.d,'');}"))throw Error('Decisions show what happened afterwards, in a popup');
+if(!html.includes("var renderInner=render;render=function(){var a=anchorGet();renderInner.apply(this,arguments);anchorFix(a);settleScan();};")||!html.includes('SETTLE_MS=500'))throw Error('The screen holds still under the finger and fresh decisions ignore taps for half a second');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
