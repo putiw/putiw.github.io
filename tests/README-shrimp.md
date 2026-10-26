@@ -733,3 +733,7 @@ ammonia is only the primary button once ammonia is near zero.
 
 - Once Feed/Water/Sell are gone, the "X of 8.2B people have a shrimp tank at home" bar now sits directly under money and influence, above Fed/Nutrition (moved in the header markup; it still only shows when the action row is gone).
 - Checked at 390 px on the year-14 average-bot save. Balance 56, academy 10, me 45 all pass.
+
+## Pass 96: Cull button easier to find
+
+- "Look over" is renamed "Cull shrimp" and moved to sit directly under the tank, above the Check shrimp / Clean tank row that opens on a tap, so it can't end up below the fold under that row.

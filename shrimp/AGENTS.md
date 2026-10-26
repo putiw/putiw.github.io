@@ -133,7 +133,7 @@ These come from Puti's feedback. Treat them as requirements.
 - There should always be something to do or improve, not one button and done.
 - Bottleneck advice only comes from the paid consultancy, never free.
 - The top Feed, Water and Sell buttons stay only while they can matter (see Top action buttons).
-- Bought shrimp are breeders and are never sold by the sales rules. The one exception: you can take any shrimp out by hand in Look over, it sells as a cull.
+- Bought shrimp are breeders and are never sold by the sales rules. The one exception: you can take any shrimp out by hand with Cull shrimp, it sells as a cull.
 
 **Revealing things**
 - Reveal one new thing at a time, and only when it's needed. Before the first shrimp the player sees only the cycle card, the test kit, ammonia and the Water button.
@@ -209,7 +209,7 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] Shrimp videos count as reach, not ego, so they don't push you away from Space.
 
 **Your own tank, Oct 26 (check these stay true)**
-- Look over is there under the tank from the first shrimp you buy. Anything taken out there, bought or bred, sells as a cull. Normal selling never touches bought breeders.
+- "Cull shrimp" sits right under the tank (above the tap-for-more row) from the first shrimp you buy. Anything taken out there, bought or bred, sells as a cull. Normal selling never touches bought breeders.
 - From the first hatchery: one home tank with 20 shrimp, and Gravel, Sponge, Trim and Pests are optional. No alerts, guide steps or glowing buttons for them, ever. The mess shows in the tank, that's all.
 
 **Last chapter and late game, Oct 26 (check these stay true)**
