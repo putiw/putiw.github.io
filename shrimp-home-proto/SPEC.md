@@ -5,7 +5,7 @@ A dev prototype, separate from the game, for Puti to test ideas before any of th
 Four tabs:
 
 - **Home**: the place that grows with you. Grandma's flat → a flat with a balcony → a house with a garden → land with a stream. A 2D, hand-drawn map you can look around and do small things on.
-- **Tank**: the tank view from the game, six hands-on jobs (gravel vacuum, filter sponge, trim, pests, sort, aquascape), and colour breeding.
+- **Tank**: the tank view from the game, five hands-on jobs (gravel vacuum, filter sponge, trim, pests, aquascape), the net and cull tank, and colour breeding.
 - **Book**: the collection (shrimp colours and grades, birds, fish, stream finds, chickens and eggs).
 - **Try**: every proposal with Keep / Maybe / Drop and a note (saved to the artifact db), plus dev controls.
 
@@ -169,3 +169,29 @@ Puti tested round 1 (notes in the artifact db, `notes/<her id>`). For the home s
 - Keep: the four stages and the Move card, decorating (Build), the trap → `takeHome` flow, tank stands, `landSetStage`, `LAND.setTool`, and the Book categories.
 
 **Status after round 2 (26 October):** done as above. Pierre lives only in the house (Puti didn't want him in the tank view). The home renders one canvas pixel per art pixel and scales up crisp, and holds 60 fps at 4× CPU slowdown on a 390 px phone. The camera keeps to the part of the map with something on it.
+
+## Round 3: the net and the cull tank (26 October)
+
+Puti's note on Sort was "cull manually, but not this interface". She asked for the catch from Shrimp Tanks instead, with the same animation and sound.
+
+- **Tap a shrimp** and it goes into her net (`catch-bucket.png`) in the top-left corner of the tank, with her catch sound.
+  - The flight is hers: 760 ms, eased out, fading to half, tilted along the path.
+  - On a narrow screen the art is cropped at the sides, so the net slides right to stay in view.
+  - Tank shrimp keep out from under the net, so it's clear which ones are in it.
+- **It can slip away:** 18% while grazing, 31% otherwise, times its escape gene, with her push sound and "Shrimp slipped away". A shrimp that's already fleeing, or one in a tank of 40 or more, is always caught.
+- **Tap a shrimp in the net** to put it back in its own tank.
+- **The bar under the tank** shows while the net has shrimp: Move to cull tank, Move to (each other tank), Put back.
+- **Hold a shrimp** for about half a second to look closer (the card with Move, Pet shop and Name). A ring fills while you hold.
+- **The cull tank** (`T.role = 'cull'`):
+  - The first Move to cull tank puts Grandma's old tank on a free stand, free.
+  - With no free stand, you pick one of your tanks.
+  - The Colony card can make a tank the cull tank, or stop.
+  - Now and then a hobbyist comes by and takes some, free: a 30% chance a day, more when the tank is full. Grown ones go first, 3–12 at a time, or a quarter to a half of a full tank. `S.stats.given` counts them.
+- **36 at a time:** each time you come to look at a tank, 36 of its shrimp are out, picked at random. In the game the rest are hiding in the moss and wood ("36 of 80 out").
+  - Netted ones leave the view and nobody takes their place. Babies and new arrivals join while there's room.
+  - Netted shrimp keep growing while they wait in the net, as in her bucket.
+  - To cull a big tank you come back often, so starting early is easier.
+  - Checking for sick shrimp is different: the shrimp you see then stand for the whole tank, so one check is enough.
+- **Sort is gone.** Its Try entry keeps the id `sort`, so her note stays with it, and is now "Net and cull tank". Its Try it button adds 60 reds of mixed grade if the tank has fewer than 60.
+
+Code: in tank.js, `netCatch`, `netReturn`, `netMoveTo`, `netToCull`, `cullTank`, `setCullRole`, `hobbyists`, `sampleInds` (`SHOW_N = 36`), `netBar` and `drawNet`. The art is in netart.js (`SPR.net`, `NET_ART`). The sounds are `sfx('catch')` (her two samples) and `sfx('push')`. Tests: `test/net.js`.

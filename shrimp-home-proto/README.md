@@ -4,14 +4,14 @@ A dev prototype, separate from Universal Shrimp, for trying ideas before they go
 
 - `SPEC.md` is the brief: what each idea is for, the look, the module API.
 - `src/` is the source. `python3 build.py` writes `dist/index.html` (for local testing, with a page skeleton) and `dist/artifact.html` (published as a claude.ai artifact).
-- `test/serve.sh` serves `dist/` on port 8765. `node test/shot.js out.png "js" waitMs width height fullPage` takes a phone-sized screenshot. `test/toys.js` runs every tank job once.
+- `test/serve.sh` serves `dist/` on port 8765. `node test/shot.js out.png "js" waitMs width height fullPage` takes a phone-sized screenshot. `test/toys.js` runs every tank job once. `node test/net.js 390` checks the net and the cull tank.
 
 ## What's in it
 
 | Tab | What to try |
 |---|---|
 | Home | Grandma's place as a little pixel world in Puti's own art (Haven, Echoing End): flat, balcony, house with a garden, land with a stream. Tap to walk as Millie, the dog follows, Pierre the cat lives indoors. Tap things to use them: tanks, the feeder, Grandma, the coop, the bench. Mow along your path, watch birds, collect eggs, catch a wild chicken with grain, fish into the pond, set a shrimp trap, decorate. Time is always 1× here. |
-| Tank | The game's tank view and Puti's Shrimp Tanks art. Jobs: gravel vacuum (hold the top of the tube, the bucket is the water change, check it for babies), filter sponge (old tank water), trim moss and stems (scoop the bits, plant a stem top), pick off bladder snails and flatworms, sort shrimp into cups, aquascape. Wellbeing: one score, about 50 is enough. Tap a shrimp to look closer, move it, sell it or name it. |
+| Tank | The game's tank view and Puti's Shrimp Tanks art. Jobs: gravel vacuum (hold the top of the tube, the bucket is the water change, check it for babies), filter sponge (old tank water), trim moss and stems (scoop the bits, plant a stem top), pick off bladder snails and flatworms, aquascape. The net, from Shrimp Tanks: tap a shrimp to net it, tap the net to put one back, move them to the cull tank, where hobbyists take them for free. Only 36 come out at a time and the rest hide, different ones each time you look. Wellbeing: one score, about 50 is enough. Hold a shrimp to look closer, move it, sell it or name it. |
 | Book | Every colour line, solid and rili, with the best grade reached, and a colour wheel of every 3° of hue you've kept; birds, fish, stream finds, chickens and eggs. Missing entries are black silhouettes. |
 | Try | Each idea with Try it, Keep / Maybe / Drop and a note. Notes save to the artifact's database (`notes/<viewer id>`), or this device when there's no database. Dev controls: stage, time, cash, genes, mess, reset. Design switches: jobs show when needed or always; wellbeing score, each thing on its own, or just for the look. |
 

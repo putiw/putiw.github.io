@@ -2,7 +2,10 @@
 var AC=null,MASTER=null,BUS=null,NOISE=null,AMB={},SFX_LOOPS={};
 function sfxUnlock(){if(AC||!S||!S.opt.sound)return;try{var C=window.AudioContext||window.webkitAudioContext;if(!C)return;AC=new C();MASTER=AC.createGain();MASTER.gain.value=0.82;MASTER.connect(AC.destination);BUS=AC.createGain();BUS.gain.value=0.5;BUS.connect(MASTER);
   var len=AC.sampleRate*2,b=AC.createBuffer(1,len,AC.sampleRate),d=b.getChannelData(0);for(var i=0;i<len;i++)d[i]=Math.random()*2-1;NOISE=b;
-  loadAmb('water','water.mp3',0.34);loadAmb('music','music.mp3',0.13);sfxAmbient();}catch(e){AC=null;}}
+  loadAmb('water','water.mp3',0.34);loadAmb('music','music.mp3',0.13);loadCatch();sfxAmbient();}catch(e){AC=null;}}
+// Puti's two catch sounds from Shrimp Tanks; one is picked at random each time a shrimp is netted
+var CATCH=[];
+function loadCatch(){['catch-shrimp-1.mp3','catch-shrimp-2.mp3'].forEach(function(u){try{fetch(u).then(function(r){if(!r.ok)throw 0;return r.arrayBuffer();}).then(function(ab){return new Promise(function(res,rej){AC.decodeAudioData(ab,res,rej);});}).then(function(b){CATCH.push(b);}).catch(function(){});}catch(e){}});}
 ['pointerdown','keydown'].forEach(function(ev){window.addEventListener(ev,function(){if(!AC)sfxUnlock();else if(AC.state==='suspended')AC.resume();},{capture:true,passive:true});});
 function sfxMute(m){$('tb-mute').classList.toggle('muted',m);if(MASTER)MASTER.gain.setTargetAtTime(m?0:0.82,AC.currentTime,0.05);if(!m&&!AC)sfxUnlock();}
 function loadAmb(k,url,vol){var a={vol:vol,g:AC.createGain(),src:null,buf:null,on:false};a.g.gain.value=0;a.g.connect(MASTER);AMB[k]=a;
@@ -38,6 +41,8 @@ function sfx(name,o){if(!AC||!S||!S.opt.sound)return;o=o||{};var t=AC.currentTim
  case 'reel':for(var r=0;r<6;r++)tone('square',1800,1700,t+r*0.03,0.01,0.015*v);break;
  case 'thud':tone('sine',160,60,t,0.12,0.15*v);break;
  case 'pour':nburst(t,0.9,0.12*v,'bandpass',700,0.8);break;
+ case 'catch':if(CATCH.length){var cs=AC.createBufferSource(),cg=AC.createGain();cs.buffer=CATCH[Math.floor(Math.random()*CATCH.length)];cg.gain.value=0.52*v;cs.connect(cg);cg.connect(BUS);cs.start(t);}else{tone('sine',700,180,t,0.09,0.18*v);}break;
+ case 'push':tone('triangle',116,74,t,0.16,0.14*v);break;
  }}catch(e){}}
 // held loops: sfxLoop(name) -> {set(level 0..1), stop()}
 function sfxLoop(name){if(!AC||!S||!S.opt.sound)return {set:function(){},stop:function(){}};var t=AC.currentTime,g=AC.createGain();g.gain.value=0;g.connect(BUS);var nodes=[];

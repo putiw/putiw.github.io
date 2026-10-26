@@ -38,9 +38,4 @@ const {chromium}=require('playwright');
  for(let i=0;i<5;i++){await p.mouse.move(sb.x+sb.w*0.5,sb.y+sb.h*0.6);await p.mouse.down();await p.waitForTimeout(250);await p.mouse.up();await p.waitForTimeout(250);}
  await shot('sponge1');for(let i=0;i<12;i++){await p.mouse.down();await p.waitForTimeout(120);await p.mouse.up();await p.waitForTimeout(120);}await shot('sponge2');
  await p.evaluate(()=>{var d=$('sp-done');if(d)d.click();else closeSheet();});await p.waitForTimeout(300);
- // SORT
- await p.evaluate(()=>{var l=[];for(var k=0;k<6;k++)l.push(breedWild());addToTank(S.tanks[0],l,'stream');S.tanks.push(newTank('Tank 2',20,grandmaScape()));toyStart('sort');});await p.waitForTimeout(800);await shot('sort0');
- sb=await p.evaluate(()=>{var r=$('so-cv').getBoundingClientRect();return {x:r.left,y:r.top,w:r.width,h:r.height};});
- for(let k=0;k<3;k++){const s0=await p.evaluate(()=>{var c=document.getElementById('so-cv');return null;});}
- await p.waitForTimeout(300);await shot('sort1');
  console.log(errs.join('\n')||'no errors');await b.close();})();
