@@ -73,7 +73,7 @@ window.ENDING_TEST_DATA = {
         {
           "id": "studyopen",
           "label": "Fund it, publish whatever they find",
-          "description": "A year to wait, and it might find nothing.",
+          "description": "A year to wait. It might find nothing, then you’ve paid for nothing.",
           "traits": {
             "know": 1.5
           },
@@ -82,14 +82,14 @@ window.ENDING_TEST_DATA = {
         },
         {
           "id": "studybuy",
-          "label": "Fund it, and tell them what you need",
-          "description": "You already know watching shrimp calms people, this just says it sooner. Out next month. Scientists who agree in advance are expensive, three times the price.",
+          "label": "Skip the study, survey your own owners",
+          "description": "Out next month. Nine in ten say they feel calmer. Scientists ignore it, customers don’t.",
           "traits": {
             "know": -1,
-            "ego": 0.5
+            "drive": 0.5
           },
-          "heart": -3,
-          "endingLine": "A rushed study shaped around a launch."
+          "heart": -1,
+          "endingLine": "A survey of your own owners. Nine in ten felt calmer."
         }
       ]
     },
@@ -130,7 +130,7 @@ window.ENDING_TEST_DATA = {
           "label": "Give the editor an interview",
           "description": "She asks hard questions and the jokes keep coming. People like you more for answering.",
           "traits": {
-            "control": 1
+            "control": -0.5
           },
           "heart": 1,
           "endingLine": "A newspaper that still makes fun of you."
@@ -140,7 +140,7 @@ window.ENDING_TEST_DATA = {
           "label": "Buy The Shrimp Times",
           "description": "Its jokes scare off new buyers right when you need them. Owned, it stays on your side.",
           "traits": {
-            "control": -2,
+            "control": 1,
             "ego": 1
           },
           "heart": -2,
@@ -157,20 +157,23 @@ window.ENDING_TEST_DATA = {
           "label": "Back the law",
           "description": "More paperwork, kits cost 5% more. More of them live.",
           "traits": {
-            "kin": 1
+            "kin": 1,
+            "means": 0.5
           },
           "heart": 2,
           "endingLine": "A pet welfare law that covers shrimp."
         },
         {
           "id": "lawbribe",
-          "label": "Pay the inspector to wave your farms through",
-          "description": "Your farms already pass, but every inspection shuts one for weeks. Upkeep 10% lower. Illegal, if it comes out.",
+          "label": "Run your own audits instead",
+          "description": "Your farms already pass. You publish your numbers and lobby to be exempt. Upkeep 10% lower. Smaller farms get the exemption too, and some of them don’t pass.",
           "traits": {
-            "risk": 1
+            "control": 1,
+            "means": -0.5,
+            "kin": -0.3
           },
-          "heart": -3,
-          "endingLine": "Farms nobody inspects."
+          "heart": -2,
+          "endingLine": "Farms that check themselves."
         }
       ]
     },
@@ -210,7 +213,7 @@ window.ENDING_TEST_DATA = {
           "description": "She knows a lot about shrimp, you share orders with her. Kit survival up a little.",
           "traits": {
             "care": 0.5,
-            "control": 1
+            "control": -0.5
           },
           "heart": 2,
           "endingLine": "A breeder co-op that started with your neighbour."
@@ -221,7 +224,7 @@ window.ENDING_TEST_DATA = {
           "description": "Her kits die a lot, and every dead kit puts a family off shrimp. One seller, one standard, more orders come to you.",
           "traits": {
             "drive": 1,
-            "control": -1
+            "control": 1
           },
           "heart": -2,
           "endingLine": "A closed shop down the road."
@@ -247,7 +250,8 @@ window.ENDING_TEST_DATA = {
           "description": "Only a few boxes lose shrimp. Replacing those costs less than heat packs on every box. AED 3 less a kit.",
           "traits": {
             "kin": -1,
-            "drive": 0.5
+            "drive": 0.5,
+            "means": -0.3
           },
           "heart": -2
         }
@@ -339,7 +343,10 @@ window.ENDING_TEST_DATA = {
           "id": "retrainpack",
           "label": "Retrain them as farm techs",
           "description": "Everyone keeps a job. You pay for training and wages you don’t strictly need.",
-          "traits": {},
+          "traits": {
+            "means": 1,
+            "care": -0.3
+          },
           "heart": 2,
           "endingLine": "Old packers running the night shift at the farms."
         },
@@ -347,7 +354,10 @@ window.ENDING_TEST_DATA = {
           "id": "layoffpack",
           "label": "Let them go",
           "description": "The robots do the work now. Two weeks’ pay each, the rest goes into more kits.",
-          "traits": {},
+          "traits": {
+            "means": -0.5,
+            "drive": 0.5
+          },
           "heart": -2
         }
       ]
@@ -359,19 +369,23 @@ window.ENDING_TEST_DATA = {
         {
           "id": "revreal",
           "label": "Ask happy owners for photos",
-          "description": "Slow, most people never post. Word of mouth up a little.",
-          "traits": {},
+          "description": "Slow, most people never post. The ones who do are real. Word of mouth up a little.",
+          "traits": {
+            "ego": -0.3,
+            "risk": -0.3
+          },
           "heart": 1
         },
         {
           "id": "revfake",
-          "label": "Buy 5,000 reviews",
-          "description": "Your rivals already do, and a shop with 12 reviews looks dead. Word of mouth up a lot. Fake, if anyone looks closely.",
+          "label": "Give a bag of food for every review",
+          "description": "5,000 reviews in a month, all from real owners, mostly five stars. The marketplace labels them incentivised. Word of mouth up a lot.",
           "traits": {
-            "risk": 0.5,
-            "ego": 0.5
+            "ego": 0.5,
+            "means": -0.5,
+            "drive": 0.5
           },
-          "heart": -2
+          "heart": -1
         }
       ]
     },
@@ -410,7 +424,8 @@ window.ENDING_TEST_DATA = {
           "label": "Sell it",
           "description": "No names, and the terms already allow it. AED 5M now, and better-aimed ads.",
           "traits": {
-            "drive": 0.5
+            "drive": 0.5,
+            "means": -0.5
           },
           "heart": -2,
           "endingLine": "Owners who get ads for shrimp food before they know they need it."
@@ -445,8 +460,7 @@ window.ENDING_TEST_DATA = {
           "label": "Stop cleaning it",
           "description": "It’s mostly nitrate, which is fertiliser, and the river is big. Farm upkeep 15% lower. Big farms can still tip a river.",
           "traits": {
-            "kin": -1,
-            "risk": 0.5
+            "kin": -1
           },
           "heart": -3,
           "endingLine": "A green river below the old farm."
@@ -491,7 +505,8 @@ window.ENDING_TEST_DATA = {
           "description": "Most of the workers keep their jobs. The taxpayers still pay for the ones that failed.",
           "traits": {
             "means": -0.5,
-            "drive": 1
+            "drive": 1,
+            "care": -0.3
           },
           "endingLine": "You bought Pelagonia’s best hatcheries and kept most of the crews."
         },
@@ -528,10 +543,11 @@ window.ENDING_TEST_DATA = {
           "endingLine": "Shrimp pumps use less power than a phone charger now."
         },
         {
-          "label": "The grid is someone else’s problem",
-          "description": "Power companies build more plants, mostly gas.",
+          "label": "Leave it to the power companies",
+          "description": "Kits stay cheap. They build more plants, mostly gas.",
           "traits": {
-            "care": -1.5
+            "care": -0.5,
+            "drive": 0.5
           },
           "endingLine": "Power companies built more plants for shrimp tanks, mostly gas."
         }
@@ -561,11 +577,11 @@ window.ENDING_TEST_DATA = {
           "endingLine": "River teams catch the red shrimp they can find."
         },
         {
-          "label": "Do nothing",
-          "description": "They spread to warm rivers on four continents.",
+          "label": "Leave it to the river agencies",
+          "description": "Your money stays in kits. The agencies catch some, and red shrimp spread to warm rivers on four continents.",
           "traits": {
-            "care": -1,
-            "kin": -0.5
+            "control": -0.5,
+            "care": -0.3
           },
           "endingLine": "Red shrimp live in warm rivers on four continents."
         }
@@ -593,10 +609,11 @@ window.ENDING_TEST_DATA = {
           "endingLine": "Spare pet shrimp end up as fish food."
         },
         {
-          "label": "Let the price crash",
-          "description": "You stop checking the price.",
+          "label": "Let the price fall",
+          "description": "Cheap shrimp everywhere. Kits sell as a starter tank, not for the shrimp.",
           "traits": {
-            "drive": -1
+            "kin": -0.5,
+            "drive": -0.3
           },
           "endingLine": "A shrimp costs nothing now, people give them away at weddings."
         }
@@ -691,11 +708,13 @@ window.ENDING_TEST_DATA = {
           "endingLine": "Mira’s other grandpa takes visitors out to the reef."
         },
         {
-          "label": "Tell her you hadn’t thought about it",
-          "description": "She tells you what the boat meant to him.",
+          "label": "Visit him with Mira",
+          "description": "No offer, just an afternoon on the dock. He shows you how he mended nets.",
           "traits": {
-            "means": 0.5
-          }
+            "care": -1,
+            "drive": -0.5
+          },
+          "endingLine": "You spent an afternoon on the dock with Mira’s other grandpa. He showed you how he mended nets."
         }
       ]
     },
@@ -716,7 +735,9 @@ window.ENDING_TEST_DATA = {
           "label": "Leave it a while",
           "description": "It stays on the shelf, green. It is still yours.",
           "traits": {
-            "kin": -0.5
+            "kin": -0.5,
+            "drive": -0.5,
+            "control": -0.5
           },
           "endingLine": "The first tank went green around year eight and stayed that way for a long time."
         }

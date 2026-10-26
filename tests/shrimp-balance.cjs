@@ -429,5 +429,24 @@ var o0=C.otrees;treesFromGala(h,4e6);if(C.otrees-o0!==1e6)throw Error('A mangrov
 `);
 if(!html.includes("$('legacy-equipment').hidden=hasFarm&&G.tanks.every(function(t){return t.feeder&&t.autoWC;})")||!html.includes("if(gc&&gc.closest('[hidden]:not(.panel)'))g=null;"))throw Error('Home gear stays until every tank runs itself, and the guide never points at a hidden card');
 if(!html.includes('data-act="hc-cull"')||!html.includes("a==='hc-cull'")||!html.includes('function openCull(i)')||!html.includes("careBack(v,x,T,t);"))throw Error('Cull is a choice in Check shrimp, and the care jobs live in the tank');
+check('traits read the balance of choices: a ruthless and a kind run end up apart on several axes',`
+function prof(cold){var g=readyGame();g.money=1e12;g.humans=1e7;g.kits.sold=1e6;g.emp.staff.pack=5;g.emp.staff.lines=1;g.me.sent=5e5;var x=function(a,b){return cold?a:b;};
+ [['ev_mira',2,0],['ev_rival',0,1],['ev_ai',0,1],['ev_marine',1,0],['ev_paper',2,1],['dye_offer',0,1],['fight_invite',0,1],['me_burnout',1,0],['coin_offer',1,0]].forEach(function(s){if(!storyChoose(g,s[0],x(s[1],s[2])))throw Error('Choice '+s[0]);});
+ Object.keys(FORK_Q).forEach(function(fk){var o=forkOpts(fk).slice().sort(function(a,b){return (a.h||0)-(b.h||0);}),p=cold?o[0]:o[o.length-1];addHeart(g,p.h);trAdd(g,TRAIT_TAGS[p.id]);});
+ Object.keys(PAINS).forEach(function(id){if(!painPick(g,id,x(2,0)))throw Error('Pain '+id);});
+ if(!byeChoose(g,'pack',x(0,1)))throw Error('Bye');gpLand(g,!cold);partyGo(g,1,!cold);if(!gpScam(g,!cold))throw Error('Scam');
+ [['c_cash',0,1],['c_power',2,0],['c_rivers',2,0],['c_many',1,0],['c_blackout',2,0],['c_prison',0,2],['c_fisher',0,2]].forEach(function(s){if(!card3Choose(g,s[0],x(s[1],s[2])))throw Error('Card '+s[0]);});
+ (cold?[['war','fund'],['poor','credit'],['no','ministers'],['water','desal']]:[['war','pay'],['hot','cool'],['water','wells'],['poor','breeders'],['care','carers'],['no','ask']]).forEach(function(s){var o=hardOp(hardGroup(s[0]),s[1]);trAdd(g,o.tr);addHeart(g,o.h||0);});
+ for(var n=0;n<4;n++)trAdd(g,GALA_FOR[x('own','kids')].tr);
+ return traitVals(g);}
+var R=prof(true),K=prof(false),apart=TRAITS.filter(function(k){return Math.abs(R[k]-K[k])>=0.4;});
+if(apart.filter(function(k){return k!=='means';}).length<4)throw Error('Ruthless and kind only differ on '+apart.join(', ')+' '+JSON.stringify([R,K]));
+['drive','means','kin','risk'].forEach(function(k){if(!(R[k]*K[k]<0))throw Error('Opposite sides on '+k+': '+R[k].toFixed(2)+' vs '+K[k].toFixed(2));});
+var a=newGame();trAdd(a,{drive:1});if(!(traitVals(a).drive>0.1&&traitVals(a).drive<0.3))throw Error('One push is a lean, not the rail: '+traitVals(a).drive);
+for(var i=0;i<10;i++)trAdd(a,{ego:i%2?1:-1});if(Math.abs(traitVals(a).ego)>0.01)throw Error('Ten pushes that cancel sit in the middle');
+for(i=0;i<5;i++)trAdd(a,{kin:1});trAdd(a,{kin:-5});if(Math.abs(traitVals(a).kin)>0.01||a.trAbs.kin!==10)throw Error('The sum and the sizes are both kept');
+var o=newGame();delete o.trAbs;o.tr={care:-3,know:2};migrate(o);if(o.trAbs.care!==3||o.trAbs.know!==2)throw Error('Old saves count their sums as one-way pushes');
+['social','guide','aiconsult','farmlic','ministry','mangrove','arco','globalbrand'].forEach(function(id){if(TRAIT_TAGS[id])throw Error('Routine upgrade still pushes a trait: '+id);});
+`);
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
