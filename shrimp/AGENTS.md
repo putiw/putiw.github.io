@@ -209,7 +209,7 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] Shrimp videos count as reach, not ego, so they don't push you away from Space.
 
 **Your own tank, Oct 26 (check these stay true)**
-- Look over is always there under the tank (4+ grown shrimp of your own). Bought shrimp never come up.
+- Look over is there under the tank from the first shrimp you buy. Bought ones you take out are given away, never sold.
 - From the first hatchery: one home tank with 20 shrimp, and Gravel, Sponge, Trim and Pests are optional. No alerts, guide steps or glowing buttons for them, ever. The mess shows in the tank, that's all.
 
 **Last chapter and late game, Oct 26 (check these stay true)**
