@@ -766,3 +766,9 @@ A fresh reviewer read every change on this branch against main. Fixed:
 - Closing a decision popup while a story card is queued now gives the speed back after the card.
 - Check shrimp no longer leaves an old canvas loop running each time it redraws.
 Bots after: strong 2,651 (dictator ending), kind 3,301 (garden village), average reaches 8.2B owners, Space completes; spotlight sweep 135 clean; tap-every-button 104 snapshots, 0 errors. Balance 58, academy 10, me 45.
+
+## Pass 101: racks open with 3 self-running tanks, first rack brings the own tank
+
+- Farm license now needs 10 kits sold and Tanks 1-3 each stocked with an auto feeder and auto water changer (no litre requirement). The guide points at whichever tank still needs automating.
+- The own-tank card ("The tank at home") comes with the first farm of any kind, not the first hatchery: extra tanks go to the farm, Tank 1 keeps its 20 best.
+- New balance check (59).

@@ -414,6 +414,12 @@ for(var i=0;i<4;i++){if(cullState(g,T).done)throw Error('Not done before 5 round
 var st=cullState(g,T);if(!st.done||st.share!==0.2||st.next!==30)throw Error('Gone through after 5, next full check in 30 days');
 g.day+=30;st=cullState(g,T);if(!st.monthly||st.share!==1)throw Error('After a month one look covers the whole tank');cullRound(g,T);if(!cullState(g,T).done)throw Error('Monthly check resets the clock');
 `);
+check('the farm license opens with 3 tanks that run themselves, the first rack sends the extra tanks to the farm',`
+var g=readyGame(),lic=PROJ.find(p=>p.id==='farmlic');g.kits.sold=10;while(g.tanks.length<3)g.tanks.push(newTank(g.tanks.length));g.tanks.forEach(function(t){t.pop=[{n:30,age:90,g:50}];t.feeder=0;t.autoWC=0;});
+if(lic.req(g))throw Error('Not before the tanks run themselves');g.tanks.forEach(function(t){t.feeder=1;t.autoWC=1;});if(!lic.req(g))throw Error('Open once all 3 have auto feed and auto water change');
+if(milestoneConditions(g).owntank)throw Error('No own-tank card before a farm');g.emp.farms.rack=1;if(!milestoneConditions(g).owntank)throw Error('The first grow rack brings the own-tank card');
+storyChoose(g,'owntank',0);if(g.tanks.length!==1||Math.round(totalN(g.tanks[0]))!==20)throw Error('One tank, twenty shrimp: '+g.tanks.length+' '+totalN(g.tanks[0]));
+`);
 check('old mothballed farms are sold at salvage, tree planting fits spare cash',`
 var g=readyGame();g.emp.farms={rack:3};g.emp.farmPaid={rack:[2000,2200,2400]};g.emp.pausedFarms={rack:2};var m0=g.money;migrate(g);
 if(g.emp.farms.rack!==1||Object.keys(g.emp.pausedFarms).length||!(g.money>m0))throw Error('Two mothballed racks sold, one keeps running: '+g.emp.farms.rack);
