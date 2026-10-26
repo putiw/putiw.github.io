@@ -812,3 +812,15 @@ Bots after: strong 2,651 (dictator ending), kind 3,301 (garden village), average
 
 - Check shrimp and Clean glass no longer hide behind a tap on the tank; they sit under it in the same grid as the own-tank jobs (Gravel, Sponge, Trim, Pests). 2 buttons in one row, 6 in two rows of three, no empty cells. Check shrimp is still where sick shrimp are found and treated or culled; Clean glass is still the algae wipe.
 - Cull button is the same plain style as Treat.
+
+## Pass 107: third UI review, text trim and calendar dates
+
+- Card header notes stay on one line (ellipsis as a last resort) and are short enough not to need it at 360 px: staff "AED 231/d", hatcheries "AED 11.3k/d", research "1 person · AED 184k/yr", Projects shows only the ✦ total with "✦ +409 a day" as a line in the card. Titles "Sales staff" (Ads) and "Schools and universities" (Lab), chart notes "tap for one day", Operating controls "stock, reserve".
+- Readings and shrimp chart titles read the same last recorded day as the line under them (one ppm format for both).
+- The Shrimp Times header no longer says "N shrimp-free". "N people quit eating shrimp" leads the effects line in the card.
+- While saving up for room is the only thing left (bigger tank or another tank before kits or the farm license), a quiet grey Next line says "Saving for a bigger tank: AED 130 of 350". No glow, no tab pulse, no slowdown (`savingLine`).
+- `dateOf(day)` gives the calendar date ("23 June 2028", same calendar as the header). The Shrimp Times latest story and archive, the newspaper banner masthead, Recent events and Completed projects use it. Header "Day N" and chart axes stay.
+- Recent events fold routine sales, water changes and hand-packed kits into one line, only for the latest day they happened, in grey (`logRows`).
+- Text trims, detail moved behind ?: Keep in tanks explanation, kit price lock, Equipment effects only (what each item is now in the Equipment ?), treats say "pick one a week under Feeding" once, Your day rows one short line (rules in the Your day ?), shop rows show kit orders/day and rent/day (rest and trust explained in Shops ?), staff rows "+25% customers each · AED 130/d each", "4 of 5 shops managed", hatchery rows "8 shrimp a day = 1 kit · AED 4/d upkeep", Mangroves one line with counters hidden until a tree is planted (? talks about shrimpcoin only once it launched), owners rows at 0 hidden with one line for what + and − count, What happened skips an effect whose % is already in the text.
+- Stale lab references gone (Chapter 4 "Your first tank stays at home", barn note, owners help). Farm license hint "Farm license: 3 tanks that run themselves, 0 of 3 ready. Next: an auto water changer for Tank 1." Postdoc cost "about AED 184k". Money chart title drops "You are in profit". Hide tank readings / Tank 1 controls moved from the ? popup to Settings (same `fold` id). Kits chapter no longer lists the five steps. The unused `tanks2` card text is current (kept, a test checks it exists).
+- BUILD 2026-10-26-r3.
