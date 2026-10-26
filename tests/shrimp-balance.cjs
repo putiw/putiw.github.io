@@ -414,6 +414,12 @@ for(var i=0;i<4;i++){if(cullState(g,T).done)throw Error('Not done before 5 round
 var st=cullState(g,T);if(!st.done||st.share!==0.2||st.next!==30)throw Error('Gone through after 5, next full check in 30 days');
 g.day+=30;st=cullState(g,T);if(!st.monthly||st.share!==1)throw Error('After a month one look covers the whole tank');cullRound(g,T);if(!cullState(g,T).done)throw Error('Monthly check resets the clock');
 `);
+check('old mothballed farms are sold at salvage, tree planting fits spare cash',`
+var g=readyGame();g.emp.farms={rack:3};g.emp.farmPaid={rack:[2000,2200,2400]};g.emp.pausedFarms={rack:2};var m0=g.money;migrate(g);
+if(g.emp.farms.rack!==1||Object.keys(g.emp.pausedFarms).length||!(g.money>m0))throw Error('Two mothballed racks sold, one keeps running: '+g.emp.farms.rack);
+var h=readyGame();h.money=1000+capitalReserve(h);if(coinPlantBatch(h)>1000||coinPlantBatch(h)<COIN_TREE)throw Error('A tap plants what spare cash can pay for: '+coinPlantBatch(h));
+`);
+if(!html.includes("$('legacy-equipment').hidden=hasFarm&&G.tanks.every(function(t){return t.feeder&&t.autoWC;})")||!html.includes("if(gc&&gc.closest('[hidden]:not(.panel)'))g=null;"))throw Error('Home gear stays until every tank runs itself, and the guide never points at a hidden card');
 if(!html.includes('data-act="hc-cull"')||!html.includes("a==='hc-cull'")||!html.includes('function openCull(i)')||!html.includes("careBack(v,x,T,t);"))throw Error('Cull is a choice in Check shrimp, and the care jobs live in the tank');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
