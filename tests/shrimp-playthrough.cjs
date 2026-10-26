@@ -13,7 +13,7 @@ function extraTanks(buy){if(!G.tanks[0].had)return;var T0=G.tanks[0];
   if(!t.had){if(t.cycledAt==null&&P.nh<.2&&P.no2<1){if(G.ob.doses<=0&&G.money>=40){pay(G,40,'supplies');G.ob.doses+=10;}addAmmonia(G,t);}if(t.chem.kh<2||P.no3>20)waterChange(G,t,50);
    if(safeToStock(G,t)&&totalN(T0)>=30)moveShrimp(G,T0,t,totalN(T0)/3);}
   else{if(!t.feeder)feed(G,t,.8);if(P.no3>18||t.chem.kh<2.5||t.chem.gh<5||(!t.autoWC&&G.day%7===0))waterChange(G,t,30);
-   if(!t.feeder&&G.stats.born>0&&G.money>90+150+capitalReserve(G))buyUpgrade(G,t,'feeder');if(!t.fan&&G.money>60+150+capitalReserve(G))buyUpgrade(G,t,'fan');}}}
+   if(!t.feeder&&G.stats.born>0&&G.money>90+150+capitalReserve(G))buyUpgrade(G,t,'feeder');if(!t.fan&&G.money>60+150+capitalReserve(G))buyUpgrade(G,t,'fan');if(t.feeder&&!t.autoWC&&G.money>220+150+capitalReserve(G))buyUpgrade(G,t,'autoWC');}}}
 function afford(c){return G.money>c+Math.max(40,staffCost(G)*14);}
 function policy(){
 while(G.progress.queue.length)acknowledgeMilestone(G);updateReveal();var T=G.tanks[0],P=ppm(T),E=G.emp;if(qcDue(G))qcRound(G,{water:1,look:0.95,dip:1});var nq=nextQC(G);if(nq&&G.money>nq.cost*3+capitalReserve(G)+300)buyQC(G,nq.id);if(farmBuilt(G)&&qc(G).strict!==2)setQCStrict(G,2);G.tanks.forEach(function(t,i){if(t.fresh)dipFresh(G,i);if(t.ill&&t.ill.days>=1)treatIll(G,i,illById(t.ill.type).cure,0.9);});
