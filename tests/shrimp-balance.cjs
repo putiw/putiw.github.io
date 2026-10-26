@@ -373,7 +373,7 @@ var g=readyGame(),T=g.tanks[0];g.progress.queue=[];T.cycledAt=1;safeToStock=func
 for(var i=0;i<12;i++){g.progress.queue=[];g.money=5;stepGame(g);}
 if(totalN(T)<1||!g.log.some(function(l){return /these are on me/.test(l.t);}))throw Error('Grandma should drop off shrimp once the water is ready and money is short');
 `);
-if(!html.includes(".opsrow select{font:500 16px")||!html.includes("#speed button,.tabs button,#guidebar,.newsflash,.top button{touch-action:manipulation}"))throw Error('iPhone should not zoom on the Operating dropdowns or on fast taps');
+if(!html.includes(".opsrow select{font:500 16px")||!html.includes("#speed button,.tabs button,#guidebar,.top button{touch-action:manipulation}.newsflash{touch-action:none}"))throw Error('iPhone should not zoom on the Operating dropdowns or on fast taps');
 if(!html.includes("localStorage.setItem(saveKey+'-bak-'+Date.now(),r)")||!html.includes("function checkBuild(){if(!/^https?:/.test(location.protocol)||document.hidden)return;"))throw Error('A save that fails to load is kept, and a hidden tab skips update checks');
 if(!html.includes("renderMilestone.last==='tenyears'&&$('milestone-card')"))throw Error('Nothing pops over the ten-year ending');
 check('late game: 40x with the hard part, dark projects can be turned down, farms keep the best bloodline, one card jumps the line',`
