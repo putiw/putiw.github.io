@@ -395,7 +395,7 @@ if(coinPlantBatch(g)!==COIN_TREE)throw Error('One tree a tap');
 for(var d=0;d<30;d++){g.day+=1;coinDay(g);}if((C.otrees||0)>0.0002*3*g.humans*30*1.2+1)throw Error('Others plant at most 0.06% of people a day');
 var s=readyGame();s.emp.won=1;s.academy=s.academy||{};s.academy.papers=45;if(!spaceOpen(s))throw Error('Years of research should open Space after Earth');s.academy.papers=3;s.academy.level=1;treesFor=function(){return [];};if(spaceOpen(s))throw Error('Without research or the curious path, no Space');
 `);
-if(!html.includes('id="after"')||!html.includes("showAfter(slab,stx,aft)")||!html.includes("if(pp&&pp.fk){showAfter(pp.name,pp.d,'');}"))throw Error('Decisions show what happened afterwards, in a popup');
+if(!html.includes('id="after"')||!html.includes("showAfter(slab,stx,aft)")||!html.includes("if(pp&&pp.fk){showAfter(pp.name,pp.d,kindNote());}"))throw Error('Decisions show what happened afterwards, in a popup');
 if(!html.includes("var renderInner=render;render=function(){var a=anchorGet();renderInner.apply(this,arguments);anchorFix(a);settleScan();};")||!html.includes('SETTLE_MS=500'))throw Error('The screen holds still under the finger and fresh decisions ignore taps for half a second');
 check('own tank keeps 20 shrimp, care builds up only then, Look over from the first shrimp',`
 var g=readyGame(),T=g.tanks[0];T.pop=[{n:80,age:120,g:40},{n:30,age:120,g:80},{n:10,age:20,g:90}];g.emp.rawShrimp=0;
