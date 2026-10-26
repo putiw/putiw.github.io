@@ -728,3 +728,8 @@ ammonia is only the primary button once ammonia is near zero.
 
 - Look over opens with the first shrimp you buy (any grown shrimp, age 30+). Bought ones show up too, and every shrimp you take out, bought or bred, is sold as a cull. Normal selling still never touches bought breeders.
 - Look over (and, at home later, Gravel, Sponge, Trim, Pests) sit in a row under the tank whenever they can do something, not only after tapping the tank (`careRow`). Bought shrimp taken out in Look over sell as culls too.
+
+## Pass 95: owners bar under money
+
+- Once Feed/Water/Sell are gone, the "X of 8.2B people have a shrimp tank at home" bar now sits directly under money and influence, above Fed/Nutrition (moved in the header markup; it still only shows when the action row is gone).
+- Checked at 390 px on the year-14 average-bot save. Balance 56, academy 10, me 45 all pass.
