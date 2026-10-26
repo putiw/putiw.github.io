@@ -822,8 +822,8 @@ function addHeart(G,h){if(h){G.emp.heart=(G.emp.heart||0)+h;trAdd(G,{means:h});}
 // Some kind choices cost time, not money: for a while fewer new people get a tank. Only where that is what would
 // really happen (a rival keeps the bargain hunters, a newspaper keeps joking, paperwork holds up every batch).
 // Others cost in their own way: per-kit costs, a lost licence income, waiting a year, weaker campaigns.
-var KIND_F=0.35,KIND_FLOOR=0.3;
-var KIND_PROJ={paperfree:[120,'The jokes keep coming, and some new buyers stay away.'],lawback:[90,'The new paperwork holds up every batch for a while.'],retrain:[90,'Your ranch plans wait while the crews learn kelp farming.'],geneshare:[150,'Rival breeders sell your line cheaper than you do.'],labgrandpa:[0,'']};
+var KIND_F=0.5,KIND_FLOOR=0.3;
+var KIND_PROJ={paperfree:[180,'The jokes keep coming, and some new buyers stay away.'],lawback:[150,'The new paperwork holds up every batch for a while.'],retrain:[150,'Your ranch plans wait while the crews learn kelp farming.'],geneshare:[240,'Rival breeders sell your line cheaper than you do.'],labgrandpa:[0,'']};
 function kindSlow(G,days,why){var E=G.emp,d=Math.floor(G.day||0);if(E.won||!days)return;E.kind=(E.kind||[]).filter(function(k){return k.u>d;});E.kind.push({u:d+days,f:KIND_F});E.kindNew=why||'Growth slows for a while.';}
 function kindMult(G){var E=G.emp,d=Math.floor(G.day||0),m=1;if(!E.kind||E.won)return 1;E.kind.forEach(function(k){if(k.u>d)m*=1-k.f;});return Math.max(KIND_FLOOR,m);}
 function kindLeft(G){var E=G.emp,d=Math.floor(G.day||0),u=0;(E.kind||[]).forEach(function(k){if(k.u>u)u=k.u;});return Math.max(0,u-d);}
@@ -1995,10 +1995,10 @@ function storyChoose(G,key,i){var E=G.emp,m=MILESTONES[key],ch=storyChoices(G,ke
  if(STORY_TAGS[key])trAdd(G,STORY_TAGS[key][i]);
  if(key==='ev_mira'){E.infOn=1;G.story.miraDay=Math.floor(G.day);if(i===2)gainInf(G,1);if(i===0){addHeart(G,1);var T=G.tanks[0];var sp=spareTankShrimp(T);if(sp>=2){var need=2;T.pop.filter(function(k){return k.age>=20&&!k.b;}).forEach(function(k){var t=Math.min(need,Math.floor(k.n));k.n-=t;need-=t;});}gainInf(G,5);}else if(i===1)gainInf(G,2);}
  if(key==='ev_paper'){if(i<2)moodAdd(G,3);else addHeart(G,-1);G.ads.push({id:'press',name:'Newspaper story',boost:i<2?2:3,left:7,days:7});}
- if(key==='ev_rival'){if(i===0)G.kitPrice=Math.max(100,Math.round(G.kitPrice*0.8/10)*10);else if(i===1){var rc=rivalCost(G);if(G.money<rc)return false;pay(G,rc,'projects');E.q+=0.02;addHeart(G,1);kindSlow(G,120,'The cheap seller keeps the bargain hunters while you make the video.');}else moodAdd(G,-3,30);}
+ if(key==='ev_rival'){if(i===0)G.kitPrice=Math.max(100,Math.round(G.kitPrice*0.8/10)*10);else if(i===1){var rc=rivalCost(G);if(G.money<rc)return false;pay(G,rc,'projects');E.q+=0.02;addHeart(G,1);kindSlow(G,180,'The cheap seller keeps the bargain hunters while you make the video.');}else moodAdd(G,-3,30);}
  if(key==='ev_ai'&&i===0){var ac=aiCost(G);if(G.money<ac)return false;pay(G,ac,'projects');E.aiRoute=2;E.aiCut=0.02;}
  if(key==='ev_school'){if(i===0){var sk=schoolKits(G);if(G.kits.stock<sk)return false;addHeart(G,1);G.kits.stock-=sk;G.kits.sold+=sk;addOwners(G,sk*effectiveQuality(G));gainInf(G,Math.max(500,sk*25));E.ceil+=0.005;}else if(i===1)gainInf(G,Math.max(100,sk0(G)));}
- if(key==='ev_marine'&&i===0){moodAdd(G,4);addHeart(G,1);kindSlow(G,30,'Some customers don’t like getting a survey from a shrimp shop and unsubscribe.');}
+ if(key==='ev_marine'&&i===0){moodAdd(G,4);addHeart(G,1);kindSlow(G,60,'Some customers don’t like getting a survey from a shrimp shop and unsubscribe.');}
  (G.story.choices||(G.story.choices={}))[key]=i;log(G,m.title+': '+ch[i][0].toLowerCase());return true;}
 function ensureProgress(G){if(!G.progress)G.progress={version:1,seen:{},queue:[],sandbox:false};var p=G.progress;if(!p.seen)p.seen={};if(!Array.isArray(p.queue))p.queue=[];return p;}
 function migrateProgress(G){
