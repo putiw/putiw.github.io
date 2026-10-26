@@ -306,7 +306,7 @@ th:first-child,td:first-child{text-align:left}
 @media (prefers-reduced-motion:reduce){.btn.pulse{animation:none}#toast{transition:none}}
 @media (prefers-reduced-motion:no-preference){.g-track i{transition:left .25s ease}.vm .mb i{transition:width .25s ease}.goal-bar i{transition:width .4s}}
 
-.topgoal{margin:6px 0 2px}.topgoal .tg-l{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}.topgoal .tg-l b{font-size:20px;color:var(--shrimp)}.topgoal .tg-l small{font-size:12.5px;color:var(--ink-2)}#tg-r{display:block;font-size:12px}#tg-r:empty{display:none}.topgoal .goal-bar{margin-top:4px;width:100%;flex:none;height:6px}
+.topgoal{margin:6px 0 2px}.topgoal .tg-l{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}.topgoal .tg-l b{font-size:20px;color:var(--shrimp)}.topgoal .tg-l small{font-size:12.5px;color:var(--ink-2)}.earthline{display:block;width:100%;text-align:left;border:0;background:transparent;padding:2px 0 0;margin:0;font:500 12px/1.3 var(--font-body);color:var(--good);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.earthline[hidden]{display:none}#tg-r{display:block;font-size:12px}#tg-r:empty{display:none}.topgoal .goal-bar{margin-top:4px;width:100%;flex:none;height:6px}
 .business-strip{display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:6px;font-size:12px;color:var(--ink-2)}.business-strip b{font:500 12px var(--font-data);color:var(--ink)}
 
 
@@ -404,6 +404,7 @@ main details:not(.card):not(.dream-tracker):not(#next-card)[open]>summary::befor
     </div>
   </div>
   <div class="topgoal" id="topgoal" hidden><div class="tg-l"><b id="tg-n" class="mono"></b><small>of 8.2B people have a shrimp tank at home</small><small id="tg-r" class="mono"></small></div><div class="goal-bar"><i id="tg-bar" style="width:0"></i></div></div>
+  <button type="button" class="earthline" id="earthline" data-act="earthline" hidden></button>
   <div class="chips" id="tankchips" hidden></div>
   <div class="readrow" id="readrow">
     <div class="vitals" id="vitals">
@@ -2990,7 +2991,7 @@ function hardLines(G){var H=G.emp.hard;if(!H)return [];var o=[];HARD.forEach(fun
 // A green token. Companies, countries and people buy it to show off, then to trade it. You plant the trees, the coins come to you.
 // Honest count: a coin for each tree still alive after a year, about 60% of seedlings. Counting seedlings mints everything at once, and leaves coins with no tree behind them.
 var COIN_TREE=4,COIN_FAIR=12,COIN_SURV=0.6,COIN_FEE=0.05,COIN_COAST=8e9;// about as many trees as the coasts that once held mangroves can take again
-function coinRoom(G){var C=coinOf(G);return Math.max(0,COIN_COAST-C.trees-(C.otrees||0));}
+function coinRoom(G){var C=coinOf(G);return Math.max(0,COIN_COAST-C.trees-(C.otrees||0)-(C.ptrees||0));}
 // what a coin costs to make: a seedling, or a surviving tree under the honest count
 function coinBreakEven(G){var C=coinOf(G);return C.honest?COIN_TREE/COIN_SURV:COIN_TREE;}
 function coinOf(G){var E=G.emp;if(!E.coin)E.coin={on:0,honest:1,price:COIN_FAIR,x:0,hype:0,trees:0,coins:0,treasury:0,unbacked:0,cohorts:[],ocohorts:[],otrees:0,hist:[],sold:0,bought:0,earned:0,spent:0};return E.coin;}
@@ -3004,7 +3005,12 @@ var TREES_AT=1e4,COIN_BATCH=1,TREE_SPREAD=0.002;
 function treesOpen(G){return (G.kits&&G.kits.sold>=TREES_AT)||coinOn(G);}
 function coinPlantBatch(G){return COIN_BATCH*COIN_TREE;}
 function treeSpread(G){var C=coinOf(G);return Math.min(coinRoom(G),(C.trees+(C.otrees||0))*TREE_SPREAD*(pd(G,'mangrove')?2:1));}
-function treesDay(G){var C=coinOf(G);if(!treesOpen(G)||coinRoom(G)<1)return;var raw=(C.trees+(C.otrees||0))*TREE_SPREAD*(pd(G,'mangrove')?2:1)+(C.spreadAcc||0),n=Math.floor(Math.min(raw,coinRoom(G)));C.spreadAcc=raw-n;if(n<1)return;
+// When people stop eating shrimp, shrimp ponds close. Once the first flooded pond grows mangroves (the 1M ripple),
+// closed ponds grow back on their own: about one tree for every two people who quit, over half a year. No coins for these.
+var POND_PER=0.5;
+function pondGrow(G){var C=coinOf(G);if(!rippleHas(G,'mangrove'))return;var tgt=rip(G).free*POND_PER,gap=Math.min(tgt-(C.ptrees||0),coinRoom(G));if(gap>0)C.ptrees=(C.ptrees||0)+Math.max(Math.min(1,gap),gap/180);}
+function earthNums(G){var C=coinOf(G),R=rip(G);return {quit:Math.floor(R.free||0),mine:Math.floor(C.trees||0),others:Math.floor(C.otrees||0),ponds:Math.floor(C.ptrees||0),trees:Math.floor((C.trees||0)+(C.otrees||0)+(C.ptrees||0))};}
+function treesDay(G){var C=coinOf(G);pondGrow(G);if(!treesOpen(G)||coinRoom(G)<1)return;var raw=(C.trees+(C.otrees||0))*TREE_SPREAD*(pd(G,'mangrove')?2:1)+(C.spreadAcc||0),n=Math.floor(Math.min(raw,coinRoom(G)));C.spreadAcc=raw-n;if(n<1)return;
  C.otrees=(C.otrees||0)+n;if(C.on){C.ocohorts=C.ocohorts||[];if(C.honest)C.ocohorts.push({day:Math.floor(G.day),n:n});else coinMintOut(G,n,n*(1-COIN_SURV));}
  if(!C.spreadNews&&C.otrees>=20){C.spreadNews=1;newsLine(G,'Your neighbours on the coast road start planting mangroves too. Nobody pays them to.');}}
 function treesFromGala(G,aed){var C=coinOf(G),n=Math.floor(Math.min(aed/COIN_TREE,coinRoom(G)));if(n<1)return 0;C.otrees=(C.otrees||0)+n;if(C.on&&C.honest){C.ocohorts=C.ocohorts||[];C.ocohorts.push({day:Math.floor(G.day),n:n});}return n;}
@@ -3202,7 +3208,7 @@ function cost2(m,i){return (m?aed(m):'')+(m&&i?' + ':'')+(i?inf(i):'');}
 function trim(n,d){return String(+Number(n).toFixed(d));}
 // iPhone Safari moves its toolbar while you scroll and the fixed tab bar can end up floating above the bottom. Pin it to what's really on screen.
 (function(){var vv=window.visualViewport;if(!vv)return;var fix=function(){var t=document.querySelector('.tabs');if(!t)return;var off=window.innerHeight-(vv.height+vv.offsetTop);t.style.transform=Math.abs(off)>1&&vv.scale<=1.01?'translateY('+(-off)+'px)':'';};vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);window.addEventListener('scroll',fix,{passive:true});})();
-var toastT=null,NF=null,BUILD='2026-10-26-news';
+var toastT=null,NF=null,BUILD='2026-10-26-earth';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
@@ -4858,7 +4864,7 @@ function endCharts(G){var C=G.chart;if(!C||!C.s||C.s.length<3)return '';var S=C.
 function endingHTML(G){var id=endingPick(G),X=ENDINGS[id]||ENDINGS.drift_shop,l=endingLines(G).concat(gpLines(G));if(X.next)l.unshift(X.next);if(X.last)l.push(X.last);
  var gp=(nm(G)?'Dear '+nm(G)+',<br><br>':'')+X.gp.replace('[visit]',END_VISIT[visitLevel(G)]).replace(/\s+$/,'')+(styleTop(G)?' '+STYLE_GP[styleTop(G).k][styleTop(G).pos?0:1]:''),lives=Object.keys(END_LIVES).filter(function(k){return k!==X.end;}).map(function(k){return END_LIVES[k];}),
   all=Object.keys(ENDINGS).map(function(k){return '<li'+(k===id?' class="here"':'')+'>'+ENDINGS[k].name+(k===id?' · you':'')+'</li>';}).join('');
- var sty=styleTop(G);return '<h3 class="end-name">'+X.name+(sty?' · '+sty.name:'')+'</h3><p>'+X.who+'</p>'+(sty?'<p>'+sty.text+'</p>':'')+endCharts(G)+'<h3>Mira</h3><p>'+X.mira+'</p>'+(l.length?'<h3>What the world looks like</h3><ul class="ending">'+l.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>':'')+
+ var sty=styleTop(G);return '<h3 class="end-name">'+X.name+(sty?' · '+sty.name:'')+'</h3>'+earthHTML(G)+'<p>'+X.who+'</p>'+(sty?'<p>'+sty.text+'</p>':'')+endCharts(G)+'<h3>Mira</h3><p>'+X.mira+'</p>'+(l.length?'<h3>What the world looks like</h3><ul class="ending">'+l.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>':'')+
   '<h3>A letter from Grandma</h3><p class="end-letter">'+gp+'</p><h3>From the tank</h3><p class="end-tank">'+X.tank+'</p>'+(lives.length?'<h3>Lives you didn’t live</h3><p>'+lives.join(', ').replace(/^./,function(c){return c.toUpperCase();})+'.</p>':'')+
   '<details class="end-all"><summary>All '+Object.keys(ENDINGS).length+' endings</summary><ol>'+all+'</ol></details>';}
 function updateUpgrades(){
@@ -5233,14 +5239,14 @@ function coinChart(C){var h=C.hist.slice(-365);if(h.length<2)return '<p class="h
  var title='Shrimpcoin is '+(ch>=0?'up ':'down ')+Math.round(Math.abs(ch)*100)+'% over '+(h.length>=365?'the last year':h.length+' days');
  return '<p class="coin-t">'+title+'</p><svg class="coin-ch" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+title+'"><line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-6)+'" y2="'+(H-B)+'" class="ax"/><line x1="'+L+'" y1="6" x2="'+L+'" y2="'+(H-B)+'" class="ax"/><text x="'+(L-4)+'" y="'+(Y(mx)+4)+'" text-anchor="end">'+mx.toFixed(1)+'</text><text x="'+(L-4)+'" y="'+(Y(mn)+4)+'" text-anchor="end">'+mn.toFixed(1)+'</text><text x="'+L+'" y="'+(H-3)+'">'+(h.length-1)+' days ago</text><text x="'+(W-6)+'" y="'+(H-3)+'" text-anchor="end">today</text><text x="4" y="'+(H/2)+'" transform="rotate(-90 8 '+(H/2)+')" text-anchor="middle">AED per coin</text><path d="'+d+'" class="ln"/></svg>';}
 function renderCoin(){var c=$('coin-card');if(!c)return;var C=G.emp.coin,on=!!(C&&C.on),tr=treesOpen(G);c.hidden=!on&&!tr;setT('coin-h',on?'Shrimpcoin':'Mangroves');if(!on&&!tr||activeTab!=='world')return;
- if(!on){C=coinOf(G);setT('coin-sum',cnt(C.trees+(C.otrees||0))+' trees');var ht='<p class="sub">Plant a seedling, others copy what they see.</p>';
-  if(C.trees+(C.otrees||0)>0)ht+='<div class="coin-kv"><span>Trees you planted</span><b>'+cnt(C.trees)+'</b><span>Trees others planted</span><b>'+cnt(C.otrees||0)+'</b><span>Others plant a day</span><b>'+(treeSpread(G)>=1?'about '+cnt(treeSpread(G)):treeSpread(G)>0?'about one every '+Math.round(1/treeSpread(G))+' days':'nobody yet')+'</b></div>';
+ if(!on){C=coinOf(G);setT('coin-sum',cnt(earthNums(G).trees)+' trees');var ht='<p class="sub">Plant a seedling, others copy what they see.</p>';
+  if(earthNums(G).trees>0)ht+='<div class="coin-kv"><span>Trees you planted</span><b>'+cnt(C.trees)+'</b><span>Trees others planted</span><b>'+cnt(C.otrees||0)+'</b>'+(C.ptrees>=1?'<span>Grown back on closed shrimp ponds</span><b>'+cnt(C.ptrees)+'</b>':'')+'<span>Others plant a day</span><b>'+(treeSpread(G)>=1?'about '+cnt(treeSpread(G)):treeSpread(G)>0?'about one every '+Math.round(1/treeSpread(G))+' days':'nobody yet')+'</b></div>';
   ht+=coinRoom(G)<1?itemHTML('Plant a tree','The coasts are full.','<button class="btn" disabled>Full</button>'):itemHTML('Plant a tree','One seedling on the old shrimp-pond coast.',bbtn('coin-plant','',aed(COIN_TREE),!frozen(G)&&G.money>=COIN_TREE+capitalReserve(G),true));
   $('coin-body').mhtml=ht;return;}
  var h1=C.hist.length>1?C.hist[C.hist.length-2]:C.price,ch=C.price/h1-1;setT('coin-sum','AED '+C.price.toFixed(2)+' '+(ch>=0?'▲':'▼')+Math.abs(ch*100).toFixed(1)+'%');
  var pc=coinPlantCost(G),ppl=Math.floor(Math.min(G.humans*0.05,Math.max(0,C.coins-C.treasury)/50));
  var h='<p class="sub">One coin for every mangrove tree'+(C.honest?' alive after a year':', counted as seedlings')+'.</p>'+coinChart(C);
- h+='<div class="coin-kv"><span>Trees you planted</span><b>'+cnt(C.trees)+'</b><span>Trees others planted</span><b>'+cnt(C.otrees||0)+'</b><span>A coin costs to make</span><b>AED '+coinBreakEven(G).toFixed(2)+(C.price>coinBreakEven(G)?', others are planting':(C.otrees>0?', others have stopped planting':', nobody else plants'))+'</b><span>Coins in the world</span><b>'+cnt(C.coins)+'</b><span>Your company holds</span><b>'+cnt(C.treasury)+' · '+aed(C.treasury*C.price)+'</b><span>Held by others</span><b>'+cnt(Math.max(0,C.coins-C.treasury))+(ppl>1e5?', '+big(ppl)+' people and a few countries':'')+'</b>'+(C.cohorts.length||(C.ocohorts||[]).length?'<span>Waiting for their first year</span><b>'+cnt(C.cohorts.concat(C.ocohorts||[]).reduce(function(a,x){return a+x.n;},0))+' trees</b>':'')+'</div>';
+ h+='<div class="coin-kv"><span>Trees you planted</span><b>'+cnt(C.trees)+'</b><span>Trees others planted</span><b>'+cnt(C.otrees||0)+'</b>'+(C.ptrees>=1?'<span>Grown back on closed shrimp ponds</span><b>'+cnt(C.ptrees)+'</b>':'')+'<span>A coin costs to make</span><b>AED '+coinBreakEven(G).toFixed(2)+(C.price>coinBreakEven(G)?', others are planting':(C.otrees>0?', others have stopped planting':', nobody else plants'))+'</b><span>Coins in the world</span><b>'+cnt(C.coins)+'</b><span>Your company holds</span><b>'+cnt(C.treasury)+' · '+aed(C.treasury*C.price)+'</b><span>Held by others</span><b>'+cnt(Math.max(0,C.coins-C.treasury))+(ppl>1e5?', '+big(ppl)+' people and a few countries':'')+'</b>'+(C.cohorts.length||(C.ocohorts||[]).length?'<span>Waiting for their first year</span><b>'+cnt(C.cohorts.concat(C.ocohorts||[]).reduce(function(a,x){return a+x.n;},0))+' trees</b>':'')+'</div>';
  var ok=!frozen(G);
  h+=coinRoom(G)<1?itemHTML('Plant trees','The coasts are full. Every place that can hold mangroves has them.','<button class="btn" disabled>Full</button>'):itemHTML('Plant a tree','About AED '+COIN_TREE+' a seedling, on the old shrimp-pond coasts. Room left for '+big(coinRoom(G))+'.',bbtn('coin-plant','',aed(coinPlantBatch(G)),ok&&G.money>=coinPlantBatch(G)+capitalReserve(G),true));
  h+=itemHTML('Buy coins','From the market, at today’s price. Big buys push the price up.',bbtn('coin-buy','',aed(pc),ok&&G.money>=pc+capitalReserve(G)));
@@ -5363,6 +5369,9 @@ var CARD_HOLD=null,SC_WC=false;
 
 // What a decision did, after it's made. A popup the player has to close, the game waits under it.
 var AFTER_HOLD=null;
+function earthLine(G){var e=earthNums(G),p=[];if(e.quit>=100)p.push(big(e.quit)+' quit eating shrimp');if(e.trees>=1)p.push(big(e.trees)+' mangroves back');return p.join(' · ');}
+function earthHTML(G){var e=earthNums(G),R=rip(G),seen=[];for(var i=0;i<R.n;i++)if(RIPPLE[i].big)seen.push(RIPPLE[i].t);if(e.quit<100&&!seen.length)return '';
+ return '<h3>What changed on Earth</h3><p>'+(e.quit>=100?big(e.quit)+' people stopped eating shrimp because a shrimp lived in their home. ':'')+(e.trees>=1?big(e.trees)+' mangroves grew back on old shrimp-pond coasts'+(e.mine>=1?', '+big(e.mine)+' of them planted by you':'')+'.':'')+'</p>'+(seen.length?'<ul class="ending">'+seen.slice(-5).map(function(t){return '<li>'+t+'</li>';}).join('')+'</ul>':'');}
 function kindNote(){var E=G.emp,w=E.kindNew;E.kindNew=0;var d=kindLeft(G);return w&&d>0?w+' For about '+d+' days, fewer new people get a tank.':'';}
 function showAfter(title,body,fx){if(fx&&body)fx=String(fx).split(' · ').filter(function(p){var m=p.match(/\d[\d,.]*%/);return !(m&&body.indexOf(m[0])>=0);}).join(' · ');if(!body&&!fx)return;var el=$('after');if(!el)return;setT('after-t',title||'');$('after-b').textContent=body||'';$('after-b').hidden=!body;$('after-fx').textContent=fx||'';$('after-fx').hidden=!fx;
  if(el.hidden){AFTER_HOLD=speed||AFTER_HOLD;if(speed)setSpeed(0);}el.hidden=false;AFTER_AT=Date.now();setTimeout(function(){try{$('after-ok').focus({preventScroll:true});}catch(e){}},50);}
@@ -5386,6 +5395,7 @@ function renderMilestone(){
  if(m.chapter||m.story||key==='win')setT('milestone-body',body);else setEmphasisText('milestone-body',body,TASK_EMPHASIS);var letter=key==='intro'?null:GRANDMA_LETTERS[key];$('milestone-letter').hidden=!letter;if(letter){setT('milestone-lsum','Grandma’s note · '+letter.title);setT('milestone-ltext',grandmaLetter(G,key));}
  var h=key==='intro'?'<button class="btn primary" data-act="milestone-next">Accept Grandma’s tank</button>':key==='win'?'<button class="btn primary" data-act="review-empire">Review your empire</button><button class="btn" data-act="sandbox">Continue sandbox</button><button class="btn" data-act="reset">New game</button>':'<button class="btn primary" data-act="milestone-next">Got it</button>';
   if(key==='win')h='<div class="ending-box">'+endingHTML(G)+'</div>'+h;
+  if(key==='tenyears'&&earthHTML(G))h='<div class="ending-box">'+earthHTML(G)+'</div>'+h;
   if(key==='gameover')h='<div class="ending-box">'+endingHTML(G)+'</div><button class="btn primary" data-act="reset">New game</button>';
   if(m.intro)h='<button class="btn primary" data-act="milestone-next" data-show="1">Got it · show me</button>';
   if(key==='cycle'){h='<button class="btn primary" data-act="milestone-next">Buy shrimp in Trade</button>';var so=G.opt.spotSeen||(G.opt.spotSeen={});so['tab-market']=1;}
@@ -5440,7 +5450,7 @@ function renderProgression(){
  if(activeTab==='tank'){var fed=allStarterAuto(G);setActs(rv('shrimp'),rv('kit'));var toggle=$('manual-feed-toggle');if(!toggle){toggle=document.createElement('button');toggle.id='manual-feed-toggle';toggle.className='btn';toggle.dataset.act='manual-feed-toggle';$('feedcard').appendChild(toggle);}toggle.hidden=!fed;toggle.textContent=E.manualOverride?'Hide emergency manual feed':'Emergency manual feed';}
  if((G.recipe||stdUnlocked(G))&&topAway(G)&&!ownTank(G))$('acts').hidden=true;
  if(activeTab==='market'&&open&&(topAway(G)||labMode()))['vitals','vwater','acts','tankchips','fold'].forEach(function(id){$(id).hidden=true;});
- var tg=G.emp.regions.length>=2&&!$('acts').getClientRects().length&&!G.emp.won;$('topgoal').hidden=!tg;if(tg){setT('tg-n',big(Math.floor(G.humans)));var kl=kindLeft(G);setT('tg-r',kl>0&&!G.emp.won?'growing slower for '+kl+' more days, doing it properly':'');$('tg-bar').style.width=Math.max(0.5,Math.min(100,G.humans/WORLD*100))+'%';}
+ var el0=earthLine(G);$('earthline').hidden=!el0;if(el0)setT('earthline',el0);var tg=G.emp.regions.length>=2&&!$('acts').getClientRects().length&&!G.emp.won;$('topgoal').hidden=!tg;if(tg){setT('tg-n',big(Math.floor(G.humans)));var kl=kindLeft(G);setT('tg-r',kl>0&&!G.emp.won?'growing slower for '+kl+' more days, doing it properly':'');$('tg-bar').style.width=Math.max(0.5,Math.min(100,G.humans/WORLD*100))+'%';}
 }
 // The ? and the person button live in the header's first row from the start. The action row hides when it has nothing to show.
 function placeInfo(){var acts=$('acts');if(!acts)return;var top=document.querySelector('.top'),any=!(top&&top.classList.contains('folded')&&top.classList.contains('lab'))&&['tb-feed','tb-wc','tb-sell'].some(function(id){return !$(id).hidden;});if(!any)acts.hidden=true;}
@@ -5597,7 +5607,7 @@ function initControls(){
     if(a==='order-take'){takeOrder(G);render();}
     if(a==='korder-take'){if(G.korder)G.korder.taken=true;render();}
     if(a==="noteflash"){b.classList.remove('on');b.hidden=true;if(b.dataset.k!=='word'&&$('tb-me')&&!$('tb-me').hidden)$('tb-me').click();return;}
-    if(b.dataset&&b.dataset.swiped){delete b.dataset.swiped;return;}if(a==="newsflash"){b.classList.remove('on');b.hidden=true;var tw=document.querySelector('.tabs [data-tab="world"]');if(tw&&!tw.hidden)tw.click();return;}
+    if(b.dataset&&b.dataset.swiped){delete b.dataset.swiped;return;}if(a==='earthline'){var tw2=document.querySelector('.tabs [data-tab="world"]');if(tw2&&!tw2.hidden)tw2.click();var rc=$('ripplecard');if(rc)try{rc.scrollIntoView({block:'start',behavior:'smooth'});}catch(e){}return;}if(a==="newsflash"){b.classList.remove('on');b.hidden=true;var tw=document.querySelector('.tabs [data-tab="world"]');if(tw&&!tw.hidden)tw.click();return;}
     if(a==='rl-hire'){if(rlHire(G,b.dataset.l,b.dataset.p)){cache.rlh=null;render();}else toast('Not enough spare cash for the first month.');return;}
     if(a==='coin-plant'){if(coinPlant(G,coinPlantBatch(G)))render();else toast('Not enough spare cash.');return;}
     if(a==='coin-buy'){if(coinBuy(G,coinPlantCost(G)))render();else toast(coinOf(G).coins-coinOf(G).treasury<1?'Nobody is selling coins right now. Your company holds them all.':'Not enough spare cash.');return;}

@@ -829,3 +829,9 @@ Bots after: strong 2,651 (dictator ending), kind 3,301 (garden village), average
 
 - Shrimp Times banners and Grandma / Your day notes can be swiped up to dismiss (tap still opens World / your page).
 - The turning points of the shrimp-free story (fishing towns upset, first mangroves, ponds turning green, fish and wild shrimp back, storm, carbon, coral, less carbon, mangrove boardwalks, farms growing seaweed) open as a centred "What happened" popup with the effect, instead of a banner. Smaller stories stay as the top banner.
+
+## Pass 109: the shrimp-free story up front
+
+- A green line under the owners bar keeps the chain on screen: "11.5M quit eating shrimp · 3.85M mangroves back". Tap it for The Shrimp Times.
+- Closed shrimp ponds grow back into mangroves on their own once the first flooded pond does (the 1M ripple): about one tree for every two people who quit, over half a year, no coins. They count on the Mangroves / Shrimpcoin card ("Grown back on closed shrimp ponds") and take coast room.
+- The ten-year card and the ending open with "What changed on Earth": people who stopped eating shrimp, mangroves back (and how many you planted), and the big turns of the story that happened.

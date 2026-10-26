@@ -420,6 +420,10 @@ if(lic.req(g))throw Error('Not before the tanks run themselves');g.tanks.forEach
 if(milestoneConditions(g).owntank)throw Error('No own-tank card before a farm');g.emp.farms.rack=1;if(!milestoneConditions(g).owntank)throw Error('The first grow rack brings the own-tank card');
 storyChoose(g,'owntank',0);if(g.tanks.length!==1||Math.round(totalN(g.tanks[0]))!==20)throw Error('One tank, twenty shrimp: '+g.tanks.length+' '+totalN(g.tanks[0]));
 `);
+check('people who quit eating shrimp let old ponds grow back into mangroves, after the first one does',`
+var g=readyGame(),R=rip(g);R.free=1e6;for(var d=0;d<30;d++){g.day++;coinDay(g);}if(coinOf(g).ptrees)throw Error('No regrowth before the first flooded pond');
+R.n=RIPPLE.findIndex(function(h){return h.fx==='mangrove';})+1;for(var d2=0;d2<200;d2++){g.day++;coinDay(g);}var e=earthNums(g);if(e.ponds<2.5e5||e.ponds>5e5+1||coinOf(g).coins)throw Error('Heading to half a tree per person who quit, over months, no coins: '+e.ponds);
+`);
 check('old mothballed farms are sold at salvage, tree planting fits spare cash',`
 var g=readyGame();g.emp.farms={rack:3};g.emp.farmPaid={rack:[2000,2200,2400]};g.emp.pausedFarms={rack:2};var m0=g.money;migrate(g);
 if(g.emp.farms.rack!==1||Object.keys(g.emp.pausedFarms).length||!(g.money>m0))throw Error('Two mothballed racks sold, one keeps running: '+g.emp.farms.rack);
