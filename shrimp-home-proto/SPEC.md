@@ -131,8 +131,9 @@ Puti tested round 1 (notes in the artifact db, `notes/<her id>`). For the home s
 - `PIXSRC`: data URIs, frame layout in `PIXMETA`.
 - `millie`: 51 frames of 128×128 in a row.
   - 0 idle facing down; 1–12 run right; 13–24 run left; 26–37 run down (toward the camera); 38 back idle; 39–50 run up.
-- `dog`: 14 frames of 128×128.
-  - 0–12 run cycle facing right (mirror for left), 13 sitting facing front.
+- `dog`: 32 frames of 128×128.
+  - 0–12 run cycle facing right (mirror for left), 13 sitting facing front. These are hers.
+  - 14–21 trotting toward the camera and 22–29 trotting away, 8 frames each; 30 standing toward, 31 standing away. Added in round 3 to match her sheet: the front view uses her own head and front legs from frame 13, the back view her head outline and ear lines with the dark saddle over the back and a tan-feathered tail. Her 14 frames are unchanged.
 - Tiles, 64×64: `grass`, `dirt`, `water`.
   - `terrain`: Haven atlas, 10×3 tiles of 64, grass-on-dirt transitions.
   - `gdw`: Echoing End autotile set, 64-px tiles: grass, dirt and water edges.
@@ -195,3 +196,10 @@ Puti's note on Sort was "cull manually, but not this interface". She asked for t
 - **Sort is gone.** Its Try entry keeps the id `sort`, so her note stays with it, and is now "Net and cull tank". Its Try it button adds 60 reds of mixed grade if the tank has fewer than 60.
 
 Code: in tank.js, `netCatch`, `netReturn`, `netMoveTo`, `netToCull`, `cullTank`, `setCullRole`, `hobbyists`, `sampleInds` (`SHOW_N = 36`), `netBar` and `drawNet`. The art is in netart.js (`SPR.net`, `NET_ART`). The sounds are `sfx('catch')` (her two samples) and `sfx('push')`. Tests: `test/net.js`.
+
+## Round 3: the dog walks up and down (26 October)
+
+Puti asked for walking up and down: the dog only had side, standing and sitting frames.
+- New frames 14–31 on the dog sheet (see Assets above), drawn to match hers.
+- The home picks the view from the way he's going (`dogDir` in land.js, with a little stickiness so diagonals don't flicker): side frames for sideways, 14–21 toward you, 22–29 away.
+- When he stops he stands facing that way (30, 31), then sits facing you (13) as before.

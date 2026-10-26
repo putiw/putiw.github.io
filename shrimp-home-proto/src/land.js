@@ -968,7 +968,7 @@ function placeChars(){var m=M(),l=LS(),st=l.me&&passable(l.me.tx,l.me.ty)?[l.me.
   if(!passable(st[0],st[1])){for(var i=0;i<m.g.length;i++)if(L.pass[i]){st=[i%m.w,(i/m.w)|0];break;}}
   L.me={x:st[0]*T+T/2,y:st[1]*T+T/2+8,dir:'down',moving:false,path:[],anim:0,act:null,idle:0,sit:null,speed:ME_SPEED};
   var dt=[[-1,0],[1,0],[0,1],[0,-1]].map(function(d){return [st[0]+d[0],st[1]+d[1]];}).filter(function(p){return passable(p[0],p[1])&&canStep(st[0],st[1],p[0],p[1]);})[0]||st;
-  L.dog={x:dt[0]*T+T/2+(dt===st?24:0),y:dt[1]*T+T/2+8,face:1,st:'sit',anim:0,t:0,q:[],hop:0,idle:0,wt:3+Math.random()*4};L.trail=[];
+  L.dog={x:dt[0]*T+T/2+(dt===st?24:0),y:dt[1]*T+T/2+8,face:1,dir:'side',st:'sit',anim:0,t:0,q:[],hop:0,idle:0,wt:3+Math.random()*4};L.trail=[];
   placeCat();}
 function meStop(){var me=L.me;if(!me)return;me.path=[];me.moving=false;me.act=null;}
 // walk to a tile; then do act()
@@ -1018,23 +1018,28 @@ function stepDog(dt){var dg=L.dog,me=L.me;if(!dg||!me)return;dg.t+=dt;if(dg.hop>
   if(dg.st==='follow'||me.moving){if(dg.st!=='follow'){dogRejoin();}
     var R=trailLen(dg);
     if(R>DOG_GAP){var tgt=dg.q.length?dg.q[0]:L.trail.length?L.trail[0]:[me.x,me.y],dx=tgt[0]-dg.x,dy=tgt[1]-dg.y,d=Math.hypot(dx,dy),v=(R>DOG_GAP+70?me.speed*1.3:me.speed*1.02)*dt;
-      if(d<=v||d<2){dg.x=tgt[0];dg.y=tgt[1];if(dg.q.length)dg.q.shift();else if(L.trail.length)L.trail.shift();}else{dg.x+=dx/d*v;dg.y+=dy/d*v;if(Math.abs(dx)>1)dg.face=dx>0?1:-1;}
+      if(d<=v||d<2){dg.x=tgt[0];dg.y=tgt[1];if(dg.q.length)dg.q.shift();else if(L.trail.length)L.trail.shift();}else{dg.x+=dx/d*v;dg.y+=dy/d*v;dogDir(dx,dy);}
       dg.anim+=dt*16;dg.run=true;dg.idle=0;}
     else{dg.run=false;dg.idle+=dt;if(!me.moving&&dg.idle>0.35){dg.st='sit';dg.t=0;dg.wt=4+Math.random()*5;faceDogTo(me.x);}}
     return;}
   dg.run=false;
   if(dg.st==='sit'){dg.idle+=dt;if(me.idle>4&&dg.t>dg.wt&&!me.sit){dg.t=0;dg.wt=4+Math.random()*6;if(Math.random()<0.45)dogWander();}}
-  else if(dg.st==='wander'){if(dg.q.length){var tg=dg.q[0],ex=tg[0]-dg.x,ey=tg[1]-dg.y,ed=Math.hypot(ex,ey),ev=70*dt;if(ed<=ev){dg.x=tg[0];dg.y=tg[1];dg.q.shift();}else{dg.x+=ex/ed*ev;dg.y+=ey/ed*ev;if(Math.abs(ex)>1)dg.face=ex>0?1:-1;}dg.anim+=dt*8;dg.run=true;}
+  else if(dg.st==='wander'){if(dg.q.length){var tg=dg.q[0],ex=tg[0]-dg.x,ey=tg[1]-dg.y,ed=Math.hypot(ex,ey),ev=70*dt;if(ed<=ev){dg.x=tg[0];dg.y=tg[1];dg.q.shift();}else{dg.x+=ex/ed*ev;dg.y+=ey/ed*ev;dogDir(ex,ey);}dg.anim+=dt*8;dg.run=true;}
     else{dg.st='sniff';dg.t=0;dg.wt=1.6+Math.random()*2;}}
   else if(dg.st==='sniff'){if(dg.t>dg.wt){var gt=tileOf(me.x,me.y),side=[[-1,0],[1,0],[0,1]].map(function(o){return [gt[0]+o[0],gt[1]+o[1]];}).filter(function(p){return passable(p[0],p[1]);})[0]||gt;
     dg.q=pathFor(dg.x,dg.y,side,(side[0]+0.5)*T+(side[0]<gt[0]?14:-14),(side[1]+0.5)*T+8)||[];dg.st='back';}}
-  else if(dg.st==='back'){if(dg.q.length){var tb=dg.q[0],bx=tb[0]-dg.x,by=tb[1]-dg.y,bd=Math.hypot(bx,by),bv=110*dt;if(bd<=bv){dg.x=tb[0];dg.y=tb[1];dg.q.shift();}else{dg.x+=bx/bd*bv;dg.y+=by/bd*bv;if(Math.abs(bx)>1)dg.face=bx>0?1:-1;}dg.anim+=dt*12;dg.run=true;}
+  else if(dg.st==='back'){if(dg.q.length){var tb=dg.q[0],bx=tb[0]-dg.x,by=tb[1]-dg.y,bd=Math.hypot(bx,by),bv=110*dt;if(bd<=bv){dg.x=tb[0];dg.y=tb[1];dg.q.shift();}else{dg.x+=bx/bd*bv;dg.y+=by/bd*bv;dogDir(bx,by);}dg.anim+=dt*12;dg.run=true;}
     else{dg.st='sit';dg.t=0;faceDogTo(me.x);L.trail=[];}}}
 function faceDogTo(x){var dg=L.dog;if(Math.abs(x-dg.x)>4)dg.face=x>dg.x?1:-1;}
+function dogDir(dx,dy){var dg=L.dog,ax=Math.abs(dx),ay=Math.abs(dy);if(ax>1)dg.face=dx>0?1:-1;if(ax<0.5&&ay<0.5)return;
+  if(dg.dir!=='down'&&dg.dir!=='up'){if(ay>ax*1.25)dg.dir=dy>0?'down':'up';}
+  else if(ax>ay*1.25)dg.dir='side';else dg.dir=dy>0?'down':'up';}
 function dogWander(){var dg=L.dog,me=L.me,st=tileOf(dg.x,dg.y),F=flood(st[0],st[1],4.5),m=M(),c=[];
   for(var i=0;i<F.dist.length;i++){if(F.dist[i]>=1.5&&F.dist[i]<=4.5){var x=i%m.w,y=(i/m.w)|0;if(Math.hypot((x+0.5)*T-me.x,(y+0.5)*T-me.y)<T*4)c.push([x,y]);}}
   if(!c.length)return;var g=pick(c),p=pathFor(dg.x,dg.y,g,(g[0]+0.2+Math.random()*0.6)*T,(g[1]+0.3+Math.random()*0.5)*T,F);if(!p||!p.length)return;dg.q=p;dg.st='wander';}
-function dogFrame(){var dg=L.dog;if(dg.hop>0)return 13;if(dg.run)return Math.floor(dg.anim)%13;if(dg.st==='sit')return 13;return 0;}
+function dogFrame(){var dg=L.dog;if(dg.hop>0)return 13;var d=(MF.dog&&MF.dog.n>=32)?dg.dir:'side';
+  if(dg.run){if(d==='down')return 14+Math.floor(dg.anim*0.75)%8;if(d==='up')return 22+Math.floor(dg.anim*0.75)%8;return Math.floor(dg.anim)%13;}
+  if(dg.st==='sit')return 13;return d==='down'?30:d==='up'?31:0;}
 function petDog(){var dg=L.dog;if(!dg)return;dg.hop=0.5;puff('heart',dg.x,dg.y-56,1,{speed:0,up:26,life:1.1});sfx('pop',{v:0.6});if(!LS().seen.dog){LS().seen.dog=1;}}
 
 // ----- Pierre, Puti's cat: naps, strolls, and stands at the tank pawing at the glass. The dog leaves him alone -----
@@ -1553,15 +1558,15 @@ function updateStat(force){var el=$('lstat');if(!el)return;var l=LS(),html='',eg
 // ----- drawing (one canvas pixel per art pixel; nothing here allocates per frame) -----
 function drawSpr(x,s,wx,wy){if(!s)return;x.drawImage(s.c,Math.round(wx-s.ax)-L.cdx,Math.round(wy-s.ay)-L.cdy);}
 var DOGL=null;
-function dogCanvas(left){var im=IMG.dog;if(!im||!im.naturalWidth)return null;if(!left)return im;if(DOGL)return DOGL;var n=(MF.dog&&MF.dog.n)||14,c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;var x=c.getContext('2d');
+function dogCanvas(left){var im=IMG.dog;if(!im||!im.naturalWidth)return null;if(!left)return im;if(DOGL)return DOGL;var n=13,c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;var x=c.getContext('2d');
   for(var i=0;i<n;i++){x.save();x.translate(i*128+128,0);x.scale(-1,1);x.drawImage(im,i*128,0,128,128,0,0,128,128);x.restore();}DOGL=c;return c;}
 // a crisp pixel line between two world points
 function pxLine(x,x0,y0,x1,y1,col,w){var n=Math.max(1,Math.round(Math.max(Math.abs(x1-x0),Math.abs(y1-y0))));x.fillStyle=col;w=w||1;for(var i=0;i<=n;i++){var t=i/n;x.fillRect(Math.round(x0+(x1-x0)*t)-L.cdx,Math.round(y0+(y1-y0)*t)-L.cdy,w,w);}}
 function drawMillie(x){var me=L.me;meFrame();var im=IMG[L.mfImg];if(!im||!im.naturalWidth){wrect(x,me.x-12,me.y-60,24,60,'#d63636');return;}
   var sit=!!me.sit;drawSpr(x,shadowSpr(17,5),me.x,me.y-(sit?2:1));x.drawImage(im,L.mfIdx*128,0,128,128,Math.round(me.x-64)-L.cdx,Math.round(me.y-(sit?116:126))-L.cdy,128,128);
   if(L.tool==='rod'&&!me.moving&&!sit){rodTip();var d=me.dir,hx=me.x+(d==='right'?14:d==='left'?-14:12),hy=me.y-48;pxLine(x,hx,hy,L.tipX,L.tipY,'#8f563b',2);}}
-function drawDog(x){var dg=L.dog,fi=dogFrame(),left=dg.face<0&&fi!==13,im=dogCanvas(left);if(!im)return;var ax=fi===13?71:60;if(left)ax=128-ax;
-  var hop=dg.hop>0?Math.sin((1-dg.hop/0.5)*Math.PI)*16:0;drawSpr(x,shadowSpr(22,5),dg.x,dg.y-1);x.drawImage(im,fi*128,0,128,128,Math.round(dg.x-ax)-L.cdx,Math.round(dg.y-126-hop)-L.cdy,128,128);}
+function drawDog(x){var dg=L.dog,fi=dogFrame(),side=fi<13,left=dg.face<0&&side,im=dogCanvas(left);if(!im)return;var ax=side?60:71;if(left)ax=128-ax;
+  var hop=dg.hop>0?Math.sin((1-dg.hop/0.5)*Math.PI)*16:0;drawSpr(x,shadowSpr(side?22:15,5),dg.x,dg.y-1);x.drawImage(im,fi*128,0,128,128,Math.round(dg.x-ax)-L.cdx,Math.round(dg.y-126-hop)-L.cdy,128,128);}
 function drawCat(x){var c=L.cat;catFrame();var s=catSpr(L.cfPose,L.cfIdx,c.face),hop=c.hop>0?Math.sin((1-c.hop/0.45)*Math.PI)*12:0;if(!c.on)drawSpr(x,shadowSpr(L.cfPose==='nap'?30:L.cfPose==='walk'?24:21,4),c.x,c.y-1);drawSpr(x,s,c.x,c.y-hop);}
 function drawWater(x){var m=M(),x0=Math.max(0,Math.floor(L.cam.x/T)),y0=Math.max(0,Math.floor(L.cam.y/T)),x1=Math.min(m.w-1,Math.ceil((L.cam.x+L.VW)/T)),y1=Math.min(m.h-1,Math.ceil((L.cam.y+L.VH)/T));x.fillStyle='#ffffff';
   for(var ty=y0;ty<=y1;ty++)for(var tx=x0;tx<=x1;tx++){if(m.g[ty*m.w+tx]!==G_WATER)continue;var k=(m.wb&&m.wb[ty*m.w+tx])||W_POND,flow=k===W_STREAM,len=k===W_SEA?6:5;
