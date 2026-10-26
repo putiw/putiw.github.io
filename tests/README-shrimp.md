@@ -727,3 +727,4 @@ ammonia is only the primary button once ammonia is near zero.
 - Bots: strong cold 2,651, strong kind 3,301, average Earth 6,133, Space 7,544, waiting 39 min. Spotlight sweep 136 clean, Space playthrough passes. Tapping every button at 16 stages: no errors.
 
 - Look over opens with the first shrimp you buy (any grown shrimp, age 30+). Bought ones show up too, and every shrimp you take out, bought or bred, is sold as a cull. Normal selling still never touches bought breeders.
+- Look over (and, at home later, Gravel, Sponge, Trim, Pests) sit in a row under the tank whenever they can do something, not only after tapping the tank (`careRow`). Bought shrimp taken out in Look over sell as culls too.
