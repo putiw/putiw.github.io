@@ -755,3 +755,14 @@ ammonia is only the primary button once ammonia is near zero.
 
 - The header count is every shrimp you own: tanks plus hatcheries (shrimp waiting to be packed and about 60 days of each running farm's output on the racks). Its title splits tanks and hatcheries. The +/day history restarts once on old saves so it doesn't jump.
 - Farms only have Buy and Sell now. Mothball and Restart are gone; an old save with mothballed farms restarts them on load. The end-of-game and sandbox notes say to sell farms you don't need.
+
+## Pass 100: last review before deploy
+
+A fresh reviewer read every change on this branch against main. Fixed:
+- Home-tank gear was hidden from the first grow rack, so the Water button could never go away and the guide pointed at a hidden card. Gear now stays until every tank has an auto feeder and auto water changer, and the guide skips any card that's hidden.
+- Old saves with mothballed farms: those farms are now sold at salvage on load instead of restarting with full upkeep.
+- Shrimpcoin planting cost a fixed ~AED 6.4M a tap; a tap now plants what spare cash pays for, up to the batch.
+- One cull look can't take out more than half the grown shrimp (the monthly look covers the whole tank).
+- Closing a decision popup while a story card is queued now gives the speed back after the card.
+- Check shrimp no longer leaves an old canvas loop running each time it redraws.
+Bots after: strong 2,651 (dictator ending), kind 3,301 (garden village), average reaches 8.2B owners, Space completes; spotlight sweep 135 clean; tap-every-button 104 snapshots, 0 errors. Balance 58, academy 10, me 45.
