@@ -351,5 +351,20 @@ if(!html.includes('function endingVerdict(G)')||!html.includes('What the world l
 const storyData={window:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../shrimp/ending-playtest-data.js'),'utf8'),storyData);
 {const D=storyData.window.ENDING_TEST_DATA,cash=D.cards.find(x=>x.id==='c_cash'),war=D.cards.find(x=>x.id==='c_war');if(!cash||/shrimp as cash|legal tender/.test(cash.body)||war)throw Error('Ending preview should match the game text (the war is a hard-part group now)');}
 if(!storyData.window.ENDING_TEST_DATA.forks.find(x=>x.id==='kids').options[1].label.includes('no ads to kids'))throw Error('Kids sponsorship choice should make its distinction clear');
+check('time away stops when a tank gets sicker or loses shrimp, and pain cards always leave one way out',`
+var g=readyGame(),T=g.tanks[0];g.emp.won=0;T.pop=[{n:100,age:60,sex:'f'}];T.ill=null;
+var day=0,mode='sick';stepGame=function(G){G.day+=0.25;day++;if(mode==='sick'&&day===8)T.ill={type:'bact',day:G.day,days:0,frac:0.2,st:2};if(mode==='die')T.pop[0].n-=2;if(mode==='sell'){T.pop[0].n-=2;G.stats.sold=(G.stats.sold||0)+2;}return true;};
+maxSpeed=function(){return 4;};
+var r=awayRun(g,3600,4);if(!r||!r.why||!/got sick/.test(r.why)||r.days>3)throw Error('Away time should stop when a tank gets sick: '+JSON.stringify(r));
+mode='die';day=0;T.ill=null;T.pop=[{n:100,age:60,sex:'f'}];r=awayRun(g,3600,4);if(!r||!/dying/.test(r.why)||totalN(T)<80)throw Error('Away time should stop when shrimp die: '+JSON.stringify(r));
+mode='sell';day=0;T.pop=[{n:100,age:60,sex:'f'}];var d0=g.day;r=awayRun(g,3600,4);if(!r||r.why||Math.round(g.day-d0)!==30)throw Error('A quiet tank gets the full 30 days: '+JSON.stringify(r));
+if(awayRun(g,30,4)!==null||awayRun(g,3600,0)!==null)throw Error('Short gaps and a paused game get no away time');
+var h=readyGame();h.money=-1;var ids=Object.keys(PAINS);ids.forEach(function(id){var ok=PAINS[id].ch.some(function(c,i){var x=JSON.parse(JSON.stringify(h));return painPick(x,id,i);});if(!ok)throw Error('Pain card '+id+' has no choice at AED -1');});
+h.money=1e9;if(!painPick(JSON.parse(JSON.stringify(h)),ids[0],PAINS[ids[0]].ch.length-1))throw Error('Pain choices still work with money');
+var reset=migrate(newGame());if(!reset.progress.v8)throw Error('A fresh migrated game should carry the newest progress marks');
+`);
+if(!html.includes('G=migrate(newGame());seenNew=null;'))throw Error('Start over must build the game the same way a first load does');
+if(!html.includes("['pointerup','touchend','click','keydown'].forEach(function(ev){document.addEventListener(ev,musicKick,true);});"))throw Error('Sound must unlock on finger-up taps and retry on every tap');
+if(!/function save\(force\)\{if\(document\.hidden&&!force\)return;/.test(html)||!html.includes('catchUp(G,(Date.now()-at)/1000,speed)'))throw Error('No saving while hidden, and coming back from the background catches up');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

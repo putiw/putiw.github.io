@@ -2813,7 +2813,9 @@ function painDayOf(G,o){return (o.day?o.day*Math.max(1,G.humans/1e5):0)+(o.refun
 function painDaily(G){var P=G.emp.pains,t=0;if(!P)return 0;Object.keys(P).forEach(function(id){var x=P[id],o=!x.old&&PAINS[id]&&PAINS[id].ch[x.i]&&PAINS[id].ch[x.i][2];if(!o)return;if(o.refund&&G.day-(x.t0||0)>120)return;t+=painDayOf(G,o);});return t;}
 // Five shell processors work until someone looks: a small chance every day that the bank freezes everything.
 function painDay(G){var E=G.emp;if(E.shell&&!E.shellCaught&&!E.won&&Math.random()<1/400){E.shellCaught=Math.floor(G.day);E.frozen=Math.max(E.frozen||0,Math.floor(G.day)+45);E.frozenWhy='shell';newsLine(G,'Regulators close five payment companies that handled shrimp kit sales.');trAdd(G,{risk:.3});}}
-function painPick(G,id,i){var P=PAINS[id],c=P&&P.ch[i];if(!c)return false;var o=c[2],cost=painCost(G,o,i);if(G.money<cost)return false;if(cost)pay(G,cost,'projects');
+function painPick(G,id,i){var P=PAINS[id],c=P&&P.ch[i];if(!c)return false;var o=c[2],cost=painCost(G,o,i);
+ // The cheapest choice is always open, into debt if it has to be: a card that holds the clock with every button off would end the game.
+ var low=Math.min.apply(null,P.ch.map(function(x,j){return painCost(G,x[2],j);}));if(G.money<cost&&cost>low)return false;if(cost)pay(G,cost,'projects');
  var E=G.emp;painOf(G)[id]={i:i,t0:Math.floor(G.day),until:Math.floor(G.day)+(o.d||0)};if(o.shell)E.shell=1;if(o.mat)E.mat*=o.mat;if(o.q)E.q+=o.q;if(o.mood)moodAdd(G,o.mood,10);if(o.h)addHeart(G,o.h);trAdd(G,o.tr);return true;}
 function painSoon(G){var P=G.emp.pains||{},d=G.day,n=0;Object.keys(PAINS).forEach(function(id){var x=P[id];if(x&&x.until>d)n=Math.max(n,Math.ceil(x.until-d));});return n;}
 function painLines(G){var P=G.emp.pains,o=[];if(!P)return o;Object.keys(PAINS).forEach(function(id){if(P[id]&&!P[id].old)o.push(PAINS[id].ch[P[id].i][3]);});return o;}
@@ -3050,6 +3052,23 @@ function styleText(G,k,pos){var f=styFacts(G),a=[];
 var STYLE_TXT={complete:['the completionist','good enough'],method:['the methodical one','a bit of everything'],steady:['slow and steady','all in']};
 var STYLE_GP={complete:['You always did finish your plate.','You always knew when to stop eating. I never did.'],method:['You used to line up your shrimp food by date. I saw.','Your room was always a mess and you could always find everything in it.'],steady:['You never once borrowed money from me. I noticed.','You spent your pocket money the day you got it, every time.']};
 function styleTop(G){var v=styleVals(G),best=null;['complete','method','steady'].forEach(function(k){if(Math.abs(v[k])>=0.25&&(!best||Math.abs(v[k])>Math.abs(v[best])))best=k;});if(!best)return null;var pos=v[best]>0;return {k:best,pos:pos,name:STYLE_TXT[best][pos?0:1],text:styleText(G,best,pos)};}
+// Time away (closed or in the background): up to 30 game days at the speed the player left at. It stops early when a
+// story card needs the player, or when a tank gets sicker or starts losing shrimp, because none of the in-play warnings
+// can reach a player who isn't looking.
+function awayRun(G,sec,spd){
+  spd=Math.min(spd||0,maxSpeed(G));if(!(spd>0)||!(sec>60))return null;
+  var steps=Math.floor(Math.min(30,sec*spd/(0.6*4))*4),m0=G.money,h0=G.humans,n0=allN(G),d0=G.day,why=null;
+  var st0=G.tanks.map(function(T){return illStage(T);}),so0=G.stats.sold||0;
+  for(var i=0;i<steps&&!why;i++){
+    if(!stepGame(G)||progressionBlocked(G))break;
+    for(var k=0;k<st0.length&&k<G.tanks.length;k++){var T=G.tanks[k],s1=illStage(T);
+      if(s1>=2&&s1>st0[k]){why=T.name+(st0[k]?' got sicker':' got sick')+' while you were away, so time stopped there.';break;}
+}
+    if(!why&&n0>=10&&allN(G)+(G.stats.sold||0)-so0<n0*0.85)why='Shrimp were dying, so time stopped there.';
+  }
+  if(G.day-d0<0.25&&!why)return null;
+  return {days:G.day-d0,why:why,m0:m0,h0:h0,n0:n0};
+}
 // ==SIM-END==
 
 // ---------- UI ----------
@@ -3106,8 +3125,11 @@ function musicStart(){if(!musicOn()||MUS.on)return;try{var AC=window.AudioContex
  MUS.on=true;var c2=MUS.ctx;if(c2.state==='suspended')c2.resume();
  (MUS.bufs?Promise.resolve(MUS.bufs):Promise.all([musLoad(c2,'water.mp3'),musLoad(c2,'music.mp3')]).then(function(b){MUS.bufs=b;return b;})).then(function(b){if(!MUS.on)return;MUS.loops.push(musLoop(c2,b[0],MUS.bus,{vol:0.4,fade:4.8,start:1.7,ahead:14}),musLoop(c2,b[1],MUS.bus,{vol:0.16,fade:2.2,start:0.6,ahead:7}));}).catch(function(){MUS.on=false;});}catch(e){MUS.on=false;}}
 function musicStop(){MUS.on=false;MUS.loops.forEach(function(l){l.stop();});MUS.loops=[];if(MUS.ctx){MUS.ctx.close();MUS.ctx=null;}}
-['pointerdown','keydown'].forEach(function(ev){document.addEventListener(ev,function first(){document.removeEventListener(ev,first,true);musicStart();},true);});
-document.addEventListener('visibilitychange',function(){if(!MUS.ctx)return;if(document.hidden)MUS.ctx.suspend();else if(MUS.on)MUS.ctx.resume();});
+// iPhone Safari only unlocks audio when a finger lifts (touchend/click), not when it lands, and refuses resume() outside
+// a tap. So every tap checks: start the sound if it should be on, or wake a context the phone left suspended.
+function musicKick(){if(!musicOn())return;if(!MUS.on){musicStart();return;}if(MUS.ctx&&MUS.ctx.state!=='running'&&!document.hidden){try{var r=MUS.ctx.resume();if(r&&r.catch)r.catch(function(){});}catch(e){}}}
+['pointerup','touchend','click','keydown'].forEach(function(ev){document.addEventListener(ev,musicKick,true);});
+document.addEventListener('visibilitychange',function(){if(!MUS.ctx)return;if(document.hidden)MUS.ctx.suspend();else if(MUS.on){try{var r=MUS.ctx.resume();if(r&&r.catch)r.catch(function(){});}catch(e){}}});
 // If a newer version is published while the game is open, say so, so nobody plays old text for hours.
 function checkBuild(){if(!/^https?:/.test(location.protocol))return;try{fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():'';}).then(function(t){var m=t.match(/BUILD='([^']+)'/);if(m&&m[1]!==BUILD&&!$('newbuild')){var b=document.createElement('button');b.id='newbuild';b.className='newbuild';b.textContent='A newer version of the game is out. Tap to reload, your save stays.';b.onclick=function(){save();location.reload();};document.body.appendChild(b);}}).catch(function(){});}catch(e){}}
 setTimeout(checkBuild,60000);setInterval(checkBuild,15*60000);
@@ -5218,7 +5240,7 @@ function initControls(){
         setTimeout(function(){all.forEach(function(x){delete x.dataset.sure;x.textContent=x.dataset.orig;x.classList.remove('sure');});},3500);return;
       }
       all.forEach(function(x){delete x.dataset.sure;x.textContent=x.dataset.orig;x.classList.remove('sure');});
-      $('settings').hidden=true;clearTimeout(toastT);toastT=null;noticeQueue=[];renderMilestone.last=null;G=newGame();seenNew=null;setSpeed(0);document.querySelector('[data-tab="tank"]').click();lastAlerts='';lastChips='';lastColSig='';lastChartKey='';cache={};syncControls();toast('Started a new game');
+      $('settings').hidden=true;clearTimeout(toastT);toastT=null;noticeQueue=[];renderMilestone.last=null;G=migrate(newGame());seenNew=null;setSpeed(0);document.querySelector('[data-tab="tank"]').click();lastAlerts='';lastChips='';lastColSig='';lastChartKey='';cache={};syncControls();toast('Started a new game');
     }
     detectMilestones(G);cache.shopsig=cache.kvsig=null;lastChartKey='';render();
   });
@@ -5248,7 +5270,24 @@ function tick(now){
   }
   requestAnimationFrame(tick);
 }
-function save(){try{G.savedAt=Date.now();G.savedSpeed=speed;localStorage.setItem(saveKey,JSON.stringify(G));}catch(e){}}
+// Saving while the page is hidden would stamp savedAt with a time the player wasn't playing, so the catch-up on return
+// would skip that time. Save once when the page hides, then not again until it's back.
+function save(force){if(document.hidden&&!force)return;try{G.savedAt=Date.now();G.savedSpeed=speed;localStorage.setItem(saveKey,JSON.stringify(G));}catch(e){}}
+// Time away: up to 30 game days at the speed the player left at. It stops early if a story card needs the player, or if a
+// tank gets sicker or loses shrimp, so nobody comes back to a tank that died while nothing could warn them.
+function catchUp(G,sec,spd){
+  var r=awayRun(G,sec,spd);if(!r)return null;
+  var msg='While you were away, '+Math.round(r.days)+' days passed. Cash '+(G.money>=r.m0?'+':'−')+aed(Math.abs(G.money-r.m0))+(G.humans>r.h0?', +'+big(G.humans-r.h0)+' owners':'')+', shrimp '+Math.round(r.n0)+' → '+Math.round(allN(G))+'.'+(r.why?' '+r.why:'');
+  log(G,msg);return msg;
+}
+var HIDDEN_AT=null;
+document.addEventListener('visibilitychange',function(){
+  if(!G)return;
+  if(document.hidden){HIDDEN_AT=Date.now();save(true);return;}
+  var at=HIDDEN_AT;HIDDEN_AT=null;if(at==null||!speed)return;
+  var msg=catchUp(G,(Date.now()-at)/1000,speed);lastT=0;acc=0;
+  if(msg){if(progressionBlocked(G)){if(CARD_HOLD==null)CARD_HOLD=speed;setSpeed(0);}render();toast(msg);save();}
+});
 function load(){
   try{var r=localStorage.getItem(saveKey);if(r){var g=JSON.parse(r);if(g&&g.v===2&&g.tanks&&g.tanks.length)return migrate(g);}}catch(e){}
   return null;
@@ -5260,12 +5299,7 @@ function start(data){
   var away=null;
   if(fromStore&&G.savedAt&&G.savedSpeed>0){
     var sec=(Date.now()-G.savedAt)/1000;
-    if(sec>60){
-      var days=Math.min(30,sec*Math.min(G.savedSpeed,maxSpeed(G))/(0.6*4)),steps=Math.floor(days*4),m0=G.money,h0=G.humans,n0=allN(G),d0=G.day;
-      for(var i=0;i<steps;i++){if(!stepGame(G)||progressionBlocked(G))break;}
-      away='While you were away, '+Math.round(G.day-d0)+' days passed. Cash '+(G.money>=m0?'+':'−')+aed(Math.abs(G.money-m0)).replace('AED ','AED ')+(G.humans>h0?', +'+big(G.humans-h0)+' owners':'')+', shrimp '+Math.round(n0)+' → '+Math.round(allN(G))+'.';
-      log(G,away);
-    }
+    if(sec>60)away=catchUp(G,sec,G.savedSpeed);
   }
   if(fromStore&&G.savedSpeed!=null)speed=Math.min(G.savedSpeed,maxSpeed(G));
   if(!G.ob.bottle&&!G.opt.all)speed=0;if(G.progress&&G.progress.home)activeTab=G.progress.home;if(fromStore&&G.opt.lastTab&&G.ob.bottle)activeTab=G.opt.lastTab;
@@ -5274,7 +5308,7 @@ function start(data){
   detectMilestones(G);if(progressionBlocked(G))setSpeed(0);selectTab(activeTab);render();var ltb=document.querySelector('.tabs [data-tab="'+activeTab+'"]');if(activeTab!=='me'&&activeTab!=='tank'&&(!ltb||ltb.hidden)){selectTab('tank');render();}requestAnimationFrame(tick);
   if(away)toast(away);
   setInterval(render,250);setInterval(save,5000);
-  window.addEventListener('pagehide',save);
+  window.addEventListener('pagehide',function(){save(true);});
 }
 if(window.claude&&window.claude.hot&&window.claude.hot.ready)window.claude.hot.ready(start);
 else start((window.claude&&window.claude.hot&&window.claude.hot.data)||{});
