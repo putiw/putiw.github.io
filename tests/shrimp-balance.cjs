@@ -376,5 +376,18 @@ if(totalN(T)<1||!g.log.some(function(l){return /these are on me/.test(l.t);}))th
 if(!html.includes(".opsrow select{font:500 16px")||!html.includes("#speed button,.tabs button,#guidebar,.newsflash,.top button{touch-action:manipulation}"))throw Error('iPhone should not zoom on the Operating dropdowns or on fast taps');
 if(!html.includes("localStorage.setItem(saveKey+'-bak-'+Date.now(),r)")||!html.includes("function checkBuild(){if(!/^https?:/.test(location.protocol)||document.hidden)return;"))throw Error('A save that fails to load is kept, and a hidden tab skips update checks');
 if(!html.includes("renderMilestone.last==='tenyears'&&$('milestone-card')"))throw Error('Nothing pops over the ten-year ending');
+check('late game: 40x with the hard part, dark projects can be turned down, farms keep the best bloodline, one card jumps the line',`
+var g=readyGame();g.emp.hard={open:1,goal:'home',picks:{}};if(maxSpeed(g)!==40)throw Error('40x opens with the hard part');
+var pol=PROJ.filter(function(p){return p.id==='buypol';})[0];g.emp.regions=['auh','dxb','uae','gcc'];g.kits.sold=1e6;g.emp.kitsOpened=1;
+if(!projDecline(g,'buypol')||projAvail(g).some(function(p){return p.id==='buypol';}))throw Error('Turning down the politician takes him off the list');
+if(projDecline(g,'landfarm'))throw Error('One side of a choice is not turned down on its own');
+var m=readyGame();m.labQuality=0.2;labCandidate=function(){return 0.9;};m.progress.queue=[];for(var i=0;i<5;i++){m.progress.queue=[];stepGame(m);}if(m.labQuality<0.89)throw Error('Farms should follow the best home bloodline without certifying');
+for(var j=0;j<50;j++)if(paceGap(0)<60000||paceGap(12)<60000)throw Error('At least a minute between story cards');
+if(STORY_FIRST.indexOf('coin_offer')<0)throw Error('The Shrimpcoin offer should not wait behind other decisions');
+var o=readyGame();o.emp.hard={open:1,goal:'want',picks:{}};migrate(o);if(!o.emp.hard.goalOk||o.emp.hard.at!==HARD.length)throw Error('An old save already in the hard part skips the walk-through');
+var n=readyGame();n.emp.hard={open:1,goal:'home',picks:{}};migrate(n);if(n.emp.hard.goalOk)throw Error('A fresh hard part starts with the goal');
+`);
+if(!html.includes("data-act=\"hard-next\"")||!html.includes("Before the groups, decide what “everyone” means.")||!html.includes("move('lab-card','up',false);")||!html.includes("wrap.hidden=true;$('p-up').appendChild(wrap)")||!html.includes("salesOpen(G)&&!salesDone(G)"))throw Error('Hard part walk-through, no lab certification, no home-tank gear after hatcheries, no idle Sales card');
+if(/' of '\+l\.finds\.length\+' found/.test(html))throw Error('Research has no total to find');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

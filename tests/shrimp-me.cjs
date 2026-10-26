@@ -160,11 +160,11 @@ var f0=foodIncome(g);g.emp.proj.foodfactory=1;if(Math.abs(foodIncome(g)/f0-4)>1e
 g.humans=8.2e9;g.emp.won=5000;g.space.started=true;g.emp.c3={c_water:0};var m=g.money;dayRollover(g);if(g.money-m<2e7)throw Error('After Earth it still earns '+(g.money-m));
 if(sideIncome(g)<3e6||!rip(g).log.some(function(x){return /desalination/.test(x.tx);}))throw Error('Water sales');
 `);
-check('story cards wait their turn, about two minutes of play apart',`
+check('story cards wait their turn, one to two and a half minutes of play apart',`
 var g=newGame();g.ps.t=1000;g.stats.sold=40;g.emp.kitsOpened=0;var p=ensureProgress(g);p.queue=[];p.seen.intro=true;g.tanks[0].cycledAt=null;
 p.seen.cycle=p.seen.hatch=p.seen.sale=p.seen.ev_paper=true;
 detectMilestones(g);var first=p.queue.slice();if(first.indexOf('ev_mira')<0||first.indexOf('dye_offer')>=0||p.wait.indexOf('dye_offer')<0)throw Error('Second card waits '+JSON.stringify(first)+JSON.stringify(p.wait));
-p.queue=[];g.ps.t+=20000;detectMilestones(g);if(p.queue.length)throw Error('Too soon');g.ps.t+=101000;detectMilestones(g);if(p.queue.length)throw Error('Year one waits a month between story cards too');g.day+=31;detectMilestones(g);if(p.queue[0]!=='dye_offer')throw Error('Within two minutes and a month');
+p.queue=[];g.ps.t+=50000;detectMilestones(g);if(p.queue.length)throw Error('Too soon, under a minute');g.ps.t+=101000;detectMilestones(g);if(p.queue.length)throw Error('Year one waits a month between story cards too');g.day+=31;detectMilestones(g);if(p.queue[0]!=='dye_offer')throw Error('Within two and a half minutes and a month');
 p.queue=[];g.money=-500;g.day=50;detectMilestones(g);if(p.queue[0]!=='broke')throw Error('Money trouble never waits');
 `);
 check('Shrimp Times stories come one at a time, and a choice\'s story comes next',`

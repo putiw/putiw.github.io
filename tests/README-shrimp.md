@@ -701,3 +701,12 @@ ammonia is only the primary button once ammonia is near zero.
 - Smaller: Operating dropdowns are 16 px so iPhone doesn't zoom; speed, tab, guide and top buttons get `touch-action:manipulation`; a save that fails to load is kept as `universal-shrimp-v2-bak-<time>`; Grandma's 5 free shrimp also come before the first purchase once the water is ready; no update checks from a hidden tab; no toasts over the ten-year ending; a failed sound load waits a minute before trying again; a page that loads in the background still gets its time; the update check runs when you come back.
 - Not changed: the market man smashing a farm without lowering the debt is a threat, not a repossession (the bank and the other loan take assets as payment).
 - Tests: away time stops on sickness and deaths and runs the full 30 days when the tank is fine, pain cards have a choice at AED −1, Grandma helps before the first shrimp, plus string checks for the UI fixes.
+
+## Pass 92: the last chapter, breathing room, late-game clutter (Puti's play, Oct 26)
+- The hard part is a walk now: first "what does everyone mean" (keep Every home or pick another goal), then one group at a time with its options and a "Next: <group>" button (it says "Leave them for now" until you pick something). Groups you've looked at fold into "Groups so far", where you can still act on them, and "Rethink the goal" stays below. `H.goalOk`, `H.at` (UI state in the save). Old saves already deep in the hard part skip the walk (`migrate`).
+- Breathing room: story cards are 75 s to 2.5 min of play apart and never under a minute, even with a backlog (`paceGap`). News lines keep the old quicker pace (`newsGap`). The Shrimpcoin offer jumps the line so it doesn't wait behind other decisions (`STORY_FIRST`).
+- 40× opens with the hard part (4B people), not only after the game is over.
+- Research lines show how many finds, never "x of y": knowledge has no end. The research-group step reads "n discoveries so far, four needed".
+- Consultants: once every region is open, the reach limit points at the hard part, never at more regions.
+- Dark projects on their own (not one side of a choice), like Fund a politician, get "Turn it down". It's gone after that (`projDecline`, `E.no`).
+- Removed: the Breeding laboratory card (farms keep the best bloodline your tanks ever reached by themselves, daily), the "Your home tanks" gear section once hatcheries are up, and the Sales & shop card once AI agents sell, every region is open and every mall has a store (`salesDone`).

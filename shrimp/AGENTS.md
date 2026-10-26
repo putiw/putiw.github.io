@@ -64,7 +64,7 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 | `guideTarget()` / `applyGuide()` | The one "Next" hint and the pulsing button it points at. |
 | `HELP` + `.explain` | The ? on each card header. Long explanations go in `HELP[id]` or in paragraphs with class `explain` (hidden in the card, shown in the ? box). |
 | `ideas(G)` | Up to three loose suggestions in the ? popup (Ideas). Only for tabs already open. `CARE_GOALS`/`phaseInfo` are legacy, no longer shown. |
-| `maxSpeed(G)` | Speeds. 4× while the tank cycles with no shrimp, 2× once shrimp are in, 4× after the first hatchery, 12× and 40× later. |
+| `maxSpeed(G)` | Speeds. 4× while the tank cycles with no shrimp, 2× once shrimp are in, 4× after the first hatchery, 12× later, 40× from the hard part (4B people) on. |
 
 ### Systems added recently
 
@@ -207,6 +207,11 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] The first shrimp purchase starts the clock at 1×. Any time the clock is paused with nothing to read, the pause pill shows above the tab bar and 1× pulses (`pauseCue`, `G.opt.pauseTold`, `G.opt.nudge`). The tank is still while paused.
 - [ ] `BUILD` near `toast` changes with every release; an open game checks every 15 minutes and offers a reload when a newer one is live. Bump it when you ship.
 - [ ] Shrimp videos count as reach, not ego, so they don't push you away from Space.
+
+**Last chapter and late game, Oct 26 (check these stay true)**
+- The hard part asks for the goal first, then shows one group at a time. Story cards are at least a minute apart. 40× opens with the hard part.
+- No "x of y found" anywhere in research. Consultants never suggest regions once all are open. Dark single projects can be turned down.
+- No Breeding laboratory card, no home-tank gear once hatcheries are up, no Sales & shop card once there's nothing left in it.
 
 **Before friends play, Oct 26 (check these stay true)**
 - Coming back after closing or backgrounding the app catches up to 30 days, and stops early if a tank gets sicker or shrimp are dying.
