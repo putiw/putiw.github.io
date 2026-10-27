@@ -984,7 +984,7 @@ function walkTo(goal,ex,ey,act,opt){var me=L.me;if(!me)return false;opt=opt||{};
   if(!isFinite(F.dist[goal[1]*M().w+goal[0]])){var nr=nearestReachable(F,ex!=null?ex:(goal[0]+0.5)*T,ey!=null?ey:(goal[1]+0.5)*T,6);if(!nr)return false;goal=nr;ex=null;ey=null;}
   var p=pathFor(me.x,me.y,goal,ex,ey,F);if(!p)return false;me.path=p;me.act=act||null;me.speed=opt.speed||(L.tool==='mow'?150:ME_SPEED);me.sneak=!!opt.sneak;
   if(!p.length){me.moving=false;if(act){me.act=null;act();}return true;}
-  if(!me.moving){me.moving=true;if(L.dog&&L.dog.st!=='follow')dogRejoin();}
+  if(!me.moving){me.moving=true;}
   if(L.watch){L.watch=null;}return true;}
 // walk next to a thing and use it
 function standTiles(o){var d=OBJ[o.k]||{},side=(d.use&&d.use.side)||'any',out=[],x,y;
@@ -1018,37 +1018,74 @@ function meFrame(){var me=L.me;if(me.sit){L.mfImg='millie2';L.mfIdx=2;return;}
 
 // ----- the dog follows Millie's footsteps -----
 var DOG_GAP=92;
-function dogRejoin(){var dg=L.dog,me=L.me;if(!dg||!me)return;var st=tileOf(dg.x,dg.y),gt=tileOf(me.x,me.y),p=pathFor(dg.x,dg.y,gt,me.x,me.y);dg.q=p||[];L.trail=[];dg.st='follow';}
+// The dog's love: hidden, 0 to 100, saved. Walking together and petting raise it slowly. More love means he follows longer,
+// thinks of you more often when he's off on his own, and plays more.
+function dogLove(){var l=LS();if(l.dogLove==null)l.dogLove=20;return l.dogLove;}
+function addLove(n){var l=LS();l.dogLove=clamp(dogLove()+n*(1.1-dogLove()/110),0,100);}
+// how long he stays with you before he loses interest (seconds): 25-50 s with a new dog, up to about 3 minutes at full love
+function dogInterest(){var lv=dogLove();return 25+Math.random()*25+lv*1.3*(0.7+Math.random()*0.6);}
+function dogBind(){var dg=L.dog;dg.bound=true;dg.left=dogInterest();}
+function dogRejoin(){var dg=L.dog,me=L.me;if(!dg||!me)return;var gt=tileOf(me.x,me.y),p=pathFor(dg.x,dg.y,gt,me.x,me.y);dg.q=p||[];L.trail=[];dg.st='follow';dg.react=0;}
 function trailLen(dg){var me=L.me,q=dg.q,t=L.trail,len=0,px=dg.x,py=dg.y;function add(x,y){len+=Math.hypot(x-px,y-py);px=x;py=y;}
   for(var i=0;i<q.length;i++)add(q[i][0],q[i][1]);for(var j=0;j<t.length;j++)add(t[j][0],t[j][1]);add(me.x,me.y);return len;}
-function stepDog(dt){var dg=L.dog,me=L.me;if(!dg||!me)return;dg.t+=dt;if(dg.hop>0)dg.hop=Math.max(0,dg.hop-dt);
-  if(Math.hypot(dg.x-me.x,dg.y-me.y)>T*9){var b=L.trail[Math.max(0,L.trail.length-12)]||[me.x-30,me.y];dg.x=b[0];dg.y=b[1];dg.q=[];L.trail=L.trail.slice(-6);}
-  if(dg.st==='follow'||me.moving){if(dg.st!=='follow'){dogRejoin();}
-    var R=trailLen(dg);
-    if(R>DOG_GAP){var tgt=dg.q.length?dg.q[0]:L.trail.length?L.trail[0]:[me.x,me.y],dx=tgt[0]-dg.x,dy=tgt[1]-dg.y,d=Math.hypot(dx,dy),v=(R>DOG_GAP+70?me.speed*1.3:me.speed*1.02)*dt;
-      if(d<=v||d<2){dg.x=tgt[0];dg.y=tgt[1];if(dg.q.length)dg.q.shift();else if(L.trail.length)L.trail.shift();}else{dg.x+=dx/d*v;dg.y+=dy/d*v;dogDir(dx,dy);}
-      dg.anim+=dt*16;dg.run=true;dg.idle=0;}
-    else{dg.run=false;dg.idle+=dt;if(!me.moving&&dg.idle>0.35){dg.st='sit';dg.t=0;dg.wt=4+Math.random()*5;faceDogTo(me.x);}}
+// one step along a list of points; the legs keep pace with the speed. Returns true when the list is used up
+function dogStep(dg,q,v,dt){if(!q.length)return true;var tg=q[0],dx=tg[0]-dg.x,dy=tg[1]-dg.y,d=Math.hypot(dx,dy),st=v*dt;
+  if(d<=st){dg.x=tg[0];dg.y=tg[1];q.shift();}else{dg.x+=dx/d*st;dg.y+=dy/d*st;dogDir(dx,dy);}dg.anim+=dt*v/17;dg.run=true;return !q.length;}
+function dogSettle(dg){dg.st='stand';dg.t=0;dg.wt=1.2+Math.random()*4;dg.run=false;faceDogTo(L.me.x);}
+var DOG_RUN=360,DOG_TROT=150;
+function stepDog(dt){var dg=L.dog,me=L.me;if(!dg||!me)return;dg.t+=dt;dg.run=false;if(dg.hop>0)dg.hop=Math.max(0,dg.hop-dt);
+  if(dg.bound==null){dg.bound=true;dg.left=dogInterest();}
+  var far=Math.hypot(dg.x-me.x,dg.y-me.y);
+  // with you: count down the interest; walking together slowly grows his love
+  if(dg.bound){dg.left-=dt;if(me.moving&&dg.st==='follow')addLove(dt*0.02);
+    if(far>T*14){var b=L.trail[Math.max(0,L.trail.length-12)]||[me.x-30,me.y];dg.x=b[0];dg.y=b[1];dg.q=[];L.trail=L.trail.slice(-6);}
+    if(dg.left<=0&&dg.st!=='play'&&dg.st!=='come'){dg.bound=false;dogWander(true);return;}}
+  // you set off: he notices after a moment, not at once
+  if(dg.bound&&me.moving&&dg.st!=='follow'&&dg.st!=='come'&&dg.st!=='play'){if(!dg.react)dg.react=0.15+Math.random()*(dg.st==='sit'?1.1:0.6);dg.react-=dt;if(dg.react<=0)dogRejoin();else return;}
+  if(dg.st==='follow'){var R=trailLen(dg);
+    if(R>DOG_GAP){var tgt=dg.q.length?[dg.q]:L.trail.length?[L.trail]:null,v=R>DOG_GAP+160?DOG_RUN:R>DOG_GAP+60?me.speed*1.45:me.speed*1.05;
+      if(tgt)dogStep(dg,tgt[0],v,dt);else{var mx=me.x-dg.x,my=me.y-dg.y,md=Math.hypot(mx,my);dg.x+=mx/md*v*dt;dg.y+=my/md*v*dt;dogDir(mx,my);dg.anim+=dt*v/17;dg.run=true;}
+      dg.idle=0;}
+    else{dg.idle+=dt;
+      // you stopped: he keeps going a step or two, then stands, then maybe sits
+      if(!me.moving){if(!dg.lag)dg.lag=0.1+Math.random()*0.7;if(dg.idle>dg.lag){dg.lag=0;dogSettle(dg);}}}
     return;}
-  dg.run=false;
-  if(dg.st==='sit'){dg.idle+=dt;if(me.idle>4&&dg.t>dg.wt&&!me.sit){dg.t=0;dg.wt=4+Math.random()*6;if(Math.random()<0.45)dogWander();}}
-  else if(dg.st==='wander'){if(dg.q.length){var tg=dg.q[0],ex=tg[0]-dg.x,ey=tg[1]-dg.y,ed=Math.hypot(ex,ey),ev=70*dt;if(ed<=ev){dg.x=tg[0];dg.y=tg[1];dg.q.shift();}else{dg.x+=ex/ed*ev;dg.y+=ey/ed*ev;dogDir(ex,ey);}dg.anim+=dt*8;dg.run=true;}
-    else{dg.st='sniff';dg.t=0;dg.wt=1.6+Math.random()*2;}}
-  else if(dg.st==='sniff'){if(dg.t>dg.wt){var gt=tileOf(me.x,me.y),side=[[-1,0],[1,0],[0,1]].map(function(o){return [gt[0]+o[0],gt[1]+o[1]];}).filter(function(p){return passable(p[0],p[1]);})[0]||gt;
-    dg.q=pathFor(dg.x,dg.y,side,(side[0]+0.5)*T+(side[0]<gt[0]?14:-14),(side[1]+0.5)*T+8)||[];dg.st='back';}}
-  else if(dg.st==='back'){if(dg.q.length){var tb=dg.q[0],bx=tb[0]-dg.x,by=tb[1]-dg.y,bd=Math.hypot(bx,by),bv=110*dt;if(bd<=bv){dg.x=tb[0];dg.y=tb[1];dg.q.shift();}else{dg.x+=bx/bd*bv;dg.y+=by/bd*bv;dogDir(bx,by);}dg.anim+=dt*12;dg.run=true;}
-    else{dg.st='sit';dg.t=0;faceDogTo(me.x);L.trail=[];}}}
+  if(dg.st==='come'){if(dogStep(dg,dg.q,DOG_RUN*1.1,dt)||Math.hypot(dg.x-me.x,dg.y-me.y)<DOG_GAP*0.8){dg.q=[];dogBind();dg.hop=0.5;puff('heart',dg.x,dg.y-56,1,{speed:0,up:26,life:1.1});if(me.moving)dogRejoin();else dogSettle(dg);}return;}
+  if(dg.st==='play'){dogPlay(dt);return;}
+  if(dg.st==='stand'){if(!dg.bound)dogMiss(dt);if(dg.st==='stand'&&dg.t>dg.wt){dg.st='sit';dg.t=0;dg.wt=4+Math.random()*7;}return;}
+  if(dg.st==='sit'){
+    if(dg.bound){if(dg.t>dg.wt&&me.idle>2&&!me.sit){dg.t=0;dg.wt=4+Math.random()*7;var r=Math.random(),lv=dogLove();
+      if(r<0.12+lv*0.0025)dogPlayStart();else if(r<0.5)dogWander(false);}}
+    else dogMiss(dt);
+    return;}
+  if(dg.st==='wander'){if(dogStep(dg,dg.q,dg.bound?DOG_TROT:DOG_TROT*1.15,dt)){dg.st='sniff';dg.t=0;dg.wt=1.6+Math.random()*2.5;}return;}
+  if(dg.st==='sniff'){if(dg.t>dg.wt){if(dg.bound){var gt=tileOf(me.x,me.y),side=[[-1,0],[1,0],[0,1]].map(function(o){return [gt[0]+o[0],gt[1]+o[1]];}).filter(function(p){return passable(p[0],p[1]);})[0]||gt;
+      dg.q=pathFor(dg.x,dg.y,side,(side[0]+0.5)*T+(side[0]<gt[0]?14:-14),(side[1]+0.5)*T+8)||[];dg.st='back';}
+    else{var r2=Math.random();if(r2<0.45)dogWander(true);else{dg.st=r2<0.7?'stand':'sit';dg.t=0;dg.wt=3+Math.random()*8;}}}
+    if(!dg.bound)dogMiss(dt);return;}
+  if(dg.st==='back'){if(dogStep(dg,dg.q,DOG_TROT*1.4,dt))dogSettle(dg);return;}}
+// on his own he thinks of you now and then, more often the more he loves you, and runs over from wherever he is
+function dogMiss(dt){var dg=L.dog;dg.miss=(dg.miss||0)+dt;if(dg.miss<3)return;dg.miss=0;var lv=dogLove(),far=Math.hypot(dg.x-L.me.x,dg.y-L.me.y);
+  if(Math.random()<0.03+lv*0.0035+(far>T*10?0.02:0))dogCome();}
+function dogCome(){var dg=L.dog,me=L.me,gt=tileOf(me.x,me.y),p=pathFor(dg.x,dg.y,gt,me.x+(dg.x<me.x?-40:40),me.y+6);if(!p){dg.x=me.x-40;dg.y=me.y;dogBind();dogSettle(dg);return;}dg.q=p;dg.st='come';dg.t=0;}
+// zoomies: a few quick dashes left and right, then he flops down
+function dogPlayStart(){var dg=L.dog;dg.st='play';dg.pn=4+Math.floor(Math.random()*5);dg.pdir=Math.random()<0.5?-1:1;dg.ptx=null;dg.t=0;}
+function dogPlay(dt){var dg=L.dog;
+  if(dg.ptx==null){if(dg.pn<=0){dg.st='stand';dg.t=0;dg.wt=0.8+Math.random()*1.5;return;}var len=T*(1.1+Math.random()*1.3),tx=dg.x+dg.pdir*len,t=tileOf(tx,dg.y);
+    if(!passable(t[0],t[1])||!losClear(dg.x,dg.y,tx,dg.y)){dg.pdir=-dg.pdir;tx=dg.x+dg.pdir*len;t=tileOf(tx,dg.y);if(!passable(t[0],t[1])||!losClear(dg.x,dg.y,tx,dg.y)){len*=0.5;tx=dg.x+dg.pdir*len;t=tileOf(tx,dg.y);if(len<T*0.6||!passable(t[0],t[1])||!losClear(dg.x,dg.y,tx,dg.y)){dg.pn=0;return;}}}
+    dg.ptx=tx;dg.pty=dg.y+(Math.random()-0.5)*20;dg.pn--;dg.dir='side';}
+  var q=[[dg.ptx,dg.pty]];dogStep(dg,q,DOG_RUN,dt);dg.dir='side';if(!q.length){dg.ptx=null;dg.pdir=-dg.pdir;if(Math.random()<0.35)dg.hop=0.35;}}
 function faceDogTo(x){var dg=L.dog;if(Math.abs(x-dg.x)>4)dg.face=x>dg.x?1:-1;}
 function dogDir(dx,dy){var dg=L.dog,ax=Math.abs(dx),ay=Math.abs(dy);if(ax>1)dg.face=dx>0?1:-1;if(ax<0.5&&ay<0.5)return;
   if(dg.dir!=='down'&&dg.dir!=='up'){if(ay>ax*1.25)dg.dir=dy>0?'down':'up';}
   else if(ax>ay*1.25)dg.dir='side';else dg.dir=dy>0?'down':'up';}
-function dogWander(){var dg=L.dog,me=L.me,st=tileOf(dg.x,dg.y),F=flood(st[0],st[1],4.5),m=M(),c=[];
-  for(var i=0;i<F.dist.length;i++){if(F.dist[i]>=1.5&&F.dist[i]<=4.5){var x=i%m.w,y=(i/m.w)|0;if(Math.hypot((x+0.5)*T-me.x,(y+0.5)*T-me.y)<T*4)c.push([x,y]);}}
-  if(!c.length)return;var g=pick(c),p=pathFor(dg.x,dg.y,g,(g[0]+0.2+Math.random()*0.6)*T,(g[1]+0.3+Math.random()*0.5)*T,F);if(!p||!p.length)return;dg.q=p;dg.st='wander';}
+function dogWander(far){var dg=L.dog,me=L.me,st=tileOf(dg.x,dg.y),R=far?9:4.5,F=flood(st[0],st[1],R),m=M(),c=[];
+  for(var i=0;i<F.dist.length;i++){if(F.dist[i]>=(far?3:1.5)&&F.dist[i]<=R){var x=i%m.w,y=(i/m.w)|0;if(far||Math.hypot((x+0.5)*T-me.x,(y+0.5)*T-me.y)<T*4)c.push([x,y]);}}
+  if(!c.length){dg.st='sit';dg.t=0;dg.wt=3+Math.random()*5;return;}var g=pick(c),p=pathFor(dg.x,dg.y,g,(g[0]+0.2+Math.random()*0.6)*T,(g[1]+0.3+Math.random()*0.5)*T,F);if(!p||!p.length){dg.st='sit';dg.t=0;dg.wt=3;return;}dg.q=p;dg.st='wander';}
 function dogFrame(){var dg=L.dog;if(dg.hop>0)return 13;var d=(MF.dog&&MF.dog.n>=32)?dg.dir:'side';
   if(dg.run){if(d==='down')return 14+Math.floor(dg.anim*0.75)%8;if(d==='up')return 22+Math.floor(dg.anim*0.75)%8;return Math.floor(dg.anim)%13;}
   if(dg.st==='sit')return 13;return d==='down'?30:d==='up'?31:0;}
-function petDog(){var dg=L.dog;if(!dg)return;dg.hop=0.5;puff('heart',dg.x,dg.y-56,1,{speed:0,up:26,life:1.1});sfx('pop',{v:0.6});if(!LS().seen.dog){LS().seen.dog=1;}}
+function petDog(){var dg=L.dog;if(!dg)return;var t0=L.lastPet||0,nw=performance.now();addLove(nw-t0>4000?1.2:0.3);L.lastPet=nw;if(!dg.bound){dogBind();dg.q=[];dogSettle(dg);}else dg.left=Math.max(dg.left,dogInterest()*0.6);if(dg.st!=='play'&&Math.random()<0.15+dogLove()*0.003){dogPlayStart();}dg.hop=0.5;puff('heart',dg.x,dg.y-56,1,{speed:0,up:26,life:1.1});sfx('pop',{v:0.6});if(!LS().seen.dog){LS().seen.dog=1;}}
 
 // ----- Pierre, Puti's cat: naps, strolls, and stands at the tank pawing at the glass. The dog leaves him alone -----
 function catRoom(){var rs=M().rooms;for(var i=0;i<rs.length;i++)if(rs[i].back!==false)return rs[i];return null;}
