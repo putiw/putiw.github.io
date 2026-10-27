@@ -26,7 +26,7 @@ var z=newGame();z.tanks[0].feeder=1;z.tanks[0].autoWC=1;personalDay(z);z.emp.inf
 check('Grandma moments wait for you, pass if nobody looks, and count both ways',`
 var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.ps.t=1;
 for(var d=0;d<60&&!g.me.cur;d++){g.day++;g.ps.t+=4000;personalDay(g);}if(!g.me.cur||g.me.cur.id!=='clinic')throw Error('Clinic moment '+JSON.stringify(g.me.cur));
-var c=g.tr.care||0;if(!momentAnswer(g,true)||g.me.done.clinic!==1||(g.tr.care||0)>=c||!g.me.hist.length)throw Error('Accept');
+var c=g.tr.drive||0,cc=g.tr.care||0;if(!momentAnswer(g,true)||g.me.done.clinic!==1||(g.tr.drive||0)>=c||(g.tr.care||0)!==cc||!g.me.hist.length)throw Error('Accept');
 g.me.mNext=0;g.me.mT=0;g.me.n=10;g.day+=1;personalDay(g);if(!g.me.cur)throw Error('Next moment');var id=g.me.cur.id;g.ps.t+=200000;g.day+=20;personalDay(g);if(g.me.cur&&g.me.cur.id===id||g.me.done[id]!==3||g.me.missed!==1)throw Error('Missed');
 `);
 check('keeping your own tank makes treats hand-given, happy treats count',`
@@ -50,16 +50,16 @@ var old=newGame();old.emp.staff.pack=5;old.emp.staff.lines=1;old.emp.proj.layoff
 `);
 check('how you play and what you choose pick the ending',`
 function run(tr,ps,me){var g=newGame();g.tr=tr;if(ps)for(var k in ps)g.ps[k]=ps[k];if(me)for(var k2 in me)g.me[k2]=me[k2];return endingPick(g);}
-var e=run({drive:6,ego:6,means:-6});if(e!=='empire_dictator')throw Error(e);
-if(run({drive:6,ego:6,means:2})!=='empire_good')throw Error('good');
-if(run({reach:-6,means:4,kin:6})!=='garden_village')throw Error('village');
-if(run({reach:-6,means:4,kin:6},null,{n:20,cnt:{nothing:20,design:20}})!=='garden_hermit')throw Error('hermit');
-if(run({know:6,ego:-4,care:4,drive:3})!=='question_prof')throw Error('prof');
-if(run({know:6,ego:-4,care:4,drive:-3})!=='question_lucky')throw Error('lucky');
-if(run({reach:6,know:-4,care:6})!=='network_life')throw Error('network');
-if(run({drive:-6,ego:-6,care:-4})!=='drift_shop')throw Error('shop');
-if(run({drive:-6,ego:-6,care:-4},null,{vids:30})!=='drift_famous')throw Error('famous');
-var fast=run({drive:-1},{t:600000,fast:580000});var slow=run({drive:-1},{t:600000,fast:0});if(fast===slow)throw Error('Play style should count '+fast);
+var e=run({drive:8,means:-6});if(e!=='empire_dictator')throw Error(e);
+if(run({drive:8,means:1})!=='empire_good')throw Error('good');
+if(run({drive:-6,means:4,kin:6})!=='garden_village')throw Error('village');
+if(run({drive:-6,means:4,kin:6},null,{n:20,cnt:{nothing:20,design:20}})!=='garden_hermit')throw Error('hermit');
+if(run({know:6,care:4,drive:3})!=='question_prof')throw Error('prof');
+if(run({know:6,care:4,drive:-3})!=='question_lucky')throw Error('lucky');
+if(run({drive:6,know:-4,care:6})!=='network_life')throw Error('network');
+if(run({drive:-8,care:-4})!=='drift_shop')throw Error('shop');
+if(run({drive:-8,care:-4},null,{vids:30})!=='drift_famous')throw Error('famous');
+var fast=run({drive:-1},null,{hrs:{work:2400,dinners:300,grandma:0,house:0,nothing:200,tanks:0}});var slow=run({drive:-1},null,{hrs:{work:500,dinners:0,grandma:400,house:200,nothing:1600,tanks:200}});if(fast===slow)throw Error('Play style should count '+fast);
 var g=newGame();g.me.visits=20;if(visitLevel(g)!=='many')throw Error('visits');g.me.visits=0;g.me.calls=3;if(visitLevel(g)!=='none')throw Error('calls count less');
 `);
 check('old saves get the new state without losing anything',`
@@ -80,7 +80,7 @@ k.emp.bank={left:12000,pay:600,miss:0,next:k.day};k.emp.farms.barn=1;k.emp.farmP
 `);
 check('dyed shrimp sell for more until someone finds out',`
 var g=newGame();var T=g.tanks[0];T.had=1;T.set.sellAge=50;T.pop=[{age:90,n:40,g:40,b:0}];g.stats.sold=40;if(!milestoneConditions(g).dye_offer)throw Error('Offer');
-var a=doSell(g,T,true,10).revenue;storyChoose(g,'dye_offer',0);var b=doSell(g,T,true,10).revenue;if(Math.abs(b/a-1.6)>0.01)throw Error('60% more '+a+' '+b);
+var a=doSell(g,T,true,10).revenue;storyChoose(g,'dye_offer',0);var b=doSell(g,T,true,10).revenue;if(Math.abs(b/a-1.9)>0.01)throw Error('90% more '+a+' '+b);
 g.day=30;var r=Math.random;Math.random=function(){return 0;};dyeDay(g);Math.random=r;if(g.dye.on||!milestoneConditions(g).mira_dye||g.orderNext<100)throw Error('Found out');
 `);
 check('fight nights pay, cost shrimp, can be raided, and lead to the investor',`
@@ -93,10 +93,10 @@ var g=newGame();g.emp.kitsOpened=1;g.money=100000;g.day=500;storyChoose(g,'wash_
 g.day=g.emp.dirty.next;if(!milestoneConditions(g).fav_0)throw Error('Favour');storyChoose(g,'fav_0',0);if(g.emp.staff.pack!==5)throw Error('Cousins');
 g.day=g.emp.dirty.next;storyChoose(g,'fav_1',0);g.day=g.emp.dirty.next;if(!favourDue(g,2))throw Error('Routes');
 var p=JSON.parse(JSON.stringify(g));storyChoose(g,'fav_2',0);if(!g.emp.network||favourDue(g,0)||favourDue(g,1)||favourDue(g,2)||!milestoneConditions(g).gp_net)throw Error('Network is the point of no return');
-g.tr={reach:6,know:-4,care:6};if(endingPick(g)!=='network_dark')throw Error('Dark '+endingPick(g));
+g.tr={drive:6,know:-4,care:6};if(endingPick(g)!=='network_dark')throw Error('Dark '+endingPick(g));
 var q=Object.assign(engineCopy(p));function engineCopy(x){var y=newGame();for(var k in x)y[k]=x[k];return y;}
 q.money=1000000;q.emp.farms.barn=4;storyChoose(q,'fav_2',1);if(q.money>100000||!frozen(q)||farmCap(q)!==20||!q.emp.turned||dirtyOn(q))throw Error('Police '+q.money+' '+farmCap(q));
-q.tr={reach:6,know:-4,care:6};if(endingPick(q)!=='network_back')throw Error('Back');q.day+=366;turnedDay(q);if(!milestoneConditions(q).mira_back)throw Error('Mira comes back');
+q.tr={drive:6,know:-4,care:6};if(endingPick(q)!=='network_back')throw Error('Back');q.day+=366;turnedDay(q);if(!milestoneConditions(q).mira_back)throw Error('Mira comes back');
 var r=engineCopy(JSON.parse(JSON.stringify(p)));r.money=1e6;storyChoose(r,'fav_2',2);if(dirtyOn(r)||!r.emp.paidOut||gpLines(r).join().indexOf('route')<0)throw Error('Paid out');
 `);
 check('the buyout offer ends the game with its own ending',`
@@ -104,12 +104,12 @@ var g=newGame();g.humans=1e6;if(!milestoneConditions(g).buyout)throw Error('Offe
 var h=newGame();h.humans=1e6;var m=h.money;storyChoose(h,'buyout',0);if(endingPick(h)!=='sold'||h.money-m<2e7)throw Error('Sold');
 `);
 check('only some players see each tree, and the steps add to the ending',`
-var g=newGame();g.humans=6e7;g.day=900;g.tr={drive:8,ego:8,means:-6};treeDay(g);if(!treeHas(g,'island')||treeHas(g,'shop')||!milestoneConditions(g).tree_island)throw Error('Island for climbers '+JSON.stringify(g.emp.trees));
+var g=newGame();g.humans=6e7;g.day=900;g.tr={drive:10,means:-6};treeDay(g);if(!treeHas(g,'island')||treeHas(g,'shop')||!milestoneConditions(g).tree_island)throw Error('Island for climbers '+JSON.stringify(g.emp.trees));
 g.money=1e8;if(!buyTreeStep(g,'isl_buy')||buyTreeStep(g,'isl_pass'))throw Error('Steps in order');g.emp.inf=1e5;buyTreeStep(g,'isl_nation');if(taxRate(g)!==0.045)throw Error('Island tax');
 if(gpLines(g).join(' ').indexOf('Shrimp Island')<0)throw Error('Ending line');
-var h=newGame();h.humans=6e7;h.day=900;h.tr={drive:-8,ego:-8,care:-4};treeDay(h);if(!treeHas(h,'shop')||treeHas(h,'island'))throw Error('Shop for floaters');
-var q=newGame();q.tr={know:8,care:6,ego:-4};q.emp.won=4000;if(!spaceOpen(q))throw Error('Space for the curious');q.tr={drive:8,ego:8,means:-6};q.emp.trees={};if(spaceOpen(q))throw Error('Not for climbers');
-var l=newGame();l.humans=6e7;l.day=900;l.tr={know:-8,kin:-8,drive:6,ego:6};treeDay(l);if(!treeHas(l,'lab'))throw Error('Designer lab for use and tool');
+var h=newGame();h.humans=6e7;h.day=900;h.tr={drive:-10,care:-4};treeDay(h);if(!treeHas(h,'shop')||treeHas(h,'island'))throw Error('Shop for floaters');
+var q=newGame();q.tr={know:8,care:6};q.emp.won=4000;if(!spaceOpen(q))throw Error('Space for the curious');q.tr={drive:10,means:-6};q.emp.trees={};if(spaceOpen(q))throw Error('Not for climbers');
+var l=newGame();l.humans=6e7;l.day=900;l.tr={know:8,kin:-8,drive:6};treeDay(l);if(!treeHas(l,'lab'))throw Error('Designer lab for use and tool');
 `);
 check('a house that runs itself, piece by piece, for you or for Grandma',`
 var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.money=1e6;if(!houseOffer(g))throw Error('Offer');buyHouse(g);if(!g.me.house.land)throw Error('Land');
@@ -118,7 +118,7 @@ while(houseNext(g))buyHouse(g);if(!g.me.house.complete||treesFor(g).indexOf('rew
 `);
 check('late cards ask once and leave a line',`
 var g=newGame();g.humans=2e9;var c=milestoneConditions(g);if(!c.c_cash||c.c_war!==undefined||c.c_water!==undefined||c.c_last!==undefined)throw Error('Thresholds');
-var bail=newGame();bail.humans=1e9;var b0=bail.tr.means||0;storyChoose(bail,'c_cash',0);if((bail.tr.drive||0)!==1||(bail.tr.means||0)!==b0-.5)throw Error('Hatchery buy keeps its trait scores');if(card3Lines(bail).join().indexOf('best hatcheries')<0)throw Error('Line');
+var bail=newGame();bail.humans=1e9;var b0=bail.tr.means||0;storyChoose(bail,'c_cash',0);if(Math.abs((bail.tr.drive||0)-.7)>1e-9||(bail.tr.means||0)!==b0-.5)throw Error('Hatchery buy keeps its trait scores');if(card3Lines(bail).join().indexOf('best hatcheries')<0)throw Error('Line');
 var old=newGame();old.day=3000;old.humans=7e9;delete old.progress.v5;migrateProgress(old);detectMilestones(old);if(old.progress.queue.some(function(k){return /^c_/.test(k);}))throw Error('Old saves skip passed cards');
 `);
 check('the hard part opens at 4 billion, caps growth, and every way out works',`
@@ -178,7 +178,7 @@ var b=newGame();b.kits.sold=100;newsLine(b,'bots');if(rip(b).log.length!==1)thro
 check('academia or industry, letters to Grandma, and choices that make the news',`
 var g=newGame();g.kits.sold=ACADEMY_AT;g.academy.level=1;g.money=1e7;rlHire(g,'auto','pd');if(forkOpts('science').some(function(p){return p.req(g);}))throw Error('Not right after the first postdoc');rlHire(g,'water','pd');g.academy.papers=4;if(!forkOpts('science').every(function(p){return p.req(g);}))throw Error('Science question once postdocs have a track record');
 var m=g.emp.mat;buyProj(g,'sciind');if(g.emp.mat!==m*0.95||treesFor(g).indexOf('lab')<0||forkOpts('science').some(function(p){return p.id==='sciacad'&&g.emp.proj[p.id];}))throw Error('Industry');
-var h=newGame();h.kits.sold=ACADEMY_AT;h.academy.level=1;h.money=1e7;rlHire(h,'auto','pd');rlHire(h,'water','pd');h.academy.papers=4;buyProj(h,'sciacad');if(!h.emp.acad||(h.tr.know||0)<2)throw Error('Academia');
+var h=newGame();h.kits.sold=ACADEMY_AT;h.academy.level=1;h.money=1e7;rlHire(h,'auto','pd');rlHire(h,'water','pd');h.academy.papers=4;buyProj(h,'sciacad');if(!h.emp.acad||!((h.tr.control||0)<0))throw Error('Academia');
 var q=newGame();q.tanks[0].feeder=1;q.tanks[0].autoWC=1;personalDay(q);for(var hh=17;hh<23;hh++)setHour(q,hh,'grandma');for(var d=0;d<30;d++){q.day++;personalDay(q);}if(q.me.letters<3||!q.me.hist.some(function(x){return /fishing boat/.test(x);}))throw Error('His story in letters');
 var w=newGame();w.humans=4e9;hardDay(w);w.money=1e12;w.fin=[{kits:1e9}];hardBuy(w,'fled','camps');if(!rip(w).log.some(function(x){return /camp school/.test(x.tx);}))throw Error('A hard-part choice makes the news');
 var o=newGame();o.emp.farms.hatch=1;storyChoose(o,'owntank',0);if(gpLines(o).join().indexOf('never looked')<0)throw Error('Kept and never looked');o.ps.look+=5;if(gpLines(o).join().indexOf('never looked')>=0)throw Error('Looked after');
@@ -192,13 +192,13 @@ g.me={on:1,house:{complete:5},cnt:{},gp:{}};g.emp.network=1;g.humans=2e8;g.space
 var n=Object.keys(MILESTONES).filter(function(k){return /^mira_/.test(k);}).length;if(n<10)throw Error('Mira moments '+n);
 `);
 check('paths without Space get a last chapter before the ending',`
-var g=newGame();g.tr={drive:6,ego:4,means:-2};g.emp.won=2000;g.humans=WORLD;g.emp.trees={island:1};g.emp.tree={isl_buy:1,isl_nation:1};g.progress.seen={};g.progress.queue=['win'];
+var g=newGame();g.tr={drive:10,means:-2};g.emp.won=2000;g.humans=WORLD;g.emp.trees={island:1};g.emp.tree={isl_buy:1,isl_nation:1};g.progress.seen={};g.progress.queue=['win'];
 if(spaceOpen(g)||lastChapter(g)!=='island')throw Error('Island chapter '+lastChapter(g));detectMilestones(g);
 if(g.progress.queue[0]!=='lastchap'||g.progress.queue.indexOf('win')<1)throw Error('Order '+g.progress.queue);var t=MILESTONES.lastchap.more(g);
 if(t.indexOf('Shrimp Island')<0||t.indexOf('calls itself a country')<0||t.indexOf('jetty')<0)throw Error('Text '+t);
-var q=newGame();q.emp.won=2000;q.emp.trees={space:1};q.tr={know:6,ego:-2,care:2};if(!spaceOpen(q)||lastChapter(q))throw Error('Space players keep their own last chapter');
-var r=newGame();r.tr={drive:-6,ego:-4,care:-2};r.emp.won=2000;r.emp.trees={shop:1};r.progress.seen={};r.progress.queue=['win'];detectMilestones(r);if(r.progress.queue[0]!=='lastchap'||MILESTONES.lastchap.more(r).indexOf('cat')<0)throw Error('Shop chapter');
-var o=newGame();o.tr={drive:-6,ego:-4};o.emp.won=1;o.progress={seen:{},queue:[],wait:[]};o.emp.trees={shop:1};detectMilestones(o);
+var q=newGame();q.emp.won=2000;q.emp.trees={space:1};q.tr={know:6,care:2};if(!spaceOpen(q)||lastChapter(q))throw Error('Space players keep their own last chapter');
+var r=newGame();r.tr={drive:-10,care:-2};r.emp.won=2000;r.emp.trees={shop:1};r.progress.seen={};r.progress.queue=['win'];detectMilestones(r);if(r.progress.queue[0]!=='lastchap'||MILESTONES.lastchap.more(r).indexOf('cat')<0)throw Error('Shop chapter');
+var o=newGame();o.tr={drive:-10};o.emp.won=1;o.progress={seen:{},queue:[],wait:[]};o.emp.trees={shop:1};detectMilestones(o);
 `);
 check('the player name shows up where it should and nowhere unsafe',`
 var g=newGame();g.name='  Puti<b>  ';if(nm(g)!=='Putib')throw Error('Clean '+nm(g));
