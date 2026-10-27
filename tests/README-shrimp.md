@@ -878,3 +878,14 @@ Bots, seed 7, unchanged: strong 2,479 (empire_dictator), kind 3,698 (garden_vill
 - Deployed: passes up to 111 (seven traits, final logic and layout pass, Earth line, big news popups, swipe-away news, calendar dates, cull inside Check shrimp, prototype tank jobs). BUILD 2026-10-27-final.
 - Bots at deploy: strong day 2,479 (empire_dictator), kind 3,698 (garden_village), average Earth 6,441 / Space 7,852 (question_prof). Null test: a random chooser lands at 0 on every trait.
 - Next up: Grandma's timeline (see "Open work" in shrimp/AGENTS.md). Read the "Token budget" section there first: this project used most of a weekly Max limit in a few days, mostly through helper agents and one very long chat.
+
+## Pass 112: Grandma's timeline, Check on Grandma, a day of two picks (27 Oct)
+
+- Grandpa died before the story. The lines where he was alive (the well, the roof dinner, "your Grandpa says") are rewritten, and three of her stories now say Maryam was his boat. Old histories are rewritten once (`fixGpText`, `GP_OLD3`, `M.gv=3`).
+- Your day: work in hours (0–14), plus two picks outside work, 3 hours each, kept until changed. Sleep is what's left up to 8, then rest. Grandma is no longer an hour. Old painted days migrate once (`dayMigrate`).
+- Check on Grandma on the You page shows what's waiting: her own events, moments, mailed money, or "Grandma is fine". Her years lists everything with dates, untold stories as a count. Windows are a game month or 3 minutes of play, whichever is longer, then it happens without you.
+- Calendar: her birthday 4 May (only the first rings), New Year's Eve dinner on real lunar dates, your birthday from the first card (default 1 Jan). Pocket money 100, sometimes 150, at most 200, mailed if you weren't there. One-offs: WeChat, the TV (waits, counts days), club president, Maryam (keep it or sell it, AED 30,000), Auntie Fang's funeral, the dance class, her knee, Göbekli Tepe at 3,000 kits a day (two weeks, orders at half), the smaller flat. One call after four months of no checks.
+- Ending: checks, there and missed, and "Stories she never told you".
+- Tests: shrimp-me 46 (new timeline check, day checks rewritten), balance 71, academy 10.
+- Bots (seed 7): strong 2,393 empire_dictator (was 2,479), kind 3,641 question_prof (was 3,698 garden_village), average Earth 6,413 / Space 7,824 garden_hermit (was 6,441 / 7,852 question_prof). The average bot now checks on Grandma every 20 days and says yes. Endings moved because Grandma time is drive− only now and the picks replace the painted day.
+- BUILD 2026-10-27-grandma.

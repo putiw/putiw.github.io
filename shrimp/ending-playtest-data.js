@@ -790,7 +790,7 @@ window.ENDING_TEST_DATA = {
       "name": "The Garden, the village",
       "who": "You never moved far. You built one thing well and you let it take the time it took. You knew the names of the people who packed your kits. When it was faster or better, you usually picked better and lost some money. You thought shrimp were worth looking after properly, all of them, even the pale ones nobody wanted.",
       "mira": "She studied the sea. She lives on the coast two hours away and still sends photos of the mangroves.",
-      "gp": "I sit in the garden most mornings now. The shrimp room is warmer than my old flat, don't tell your Grandpa. You took longer than you had to, everyone said so. I think you knew that and didn't mind. [visit] I'm proud of you, I don't say it enough, so I'm writing it down.",
+      "gp": "I sit in the garden most mornings now. The shrimp room is warmer than my old flat, don't tell the shrimp club. You took longer than you had to, everyone said so. I think you knew that and didn't mind. [visit] I'm proud of you, I don't say it enough, so I'm writing it down.",
       "tank": "There was a lot of green. Food came at the same time every day. Sometimes a big face came close to the glass and stayed a long time. We didn't know what it wanted. It never took anyone away."
     },
     "garden_hermit": {
@@ -799,7 +799,7 @@ window.ENDING_TEST_DATA = {
       "name": "The Garden, the hermit",
       "who": "At some point you stopped going to the meetings. You built the house, you built the shrimp room, you put a sign on the gate. The company kept going without you and you were fine with that. You talk to the shrimp more than to people.",
       "mira": "She visits once a year and fixes your solar panels. She says you're impossible. She keeps coming.",
-      "gp": "You're the only person I know who got everything they wanted and then went to live in a field. Your Grandpa wants a well now, thanks a lot. [visit] Call me sometimes, the shrimp can't tell you what's going on in the world.",
+      "gp": "You're the only person I know who got everything they wanted and then went to live in a field. Now the shrimp club wants a well, thanks a lot. [visit] Call me sometimes, the shrimp can't tell you what's going on in the world.",
       "tank": "It was very quiet. The light came from the sun, not from a lamp. Someone sat with us every evening and did nothing. We liked it."
     },
     "question_prof": {
@@ -817,7 +817,7 @@ window.ENDING_TEST_DATA = {
       "name": "The Question, the lucky one",
       "who": "You funded people for years for no good reason. Nobody could tell you what the research was for and you paid anyway. Most of it went nowhere. One of them found the gene for heat tolerance, and that's why there are shrimp on a hot world now. You never claimed it, you just kept paying.",
       "mira": "She runs the lab that found it. She sends you the papers with your name crossed out of the thank-yous, because you asked her to.",
-      "gp": "People keep asking me what you do and I say I don't know, something with science. They think I'm being modest for you. I'm not, I really don't know. [visit] Your Grandpa says it's something with shrimp and the weather. That's what I tell people now.",
+      "gp": "People keep asking me what you do and I say I don't know, something with science. They think I'm being modest for you. I'm not, I really don't know. [visit] The shrimp club says it's something with shrimp and the weather. That's what I tell people now.",
       "tank": "For a long time nothing happened and people kept watching. Then one day the water was warm, very warm, and we were fine."
     },
     "network_life": {
@@ -826,7 +826,7 @@ window.ENDING_TEST_DATA = {
       "name": "The Network, the lifeline",
       "who": "You went everywhere and talked to everyone. Somewhere in the middle you noticed that a network that keeps live shrimp alive across the world can keep other things alive too. You put water filters on the trucks, then vaccines, then insulin. Half your company doesn't touch shrimp anymore. You spent most of your life in airports and you know someone in every city.",
       "mira": "She runs the water routes. She's the reason they reach the desert towns.",
-      "gp": "You sent me a postcard from a place I can't pronounce, the stamp had one of your trucks on it. I keep them all in the shrimp book. [visit] Your Grandpa says fewer postcards, more visits.",
+      "gp": "You sent me a postcard from a place I can't pronounce, the stamp had one of your trucks on it. I keep them all in the shrimp book. [visit] I say fewer postcards, more visits.",
       "tank": "We went a very long way. It was cold and dark and loud, and then it was quiet and someone very small put their nose on the glass and didn't move for an hour."
     },
     "network_dark": {
