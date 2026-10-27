@@ -34,3 +34,16 @@
 .hmove span{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}
 .lpal button b{white-space:normal;line-height:1.15;overflow:visible;text-overflow:clip}
 .lstat span{white-space:normal;overflow:visible;text-overflow:clip}
+/* build panel: groups, then that group's things as a grid */
+.palette.lpal{display:block;overflow:visible;padding:0 0 4px}
+.bcats{display:flex;gap:6px;margin:0 0 8px;overflow-x:auto;scrollbar-width:none}
+.bcats::-webkit-scrollbar{display:none}
+.bcat{flex:0 0 auto;width:auto!important;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:6px 12px;font:600 12.5px/1 var(--font-body);cursor:pointer}
+.bcat[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.bcat.brm{margin-left:auto;color:#a8432f}
+.bcat.brm[aria-pressed="true"]{background:#a8432f;border-color:#a8432f;color:#fff}
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:6px}
+.bgrid button{width:auto!important;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font:500 11px/1.15 var(--font-body);color:var(--ink-2)}
+.bgrid button canvas{width:56px;height:36px}
+.bgrid button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.bnote{font-size:12.5px;color:var(--ink-2);padding:4px 2px 2px}
