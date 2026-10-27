@@ -419,6 +419,16 @@ Do not report a feature as finished just because its new path works once. Check 
 
 Planned and agreed with Puti, not built yet:
 
+**Tab cleanup (agreed 28 Oct, one chat per step, in this order)**
+Puti finds Kits, Ads and World overwhelming: too many cards, too much text on each, and no way to tell what a button changes. Goal: fewer cards, one line of text per card face, every number on the page where it is used.
+1. Card headers, every tab: no chevron arrow, the ? shows only when a card is open, the whole header row toggles. Closed card = title + one number.
+   Finance sheet opened by tapping the cash in the header: Money over time, Consultants, Operating controls (stock days, cash reserve) and the wage bill per team (each line links to that team's card). No Staff tab (Puti agreed): staff stay next to their work.
+2. Kits tab, three cards: Kits (price, stock, orders, profit; rest behind More numbers), Making kits (Packing & staff + Quality checks: capacity line, next machine, How strict row), Kit development (next project, finished ones folded).
+3. Ads tab: Ads (one-off ads as a button row, permanent ones folded), Shops (one line per region, e.g. "The Gulf 79/90 · Open 10", closing stores in a fold), Sales staff, and Marketing development + Campaigns merged into one ✦ card. These ✦ items stay in Ads (Puti: World is already too full). Consider moving Regions here (it's reach).
+   World tab: Shaping the world, Owners' tanks, one coast card (Mangroves, Shrimpcoin, Shrimp Island), The Shrimp Times last.
+4. The Shrimp Times gets a Science section: lab results, funded studies, University track news (newsLine calls around the lab projects, ~2817-2852 and 3144-3163 on 28 Oct). Tag at newsLine, everything else stays on the front page.
+Rules for all four: no growth or bottleneck summary anywhere; bottleneck advice only from the paid consultants. Numbers are fine, each on its own page (packing capacity on Kits, reach on Ads, ceiling with Regions).
+
 **Small leftovers from the 2026-10-27 final pass**
 - "Check shrimp" wraps to two lines in the six-button own-tank grid at 360–390 px (drop the icon at narrow widths).
 - The Rewilding and "A place of your own" cards have no fold arrow (they rebuild every render; needs open/closed state).
