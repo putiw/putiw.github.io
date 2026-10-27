@@ -1006,3 +1006,12 @@ Step 3 of the tab cleanup.
 - Regions moved from World to Ads (reach). Its card says the ceiling ("Up to 46% of them want a tank, 245M people"). Guide, consultant and bottleneck links to Regions point at Ads.
 - World order: The hard part (when open), Shaping the world, Owners' tanks, the coast card, other trees, The Shrimp Times last. The coast card holds Mangroves / Shrimpcoin and Shrimp Island (`#coin-island`; the island tree card is gone). Title is Shrimpcoin, Mangroves or, with only the island, Shrimp Island.
 - Balance 78 (new Ads/World check), academy 10, me 46. Playwright at 360 and 390 px on first sale, first farm, million owners and win.
+
+## Pass 122: The Shrimp Times gets a Science section (28 Oct)
+
+Step 4 of the tab cleanup.
+
+- `newsLine(G,t,sci)`: a third argument marks a story for Science. Tagged: research line finds and duds (`rlDay`), the yearly postdoc find (`academyDay`), the shrimp-and-stress studies (`studyopen`, `studybuy`) and any delayed news from a University track project (`p.later` on `t:'uni'`, carried through `laterDay`). Everything else stays on the front page.
+- The card shows the front page (latest story, Earlier stories), the effects line, then a Science heading with its latest story and its own Earlier fold. Old saves keep their old stories on the front page.
+- The Shrimp Times order is set to last in `updateRipple` too (it used to set 2).
+- Balance 79 (sim check for the tag, markup check), academy 10, me 46. Checked in Playwright at 390 px.
