@@ -101,7 +101,15 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **Choices and heart** (`FORK_Q`, `forkOpts`, `addHeart`, `dealsDay`, `laterDay`, `endingLines`, `endingVerdict`): kind or cold answers to one problem, hidden heart score, delayed news, and the win card's "What the world looks like" list.
 - **Quality checks** (`QC_STEPS`, `qcRound`, `sickKitRate`, `openQC`): a manual round once a month, steps automated in order, and a strictness setting.
 - **Hand packing** (`PACK_STEPS`, `handStep`, `buyTool`): five taps a kit, automated one tool at a time.
-- **Who you become** (`TRAITS`, `trAdd`, `G.ps`, `traitVals`, `endingPick`, `ENDINGS`): nine hidden traits from choices and play style pick one of 16 endings. Every new choice should move a trait other than Means too (tag it in `TRAIT_TAGS`, `STORY_TAGS`, or the choice itself). A trait reads the balance of pushes, not their volume: `trAdd` keeps the sum in `G.tr` and the sum of sizes in `G.trAbs`, and the choice part is sum / (sizes + `TRAIT_K`). Upgrades nearly everyone buys carry no tags; only forks and one-offs some players skip on principle do. Control means who decides: in control = you decide or own it, lets go = staff, partners, owners or a vendor decide. Keep each negative pole reachable without crime, and keep risk for real bets, not for getting caught.
+- **Who you become** (`TRAITS`, `trAdd`, `G.ps`, `traitVals`, `playVal`, `endingPick`, `ENDINGS`): seven hidden traits from choices and play pick one of 16 endings. Every new choice should move a trait other than Means too (tag it in `TRAIT_TAGS`, `STORY_TAGS`, or the choice itself). A trait reads the balance of pushes, not their volume: `trAdd` keeps the sum in `G.tr` and the sum of sizes in `G.trAbs`, and the choice part is sum / (sizes + `TRAIT_K`). Upgrades nearly everyone buys carry no tags; only forks and one-offs some players skip on principle do. Keep each negative pole reachable without crime, and keep risk for real bets, not for getting caught. The seven (Pass 110):
+  - **drive**: driven (wants to achieve greatness) / easy-going (happy with a shrimp tank and some plants). Contentment, rest, saying enough, staying small, selling the company and family time are easy-going. Grandma time is easy-going. Old saves fold ego and reach into drive (`migrate`). Play: Your day work and dinners against Grandma, house, own tank and rest, measured from the default day (8 against 8 reads 0), time on the You page and own-tank jobs by hand. Never speed or region timing.
+  - **means**: plays fair / ends justify means. `addHeart` adds heart × `HEART_TR` (0.3); repeated picks (campaigns, films, galas) count less each time (`repW`). On a means split the cold side pays about 1.5× and the fair side costs about 1.5×, and both costs show before the pick.
+  - **know**: fine-tunes everything / good enough is good enough. 70% play: setting changes away from defaults, ? opens and chart opens per game year (`psNote` → `G.ps.tw/help/chart`), about −0.6 for nobody-touches-anything up to +0.8. Tags only on real measure, test or optimise against good-enough choices, never on curiosity or research.
+  - **kin**: loves shrimp / shrimp are stock. Culling counts toward stock (`P.cull`).
+  - **care**: helps strangers far away / looks after their own. Only on choices that split help between far and near. Grandma never pushes care.
+  - **risk**: takes risks / careful.
+  - **control**: has everything in order before moving on / moves on with loose ends. 70% play: at the first kit, each new farm tier (first rack included), each region and the space start, `prepNow` records optional tank gear, QC steps owned, stores in opened regions and no pain card left open. Never automation (the game pushes everyone to automate) and never cash (that's risk). Tags follow who decides: do it yourself or keep it = in control, hand it over (staff, partners, a vendor, a chatbot, a permit firm) = lets go.
+  - Endings: empire = driven + ends justify means, garden = easy-going + fair + loves shrimp, question = fine-tunes + helps strangers, network = driven + good enough + helps strangers, drift = easy-going + looks after their own. `tests/shrimp-balance.cjs` checks that a random chooser sits within ±0.05 of the middle on every trait, that drive pushes are even, and that every family can be reached.
 - **You tab** (`G.me`, `PICKS`, `MOMENTS`, `HOUSE`): free time, Grandma, a place of your own. Moments only show on the tab.
 - **Money trouble and dirty money** (`broke`, `debtDay`, `G.dye`, fight night pick, `E.dirty`, `FAVOURS`, `E.network`, `E.turned`): the network deal is the point of no return.
 - **Trees** (`treesFor`, `TREES`, `E.trees`): each type sees its own tree, Space is the curious one's.
@@ -202,11 +210,11 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] The ending page: type and variation, who you became, Mira, what the world looks like, Grandma's letter (with the visits line), from the tank, lives you didn't live, all 16 endings, then the charts (`endCharts`: owners over the years, cash, and where your traits sit).
 - [ ] Space opens only after Earth, and only for curious players (`spaceOpen`). Other types get their own tree in World.
 
-- [ ] The ending page shows four charts under who you became: owners over time with milestone dots, cash over time, the nine traits, and where the money went (`chartDay` records `G.chart`, `endCharts` draws plain SVG with the takeaway in each title). Saves from before this only chart from the day recording began.
+- [ ] The ending page shows four charts under who you became: owners over time with milestone dots, cash over time, the seven traits, and where the money went (`chartDay` records `G.chart`, `endCharts` draws plain SVG with the takeaway in each title). Saves from before this only chart from the day recording began.
 - [ ] Sound: `shrimp/water.mp3` and `shrimp/music.mp3` from the shrimp tanks game, same graph as there (master 0.82, bus 0.5, water 0.4 with 4.8 s fades, music 0.16 with 2.2 s fades). Mute button always in the top bar (`tb-mute`), starts on the first tap, pauses when the tab is hidden, off switch in Settings (localStorage `shrimp-music`). App icons: `favicon.ico`, `icon-32.png`, `icon-192.png`, `icon-180.png` (apple-touch), cropped from the tank art.
 - [ ] The first shrimp purchase starts the clock at 1×. Any time the clock is paused with nothing to read, the pause pill shows above the tab bar and 1× pulses (`pauseCue`, `G.opt.pauseTold`, `G.opt.nudge`). The tank is still while paused.
 - [ ] `BUILD` near `toast` changes with every release; an open game checks every 15 minutes and offers a reload when a newer one is live. Bump it when you ship.
-- [ ] Shrimp videos count as reach, not ego, so they don't push you away from Space.
+- [ ] Shrimp videos are driven (`drive`), and there is no ego or reach trait any more (Pass 110).
 
 **Your own tank, Oct 26 (check these stay true)**
 - The header shrimp count is everyShrimp(G): tanks plus farmStock (shrimp waiting + about 60 days of hatchery output on the racks). Tap-hold title splits it. Farms can only be bought or sold, no mothball/restart (old saves with paused farms restart on load).
@@ -285,14 +293,14 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 
 In game days, best play is about 7 years and casual play about 15.
 
-Latest bot results (seed 7, 24 Oct):
+Latest bot results (seed 7, 27 Oct, Pass 110):
 
 | Bot | Result |
 |---|---|
-| Strong, cold answers (default) | Earth won on day 2,893, empire_dictator |
-| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 3,219, question_prof |
-| Average, curious and kind (default) | Earth on day 5,994-6,190 depending on seed, space done by day ~7,600 |
-| Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,349, no Space |
+| Strong, cold answers (default) | Earth won on day 2,479, empire_dictator |
+| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 3,698, garden_village |
+| Average, curious and kind (default) | Earth on day 6,441, space done by day 7,852, question_prof |
+| Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,349, no Space (24 Oct, not rerun in Pass 110) |
 
 All bots use campaigns (when ✦ is plentiful), films, Shrimpcoin, shops and mall stores. The average bot also funds research lines. It has 22 years to finish both chapters.
 
@@ -364,7 +372,8 @@ Do not report a feature as finished just because its new path works once. Check 
 - **Explanations on the card face.** Cards kept growing with how-it-works paragraphs. Put the why in `HELP[cardId]` or a `.explain` element (shown under ?), keep only numbers and choices on the card.
 - **Story text rewritten as policy memos.** One pass made every late card "grounded" by turning it into explainer prose: semicolons, "sovereignty", "(+3% adoption ceiling)", and the jokes removed. Grounded means the premise holds up (scale, facts, cause and effect), not that the voice goes flat. Keep Puti's voice and fix the logic.
 - **Satire that doesn't fit the scale.** News like "cocktail sales drop 12%" at 10,000 owners, or "the last person on Earth" with 4 million left, reads as bad writing. Match every news line and card to the owner count where it fires.
-- **The ending preview drifting from the game.** `shrimp/ending-playtest-data.js` is built from the game now: run `node tests/build-ending-playtest.cjs` after changing forks, late cards or endings. The `extras` list in `ending-playtest.html` is still hand-written.
+- **The ending preview drifting from the game.** `shrimp/ending-playtest-data.js` is built from the game now: run `node tests/build-ending-playtest.cjs` after changing forks, late cards or endings. The `extras` list and the ending formula in `ending-playtest.html` are hand-written, keep them in step with `STORY_TAGS` and `endingScores`.
+- **A win card button that parked the game.** "Review your empire" set `progress.reviewing` with nothing to do, so the game froze. The win card offers Keep playing and New game only, and `migrate` releases saves stuck that way. The Space hand-off (`requestSpaceDream`) also sets `reviewing` while `spaceDream` is queued; leave that one.
 - **Buttons rebuilt under a finger.** Writing `innerHTML` every render swapped buttons out mid-tap, so holds and fast taps got lost. Use `el.mhtml=html` (the `morph` helper): it patches the DOM in place, keeps `open` on folds and the classes in `KEEP_CLS`, and does nothing when the string hasn't changed.
 - **Prices that stop mattering.** A fixed AED 20M choice is free with AED 300B in the bank. Fixed prices go through `scM(G,m)` / `si(G,i)`: never less than 0.2% of your cash (or ✦). Story labels are rewritten with the scaled number (`needM`/`needI` carry `.cost`/`.inf`).
 - **A story choice that ends the game.** Selling or closing the company set `ended` but nothing queued the ending, so the game sat frozen. The choice handler now runs `detectMilestones` right away.

@@ -447,10 +447,77 @@ var R=prof(true),K=prof(false),apart=TRAITS.filter(function(k){return Math.abs(R
 if(apart.filter(function(k){return k!=='means';}).length<4)throw Error('Ruthless and kind only differ on '+apart.join(', ')+' '+JSON.stringify([R,K]));
 ['drive','means','kin','risk'].forEach(function(k){if(!(R[k]*K[k]<0))throw Error('Opposite sides on '+k+': '+R[k].toFixed(2)+' vs '+K[k].toFixed(2));});
 var a=newGame();trAdd(a,{drive:1});if(!(traitVals(a).drive>0.1&&traitVals(a).drive<0.3))throw Error('One push is a lean, not the rail: '+traitVals(a).drive);
-for(var i=0;i<10;i++)trAdd(a,{ego:i%2?1:-1});if(Math.abs(traitVals(a).ego)>0.01)throw Error('Ten pushes that cancel sit in the middle');
+for(var i=0;i<10;i++)trAdd(a,{risk:i%2?1:-1});if(Math.abs(traitVals(a).risk)>0.01)throw Error('Ten pushes that cancel sit in the middle');
 for(i=0;i<5;i++)trAdd(a,{kin:1});trAdd(a,{kin:-5});if(Math.abs(traitVals(a).kin)>0.01||a.trAbs.kin!==10)throw Error('The sum and the sizes are both kept');
 var o=newGame();delete o.trAbs;o.tr={care:-3,know:2};migrate(o);if(o.trAbs.care!==3||o.trAbs.know!==2)throw Error('Old saves count their sums as one-way pushes');
 ['social','guide','aiconsult','farmlic','ministry','mangrove','arco','globalbrand'].forEach(function(id){if(TRAIT_TAGS[id])throw Error('Routine upgrade still pushes a trait: '+id);});
 `);
+// Pass 110: seven traits. DECS lists every one-off decision with the trait push of each option, measured by running it on a rich game
+// (story cards, staff goodbyes, growing pains, late cards, forks, hard-part options, Grandma moments). Repeatables (galas, campaigns) are left out.
+const DECS=`var big=typeof big==='function'?big:function(n){return String(Math.round(n));};
+function richGame(){var g=newGame();acknowledgeMilestone(g);g.day=2000;g.money=1e13;g.emp.inf=1e12;g.emp.infOn=1;g.kits.stock=1e9;g.kits.sold=1e8;g.humans=5e9;g.stats.sold=1e6;
+ g.emp.staff={pack:3,sales:3,mgr:3,social:3};g.emp.farms={barn:4};g.me.on=1;g.story.choices={ev_mira:0};g.emp.fight=1;return g;}
+function pushOf(g){var o={};TRAITS.forEach(function(k){var v=(g.tr||{})[k]||0;if(Math.abs(v)>1e-9)o[k]=v;});return o;}
+function decisions(){var js=JSON.stringify(richGame()),out=[];
+ for(var k in MILESTONES){var ch=null;try{ch=storyChoices(JSON.parse(js),k);}catch(e){}if(!ch||ch.length<2||k==='stream'||k==='broke')continue;
+  var d={id:k,text:(MILESTONES[k].title||'')+' '+(MILESTONES[k].body||''),opts:[]};
+  for(var i=0;i<ch.length;i++){var g=JSON.parse(js);g.tr={};g.trAbs={};storyChoose(g,k,i);d.opts.push({label:ch[i][0],push:pushOf(g)});}out.push(d);}
+ var fk={};PROJ.forEach(function(p){if(p.c==='fork'&&p.fk!=='layoff')(fk[p.fk]=fk[p.fk]||[]).push(p);});
+ for(var f in fk){var d2={id:'fork_'+f,text:FORK_Q[f]||'',opts:[]};fk[f].forEach(function(p){var g=JSON.parse(js);g.tr={};g.trAbs={};trAdd(g,TRAIT_TAGS[p.id]);addHeart(g,p.h);d2.opts.push({label:p.name,push:pushOf(g)});});out.push(d2);}
+ HARD.forEach(function(gr){var ops=(gr.ops||[]).filter(function(o){return !o.old;});if(ops.length<2)return;var d3={id:'hard_'+gr.id,text:gr.name||'',opts:[]};ops.forEach(function(o){var g=JSON.parse(js);g.tr={};g.trAbs={};trAdd(g,o.tr);addHeart(g,o.h||0);d3.opts.push({label:o.t,push:pushOf(g)});});out.push(d3);});
+ MOMENTS.forEach(function(m){out.push({id:'mo_'+m.id,text:'Grandma '+(m.t||''),opts:[{label:m.yes||'yes',push:Object.assign({},m.ytr)},{label:m.no||'no',push:Object.assign({},m.ntr)}]});});
+ return out;}
+`;
+check('seven traits: ego and reach fold into drive, a stuck review is released, the Space hand-off keeps its flag',`
+if(TRAITS.length!==7||TRAITS.indexOf('ego')>=0||TRAITS.indexOf('reach')>=0)throw Error('Seven traits '+TRAITS);
+var o=newGame();o.tr={drive:1,ego:2,reach:-0.5,care:1};o.trAbs={drive:1,ego:3,reach:1.5,care:1};migrate(o);
+if(o.tr.drive!==2.5||o.trAbs.drive!==5.5||'ego' in o.tr||'reach' in o.tr||'ego' in o.trAbs||'reach' in o.trAbs||o.tr.care!==1)throw Error('Fold '+JSON.stringify([o.tr,o.trAbs]));
+var n=newGame();delete n.trAbs;n.tr={ego:2,reach:1};migrate(n);if(n.tr.drive!==3||n.trAbs.drive!==3||'ego' in n.tr)throw Error('Fold without sizes '+JSON.stringify([n.tr,n.trAbs]));
+var v=traitVals(o);if(Object.keys(v).length!==7||Object.keys(v).some(function(k){return !isFinite(v[k]);}))throw Error('Values '+JSON.stringify(v));
+var w=newGame();w.emp.won=2000;w.progress.reviewing=true;w.progress.queue=[];migrate(w);if(w.progress.reviewing)throw Error('Stuck review should be released so the win card offers Keep playing');
+if(!MILESTONES.spaceDream)MILESTONES.spaceDream={chapter:'Chapter 6',title:'Next stop, space',body:''};// the card itself lives outside the sim
+var s=newGame();s.tr={know:8,care:6};acknowledgeMilestone(s);s.emp.won=3000;s.day=3000;if(!requestSpaceDream(s))throw Error('Dream');var s2=migrate(JSON.parse(JSON.stringify(s)));if(!s2.progress.reviewing||s2.progress.queue[0]!=='spaceDream'||!beginSpace(s2)||progressionBlocked(s2))throw Error('Space hand-off has to survive a reload');
+`);
+if(html.includes('review-empire')||html.includes('Review your empire'))throw Error('The win card has no review button, it froze the game');
+{const w0=html.indexOf("key==='win'?'<button"),w=html.slice(w0,html.indexOf("</button>':'",w0)+9);if(!w.includes('data-act="sandbox">Keep playing<')||!w.includes('data-act="reset">New game<')||(w.split('<button').length-1)!==2)throw Error('Win card offers Keep playing and New game only: '+w);}
+count++;console.log('PASS the win card offers Keep playing and New game, no review button');
+check('Grandma time never pushes care, it is easy-going where it pushes anything',`
+`+DECS+`
+var bad=[];decisions().forEach(function(d){d.opts.forEach(function(o){if(/Grandma/.test(d.text+' '+o.label)&&o.push.care)bad.push(d.id+': '+o.label);});});
+MOMENTS.forEach(function(m){if((m.ytr||{}).care||(m.ntr||{}).care)bad.push('moment '+m.id);});
+PICKS.forEach(function(p){if(/Grandma/.test(p.name)&&(p.tr.care||(p.tr.drive||0)>0))bad.push('pick '+p.id);});
+['gp_land','party1','party2'].forEach(function(k){var g=richGame();g.tr={};g.trAbs={};storyChoose(g,k,0);if(g.tr.care||!((g.tr.drive||0)<0))bad.push(k+' should be easy-going only '+JSON.stringify(g.tr));});
+var b=richGame();b.money=-5000;b.tr={};b.trAbs={};var bi=brokeOpts(b).map(function(x){return x.id;}).indexOf('gp');if(bi>=0){brokePick(b,bi);if(b.tr.care)bad.push('broke: Grandma money');}
+if(bad.length)throw Error('Care pushes on Grandma: '+bad.join(' | '));
+`);
+check('drive: driven and easy-going options are about as many and as big',`
+`+DECS+`
+var p=0,n=0,ps=0,ns=0;decisions().forEach(function(d){d.opts.forEach(function(o){var v=o.push.drive||0;if(v>0){p++;ps+=v;}if(v<0){n++;ns-=v;}});});
+if(p/n<0.8||p/n>1.25||ps/ns<0.85||ps/ns>1.18)throw Error('Drive pushes: '+p+' up ('+ps.toFixed(1)+') against '+n+' down ('+ns.toFixed(1)+')');
+var g=richGame();g.tr={};g.trAbs={};storyChoose(g,'buyout',1);if(Object.keys(pushOf(g)).length)throw Error('Refusing the buyout pushes nothing');
+`);
+check('null test: a random chooser lands in the middle on every trait',`
+`+DECS+`
+var D=decisions(),s=11,rnd=function(){s=(s*1664525+1013904223)>>>0;return s/4294967296;},R={};TRAITS.forEach(function(k){R[k]=[];});
+for(var it=0;it<3000;it++){var t={},a={};D.forEach(function(d){var o=d.opts[Math.floor(rnd()*d.opts.length)].push;for(var k in o){t[k]=(t[k]||0)+o[k];a[k]=(a[k]||0)+Math.abs(o[k]);}});TRAITS.forEach(function(k){R[k].push((t[k]||0)/((a[k]||0)+TRAIT_K));});}
+var off=TRAITS.map(function(k){var v=R[k].sort(function(x,y){return x-y;});return [k,v[1500]];}).filter(function(x){return Math.abs(x[1])>0.05;});
+if(D.length<60)throw Error('Only '+D.length+' decisions found');if(off.length)throw Error('Random chooser median off centre: '+JSON.stringify(off));
+`);
+check('every ending family can be reached, from choices alone',`
+`+DECS+`
+var D=decisions(),s=5,rnd=function(){s=(s*1664525+1013904223)>>>0;return s/4294967296;},seen={},js=JSON.stringify(newGame());
+for(var it=0;it<800;it++){var w={};TRAITS.forEach(function(k){w[k]=rnd()*2-1;});var g=JSON.parse(js);g.tr={};g.trAbs={};
+ D.forEach(function(d){var best=null,bv=-1e9;d.opts.forEach(function(o){var v=rnd()*0.3;for(var k in o.push)v+=w[k]*o.push[k];if(v>bv){bv=v;best=o;}});trAdd(g,best.push);});
+ var e=endingPick(g),f=e.split('_')[0];seen[f]=(seen[f]||0)+1;}
+['empire','garden','question','network','drift'].forEach(function(f){if(!seen[f])throw Error('Never reached '+f+' '+JSON.stringify(seen));});
+`);
+check('know is how you tune things: setting changes, ? and charts per game year, from about -0.6 to +0.8',`
+var g=newGame();g.day=730;g.ps.t=4e6;var lo=playVal(g,'know');g.ps.tw=60;g.ps.help=20;g.ps.chart=10;var hi=playVal(g,'know');
+if(Math.abs(lo+0.6)>0.01||!(hi>0.6&&hi<=0.8))throw Error('Know from play '+lo+' '+hi);
+var c=newGame();c.day=730;c.ps.t=4e6;c.ps.prep=[0.2,4];var lc=playVal(c,'control');c.ps.prep=[4,4];if(!(lc<-0.5&&playVal(c,'control')>0.5))throw Error('Control reads how ready you were at each big step');
+var d=newGame();d.day=730;d.ps.t=4e6;if(playVal(d,'drive')!=null)throw Error('A player who never opened the You page says nothing about drive');
+`);
+if(!/psNote\('tw',p\[0\]\)/.test(html)||!/psNote\('help'/.test(html)||!/psNote\('chart'/.test(html)||!/G\.ps\.help\+\+/.test(html)||!/psNote\('tw','kitPrice'\)/.test(html))throw Error('Setting, ? and chart opens must reach G.ps');
+count++;console.log('PASS sliders, kit price, ? and charts all count toward know');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
