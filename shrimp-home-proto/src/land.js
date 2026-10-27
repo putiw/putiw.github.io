@@ -174,9 +174,9 @@ var FB=cu('#8f563b'),FB2=cu('#7a4a32'),FD=cu('#663931'),FL=cu('#45283c'),FO=cu('
 // squares, so the banks curve. Only when the map's tiles match the shape exactly: an old save made differently keeps squares.
 var NAT_K=1.4;
 function natShapes(m){var N={stream:false,lake:null,pond:null},x,y,i,ok;
-  if(m.stream){ok=true;for(y=0;y<m.h&&ok;y++)for(x=0;x<m.w;x++){i=y*m.w+x;var sc=streamCy(x+0.5),sw=streamW(x+0.5),inW=y>=22&&Math.abs(y+0.5-sc)<sw/2,isW=m.g[i]===G_WATER&&!!m.wb&&m.wb[i]===W_STREAM;if(inW!==isW){ok=false;break;}}N.stream=ok;}
+  if(m.stream){var bad=0,tot=0;for(y=0;y<m.h;y++)for(x=0;x<m.w;x++){i=y*m.w+x;var sc=streamCy(x+0.5),sw=streamW(x+0.5),inW=y>=22&&Math.abs(y+0.5-sc)<sw/2,isW=m.g[i]===G_WATER&&!!m.wb&&m.wb[i]===W_STREAM;if(inW)tot++;if(inW!==isW&&!painted(m,i))bad++;}N.stream=bad<=Math.max(2,tot*0.05);}
   if(m.lake){var Lk=m.lake;ok=true;for(y=0;y<m.h&&ok;y++)for(x=0;x<m.w;x++){i=y*m.w+x;var ax=(x+0.5-Lk.cx)/Lk.rx,ay=(y+0.5-Lk.cy)/Lk.ry,dd=ax*ax+ay*ay+0.06*Math.sin(x*1.3+y),isL=m.g[i]===G_WATER&&!!m.wb&&m.wb[i]===W_LAKE;
-    if((isL&&dd>=1)||(dd<1&&m.g[i]!==G_WATER)){ok=false;break;}}N.lake=ok?Lk:null;}
+    if(((isL&&dd>=1)||(dd<1&&m.g[i]!==G_WATER))&&!painted(m,i)){ok=false;break;}}N.lake=ok?Lk:null;}
   var P=m.pond||(m.w===18&&m.h===21?{cx:3.6,cy:15.6,rx:2.45,ry:1.6}:m.w===30&&m.h===40?{cx:9.6,cy:15.6,rx:2.45,ry:1.6}:null);
   if(P){ok=true;for(y=Math.max(0,Math.floor(P.cy-P.ry-1));y<=Math.min(m.h-1,Math.ceil(P.cy+P.ry+1))&&ok;y++)for(x=Math.max(0,Math.floor(P.cx-P.rx-1));x<=Math.min(m.w-1,Math.ceil(P.cx+P.rx+1));x++){i=y*m.w+x;
     var bx=(x+0.5-P.cx)/P.rx,by=(y+0.5-P.cy)/P.ry,inP=bx*bx+by*by<1,isP=m.g[i]===G_WATER&&(!m.wb||!m.wb[i]||m.wb[i]===W_POND);if(inP!==isP){ok=false;break;}}N.pond=null;}
@@ -184,7 +184,7 @@ function natShapes(m){var N={stream:false,lake:null,pond:null},x,y,i,ok;
 // 1 natural water, 2 the stream's sand, 0 anything else
 function painted(m,i){var P=L.pmask;if(!P||P.length!==m.w*m.h){P=L.pmask=new Uint8Array(m.w*m.h);(LS().edits||[]).forEach(function(e){if(!e.k||e.k.indexOf('g-')!==0)return;for(var y=e.ty;y<e.ty+e.fh;y++)for(var x=e.tx;x<e.tx+e.fw;x++)P[y*m.w+x]=1;});}return P[i];}
 function natKind(m,x,y){var N=L.nat;if(!N||x<0||y<0||x>=m.w||y>=m.h)return 0;var i=y*m.w+x,g=m.g[i];if(g===G_SAND)return N.stream&&!painted(m,i)?2:0;if(g!==G_WATER)return 0;var k=m.wb&&m.wb[i];
-  if(k===W_STREAM)return N.stream?1:0;if(k===W_LAKE)return N.lake?1:0;
+  if(k===W_STREAM)return N.stream&&!painted(m,i)?1:0;if(k===W_LAKE)return N.lake&&!painted(m,i)?1:0;
   if(N.pond&&(!k||k===W_POND)){var P=N.pond,bx=(x+0.5-P.cx)/P.rx,by=(y+0.5-P.cy)/P.ry;if(bx*bx+by*by<1)return 1;}return 0;}
 // how far into natural water a point is (tiles), as a field that is 0.5 at the bank. sc, sw: the stream's middle and width here
 function natW(X,Y,sc,sw){var N=L.nat,f=-9,d;if(N.stream){d=sw/2-Math.abs(Y-sc);if(d>f)f=d;}
@@ -640,7 +640,7 @@ defObj('birdbath',{base:56,name:'Bird bath',spr:function(o){var pb=new PB(48,48)
   pb.ell(24,14,20,7,'#847e87');pb.ell(24,12,20,6,'#9badb7');pb.ell(24,12,16,4,'#5fcde4');pb.rect(18,11,5,1,'#cbdbfc');ink(pb);var s=mk(pb,24,44);s.rim=[[-16,-32],[16,-32]];return s;}});
 defObj('lantern',{base:56,name:'Lantern',spr:function(o){var pb=new PB(24,76);pb.rect(10,22,4,52,'#2a2a2e');pb.rect(5,72,14,3,'#2a2a2e');pb.rect(4,6,16,18,'#2a2a2e');pb.rect(6,9,12,12,'#fbf236');pb.rect(7,10,4,4,'#fff9c8');pb.poly([[3,7],[12,0],[21,7]],'#2a2a2e');ink(pb);return mk(pb,12,74);}});
 // fences join up with their neighbours
-function fenceMask(o){var ob=LS().objs,m=0;function has(dx,dy){return ob.some(function(p){return (p.k==='fence'||p.k==='gate')&&p.tx<=o.tx+dx&&o.tx+dx<p.tx+p.fw&&p.ty===o.ty+dy;});}
+function fenceMask(o){var ob=LS().objs,m=0;function has(dx,dy){return ob.some(function(p){return (p.k==='fence'||p.k==='gate'||(dy===0&&p.k==='wall'))&&p.tx<=o.tx+dx&&o.tx+dx<p.tx+p.fw&&p.ty===o.ty+dy;});}
   if(has(1,0))m|=1;if(has(-1,0))m|=2;if(has(0,-1))m|=4;if(has(0,1))m|=8;return m;}
 defObj('fence',{base:46,name:'Fence',keyOf:function(o){return 'f'+fenceMask(o);},spr:function(o){var msk=fenceMask(o),pb=new PB(64,112),cx=32,base=104;
   function rail(x0,x1,y){pb.rect(x0,y,x1-x0,4,'#c68450');pb.rect(x0,y,x1-x0,1,'#d9a066');pb.rect(x0,y+3,x1-x0,1,'#8e4f26');}
@@ -648,16 +648,38 @@ defObj('fence',{base:46,name:'Fence',keyOf:function(o){return 'f'+fenceMask(o);}
   if(msk&4){pb.rect(cx-3,base-64-26,6,64,'#c68450');pb.rect(cx-3,base-64-26,1,64,'#d9a066');pb.rect(cx+2,base-64-26,1,64,'#8e4f26');}
   pb.rect(cx-4,base-40,8,40,'#a8673a');pb.rect(cx-4,base-40,2,40,'#c68450');pb.rect(cx+2,base-40,2,40,'#8e4f26');pb.poly([[cx-4,base-40],[cx,base-45],[cx+4,base-40]],'#c68450');
   ink(pb);return mk(pb,cx,base);}});
-defObj('gate',{fw:2,base:46,name:'Gate',spr:function(o){var pb=new PB(128,64),base=56;[2,120].forEach(function(x){pb.rect(x,base-46,6,46,'#a8673a');pb.rect(x,base-46,2,46,'#c68450');});
+function wallMask(o){var ob=LS().objs,m=0;function has(dx,dy){return ob.some(function(p){return (p.k==='wall'||(dy===0&&(p.k==='gate'||p.k==='fence')))&&p.tx<=o.tx+dx&&o.tx+dx<p.tx+p.fw&&p.ty===o.ty+dy;});}
+  if(has(1,0))m|=1;if(has(-1,0))m|=2;if(has(0,-1))m|=4;if(has(0,1))m|=8;return m;}
+var WALL_H=76,WALL_CAP=12;
+defObj('wall',{base:60,name:'Wall',keyOf:function(o){return 'w'+(o.v||'p')+wallMask(o);},spr:function(o){var msk=wallMask(o),stone=o.v==='s',H=WALL_H,cap=WALL_CAP,pb=new PB(64,64+H+cap),base=64+H+cap-4,cx=32;
+  var F=stone?'#a3a7ad':'#efe8da',F2=stone?'#8f949b':'#ded5c3',FD=stone?'#6d7279':'#b9ad94',C=stone?'#6f747c':'#b8ab92',CD=stone?'#575b62':'#9a8e76';
+  var side=(msk&3)||!(msk&12),x0=(msk&2)||(side&&!(msk&1)&&!(msk&2))?0:cx-12,x1=(msk&1)||(side&&!(msk&1)&&!(msk&2))?64:cx+12;if(!side){x0=cx-12;x1=cx+12;}
+  // the face, seen from the front, unless another wall stands in front of it
+  if(!(msk&8)||side){var fy0=base-H;pb.rect(x0,fy0,x1-x0,H,F);
+    if(stone){for(var r=0;r*12<H;r++){var off=(r%2)*10;for(var bx=x0-off;bx<x1;bx+=20){var a=Math.max(x0,bx),b2=Math.min(x1,bx+19);if(b2-a>2){pb.rect(a,fy0+r*12+1,b2-a,10,((bx+r*7)&16)?F:F2);pb.rect(a,fy0+r*12+10,b2-a,1,FD);}}pb.rect(x0,fy0+r*12,x1-x0,1,FD);}}
+    else{pb.rect(x0,fy0+H-10,x1-x0,10,F2);pb.rect(x0,fy0+H-10,x1-x0,1,FD);for(var q=0;q<4;q++)pb.set(x0+((q*17+o.tx*5)%Math.max(1,x1-x0)),fy0+12+q*13,F2);}
+    pb.rect(x0,base-2,x1-x0,2,FD);}
+  // the top: the wall's thickness seen from above, reaching up to the wall behind
+  var cy=base-H-cap,top=(msk&4)?cy-64:cy;pb.rect(Math.max(0,(msk&2)?0:cx-12),top,((msk&1)?64:cx+12)-((msk&2)?0:cx-12),cy+cap-top,C);
+  if(msk&4)pb.rect(cx-12,top,24,cy-top+cap,C);pb.rect((msk&2)?0:cx-12,cy+cap-2,((msk&1)?64:cx+12)-((msk&2)?0:cx-12),2,CD);
+  ink(pb);return mk(pb,cx,base);}});
+defObj('gate',{fw:2,base:46,name:'Gate',walk:true,spr:function(o){var pb=new PB(128,64),base=56;[2,120].forEach(function(x){pb.rect(x,base-46,6,46,'#a8673a');pb.rect(x,base-46,2,46,'#c68450');});
   for(var s=0;s<7;s++){var x=12+s*15;pb.rect(x,base-36,8,34,'#c68450');pb.rect(x,base-36,8,1,'#d9a066');pb.rect(x+7,base-36,1,34,'#8e4f26');}
   pb.rect(10,base-30,108,4,'#8e4f26');pb.rect(10,base-12,108,4,'#8e4f26');pb.line(12,base-10,116,base-30,'#8e4f26');pb.line(12,base-9,116,base-29,'#8e4f26');pb.rect(60,base-22,6,3,'#2a2a2e');ink(pb);return mk(pb,64,base);}});
 defObj('rock',{base:56,solid:false,name:'Rock',keyOf:function(o){return 'r'+(o.v||0);},spr:function(o){var ys=yardSpr((o.v||0)===2?'bigrock':'rock');if(ys)return ys;var v=o.v||0,w=[30,22,40][v],h=[18,14,22][v],pb=new PB(w+8,h+8);shadowPB(pb,(w+8)/2,h+4,w/2,3,60);
   pb.ell((w+8)/2,h/2+3,w/2,h/2,'#847e87');pb.ell((w+8)/2-2,h/2+1,w/2-3,h/2-3,'#9badb7');pb.ell((w+8)/2-w*0.18,h*0.32+2,w*0.18,h*0.14,'#cbdbfc');for(var x=0;x<w+8;x++)if(pb.on(x,h+2)&&!pb.on(x,h+3))pb.set(x,h+2,'#696a6a');return mk(pb,(w+8)/2,h+4);}});
 defObj('reeds',{base:58,solid:false,name:'Reeds',keyOf:function(o){return 'e'+(o.v||0);},spr:function(o){var pb=new PB(34,54),r=mulberry32(11+(o.v||0)*7);for(var s=0;s<7;s++){var x=6+s*3+Math.floor(r()*3),h=24+Math.floor(r()*24),lean=Math.round((r()-0.5)*6);
   for(var k=0;k<h;k++)pb.set(x+Math.round(lean*k/h),52-k,k>h-4?'#99e550':s%2?'#6abe30':'#4b692f');if(s%2===0&&h>30){var tx=x+lean,ty=52-h+4;pb.rect(tx-1,ty,3,7,'#8f563b');pb.rect(tx-1,ty,1,7,'#a9744f');}}return mk(pb,17,52);}});
-defObj('bridge',{flat:true,fw:2,fh:3,walk:true,name:'Bridge',keyOf:function(o){return 'b'+o.fh;},spr:function(o){var W=o.fw*64,H=o.fh*64,pb=new PB(W,H);
-  for(var y=0;y<H;y+=10){pb.rect(8,y,W-16,8,hash2(y,1,2)<0.5?'#c68450':'#b97a47');pb.rect(8,y,W-16,1,'#d9a066');pb.rect(8,y+7,W-16,1,'#8e4f26');}
-  [2,W-8].forEach(function(x){pb.rect(x,0,6,H,'#8e4f26');pb.rect(x,0,2,H,'#c68450');for(var py=0;py<H;py+=30)pb.rect(x-1,py,8,6,'#663931');});ink(pb);return mk(pb,W/2,H);}});
+function bridgeMask(o){var ob=LS().objs,m=0;function has(dx,dy){return ob.some(function(p){return p!==o&&p.k==='bridge'&&o.tx+dx>=p.tx&&o.tx+dx<p.tx+p.fw&&o.ty+dy>=p.ty&&o.ty+dy<p.ty+p.fh;});}
+  if(has(o.fw,0))m|=1;if(has(-1,0))m|=2;if(has(0,-1))m|=4;if(has(0,o.fh))m|=8;return m;}
+defObj('bridge',{flat:true,fw:2,fh:3,walk:true,name:'Bridge',keyOf:function(o){return 'b'+o.fw+'x'+o.fh+'m'+bridgeMask(o);},spr:function(o){var W=o.fw*64,H=o.fh*64,pb=new PB(W,H),msk=bridgeMask(o);
+  // planks run across the way you walk: a bridge longer side to side has upright planks and rails top and bottom
+  var ew=(msk&3)&&!(msk&12)||(o.fw>o.fh);
+  if(!ew){for(var y=0;y<H;y+=10){pb.rect(0,y,W,8,hash2(y+o.ty*64,1,2)<0.5?'#c68450':'#b97a47');pb.rect(0,y,W,1,'#d9a066');pb.rect(0,y+7,W,1,'#8e4f26');}
+    [[2,!(msk&2)],[W-8,!(msk&1)]].forEach(function(r){if(!r[1])return;var x=r[0];pb.rect(x,0,6,H,'#8e4f26');pb.rect(x,0,2,H,'#c68450');for(var py=0;py<H;py+=32)pb.rect(x-1,py,8,6,'#663931');});}
+  else{for(var x2=0;x2<W;x2+=10){pb.rect(x2,0,8,H,hash2(x2+o.tx*64,3,2)<0.5?'#c68450':'#b97a47');pb.rect(x2,0,1,H,'#d9a066');pb.rect(x2+7,0,1,H,'#8e4f26');}
+    [[2,!(msk&4)],[H-8,!(msk&8)]].forEach(function(r){if(!r[1])return;var y2=r[0];pb.rect(0,y2,W,6,'#8e4f26');pb.rect(0,y2,W,2,'#c68450');for(var px=0;px<W;px+=32)pb.rect(px,y2-1,6,8,'#663931');});}
+  ink(pb);return mk(pb,W/2,H);}});
 defObj('herbs',{base:40,name:'Herb pot',spr:function(o){var pb=new PB(32,36);pb.rect(6,20,20,14,'#c8714a');pb.rect(4,18,24,3,'#d9895f');pb.rect(6,31,20,3,'#a85a38');
   if(o.v){for(var s=0;s<6;s++){pb.line(9+s*3,19,8+s*3+(s%2),6+(s%3)*2,'#37946e');pb.set(8+s*3,8+(s%3)*2,'#6abe30');}}else{[[10,12],[16,8],[22,12],[13,15],[20,15]].forEach(function(p){pb.ell(p[0],p[1],4,3,'#4aa63e');pb.set(p[0]-1,p[1]-1,'#86d06a');});}
   ink(pb);return mk(pb,16,34);}});
@@ -1182,7 +1204,8 @@ function spawnBird(){var hab=L.hab,me=L.me,sit=me&&me.sit,cap=(BIRD_CAP[S.stage]
   var cand=[],rareOut=L.birds.some(function(b){return BIRD[b.sp]&&BIRD[b.sp].rare;});BIRDS.forEach(function(B){if(S.stage<B.stage)return;if(B.need&&!hab[B.need])return;if(B.rare&&rareOut)return;
     var free=L.spots.filter(function(s){return spotOK(B,s)&&!L.birds.some(function(b){return b.spot===s;})&&!(me&&Math.hypot(s.x-me.x,s.y-me.y)<(sit?40:70));});
     if(!free.length)return;var w=B.rare?B.w:B.w*(free.some(function(s){return s.t==='feeder'||s.t==='ground';})?2.5:1);cand.push({B:B,free:free,w:w});});
-  if(!cand.length)return;var tot=cand.reduce(function(a,c){return a+c.w;},0),r=Math.random()*tot,c=cand[0];for(var i=0;i<cand.length;i++){r-=cand[i].w;if(r<=0){c=cand[i];break;}}
+  if(!cand.length)return;var rc=cand.filter(function(c){return c.B.rare;}),cc=cand.filter(function(c){return !c.B.rare;});cand=(rc.length&&(Math.random()<0.05||!cc.length))?rc:(cc.length?cc:rc);
+  var tot=cand.reduce(function(a,c){return a+c.w;},0),r=Math.random()*tot,c=cand[0];for(var i=0;i<cand.length;i++){r-=cand[i].w;if(r<=0){c=cand[i];break;}}
   // when she keeps still, spots near her win
   var ws=c.free.map(function(s){var d=me?Math.hypot(s.x-me.x,s.y-me.y):9999,near=meStill()?(sit?5:3)*Math.exp(-d/(T*3)):0;return (inView(s.x,s.y,-10)?1:0.25)+near;}),wt=ws.reduce(function(a,b){return a+b;},0),q=Math.random()*wt,spot=c.free[0];
   for(var k=0;k<ws.length;k++){q-=ws[k];if(q<=0){spot=c.free[k];break;}}
@@ -1264,7 +1287,7 @@ function drawPart(x,p){var a=1-p.life/p.max;x.globalAlpha=clamp(a*1.5,0,1);
   else if(p.k==='feather'){wrect(x,p.x,p.y,3,1,p.col||'#f7f3ea');wrect(x,p.x+1,p.y+1,1,1,'#9badb7');}
   else if(p.k==='ring'){var rr=(4+(1-a)*18)*p.r;x.globalAlpha=clamp(0.85*a,0,1);x.fillStyle='#ffffff';for(var q=0;q<RING.length;q+=2){x.fillRect(Math.round(p.x+RING[q][0]/9*rr)-L.cdx,Math.round(p.y+RING[q][1]/9*rr*0.45)-L.cdy,1,1);}}
   else if(p.k==='drop')wrect(x,p.x,p.y,1,2,'#cbdbfc');
-  else if(p.k==='seed')wrect(x,p.x,p.y,2,1,'#d9a066');
+  else if(p.k==='seed'){wrect(x,p.x-1,p.y-1,4,3,'#3a2a14');wrect(x,p.x,p.y,2,1,'#f5cf5c');}
   else if(p.k==='spark')wrect(x,p.x,p.y,2,2,p.col||'#fbf236');
   else if(p.k==='heart')drawSpr(x,heartSpr(),p.x,p.y);
   else if(p.k==='dust')wrect(x,p.x,p.y,2,2,'#eec39a');}
@@ -1527,11 +1550,14 @@ var GROUND_ON=[G_GRASS,G_MEADOW,G_DIRT,G_STONE,G_SAND,G_STEP,G_TILE,G_FLOOR,G_WA
 [{k:'g-grass',name:'Lawn',edit:G_GRASS,price:2},{k:'g-meadow',name:'Long grass',edit:G_MEADOW,price:2},{k:'g-dirt',name:'Dirt',edit:G_DIRT,price:1},
  {k:'g-sand',name:'Sand',edit:G_SAND,price:3},{k:'g-stone',name:'Stone paving',edit:G_STONE,price:8},{k:'g-floor',name:'Wood deck',edit:G_FLOOR,price:10},
  {k:'g-tile',name:'Terracotta tiles',edit:G_TILE,price:10},{k:'g-water',name:'Pond water',edit:G_WATER,price:12}].reverse().forEach(function(b){b.ground=1;b.stage=0;b.where=GROUND_ON;BUILD.unshift(b);});
-var BCAT=[{id:'ground',name:'Ground'},{id:'garden',name:'Garden'},{id:'yard',name:'Yard'},{id:'indoor',name:'Indoors'}];
+BUILD.push({k:'wall',name:'Plaster wall',price:20,where:GROUND_ON.filter(function(g){return g!==G_WATER;}),stage:0,o:{v:'p'},id2:'wall-p'},{k:'wall',name:'Stone wall',price:30,where:GROUND_ON.filter(function(g){return g!==G_WATER;}),stage:0,o:{v:'s'},id2:'wall-s'},{k:'gate',name:'Gate',price:40,where:OUT.concat([G_SAND,G_STONE]),stage:0,o:{fw:2}});
+BUILD.push({k:'bridge',name:'Bridge',price:25,where:[G_WATER],stage:0,o:{fw:1,fh:1},fw:1,fh:1});
+BUILD.forEach(function(b){if(b.id2)b.k2=b.id2;});
+var BCAT=[{id:'ground',name:'Ground'},{id:'walls',name:'Walls'},{id:'garden',name:'Garden'},{id:'yard',name:'Yard'},{id:'indoor',name:'Indoors'}];
 var BCAT_OF={stones:'ground',flowers:'garden',bush:'garden',oak:'garden',pot:'garden',herbs:'garden',
-  fence:'yard',bench:'yard',birdbath:'yard',lantern:'yard',feeder:'yard',coop:'yard',bchair:'yard',rug:'indoor',tallplant:'indoor',bookshelf:'indoor',armchair:'indoor',lamp:'indoor'};
+  bridge:'ground',fence:'walls',wall:'walls',gate:'walls',bench:'yard',birdbath:'yard',lantern:'yard',feeder:'yard',coop:'yard',bchair:'yard',rug:'indoor',tallplant:'indoor',bookshelf:'indoor',armchair:'indoor',lamp:'indoor'};
 BUILD.forEach(function(b){b.cat=b.ground?'ground':BCAT_OF[b.k]||'yard';});
-var BUILDI={};BUILD.forEach(function(b){BUILDI[b.k]=b;});
+var BUILDI={};BUILD.forEach(function(b){b.id=b.k2||b.k;BUILDI[b.id]=b;if(!BUILDI[b.k])BUILDI[b.k]=b;});
 function buildList(){var m=M(),has={};m.g.forEach(function(g){has[g]=1;});return BUILD.filter(function(b){if(b.ground)return S.stage>=1&&(has[G_GRASS]||has[G_MEADOW]||has[G_TILE]||has[G_STONE]);return S.stage>=b.stage&&b.where.some(function(g){return has[g];});});}
 function itemSize(b){var o=b.o||{},d=OBJ[b.k]||{};return [b.fw||o.fw||d.fw||1,b.fh||o.fh||d.fh||1];}
 function anchorFor(b,tx,ty){var sz=itemSize(b);return [tx-Math.floor((sz[0]-1)/2),ty-Math.floor((sz[1]-1)/2)];}
@@ -1561,15 +1587,15 @@ function placeAt(b,ax,ay){if(b.ground){var ok=paintGround(b,ax,ay,false);groundD
     (l.edits=l.edits||[]).push({k:b.k,tx:ax,ty:ay,fw:sz[0],fh:sz[1],prev:prev,price:b.price});l.objs=l.objs.filter(function(o){return !(o.deco&&o.tx>=ax&&o.tx<ax+sz[0]&&o.ty>=ay&&o.ty<ay+sz[1]);});
     repaintAround(ax,ay,sz[0],sz[1]);if(b.edit===G_WATER)syncAgents();}
   else{var o={};for(var k in b.o||{})o[k]=b.o[k];o.built=1;var ob=mkObj(b.k,ax,ay,o);if(b.k==='flowers')ob.v=Math.floor(Math.random()*5);l.objs.push(ob);
-    if(OBJ[b.k].flat)for(var y4=ay;y4<ay+sz[1];y4++)for(var x4=ax;x4<ax+sz[0];x4++)repaintTile(x4,y4);if(b.k==='fence'){resetSprites();}}
+    if(OBJ[b.k].flat)for(var y4=ay;y4<ay+sz[1];y4++)for(var x4=ax;x4<ax+sz[0];x4++)repaintTile(x4,y4);if(b.k==='fence'||b.k==='wall'||b.k==='gate'||b.k==='bridge'){resetSprites();if(b.k==='bridge')for(var yb=ay-1;yb<=ay+1;yb++)for(var xb=ax-1;xb<=ax+1;xb++)repaintTile(xb,yb);}}
   if(b.k==='coop'){L.henPx=undefined;syncAgents();}sfx('thud');puff('dust',(ax+sz[0]/2)*T,(ay+sz[1])*T-8,8,{speed:40,life:0.5});computePass();computeSpots();L.hints=null;L.dirty=true;save();return true;}
 function removeThing(o,e){var l=LS(),m=M();
   if(o){l.objs=l.objs.filter(function(q){return q!==o;});var b=BUILDI[o.k];earn(Math.floor((b?b.price:0)/2),'refund');
-    if(OBJ[o.k].flat)for(var y=o.ty;y<o.ty+o.fh;y++)for(var x=o.tx;x<o.tx+o.fw;x++)repaintTile(x,y);if(o.k==='fence')resetSprites();}
+    if(OBJ[o.k].flat)for(var y=o.ty;y<o.ty+o.fh;y++)for(var x=o.tx;x<o.tx+o.fw;x++)repaintTile(x,y);if(o.k==='fence'||o.k==='wall'||o.k==='gate'||o.k==='bridge')resetSprites();}
   else if(e){var j=0;for(var y2=e.ty;y2<e.ty+e.fh;y2++)for(var x2=e.tx;x2<e.tx+e.fw;x2++){var p=e.prev[j++];mset(m,x2,y2,p[0],p[1]);if(m.wb)m.wb[mi(m,x2,y2)]=p[2]||0;}l.edits=l.edits.filter(function(q){return q!==e;});L.pmask=null;earn(Math.floor(e.price/2),'refund');
     repaintAround(e.tx,e.ty,e.fw,e.fh);if(e.k==='pond'||e.k==='g-water'||e.prev.some(function(p){return p[0]===G_WATER;}))syncAgents();}
   sfx('pop');computePass();computeSpots();L.hints=null;L.dirty=true;save();}
-function tapBuild(wx,wy,t,cx,cy){if(L.removing){var ob0=LS().objs,o0=null;for(var i0=ob0.length-1;i0>=0;i0--){var q0=ob0[i0];if(q0.built&&t[0]>=q0.tx&&t[0]<q0.tx+q0.fw&&t[1]>=q0.ty&&t[1]<q0.ty+q0.fh){o0=q0;break;}}
+function tapBuild(wx,wy,t,cx,cy){if(L.moving){tapMove(t);return;}if(L.removing){var ob0=LS().objs,o0=null;for(var i0=ob0.length-1;i0>=0;i0--){var q0=ob0[i0];if(q0.built&&t[0]>=q0.tx&&t[0]<q0.tx+q0.fw&&t[1]>=q0.ty&&t[1]<q0.ty+q0.fh){o0=q0;break;}}
     var e0=o0?null:groundEdit(t[0],t[1]);if(o0||e0){removeThing(o0,e0);return;}toast(objAtTile(t[0],t[1],true)?'That came with the place.':'Nothing you built here.');sfx('nope');return;}
   var b=L.buildSel&&BUILDI[L.buildSel];
   if(b){var a=b.ground?t:anchorFor(b,t[0],t[1]);if(!canPlace(b,a[0],a[1])){if(!(b.ground&&mget(M(),t[0],t[1])===b.edit))toast(b.ground&&inAnyRoom(t[0],t[1])?'Not inside the house.':'It doesn’t fit there.');sfx('nope');return;}placeAt(b,a[0],a[1]);return;}
@@ -1585,15 +1611,34 @@ function groundIcon(b){var m=M(),c=document.createElement('canvas');c.width=56;c
     x.drawImage(L.gcv,tx*T,ty*T+Math.round(T*0.22),T,Math.round(T*0.56),0,0,56,36);return c;}
   x.fillStyle=GROUND_SW[b.edit]||'#888';x.fillRect(0,0,56,36);return c;}
 // the build panel: a row of groups, the group's things as a grid, and Remove at the end of the row
+var NO_MOVE={trap:1};
+function canMove(o,ax,ay){var m=M(),d=OBJ[o.k]||{},b=BUILDI[o.k],flat=d.flat;
+  for(var y=ay;y<ay+o.fh;y++)for(var x=ax;x<ax+o.fw;x++){if(x<0||y<0||x>=m.w||y>=m.h)return false;var g=mget(m,x,y);
+    if(o.k==='bridge'){if(g!==G_WATER)return false;}else{if(g===G_VOID||g===G_WALL||g===G_WATER)return false;}
+    var ob=LS().objs;for(var i=0;i<ob.length;i++){var q=ob[i];if(q===o||q.deco)continue;if(x>=q.tx&&x<q.tx+q.fw&&y>=q.ty&&y<q.ty+q.fh){var qf=OBJ[q.k]&&OBJ[q.k].flat;if(!(qf^!!flat))return false;}}
+    if(!flat&&o.k!=='bridge'&&occupied(x,y))return false;}
+  return true;}
+function moveTo(o,ax,ay){var ox=o.tx,oy=o.ty,d=OBJ[o.k]||{};o.tx=ax;o.ty=ay;
+  if(d.flat||o.k==='bridge'){for(var y=Math.min(oy,ay)-1;y<=Math.max(oy,ay)+o.fh;y++)for(var x=Math.min(ox,ax)-1;x<=Math.max(ox,ax)+o.fw;x++)repaintTile(x,y);}
+  resetSprites();if(o.gm){M().catArea={x:ax-2,y:ay-1,w:o.fw+4,h:4,back:true};}
+  if(o.k==='coop')L.henPx=undefined;LS().objs=LS().objs.filter(function(q){return !(q.deco&&q.tx>=ax&&q.tx<ax+o.fw&&q.ty>=ay&&q.ty<ay+o.fh);});
+  computePass();computeSpots();syncAgents();L.hints=null;L.dirty=true;sfx('thud');puff('dust',(ax+o.fw/2)*T,(ay+o.fh)*T-8,6,{speed:30,life:0.5});save();}
+function tapMove(t){var o=L.moveObj;
+  if(!o){var ob=LS().objs,best=null;for(var i=ob.length-1;i>=0;i--){var q=ob[i];if(q.deco||NO_MOVE[q.k])continue;if(t[0]>=q.tx&&t[0]<q.tx+q.fw&&t[1]>=q.ty&&t[1]<q.ty+q.fh){if(!best||(OBJ[best.k]&&OBJ[best.k].flat&&!(OBJ[q.k]&&OBJ[q.k].flat)))best=q;}}
+    if(!best){toast('Tap something to move.');sfx('nope');return;}L.moveObj=best;sfx('click');L.hints=null;L.dirty=true;updateStat(true);return;}
+  if(t[0]>=o.tx&&t[0]<o.tx+o.fw&&t[1]>=o.ty&&t[1]<o.ty+o.fh){L.moveObj=null;L.hints=null;L.dirty=true;updateStat(true);return;}
+  var ax=t[0]-Math.floor((o.fw-1)/2),ay=t[1]-Math.floor((o.fh-1)/2);if(!canMove(o,ax,ay)){toast('It doesn’t fit there.');sfx('nope');return;}
+  moveTo(o,ax,ay);L.moveObj=null;updateStat(true);}
 function renderBuildPal(pal){var list=buildList(),cats=BCAT.filter(function(c){return list.some(function(b){return b.cat===c.id;});});
   if(!L.buildCat||!cats.some(function(c){return c.id===L.buildCat;}))L.buildCat=cats.length?cats[0].id:null;
   var items=list.filter(function(b){return b.cat===L.buildCat;});
-  pal.innerHTML='<div class="bcats" role="tablist">'+cats.map(function(c){return '<button class="bcat" role="tab" data-cat="'+c.id+'" aria-pressed="'+(!L.removing&&L.buildCat===c.id)+'">'+esc(c.name)+'</button>';}).join('')+
-    '<button class="bcat brm" data-rmode aria-pressed="'+!!L.removing+'">Remove</button></div>'+
-    (L.removing?'<div class="bnote">Tap something you built or painted to take it away. You get half back.</div>':
-    '<div class="bgrid">'+items.map(function(b){return '<button data-item="'+b.k+'" aria-pressed="'+(L.buildSel===b.k)+'"><span class="pi"></span><b>'+esc(b.name)+'</b><small>'+fmtA(b.price)+(b.ground?' a tile':'')+'</small></button>';}).join('')+'</div>');
-  pal.querySelectorAll('[data-cat]').forEach(function(bt){bt.onclick=function(){L.buildCat=bt.dataset.cat;L.removing=false;L.buildSel=null;sfx('click');renderBuildPal(pal);updateStat(true);L.hints=null;L.dirty=true;};});
-  var rm=pal.querySelector('[data-rmode]');rm.onclick=function(){L.removing=!L.removing;L.buildSel=null;sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
+  pal.innerHTML='<div class="bcats" role="tablist">'+cats.map(function(c){return '<button class="bcat" role="tab" data-cat="'+c.id+'" aria-pressed="'+(!L.removing&&!L.moving&&L.buildCat===c.id)+'">'+esc(c.name)+'</button>';}).join('')+
+    '<button class="bcat bmv" data-mmode aria-pressed="'+!!L.moving+'">Move</button><button class="bcat brm" data-rmode aria-pressed="'+!!L.removing+'">Remove</button></div>'+
+    (L.moving?'<div class="bnote">Tap a thing to pick it up, then tap where it goes. Moving is free.</div>':L.removing?'<div class="bnote">Tap something you built or painted to take it away. You get half back.</div>':
+    '<div class="bgrid">'+items.map(function(b){return '<button data-item="'+b.id+'" aria-pressed="'+(L.buildSel===b.id)+'"><span class="pi"></span><b>'+esc(b.name)+'</b><small>'+fmtA(b.price)+(b.ground?' a tile':'')+'</small></button>';}).join('')+'</div>');
+  pal.querySelectorAll('[data-cat]').forEach(function(bt){bt.onclick=function(){L.buildCat=bt.dataset.cat;L.removing=false;L.moving=false;L.moveObj=null;L.buildSel=null;sfx('click');renderBuildPal(pal);updateStat(true);L.hints=null;L.dirty=true;};});
+  pal.querySelector('[data-mmode]').onclick=function(){L.moving=!L.moving;L.removing=false;L.moveObj=null;L.buildSel=null;L.hints=null;sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
+  var rm=pal.querySelector('[data-rmode]');rm.onclick=function(){L.removing=!L.removing;L.moving=false;L.moveObj=null;L.buildSel=null;sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
   pal.querySelectorAll('[data-item]').forEach(function(bt){var ic=bt.querySelector('.pi');try{ic.appendChild(itemIcon(BUILDI[bt.dataset.item]));}catch(e){}
     bt.onclick=function(){L.buildSel=L.buildSel===bt.dataset.item?null:bt.dataset.item;L.hints=null;L.dirty=true;pal.querySelectorAll('[data-item]').forEach(function(q){q.setAttribute('aria-pressed',String(q.dataset.item===L.buildSel));});sfx('click');updateStat(true);};});}
 function itemIcon(b){var c=document.createElement('canvas'),d=Math.min(2,window.devicePixelRatio||1);c.width=56*d;c.height=36*d;c.style.width='56px';c.style.height='36px';var x=c.getContext('2d');x.imageSmoothingEnabled=false;
@@ -1643,7 +1688,7 @@ function mountHome(){var p=$('p-home');ensureLand();
 function setTool(id,quiet){id=mapTool(id);if(L.cv&&!toolsHere().some(function(t){return t.id===id;})){if(!quiet)toast(id==='rod'?'No fish here yet. Wait for the land with the stream.':'Not here yet.');id='walk';}
   L.tool=id;LS().tool=id;closeBub();L.hints=null;L.dirty=true;if(id!=='rod'&&L.fishing)L.fishing=null;if(id!=='build')L.camFree=false;if(id==='mow'&&L.me)L.me.speed=150;else if(L.me)L.me.speed=ME_SPEED;
   document.querySelectorAll('#ltools [data-tool]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.tool===id));});
-  var pal=$('lpal');if(pal){if(id==='build'){renderBuildPal(pal);pal.hidden=false;}else{pal.hidden=true;L.buildSel=null;L.removing=false;}}
+  var pal=$('lpal');if(pal){if(id==='build'){renderBuildPal(pal);pal.hidden=false;}else{pal.hidden=true;L.buildSel=null;L.removing=false;L.moving=false;L.moveObj=null;}}
   if(!quiet)sizeCanvas();updateStat(true);}
 // one canvas pixel per art pixel, scaled up by CSS: a whole number of screen pixels per art pixel where the screen allows
 // (2 on 3x phones), 1.5 on 2x phones, about 44 CSS px per tile either way
@@ -1663,6 +1708,7 @@ function updateStat(force){var el=$('lstat');if(!el)return;var l=LS(),html='',eg
   if(L.watch)html='Stay still while the ring fills.';
   else if(f&&(f.st==='wait'||f.st==='fly'))html='Wait for the float to go under, then tap.';
   else if(f&&f.st==='bite')html='<b>Now!</b> Tap.';
+  else if(L.tool==='build'&&L.moving)html=L.moveObj?'Tap where the '+esc(((OBJ[L.moveObj.k]||{}).name||'thing').toLowerCase())+' goes. Tap it again to put it down.':'Tap anything to pick it up.';
   else if(L.tool==='build'&&L.removing)html='Tap or drag over things you built to take them away.';
   else if(b)html=b.ground?esc(b.name)+': tap a tile, or drag to paint. '+fmtA(b.price)+' a tile.':'Tap where the '+esc(b.name.toLowerCase())+' goes. '+fmtA(b.price)+'.';
   else if(L.tool==='build')html='Pick something to build. Drag the map to look around.';
@@ -1716,8 +1762,10 @@ function drawWatch(x){var w=L.watch;if(!w||!w.b)return;var b=w.b,k=clamp(w.t/1.5
 // a bird's name floats up over it for a moment (a little HTML tag, so the text stays sharp)
 function showLabel(text,wx,wy){var host=$('lwrap');if(!host)return;var c=toCss(wx,wy),d=document.createElement('div');d.className='llbl';d.textContent=text;d.style.left=c[0]+'px';d.style.top=c[1]+'px';host.appendChild(d);setTimeout(function(){d.remove();},2200);}
 // where the chosen thing can go, worked out once per pick
-function buildHints(){var b=L.tool==='build'&&L.buildSel&&BUILDI[L.buildSel];L.hints=null;if(!b)return;var m=M(),h=new Uint8Array(m.w*m.h);for(var ty=0;ty<m.h;ty++)for(var tx=0;tx<m.w;tx++){var a=anchorFor(b,tx,ty);if(canPlace(b,a[0],a[1]))h[ty*m.w+tx]=1;}L.hints=h;L.dirty=true;}
-function drawBuildHints(x){if(L.tool!=='build'||!L.buildSel)return;if(!L.hints)buildHints();var h=L.hints;if(!h)return;var m=M(),x0=Math.max(0,Math.floor(L.cam.x/T)),y0=Math.max(0,Math.floor(L.cam.y/T)),x1=Math.min(m.w-1,Math.ceil((L.cam.x+L.VW)/T)),y1=Math.min(m.h-1,Math.ceil((L.cam.y+L.VH)/T));
+function buildHints(){var b=L.tool==='build'&&L.buildSel&&BUILDI[L.buildSel];L.hints=null;
+  if(L.tool==='build'&&L.moving&&L.moveObj){var mo=L.moveObj,mm=M(),hm=new Uint8Array(mm.w*mm.h);for(var yy=0;yy<mm.h;yy++)for(var xx=0;xx<mm.w;xx++){if(canMove(mo,xx-Math.floor((mo.fw-1)/2),yy-Math.floor((mo.fh-1)/2)))hm[yy*mm.w+xx]=1;}L.hints=hm;L.dirty=true;return;}
+  if(!b)return;var m=M(),h=new Uint8Array(m.w*m.h);for(var ty=0;ty<m.h;ty++)for(var tx=0;tx<m.w;tx++){var a=anchorFor(b,tx,ty);if(canPlace(b,a[0],a[1]))h[ty*m.w+tx]=1;}L.hints=h;L.dirty=true;}
+function drawBuildHints(x){if(L.tool!=='build'||!(L.buildSel||(L.moving&&L.moveObj)))return;if(L.moving&&L.moveObj){var mo=L.moveObj;x.strokeStyle='#fbf8f1';x.lineWidth=2;x.setLineDash([6,4]);x.strokeRect(mo.tx*T-L.cdx+1,mo.ty*T-L.cdy+1,mo.fw*T-2,mo.fh*T-2);x.setLineDash([]);}if(!L.hints)buildHints();var h=L.hints;if(!h)return;var m=M(),x0=Math.max(0,Math.floor(L.cam.x/T)),y0=Math.max(0,Math.floor(L.cam.y/T)),x1=Math.min(m.w-1,Math.ceil((L.cam.x+L.VW)/T)),y1=Math.min(m.h-1,Math.ceil((L.cam.y+L.VH)/T));
   for(var ty=y0;ty<=y1;ty++)for(var tx=x0;tx<=x1;tx++){if(!h[ty*m.w+tx])continue;x.fillStyle=INKc;x.fillRect(tx*T+29-L.cdx,ty*T+29-L.cdy,6,6);x.fillStyle='#fbf8f1';x.fillRect(tx*T+30-L.cdx,ty*T+30-L.cdy,4,4);}}
 function drawMarker(x){var mk2=L.marker;if(!mk2)return;var a=1-mk2.t/0.7,r=Math.round(4+mk2.t*10);x.globalAlpha=clamp(a,0,1);x.fillStyle='#fbf8f1';var X=Math.round(mk2.x)-L.cdx,Y=Math.round(mk2.y)-L.cdy;
   x.fillRect(X-r,Y,3,1);x.fillRect(X+r-3,Y,3,1);x.fillRect(X-1,Y-Math.round(r*0.5),3,1);x.fillRect(X-1,Y+Math.round(r*0.5),3,1);x.globalAlpha=1;}
@@ -1744,7 +1792,7 @@ function draw(){var x=L.x,m=M(),cv=L.cv,i;L.cdx=Math.round(L.cam.x);L.cdy=Math.r
   if(L.groundOK){var sx0=Math.max(0,L.cdx),sy0=Math.max(0,L.cdy),sx1=Math.min(W,L.cdx+cv.width),sy1=Math.min(H,L.cdy+cv.height);if(sx1>sx0&&sy1>sy0)x.drawImage(L.gcv,sx0,sy0,sx1-sx0,sy1-sy0,sx0-L.cdx,sy0-L.cdy,sx1-sx0,sy1-sy0);}
   if(!ART.ready)return;
   drawWater(x);drawPondFish(x);drawWindowFeeders(x);
-  if(L.grain.length){for(i=0;i<L.grain.length;i++){var g=L.grain[i];x.fillStyle='#d9a066';x.fillRect(Math.round(g.x)-L.cdx,Math.round(g.y)-L.cdy,2,1);x.fillStyle='#8a6f30';x.fillRect(Math.round(g.x)-L.cdx,Math.round(g.y)+1-L.cdy,2,1);}}
+  if(L.grain.length){for(i=0;i<L.grain.length;i++){var g=L.grain[i];var gx=Math.round(g.x)-L.cdx,gy=Math.round(g.y)-L.cdy;x.fillStyle='rgba(30,22,8,0.4)';x.fillRect(gx-4,gy+4,10,3);x.fillStyle='#2e2010';x.fillRect(gx-3,gy-3,8,8);x.fillRect(gx-4,gy-2,10,6);x.fillStyle='#f7c948';x.fillRect(gx-3,gy-2,8,6);x.fillRect(gx-2,gy-3,6,8);x.fillStyle='#c98f22';x.fillRect(gx-2,gy+2,7,2);x.fillStyle='#fff6c2';x.fillRect(gx-1,gy-2,3,2);}}
   drawMarker(x);
   NIT=0;SORTED.length=0;var ob=LS().objs;
   for(i=0;i<ob.length;i++){var o=ob[i],d=OBJ[o.k];if(!d||d.flat||d.wall)continue;var by=oBase(o),ox=oX(o);if(ox<L.cam.x-260||ox>L.cam.x+L.VW+260||by<L.cam.y-60||by>L.cam.y+L.VH+300)continue;addIt(by,I_OBJ,o,0);}

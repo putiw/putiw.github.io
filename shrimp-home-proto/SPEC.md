@@ -226,3 +226,9 @@ Puti asked for walking up and down: the dog only had side, standing and sitting 
 - Her yard drawings (`keyframes/yard.aseprite`, 27 Oct): the coop (round windows, arched door; the nest is found from the straw pixels), the two rocks and both bird feeders now come from her sheet (`pixel-src/yard/build.py`, anchored at the feet points in `keyframes/_layout.json`). The feeders show how full they are by turning seed pixels above the level back to glass. Bench, chair, bird bath, lantern, gate, fence, bridge and mower are unchanged in her sheet and still drawn in code.
 - The vegetable bed is gone as a thing to build and from the garden; old saves drop theirs. Planting straight into soil comes later.
 - Rebuild: `python3 pixel-src/animals/export_js.py <anim> <chars> src/animart.js <yard>`.
+- Move (Build): tap anything to pick it up (dashed outline, dots where it fits), tap where it goes; free. Works on everything except the shrimp trap; anywhere dry (bridges only on water). Grandma's chair takes Pierre's area with it.
+- Walls (Build, Walls): plaster and stone wall blocks, one tile each, that join with their neighbours (and with fences and gates side by side). Solid. A Gate is buildable and you can walk through it.
+- Bridge (Build, Ground): one tile on water; pieces join into one bridge with rails only on its outer sides.
+- The river keeps its curved banks unless more than 5% of its tiles are changed; tiles you painted are left out of that count. (One changed tile used to switch the curved banks off for the whole river, which drew grass squares on the banks.)
+- Grain is drawn as fat yellow seeds with a dark edge and a shadow.
+- Rare birds: 1 bird in 20 (5% per arrival when one can come), still never more than one at a time.
