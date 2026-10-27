@@ -237,4 +237,4 @@ Puti asked for walking up and down: the dog only had side, standing and sitting 
 - The tank's net only shows while something is in it or flying into it.
 - Build grid columns are picked so the last row is full; group chips stretch to fill their rows.
 - Game build: `python3 build.py --game` writes `../shrimp/home.html` with `src/game.js` and without Book and Try. Copy it to the game branch (`shrimp-prelaunch-fixes`). See the game's AGENTS.md, "Grandma's land".
-- Carrying (27 Oct): a caught wild chicken is in Millie's arms (`S.land.carry`) until you tap the yard by the coop, where she puts her down. Caught fish are in her hands (up to three, wriggling) until you tap your pond (they go in) or the stream or the lake (they go free). Hands full: no catching.
+- Carrying (27 Oct): a caught wild chicken is in Millie's arms (`S.land.carry`) until you tap the yard by the coop, where she puts her down. A caught fish is in her hands (one at a time, wriggling) until you tap your pond (they go in) or the stream or the lake (they go free). Hands full: no catching.

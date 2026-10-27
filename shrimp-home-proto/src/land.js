@@ -1523,8 +1523,8 @@ function stepFishing(dt){var f=L.fishing;if(!f)return;f.t+=dt;var me=L.me;if(me&
   else if(f.st==='reel'){rodTip();f.x=lerp(f.x,L.tipX,dt*3);f.y=lerp(f.y,L.tipY+30,dt*3);if(f.t>0.9){f.st='idle';landFish(f.water);updateStat(true);}}}
 function landFish(water){var pool=FISH.filter(function(F){return F.where==='both'||F.where===water;}),tot=pool.reduce(function(a,F){return a+F.w;},0),r=Math.random()*tot,F=pool[0];
   for(var i=0;i<pool.length;i++){r-=pool[i].w;if(r<=0){F=pool[i];break;}}var len=Math.round(lerp(F.len[0],F.len[1],Math.random()));LS().stats.fish++;
-  var bk=LS().bucket,canKeep=bk.length<3&&LS().pond.length+bk.length<10&&!LS().carry;
-  openSheet({title:F.name,mount:function(el){el.innerHTML='<div class="fishcv"></div><p class="sub">'+len+' cm.'+(canKeep?' Let it go, or carry it to your pond.':bk.length>=3?' Your hands are full. Take them to the pond or the stream first.':LS().carry?' Your hands are full.':'')+'</p><div class="btns"><button class="btn" data-go>Let it go</button>'+(canKeep?'<button class="btn primary" data-keep>Carry it</button>':'')+'</div>';
+  var bk=LS().bucket,canKeep=bk.length<1&&LS().pond.length+bk.length<10&&!LS().carry;
+  openSheet({title:F.name,mount:function(el){el.innerHTML='<div class="fishcv"></div><p class="sub">'+len+' cm.'+(canKeep?' Let it go, or carry it to your pond.':bk.length>=1?' Your hands are full. Take the other one to the pond or the stream first.':LS().carry?' Your hands are full.':'')+'</p><div class="btns"><button class="btn" data-go>Let it go</button>'+(canKeep?'<button class="btn primary" data-keep>Carry it</button>':'')+'</div>';
     var box=el.querySelector('.fishcv'),w=Math.min(el.clientWidth||320,520);box.style.cssText='width:'+w+'px;max-width:100%;height:110px;border-radius:10px;border:1px solid var(--line);margin:0 auto 8px;background:#89d8e4;display:flex;align-items:center;justify-content:center;overflow:hidden';
     var fs=fishSpr(F.id),sc=Math.max(1,Math.floor(Math.min((w-10)/fs.w,4)));box.appendChild(spriteCanvas(fs,sc,fs.w*sc,fs.h*sc));
     bookAdd('fish',F.id,{where:water==='stream'?'the stream':'the lake',cm:len});
