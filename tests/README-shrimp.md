@@ -872,3 +872,9 @@ Not changed: "Check shrimp" still wraps in the six-button own-tank grid (only fi
 
 Bots, seed 7, unchanged: strong 2,479 (empire_dictator), kind 3,698 (garden_village), average Earth 6,441 and Space 7,852 (question_prof). Nobody insolvent. Balance checks 71.
 - BUILD 2026-10-27-final.
+
+## Status at 2026-10-27 (end of the long chat)
+
+- Deployed: passes up to 111 (seven traits, final logic and layout pass, Earth line, big news popups, swipe-away news, calendar dates, cull inside Check shrimp, prototype tank jobs). BUILD 2026-10-27-final.
+- Bots at deploy: strong day 2,479 (empire_dictator), kind 3,698 (garden_village), average Earth 6,441 / Space 7,852 (question_prof). Null test: a random chooser lands at 0 on every trait.
+- Next up: Grandma's timeline (see "Open work" in shrimp/AGENTS.md). Read the "Token budget" section there first: this project used most of a weekly Max limit in a few days, mostly through helper agents and one very long chat.

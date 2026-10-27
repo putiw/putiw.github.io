@@ -2,6 +2,15 @@
 
 Read this before you change anything in `shrimp/`. It covers what the game is, how the code is laid out, the owner's design rules, how to test, and the mistakes that have already cost time.
 
+## Token budget (read first)
+
+Puti is on a Max plan and one week of this project used most of a weekly limit by Tuesday. Most of it went to helper agents (each re-reads the ~940 KB game file many times) and to one week-long chat that re-read its whole history on every reply. So:
+- Do the work yourself. Start a helper agent only for something genuinely parallel and large, and never two that edit `index.html` at the same time.
+- Never read `index.html` whole. `grep -n` for the function, then read only those lines (`sed -n 'A,Bp'`, cut long lines).
+- Run the fast suites (`shrimp-balance`, `shrimp-academy`, `shrimp-me`) after each change. Run bots, the spotlight sweep and the monkey only once before a deploy, not after every edit.
+- Keep chats short: one topic per chat, then start fresh. This file and `tests/README-shrimp.md` carry the state between chats.
+- Don't reply to every background notice or commit reminder at length.
+
 ## Names you will meet in the code
 
 - **`gp` means grandparent, and the grandparent is Grandma.** The game used to have Grandpa, so some saved fields and ids still say `gp`, `gpLoan`, `keep:'gp'`, `G.me.gp`, the story keys `gp_net`, the ad id `grandpa`, and the unused lab project id `labgrandpa`. They are saved in players' games, so do not rename them without a migration. Functions and constants were renamed (`GRANDMA_LETTERS`, `grandmaLetter`, `payGrandma`). The late spouse is Grandpa (fish soup, the Maryam boat story, "calls you in for dinner"). Grandpa is alive in the story: he wants a well, he calls you in for dinner, Grandma writes that you write like he talks. Don't write him as dead.
@@ -393,6 +402,22 @@ Do not report a feature as finished just because its new path works once. Check 
 ## Open work
 
 Planned and agreed with Puti, not built yet:
+
+**Grandma's timeline (next up, agreed 2026-10-26).** Most players forget Grandma, and they should feel it, but today a forgetful player sees nothing, so they never learn what they missed.
+- Her life goes on with or without you: a yearly timeline of her own events (80th birthday, the shrimp club elects her, her knee, learning video calls, selling Grandpa's boat Maryam, a friend's funeral, moving to a smaller flat). Each one resolves as "you were there" (recent Grandma hours or a yes to her moment) or "you heard later / you missed it". Show it on the You page.
+- Saying no to a Grandma moment (`MOMENTS`) leaves a line in her history (e.g. "Grandma took the bus to the clinic. She said the driver was nice."), not only in the log.
+- Her six letter stories (`GP_STORY`) show as untold slots until earned; the ending lists the missed ones as "Stories she never told you".
+- After a few months with no Grandma time she calls once ("You don't have to come. I just wanted to hear about the shrimp."). No penalty.
+- The ending's Grandma section adds up hours with her, moments you were there for, and moments you missed.
+- Grandma time pushes easy-going (drive−) only; never care.
+
+**Small leftovers from the 2026-10-27 final pass**
+- "Check shrimp" wraps to two lines in the six-button own-tank grid at 360–390 px (drop the icon at narrow widths).
+- The Rewilding and "A place of your own" cards have no fold arrow (they rebuild every render; needs open/closed state).
+- The professor ending's "From the tank" line mentions space while it shows on the win card before Space has started.
+- Shrimpcoin chart axis text scales up large at 1280 px.
+- "Undercut them on price" reads "Each kit costs 12% more to make": accurate, but odd under that label.
+
 
 **Sales channels.** Shops, Online and Community, all open to everyone, each with its own upgrade tree.
 - Opening a channel costs money, and you can't afford all three early, so you pick which to grow first.
