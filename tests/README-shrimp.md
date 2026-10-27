@@ -905,3 +905,9 @@ Bots, seed 7, unchanged: strong 2,479 (empire_dictator), kind 3,698 (garden_vill
 - BUILD 2026-10-27-land.
 
 - Carrying (Pass 113b): a caught chicken rides in Millie's arms until you tap the yard by the coop; one caught fish at a time in her hands until you tap the pond (in) or the stream or the lake (free).
+
+## Pass 114: Layout overflow (27 Oct)
+
+- Birthday date field overflowed its card on iPhone (Safari gives date inputs an intrinsic width). Date fields now drop native appearance, `display:block`, left-aligned value. All inputs, selects and textareas get `max-width:100%;min-width:0;box-sizing:border-box`.
+- New `tests/shrimp-layout.cjs`: loads the start screen and every run-7 snapshot at 320, 360 and 390 px, opens every tab and details, flags any element wider than its card or the screen. Result: clean, except one chart label 2px past its SVG on the win World tab (not clipped, left as is). Chromium only; no WebKit here, so check the date field on a phone.
+- Fast suites: balance 71, academy 10, me 46.
