@@ -15,6 +15,14 @@ A = (9, 6, 9, 255)
 T = (0, 0, 0, 0)
 
 
+def layer_at(a, name):
+    i = next(i for i, L in enumerate(a['layers']) if L['name'] == name)
+    c = next(c for c in a['frames'][0]['cels'] if c['layer'] == i)
+    im = c['img'].convert('RGBA')
+    bb = im.getbbox()
+    return im.crop(bb), (c['x'] + bb[0], c['y'] + bb[1])
+
+
 def layer(a, name):
     i = next(i for i, L in enumerate(a['layers']) if L['name'] == name)
     c = next(c for c in a['frames'][0]['cels'] if c['layer'] == i)
@@ -242,12 +250,18 @@ def rot_pixels(src, ang, px, py):
     return out
 
 
-def bird_frame(src, spec, pose, t):
+def bird_frame(src, spec, pose, t, alt=None):
     g0 = grid(src)
     H0, W0 = len(g0), len(g0[0])
-    pad = 12
-    W, H = W0 + 2 * pad, H0 + 2 * pad
+    pad = spec.get('pad', 12)
+    ex, ey = spec.get('extra', (0, 0))
+    W, H = W0 + 2 * pad + ex, H0 + 2 * pad + ey
     g = blank(W, H)
+    if pose == 'fly' and alt is not None and t % 4 != 2:
+        # her own wings-open drawing; frame 2 glides with the wings shut
+        ag, (dx, dy) = grid(alt[0]), alt[1]
+        paste(g, ag, pad + ex + dx, pad + ey + dy + [-4, -6, 0, -2][t % 4])
+        return g
     legtop = spec['legtop']
     lx0, lx1 = spec['legx']
     isleg = lambda x, y: y >= legtop and lx0 <= x <= lx1
@@ -273,7 +287,7 @@ def bird_frame(src, spec, pose, t):
     big = blank(W0 + 2 * P, H0 + 2 * P)
     paste(big, up, P, P)
     big = rot_pixels(big, ang, hipx + P, hipy + P)
-    ox, oy = pad, pad
+    ox, oy = pad + ex, pad + ey
     if showlegs:
         sink = 1 if (pose == 'hop' and t % 6 == 1) else 0
         paste(g, legs, ox, oy + max(by, 0))
@@ -370,6 +384,36 @@ BIRDS = {
                  wingc=((90, 78, 68, 255), (34, 28, 26, 255), (66, 57, 52, 255)),
                  tuck=[(30, 31), (37, 31)], foot=(249, 163, 27, 255)),
 }
+def auto_spec(fb, lname, flip, legtop, legx, hip, shoulder, wingL, fly=None):
+    im, _ = layer_at(fb, lname)
+    if flip:
+        im = im.transpose(Image.FLIP_LEFT_RIGHT)
+    # wing colours: the three commonest colours round the shoulder, light to dark
+    cnt = {}
+    for y in range(max(0, shoulder[1] - 7), min(im.height, shoulder[1] + 8)):
+        for x in range(max(0, shoulder[0] - 9), min(im.width, shoulder[0] + 6)):
+            p = im.getpixel((x, y))
+            if p[3] and sum(p[:3]) > 60:
+                cnt[p] = cnt.get(p, 0) + 1
+    top = sorted(cnt, key=lambda p: -cnt[p])[:3]
+    while len(top) < 3:
+        top.append(top[-1] if top else (90, 90, 90, 255))
+    top = sorted(top, key=lambda p: sum(p[:3]))
+    feetc = [im.getpixel((x, y)) for y in range(legtop, im.height) for x in range(legx[0], min(im.width, legx[1] + 1)) if im.getpixel((x, y))[3] and sum(im.getpixel((x, y))[:3]) > 40]
+    foot = max(set(feetc), key=feetc.count) if feetc else (40, 40, 40, 255)
+    mid = (legx[0] + legx[1]) // 2
+    return dict(layer=lname, flip=flip, legtop=legtop, legx=legx, hip=hip, shoulder=shoulder, wingL=wingL,
+                wingc=(top[1], top[0], top[2]), tuck=[(mid - 4, legtop), (mid + 3, legtop)], foot=foot, fly=fly, pad=30)
+
+
+RARE = {
+    'hoopoe': ('Hoopoe', False, 42, (30, 55), (40, 40), (36, 30), 22, 'Hoopoe2'),
+    'parakeet': ('rose-ringed parakeet', True, 55, (30, 48), (38, 54), (40, 28), 34, None),
+    'sunbird': ('purple sunbird', True, 46, (21, 38), (28, 45), (34, 22), 28, None),
+    'kingfisher': ('Arabian collared kingfisher', False, 45, (35, 62), (45, 44), (40, 26), 32, None),
+}
+
+
 BIRD_POSES = {'idle': 6, 'peck': 5, 'hop': 6, 'fly': 4}
 
 # ---------------------------------------------------------------- fish
@@ -441,16 +485,36 @@ def main(hens_path, fb_path, out):
         im, w, h = sheet(frames)
         im.save(f'{out}/hen-{name}.png')
         man['hens'][name] = {'w': w, 'h': h, 'poses': rows}
+    for k, v in RARE.items():
+        if any(L['name'] == v[0] for L in fb['layers']):
+            BIRDS[k] = auto_spec(fb, *v)
     for name, spec in BIRDS.items():
-        src = layer(fb, spec['layer'])
+        src, at = layer_at(fb, spec['layer'])
+        alt = None
+        if spec.get('fly'):
+            a2, at2 = layer_at(fb, spec['fly'])
+            alt = [a2, (at2[0] - at[0], at2[1] - at[1])]
+        if spec.get('flip'):
+            src = src.transpose(Image.FLIP_LEFT_RIGHT)
+            if alt:
+                alt[0] = alt[0].transpose(Image.FLIP_LEFT_RIGHT)
+                alt[1] = (src.width - (alt[1][0] + alt[0].width), alt[1][1])
+        if alt:
+            # room for the open wings: they reach further left and up than the sitting bird
+            spec['extra'] = (max(0, -alt[1][0]), max(0, -alt[1][1] + 6))
+            ex = alt[1][0] + alt[0].width - src.width
+            spec['extra'] = (spec['extra'][0] + max(0, ex), spec['extra'][1])
+            alt[1] = (alt[1][0] + 0, alt[1][1])
         frames, rows = [], {}
         for pose, n in BIRD_POSES.items():
             rows[pose] = [len(frames), n]
             for t in range(n):
-                frames.append(bird_frame(src, spec, pose, t))
+                frames.append(bird_frame(src, spec, pose, t, alt))
         im, w, h = sheet(frames)
         im.save(f'{out}/bird-{name}.png')
-        man['birds'][name] = {'w': w, 'h': h, 'poses': rows, 'title': spec['layer']}
+        ex, ey = spec.get('extra', (0, 0))
+        feet = max(y for y in range(src.height) for x in range(spec['legx'][0], min(src.width, spec['legx'][1] + 1)) if y >= spec['legtop'] and src.getpixel((x, y))[3])
+        man['birds'][name] = {'w': w, 'h': h, 'poses': rows, 'title': spec['layer'], 'ax': spec.get('pad', 12) + ex + spec['hip'][0], 'ay': spec.get('pad', 12) + ey + feet + 1}
     for title, face in FISH:
         src = layer(fb, title)
         frames = fish_frames(src, face)

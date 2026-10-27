@@ -218,7 +218,7 @@ function composeTile(m,tx,ty){var g=mget(m,tx,ty),o=CT_O,X=tx*T,Y=ty*T,i,lx,ly,c
   if(!mixed)return o;
   var wT=wn?texOf(m,G_WATER,wx,wy):null,gT=cls===1?null:gn?grassTexFor(gg,gx,gy,2).d:null,eT=cls===2?null:en&&eg!==G_STONE?texOf(m,eg,ex,ey):null,eStone=en&&eg===G_STONE;
   // near the stream, the lake or the garden pond the banks come from their shapes
-  var nat=false,NS=L.nat;if(NS&&(NS.stream||NS.lake||NS.pond)){k=0;for(dy=-1;dy<=1;dy++)for(dx=-1;dx<=1;dx++,k++){var nk=natKind(m,clamp(tx+dx,0,m.w-1),clamp(ty+dy,0,m.h-1));CT_NK[k]=nk;if(nk)nat=true;}}
+  var nat=false,NS=L.nat;if(NS&&(NS.stream||NS.lake||NS.pond)){k=0;for(dy=-1;dy<=1;dy++)for(dx=-1;dx<=1;dx++,k++){var nk=natKind(m,clamp(tx+dx,0,m.w-1),clamp(ty+dy,0,m.h-1));CT_NK[k]=nk;if(nk)nat=true;}if(nat&&painted(m,mi(m,tx,ty)))nat=false;}
   if(nat){for(k=0;k<9;k++){CT_WB[k]=(Wv[k]&&CT_NK[k]!==1)?1:0;CT_GM[k]=(Gv[k]||CT_NK[k])?1:0;}
     for(lx=0;lx<64;lx++){var xc=(X+lx+0.5)/T;CT_SC[lx]=NS.stream?streamCy(xc):0;CT_SW[lx]=NS.stream?streamW(xc):0;}
     if(!eT&&cls!==2&&NS.stream&&TX.sand.length)eT=TX.sand[Math.floor(hash2(tx,ty,32)*TX.sand.length)].d;}
@@ -671,7 +671,12 @@ defObj('trap',{solid:false,name:'Shrimp trap',spr:null,hit:function(o){return [o
 // -- birds. Each has its real colour patches. Poses: 0 perched, 1 pecking, 2 wings up, 3 wings down
 var BIRDS=[
  {id:'bulbul',name:'White-eared bulbul',len:16,where:['feeder','tree','window'],hint:'Comes to any feeder',w:8,stage:0},
- {id:'myna',name:'Common myna',len:17,where:['ground','lawn','feeder'],hint:'Walks about on the lawn',w:5,stage:0}];
+ {id:'myna',name:'Common myna',len:17,where:['ground','lawn','feeder'],hint:'Walks about on the lawn',w:5,stage:0},
+ // rare: one of these at most at a time
+ {id:'hoopoe',name:'Hoopoe',len:19,where:['lawn','ground'],hint:'Rare. Probes the lawn for grubs',w:0.25,stage:0,rare:1},
+ {id:'parakeet',name:'Rose-ringed parakeet',len:24,where:['tree','feeder'],hint:'Rare. Loud, in the trees',w:0.25,stage:0,rare:1},
+ {id:'sunbird',name:'Purple sunbird',len:16,where:['flowers','feeder','tree'],hint:'Rare. Comes to flowers',w:0.25,stage:0,rare:1},
+ {id:'kingfisher',name:'Arabian collared kingfisher',len:22,where:['water','fence','tree'],hint:'Rare. Watches the water',w:0.2,stage:0,rare:1}];
 var BIRD={};BIRDS.forEach(function(b){BIRD[b.id]=b;});
 function birdPB(B,pose){var L=Math.round(B.len*1.45),tall=!!B.tall,W=L+16,H=tall?Math.round(L*1.7):L+8,pb=new PB(W,H),s=L/18,fly=pose>=2;
   var bx=Math.round(W/2-1),by=tall?Math.round(H*0.5):H-Math.round(7*s)-1,peck=pose===1;
@@ -703,7 +708,7 @@ function animFrame(kind,n,pose,ph,fps){var m=AM(kind,n);if(!m)return 0;var p=m.p
 function animSpr(key,m,i,face,ax,ay){var im=IMG[key];if(!im||!m)return null;var c=document.createElement('canvas');c.width=m.w;c.height=m.h;var x=c.getContext('2d');x.imageSmoothingEnabled=false;
   if(face<0){x.translate(m.w,0);x.scale(-1,1);}x.drawImage(im,i*m.w,0,m.w,m.h,0,0,m.w,m.h);return {c:c,ax:face<0?m.w-ax:ax,ay:ay,w:m.w,h:m.h};}
 var BIRD_HIP={bulbul:44,myna:48};
-function birdSpr(id,pose,face){var m=AM('birds',id);if(m&&IMG['an-bird-'+id]){var t=CACHE.bird[id]||(CACHE.bird[id]=[]);return cached(t,pose*2+(face<0?1:0),function(){return animSpr('an-bird-'+id,m,pose,face,BIRD_HIP[id]||m.w/2,m.h-13);});}
+function birdSpr(id,pose,face){var m=AM('birds',id);if(m&&IMG['an-bird-'+id]){var t=CACHE.bird[id]||(CACHE.bird[id]=[]);return cached(t,pose*2+(face<0?1:0),function(){return animSpr('an-bird-'+id,m,pose,face,m.ax||BIRD_HIP[id]||m.w/2,m.ay||m.h-13);});}
   var B=BIRD[id];var t=CACHE.bird[id]||(CACHE.bird[id]=[]);return cached(t,pose*2+(face<0?1:0),function(){var pb=birdPB(B,0);if(face<0)pb=pb.flipX();return mk(pb,Math.round(pb.w/2),pb.h-1);});}
 // -- chickens
 var HENS=[
@@ -1162,9 +1167,9 @@ function spotOK(B,s){if(s.t==='feeder'){if(B.where.indexOf('feeder')<0)return fa
   if(B.where.indexOf(s.t)<0)return false;if(B.id==='heron')return !!s.wade;if(B.id==='kingfisher')return !!(s.rock||s.wade);return true;}
 function meStill(){var me=L.me;return me&&!me.moving&&(me.sit||me.idle>1.6);}
 function spawnBird(){var hab=L.hab,me=L.me,sit=me&&me.sit,cap=(BIRD_CAP[S.stage]||3)+(sit?2:0);if(L.birds.length>=cap)return;
-  var cand=[];BIRDS.forEach(function(B){if(S.stage<B.stage)return;if(B.need&&!hab[B.need])return;
+  var cand=[],rareOut=L.birds.some(function(b){return BIRD[b.sp]&&BIRD[b.sp].rare;});BIRDS.forEach(function(B){if(S.stage<B.stage)return;if(B.need&&!hab[B.need])return;if(B.rare&&rareOut)return;
     var free=L.spots.filter(function(s){return spotOK(B,s)&&!L.birds.some(function(b){return b.spot===s;})&&!(me&&Math.hypot(s.x-me.x,s.y-me.y)<(sit?40:70));});
-    if(!free.length)return;var w=B.w*(free.some(function(s){return s.t==='feeder'||s.t==='ground';})?2.5:1);cand.push({B:B,free:free,w:w});});
+    if(!free.length)return;var w=B.rare?B.w:B.w*(free.some(function(s){return s.t==='feeder'||s.t==='ground';})?2.5:1);cand.push({B:B,free:free,w:w});});
   if(!cand.length)return;var tot=cand.reduce(function(a,c){return a+c.w;},0),r=Math.random()*tot,c=cand[0];for(var i=0;i<cand.length;i++){r-=cand[i].w;if(r<=0){c=cand[i];break;}}
   // when she keeps still, spots near her win
   var ws=c.free.map(function(s){var d=me?Math.hypot(s.x-me.x,s.y-me.y):9999,near=meStill()?(sit?5:3)*Math.exp(-d/(T*3)):0;return (inView(s.x,s.y,-10)?1:0.25)+near;}),wt=ws.reduce(function(a,b){return a+b;},0),q=Math.random()*wt,spot=c.free[0];

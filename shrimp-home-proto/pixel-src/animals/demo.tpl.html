@@ -264,7 +264,7 @@ function viewer() {
   const list = [];
   const label = { white: 'White hen (yours)', brown: 'Brown hen', speckled: 'Speckled hen', blue: 'Blue egg hen', jungle: 'Wild junglefowl', bulbul: 'White-eared bulbul', myna: 'Common myna' };
   for (const n in MAN.hens) list.push(['hens', n, 'hen-' + n, label[n]]);
-  for (const n in MAN.birds) list.push(['birds', n, 'bird-' + n, label[n]]);
+  for (const n in MAN.birds) list.push(['birds', n, 'bird-' + n, label[n] || MAN.birds[n].title]);
   for (const n in MAN.fish) list.push(['fish', n, 'fish-' + n, MAN.fish[n].title]);
   let cur = list[0], cp = 'walk', tick = 0;
   function btn(row, text, on, fn) { const b = document.createElement('button'); b.textContent = text; b.setAttribute('aria-pressed', on); b.onclick = fn; row.appendChild(b); return b; }
