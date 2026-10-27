@@ -436,7 +436,7 @@ function genGarden(m,o,ox,oy,nTanks,land){
   for(var y=oy+11;y<=oy+19;y++){mset(m,ox+7,y,G_STEP,0.4);mset(m,ox+8,y,G_STEP,0.4);}
   // hedge at the back, the side garden
   mfill(m,ox,oy,ox+17,oy,G_DIRT,0);for(var hx=0;hx<18;hx++)o.push(mkObj('bush',ox+hx,oy,{v:hx%3,hedge:1}));
-  o.push(mkObj('vegbed',ox+14,oy+2,{fw:3,fh:2}));
+
   o.push(mkObj('olive',ox+15,oy+7,{fw:2}));
   o.push(mkObj('oak',ox+1,oy+11));
   // coop with a scratched yard, feeder, pond, bench, a second big tree
@@ -588,7 +588,10 @@ defObj('mat',{flat:true,fw:2,name:'Mat',spr:function(o){var W=o.fw*64,pb=new PB(
 defObj('wfeeder',{solid:false,wall:true,name:'Window feeder',spr:function(o){var pb=new PB(40,26);pb.rect(4,6,32,16,'#d8eef4');pb.rect(4,6,32,1,'#ffffff');pb.rect(2,20,36,4,'#c9ccd0');pb.rect(2,20,36,1,'#ffffff');ink(pb);return mk(pb,20,24);},
   hit:function(o){return [o.tx*T-14,o.ty*T-48,T+28,58];},use:{side:'here'}});
 // -- pole feeder outdoors (the balcony one hangs from a stand)
-defObj('feeder',{base:58,name:'Bird feeder',keyOf:function(o){return (o.v||'')+'|'+Math.round((o.s||0)*5);},spr:function(o){var hang=o.v==='hang',H=hang?84:104,pb=new PB(44,H+4),cx=22,top=hang?16:22,lvl=clamp(o.s||0,0,1);
+defObj('feeder',{base:58,name:'Bird feeder',keyOf:function(o){return (o.v||'')+'|'+Math.round((o.s||0)*5);},spr:function(o){var ys=yardSpr(o.v==='hang'?'feederhang':'feeder');
+  if(ys&&ys.m.seed){var sd=ys.m.seed,lvl=clamp(o.s||0,0,1),cut=Math.round(sd.y1-(sd.y1-sd.y0+1)*lvl),x=ys.c.getContext('2d'),d=x.getImageData(0,0,ys.w,ys.h),p=d.data;
+    for(var yy=sd.y0;yy<=cut&&yy<=sd.y1;yy++)for(var xx=sd.x0;xx<=sd.x1;xx++){var i=(yy*ys.w+xx)*4;if(p[i+3]&&p[i]>150&&p[i+1]>90&&p[i+1]<200&&p[i+2]<140&&Math.abs(p[i]-p[i+1])>25){p[i]=216;p[i+1]=238;p[i+2]=244;}}
+    x.putImageData(d,0,0);ys.perch=ys.m.perch;ys.tray=ys.m.tray;return ys;}var hang=o.v==='hang',H=hang?84:104,pb=new PB(44,H+4),cx=22,top=hang?16:22,lvl=clamp(o.s||0,0,1);
   if(hang){pb.rect(cx-1,0,2,top,'#2a2a2e');pb.rect(cx-12,0,24,2,'#2a2a2e');pb.rect(cx-12,0,2,H,'#2a2a2e');pb.rect(cx-16,H-2,10,3,'#2a2a2e');}
   else{pb.rect(cx-1,top+34,3,H-top-34,'#3a3940');pb.rect(cx-6,H-3,13,3,'#3a3940');}
   pb.poly([[cx-14,top+2],[cx,top-8],[cx+14,top+2]],'#ac3232');pb.rect(cx-14,top+2,28,2,'#7a2020');pb.line(cx-12,top,cx,top-6,'#d95763');
@@ -597,7 +600,9 @@ defObj('feeder',{base:58,name:'Bird feeder',keyOf:function(o){return (o.v||'')+'
   ink(pb);var s=mk(pb,cx,H+1);s.perch=[[-15,-(H+1)+top+29],[15,-(H+1)+top+29],[0,-(H+1)+top-8]];s.tray=-(H+1)+top+28;return s;},
   hit:function(o){return [oX(o)-20,oBase(o)-(o.v==='hang'?90:110),40,112];},use:{side:'any'}});
 // -- the hen house
-defObj('coop',{fw:3,fh:2,base:50,name:'Coop',spr:function(o){var W=200,H=156,pb=new PB(W,H),x0=22,bw=150,by0=56,bh=72;
+function yardSpr(n){var m=typeof ANIMMETA==='object'&&ANIMMETA.yard&&ANIMMETA.yard[n],im=IMG['yd-'+n];if(!m||!im||!im.naturalWidth)return null;
+  var c=document.createElement('canvas');c.width=m.w;c.height=m.h;var x=c.getContext('2d');x.drawImage(im,0,0);return {c:c,ax:m.ax,ay:m.ay,w:m.w,h:m.h,m:m};}
+defObj('coop',{fw:3,fh:2,base:50,name:'Coop',spr:function(o){var ys=yardSpr('coop');if(ys){if(ys.m.nest)ys.nest={x:ys.m.nest.x,y:ys.m.nest.y,w:ys.m.nest.w};return ys;}var W=200,H=156,pb=new PB(W,H),x0=22,bw=150,by0=56,bh=72;
   for(var l=0;l<4;l++){var lx=x0+6+l*44;pb.rect(lx,by0+bh,6,22,'#6b4226');}
   for(var y=by0;y<by0+bh;y++)pb.rect(x0,y,bw,1,((y-by0)>>3)%2?'#c68450':'#b97a47');for(var y2=by0;y2<by0+bh;y2+=8)pb.rect(x0,y2,bw,1,'#8e4f26');
   pb.rect(x0+14,by0+20,34,40,'#3a2414');pb.rect(x0+14,by0+20,34,2,'#2a1810');pb.rect(x0+16,by0+50,30,10,'#e8c56a');for(var s=0;s<12;s++)pb.set(x0+17+s*2.4,by0+48+(s%3),'#f2d88a');
@@ -646,7 +651,7 @@ defObj('fence',{base:46,name:'Fence',keyOf:function(o){return 'f'+fenceMask(o);}
 defObj('gate',{fw:2,base:46,name:'Gate',spr:function(o){var pb=new PB(128,64),base=56;[2,120].forEach(function(x){pb.rect(x,base-46,6,46,'#a8673a');pb.rect(x,base-46,2,46,'#c68450');});
   for(var s=0;s<7;s++){var x=12+s*15;pb.rect(x,base-36,8,34,'#c68450');pb.rect(x,base-36,8,1,'#d9a066');pb.rect(x+7,base-36,1,34,'#8e4f26');}
   pb.rect(10,base-30,108,4,'#8e4f26');pb.rect(10,base-12,108,4,'#8e4f26');pb.line(12,base-10,116,base-30,'#8e4f26');pb.line(12,base-9,116,base-29,'#8e4f26');pb.rect(60,base-22,6,3,'#2a2a2e');ink(pb);return mk(pb,64,base);}});
-defObj('rock',{base:56,solid:false,name:'Rock',keyOf:function(o){return 'r'+(o.v||0);},spr:function(o){var v=o.v||0,w=[30,22,40][v],h=[18,14,22][v],pb=new PB(w+8,h+8);shadowPB(pb,(w+8)/2,h+4,w/2,3,60);
+defObj('rock',{base:56,solid:false,name:'Rock',keyOf:function(o){return 'r'+(o.v||0);},spr:function(o){var ys=yardSpr((o.v||0)===2?'bigrock':'rock');if(ys)return ys;var v=o.v||0,w=[30,22,40][v],h=[18,14,22][v],pb=new PB(w+8,h+8);shadowPB(pb,(w+8)/2,h+4,w/2,3,60);
   pb.ell((w+8)/2,h/2+3,w/2,h/2,'#847e87');pb.ell((w+8)/2-2,h/2+1,w/2-3,h/2-3,'#9badb7');pb.ell((w+8)/2-w*0.18,h*0.32+2,w*0.18,h*0.14,'#cbdbfc');for(var x=0;x<w+8;x++)if(pb.on(x,h+2)&&!pb.on(x,h+3))pb.set(x,h+2,'#696a6a');return mk(pb,(w+8)/2,h+4);}});
 defObj('reeds',{base:58,solid:false,name:'Reeds',keyOf:function(o){return 'e'+(o.v||0);},spr:function(o){var pb=new PB(34,54),r=mulberry32(11+(o.v||0)*7);for(var s=0;s<7;s++){var x=6+s*3+Math.floor(r()*3),h=24+Math.floor(r()*24),lean=Math.round((r()-0.5)*6);
   for(var k=0;k<h;k++)pb.set(x+Math.round(lean*k/h),52-k,k>h-4?'#99e550':s%2?'#6abe30':'#4b692f');if(s%2===0&&h>30){var tx=x+lean,ty=52-h+4;pb.rect(tx-1,ty,3,7,'#8f563b');pb.rect(tx-1,ty,1,7,'#a9744f');}}return mk(pb,17,52);}});
@@ -923,7 +928,7 @@ function mainRoom(){return M().rooms[0];}
 function inRoom(r,tx,ty){return r&&tx>=r.x&&tx<r.x+r.w&&ty>=r.y&&ty<r.y+r.h;}
 
 // ----- state setup and old saves -----
-function ensureLand(){var l=S.land;if(!l||typeof l!=='object')l=S.land={};
+function ensureLand(){var l=S.land;if(!l||typeof l!=='object')l=S.land={};if(l.objs)l.objs=l.objs.filter(function(o){return o.k!=='vegbed';});
   if(!l.basket)l.basket={};if(!l.eggs)l.eggs=[];if(!l.hens)l.hens=[];if(!l.wild)l.wild=[];if(!l.pond)l.pond=[];if(!l.bucket)l.bucket=[];
   if(!l.stats)l.stats={mowed:0,eggs:0,fish:0,birds:0,traps:0};if(!l.seen)l.seen={};
   if(l.v!==LAND_V){
@@ -1507,7 +1512,6 @@ var BUILD=[
  {k:'bench',name:'Bench',price:80,where:OUTS,stage:2,o:{fw:2}},
  {k:'birdbath',name:'Bird bath',price:60,where:OUTS,stage:2},
  {k:'lantern',name:'Lantern',price:40,where:OUTS.concat([G_TILE]),stage:1},
- {k:'vegbed',name:'Vegetable bed',price:50,where:OUT,stage:2,o:{fw:3,fh:2}},
  {k:'feeder',name:'Bird feeder',price:45,where:OUTS.concat([G_TILE]),stage:1,o:{s:0}},
  {k:'coop',name:'Coop',price:400,where:OUT,stage:2,max:1,o:{fw:3,fh:2}},
  {k:'pot',name:'Flower pot',price:20,where:[G_TILE,G_STONE,G_FLOOR],stage:1,o:{v:1}},
@@ -1524,7 +1528,7 @@ var GROUND_ON=[G_GRASS,G_MEADOW,G_DIRT,G_STONE,G_SAND,G_STEP,G_TILE,G_FLOOR,G_WA
  {k:'g-sand',name:'Sand',edit:G_SAND,price:3},{k:'g-stone',name:'Stone paving',edit:G_STONE,price:8},{k:'g-floor',name:'Wood deck',edit:G_FLOOR,price:10},
  {k:'g-tile',name:'Terracotta tiles',edit:G_TILE,price:10},{k:'g-water',name:'Pond water',edit:G_WATER,price:12}].reverse().forEach(function(b){b.ground=1;b.stage=0;b.where=GROUND_ON;BUILD.unshift(b);});
 var BCAT=[{id:'ground',name:'Ground'},{id:'garden',name:'Garden'},{id:'yard',name:'Yard'},{id:'indoor',name:'Indoors'}];
-var BCAT_OF={stones:'ground',flowers:'garden',bush:'garden',oak:'garden',vegbed:'garden',pot:'garden',herbs:'garden',
+var BCAT_OF={stones:'ground',flowers:'garden',bush:'garden',oak:'garden',pot:'garden',herbs:'garden',
   fence:'yard',bench:'yard',birdbath:'yard',lantern:'yard',feeder:'yard',coop:'yard',bchair:'yard',rug:'indoor',tallplant:'indoor',bookshelf:'indoor',armchair:'indoor',lamp:'indoor'};
 BUILD.forEach(function(b){b.cat=b.ground?'ground':BCAT_OF[b.k]||'yard';});
 var BUILDI={};BUILD.forEach(function(b){BUILDI[b.k]=b;});
