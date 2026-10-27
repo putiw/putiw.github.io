@@ -427,6 +427,20 @@ Puti finds Kits, Ads and World overwhelming: too many cards, too much text on ea
 3. Ads tab: Ads (one-off ads as a button row, permanent ones folded), Shops (one line per region, e.g. "The Gulf 79/90 · Open 10", closing stores in a fold), Sales staff, and Marketing development + Campaigns merged into one ✦ card. These ✦ items stay in Ads (Puti: World is already too full). Consider moving Regions here (it's reach).
    World tab: Shaping the world, Owners' tanks, one coast card (Mangroves, Shrimpcoin, Shrimp Island), The Shrimp Times last.
 4. The Shrimp Times gets a Science section: lab results, funded studies, University track news (newsLine calls around the lab projects, ~2817-2852 and 3144-3163 on 28 Oct). Tag at newsLine, everything else stays on the front page.
+**Text fixes (text-only review, 28 Oct, line numbers as of a13cf98).** Each is text saying something the code doesn't do. Fix in whichever chat touches the area, or in one small pass.
+- Gear, Hatcheries: "Next: shrimp arcology, after a project in Gear." (`farmNext` hint, ~L5010) points at a project the player can't see: Shrimp arcology blueprint needs the ocean permit and East Asia open. Name the project and what it waits for when its `req` isn't met ("its blueprint comes once East Asia is open"). Same for the ocean ranch (permit needs Europe open).
+- Farm license role line (~L5583): "Grow racks start at AED 2,000"; the rack costs AED 1,200. Build it from `farmCost(G,FARMS[0])`.
+- Speed tooltip (~L5680): "40×: once everyone on Earth has a tank" but 40× opens at `HARD_AT` (4B, about half). "4×: after your first hatchery" but any farm counts, including a grow rack (and the speed4 spotlight says "Your first hatchery is running").
+- Log line (~L1403): "A million owners: 40× speed unlocked" but it unlocks 12×.
+- Kits alert (`empTips`, ~L3548): "raise the ceiling in Business". There is no Business tab.
+- Shops (~L4995): "Mall stores open after a shrimp boutique, or once you open Dubai" leaves out that 50 kits must be sold (`storesOn`). Also "Ads, shops and mall stores in Ads" (~L2148).
+- Lab: salaries and degree choices show USD (`usd()`: "USD 150k", "/yr") while everything is charged in AED. Show AED.
+- Free bottleneck advice outside the consultants, against the rule: guide lines "Orders are coming in faster than you can pack. Hire a packer in Kits." (~L5271), "Most people who want a tank here have one. New regions in World..." (~L5302), the grow rack / bigger farm nudges (~L5273-5295), and the Kits alerts "Adoption ceiling reached..." and "Production is short of working capital..." (`empTips`). Gate them behind `consultHas(G)` or drop them.
+- Pointers that go stale with the tab cleanup: "Consultants in Kits" (guide ~L5301, ~L5316), "lower the reserve in Kits" (`bottleneck`), "Check the reserve and materials in Kits" (`empTips`), "Farms and shops sell back at half price in Kits" (`brokeOpts`). Update when they move to the finance sheet.
+- Words: farm, grow rack, hatchery and "Hatcheries & breeding" are used for the same thing. Pick one word for the player ("farm"), keep the tier names.
+- Dead text: the `descriptions` object (~L5677) is never shown and still says "Build a university team before the ten-year space chapter". Delete it. The "A place of your own" card markup is dead too.
+- Checked and fine: auto feeder AED 90, fan AED 60 and 1.5 °C, kits 8 shrimp at 20 days, QC 30 days, robotic line at 300 kits, trust 85% / 60%, shop buyer counts, Grandpa only in the past (the alive lines are migration maps).
+
 Rules for all four: no growth or bottleneck summary anywhere; bottleneck advice only from the paid consultants. Numbers are fine, each on its own page (packing capacity on Kits, reach on Ads, ceiling with Regions).
 
 **Small leftovers from the 2026-10-27 final pass**
