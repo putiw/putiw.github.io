@@ -29,7 +29,8 @@ Universal Shrimp is a single-file HTML idle/sim game in the spirit of Universal 
 
 | Path | What it is |
 |---|---|
-| `shrimp/index.html` | The whole game: markup, CSS, sim and UI in one file, sprites embedded as data URIs. The only game file. |
+| `shrimp/index.html` | The whole game: markup, CSS, sim and UI in one file, sprites embedded as data URIs. |
+| `shrimp/home.html` | Grandma's land (27 Oct): the pixel map built from the Shrimp Home Prototype (`shrimp-proto` branch, `shrimp-home-proto/`, `python3 build.py --game`). Generated, don't edit by hand. Opened full screen over the game in an iframe. |
 | `shrimp-tanks/` | A different, older game (Phaser build). Don't confuse the two. |
 | `tests/shrimp-balance.cjs` | Focused checks for mechanics, migrations and key UI strings. Must pass. |
 | `tests/shrimp-academy.cjs` | Research and chapter checks. Must pass. |
@@ -125,6 +126,15 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **Late cards** (`CARDS3`): data-driven story cards, `[label, result, traits, effect, ending line]`. A card only if different people would really choose differently, otherwise a headline (`HEADLINES`). Story cards and Shrimp Times stories take turns, each 30 s to 2 min of play apart, and a choice's own story comes right after it. Always use `newsLine`/`newsEvent`, never push to `R.log` directly.
 - **Notes, not news** (`noteLine`, `NOTE_KINDS`, `paperOpen`, `updateNotes`, `#noteflash`): The Shrimp Times only prints once the World tab is there (`paperOpen`: World or the Lab open, or 10k+ people). Before that any `newsLine` becomes a "Word gets around" note. Personal things never go in the paper: Your day milestones are `noteLine(G,'day',t)`, Grandma is `noteLine(G,'grandma',t)`, small buzz about the kits is `noteLine(G,'word',t)`. Notes show one at a time as a banner like the newsflash with their own masthead, at least 12 s apart, never over a card, spotlight, cleaning or a check. Tapping a Your day or Grandma note opens the You page. `HOUR_NOTE` picks the channel for each Your day line; the viral video and the streaming show are news.
 - **Income after Earth** (`foodIncome`, `sideIncome`): new income comes from things already built and shows as one finance line, never a new screen or button.
+
+### Grandma's land (27 Oct)
+
+- **Steps** (`GPLACE`, `gplaceNext`, `gplaceOffer`, `buyGplace`, `landOpen`, `renderGplace`, card `#me-gplace` in the You tab): A flat with a balcony AED 4k, A house with a garden AED 40k, Land with a stream AED 250k. The first two are paid steps with no map. Land opens the map: a Go button on the card. Kept in `G.me.gplace`. Separate from "A place of your own" (`HOUSE`), which still exists; Puti hasn't decided whether to merge them.
+- **The map** is `shrimp/home.html` in `#land-ov` (an iframe, full screen). The company keeps running behind it. Messages: the land sends `{land:1,type:'ready'|'spend'|'earn'|'take'|'care'|'back'}`, the game answers `{game:1,type:'cash'|'own'}` once a second while it's open (`landSend`).
+- **Money**: the land spends and earns the company's cash (`pay`/`earn`, category `personal`).
+- **Tank**: the land's "Your tank" follows the game's tank 1 (`landOwn`: adults at 75 days, young, mean grade). Shrimp netted out of it there (moved to another tank there, or sold there) leave tank 1 (`landTake`). Finishing a tank job there counts as care (`careDone`).
+- **Time** on the land is real time (a second is a second, days are real days) and the light follows the player's clock. Time away is caught up when it opens, up to 30 days.
+- The land saves in its own localStorage key `shrimp-land-v1`.
 
 ## How to read Puti's requests
 

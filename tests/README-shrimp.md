@@ -878,3 +878,15 @@ Bots, seed 7, unchanged: strong 2,479 (empire_dictator), kind 3,698 (garden_vill
 - Deployed: passes up to 111 (seven traits, final logic and layout pass, Earth line, big news popups, swipe-away news, calendar dates, cull inside Check shrimp, prototype tank jobs). BUILD 2026-10-27-final.
 - Bots at deploy: strong day 2,479 (empire_dictator), kind 3,698 (garden_village), average Earth 6,441 / Space 7,852 (question_prof). Null test: a random chooser lands at 0 on every trait.
 - Next up: Grandma's timeline (see "Open work" in shrimp/AGENTS.md). Read the "Token budget" section there first: this project used most of a weekly Max limit in a few days, mostly through helper agents and one very long chat.
+
+
+## Pass 112: Grandma's land in the game
+
+- You tab: a Grandma's place card with three paid steps, A flat with a balcony (AED 4k), A house with a garden (AED 40k), Land with a stream (AED 250k). Only the land has a map; buying it adds a Go button.
+- Go opens `shrimp/home.html` full screen over the game: the pixel land from the Shrimp Home Prototype, Home and Tank tabs only, Back to the company in the header. The company keeps running.
+- One wallet: building on the land spends the company's cash.
+- Your tank on the land is the game's tank 1. Shrimp moved or sold out of it on the land leave tank 1. Tank jobs there count as care.
+- Real time on the land, light from the player's clock (blue night, warm dawn and dusk).
+- The land starts empty the first time: the stream, the lake and grass, Grandma in her armchair on a bit of floor, Pierre and the dog.
+- Checked in Playwright at 390 px: buy the three steps, Go, spend on the land (cash drops in the game), tank 1 with 20 shrimp shows 20 on the land, two moved to a cull tank there leave 18 in the game, Back closes it. No errors. Balance 71, academy 10, me 45 passed.
+- Not done: Puti hasn't decided how this sits with "A place of your own" (`HOUSE`).
