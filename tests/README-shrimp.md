@@ -904,4 +904,4 @@ Bots, seed 7, unchanged: strong 2,479 (empire_dictator), kind 3,698 (garden_vill
 - Long checks after merging Pass 112: strong bot WIN day 2,393 (empire_dictator), average Earth 6,441 / Space 7,852 (question_prof; Pass 112 had 6,413 / 7,824 garden_hermit because the bot's yes to Grandma's land used to start the old house; now it opens Grandma's place instead), space chapter passes, spotlight sweep 126 all good, quick monkey on four stages: no errors, no NaN.
 - BUILD 2026-10-27-land.
 
-- Carrying (Pass 113b): a caught chicken rides in Millie's arms until you tap the yard by the coop; caught fish in her hands until you tap the pond (in) or the stream or the lake (free).
+- Carrying (Pass 113b): a caught chicken rides in Millie's arms until you tap the yard by the coop; one caught fish at a time in her hands until you tap the pond (in) or the stream or the lake (free).
