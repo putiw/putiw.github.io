@@ -1084,12 +1084,19 @@ function dogMiss(dt){var dg=L.dog;dg.miss=(dg.miss||0)+dt;if(dg.miss<3)return;dg
   if(Math.random()<0.03+lv*0.0035+(far>T*10?0.02:0))dogCome();}
 function dogCome(){var dg=L.dog,me=L.me,gt=tileOf(me.x,me.y),p=pathFor(dg.x,dg.y,gt,me.x+(dg.x<me.x?-40:40),me.y+6);if(!p){dg.x=me.x-40;dg.y=me.y;dogBind();dogSettle(dg);return;}dg.q=p;dg.st='come';dg.t=0;}
 // zoomies: a few quick dashes left and right, then he flops down
-function dogPlayStart(){var dg=L.dog;dg.st='play';dg.pn=4+Math.floor(Math.random()*5);dg.pdir=Math.random()<0.5?-1:1;dg.ptx=null;dg.t=0;}
+function dogPlayStart(){var dg=L.dog;dg.st='play';dg.pn=3+Math.floor(Math.random()*7);dg.pdir=Math.random()<0.5?-1:1;dg.ptx=null;dg.t=0;dg.pwait=0;}
+// zoomies: every dash is different. Mostly short darts, some medium runs, now and then a long sprint; the speed changes
+// a little each time, and he sometimes stops dead for a beat before turning
+function dashLen(){var r=Math.random();return T*(r<0.4?0.35+Math.random()*0.6:r<0.78?1+Math.random()*1.2:2.4+Math.random()*2.8);}
 function dogPlay(dt){var dg=L.dog;
-  if(dg.ptx==null){if(dg.pn<=0){dg.st='stand';dg.t=0;dg.wt=0.8+Math.random()*1.5;return;}var len=T*(1.1+Math.random()*1.3),tx=dg.x+dg.pdir*len,t=tileOf(tx,dg.y);
-    if(!passable(t[0],t[1])||!losClear(dg.x,dg.y,tx,dg.y)){dg.pdir=-dg.pdir;tx=dg.x+dg.pdir*len;t=tileOf(tx,dg.y);if(!passable(t[0],t[1])||!losClear(dg.x,dg.y,tx,dg.y)){len*=0.5;tx=dg.x+dg.pdir*len;t=tileOf(tx,dg.y);if(len<T*0.6||!passable(t[0],t[1])||!losClear(dg.x,dg.y,tx,dg.y)){dg.pn=0;return;}}}
-    dg.ptx=tx;dg.pty=dg.y+(Math.random()-0.5)*20;dg.pn--;dg.dir='side';}
-  var q=[[dg.ptx,dg.pty]];dogStep(dg,q,DOG_RUN,dt);dg.dir='side';if(!q.length){dg.ptx=null;dg.pdir=-dg.pdir;if(Math.random()<0.35)dg.hop=0.35;}}
+  if(dg.pwait>0){dg.pwait-=dt;dg.run=false;return;}
+  if(dg.ptx==null){if(dg.pn<=0){dg.st='stand';dg.t=0;dg.wt=0.8+Math.random()*1.8;return;}
+    var len=dashLen(),tx,t,ok=false;
+    for(var tries=0;tries<6&&!ok;tries++){tx=dg.x+dg.pdir*len;t=tileOf(tx,dg.y);if(passable(t[0],t[1])&&losClear(dg.x,dg.y,tx,dg.y))ok=true;else if(tries===2)dg.pdir=-dg.pdir;else len*=0.6;}
+    if(!ok||len<T*0.3){dg.pn=0;return;}
+    dg.ptx=tx;dg.pty=dg.y+(Math.random()-0.5)*(len>T*2?36:18);dg.psp=DOG_RUN*(0.75+Math.random()*0.55)*(len<T?0.85:1);dg.pn--;dg.dir='side';}
+  var q=[[dg.ptx,dg.pty]];dogStep(dg,q,dg.psp||DOG_RUN,dt);dg.dir='side';
+  if(!q.length){dg.ptx=null;dg.pdir=-dg.pdir;var r=Math.random();if(r<0.3)dg.hop=0.35;else if(r<0.55)dg.pwait=0.15+Math.random()*0.6;}}
 function faceDogTo(x){var dg=L.dog;if(Math.abs(x-dg.x)>4)dg.face=x>dg.x?1:-1;}
 function dogDir(dx,dy){var dg=L.dog,ax=Math.abs(dx),ay=Math.abs(dy);if(ax>1)dg.face=dx>0?1:-1;if(ax<0.5&&ay<0.5)return;
   if(dg.dir!=='down'&&dg.dir!=='up'){if(ay>ax*1.25)dg.dir=dy>0?'down':'up';}
