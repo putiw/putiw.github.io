@@ -529,5 +529,14 @@ if(!html.includes("'% for '+a.days+' day'+(a.days===1?'':'s')")||!html.includes(
 if(!html.includes("return c[0].indexOf(a)>=0?'':m;"))throw Error('A story choice that names its price should not repeat it as Costs');
 if(!/#milestone-actions>\[data-act=sandbox\],#milestone-actions>\[data-act=sandbox\]~\.btn\{flex:1 1 40%\}/.test(html)||!html.includes("(sty?'\\u00a0· '+sty.name:'')"))throw Error('Win card buttons share the row, the ending subtitle never starts a line with ·');
 count++;console.log('PASS Pass 111 singulars, story costs once, win card buttons and ending title');
+check('Pass 117: one home tank on a feeder drops hunger and ration, the header has no to-kits line',`
+var g=newGame(),t=g.tanks[0];t.feeder=true;if(feedLite(g))throw Error('Feeding lite before farms');
+g.emp.farms={rack:1};if(!feedLite(g))throw Error('One home tank on a feeder with a farm should be lite');
+g.tanks.push(JSON.parse(JSON.stringify(t)));if(feedLite(g))throw Error('Two home tanks keep the full feeding card');
+g.tanks.pop();t.feeder=false;if(feedLite(g))throw Error('No feeder keeps hunger and ration');
+`);
+if(html.includes("/d to kits"))throw Error('The header still says /d to kits');
+if(!html.includes(".cash-sub{display:flex;gap:8px;align-items:baseline;margin-top:2px;white-space:nowrap"))throw Error('The cash line must not wrap');
+count++;console.log('PASS Pass 117 feeding lite and header');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

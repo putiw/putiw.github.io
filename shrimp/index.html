@@ -41,7 +41,7 @@ button{font:inherit;color:inherit}
 .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
 
 .brand{padding:6px 0 2px;gap:8px}
-.brand h1{font-size:16px;white-space:nowrap}.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.cash{display:flex;flex-direction:column;line-height:1.1}.cash #b-money{font:700 19px var(--font-body);letter-spacing:-.01em}.cash-top{display:flex;gap:7px;align-items:baseline;white-space:nowrap}.cash-top #b-inf{font:600 13px var(--font-body)}@media (max-width:374px){.cash #b-money{font-size:16px}.cash-top #b-net{font-size:11px}.cash-top{gap:6px}.cash-top #b-inf{font-size:12px}.r1 .speed{gap:3px}.r1 .speed button{min-width:26px;padding-left:3px;padding-right:3px}}.cash-top #b-net,#b-nsh{font:600 11.5px var(--font-body);margin-left:0!important}#b-nsh{color:var(--ink-3)}.cash-sub{display:flex;gap:8px;align-items:baseline;margin-top:2px}.cash-sub small{margin-left:0!important}.nshrimp{font:700 14px var(--font-body);color:var(--shrimp);white-space:nowrap}.nshrimp small{font:500 11px var(--font-body);color:var(--ink-3);margin-left:3px!important}
+.brand h1{font-size:16px;white-space:nowrap}.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.cash{display:flex;flex-direction:column;line-height:1.1}.cash #b-money{font:700 19px var(--font-body);letter-spacing:-.01em}.cash-top{display:flex;gap:7px;align-items:baseline;white-space:nowrap}.cash-top #b-inf{font:600 13px var(--font-body)}@media (max-width:374px){.cash #b-money{font-size:16px}.cash-top #b-net{font-size:11px}.cash-top{gap:6px}.cash-top #b-inf{font-size:12px}.r1 .speed{gap:3px}.r1 .speed button{min-width:26px;padding-left:3px;padding-right:3px}}.cash-top #b-net,#b-nsh{font:600 11.5px var(--font-body);margin-left:0!important}#b-nsh{color:var(--ink-3)}.cash-sub{display:flex;gap:8px;align-items:baseline;margin-top:2px;white-space:nowrap;overflow:hidden;min-width:0}.cash{min-width:0;flex:1 1 auto}.cash-top,.cash-sub,.earthline{font-variant-numeric:tabular-nums}.cash-sub small{margin-left:0!important}.nshrimp{font:700 14px var(--font-body);color:var(--shrimp);white-space:nowrap}.nshrimp small{font:500 11px var(--font-body);color:var(--ink-3);margin-left:3px!important}
 .date{flex:1;min-width:0;font:400 11.5px var(--font-data);color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .goalrow{display:flex;align-items:center;gap:6px;font-size:11px;line-height:1;color:var(--ink-2);margin-top:3px;white-space:nowrap;overflow:visible}
 .goalrow .goal-bar{flex:0 0 48px}
@@ -307,7 +307,7 @@ th:first-child,td:first-child{text-align:left}
 @media (prefers-reduced-motion:no-preference){.g-track i{transition:left .25s ease}.vm .mb i{transition:width .25s ease}.goal-bar i{transition:width .4s}}
 
 .topgoal{margin:6px 0 2px}.topgoal .tg-l{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}.topgoal .tg-l b{font-size:20px;color:var(--shrimp)}.topgoal .tg-l small{font-size:12.5px;color:var(--ink-2)}.earthline{display:block;width:100%;text-align:left;border:0;background:transparent;padding:2px 0 0;margin:0;font:500 12px/1.3 var(--font-body);color:var(--good);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.earthline[hidden]{display:none}#tg-r{display:block;font-size:12px}#tg-r:empty{display:none}.topgoal .goal-bar{margin-top:4px;width:100%;flex:none;height:6px}
-.business-strip{display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:6px;font-size:12px;color:var(--ink-2)}.business-strip b{font:500 12px var(--font-data);color:var(--ink)}
+.business-strip{display:flex;flex-wrap:nowrap;gap:2px 14px;margin-top:4px;font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;font-variant-numeric:tabular-nums}.business-strip>span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis}.readrow:not(:has(>:not([hidden]))){display:none}.business-strip b{font:500 12px var(--font-data);color:var(--ink)}
 
 
 
@@ -469,10 +469,10 @@ h1,h2,h3,h4,summary,button,.btn,label,th,.scope-label{text-wrap:balance}p,li,sma
     <div class="seg" id="foodseg"></div>
     <p class="hint explain" id="f-note"></p>
     <div id="feedg"></div>
-    <div class="g" style="border-top:1px solid var(--line)"><div class="g-top"><span class="g-name">Food in tank</span><span class="g-val" id="f-food">0 mg</span></div>
+    <div class="g" id="f-foodg" style="border-top:1px solid var(--line)"><div class="g-top"><span class="g-name">Food in tank</span><span class="g-val" id="f-food">0 mg</span></div>
       <div class="g-track" style="background:var(--surface-2)"><i id="f-foodbar" style="left:0;width:0;position:absolute;top:0;height:8px;margin:0;border-radius:4px;background:var(--s3);box-shadow:none"></i></div>
       <div class="hint" id="f-foodnote"></div></div>
-    <div class="ctl"><label for="s-ration">Ration</label><input type="range" id="s-ration" data-x="1" min="0" max="300" step="1"><span class="v" id="v-ration"></span></div>
+    <div class="ctl" id="f-ration"><label for="s-ration">Ration</label><input type="range" id="s-ration" data-x="1" min="0" max="300" step="1"><span class="v" id="v-ration"></span></div>
     <p class="hint explain" id="h-ration"></p>
     <div class="fmsg" id="feed-msg" aria-live="polite"></div>
     <div class="treatrow" id="treatrow" hidden><div class="care-k" id="treat-k">Weekly treats</div><div class="seg" id="treatseg"></div><p class="hint" id="treat-note"></p></div>
@@ -2636,6 +2636,8 @@ var HAPPY=[{id:'pea',name:'Blanched pea',cost:1,days:3},{id:'mulberry',name:'Mul
 function ownLevel(G){var M=G.me||{},d=(G.ps?G.ps.look+G.ps.treat+Math.floor((G.ps.care||0)/2):0)+(M.happy||0)+Math.floor((M.tq||0)*2)+Math.floor((G.stats.wiped||0)/30)-(M.keepBase||0);return d>=12?2:d>=3?1:0;}
 function retireTanks(G){if(G.tanks.length<2)return 0;var n=0;G.tanks.slice(1).forEach(function(t){n+=totalN(t);});G.emp.rawShrimp=(G.emp.rawShrimp||0)+n;G.tanks=[G.tanks[0]];G.sel=0;G.recipe=false;log(G,'The farm takes the extra tanks and '+Math.round(n)+' shrimp. Your first tank stays on the shelf');return n;}
 function ownTank(G){return !!(G.me&&G.me.keep==='self');}
+// One home tank left on an auto feeder (racks took the rest, or you keep it yourself): no hunger, nutrition or ration on screen, just food type and treats
+function feedLite(G){var T=G.tanks[0];return G.tanks.length===1&&!!(T&&T.feeder)&&(farmBuilt(G)||ownTank(G));}
 function tankGone(G){return !!(G.me&&G.me.keep&&G.me.keep!=='self');}
 function happyOn(T,id){return !!(T&&T.happy&&T.happy[id]>0);}
 function giveHappy(G,id){var T=G.tanks[0],h=HAPPY.filter(function(x){return x.id===id;})[0];if(!h||!T||totalN(T)<1||happyOn(T,id)||G.money<h.cost)return false;pay(G,h.cost,'food');T.happy=T.happy||{};T.happy[id]=h.days;G.me.happy++;log(G,'Gave them a '+h.name.toLowerCase()+'. They crowd around it',T);return true;}
@@ -3394,7 +3396,7 @@ function cost2(m,i){return (m?aed(m):'')+(m&&i?' + ':'')+(i?inf(i):'');}
 function trim(n,d){return String(+Number(n).toFixed(d));}
 // iPhone Safari moves its toolbar while you scroll and the fixed tab bar can end up floating above the bottom. Pin it to what's really on screen.
 (function(){var vv=window.visualViewport;if(!vv)return;var fix=function(){var t=document.querySelector('.tabs');if(!t)return;var off=window.innerHeight-(vv.height+vv.offsetTop);t.style.transform=Math.abs(off)>1&&vv.scale<=1.01?'translateY('+(-off)+'px)':'';};vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);window.addEventListener('scroll',fix,{passive:true});})();
-var toastT=null,NF=null,BUILD='2026-10-27-steady';
+var toastT=null,NF=null,BUILD='2026-10-27-header';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
@@ -3785,6 +3787,7 @@ function updateFeed(){
   $('f-foodbar').style.width=(fr*100).toFixed(1)+'%';
   var hrs=app>0?c.food/(0.03125*app):0;
   var hl2=handLeft(G,T);setT('f-foodnote',N>=1&&!T.feeder&&hl2>0?(hl2>1?'Fed for today and tomorrow.':'Fed for today. Feed again tomorrow.'):c.food<0.5?(N>=1?'Nothing left. They are grazing on biofilm only.':'Empty.'):'≈ '+(hrs<36?Math.round(hrs)+' h':trim(hrs/24,1)+' days')+' of food. Leftovers rot into ammonia.');
+  var lite=feedLite(G);['feedg','f-foodg','f-ration','h-ration','feed-msg'].forEach(function(id){$(id).hidden=lite;});
   setEmphasisText('h-ration',N>=1?'100% = full appetite. They graze, so 80% is usually enough. Above 100% rots.':'Ration is a share of their daily appetite.',['100%','80%','Above 100%']);
 }
 function labMode(){return farmCap(G)>=10;}
@@ -3827,7 +3830,7 @@ function setActs(sh,kit){var n=actNeed(G),f=$('tb-feed'),w=$('tb-wc'),se=$('tb-s
   var cols=[f,w,se].filter(function(e){return !e.hidden;}).map(function(e){return e===se?'1.3fr':'1fr';});$('acts').hidden=!cols.length;$('acts').style.gridTemplateColumns=cols.join(' ')||'1fr';}
 function applyReveal(){
   var sh=rv('shrimp'),kit=rv('kit');
-  $('vitals').hidden=!sh||(G.tanks.length>1&&!RV()&&totalN(TK())<1&&!TK().had);if($('vm-nutr'))$('vm-nutr').hidden=!rv('hatch')&&!G.opt.all;$('fold').hidden=!rv('wc');
+  $('vitals').hidden=!sh||feedLite(G)||(G.tanks.length>1&&!RV()&&totalN(TK())<1&&!TK().had);if($('vm-nutr'))$('vm-nutr').hidden=!rv('hatch')&&!G.opt.all;$('fold').hidden=!rv('wc');
   var nums=!!G.opt.waterNums;['no3','kh','gh'].forEach(function(k){$('wp-'+k).hidden=!kit||!nums;});$('vitals').classList.toggle('stack',nums&&kit);$('wp-temp').hidden=!rv('phkh')||!nums;if($('wp-sum'))$('wp-sum').hidden=!kit;
   $('vwater').hidden=!kit||!sh;
   ['ph','gh','kh'].forEach(function(k){var e=$('gv-'+k);if(e){var g=e.closest('.g');if(g)g.hidden=!rv('phkh');}});
@@ -5108,7 +5111,7 @@ function updateHeader(){
   setT('b-day','D'+Math.floor(G.day));setT('b-date','Day '+(Math.floor(G.day)+1).toLocaleString('en-US')+' · '+d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+(rv('temp')?' · room '+roomT(G,clock(G)).toFixed(1)+' °C'+(G.ac?' AC':''):''));
   var r=G.humans/WORLD;
   var owners=big(Math.floor(G.humans));setT('b-goal-wide',owners+' of 8.2B people have a tank at home');setT('b-goal-short',owners+' / 8.2B people');
-  var iv=Math.floor(G.emp.inf);setT('b-inf',G.emp.infTotal>0?'✦ '+(iv>=1e4?big(iv):iv>=1000?(iv/1000).toFixed(1).replace(/\.0$/,'')+'k':iv):'');var nsh=everyShrimp(G),nh=G.nh||[],nd=nh.length>=2?(nh[nh.length-1]-nh[0])/(nh.length-1):null;var awaySh=topAway(G);setT('b-nsh',nsh<1||nd==null||!G.stats.born?'':nd<=-1&&farmBuilt(G)?big(Math.abs(Math.round(nd)))+'/d to kits':(nd>=0?'+':'−')+big(Math.abs(Math.round(nd)))+'/d');$('b-shrimp').hidden=nsh<1;if(nsh>=1){var nsh2=cnt(nsh)+'<small>shrimp</small>';$('b-shrimp').mhtml=nsh2;var fs=farmStock(G);$('b-shrimp').title=fs>=1?cnt(allN(G))+' in your tanks, '+cnt(fs)+' on your farms':'';}
+  var iv=Math.floor(G.emp.inf);setT('b-inf',G.emp.infTotal>0?'✦ '+(iv>=1e4?big(iv):iv>=1000?(iv/1000).toFixed(1).replace(/\.0$/,'')+'k':iv):'');var nsh=everyShrimp(G),nh=G.nh||[],nd=nh.length>=2?(nh[nh.length-1]-nh[0])/(nh.length-1):null;var awaySh=topAway(G);setT('b-nsh',nsh<1||nd==null||!G.stats.born||farmBuilt(G)?'':(nd>=0?'+':'−')+big(Math.abs(Math.round(nd)))+'/d');$('b-shrimp').hidden=nsh<1;if(nsh>=1){var nsh2=cnt(nsh)+'<small>shrimp</small>';$('b-shrimp').mhtml=nsh2;var fs=farmStock(G);$('b-shrimp').title=fs>=1?cnt(allN(G))+' in your tanks, '+cnt(fs)+' on your farms':'';}
   var lab=labMode(),fo=lab&&topAway(G)?!G.opt.labOpen:!!G.opt.collapse;document.querySelector('.top').classList.toggle('folded',fo);document.querySelector('.top').classList.toggle('lab',lab);setT('fold',lab?(fo?'Show Tank 1 controls':'Hide Tank 1 controls'):fo?'Show tank readings':'Hide tank readings');$('fold').setAttribute('aria-expanded',String(!fo));
   $('empdot').hidden=!empireNew();
   var eo=kitsOpen(G)||G.emp.shownEmp;if(eo&&!G.emp.shownEmp){G.emp.shownEmp=1;}$('tab-emp').hidden=!eo;$('speed').classList.toggle('pre',!anyHad()&&!G.ob.bottle&&!G.opt.all);var ms=maxSpeed(G);$('sp40').hidden=ms<40;document.querySelector('[data-speed="12"]').hidden=ms<12;document.querySelector('[data-speed="4"]').hidden=ms<4;document.querySelector('[data-speed="1"]').classList.toggle('nx',ms>=12);document.querySelector('[data-speed="2"]').classList.toggle('nx',ms>=40);if(speed>ms){setSpeed(ms);if(ms===2&&!G.ob.cap2){G.ob.cap2=1;toast('Shrimp are in, so time runs at 2× at most for now.');}}

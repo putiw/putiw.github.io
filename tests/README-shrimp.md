@@ -955,3 +955,11 @@ BUILD 2026-10-27-opening.
 - Average bot owners: year 4 105k (was 64k), year 5 592k (was 480k). Earth 6,525 / Space 7,936 garden_hermit (was 6,581 / 7,992 on the opening pass). Strong: WIN 2,338 empire_dictator (was 2,393). Kind and cold bots not rerun.
 - Tests: balance 71, academy 10, me 46 (pain checks updated: open 0.6, set-up 0.85, no stacking).
 BUILD 2026-10-27-steady.
+
+## Pass 117: A tighter header, no hunger bars on the one home tank (27 Oct)
+
+- "2/d to kits" is gone. The shrimp trend (+N/d) shows only before the first farm; after that the count is mostly farm stock and the trend meant nothing.
+- The header doesn't change height: the ✦ / shrimp line never wraps (cut off instead), numbers use tabular figures, the Packed / orders strip is one line, and the empty readings row no longer leaves a gap above it.
+- One home tank on an auto feeder, once racks took the rest or you keep it yourself (`feedLite`): Feeding shows only food type and treats. Hunger, Nutrition, Food in tank, Ration and the top Fed / Nutrition bars are hidden. The auto feeder still uses its Auto feed setting in Gear.
+- Checked in Playwright at 390 and 360 px on the first farm, a million owners and win snapshots; layout scanner clean except the known 2px win chart label. Balance 73, academy 10, me 46. Bots not rerun (UI only).
+BUILD 2026-10-27-header.
