@@ -911,3 +911,37 @@ Bots, seed 7, unchanged: strong 2,479 (empire_dictator), kind 3,698 (garden_vill
 - Birthday date field overflowed its card on iPhone (Safari gives date inputs an intrinsic width). Date fields now drop native appearance, `display:block`, left-aligned value. All inputs, selects and textareas get `max-width:100%;min-width:0;box-sizing:border-box`.
 - New `tests/shrimp-layout.cjs`: loads the start screen and every run-7 snapshot at 320, 360 and 390 px, opens every tab and details, flags any element wider than its card or the screen. Result: clean, except one chart label 2px past its SVG on the win World tab (not clipped, left as is). Chromium only; no WebKit here, so check the date field on a phone.
 - Fast suites: balance 71, academy 10, me 46.
+
+## Pass 115: The opening, one thing at a time (27 Oct)
+
+From a frame-by-frame review of the opening (start to three tanks and kits) at 390 px.
+
+Shown later, when it's needed:
+- Day 1: no tab bar while there is only one tab (`body.onetab`), no speed buttons until the ammonia bottle, no room temperature until the water first runs warm or cold (`ob.temp`), no bills line before shrimp.
+- Water button from the cycled step (or when the cycle stalls), not from the test kit. Sell from the first shrimp it can sell, not a grey "Ready in ~86 d" from day 34. Clean glass waits for shrimp.
+- Nutrition bar from the first babies. The water chip only shows when the water isn't fine (tap still toggles numbers). "+1/d" shrimp only after the first hatch.
+- Buy shrimp: Cherry and Sakura first, the two pricier kinds and the "Grade ~N" lines after the first sale. The first buy goes back to the Tank tab.
+- Water care: New water GH and KH sliders from the first time GH or KH is low (`ob.mins`).
+- Colony: grade bars and the grade line from the first sale. Readings charts from the first babies.
+- Gear: Runs itself first. Temperature when the water runs warm or cold, Room and filter when a tank gets crowded or 100 are sold (`ob.room`), Decor and Treats with the first babies, everything once kits open. "Show completed equipment" only when something is done.
+- Trade: the second colony histogram is gone (same as Tank). Sales rules fold closed, the Sell box and Price sit outside it.
+- Kits: Keep in tanks, Kit development (`eproj`) and Quality checks from 10 kits (`QC_FROM`), not 1 and 3. ✦ 0 is not shown before ✦ exists.
+- Your time (the You page) opens with the first kit sold or the first hatchery, on top of the auto feeder and water changer (`meReady`).
+
+Nudges removed (the player picks the route):
+- No Next lines for the auto feeder, the auto water changer, "Saving for a bigger tank: AED x of y", the kit room route, or the first packing tool (the tool line is soft now, in the ? popup). The kit room requirement is one loose idea in the ? popup from 100 sold.
+- The new-tank sheet no longer sells an auto feeder and water changer.
+
+Shown matches true:
+- Feed only glows when they're actually hungry. No "new" tag on the first card. The test kit says "tests the water". Nitrite and ammonia stay neutral in an empty tank. The hidden AED 20 for cycling is gone (it showed as "+2.8/d" before any shrimp). The "farms copy its setup" note says "You know what works now." The Babies chapter names what's new now. Ads spotlight no longer lists tabs that aren't open.
+- A taken pet shop order keeps back the shrimp it needs, so Sell doesn't sell them out from under it.
+- Move shrimp defaults to a quarter of the tank (at least 10) instead of 10 or 1.
+
+Influence: story and card text now says "influence ✦" where it only said ✦ ("You lose some sales, but you gain a little influence ✦ every day").
+
+Grandma's land (source on `shrimp-proto`, rebuilt into `shrimp/home.html`):
+- A wall on the last tile of a floor sits on the floor's outer edge, so no floor shows outside it (`wallSide`).
+- Grass squares left on the stream bank (empty-land saves) turn back into sand, so the bank follows the stream's curve (`fixBanks`, once per map).
+
+Tests: balance 71, academy 10, me 46 (string checks updated; me tests sell a kit before the You page). Land: toys and net pass. Bots not rerun (not a deploy).
+BUILD 2026-10-27-opening.

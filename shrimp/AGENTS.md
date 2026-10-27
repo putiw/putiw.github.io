@@ -164,7 +164,8 @@ These come from Puti's feedback. Treat them as requirements.
 - Bought shrimp are breeders and are never sold by the sales rules. The one exception: you can take any shrimp out by hand with Cull in Check shrimp, it sells as a cull.
 
 **Revealing things**
-- Reveal one new thing at a time, and only when it's needed. Before the first shrimp the player sees only the cycle card, the test kit, ammonia and the Water button.
+- Reveal one new thing at a time, and only when it's needed. Before the first shrimp the player sees only the cycle card, the test kit, ammonia, the speed buttons (from the bottle) and the Water button (from the cycled step). The full reveal order is in Pass 115 of `tests/README-shrimp.md`; keep new things behind a real need (`ob.temp`, `ob.room`, `ob.mins`, first babies, first sale, 10 kits).
+- A tab bar with one tab is hidden. A dead button (grey with a countdown) is hidden until it can do something.
 - Every new section gets a spotlight, not a toast. Toasts are only for small confirmations ("Added ammonia").
 - Keep card text to one short line with the action in **bold**. Explanations go behind the ?.
 - Everything should be collapsible.
@@ -435,5 +436,6 @@ Planned and agreed with Puti, not built yet:
 - The own tank's year-eight card (`c_mytank`) only checks the glass.
 
 **Known gaps**
-- Kits open after 200 home-bred sales and 60 L of tanks with shrimp in them (`KIT_UNLOCK`, `KIT_ROOM`). The guide says so from 100 sold.
+- Kits open after 200 home-bred sales and 60 L of tanks with shrimp in them (`KIT_UNLOCK`, `KIT_ROOM`). From 100 sold one loose idea in the ? popup says more tank room is needed; the guide no longer names the route.
+- The opening is slow from the first sale (day ~120) to kits (day ~320) for a player who never buys ads. Worth a look with the bots.
 - The first babies trigger a few spotlights in a row (Colony, Recent events). They could be merged into one.

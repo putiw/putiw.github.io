@@ -1862,8 +1862,17 @@ function renderGround(){var m=M();if(!m)return;var W=m.w*T,H=m.h*T;if(!L.gcv)L.g
   var x=L.gcv.getContext('2d');x.imageSmoothingEnabled=false;x.setTransform(1,0,0,1,0,0);x.fillStyle=PAL.VOID;x.fillRect(0,0,W,H);
   if(!ART.ready){L.groundOK=false;return;}
   // what's on screen is painted now; the rest of the map follows a little each frame (gbk -2: not painted yet)
-  L.nat=natShapes(m);var n=m.g.length;L.tmk=new Array(n);L.rqf=new Uint8Array(n);L.gbk=new Int8Array(n);for(var i=0;i<n;i++){L.rqf[i]=1;L.gbk[i]=-2;}
+  fixBanks(m);L.nat=natShapes(m);var n=m.g.length;L.tmk=new Array(n);L.rqf=new Uint8Array(n);L.gbk=new Int8Array(n);for(var i=0;i<n;i++){L.rqf[i]=1;L.gbk[i]=-2;}
   L.rqn=n;L.rbx=null;L.groundOK=true;drainRepaint(0);}
+// The stream's bank is painted from its smooth shape, but a grass tile that touches the water or sits inside the bank
+// band still painted as a full grass square (empty-land saves turned the old dirt there into meadow). Those tiles
+// go back to sand, unless the player painted them.
+function fixBanks(m){if(!m.stream||m.banksOK===2)return;var w=m.w,x,y,i;L.pmask=null;
+  for(y=21;y<m.h;y++)for(x=0;x<w;x++){i=y*w+x;if(!isGrass(m.g[i])||painted(m,i))continue;
+    var sc=streamCy(x+0.5),sw=streamW(x+0.5),inBand=Math.abs(y+0.5-sc)<sw/2+0.95,near=false;
+    for(var dy=-1;dy<=1&&!near;dy++)for(var dx=-1;dx<=1;dx++){var g2=mget(m,x+dx,y+dy);if(g2===G_WATER&&m.wb&&m.wb[(y+dy)*w+x+dx]===W_STREAM){near=true;break;}}
+    if(inBand||near)m.g[i]=G_SAND;}
+  m.banksOK=2;}
 function repaintTile(tx,ty){var m=M();if(!L.gcv||!L.groundOK||tx<0||ty<0||tx>=m.w||ty>=m.h)return;var i=mi(m,tx,ty);
   if(L.rqf&&L.rqf[i]){L.rqf[i]=0;L.rqn--;}if(inView((tx+0.5)*T,(ty+0.5)*T,T))L.dirty=true;var x=L.gcv.getContext('2d');paintTileInto(x,m,tx,ty);
   if(overlaid(m,tx,ty)){x.save();x.beginPath();x.rect(tx*T,ty*T,T,T);x.clip();paintRooms(x,m,tx,ty);paintFlats(x,tx,ty);x.restore();}L.gbk[i]=bucketKey(m,i);}
@@ -2158,18 +2167,23 @@ defObj('fence',{base:46,name:'Fence',keyOf:function(o){return 'f'+fenceMask(o);}
 function wallMask(o){var ob=LS().objs,m=0;function has(dx,dy){return ob.some(function(p){return (p.k==='wall'||(dy===0&&(p.k==='gate'||p.k==='fence')))&&p.tx<=o.tx+dx&&o.tx+dx<p.tx+p.fw&&p.ty===o.ty+dy;});}
   if(has(1,0))m|=1;if(has(-1,0))m|=2;if(has(0,-1))m|=4;if(has(0,1))m|=8;return m;}
 var WALL_H=76,WALL_CAP=12;
-defObj('wall',{base:60,name:'Wall',keyOf:function(o){return 'w'+(o.v||'p')+wallMask(o);},spr:function(o){var msk=wallMask(o),stone=o.v==='s',H=WALL_H,cap=WALL_CAP,pb=new PB(64,64+H+cap),base=64+H+cap-4,cx=32;
+// A wall on the last tile of a floor sits on the floor's outer edge, so no floor shows outside it. side -1: left edge, 1: right edge.
+function inG(g){return g===G_FLOOR||g===G_TILE||g===G_HALL;}
+function wallSide(o){var m=M();if(!m)return 0;var c=inG(mget(m,o.tx,o.ty)),l=inG(mget(m,o.tx-1,o.ty)),r=inG(mget(m,o.tx+1,o.ty));
+  if(c&&!r&&l)return 1;if(c&&!l&&r)return -1;if(!c&&l&&!r)return -1;if(!c&&r&&!l)return 1;return 0;}
+defObj('wall',{base:60,name:'Wall',keyOf:function(o){var msk=wallMask(o);return 'w'+(o.v||'p')+msk+'s'+((msk&3)===3?0:wallSide(o));},spr:function(o){var msk=wallMask(o),stone=o.v==='s',H=WALL_H,cap=WALL_CAP,pb=new PB(64,64+H+cap),base=64+H+cap-4,sd=(msk&3)===3?0:wallSide(o),cx=32+sd*20;
   var F=stone?'#a3a7ad':'#efe8da',F2=stone?'#8f949b':'#ded5c3',FD=stone?'#6d7279':'#b9ad94',C=stone?'#6f747c':'#b8ab92',CD=stone?'#575b62':'#9a8e76';
-  var side=(msk&3)||!(msk&12),x0=(msk&2)||(side&&!(msk&1)&&!(msk&2))?0:cx-12,x1=(msk&1)||(side&&!(msk&1)&&!(msk&2))?64:cx+12;if(!side){x0=cx-12;x1=cx+12;}
+  var L0=(msk&2)?0:Math.max(0,cx-12),R0=(msk&1)?64:Math.min(64,cx+12);
+  var side=(msk&3)||!(msk&12),x0=(msk&2)||(side&&!(msk&1)&&!(msk&2)&&!sd)?0:L0,x1=(msk&1)||(side&&!(msk&1)&&!(msk&2)&&!sd)?64:R0;if(!side){x0=Math.max(0,cx-12);x1=Math.min(64,cx+12);}
   // the face, seen from the front, unless another wall stands in front of it
   if(!(msk&8)||side){var fy0=base-H;pb.rect(x0,fy0,x1-x0,H,F);
     if(stone){for(var r=0;r*12<H;r++){var off=(r%2)*10;for(var bx=x0-off;bx<x1;bx+=20){var a=Math.max(x0,bx),b2=Math.min(x1,bx+19);if(b2-a>2){pb.rect(a,fy0+r*12+1,b2-a,10,((bx+r*7)&16)?F:F2);pb.rect(a,fy0+r*12+10,b2-a,1,FD);}}pb.rect(x0,fy0+r*12,x1-x0,1,FD);}}
     else{pb.rect(x0,fy0+H-10,x1-x0,10,F2);pb.rect(x0,fy0+H-10,x1-x0,1,FD);for(var q=0;q<4;q++)pb.set(x0+((q*17+o.tx*5)%Math.max(1,x1-x0)),fy0+12+q*13,F2);}
     pb.rect(x0,base-2,x1-x0,2,FD);}
   // the top: the wall's thickness seen from above, reaching up to the wall behind
-  var cy=base-H-cap,top=(msk&4)?cy-64:cy;pb.rect(Math.max(0,(msk&2)?0:cx-12),top,((msk&1)?64:cx+12)-((msk&2)?0:cx-12),cy+cap-top,C);
-  if(msk&4)pb.rect(cx-12,top,24,cy-top+cap,C);pb.rect((msk&2)?0:cx-12,cy+cap-2,((msk&1)?64:cx+12)-((msk&2)?0:cx-12),2,CD);
-  ink(pb);return mk(pb,cx,base);}});
+  var cy=base-H-cap,top=(msk&4)?cy-64:cy;pb.rect(L0,top,R0-L0,cy+cap-top,C);
+  if(msk&4)pb.rect(Math.max(0,cx-12),top,Math.min(64,cx+12)-Math.max(0,cx-12),cy-top+cap,C);pb.rect(L0,cy+cap-2,R0-L0,2,CD);
+  ink(pb);return mk(pb,32,base);}});
 defObj('gate',{fw:2,base:46,name:'Gate',walk:true,spr:function(o){var pb=new PB(128,64),base=56;[2,120].forEach(function(x){pb.rect(x,base-46,6,46,'#a8673a');pb.rect(x,base-46,2,46,'#c68450');});
   for(var s=0;s<7;s++){var x=12+s*15;pb.rect(x,base-36,8,34,'#c68450');pb.rect(x,base-36,8,1,'#d9a066');pb.rect(x+7,base-36,1,34,'#8e4f26');}
   pb.rect(10,base-30,108,4,'#8e4f26');pb.rect(10,base-12,108,4,'#8e4f26');pb.line(12,base-10,116,base-30,'#8e4f26');pb.line(12,base-9,116,base-29,'#8e4f26');pb.rect(60,base-22,6,3,'#2a2a2e');ink(pb);return mk(pb,64,base);}});

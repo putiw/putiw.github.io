@@ -31,13 +31,13 @@ if(!html.includes('id="tb-info"')||!html.includes('<div id="info-alerts"')||!htm
 console.log('PASS duplicate details fold away, header lines align and the first feed is highlighted');
 if(!html.includes("+[['no3','NO₃'],['kh','KH'],['gh','GH'],['temp','Temp']]"))throw Error('Top readings should show nitrate, KH, GH and temperature in order');
 if(!html.includes('#vwater{gap:3px;margin:0 0 0 auto;flex-wrap:nowrap;flex:0 0 auto}')||!html.includes('<div class="readrow" id="readrow">'))throw Error('Hunger, nutrition and water readings should share one compact line');
-if(!html.includes("$('vitals').hidden=!sh;"))throw Error('Hunger and nutrition should show once there are shrimp');
+if(!html.includes("$('vitals').hidden=!sh||"))throw Error('Hunger and nutrition should show once there are shrimp');
 console.log('PASS top readings show NO₃, KH, GH, pH and temperature');
 const tradeStart=html.indexOf('id="sellcard"'),hist=html.indexOf('id="trade-colcard"'),sales=html.indexOf('id="trade-sales-rules"'),sellAge=html.indexOf('id="s-sellAge"'),sellAction=html.indexOf('id="btn-sellall"'),price=html.indexOf('id="s-price"'),salesDetails=html.indexOf('<summary>Sales details</summary>');
 if(!(tradeStart>=marketStart&&tradeStart<hist&&hist<sales&&sales<sellAge&&sellAge<sellAction&&sellAction<price&&price<salesDetails&&salesDetails<marketEnd))throw Error('Trade should combine an independent colony histogram, sales rules, sell action, price and folded sales details in that order');
 if(html.includes('id="rulescard"')||html.includes('id="trade-gradebars"')||html.includes('id="trade-gradeline"')||html.includes('id="trade-berried"'))throw Error('Merged Trade card should retain only the colony histogram from the old Colony panel');
 if(!html.includes("$('sellcard').hidden=lt||!(sh&&(G.stats.born>0||G.stats.sold>0||G.opt.all))"))throw Error('Sales rules should appear as soon as the first shrimp are born');
-if(!html.includes("f.hidden=!sh||!n.feed;w.hidden=!kit||!n.wc;se.hidden=!sh||!n.sell;")||!html.includes("feed:G.tanks.some(function(t){return !t.feeder;})")||!html.includes("sell:!(labMode()&&!G.opt.all)"))throw Error('Top Feed, Water and Sell actions should stay until every tank automates them, and Sell until shrimp all go to kits');
+if(!html.includes("f.hidden=!sh||!n.feed||emp;w.hidden=!kit||!n.wc||")&&html.includes("se.hidden=!sh||!n.sell||")||!html.includes("feed:G.tanks.some(function(t){return !t.feeder;})")||!html.includes("sell:!(labMode()&&!G.opt.all)"))throw Error('Top Feed, Water and Sell actions should stay until every tank automates them, and Sell until shrimp all go to kits');
 if(!html.includes("activeTab==='up'&&!G.opt.visitedUp")||!html.includes("g.tab==='up'&&o.visitedUp"))throw Error('Equipment tab guidance dot should be remembered as seen after visiting');
 if(!html.includes("var CARD_GROUP={kits:'k',staff:'k',korder:'k'};"))throw Error('Sales rules and colony toggles should not be coupled by spotlight grouping');
 console.log('PASS Trade combines independent colony/sales toggles; actions persist and Equipment dot clears after visit');
