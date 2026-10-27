@@ -1015,3 +1015,17 @@ Step 4 of the tab cleanup.
 - The card shows the front page (latest story, Earlier stories), the effects line, then a Science heading with its latest story and its own Earlier fold. Old saves keep their old stories on the front page.
 - The Shrimp Times order is set to last in `updateRipple` too (it used to set 2).
 - Balance 79 (sim check for the tag, markup check), academy 10, me 46. Checked in Playwright at 390 px.
+
+## Pass 123: Text fixes from the 28 Oct text review
+
+- No free bottleneck advice: the Next-bar lines for packers, bigger farms, new regions, the farm license and the first grow rack are gone (`packer`, `farmtier`, `reg1`, `lic`, `rack`). "Adoption ceiling reached" and "Production is short of working capital" (behind !!) show only while the consultants are in (`consultHas` in `empTips`); the ceiling one now points at Ads, not a Business tab.
+- Gear farm hint names what the next farm waits for: "after the ocean ranching permit in Gear", or "its permit comes once Europe is open", "its blueprint comes once you have the ocean permit and East Asia is open".
+- Farm license role line uses the real rack price (`farmCost(G,FARMS[0])`, AED 1,200).
+- Speed: tooltip says 4× after your first farm and 40× once 4B people have a tank (`HARD_AT`); the speed4 spotlight and its fire line say farm; the million-owners log line says 12×.
+- Shops: "Mall stores open once 50 kits are sold and you run a shrimp boutique or have Dubai open." The ? Ideas line no longer says "in Ads" on the Ads tab.
+- Out of money: "Farms sell back in Gear, shops close for some money back in Ads."
+- One word for the player: farm. Card "Hatcheries & breeding" is "Farms"; tutorial, spotlight, consultant and help lines say farms. Tier names (Industrial hatchery, Mega hatchery) and story lines about a real hatchery stay.
+- Pointers moved with the tabs: regions are in Ads (consultant fix line, ? Ideas, reveal toast, the soft guide), packers are under Making kits.
+- Dead code: `descriptions` and `titles` objects deleted; the old "A place of your own" card body is gone (`renderHouse` only hides the card), its click handler too.
+- USD in the Lab stays on purpose.
+- Balance 80 (text-fix check), academy 10, me 46.

@@ -560,6 +560,10 @@ if(html.includes('id="c-op"')||!/<div id="e-proj"><\/div>\s*<div id="op-wrap" hi
 if(!html.includes("move('c-reg','promote',rv('ereg'))")||!html.includes('<div id="coin-island"></div>'))throw Error('Regions in Ads, Shrimp Island in the coast card');
 if(!html.includes('class="treats adrow"')||!html.includes('<details class="store-close"><summary>Close stores</summary>'))throw Error('One-off ads as a button row, store closing in a fold');
 count++;console.log('PASS Pass 121 Ads and World tabs');
+// Pass 123: text fixes. No free bottleneck lines in the Next bar, ceiling and working-capital alerts only with consultants
+for(const k of ["key:'packer'","key:'farmtier'","key:'reg1'","key:'lic'","key:'rack'","var descriptions={","in Business","after a project in Gear","40× speed unlocked","Grow racks start at AED 2,000","Hatcheries &amp; breeding"])if(html.includes(k))throw Error('Text fix not applied: '+k);
+if(!/function empTips\(\)\{[\s\S]{0,700}if\(!consultHas\(G\)\)return out;\s*if\(G\.humans>=K\*0\.97/.test(html))throw Error('Bottleneck alerts only while consultants are in');
+count++;console.log('PASS Pass 123 text fixes');
 check('Pass 122: lab finds, funded studies and university news go to the Science section',`
 var g=newGame();g.kits.sold=100;newsLine(g,'front');newsLine(g,'lab',1);var L=rip(g).log;if(L.length!==2||L[0].sci||!L[1].sci)throw Error('newsLine sci tag');
 g.emp.later=[{d:0,t:'study',sci:1}];g.day=1;laterDay(g);if(!rip(g).log[2].sci)throw Error('later study news keeps the tag');

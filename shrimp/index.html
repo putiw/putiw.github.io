@@ -625,7 +625,7 @@ h1,h2,h3,h4,summary,button,.btn,label,th,.scope-label{text-wrap:balance}p,li,sma
   <div class="card coll" data-k="shops" id="c-shops" hidden><div class="hd"><h2>Shops</h2><small id="e-shopsum"></small></div>
     <p class="sub explain">Mall stores: people trust a brand they can walk into. Trust is how well word of mouth works in a region: 60% with none of your stores (85% at home in Abu Dhabi), 100% once one mall in five has your store. Every new region adds to the count. You can close stores, the fit-out is not refunded. Each store is a one-off fit-out, then rent, license and staff every day, and brings its own kit orders and influence ✦. You open one at a time at first, 10 at a time once you run 10, 100 once you run 100. Small shops: more shrimp customers and a few kit orders, trade license AED 12,000/yr, rent paid yearly, each extra of a type costs 15% more.</p>
     <div id="e-stores"></div><div id="e-shops"></div></div>
-  <div class="card coll" data-k="farms" id="c-farms" hidden><div class="hd"><h2>Hatcheries &amp; breeding</h2><small id="e-farmsum"></small></div><div id="e-farms"></div></div>
+  <div class="card coll" data-k="farms" id="c-farms" hidden><div class="hd"><h2>Farms</h2><small id="e-farmsum"></small></div><div id="e-farms"></div></div>
   <div class="card coll" data-k="owners" id="c-owners" hidden><div class="hd"><h2>Owners’ tanks</h2><small id="ow-sum"></small></div><div id="ow-body"></div></div>
   <div class="card coll" data-k="reg" id="c-reg" hidden><div class="hd"><h2>Regions</h2><small id="e-regsum"></small></div>
     <p class="sub explain">Kit buyers only come from open regions, up to your adoption ceiling.</p>
@@ -833,7 +833,7 @@ var PROJ=[
   {id:'landwet',c:'fork',a:'up',fk:'land',name:'Drain a wetland',d:'Cheap, flat, already wet, nobody farms it. Mega hatcheries cost 38% less. Birds stop there on the way south.',m:0,i:0,h:-3,req:function(G){return (G.emp.farms.hatch||0)>0&&G.kits.sold>=5000;},later:{d:240,t:'The birds that used to stop at the old wetland fly on now. Nobody knows where they go.'},end:'A filled wetland, and birds that don’t stop anymore.'}
 ];
 // Choices: two answers to one problem. The question shows once above both.
-var FORK_Q={science:'Companies are offering your postdocs three times their pay.',labname:'The university wants to name the new marine lab after someone.',study:'A university wants to run a big study on shrimp and stress.',gene:'Your lab found the gene behind the cherry red.',paper:'The Shrimp Times makes fun of you every week.',welfare:'Lawmakers want a pet welfare law, it would cover shrimp too.',fish:'Fishing towns lose work as more people keep shrimp as pets. The crews need new jobs.',breeder:'A small breeder down the road sells kits too.',ship:'Some shrimp die in the mail.',culls:'Low-grade shrimp pile up at the farms.',filter:'The kit filter could be built better.',food:'Owners keep asking what to feed.',layoff:'The robots can do the packers\u2019 jobs now.',reviews:'Your shop page only has a few reviews.',kids:'A children\u2019s TV channel wants your ads. The same money would buy kits for schools.',data:'An ad company wants to buy your owner data.',waste:'Cleaning the water from your hatcheries costs a lot.',land:'The next mega hatchery needs a lot of land.'};
+var FORK_Q={science:'Companies are offering your postdocs three times their pay.',labname:'The university wants to name the new marine lab after someone.',study:'A university wants to run a big study on shrimp and stress.',gene:'Your lab found the gene behind the cherry red.',paper:'The Shrimp Times makes fun of you every week.',welfare:'Lawmakers want a pet welfare law, it would cover shrimp too.',fish:'Fishing towns lose work as more people keep shrimp as pets. The crews need new jobs.',breeder:'A small breeder down the road sells kits too.',ship:'Some shrimp die in the mail.',culls:'Low-grade shrimp pile up at the farms.',filter:'The kit filter could be built better.',food:'Owners keep asking what to feed.',layoff:'The robots can do the packers\u2019 jobs now.',reviews:'Your shop page only has a few reviews.',kids:'A children\u2019s TV channel wants your ads. The same money would buy kits for schools.',data:'An ad company wants to buy your owner data.',waste:'Cleaning the water from your farms costs a lot.',land:'The next mega hatchery needs a lot of land.'};
 function forkDone(G,fk){return PROJ.some(function(x){return x.fk===fk&&G.emp.proj[x.id];});}
 function forkOpts(fk){return PROJ.filter(function(x){return x.fk===fk;});}
 // Heart: what kind of company you ran. Never shown as a number, the ending shows it.
@@ -1062,7 +1062,7 @@ function handStep(G){var E=G.emp,w=E.kitWip||(E.kitWip={mat:0,shrimp:0}),st=w.st
  for(var j=0;j<PACK_STEPS.length;j++){var s2=PACK_STEPS[j];if(st[s2.id])continue;if(!hasTool(G,s2.id))break;if(s2.id==='catch'&&!w.shrimp){if(!takeKitShrimp(G))break;w.shrimp=1;}st[s2.id]=1;}
  if(PACK_STEPS.every(function(x){return st[x.id];})){E.kitWip={mat:0,shrimp:0};G.kits.stock++;E.packedTotal=(E.packedTotal||0)+1;E.handPacked=(E.handPacked||0)+1;if(E.handPacked===1)log(G,'Packed your first kit by hand');return {did:did,kit:true};}
  return {did:did};}
-var LINE={m:150000,i:0,out:400,note:'Packs hatchery shrimp into kits. Materials, delivery and electricity are charged separately.'};
+var LINE={m:150000,i:0,out:400,note:'Packs farm shrimp into kits. Materials, delivery and electricity are charged separately.'};
 var PACK_LINES=[
  {id:'line',name:'Robotic packing line',cost:150000,out:400,up:20,sold:300,supply:10},
  {id:'hall',name:'Automated packing hall',cost:8e6,out:12000,up:2400,sold:10000,supply:250},
@@ -1158,12 +1158,12 @@ function bottleneck(G){
  if(E.won)r={k:'complete',d:'Everyone has a tank.',f:'Look back at how you got here, or keep playing.'};
  else if(painMult(G)<1&&painNote(G))r={k:'pain',d:'Slowed: '+painNote(G)+'. Orders and breeding run at part speed until then.',f:'Nothing to do but wait, or keep building.'};
  else if(Object.keys(E.farms).some(function(k){return E.farms[k]>0;})&&!fc)r={k:'paused',d:'Limit: breeding is mothballed.',f:'Restart a farm, or sell spare assets for cash.'};
- else if(kitCap(G)-G.humans<Math.max(5,d*10))r=nextRegion(G)?{k:'ceiling',d:'Limit: reach. Almost everyone willing already owns a tank.',f:'Open the next region or raise adoption in World.'}:hardOpen(G)?{k:'ceiling',d:'Limit: the hard part. Every region is open, the homes left need something done about them first.',f:'Work through the groups in The hard part, in World.'}:{k:'ceiling',d:'Limit: reach. Every region is open and almost everyone willing already owns a tank.',f:'Raise adoption with Ads and World projects.'};
+ else if(kitCap(G)-G.humans<Math.max(5,d*10))r=nextRegion(G)?{k:'ceiling',d:'Limit: reach. Almost everyone willing already owns a tank.',f:'Open the next region in Ads or raise adoption in World.'}:hardOpen(G)?{k:'ceiling',d:'Limit: the hard part. Every region is open, the homes left need something done about them first.',f:'Work through the groups in The hard part, in World.'}:{k:'ceiling',d:'Limit: reach. Every region is open and almost everyone willing already owns a tank.',f:'Raise adoption with Ads and World projects.'};
  else if(G.kits.stock<d*3&&sup<d*.95){
   if(!pc)r={k:'packing',d:'Limit: packing. Nobody packs kits daily.',f:'Pack by hand, then buy a packing bench in Kits.'};
   else if(pc<Math.min(d,fc+(E.rawShrimp||0)/KIT_SHRIMP))r={k:'packing',d:'Limit: packing. Packs '+big(pc)+'/day, breeding supports '+big(fc)+'.',f:'More packers or machines in Kits.'};
   else if(G.money<operatingReserve(G)+productionUnitCost(G))r={k:'cash',d:'Limit: cash. Production pauses to protect your reserve.',f:'Earn cash first, or lower the reserve under Money.'};
-  else r={k:'shrimp',d:'Limit: breeding. Supports '+big(fc)+' kits/day, orders '+big(d)+'.',f:'Add hatcheries in Gear.'};
+  else r={k:'shrimp',d:'Limit: breeding. Supports '+big(fc)+' kits/day, orders '+big(d)+'.',f:'Add farms in Gear.'};
  }
  else if(wordOfMouth(G)<0.75&&G.humans>=2e4)r={k:'demand',d:'Limit: marketing. Only '+Math.round(wordOfMouth(G)*100)+'% of the word of mouth you could have is reaching people. The bigger you get, the more marketing it takes.',f:'More stores, ads and brand work in Ads.'};
  else if(G.kits.stock>Math.max(10,d*14))r={k:'demand',d:'Limit: buyers. Kits pile up unsold.',f:'Lower the kit price or add marketing before more capacity.'};
@@ -1212,7 +1212,7 @@ function mallsTotal(G){var t=0;REGIONS.forEach(function(r){if(regOpen(G,r.id))t+
 function storeFit(G,r){return Math.round(STORE_FIT*MALL_F[r]);}
 function storeDay(G,r){return STORE_DAY*MALL_F[r];}
 function storeDayCost(G){var t=0,s=G.emp.stores||{};for(var k in s)t+=s[k]*storeDay(G,k);return t;}
-// Mall stores open after a shrimp boutique, or once you open Dubai.
+// Mall stores open at 50 kits sold, after a shrimp boutique or once you open Dubai.
 function storesOn(G){return kitsOpen(G)&&G.kits.sold>=50&&(storeCount(G)>0||G.emp.regions.length>1||(G.emp.shops.bout||0)>0);}
 // You open one store at a time at first. Running 10 stores lets you open 10 at once, 100 lets you open 100, 1,000 lets you open 1,000.
 function storeBatchMax(G){var n=storeCount(G);return n>=1000?1000:n>=100?100:n>=10?10:1;}
@@ -1405,7 +1405,7 @@ function empireDay(G){
     }
     E.fastDays=(pd(G,'autopackm')&&fc>=10&&sold>0&&E.packed>=sold&&sold*(G.kitPrice/1.05-productionUnitCost(G))-fixedOverhead(G)>=FAST_PROFIT)?(E.fastDays||0)+1:0;
     if(E.fastDays>=7)E.fastReady=true;
-    if(E.fastReady&&G.humans>=1e6&&!E.fastUnlocked){E.fastUnlocked=true;log(G,'A million owners: 40× speed unlocked');}
+    if(E.fastReady&&G.humans>=1e6&&!E.fastUnlocked){E.fastUnlocked=true;log(G,'A million owners: 12× speed unlocked');}
     if(!E.won&&!hardOpen(G)&&G.humans>=WORLD-0.5){G.humans=WORLD;E.won=Math.floor(G.day);log(G,'Every human on Earth now owns a shrimp tank');}
   }
 }
@@ -1974,7 +1974,7 @@ var MILESTONES={
   sale:{title:'Your first shrimp sale',body:"You bred and sold your own shrimp. Money from shrimp you breed pays for the next upgrade, ads in the Ads tab bring more buyers.",tab:'market'},
   kits:{chapter:"Chapter 3",title:"The first box",body:"A customer asks if you sell the whole thing, tank, food, shrimp, instructions. You say yes before you even know how. That night the kitchen table turns into a packing table, bags, a borrowed oxygen bottle, a pile of boxes.\n\nNew: the packing table in Kits. Every kit is five steps by hand, tools take over one step at a time.",tab:"emp"},
   kit:{title:"Your first kit reached a customer",body:"Now survival and referrals matter, happy owners tell their friends. A care guide in each kit helps with both.",tab:"emp"},
-  farm:{chapter:"Chapter 4",title:"The warehouse",body:"The first rack is running in a rented unit in Mussafah, rows of tanks under grow lights, all copies of your recipe. There are shrimp being born now that you will never see.\n\nNew: hatcheries breed, the Kits tab packs, the Ads tab sells. Your first tank stays at home.",tab:"up"},
+  farm:{chapter:"Chapter 4",title:"The warehouse",body:"The first rack is running in a rented unit in Mussafah, rows of tanks under grow lights, all copies of your recipe. There are shrimp being born now that you will never see.\n\nNew: farms breed, the Kits tab packs, the Ads tab sells. Your first tank stays at home.",tab:"up"},
   ministry:{title:'The Ministry',body:"Pick a message and see what happens. Some are true, some just work.",tab:'world'},
   million:{chapter:"Chapter 5",title:"A million tanks",body:"Tonight a million people are watching shrimp eat moss. Your inbox is full of tank photos, you stopped opening them in March. AI agents answer care questions in forty languages.\n\nNew: 12× speed. World is where it grows, regions, universities, media, politics and nature.",tab:"world"},
   tenyears:{title:"Ten years",body:"Ten years since Grandma gave you the tank. Not every home has one yet. You can keep going.",tab:"emp"},
@@ -1982,7 +1982,7 @@ var MILESTONES={
   health:{intro:1,title:"A health check",body:"Shrimp get sick sometimes, bad molts, infections, tiny flatworms that come in with new shrimp. Find the sick ones, look at what's wrong, pick the cure.\n\nIf you leave it, it spreads, colour fades and more die every day. Leave it long enough and the whole tank dies. Try it: tap the tank, then Check shrimp.",tab:"tank"},
   qc:{intro:1,title:"Quality checks",body:"A kit with a sick shrimp dies in someone\u2019s living room, and they don\u2019t buy another one.\n\nBefore shrimp get packed, test the water, look them over and salt dip the batch. By hand for now, once a month. Later you can buy a machine for each step.",tab:"emp"},
   tools:{intro:1,title:"Automate one step",body:"Five taps a kit gets old fast. Each packing tool takes over one step.\n\nGet all five and you have a packing station, it packs a kit a day and you can hire packers. Try it: the first tool under Making kits.",tab:"emp"},
-  station:{intro:1,title:"The packing station",body:"All five tools on one table. It packs a kit a day now, you can still pack by hand too.\n\nPackers cost AED 35 a day each and pack about 3 more a day. Only hire when orders are more than you can keep up with, Packing & staff in Kits.",tab:"emp"},
+  station:{intro:1,title:"The packing station",body:"All five tools on one table. It packs a kit a day now, you can still pack by hand too.\n\nPackers cost AED 35 a day each and pack about 3 more a day. Only hire when orders are more than you can keep up with, under Making kits in Kits.",tab:"emp"},
   bulk:{intro:1,title:"Bulk orders",body:"Sometimes schools, hotels or hospitals want a lot of kits at once, for a better price.\n\nThey only show up when you can pack more than your customers buy. If you accept, part of each day's packing goes to the order until it's full, then it ships.",tab:"emp"},
   worldtab:{intro:1,title:"The World tab",body:"Kit buyers only come from regions you opened, and not everyone there wants a tank.\n\nRegions add people. University, Media, Politics and Nature make more of them want one. Some things cost money, some need ✦, people who owe you a favour.",tab:"world"},
   ripple:{intro:1,title:"The Shrimp Times",body:"One of your customers started a parody account. It\u2019s called The Shrimp Times, and it\u2019s about you.\n\nNew issues show up in World.",tab:"world"},
@@ -2149,8 +2149,8 @@ function ideas(G){
   if(farmBuilt(G)&&(farmCap(G)>=10||G.humans>=5000)){out=[];
     if(FARMS.some(function(f){return farmBuyable(G,f);}))add('Bigger farms in Gear breed more shrimp for kits.','up','farmup');
     if(projAvail(G).some(function(p){return p.id==='aicam'||p.id==='autopackm';})||PACK_LINES.some(function(l,i){return lineReady(G,i)&&!lineCount(G,i);}))add('Packing machines in Kits pack more kits a day.','emp','packup');
-    if(nextRegion(G)&&(typeof rv!=='function'||rv('ereg')))add('New regions in World open more of the world.','world','region');
-    add('Ads, shops and mall stores in Ads spread the word.','promote','mkt');
+    if(nextRegion(G)&&(typeof rv!=='function'||rv('ereg')))add('New regions in Ads open more of the world.','promote','region');
+    add('Ads, shops and mall stores spread the word.','promote','mkt');
     if(academyOpen(G)&&!rlStaff(G))add('The Lab can make kits cheaper and farms better.','research','lab');
     if(G.emp.consultSeen)add('Not sure what holds you back? Consultants behind your cash read the business for you.','fin','consult');
     return out.slice(0,3);}
@@ -2171,7 +2171,7 @@ function phaseInfo(G){
   if(!kitsOpen(G))return cg?{name:cname,goal:cg.t,body:cg.why,tab:G.ob.up?'up':'tank',cost:cc}:{name:'Next',goal:'Grow the colony',body:'Your tanks are set up. Breed and sell.',tab:'tank'};
   if(!farmBuilt(G))return cg?{name:cname,goal:cg.t,body:cg.why,tab:cg.id==='rack'?'up':'emp',cost:cc}:{name:'Next',goal:'A grow rack',body:'Racks breed shrimp for kits. Needs the farm license.',tab:'up'};
   if(G.humans<1e6)return {name:'Producer',goal:'One million owners · '+cnt(G.humans),body:'Farms breed, the Kits tab packs, the Ads tab sells.',tab:'emp'};
-  return {name:'Global organizer',goal:G.emp.won?'Everyone has a tank':'Everyone on Earth · '+cnt(G.humans)+' / 8.2B',body:'Regions and culture in World raise how many will adopt.',tab:'emp'};
+  return {name:'Global organizer',goal:G.emp.won?'Everyone has a tank':'Everyone on Earth · '+cnt(G.humans)+' / 8.2B',body:'Regions in Ads and culture in World raise how many will adopt.',tab:'emp'};
 }
 
 // Research is available during Earth progression. Grants prepay work. Idle labs
@@ -2792,7 +2792,7 @@ function brokeOpts(G){var E=G.emp,d=debtOf(G),o=[],inc=dayIncome(G);
  if(!E.bank&&(G.kits.sold>=100||inc>200))o.push(['Bank loan, '+fmtA(Math.max(d*1.5,5000)),'Paid back monthly with interest. Miss three payments and the bank takes '+(farmBuilt(G)?'a farm':'your van')+'.','bank']);
  var fb=farmBuilt(G);if(!E.shark)o.push(['Borrow from a man at the market, '+fmtA(d*1.2+1000),'Cash tonight. Pay back 30% more in two months, or they come for '+(fb?'a farm':'your shrimp')+'.','shark']);
  if(!dirtyOn(G)&&!E.turned&&(((G.me&&G.me.cnt.fight)||0)>0||E.sharkUsed))o.push(['Wash money for someone','The debt is gone by tomorrow. Someone from fight night will be in touch.','wash']);
- o.push(fb?['Sell something myself','Farms and shops sell back at half price in Kits. You have a week.','sell']:['Sell shrimp myself','Sell on the Trade tab, the pet shop always buys. You have a week.','sell']);
+ o.push(fb?['Sell something myself','Farms sell back in Gear, shops close for some money back in Ads. You have a week.','sell']:['Sell shrimp myself','Sell on the Trade tab, the pet shop always buys. You have a week.','sell']);
  if(d>Math.max(1500,365*inc*0.25))o.push(['Declare bankruptcy, the game ends here','The bank takes what’s left. You see your ending.','bankrupt']);
  return o;}
 function brokePick(G,i){var E=G.emp,o=brokeOpts(G)[i];if(!o)return false;var id=o[2],d=debtOf(G),now=Math.floor(G.day);delete ensureProgress(G).seen.broke;E.brokeSnooze=now+7;
@@ -3550,7 +3550,9 @@ function empTips(){
   if(due>0&&G.money<due)out.push({sev:'warn',t:'Rent and license renewals worth '+aed(due)+' are due within 2 weeks, and you have '+aed(G.money)+'.'});
   if(!kitsOpen(G))return out;
   var d=kitDemand(G),K=kitCap(G);
-  if(G.humans>=K*0.97&&nextRegion(G))out.push({sev:'warn',t:'Adoption ceiling reached. Open the next region or raise the ceiling in Business.'});
+  // Bottleneck reads only while the consultants are in (rule: no free bottleneck advice).
+  if(!consultHas(G))return out;
+  if(G.humans>=K*0.97&&nextRegion(G))out.push({sev:'warn',t:'Adoption ceiling reached. Open the next region in Ads.'});
   if(farmCap(G)>0&&G.money<operatingReserve(G)+Math.min(farmCap(G),kitDemand(G))*productionUnitCost(G)&&G.emp.prod<farmCap(G)*KIT_SHRIMP*0.5)out.push({sev:'warn',t:'Production is short of working capital. Tap your cash to check the reserve.'});
   return out;
 }
@@ -3816,12 +3818,12 @@ function updateReveal(){
   if(G.stats.sold>0||(had&&sellableStock(G)>0))fire('sell','Ads tab open: ads bring buyers.');
   if(had&&(G.ob.feeds>=3||G.stats.born>0||G.stats.sold>0||T0.chem.temp>27.5||T0.chem.temp<20))fire('up','Gear tab open.');
   if(G.stats.born>0&&(G.ob.feeds||0)>=1)fire('look','Tap the tank to check your shrimp up close or clean the glass.');
-    if(farmBuilt(G))fire('speed4','4× is now available: your first hatchery is running.');if(maxSpeed(G)>=12)fire('speed12','12× is now available: a million owners and a profitable automated business.');if(maxSpeed(G)>=40)fire('speed40','40× is now available: everyone on Earth has a tank.');
+    if(farmBuilt(G))fire('speed4','4× is now available: your first farm is running.');if(maxSpeed(G)>=12)fire('speed12','12× is now available: a million owners and a profitable automated business.');if(maxSpeed(G)>=40)fire('speed40','40× is now available: everyone on Earth has a tank.');
   if(kitsOpen(G)){var E0=G.emp,sc0=shopCount(G);
     if(kitsOpen(G)&&(G.kits.sold>=10||Object.keys(G.emp.proj).length))fire('eproj','Projects open.');
     if(o.eproj&&(G.kits.sold>=30||sc0>0))fire('eshops','Shops open in Ads.');
-    if(o.eshops&&(G.kits.sold>=100||E0.regions.length>1))fire('ereg','Regions open in World.');
-    if(pd(G,'farmlic'))fire('efarm','Hatcheries open in Gear.');}
+    if(o.eshops&&(G.kits.sold>=100||E0.regions.length>1))fire('ereg','Regions open in Ads.');
+    if(pd(G,'farmlic'))fire('efarm','Farms open in Gear.');}
   if(G.stats.born>0&&!o.hatch){o.hatch=1;}
   // Silent flags: the temperature and room parts of Gear (and room temp in the header) wait until they matter.
   if(!o.temp&&G.tanks.some(function(t){return t.had&&(t.chem.temp>26.5||t.chem.temp<21);}))o.temp=1;
@@ -4043,7 +4045,7 @@ var SPOT_T={look:function(){return document.getElementById('tankview');},market:
  speed4:function(){return document.querySelector('#speed [data-speed="4"]');},speed12:function(){return document.querySelector('#speed [data-speed="12"]');},speed40:function(){return document.querySelector('#speed [data-speed="40"]');},
  eproj:'silent',eshops:'silent',ereg:'silent',efarm:'silent'};
 var SPOT_MSG={look:'Tap the tank to check your shrimp up close or clean the glass.',wc:'Water care is open. Change some water to clear out waste and bring KH and GH back up.',sell:'The Ads tab is open. Ads bring more buyers.',up:'Gear is open. Upgrades for your tank live here.',
- speed4:'4× speed is open. Your first hatchery is running.',speed12:'12× speed is open.',speed40:'40× speed is open.',eproj:'Projects are open. Some cost money, some need ✦.',eshops:'Shops are open. More places sell your kits.',ereg:'Regions are open. Open new ones to reach more people.',efarm:'Hatcheries are open. Grow racks breed shrimp for kits.'};
+ speed4:'4× speed is open. Your first farm is running.',speed12:'12× speed is open.',speed40:'40× speed is open.',eproj:'Projects are open. Some cost money, some need ✦.',eshops:'Shops are open. More places sell your kits.',ereg:'Regions are open. Open new ones to reach more people.',efarm:'Farms are open. They breed shrimp for kits.'};
 function spotlight(target,text){if(G.opt.all)return;SPOTQ.push({t:target,text:text});if(!SPOT){SPOT={wait:1};setTimeout(function(){if(SPOT&&SPOT.wait)SPOT=null;spotNext();},60);}}
 function spotNext(){if(SPOT&&SPOT.on)return;var s=SPOTQ[0];if(!s){SPOT=null;return;}
  var gap=s.now?0:15000-(Date.now()-(spotWatch.last||0));if(gap>0){SPOT={wait:1};setTimeout(function(){SPOT=null;spotNext();},gap);return;}
@@ -4074,7 +4076,7 @@ window.addEventListener('resize',function(){spotPlace();});
 // a card you already used does not need a spotlight later
 document.addEventListener('click',function(e){if(SPOT&&SPOT.on)return;var c=e.target.closest&&e.target.closest('main .card[id]');if(c&&e.target.closest('button,input,select,summary,.hd,[data-act]')){var o=G.opt.spotSeen||(G.opt.spotSeen={});o[c.id]=1;}},true);
 // Every section and tab gets a spotlight the first time it appears on screen.
-var SPOT_INFO={'me-gplace':'Grandma’s place. A bigger flat, a house, then land with a stream you can walk around.','coin-card':'Mangroves are open. Plant a tree on the old shrimp-pond coast when you like. Others start planting too.','hard-card':'The homes left are hard to reach for reasons that have nothing to do with shrimp. First decide what everyone means, then the groups, one at a time.','rl-card':'Fund researchers in as many fields as you like, every year until you stop. What they find is luck.','feedcard':'Pick the food and how much they get. The Feed button up top feeds them.','wccard':'How much water a change swaps, and what the new water is like. The Water button up top does the change.','wtcard':'All your test kit readings. Tap one to see what moves it.','carecard':'Health checks when someone looks sick, and treats.','colcard':'Ages and colour grades of everyone in the tank.','charts':'How the water and the colony changed, day by day.','logcard':'Everything that happened lately.','next-card':'Something to save for, it makes the tank better or bigger.','ordercard':'A pet shop wants shrimp. They pay more, but want a set number by a deadline.','buycard':'Buy shrimp here. They stay as breeders, you never sell them.','sellcard':'Sell what\u2019s ready and set your price. The sales rules work fine as they are.','excelcard':'An Excel course gets you charts of where your money goes.','fincard':'Income, spending and cash, day by day.','adscard':'Ads bring more buyers.','equipcard':'Upgrades for the tank you have selected.','tankscard':'Add more tanks for more breeders.','supcard':'Buy supplies in bulk.','autocard':'How much the auto feeder gives and how often the water gets changed.','ovcard':'Every tank in one table, tap a row to open it.','recipecard':'One set of settings for every tank.','c-kits':'A small tank with 8 young shrimp. You pack them and sell them.','qccard':'Check the shrimp before they go into kits, so kits don’t die.','c-staff':'Tools, packers and machines that pack kits.','consultcard':'Pay for a report on what’s slowing you down.','kordercard':'A big buyer wants a lot of kits at once.','c-proj':'Things you can do. Some cost money, some need ✦, people who owe you a favour. Nothing here is required.','c-shops':'Mall stores make people in a region trust you, so word of mouth there spreads faster. Small shops sell shrimp and a few kits.','c-farms':'Grow racks and hatcheries breed shrimp for kits. 8 shrimp make 1 kit, breeding costs AED 12 a kit. Idle farms still pay upkeep. Each extra farm of a type costs 9% more.','lab-card':'Certify your best colony so the farms copy it.','operations-card':'How much stock and cash to keep on hand.','c-owners':'How the tanks you sold are doing.','c-reg':'Open new parts of the world to more buyers.','op-wrap':'Pick a message for the Ministry to spread. Public mood sets how many people want a tank and how fast word spreads.','ripplecard':'A customer\u2019s satire newsletter about your business.','academy-card':'Fund researchers in six fields. Together they are your lab.','space-card':'Grandma’s next dream.'};
+var SPOT_INFO={'me-gplace':'Grandma’s place. A bigger flat, a house, then land with a stream you can walk around.','coin-card':'Mangroves are open. Plant a tree on the old shrimp-pond coast when you like. Others start planting too.','hard-card':'The homes left are hard to reach for reasons that have nothing to do with shrimp. First decide what everyone means, then the groups, one at a time.','rl-card':'Fund researchers in as many fields as you like, every year until you stop. What they find is luck.','feedcard':'Pick the food and how much they get. The Feed button up top feeds them.','wccard':'How much water a change swaps, and what the new water is like. The Water button up top does the change.','wtcard':'All your test kit readings. Tap one to see what moves it.','carecard':'Health checks when someone looks sick, and treats.','colcard':'Ages and colour grades of everyone in the tank.','charts':'How the water and the colony changed, day by day.','logcard':'Everything that happened lately.','next-card':'Something to save for, it makes the tank better or bigger.','ordercard':'A pet shop wants shrimp. They pay more, but want a set number by a deadline.','buycard':'Buy shrimp here. They stay as breeders, you never sell them.','sellcard':'Sell what\u2019s ready and set your price. The sales rules work fine as they are.','excelcard':'An Excel course gets you charts of where your money goes.','fincard':'Income, spending and cash, day by day.','adscard':'Ads bring more buyers.','equipcard':'Upgrades for the tank you have selected.','tankscard':'Add more tanks for more breeders.','supcard':'Buy supplies in bulk.','autocard':'How much the auto feeder gives and how often the water gets changed.','ovcard':'Every tank in one table, tap a row to open it.','recipecard':'One set of settings for every tank.','c-kits':'A small tank with 8 young shrimp. You pack them and sell them.','qccard':'Check the shrimp before they go into kits, so kits don’t die.','c-staff':'Tools, packers and machines that pack kits.','consultcard':'Pay for a report on what’s slowing you down.','kordercard':'A big buyer wants a lot of kits at once.','c-proj':'Things you can do. Some cost money, some need ✦, people who owe you a favour. Nothing here is required.','c-shops':'Mall stores make people in a region trust you, so word of mouth there spreads faster. Small shops sell shrimp and a few kits.','c-farms':'Farms breed shrimp for kits. 8 shrimp make 1 kit, breeding costs AED 12 a kit. Idle farms still pay upkeep. Each extra farm of a type costs 9% more.','lab-card':'Certify your best colony so the farms copy it.','operations-card':'How much stock and cash to keep on hand.','c-owners':'How the tanks you sold are doing.','c-reg':'Open new parts of the world to more buyers.','op-wrap':'Pick a message for the Ministry to spread. Public mood sets how many people want a tank and how fast word spreads.','ripplecard':'A customer\u2019s satire newsletter about your business.','academy-card':'Fund researchers in six fields. Together they are your lab.','space-card':'Grandma’s next dream.'};
 // Cards you don't need to act on never pop a spotlight. Their ? explains them.
 var SPOT_QUIET=['feedcard','wccard','wtcard','colcard','charts','logcard','equipcard','supcard','autocard','ovcard','fincard','excelcard','next-card','tankscard','operations-card','c-proj','lab-card','ripplecard','c-owners','consultcard','c-staff','c-sales','rl-card','wagecard'];
 var SPOT_TAB={market:'Trade is open.',up:'Gear is open. Upgrades for your tank.',promote:'The Ads tab is open.',emp:'Kits are open. Pack and sell starter kits.',world:'World is open. Owners, the coast and the bigger picture.',research:'The Lab tab is open. The university, research lines and school projects.',space:'Space is open.'};
@@ -5028,7 +5030,7 @@ function updateEmpire(){
       if(!shopBuyable(G,x))return '';
       var up=shopUpfront(G,x);var mg=Math.round((E.staff.aiMgr||E.staff.mgr*4>shopCount(G)?1:.5)*100),fc=shopForecast(G,x);return itemHTML(title,(x.id==='bout'?'Grade 65+ sells for 30% more. ':'')+'+'+x.kits+' kit orders/day · '+aed(x.rent)+'/day rent'+(mg<100?' · '+mg+'% output, needs managers':''),bbtn('shop','data-id="'+x.id+'"',aed(up),G.money>=up+capitalReserve(G)+x.rent*14,true,up+capitalReserve(G)+x.rent*14),(fc?'<p class="impact">'+fc+'</p>':'')+(n?'<div class="mini">'+bbtn('shop-close','data-id="'+x.id+'"','Close one (35% back)',true)+'</div>':''));
     }).join('')+((function(){var old=SHOPS.filter(function(x){return (E.shops[x.id]||0)>0&&!shopBuyable(G,x);});SHOPS.forEach(function(x){if((E.shops[x.id]||0)>0&&!shopBuyable(G,x))rent+=(E.shops[x.id]||0)*x.rent;});
-      var nx=null,t=topIdx(SHOPS,E.shops);if(!storeCount(G)){var ns=SHOPS[t+1];if(ns&&!ns.retired&&!shopOk(G,ns))nx='Next: '+ns.name.toLowerCase()+', opens at '+big([0,100,1000][t+1]||0)+' kits sold.';else if(!storesOn(G)&&kitsOpen(G))nx='Mall stores open after a shrimp boutique, or once you open Dubai.';}
+      var nx=null,t=topIdx(SHOPS,E.shops);if(!storeCount(G)){var ns=SHOPS[t+1];if(ns&&!ns.retired&&!shopOk(G,ns))nx='Next: '+ns.name.toLowerCase()+', opens at '+big([0,100,1000][t+1]||0)+' kits sold.';else if(!storesOn(G)&&kitsOpen(G))nx='Mall stores open once 50 kits are sold and you run a shrimp boutique or have Dubai open.';}
       return (nx?'<p class="hint">'+nx+'</p>':'')+(old.length?'<details class="old-tier"><summary>'+(storeCount(G)?'Small shops you still run: ':'Older shops still open: ')+old.map(function(x){return E.shops[x.id]+' × '+x.name.toLowerCase();}).join(', ')+'</summary>'+old.map(function(x){return itemHTML(x.name+' ×'+E.shops[x.id],'No new ones of these.','','<div class="mini">'+bbtn('shop-close','data-id="'+x.id+'"','Close one (35% back)',true)+'</div>');}).join('')+'</details>':'');})());
     setT('e-shopsum',storesOn(G)?(mallsEmpty(G)?mallsEmpty(G).toLocaleString('en-US')+' stores to go':storeCount(G).toLocaleString('en-US')+' stores'):rent?'AED '+big(rent*365+licFee(G))+'/yr':'');
   }
@@ -5043,7 +5045,7 @@ function updateEmpire(){
         if(!farmBuyable(G,x))return '';
         var wc=farmWorkingCapital(G,x),short=G.money>=farmCost(G,x)&&G.money<farmCost(G,x)+wc;return itemHTML(title,x.note+' '+big(x.out*KIT_SHRIMP)+' shrimp a day = '+big(x.out)+(x.out===1?' kit':' kits')+' · '+aed(x.up)+'/d upkeep.'+(n?' '+activeFarms(G,x.id)+' of '+n+' running.':'')+(short?' Keep '+aed(wc)+' in reserve to buy.':''),bbtn('farm','data-id="'+x.id+'"',aed(farmCost(G,x)),G.money>=farmCost(G,x)+farmWorkingCapital(G,x),true,farmCost(G,x)+farmWorkingCapital(G,x)),(consultHas(G,'fix')?'<p class="impact">After purchase and reserve: '+aed(G.money-farmCost(G,x)-wc)+'. '+purchaseForecast(G,farmCost(G,x),x.out,0,x.up)+'</p>':'')+(n?'<div class="mini">'+bbtn('farm-sell','data-id="'+x.id+'"','Sell '+aed(farmSalvage(G,x)),true)+'</div>':''));
       }).join('');
-      var fnx=farmNext(G);if(fnx)efh+='<p class="hint">Next: '+fnx.name.toLowerCase()+(fnx.req&&!pd(G,fnx.req)?', after a project in Gear.':', opens at '+big(FARM_AT[FARMS.indexOf(fnx)])+' kits sold.')+'</p>';
+      var fnx=farmNext(G);if(fnx)efh+='<p class="hint">Next: '+fnx.name.toLowerCase()+(fnx.req&&!pd(G,fnx.req)?(function(){var rp=PROJ.filter(function(x){return x.id===fnx.req;})[0],rn=function(id){return REGIONS.filter(function(r){return r.id===id;})[0].name;};return rp.req(G)?', after the '+rp.name.toLowerCase()+' in '+TAB_NAME[projTab(rp)]+'.':fnx.id==='ocean'?', its permit comes once '+rn('eu')+' is open.':', its blueprint comes once '+(pd(G,'ocean')?'':'you have the ocean permit and ')+rn('ea')+' is open.';})():', opens at '+big(FARM_AT[FARMS.indexOf(fnx)])+' kits sold.')+'</p>';
       var old=FARMS.filter(function(x){return (E.farms[x.id]||0)>0&&!farmBuyable(G,x);});
       FARMS.forEach(function(x){if((E.farms[x.id]||0)>0&&!farmBuyable(G,x))up+=activeFarms(G,x.id)*x.up;});
       if(old.length)efh+='<details class="old-tier"><summary>Older farms still running: '+old.map(function(x){return E.farms[x.id]+' × '+x.name.toLowerCase();}).join(', ')+'</summary>'+old.map(function(x){var wc=farmWorkingCapital(G,x);return itemHTML(x.name+' ×'+E.farms[x.id],activeFarms(G,x.id)+' running, '+big(activeFarms(G,x.id)*x.out)+' kits a day. You can’t add more of these.','','<div class="mini">'+bbtn('farm-sell','data-id="'+x.id+'"','Sell '+aed(farmSalvage(G,x)),true)+'</div>');}).join('')+'</details>';
@@ -5114,7 +5116,7 @@ function updateUpgrades(){
   var nt=G.tanks.length;setT('u-tanks',nt+' of '+(nt<MAX_TANKS?MAX_TANKS:MAX_ALL_TANKS));
   if(nt>=MAX_TANKS){
     var sc=stdCost();
-    if(nt>=MAX_ALL_TANKS)$('newtank').mhtml='<div class="lock">You have all '+MAX_ALL_TANKS+' tanks. Hatcheries in Gear scale further.</div>';
+    if(nt>=MAX_ALL_TANKS)$('newtank').mhtml='<div class="lock">You have all '+MAX_ALL_TANKS+' tanks. Bigger farms in Gear scale further.</div>';
     else if(!stdUnlocked(G))$('newtank').mhtml='';
     else $('newtank').mhtml=itemHTML('Standard tank',VOLS[VOLS.length-1]+' L with bio-tower, chiller, fan, auto feeder and auto water changer. Arrives cycled, with '+(G.recipe?'your recipe':'Tank 1\'s settings')+' and 10 adults at your average grade.',bbtn('stdtank','',aed(sc),G.money>=sc,true,sc));
   }else $('newtank').mhtml=ownTank(G)?'':
@@ -5304,7 +5306,6 @@ function guideTarget(){
     if(pk&&G.kits.sold<3)return pk;
     if(qcDue(G)&&G.kits.sold>=QC_FROM&&qc(G).rounds&&(t=guideOk({key:'qc'+(qc(G).rounds||0),soft:true,tab:'emp',card:'staff',sel:'[data-act="qc-round"]',text:'Time for this month\u2019s quality check in Kits.',skip:true}))&&!pk)return t;
     var tl=nextTool(G);if(tl&&G.kits.sold>=3&&G.money>=tl.cost+kitMaterials(G)+capitalReserve(G)&&(t=guideOk({key:'tool'+tl.id,soft:true,tab:'emp',card:'staff',text:toolsHave(G)?'Another packing tool takes over the next step: '+tl.tool.toLowerCase()+'.':'Packing every kit by hand gets slow. A '+tl.tool.toLowerCase()+' in Kits does one of the five steps for you.'})))return t;
-    var st0=G.emp.staff;if(st0.tier&&!st0.pack&&kitDemand(G)>packCap(G)*0.8&&G.money>=staffPay(G,'pack')*30&&(t=guideOk({key:'packer',tab:'emp',card:'staff',sel:'[data-act="hire"][data-role="pack"][data-d="1"]',text:'Orders are coming in faster than you can pack. Hire a packer in Kits.'})))return t;
     if(G.kits.sold>=10){
       var lic=PROJ.find(function(p){return p.id==='farmlic';});
       if(!pd(G,'farmlic')){var ts2=tankStep(FARM_TANKS,true);if(ts2&&!ts2.soft&&ts2.sel&&!(pk&&/^(cyc|stock)/.test(ts2.key)))return ts2;if(ts2&&/^(cyc|stock)/.test(ts2.key))return pk||ts2;
@@ -5312,8 +5313,7 @@ function guideTarget(){
          var na=G.tanks.slice(0,FARM_TANKS).findIndex(function(x){return totalN(x)>=1&&!(x.feeder&&x.autoWC);});
          if(na>=0){var nT=G.tanks[na],nid=nT.feeder?'autoWC':'feeder',ncost=upgradeCost(G,nT,nid);if(ncost!=null&&G.money>=ncost&&(t=guideOk({key:'fauto'+na+nid,tab:'up',card:'equipcard',sel:G.sel!==na?'.tchip[data-sel="'+na+'"]':'[data-act="upg"][data-id="'+nid+'"]',text:need+'Next: an auto '+(nid==='feeder'?'feeder':'water changer')+' for '+nT.name+'.'})))return t;}
          else if(G.tanks.length<FARM_TANKS&&G.tanks.length<MAX_TANKS&&G.money>=(NEW_TANK_COST[G.tanks.length]||0)&&(t=guideOk({key:'ftank'+G.tanks.length,tab:'up',card:'tanks',sel:'[data-act="addtank"]',text:need+'Next: add a tank in Gear.'})))return t;}
-        else if(G.money>=lic.m&&(t=guideOk({key:'lic',tab:projectArea(lic),card:'proj',sel:'[data-act="proj"][data-id="farmlic"]',text:'You can get a farm license now. It lets you build grow racks that breed shrimp for kits.'})))return t;}
-      else{var f0=FARMS[0];if(G.money>=farmCost(G,f0)+farmWorkingCapital(G,f0)&&(t=guideOk({key:'rack',tab:'up',card:'farms',sel:'[data-act="farm"][data-id="'+f0.id+'"]',text:'Grow racks in Gear breed shrimp for kits, so your tanks don\u2019t have to.'})))return t;}
+      }
     }
     return pk||wait('Kits sell as orders arrive.');
   }
@@ -5334,12 +5334,11 @@ function guideTarget(){
   var wom=wordOfMouth(G),sup=Math.min(packCap(G),farmCap(G)+tankSurplusKits(G));
   if(!tg.mkt&&wom<0.75&&kitDemand(G)<sup*0.8&&G.kits.sold>=30){var adOk=!G.webShop||ADS.some(function(x){return adReady(G,x)&&G.money>=x.cost+capitalReserve(G);});
     if((t=guideOk({key:'mkt',tab:'promote',card:adOk?'ads':'shops',sel:adOk?'[data-act="ad"]:not([disabled])':null,text:'You can make more kits than people order. Ads, an online shop and shops in Ads tell more people about you.'})))return t;}
-  if(!tg.farm&&tf&&FARMS.indexOf(tf)>=1&&G.money>=farmCost(G,tf)+farmWorkingCapital(G,tf)+capitalReserve(G)&&packCap(G)>=farmCap(G)*0.8&&kitDemand(G)>farmCap(G)*0.7&&(t=guideOk({key:'farmtier',tab:'up',card:'farms',sel:'[data-act="farm"][data-id="'+tf.id+'"]',text:'Orders are outrunning your grow racks. Bigger farms in Gear breed more shrimp for kits: a '+tf.name.toLowerCase()+' is next.'})))return t;
-  var nr=nextRegion(G);if(!tg.region&&rv('ereg')&&nr&&G.money>=nr.m+capitalReserve(G)&&kitCap(G)-G.humans<Math.max(50,kitDemand(G)*30)&&(t=guideOk({key:'reg1',tab:'promote',card:'reg',sel:'[data-act="region"]',text:'Most people who want a tank here have one. New regions in World open more of the world to you.'})))return t;
+  var nr=nextRegion(G);
   // Money sitting idle: point at the people who read the business for a living.
   if(idle&&G.emp.consultSeen&&!consultHas(G)&&(t=guideOk({key:'idle'+Math.floor(G.day/120),sel:'#b-cash',text:big(Math.round(G.money))+' AED is sitting idle. Not sure where it should go? Tap your cash, the consultants there can tell you what\u2019s holding you back.'})))return t;
   for(var li=0;li<PACK_LINES.length;li++)if(lineReady(G,li)&&!lineCount(G,li)&&G.money>=lineCost(G,li)+capitalReserve(G)&&(t=guideOk({key:'line'+li,tab:'emp',card:'staff',sel:'[data-act="line"][data-tier="'+li+'"]',soft:true,text:'A new packing machine is available in Kits.'})))return t;
-  if(rv('ereg')&&nr&&G.money>=nr.m+capitalReserve(G)&&kitCap(G)-G.humans<Math.max(50,kitDemand(G)*30)&&(t=guideOk({key:'reg'+nr.id,tab:'promote',card:'reg',sel:'[data-act="region"]',soft:true,text:'World has new regions.'})))return t;
+  if(rv('ereg')&&nr&&G.money>=nr.m+capitalReserve(G)&&kitCap(G)-G.humans<Math.max(50,kitDemand(G)*30)&&(t=guideOk({key:'reg'+nr.id,tab:'promote',card:'reg',sel:'[data-act="region"]',soft:true,text:'A new region can open in Ads.'})))return t;
   var cp=projAvail(G).find(function(p){return p.c==='cult'&&E.inf>=p.i&&G.money>=pm(G,p)&&p.id!=='gala';});if(cp&&(t=guideOk({key:'cult'+cp.id,tab:projTab(cp),card:'proj',sel:'[data-act="proj"]:not([data-id="gala"])',soft:true,text:'Something new you could do in World.'})))return t;
   if(rv('ereg')){var mix=regionMix(G),nx2=nextRegion(G),wi=wbItem('winter');
     if(E.hw&&!wbHas(G,'alerts')&&wbItem('alerts').req(G)&&G.money>=wbItem('alerts').m+capitalReserve(G)&&(t=guideOk({key:'alerts',tab:'world',card:'owners',sel:'[data-act="wb"][data-id="alerts"]',text:'Heat wave in '+E.hw.name+'. Heat-wave alerts protect owners\u2019 tanks.'})))return t;
@@ -5412,11 +5411,8 @@ function renderTrees(){var c=$('treecard'),E=G.emp,open=TREE_ORDER.filter(functi
   if(nx){var ok=G.money>=(nx.m||0)&&E.inf>=(nx.i||0)&&!frozen(G);h+=chapterRow(nx.name,nx.d,'<button class="btn primary" data-act="tree-step" data-id="'+nx.id+'"'+(ok?'':' disabled')+'>'+costLabel(nx.m,nx.i)+'</button>');}
   if(done.length)h+='<ul class="me-hist">'+done.map(function(s){return '<li>'+s.name+'</li>';}).join('')+'</ul>';h+='</div>';});
  if(c.dataset.h!==h){c.dataset.h=h;c.innerHTML=h;}var ci=$('coin-island');if(ci.dataset.h!==hi){ci.dataset.h=hi;ci.innerHTML=hi;}}
-function renderHouse(){var c=$('me-house'),M=G.me;if(!renderHouse.home)renderHouse.home=c.parentNode;var want=ownTank(G)&&M.house&&M.house.land?$('p-tank'):renderHouse.home;if(c.parentNode!==want)want.appendChild(c);c.hidden=!houseOffer(G);if(c.hidden)return;var x=houseNext(G),H=M.house||{},h='<div class="hd"><h2>A place of your own</h2><small>'+(H.complete?'self-sufficient':H.land?HOUSE.filter(function(y){return H[y.id];}).length+' of '+HOUSE.length:'')+'</small></div>';
- if(x){var cost=houseCost(G,x),ok=G.money>=cost;if(x.id==='walls')h+='<div class="item"><div><h3>'+x.name+', '+aed(cost)+'</h3><p>'+x.d+'</p></div></div><div class="me-mbtn"><button class="btn" data-act="house" data-who="self"'+(ok?'':' disabled')+'>For me</button><button class="btn" data-act="house" data-who="gp"'+(ok?'':' disabled')+'>For Grandma</button><button class="btn" data-act="house" data-who="both"'+(ok?'':' disabled')+'>For both of us</button></div>';
-  else h+=chapterRow(x.name,x.d||(H.land?'One more piece and the house needs less from outside.':''),'<button class="btn" data-act="house"'+(ok?'':' disabled')+'>'+aed(cost)+'</button>');}
- else h+='<p class="me-note">Power from the sun and the wind, water from the well and the roof, food from the garden. '+(H.who==='gp'?'Grandma lives there.':H.who==='both'?'You and Grandma live there.':'It’s yours.')+'</p>';
- if(c.dataset.h!==h){c.dataset.h=h;c.innerHTML=h;}}
+// The old 'A place of your own' card is gone (Grandma's place replaced it). Old saves keep G.me.house for the ending lines.
+function renderHouse(){var c=$('me-house');if(c)c.hidden=true;}
 function renderGplace(){var c=$('me-gplace');if(!c)return;c.hidden=!gplaceOffer(G);if(c.hidden)return;var P=G.me.gplace||{},x=gplaceNext(G),n=GPLACE.filter(function(y){return P[y.id];}).length,h='<div class="hd"><h2>Grandma’s place</h2><small>'+(n?n+' of '+GPLACE.length:'')+'</small></div>';
  if(x)h+=chapterRow(x.name,x.d,'<button class="btn" data-act="gplace"'+(G.money>=x.m?'':' disabled')+'>'+aed(x.m)+'</button>');
  if(landOpen(G))h+=chapterRow('Grandma’s land','Walk there, tidy the tank, build what you like.','<button class="btn primary" data-act="gland">Go</button>');
@@ -5618,7 +5614,7 @@ function adImpact(G,boost){if(!consultHas(G,'fix'))return '';var extra=boost;if(
 function campaignHint(m){return (m.risk?'Not really true, people might check.':'')+(m.rep?(m.risk?' ':'')+'Works a bit less each time.':'');}
 function campaignRecap(G){var r=G.emp.op.recap;if(!r)return '';var pts=Math.round(r.m*100);return '<div class="phase-note" style="padding:10px"><h3>Last campaign: '+r.title+'</h3><p>'+(pts?'Public mood '+(pts>0?'+':'')+pts+' points':'Nobody really noticed')+(r.backlash?', then people found out.':'.')+'</p></div>';}
 function projectImpact(G,p){if(!consultHas(G,'fix'))return '';
-  if(p.id==='farmlic')return 'Next role: breeding at scale. Grow racks start at AED 2,000 plus working capital.';
+  if(p.id==='farmlic')return 'Next role: breeding at scale. Grow racks start at '+aed(farmCost(G,FARMS[0]))+' plus working capital.';
   if(['aiconsult','aicam','autopackm','drones','sop'].indexOf(p.id)>=0)return 'Scope: '+(p.id==='aicam'?'doubles owner and staff packing capacity':p.id==='autopackm'?'adds 20 automatic kits/day, then robotic lines':p.id==='sop'?'standardizes personal tanks':'sales and shop management')+'.';
   if(p.id==='social')return 'Scope: repeatable advertising. Existing owners already generate '+big(G.emp.beta*opMult(G)*G.humans)+' base orders/day before price and saturation.';
   var E=JSON.parse(JSON.stringify(G.emp)),before={q:E.q,beta:E.beta,ceil:E.ceil,mat:E.mat};if(p.eff)p.eff(E);var changes=[];
@@ -5711,11 +5707,9 @@ function renderProgression(){
  $('c-proj').querySelector('h2').textContent=activeTab==='world'?'Shaping the world':activeTab==='research'?'Schools and universities':activeTab==='promote'?'Marketing development':activeTab==='up'?'Equipment development':'Kit development';
  var irp=rate(G,'_inf');$('c-proj').querySelector('p.sub').textContent=irp?'✦ '+(irp>=0?'+':'')+big(irp)+' a day':'';
  var guide=business?activeTab:'emp';move('business-guide',guide,business);$('business-guide').style.order='-10';
- var titles={emp:'Kits: shrimp → packing → customers',up:'Operations: breeding and reliable care',promote:'Marketing: bring buyers to your available stock',world:'World: adoption, research and university'};
- var descriptions={emp:open?'Shrimp in, kits out. Price sets orders.':'',up:'Hatcheries supply shrimp. Packing is purchased separately in Kits. Your original tank can improve its permanent quality certificate.',promote:'Advertising attracts initial customers. Referrals sustain growth. Shops add distribution and influence, with annual rent and management costs.',world:academyOpen(G)?'Research grants now improve Earth production. Build a university team before the ten-year space chapter. Regions and culture keep expanding adoption.':'Regions add reachable people. Adoption projects raise willingness. Research partnerships open after 1,000 delivered kits.'};
  setT('business-title','');setT('business-body','');$('business-title').hidden=true;$('business-body').hidden=true;
  var future=projAvail(G).filter(function(p){return projectArea(p)===activeTab;}).sort(function(a,b){return projectRank(G,a)-projectRank(G,b);}).filter(function(p){return !(activeTab==='promote'&&G.kits.sold>=1000&&p.id==='social');}).slice(0,1);
- $('speed').title=maxSpeed(G)<4?'4×: after your first hatchery.':maxSpeed(G)<12?(G.emp.fastReady?'12×: at a million owners ('+big(Math.floor(G.humans))+' now).':'12×: after auto packing, a barn, 7 days of AED '+fmt(FAST_PROFIT)+'+ kit profit a day, then a million owners.'):maxSpeed(G)<40?'40×: once everyone on Earth has a tank.':'';setT('business-roadmap','');
+ $('speed').title=maxSpeed(G)<4?'4×: after your first farm.':maxSpeed(G)<12?(G.emp.fastReady?'12×: at a million owners ('+big(Math.floor(G.humans))+' now).':'12×: after auto packing, a barn, 7 days of AED '+fmt(FAST_PROFIT)+'+ kit profit a day, then a million owners.'):maxSpeed(G)<40?'40×: once '+big(HARD_AT)+' people have a tank.':'';setT('business-roadmap','');
  var limit=open&&consultHas(G,'fix')?bottleneck(G):null,target=limit?{packing:'emp',shrimp:'up',ceiling:'promote',demand:'promote',cash:'emp',paused:'up'}[limit.k]:null,action=target&&target!==activeTab?'<button class="btn" data-act="navigate" data-tab="'+target+'">'+({emp:'Open Kits',up:'Open Gear',world:'Open World',promote:'Open Ads'}[target])+'</button>':'';$('business-actions').mhtml=action;
  $('business-strip').hidden=true;$('business-guide').hidden=!business||(!$('business-roadmap').textContent&&!$('business-actions').innerHTML);
  if(business){var net=operatingNet(G),run=cashRunway(G),d=kitDemand(G);['vitals','vwater','acts','tankchips','fold'].forEach(function(id){$(id).hidden=true;});var bt=bnText(G);$('astrip').hidden=!bt;setT('astrip',bt);lastAlerts='';}
@@ -5943,7 +5937,6 @@ function initControls(){
     if(a==='ts-upg'){if(TS&&buyUpgrade(G,G.tanks[TS.i],b.dataset.id)){toast('Installed on '+G.tanks[TS.i].name);cache.upsig=null;renderTankSheet();}return;}
     if(a==='treat-unlock'){if(unlockTreat(G,b.dataset.id)){var tu=TREATS.filter(function(x){return x.id===b.dataset.id;})[0];toast(tu.name+' unlocked. Pick it under Feeding.');cache={};render();}return;}
     if(a==='tree-step'){if(buyTreeStep(G,b.dataset.id)){$('treecard').dataset.h='';render();}else toast('Not enough for that yet');return;}
-    if(a==='house'){if(buyHouse(G,b.dataset.who)){$('me-house').dataset.h='';render();}return;}
     if(a==='gplace'){if(buyGplace(G)){$('me-gplace').dataset.h='';render();}return;}
     if(a==='gland'){landShow();return;}
     if(a==='dye-stop'){if(G.dye){G.dye.on=0;log(G,'Stopped dyeing the pale shrimp');}render();return;}
