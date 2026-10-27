@@ -555,5 +555,10 @@ count++;console.log('PASS Pass 119 card headers and Money sheet');
  if(!kitsSec.includes('<h2>Kits</h2>')||!html.includes('id="c-sales"')||html.includes("activeTab==='promote'?'Sales staff'"))throw Error('Kits card renamed, sales staff in their own card');
  if(html.includes("['Adoption ceiling',")||html.includes("['Packed yesterday',"))throw Error('Ceiling lives with Regions, packing numbers with Making kits');}
 count++;console.log('PASS Pass 120 Kits tab in three cards');
+// Pass 121: Ads holds Ads, Shops, Sales staff, Marketing + Campaigns, Regions; World holds Shaping the world, Owners' tanks, the coast card, The Shrimp Times
+if(html.includes('id="c-op"')||!/<div id="e-proj"><\/div>\s*<div id="op-wrap" hidden>/.test(html))throw Error('Campaigns live inside the Marketing development card');
+if(!html.includes("move('c-reg','promote',rv('ereg'))")||!html.includes('<div id="coin-island"></div>'))throw Error('Regions in Ads, Shrimp Island in the coast card');
+if(!html.includes('class="treats adrow"')||!html.includes('<details class="store-close"><summary>Close stores</summary>'))throw Error('One-off ads as a button row, store closing in a fold');
+count++;console.log('PASS Pass 121 Ads and World tabs');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

@@ -994,3 +994,15 @@ Step 2 of the tab cleanup.
 - Sales staff got their own card in Ads (`c-sales`, data-k `sales`, opens on reveal). `c-staff` no longer switches title and content with the tab; staff render builds packing into `e-staff` and sales and shop managers into `e-sales` regardless of the open tab. Wages sheet line for sales points at `c-sales`.
 - Guide steps that pointed at the Kits or Quality checks card (first kit, tools, QC round, kit wait) point at Making kits.
 - Balance 77 (new Kits layout check), academy 10, me 46. Checked in Playwright at 360 and 390 px on first kit, first farm, million owners and win.
+
+## Pass 121: Ads and World tabs (28 Oct)
+
+Step 3 of the tab cleanup.
+
+- Ads card: one-off ads are a row of buttons (name, price, days; "N d left" while running). What each does is behind the ?. The online shop is its own row until bought, then folds to "Online shop · running". Repeat toggles fold under "Repeat automatically". With consultants in, one forecast line. Past 1,000 kits everything still folds under "Local ads". The "Early marketing tools" button sits where the Ads card would.
+- Shops: one line per open region, "The Gulf 79/90 · trust 99%" with one Open button (the biggest batch you can open there), "full" once covered. Closing stores moved into one fold, "Close stores". Fit-out and per-store numbers behind the ?. Header shows nothing with no shops (was "AED 0/yr").
+- Sales staff: own card (Pass 120).
+- Campaigns merged into Marketing development (`#op-wrap` inside `c-proj`, shown on Ads after the Ministry). The `c-op` card is gone; the Ministry spotlight now targets `op-wrap`, the campaign guide points at the projects card. ✦ stays in Ads.
+- Regions moved from World to Ads (reach). Its card says the ceiling ("Up to 46% of them want a tank, 245M people"). Guide, consultant and bottleneck links to Regions point at Ads.
+- World order: The hard part (when open), Shaping the world, Owners' tanks, the coast card, other trees, The Shrimp Times last. The coast card holds Mangroves / Shrimpcoin and Shrimp Island (`#coin-island`; the island tree card is gone). Title is Shrimpcoin, Mangroves or, with only the island, Shrimp Island.
+- Balance 78 (new Ads/World check), academy 10, me 46. Playwright at 360 and 390 px on first sale, first farm, million owners and win.
