@@ -1806,7 +1806,7 @@ window.LAND={L:L,T:T,stats:function(){return S.land.stats;},toWorld:fromCss,camF
 // ----- #full: open straight on the land, fully upgraded, with every hen and her fish (for previews) -----
 // #fresh: build from empty land. Kept: the stream and its banks, the lake, grass, the trees and rocks outside the garden,
 // the bridge. Grandma sits in her armchair on a little wood floor; the dog and Pierre are there. No walls, no hens.
-var FRESH_V=1;
+var FRESH_V=2;
 window.landFresh=function(){ensureLand();S.stage=3;var l=S.land,g=genStage(3),m=g.map;
   for(var i=0;i<m.g.length;i++){var x=i%m.w,y=(i/m.w)|0,gi=m.g[i];var keep=gi===G_WATER||(gi===G_SAND&&y>=21);if(!keep){m.g[i]=G_MEADOW;m.gh[i]=0.5+Math.random()*0.3;}}
   m.rooms=[];m.balcony=null;m.henArea=null;m.pond=null;
@@ -1819,7 +1819,7 @@ window.landFresh=function(){ensureLand();S.stage=3;var l=S.land,g=genStage(3),m=
 window.landFull=function(){ensureLand();if(S.stage<3||!S.land.map)landSetStage(3);var l=S.land;S.cash=Math.max(S.cash||0,1000000);
   l.pond=FISH.map(function(F){return {kind:F.id,len:F.len[1]};});
   resetRuntime();save(true);setTab('home');updateHeader();};
-window.addEventListener('load',function(){if(location.hash==='#fresh'&&!(S.land&&S.land.fresh===FRESH_V))setTimeout(function(){try{landFresh();}catch(e){console.error(e);}},50);else if(location.hash==='#fresh')setTimeout(function(){setTab('home');},50);
+window.addEventListener('load',function(){var fr=location.hash==='#fresh'||window.FRESH_START;if(fr)setTimeout(function(){try{if(!(S.land&&S.land.fresh===FRESH_V))landFresh();else setTab('home');}catch(e){console.error(e);}},300);
   if(location.hash==='#full')setTimeout(function(){try{landFull();}catch(e){console.error(e);}},50);});
 })();
 
