@@ -22,4 +22,13 @@ const snaps=JSON.parse(fs.readFileSync(process.env.SPOT_RUN||require('os').tmpdi
     await p.evaluate(()=>{if(SPOT&&SPOT.ready)spotClose();});await p.waitForTimeout(100);}
   }
   if(errs.length)bad.push(sk+' errors '+errs.join('|'));await p.close();}
+ // Play-stat hooks for the ending (Pass 110): a setting change, a ? open and a chart open each count once, and screen time
+ // splits into the You page (home) and the company tabs.
+ {const p=await b.newPage({viewport:{width:390,height:760}});await p.setContent('<body>'+html+'</body>');
+  await p.evaluate((s)=>{G=s;migrate(G);G.progress.queue=[];cache={};render();G.ps.tw=G.ps.help=G.ps.chart=G.ps.home=G.ps.biz=0;SPOT=null;},snaps['first sale']);
+  const r=await p.evaluate(async()=>{var w=function(ms){return new Promise(function(r){setTimeout(r,ms);});};document.querySelector('.tabs [data-tab="tank"]').click();render();await w(100);
+   var sl=document.getElementById('s-ration');sl.value=+sl.value+10;sl.dispatchEvent(new Event('input',{bubbles:true}));sl.value=+sl.value+5;sl.dispatchEvent(new Event('input',{bubbles:true}));var o={tw:G.ps.tw};
+   var q=document.querySelector('.qhelp');if(q)q.click();o.help=G.ps.help;var ch=document.getElementById('charts');ch.classList.add('shut');ch.querySelector('.hd').click();o.chart=G.ps.chart;
+   G.me.on=1;await w(700);o.biz=G.ps.biz;o.home=G.ps.home;return o;});
+  n++;if(r.tw!==1||r.help!==1||r.chart!==1||!(r.biz>0)||r.home!==0)bad.push('play-stat hooks '+JSON.stringify(r));await p.close();}
  console.log('checked',n);console.log(bad.join('\n')||'all good');await b.close();})();

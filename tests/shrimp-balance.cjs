@@ -447,7 +447,7 @@ var R=prof(true),K=prof(false),apart=TRAITS.filter(function(k){return Math.abs(R
 if(apart.filter(function(k){return k!=='means';}).length<4)throw Error('Ruthless and kind only differ on '+apart.join(', ')+' '+JSON.stringify([R,K]));
 ['drive','means','kin','risk'].forEach(function(k){if(!(R[k]*K[k]<0))throw Error('Opposite sides on '+k+': '+R[k].toFixed(2)+' vs '+K[k].toFixed(2));});
 var a=newGame();trAdd(a,{drive:1});if(!(traitVals(a).drive>0.1&&traitVals(a).drive<0.3))throw Error('One push is a lean, not the rail: '+traitVals(a).drive);
-for(var i=0;i<10;i++)trAdd(a,{ego:i%2?1:-1});if(Math.abs(traitVals(a).ego)>0.01)throw Error('Ten pushes that cancel sit in the middle');
+for(var i=0;i<10;i++)trAdd(a,{risk:i%2?1:-1});if(Math.abs(traitVals(a).risk)>0.01)throw Error('Ten pushes that cancel sit in the middle');
 for(i=0;i<5;i++)trAdd(a,{kin:1});trAdd(a,{kin:-5});if(Math.abs(traitVals(a).kin)>0.01||a.trAbs.kin!==10)throw Error('The sum and the sizes are both kept');
 var o=newGame();delete o.trAbs;o.tr={care:-3,know:2};migrate(o);if(o.trAbs.care!==3||o.trAbs.know!==2)throw Error('Old saves count their sums as one-way pushes');
 ['social','guide','aiconsult','farmlic','ministry','mangrove','arco','globalbrand'].forEach(function(id){if(TRAIT_TAGS[id])throw Error('Routine upgrade still pushes a trait: '+id);});
