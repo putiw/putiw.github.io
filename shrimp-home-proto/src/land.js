@@ -179,7 +179,7 @@ function natShapes(m){var N={stream:false,lake:null,pond:null},x,y,i,ok;
     if((isL&&dd>=1)||(dd<1&&m.g[i]!==G_WATER)){ok=false;break;}}N.lake=ok?Lk:null;}
   var P=m.pond||(m.w===18&&m.h===21?{cx:3.6,cy:15.6,rx:2.45,ry:1.6}:m.w===30&&m.h===40?{cx:9.6,cy:15.6,rx:2.45,ry:1.6}:null);
   if(P){ok=true;for(y=Math.max(0,Math.floor(P.cy-P.ry-1));y<=Math.min(m.h-1,Math.ceil(P.cy+P.ry+1))&&ok;y++)for(x=Math.max(0,Math.floor(P.cx-P.rx-1));x<=Math.min(m.w-1,Math.ceil(P.cx+P.rx+1));x++){i=y*m.w+x;
-    var bx=(x+0.5-P.cx)/P.rx,by=(y+0.5-P.cy)/P.ry,inP=bx*bx+by*by<1,isP=m.g[i]===G_WATER&&(!m.wb||!m.wb[i]||m.wb[i]===W_POND);if(inP!==isP){ok=false;break;}}N.pond=ok?P:null;}
+    var bx=(x+0.5-P.cx)/P.rx,by=(y+0.5-P.cy)/P.ry,inP=bx*bx+by*by<1,isP=m.g[i]===G_WATER&&(!m.wb||!m.wb[i]||m.wb[i]===W_POND);if(inP!==isP){ok=false;break;}}N.pond=null;}
   return N;}
 // 1 natural water, 2 the stream's sand, 0 anything else
 function painted(m,i){var P=L.pmask;if(!P||P.length!==m.w*m.h){P=L.pmask=new Uint8Array(m.w*m.h);(LS().edits||[]).forEach(function(e){if(!e.k||e.k.indexOf('g-')!==0)return;for(var y=e.ty;y<e.ty+e.fh;y++)for(var x=e.tx;x<e.tx+e.fw;x++)P[y*m.w+x]=1;});}return P[i];}
@@ -193,6 +193,10 @@ function natW(X,Y,sc,sw){var N=L.nat,f=-9,d;if(N.stream){d=sw/2-Math.abs(Y-sc);i
   return 0.5+f*NAT_K;}
 // grass starts where the stream's sandy bank ends
 function natG(Y,sc,sw){return 0.5+(Math.abs(Y-sc)-(sw/2+0.95))*NAT_K;}
+var CT_W5=new Float32Array(25),WK_R2=1.3*1.3,CT_GM2=new Float32Array(9);
+function water5(m,tx,ty,cls,nat){var k=0,any=false;for(var dy=-2;dy<=2;dy++)for(var dx=-2;dx<=2;dx++,k++){var x=clamp(tx+dx,0,m.w-1),y=clamp(ty+dy,0,m.h-1),g2=mget(m,x,y),c2=gClass(g2);if(c2===0)c2=cls;
+  var w=c2===3&&!(nat&&natKind(m,x,y)===1)?1:0;CT_W5[k]=w;if(w)any=true;}return any;}
+function wfield(lx,ly){var u=(lx+0.5)/64-0.5,v=(ly+0.5)/64-0.5,sw=0,sk=0,k=0;for(var dy=-2;dy<=2;dy++)for(var dx=-2;dx<=2;dx++,k++){var ex=u-dx,ey=v-dy,d2=ex*ex+ey*ey;if(d2>=WK_R2)continue;var q=1-d2/WK_R2;q*=q;sk+=q;sw+=q*CT_W5[k];}return sk?sw/sk:0;}
 var CT_NK=new Uint8Array(9),CT_WB=new Float32Array(9),CT_GM=new Float32Array(9),CT_SC=new Float32Array(64),CT_SW=new Float32Array(64);
 // composeTile reuses one buffer. A grass tile on an edge keeps a mask (L.tmk) of which pixels are its own grass, so regrowth
 // and mowing repaint it with a quick copy instead of the whole edge sum
@@ -203,7 +207,10 @@ function composeTile(m,tx,ty){var g=mget(m,tx,ty),o=CT_O,X=tx*T,Y=ty*T,i,lx,ly,c
     for(ly=0;ly<64;ly++)for(lx=0;lx<64;lx++)o[ly*64+lx]=f?f(X+lx,Y+ly):VOID_U;
     if((g===G_FLOOR||g===G_HALL||g===G_TILE)&&mget(m,tx,ty-1)===G_WALL)for(ly=0;ly<6;ly++)for(lx=0;lx<64;lx++)o[ly*64+lx]=darkU(o[ly*64+lx],0.72+ly*0.045);
     if(cls===0)return o;}
-  else o.set(texOf(m,g,tx,ty));
+  else{o.set(texOf(m,g,tx,ty));
+    if(cls===2&&g!==G_STONE){var Sv=CT_GM2,on=null,k2=0;for(var dy0=-1;dy0<=1;dy0++)for(var dx0=-1;dx0<=1;dx0++,k2++){var g3=mgetE(m,tx+dx0,ty+dy0),diff=g3!==g&&(g3===G_SAND||g3===G_DIRT);Sv[k2]=diff?0:1;if(diff&&!on)on=[g3,tx+dx0,ty+dy0];}
+      if(on){var oT=texOf(m,on[0],on[1],on[2]);for(ly=0;ly<64;ly++)for(lx=0;lx<64;lx++){var qx2=X+lx,qy2=Y+ly,nz=(vnz(qx2,qy2,22,97)-0.5)*0.9+(vnz(qx2,qy2,7,96)-0.5)*0.35+(hash2(qx2>>1,qy2>>1,98)-0.5)*0.14,fs=bil(Sv,lx,ly)+(g===G_SAND?nz:-nz);
+        if(fs<0.5)o[ly*64+lx]=oT[ly*64+lx];else if(fs<0.54&&hash2(qx2,qy2,99)<0.35)o[ly*64+lx]=darkU(o[ly*64+lx],0.9);}}}}
   // the 3x3 around: is it water, is it grass (floors and nothing count as this tile)
   var Wv=CT_W,Gv=CT_G,mixed=false,wn=false,gn=false,en=false,wx=0,wy=0,gg=0,gx=0,gy=0,eg=0,ex=0,ey=0,k=0;
   for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++,k++){var g2=mgetE(m,tx+dx,ty+dy),c2=gClass(g2);if(c2===0){c2=cls;g2=g;}if(c2!==cls)mixed=true;
@@ -218,7 +225,8 @@ function composeTile(m,tx,ty){var g=mget(m,tx,ty),o=CT_O,X=tx*T,Y=ty*T,i,lx,ly,c
   // mask codes for a grass tile: 0 fixed colour, 1 its own grass, 2-4 its own grass darkened
   var MK=CT_M,own=cls===1,FW=CT_FW;
   // the water field once per pixel, from 12 rows above the tile (the bank face looks up to 11 px up)
-  if(wn)for(ly=-12;ly<64;ly++)for(lx=0;lx<64;lx++){var qx=X+lx,qy=Y+ly,bw=nat?Math.max(bil(CT_WB,lx,ly),natW((qx+0.5)/T,(qy+0.5)/T,CT_SC[lx],CT_SW[lx])):bil(Wv,lx,ly);
+  var w5=wn&&water5(m,tx,ty,cls,nat);
+  if(wn)for(ly=-12;ly<64;ly++)for(lx=0;lx<64;lx++){var qx=X+lx,qy=Y+ly,tw=w5?wfield(lx,ly)+(vnz(qx,qy,40,91)-0.5)*0.24:0,bw=nat?Math.max(tw,natW((qx+0.5)/T,(qy+0.5)/T,CT_SC[lx],CT_SW[lx])):tw;
     FW[(ly+12)*64+lx]=bw+(vnz(qx,qy,9,71)-0.5)*0.16+(hash2(qx>>1,qy>>1,73)-0.5)*0.07;}
   for(ly=0;ly<64;ly++)for(lx=0;lx<64;lx++){i=ly*64+lx;var px=X+lx,py=Y+ly;
     var fw=wn?FW[(ly+12)*64+lx]:0;
@@ -227,11 +235,13 @@ function composeTile(m,tx,ty){var g=mget(m,tx,ty),o=CT_O,X=tx*T,Y=ty*T,i,lx,ly,c
       if(face){c=face>=FH-1?FL:face>=FH-3?FD:(hash2(px>>1,py,77)<0.2?FB2:FB);}
       else if(fw<0.545){if(hash2(px,py,78)<0.62)c=FO;}else if(fw<0.58){if(hash2(px,py,79)<0.45)c=FO2;}
       o[i]=c;MK[i]=0;continue;}
+    var dryW=cls===3&&fw<=0.5;
     var nG=(vnz(px,py,7,31)-0.5)*0.18+(hash2(px>>1,py>>1,57)-0.5)*0.1,fg=gn||cls===1?(nat?Math.min(bil(CT_GM,lx,ly),NS.stream?natG((py+0.5)/T,CT_SC[lx],CT_SW[lx]):9):bil(Gv,lx,ly))+nG:0;
+    if(dryW&&gn&&fg<=0.5)fg=0.52+(0.5-fw)*0.4;
     if(fg>0.5){var cg=cls===1?o[i]:(gT?gT[i]:o[i]),mk=own?1:0;
       if(fg<0.555||(wn&&fw>0.44)){var r=hash2(px,py,63);if(r<0.42){cg=K30;mk=0;}else if(r<0.78){cg=GD_;mk=0;}}
       o[i]=cg;MK[i]=mk;}
-    else{var fromOwn=own&&!eStone&&!eT,ce=cls===2?o[i]:eStone?stonePx(px,py):(eT?eT[i]:o[i]),d1=fg>0.43,d2=wn&&fw>0.42;
+    else{var fromOwn=own&&!eStone&&!eT,ce=cls===2?o[i]:eStone?stonePx(px,py):(eT?eT[i]:dryW&&gT?gT[i]:o[i]),d1=fg>0.43,d2=wn&&fw>0.42;
       if(d1)ce=darkU(ce,0.88);if(d2)ce=darkU(ce,0.9);o[i]=ce;MK[i]=fromOwn?1+(d1?1:0)+(d2?2:0):0;}}
   if(own&&L.tmk){var ti=mi(m,tx,ty);L.tmk[ti]={c:o.slice(),m:MK.slice()};}
   return o;}
@@ -1014,7 +1024,7 @@ function stepMe(dt){var me=L.me;if(!me)return;
 // which picture of Millie: sets L.mfImg and L.mfIdx (no arrays made per frame)
 function meFrame(){var me=L.me;if(me.sit){L.mfImg='millie2';L.mfIdx=2;return;}
   if(me.moving){var k=Math.floor(me.anim)%12;L.mfImg='millie';L.mfIdx=me.dir==='right'?1+k:me.dir==='left'?13+k:me.dir==='down'?26+k:39+k;return;}
-  if(me.dir==='down'){L.mfImg='millie';L.mfIdx=0;}else if(me.dir==='up'){L.mfImg='millie';L.mfIdx=38;}else{L.mfImg='millie2';L.mfIdx=me.dir==='right'?0:1;}}
+  if(me.dir==='down'){L.mfImg='millie';L.mfIdx=0;}else if(me.dir==='up'){L.mfImg='millie';L.mfIdx=38;}else{L.mfImg='millie';L.mfIdx=me.lastV==='up'?38:0;}}
 
 // ----- the dog follows Millie's footsteps -----
 var DOG_GAP=92;
