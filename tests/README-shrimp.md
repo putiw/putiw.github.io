@@ -963,3 +963,11 @@ BUILD 2026-10-27-steady.
 - One home tank on an auto feeder, once racks took the rest or you keep it yourself (`feedLite`): Feeding shows only food type and treats. Hunger, Nutrition, Food in tank, Ration and the top Fed / Nutrition bars are hidden. The auto feeder still uses its Auto feed setting in Gear.
 - Checked in Playwright at 390 and 360 px on the first farm, a million owners and win snapshots; layout scanner clean except the known 2px win chart label. Balance 73, academy 10, me 46. Bots not rerun (UI only).
 BUILD 2026-10-27-header.
+
+## Pass 118: Coins from day one, Consultants opens, no shrimp trend with farms (27 Oct)
+
+- Shrimpcoin had no coins for a whole year after launch, while the price chart moved. A coin is made when a tree turns one, and trees planted before the launch never made any. Now the trees others planted before the launch count on launch day: the 60% that made it become coins (yours get the 5% fee), so there's something to trade from the start. Your own pre-launch trees still wait until they turn one. Saves that already launched get this once (`coinPreMint`, `C.preMint`): others' trees not waiting in a cohort and not yet coined.
+- Consultants and Operating controls didn't open on a tap. They are `<details>` with a `summary class="hd"`, so the fold-card setup also made them `.coll`, and the two toggles fought (open but `shut`, an empty card). `<details>` cards stay out of `.coll` now.
+- The +N/d shrimp trend in the header is hidden whenever farms or hatcheries hold shrimp (`labMode`, `farmStock`), not only after `farmBuilt`.
+- Balance 75 (new coin check), academy 10, me 46. Consultants toggle checked in Playwright with touch taps, with the idle-cash guide on it.
+BUILD 2026-10-27-coin.

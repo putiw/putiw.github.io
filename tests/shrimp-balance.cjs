@@ -538,5 +538,10 @@ g.tanks.pop();t.feeder=false;if(feedLite(g))throw Error('No feeder keeps hunger 
 if(html.includes("/d to kits"))throw Error('The header still says /d to kits');
 if(!html.includes(".cash-sub{display:flex;gap:8px;align-items:baseline;margin-top:2px;white-space:nowrap"))throw Error('The cash line must not wrap');
 count++;console.log('PASS Pass 117 feeding lite and header');
+check('Pass 118: trees planted before shrimpcoin launches give coins on day one, old launched saves get them once',`
+var g=newGame(),C=coinOf(g);C.otrees=1e6;coinLaunch(g,true);if(Math.round(C.coins)!==6e5)throw Error('Launch should coin the 60% of 1M trees that made it, got '+C.coins);if(C.coins-C.treasury<5e5)throw Error('Most launch coins belong to the planters');
+var h=newGame(),D=coinOf(h);D.on=1;D.honest=1;D.otrees=2e6;D.ocohorts=[{day:0,n:5e5}];coinDay(h);if(Math.round(D.coins)!==9e5)throw Error('Old save: 1.5M trees not waiting should coin 900k, got '+D.coins);var c0=D.coins;coinDay(h);if(D.coins!==c0)throw Error('Pre-launch coins only once');
+`);
+count++;console.log('PASS Pass 118 shrimpcoin launch supply');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
