@@ -1,0 +1,280 @@
+<title>Home Animals</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Field notebook, same as the home prototype: paper ground, ink text, forest green controls. Light only by design. */
+:root{
+  --paper:#efe9dc; --card:#f8f4ea; --ink:#22201b; --muted:#6b6457; --line:#d9d0bd; --green:#2f6b4f; --grass:#7fa65a;
+  --sans:'Inter',system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+body{background:var(--paper);color:var(--ink);font:15px/1.45 var(--sans);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 40px}
+main{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1{font-size:22px;margin:0}
+h2{font-size:16px;margin:0}
+p{margin:0;color:var(--muted)}
+section{display:flex;flex-direction:column;gap:8px}
+canvas.scene{width:100%;display:block;border-radius:10px;border:1px solid var(--line);image-rendering:pixelated;touch-action:manipulation;background:var(--card)}
+.frames{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.row{display:flex;flex-wrap:wrap;gap:6px}
+button{font:600 13px var(--sans);border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:6px 11px;cursor:pointer}
+button[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:var(--paper)}
+button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.viewer{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+.viewer canvas{image-rendering:pixelated;background:var(--paper);border-radius:8px}
+.strip{overflow-x:auto;max-width:100%}
+.strip canvas{display:block}
+.note{font-size:13px}
+</style>
+<main>
+  <header style="display:flex;flex-direction:column;gap:4px">
+    <h1>Home animals</h1>
+    <p>Your white hen, bulbul, myna and seven fish, animated. The brown, speckled, blue egg and wild hens are recoloured from your white hen.</p>
+  </header>
+
+  <section>
+    <h2>Yard</h2>
+    <canvas class="scene" id="yard"></canvas>
+    <p class="note">Hens walk, peck and stand. Tap one and it runs.</p>
+  </section>
+
+  <section>
+    <h2>Feeder</h2>
+    <canvas class="scene" id="feeder"></canvas>
+    <p class="note">Birds fly in, hop and peck at the seed. Tap one and it flies off. It comes back later.</p>
+  </section>
+
+  <section>
+    <h2>Pond</h2>
+    <canvas class="scene" id="pond"></canvas>
+  </section>
+
+  <section>
+    <h2>Every frame</h2>
+    <div class="frames">
+      <div class="row" id="pickWho"></div>
+      <div class="row" id="pickPose"></div>
+      <div class="viewer"><canvas id="big"></canvas><p class="note" id="info"></p></div>
+      <div class="strip"><canvas id="strip"></canvas></div>
+    </div>
+  </section>
+</main>
+<script>
+const MAN = __MANIFEST__;
+const SRC = __SHEETS__;
+const IMG = {};
+let loaded = 0, total = Object.keys(SRC).length;
+for (const k in SRC) { const im = new Image(); im.onload = () => { if (++loaded === total) start(); }; im.src = SRC[k]; IMG[k] = im; }
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const PX = 2; // screen px per art pixel in the scenes
+
+function info(kind, name) { return MAN[kind][name]; }
+function drawFrame(ctx, key, meta, i, x, y, flip, s) {
+  const w = meta.w, h = meta.h;
+  ctx.save();
+  ctx.translate(Math.round(x), Math.round(y));
+  if (flip) { ctx.scale(-1, 1); }
+  ctx.drawImage(IMG[key], i * w, 0, w, h, flip ? -w * s / 2 : -w * s / 2, -h * s, w * s, h * s);
+  ctx.restore();
+}
+function setup(c, artW, artH) {
+  const dpr = devicePixelRatio || 1;
+  const cssW = c.clientWidth;
+  const scale = cssW / artW;
+  c.width = Math.round(cssW * dpr); c.height = Math.round(artH * scale * dpr);
+  c.style.height = (artH * scale) + 'px';
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
+  return { ctx, scale, W: artW, H: artH };
+}
+function tapPos(c, S, e) { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) / S.scale, (e.clientY - r.top) / S.scale]; }
+const rnd = (a, b) => a + Math.random() * (b - a);
+
+// ---------------- yard
+function yard() {
+  const c = document.getElementById('yard');
+  const S = setup(c, 280, 170);
+  const ground = document.createElement('canvas'); ground.width = 280; ground.height = 170;
+  const g = ground.getContext('2d');
+  g.fillStyle = '#86ab5f'; g.fillRect(0, 0, 280, 170);
+  for (let i = 0; i < 900; i++) { g.fillStyle = Math.random() < .5 ? '#79a052' : '#93b86b'; g.fillRect((Math.random() * 280) | 0, (Math.random() * 170) | 0, 1, 2); }
+  g.fillStyle = '#c9b48a'; g.fillRect(0, 120, 280, 3); // a path
+  const names = ['white', 'brown', 'speckled', 'blue', 'jungle'];
+  const hens = names.map((n, i) => ({ n, x: 40 + i * 50, y: rnd(60, 160), vx: 0, flip: Math.random() < .5, pose: 'idle', t: 0, f: 0, left: rnd(.5, 2) }));
+  function choose(h) {
+    const r = Math.random();
+    if (r < .45) { h.pose = 'walk'; h.left = rnd(1.2, 3); const dir = Math.random() < .5 ? -1 : 1; h.vx = 9 * dir; h.vy = rnd(-4, 4); h.flip = dir < 0; }
+    else if (r < .8) { h.pose = 'peck'; h.left = rnd(1.2, 3); h.vx = 0; h.vy = 0; }
+    else { h.pose = 'idle'; h.left = rnd(1, 2.5); h.vx = 0; h.vy = 0; }
+    h.t = 0;
+  }
+  c.addEventListener('pointerdown', e => {
+    const [px, py] = tapPos(c, S, e);
+    for (const h of hens) {
+      const m = info('hens', h.n);
+      if (Math.abs(px - h.x) < m.w / 2 && py < h.y + 2 && py > h.y - m.h) {
+        h.pose = 'run'; h.left = 1.2; h.t = 0; const dir = px < h.x ? 1 : -1; h.vx = 40 * dir; h.vy = rnd(-8, 8); h.flip = dir < 0;
+      }
+    }
+  });
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    const ctx = S.ctx;
+    ctx.drawImage(ground, 0, 0);
+    for (const h of hens) {
+      h.t += dt; h.left -= dt;
+      if (h.left <= 0) choose(h);
+      h.x += (h.vx || 0) * dt; h.y += (h.vy || 0) * dt;
+      if (h.x < 20) { h.x = 20; h.vx = Math.abs(h.vx); h.flip = false; }
+      if (h.x > 260) { h.x = 260; h.vx = -Math.abs(h.vx); h.flip = true; }
+      h.y = Math.max(55, Math.min(166, h.y));
+    }
+    hens.sort((a, b) => a.y - b.y);
+    for (const h of hens) {
+      const m = info('hens', h.n);
+      const [s0, n] = m.poses[h.pose];
+      const fps = { walk: 8, run: 14, peck: 7, idle: 3 }[h.pose];
+      let k = Math.floor(h.t * fps);
+      if (h.pose === 'peck') k = k % (n + 3); // a little pause between pecks
+      const i = s0 + (k < n ? k : 0) % n;
+      ctx.fillStyle = 'rgba(40,50,20,.22)'; ctx.fillRect(Math.round(h.x - 10), Math.round(h.y - 1), 20, 2);
+      drawFrame(ctx, 'hen-' + h.n, m, i, h.x, h.y, h.flip, 1);
+    }
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+// ---------------- feeder
+function feeder() {
+  const c = document.getElementById('feeder');
+  const S = setup(c, 280, 150);
+  const sky = document.createElement('canvas'); sky.width = 280; sky.height = 150;
+  const g = sky.getContext('2d');
+  g.fillStyle = '#cfe1ea'; g.fillRect(0, 0, 280, 150);
+  g.fillStyle = '#a9c7d6'; g.fillRect(0, 100, 280, 2);
+  g.fillStyle = '#c8b089'; g.fillRect(0, 118, 280, 32); // balcony rail top / ground
+  g.fillStyle = '#9b8058'; g.fillRect(0, 116, 280, 2);
+  // feeder tray
+  g.fillStyle = '#7a5a3a'; g.fillRect(150, 112, 70, 4); g.fillStyle = '#22201b'; g.fillRect(150, 116, 70, 1);
+  for (let i = 0; i < 40; i++) { g.fillStyle = Math.random() < .5 ? '#d8b56a' : '#b48b44'; g.fillRect(152 + ((Math.random() * 66) | 0), 111 - ((Math.random() * 2) | 0), 1, 1); }
+  const birds = [
+    { n: 'bulbul', home: 175, ground: 112, state: 'away', t: 0, left: 1, x: -40, y: 40, flip: false },
+    { n: 'myna', home: 90, ground: 118, state: 'away', t: 0, left: 3, x: 320, y: 30, flip: true },
+    { n: 'bulbul', home: 205, ground: 112, state: 'away', t: 0, left: 6, x: 320, y: 50, flip: true },
+  ];
+  c.addEventListener('pointerdown', e => {
+    const [px, py] = tapPos(c, S, e);
+    for (const b of birds) {
+      const m = info('birds', b.n);
+      if (b.state !== 'away' && b.state !== 'leave' && Math.abs(px - b.x) < 22 && Math.abs(py - (b.y - 16)) < 22) {
+        b.state = 'leave'; b.t = 0; b.flip = px > b.x; b.vx = b.flip ? -70 : 70;
+      }
+    }
+  });
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    const ctx = S.ctx; ctx.drawImage(sky, 0, 0);
+    for (const b of birds) {
+      b.t += dt;
+      if (b.state === 'away') { b.left -= dt; if (b.left <= 0) { b.state = 'in'; b.t = 0; const fromL = Math.random() < .5; b.x = fromL ? -30 : 310; b.y = rnd(20, 60); b.flip = !fromL; } }
+      else if (b.state === 'in') {
+        const dx = b.home - b.x, dy = b.ground - b.y, d = Math.hypot(dx, dy);
+        if (d < 3) { b.x = b.home; b.y = b.ground; b.state = 'perch'; b.t = 0; b.left = rnd(1, 2); b.pose = 'idle'; }
+        else { const sp = 80; b.x += dx / d * sp * dt; b.y += dy / d * sp * dt; b.flip = dx < 0; }
+      }
+      else if (b.state === 'perch') {
+        b.left -= dt;
+        if (b.pose === 'hop') b.x += (b.flip ? -14 : 14) * dt;
+        if (b.left <= 0) {
+          const r = Math.random();
+          b.pose = r < .45 ? 'peck' : r < .75 ? 'idle' : 'hop'; b.t = 0;
+          b.left = b.pose === 'hop' ? 6 / 10 : rnd(1, 2.4);
+          if (b.pose === 'hop' && Math.random() < .5) b.flip = !b.flip;
+          if (b.x < 40) b.flip = false; if (b.x > 250) b.flip = true;
+        }
+      }
+      else if (b.state === 'leave') { b.x += b.vx * dt; b.y -= 45 * dt; if (b.x < -40 || b.x > 330 || b.y < -40) { b.state = 'away'; b.left = rnd(3, 7); } }
+    }
+    for (const b of birds) {
+      if (b.state === 'away') continue;
+      const m = info('birds', b.n);
+      const pose = (b.state === 'in' || b.state === 'leave') ? 'fly' : b.pose;
+      const [s0, n] = m.poses[pose];
+      const fps = { fly: 12, hop: 10, peck: 8, idle: 4 }[pose];
+      const i = s0 + Math.floor(b.t * fps) % n;
+      // sprites have 12 px padding round her drawing; feet sit 12 px above the bottom
+      drawFrame(ctx, 'bird-' + b.n, m, i, b.x, b.y + 12, b.flip, 1);
+    }
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+// ---------------- pond
+function pond() {
+  const c = document.getElementById('pond');
+  const S = setup(c, 280, 150);
+  const water = document.createElement('canvas'); water.width = 280; water.height = 150;
+  const g = water.getContext('2d');
+  const grd = g.createLinearGradient(0, 0, 0, 150); grd.addColorStop(0, '#6aa6b8'); grd.addColorStop(1, '#3f7486');
+  g.fillStyle = grd; g.fillRect(0, 0, 280, 150);
+  g.fillStyle = '#5d8a5a'; for (let x = 0; x < 280; x += 7) { const h = 10 + ((x * 37) % 23); g.fillRect(x, 150 - h, 2, h); }
+  g.fillStyle = '#b9a27a'; g.fillRect(0, 146, 280, 4);
+  const names = Object.keys(MAN.fish);
+  const fish = names.map((n, i) => ({ n, x: rnd(30, 250), y: 22 + i * 17, v: rnd(10, 22) * (Math.random() < .5 ? -1 : 1), t: rnd(0, 3), bob: rnd(0, 6) }));
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    const ctx = S.ctx; ctx.drawImage(water, 0, 0);
+    for (const f of fish) {
+      f.t += dt; f.x += f.v * dt;
+      const m = info('fish', f.n);
+      if (f.x < m.w / 2 + 2 && f.v < 0 || f.x > 278 - m.w / 2 && f.v > 0) f.v = -f.v;
+      if (Math.random() < dt * .15) f.v = -f.v;
+      const [s0, n] = m.poses.swim;
+      const i = s0 + Math.floor(f.t * (6 + Math.abs(f.v) / 3)) % n;
+      const y = f.y + Math.sin(f.t * 1.3 + f.bob) * 2 + m.h / 2;
+      drawFrame(ctx, 'fish-' + f.n, m, i, f.x, y, f.v < 0, 1);
+    }
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+// ---------------- frame viewer
+function viewer() {
+  const who = document.getElementById('pickWho'), pose = document.getElementById('pickPose');
+  const big = document.getElementById('big'), strip = document.getElementById('strip'), note = document.getElementById('info');
+  const list = [];
+  const label = { white: 'White hen (yours)', brown: 'Brown hen', speckled: 'Speckled hen', blue: 'Blue egg hen', jungle: 'Wild junglefowl', bulbul: 'White-eared bulbul', myna: 'Common myna' };
+  for (const n in MAN.hens) list.push(['hens', n, 'hen-' + n, label[n]]);
+  for (const n in MAN.birds) list.push(['birds', n, 'bird-' + n, label[n]]);
+  for (const n in MAN.fish) list.push(['fish', n, 'fish-' + n, MAN.fish[n].title]);
+  let cur = list[0], cp = 'walk', tick = 0;
+  function btn(row, text, on, fn) { const b = document.createElement('button'); b.textContent = text; b.setAttribute('aria-pressed', on); b.onclick = fn; row.appendChild(b); return b; }
+  function render() {
+    who.innerHTML = ''; pose.innerHTML = '';
+    for (const it of list) btn(who, it[3], it === cur, () => { cur = it; const ps = Object.keys(info(it[0], it[1]).poses); if (!ps.includes(cp)) cp = ps[0]; render(); });
+    const m = info(cur[0], cur[1]);
+    for (const p in m.poses) btn(pose, p, p === cp, () => { cp = p; render(); });
+    const [s0, n] = m.poses[cp], s = 2;
+    strip.width = (m.w * s + 8) * n; strip.height = m.h * s;
+    const sx = strip.getContext('2d'); sx.imageSmoothingEnabled = false;
+    sx.fillStyle = '#efe9dc'; sx.fillRect(0, 0, strip.width, strip.height);
+    for (let k = 0; k < n; k++) sx.drawImage(IMG[cur[2]], (s0 + k) * m.w, 0, m.w, m.h, k * (m.w * s + 8), 0, m.w * s, m.h * s);
+    big.width = m.w * 4; big.height = m.h * 4;
+    note.textContent = n + ' frames, ' + m.w + ' × ' + m.h + ' px each.';
+  }
+  render();
+  setInterval(() => {
+    const m = info(cur[0], cur[1]); const [s0, n] = m.poses[cp];
+    const bx = big.getContext('2d'); bx.imageSmoothingEnabled = false; bx.clearRect(0, 0, big.width, big.height);
+    bx.drawImage(IMG[cur[2]], (s0 + tick % n) * m.w, 0, m.w, m.h, 0, 0, m.w * 4, m.h * 4); tick++;
+  }, 1000 / 7);
+}
+
+function start() { yard(); feeder(); pond(); viewer(); }
+</script>
