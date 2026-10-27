@@ -971,3 +971,15 @@ BUILD 2026-10-27-header.
 - The +N/d shrimp trend in the header is hidden whenever farms or hatcheries hold shrimp (`labMode`, `farmStock`), not only after `farmBuilt`.
 - Balance 75 (new coin check), academy 10, me 46. Consultants toggle checked in Playwright with touch taps, with the idle-cash guide on it.
 BUILD 2026-10-27-coin.
+
+## Pass 119: Card headers without arrows, the Money sheet (28 Oct)
+
+Step 1 of the tab cleanup agreed on 28 Oct.
+
+- Card headers on every tab: the chevron is gone, the whole header row opens and closes the card, and the ? only shows on an open card. Fold cards (`.coll`) and `<details>` cards share one rule set: 30 px row, same gap, no marker. `<details>` cards still stay out of `.coll` (Pass 118), each keeps its own toggle.
+- A closed card is its title and one number. Text notes became numbers: Feeding "95 mg a day", Water test "80 L", Colony "6 berried", Water care "30% this week" (`wcWeek`), Readings "nitrate 6.7 ppm", Colony & sales "201 sold", Automation "3 of 3 tanks", Advertising "referrals 30%" (reach before kits), Shops "N stores" or yearly rent, Research "N people", The Shrimp Times "N stories", Shrimpcoin price only, Your home tanks "N tanks". Supplies and Recent events have no number and show none.
+- Money sheet: tap the cash in the header (dotted underline once kits open, `finOpen`). It holds Money over time, Consultants, Operating controls (stock days, cash reserve) and a new Wages card: Packing, Sales and shop managers, Tank technicians, Research, Mall stores (rent and staff), each line jumps to that team's card (`wageLines`, `finGo`). Kept-on staff (Kiki, Luca, Gema, Mimi) count with their team. The sheet pauses like the tank sheet and holds back cards, spotlights, notes and the guide bar. One spotlight on the cash the first time it opens up.
+- Kits no longer has Money over time, Consultants or Operating controls. Before kits open, Money over time stays in Trade. No Staff tab.
+- The Packed / orders / Cash lasts strip under the header is gone (no growth summary on screen). The bottleneck read stays behind the paid consultants. The idle-cash and "what slows growth" hints now glow the cash, tapping the guide bar opens the sheet, and the ? Ideas line opens it too.
+- Checked in Playwright at 360 and 390 px on the first kit, first farm and million owners snapshots (strong bot, seed 7: WIN day 2,338, empire_dictator, same as Pass 116), every tab plus the sheet. Layout scanner: only the known 2px win chart label. Balance 76 (new header and sheet check), academy 10, me 46.
+BUILD 2026-10-28-money.

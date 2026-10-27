@@ -543,5 +543,10 @@ var g=newGame(),C=coinOf(g);C.otrees=1e6;coinLaunch(g,true);if(Math.round(C.coin
 var h=newGame(),D=coinOf(h);D.on=1;D.honest=1;D.otrees=2e6;D.ocohorts=[{day:0,n:5e5}];coinDay(h);if(Math.round(D.coins)!==9e5)throw Error('Old save: 1.5M trees not waiting should coin 900k, got '+D.coins);var c0=D.coins;coinDay(h);if(D.coins!==c0)throw Error('Pre-launch coins only once');
 `);
 count++;console.log('PASS Pass 118 shrimpcoin launch supply');
+// Pass 119: card headers have no arrow and show the ? only when open; Money sheet behind the header cash
+if(/h2::before\{content:'(▾|)'/.test(html)||!html.includes(".card>.hd h2::before,.card>summary h2::before{content:none!important")||!html.includes("details.card:not([open])>summary>.qhelp{display:none}"))throw Error('Card headers: no arrow, ? only on open cards');
+if(!/<div id="fs-body">\s*<details class="card" id="consultcard"/.test(html)||!html.includes('<details class="card" id="operations-card"')||html.indexOf('id="operations-card"')<html.indexOf('id="finsheet"')||!html.includes('id="wagecard"'))throw Error('Consultants, Operating controls and Wages live in the Money sheet, not Kits');
+if(html.includes("$('business-strip').mhtml")||html.includes("Consultants in Kits"))throw Error('No growth strip, no consultants in Kits');
+count++;console.log('PASS Pass 119 card headers and Money sheet');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
