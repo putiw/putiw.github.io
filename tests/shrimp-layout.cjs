@@ -1,6 +1,6 @@
 // layout scan: anything wider than its card (or the screen) at 360 and 390 px, on every tab, at several stages
 const {chromium}=require('playwright');const fs=require('fs');
-const snaps=JSON.parse(fs.readFileSync('/tmp/shrimp-tests/run-7.json','utf8')).snapshots;
+const snaps=JSON.parse(fs.readFileSync(process.env.ACADEMY_RUN||'/tmp/shrimp-tests/run-7.json','utf8')).snapshots;
 const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');
 (async()=>{const b=await chromium.launch();const found={};
  const stages=[null].concat(Object.keys(snaps));
