@@ -103,7 +103,7 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **Ladders** (`topIdx`, `farmBuyable`, `farmNext`, `FARM_AT`, `shopBuyable`): farms and shops open one tier at a time and the older tier stops being sold. Small shops stop once the first mall store opens.
 - **Research merge** (`rlStaff`, `academyDay`, `scienceFork`): one Research card on the Lab tab (`academy-card`). Staff raise the research rate. The "pay to keep postdocs" fork waits for two postdocs and four papers.
 - **Your day hours** (`workPer`, `HOUR_STEPS`, `hoursDay`): work hours move kit and shrimp demand, hour milestones fire events. Grandma calls with a short supply-and-demand lesson at about 3 kits a day (`M.call='lesson'`, the person button rings).
-- **Tab layout** (24 Oct): tabs are Tank, Gear, Trade, Kits, Ads, World and Lab (`TAB_NAME`), plus the You page under the person button. Ads holds ads, sales and shops, mall stores, media projects (Ministry, posters, films), the campaign desk and Shrimp Pictures. The Lab tab opens at 3,000 kits sold (`ACADEMY_AT`) with one merged Research card and the school and university projects. World keeps the hard part, Shrimpcoin, the trees, owners' tanks, regions, The Shrimp Times, and the politics and nature tracks. Trade hides once the farms run things (`labMode`). Money over time, Consultants, Operating controls and Wages live in the Money sheet behind the header cash once kits open (`finOpen`, `openFin`, `wageLines`, Pass 119). The readings chart hides once the farm takes your tanks. `projTab(p)` decides where a project shows up; the sim still uses `projectArea` for gating.
+- **Tab layout** (28 Oct, Passes 119-122): tabs are Tank, Gear, Trade, Kits, Ads, World and Lab (`TAB_NAME`), plus the You page under the person button. Kits: Kits (price, profit, stock; rest under More numbers), Making kits (`c-staff`: packing table, tools, Pack buttons, Keep in tanks, capacity line, packers, machines, Quality checks as a section `#qccard`), Kit development. Ads: Ads (one-off ads as a button row, online shop folds once bought), Shops (one line per region with one Open button, Close stores fold), Sales staff (`c-sales`, `e-sales`), Marketing development with the campaign desk inside (`#op-wrap`, ✦ stays in Ads), Regions (shows the ceiling). World: The hard part, Shaping the world, Owners' tanks, the coast card (Mangroves / Shrimpcoin plus Shrimp Island in `#coin-island`), other trees, The Shrimp Times last with a Science section (`newsLine(G,t,1)`). The Lab tab opens at 3,000 kits sold (`ACADEMY_AT`) with one merged Research card and the school and university projects. Trade hides once the farms run things (`labMode`). Money over time, Consultants, Operating controls and Wages live in the Money sheet behind the header cash once kits open (`finOpen`, `openFin`, `wageLines`). The readings chart hides once the farm takes your tanks. `projTab(p)` decides where a project shows up; the sim still uses `projectArea` for gating. Player word for racks, barns and hatcheries is farm.
 - **Homes, not people** (`HH_AVG`, `hhDiv`, `hhPeople`, `addOwners`): one kit is one home of 1 to 4 people (2.5 on average, random per kit for small sales). Kit demand is divided by the household size once 2,000 kits are sold, so people-growth pace stays the same and kit counts are about 2.5x lower than before. Always add owners through `addOwners`.
 
 - **Tank view** (`updateTankView`, `tv*` functions, `SPR` sprites): a canvas drawn from a sample of the real colony, using art layers from Puti's Shrimp Tanks game. It runs at about 30 fps and stops off screen, on other tabs and when the app is hidden. Pellets follow `T.chem.food`.
@@ -318,13 +318,13 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 
 In game days, best play is about 7 years and casual play about 15.
 
-Latest bot results (seed 7, 27 Oct, Pass 112; strong and average rerun in Pass 116):
+Latest bot results (seed 7, 28 Oct, Pass 123):
 
 | Bot | Result |
 |---|---|
-| Strong, cold answers (default) | Earth won on day 2,338, empire_dictator (Pass 116) |
-| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 3,641, question_prof |
-| Average, curious and kind (default) | Earth on day 6,525, space done by day 7,936, garden_hermit (Pass 116) |
+| Strong, cold answers (default) | Earth won on day 2,338, empire_dictator |
+| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 3,208, question_prof |
+| Average, curious and kind (default) | Earth on day 6,525, space done by day 7,936, garden_hermit |
 | Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,349, no Space (24 Oct, not rerun in Pass 110) |
 
 All bots use campaigns (when ✦ is plentiful), films, Shrimpcoin, shops and mall stores. The average bot also funds research lines. It has 22 years to finish both chapters.
@@ -343,7 +343,7 @@ Before adding or changing a feature, trace its existing state and every consumer
 4. Add or update a focused regression test for each changed rule and run every affected suite. For UI-only work, verify the actual browser at narrow phone widths and at the progression stage where the feature appears. For balance/economy work, compare the strong and average bots; for Space work, run the Space continuation too.
 5. Review adjacent features after the change, not only the target path. Report any untested path explicitly; update the feature checklist and changelog when behaviour changes.
 
-1. Fast checks, run every time: `node tests/shrimp-balance.cjs` (75), `node tests/shrimp-academy.cjs` (10), `node tests/shrimp-me.cjs` (46: free time, Grandma, endings, schedule, research lines, charts, stores, pains, style, parties, quiet spells, water).
+1. Fast checks, run every time: `node tests/shrimp-balance.cjs` (80), `node tests/shrimp-academy.cjs` (10), `node tests/shrimp-me.cjs` (46: free time, Grandma, endings, schedule, research lines, charts, stores, pains, style, parties, quiet spells, water).
 2. For balance or sim changes, run the bots: `node tests/shrimp-playthrough.cjs` (strong cold), `BOT_HEART=kind node tests/shrimp-playthrough.cjs` (strong kind), `node tests/shrimp-average-playthrough.cjs` (average curious player, goes to Space). Watch for `INSOLVENT` and big timing shifts against Pacing targets. `REVIEW_OUTPUT=<dir>` sets where the run json with snapshots goes (default `/private/tmp/shrimp-tests`, which doesn't exist on Linux).
 3. Spotlight sweep in a real browser: `SPOT_RUN=<dir>/run-7.json node tests/shrimp-spotlights.cjs` after a strong bot run. Every spotlight on every tab at six stages.
    For Space changes, continue the academy fixture with `ACADEMY_RUN=<dir>/run-7.json node tests/shrimp-space-playthrough.cjs` and verify all planets remain sustainable.
@@ -419,29 +419,11 @@ Do not report a feature as finished just because its new path works once. Check 
 
 Planned and agreed with Puti, not built yet:
 
-**Tab cleanup (agreed 28 Oct, one chat per step, in this order)**
-Puti finds Kits, Ads and World overwhelming: too many cards, too much text on each, and no way to tell what a button changes. Goal: fewer cards, one line of text per card face, every number on the page where it is used.
-1. Done in Pass 119. Card headers, every tab: no chevron arrow, the ? shows only when a card is open, the whole header row toggles. Closed card = title + one number.
-   Finance sheet opened by tapping the cash in the header: Money over time, Consultants, Operating controls (stock days, cash reserve) and the wage bill per team (each line links to that team's card). No Staff tab (Puti agreed): staff stay next to their work.
-2. Kits tab, three cards: Kits (price, stock, orders, profit; rest behind More numbers), Making kits (Packing & staff + Quality checks: capacity line, next machine, How strict row), Kit development (next project, finished ones folded).
-3. Ads tab: Ads (one-off ads as a button row, permanent ones folded), Shops (one line per region, e.g. "The Gulf 79/90 · Open 10", closing stores in a fold), Sales staff, and Marketing development + Campaigns merged into one ✦ card. These ✦ items stay in Ads (Puti: World is already too full). Consider moving Regions here (it's reach).
-   World tab: Shaping the world, Owners' tanks, one coast card (Mangroves, Shrimpcoin, Shrimp Island), The Shrimp Times last.
-4. The Shrimp Times gets a Science section: lab results, funded studies, University track news (newsLine calls around the lab projects, ~2817-2852 and 3144-3163 on 28 Oct). Tag at newsLine, everything else stays on the front page.
-Rules for all four: no growth or bottleneck summary anywhere; bottleneck advice only from the paid consultants. Numbers are fine, each on its own page (packing capacity on Kits, reach on Ads, ceiling with Regions).
-
-**Text fixes (text-only review, 28 Oct, line numbers as of a13cf98).** Each is text saying something the code doesn't do. Fix in whichever chat touches the area, or in one small pass.
-- Gear, Hatcheries: "Next: shrimp arcology, after a project in Gear." (`farmNext` hint, ~L5010) points at a project the player can't see: Shrimp arcology blueprint needs the ocean permit and East Asia open. Name the project and what it waits for when its `req` isn't met ("its blueprint comes once East Asia is open"). Same for the ocean ranch (permit needs Europe open).
-- Farm license role line (~L5583): "Grow racks start at AED 2,000"; the rack costs AED 1,200. Build it from `farmCost(G,FARMS[0])`.
-- Speed tooltip (~L5680): "40×: once everyone on Earth has a tank" but 40× opens at `HARD_AT` (4B, about half). "4×: after your first hatchery" but any farm counts, including a grow rack (and the speed4 spotlight says "Your first hatchery is running").
-- Log line (~L1403): "A million owners: 40× speed unlocked" but it unlocks 12×.
-- Kits alert (`empTips`, ~L3548): "raise the ceiling in Business". There is no Business tab.
-- Shops (~L4995): "Mall stores open after a shrimp boutique, or once you open Dubai" leaves out that 50 kits must be sold (`storesOn`). Also "Ads, shops and mall stores in Ads" (~L2148).
-- USD in the Lab (salaries, degrees, PhD pay) is on purpose (Puti, 28 Oct): research is priced in USD. Leave it.
-- Free bottleneck advice outside the consultants, against the rule. In the Next bar on the page, seen without tapping: "Orders are coming in faster than you can pack. Hire a packer in Kits." (`packer`, ~L5271), "Orders are outrunning your grow racks. Bigger farms..." (`farmtier`, ~L5301), "Most people who want a tank here have one. New regions in World..." (`reg1`, ~L5302). Behind the !! button: "Adoption ceiling reached..." and "Production is short of working capital..." (`empTips`). Agreed: drop the three Next-bar lines, show the two alerts only while consultants are in (`consultHas`). The top strip (`bnText`) is already consultant-only. Drop the farm license and grow rack Next lines (`lic`, `rack`) too (Puti, 28 Oct); the spotlight on the new card is enough.
-- Pointers that go stale with the tab cleanup: the consultant, reserve and working-capital lines now point at the cash (Pass 119). Still open: "Farms and shops sell back at half price in Kits" (`brokeOpts`), check it when Kits is rebuilt in step 2.
-- Words: farm, grow rack, hatchery and "Hatcheries & breeding" are used for the same thing. Pick one word for the player ("farm"), keep the tier names.
-- Dead text: the `descriptions` object (~L5677) is never shown and still says "Build a university team before the ten-year space chapter". Delete it. The "A place of your own" card markup is dead too.
-- Checked and fine: auto feeder AED 90, fan AED 60 and 1.5 °C, kits 8 shrimp at 20 days, QC 30 days, robotic line at 300 kits, trust 85% / 60%, shop buyer counts, Grandpa only in the past (the alive lines are migration maps).
+**Tab cleanup and text fixes (28 Oct): done** in Passes 119 to 123, deployed 28 Oct. Rules that stay: no growth or bottleneck summary anywhere, bottleneck advice only from the paid consultants (the !! ceiling and working-capital alerts only while `consultHas`). Numbers live on the page where they're used (packing capacity under Making kits, reach in Ads, the ceiling on Regions). USD in the Lab is on purpose.
+Left from that review, not done:
+- The farm-license Next steps (`fauto`, `ftank`: "Farm license: 3 tanks that run themselves...") still name the route. Not in the agreed list, ask Puti before removing.
+- The `mkt` lever line ("You can make more kits than people order...") is a taught-once lever (`leversTaught`), kept on purpose.
+- Old saves keep their old lab stories on the front page of The Shrimp Times; only new ones go to Science.
 
 **Small leftovers from the 2026-10-27 final pass**
 - "Check shrimp" wraps to two lines in the six-button own-tank grid at 360–390 px (drop the icon at narrow widths).

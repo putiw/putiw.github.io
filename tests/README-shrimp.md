@@ -1029,3 +1029,12 @@ Step 4 of the tab cleanup.
 - Dead code: `descriptions` and `titles` objects deleted; the old "A place of your own" card body is gone (`renderHouse` only hides the card), its click handler too.
 - USD in the Lab stays on purpose.
 - Balance 80 (text-fix check), academy 10, me 46.
+
+## Pass 124: Pre-deploy checks and deploy (28 Oct)
+
+- Fast: balance 80, academy 10, me 46.
+- Strong cold: WIN day 2,338, empire_dictator (same as Pass 116). Strong kind: WIN day 3,208, question_prof (was 3,641 in Pass 112, not rerun since). Average: Earth 6,525, Space 7,936, garden_hermit, 41 minutes waiting (same as Pass 116). Space chapter bot: pass. The tab work is UI only, the sim numbers didn't move.
+- Spotlight sweep: 114 checked, all good. Layout scanner: only the known 2px win chart label.
+- Monkey: 250 random taps at 360 and 390 px on first kit, first farm, million owners and win, no page errors, no sideways scroll. Every card on Kits, Ads and World opens and closes on one tap.
+- First-kit guide checked: with Making kits closed, the Next step opens it and the packing table button shows.
+BUILD 2026-10-28-tabs. Merged into main.
