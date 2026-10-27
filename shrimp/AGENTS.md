@@ -13,7 +13,7 @@ Puti is on a Max plan and one week of this project used most of a weekly limit b
 
 ## Names you will meet in the code
 
-- **`gp` means grandparent, and the grandparent is Grandma.** The game used to have Grandpa, so some saved fields and ids still say `gp`, `gpLoan`, `keep:'gp'`, `G.me.gp`, the story keys `gp_net`, the ad id `grandpa`, and the unused lab project id `labgrandpa`. They are saved in players' games, so do not rename them without a migration. Functions and constants were renamed (`GRANDMA_LETTERS`, `grandmaLetter`, `payGrandma`). The late spouse is Grandpa (fish soup, the Maryam boat story, "calls you in for dinner"). Grandpa is alive in the story: he wants a well, he calls you in for dinner, Grandma writes that you write like he talks. Don't write him as dead.
+- **`gp` means grandparent, and the grandparent is Grandma.** The game used to have Grandpa, so some saved fields and ids still say `gp`, `gpLoan`, `keep:'gp'`, `G.me.gp`, the story keys `gp_net`, the ad id `grandpa`, and the unused lab project id `labgrandpa`. They are saved in players' games, so do not rename them without a migration. Functions and constants were renamed (`GRANDMA_LETTERS`, `grandmaLetter`, `payGrandma`). Grandpa died before the story starts (Puti, 27 Oct). He is only in the past: the fish market, his boat Maryam (named after his mother, Grandma still pays the harbour fee), his fishing hat, "you write like Grandpa used to talk". Don't write him as alive.
 - **Player name.** Typed on the first card, kept in `G.name` (and localStorage `shrimp-name` for the next game). Always read it with `nm(G)` and put it into text with `N(G,text)`: `{,name}` becomes `, Name` or nothing, `{name|fallback}` becomes the name or the fallback. `nm` strips everything except letters, digits, space, dot, hyphen and caps at 16 characters, because the name goes into `innerHTML`. Never print `G.name` directly.
 - **Staff:** Kiki (packing), Luca (sales), Gema (shops), Mimi (social), Lucy (the lab scientist).
 
@@ -121,6 +121,7 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
   - **control**: has everything in order before moving on / moves on with loose ends. 70% play: at the first kit, each new farm tier (first rack included), each region and the space start, `prepNow` records optional tank gear, QC steps owned, stores in opened regions and no pain card left open. Never automation (the game pushes everyone to automate) and never cash (that's risk). Tags follow who decides: do it yourself or keep it = in control, hand it over (staff, partners, a vendor, a chatbot, a permit firm) = lets go.
   - Endings: empire = driven + ends justify means, garden = easy-going + fair + loves shrimp, question = fine-tunes + helps strangers, network = driven + good enough + helps strangers, drift = easy-going + looks after their own. `tests/shrimp-balance.cjs` checks that a random chooser sits within ±0.05 of the middle on every trait, that drive pushes are even, and that every family can be reached.
 - **You tab** (`G.me`, `PICKS`, `MOMENTS`, `HOUSE`): free time, Grandma, a place of your own. Moments only show on the tab.
+- **Grandma's timeline** (`gtDay`, `gtCheck`, `gtAnswer`, `gtCollect`, `GT_YEAR`, `GT_EV`, `G.me.gt`): her life runs on the calendar (`gtDayOf`, day 0 is 20 Oct 2026). Nothing shows until the player taps Check on Grandma on the You page; then queued things, mailed money, moments (`M.cur`) and the lesson call show there, and Her years lists everything with dates. Every window is a game month or 3 minutes of play (`GT_WIN`, `GT_RT`), whichever is longer, then it happens without you (`miss` line, drive+). Yearly: her birthday 4 May (80 in 2027, only the first one rings the person button, after that you remember it), the New Year's Eve dinner (`CNY` table of real lunar dates 2026-2070, dinner the evening before, window the month before), and your birthday (`G.bday`, entered on the first card, default 1 Jan). New Year and your birthday bring pocket money (`gtGift`: 100, sometimes 150, at most 200, as Loans and gifts); missed means she mails it and you collect it on the next check. One-offs at least 60 days apart: WeChat, the TV (waits however long, counts the days), club president, selling Maryam (keep it and a sail comes every spring, help sell it and she gives you AED 30,000; consequences show only after the pick), Auntie Fang's funeral, the dance class, her knee, Göbekli Tepe at 3,000 kits a day (two weeks away, `M.trip`, `workMult` 0.5), the smaller flat. After 120 days and 6 minutes of play without a check she calls once, no penalty. Being there (`gtThere`) counts a visit, earns her next story (`M.lt`, `GP_STORY`), drive- only, never care. A check counts as a visit at most every 14 days. No-lines for moments are in `MOMENT_NO`. The ending adds checks, there and missed, and the stories she never told (`gtUntold`).
 - **Money trouble and dirty money** (`broke`, `debtDay`, `G.dye`, fight night pick, `E.dirty`, `FAVOURS`, `E.network`, `E.turned`): the network deal is the point of no return.
 - **Trees** (`treesFor`, `TREES`, `E.trees`): each type sees its own tree, Space is the curious one's.
 - **Late cards** (`CARDS3`): data-driven story cards, `[label, result, traits, effect, ending line]`. A card only if different people would really choose differently, otherwise a headline (`HEADLINES`). Story cards and Shrimp Times stories take turns, each 30 s to 2 min of play apart, and a choice's own story comes right after it. Always use `newsLine`/`newsEvent`, never push to `R.log` directly.
@@ -264,7 +265,7 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] Consultants appear once you have had AED 20k.
 - [ ] The SOP project (recipe tank) opens standard tanks 4 to 12; standard tanks come with everything, decor included. Tapping a row in the All tanks table looks at that tank alone (health check, restock), Back returns to the recipe.
 - [ ] When farms take over (first hatchery, or farms ≥ 10 kits/day) the farm takes every tank but the first (`retireTanks`), so no more alerts about tanks you can't reach.
-- [ ] Your day (`ACTS`, `M.day`, `dayHours`, `lifeDay` daily, `personalWeek` weekly): one typical day, set with −/+ per activity (`addHour`). Rest is whatever is left. Only the totals count, so the day is laid out from them (`layDay`: wake at 7, sleep last) and drawn as one timeline bar. Repeats daily. 3 hours a day ≈ one old weekly pick. Sleep and exercise move health (`M.hp`): under 45 a doctor card, under 40 mild illness (3 weeks, 2% of cash), under 20 serious illness (a year, half the cash, company at half speed via `workMult`). Long work days and short nights build strain (`M.bo`): at 100 you burn out for four weeks (hours do nothing, ✦ at half). Work hours nudge sales ±2% an hour around 8. Design hours win prizes at 150/500/1200 h, video hours go viral at 400 h, paper hours raise research odds after 300 h. Once a year lane stays (trips home, holidays, conference).
+- [ ] Your day (`ACTS`, `M.wh`, `M.p2`, `dayHours`, `setWork`, `setPick`, `lifeDay` daily, `personalWeek` weekly): work is set in hours (0-14), plus two picks outside work, 3 hours a day each, that last until changed (a third pick drops the older one). Sleep is what's left up to 8, then rest, so long days cut sleep. Grandma is not an hour any more, she's the Check on Grandma button. Old painted days migrate once (`dayMigrate`). Sleep and exercise move health (`M.hp`): under 45 a doctor card, under 40 mild illness (3 weeks, 2% of cash), under 20 serious illness (a year, half the cash, company at half speed via `workMult`). Long work days and short nights build strain (`M.bo`): at 100 you burn out for four weeks (hours do nothing, ✦ at half). Work hours nudge sales ±2% an hour around 8. Design hours win prizes at 150/500/1200 h, video hours go viral at 400 h, paper hours raise research odds after 300 h. Once a year lane stays (trips home, holidays, conference).
 - [ ] Story prices that were fixed grow with the company (`aiCost` 20% of cash plus 2% of every kit sale, `rivalCost`, `schoolKits`).
 - [ ] The spotlight ring follows its card if anything moves (`spotTrack`).
 - [ ] Once a second region is open and the tank buttons leave the top bar, the owners count (x of 8.2B) sits in the top bar instead.
@@ -281,7 +282,8 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 
 **You tab and Grandma**
 - [ ] Opens once the first tank feeds itself and changes its own water, with the Your Saturdays card.
-- [ ] Free time is one typical day of 24 hours (`ACTS`), set with −/+ rows on the You tab. Burnout after long heavy stretches costs lost weeks, and each new burnout shows the Tired card again.
+- [ ] Free time is work hours plus two picks on the You tab (see Your day). Burnout after long heavy stretches costs lost weeks, and each new burnout shows the Tired card again.
+- [ ] Check on Grandma: nothing about her shows until you tap it, only her first birthday and the one missing-you call ring. Windows are a game month or 3 minutes of play. Missed things happen without you and go in Her years. Pocket money on New Year and your birthday, mailed if you missed it. Untold stories show as a count, the ending lists them.
 - [ ] Grandma moments only show on the tab and pass if nobody looks.
 - [ ] Writing letters tells Grandma's story bit by bit. Her milestone letters live in the You tab once it opens.
 - [ ] Climbers get shorter letters, floaters get longer ones (`gpVoice`).
@@ -312,13 +314,13 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 
 In game days, best play is about 7 years and casual play about 15.
 
-Latest bot results (seed 7, 27 Oct, Pass 110):
+Latest bot results (seed 7, 27 Oct, Pass 112):
 
 | Bot | Result |
 |---|---|
-| Strong, cold answers (default) | Earth won on day 2,479, empire_dictator |
-| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 3,698, garden_village |
-| Average, curious and kind (default) | Earth on day 6,441, space done by day 7,852, question_prof |
+| Strong, cold answers (default) | Earth won on day 2,393, empire_dictator |
+| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 3,641, question_prof |
+| Average, curious and kind (default) | Earth on day 6,413, space done by day 7,824, garden_hermit |
 | Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,349, no Space (24 Oct, not rerun in Pass 110) |
 
 All bots use campaigns (when ✦ is plentiful), films, Shrimpcoin, shops and mall stores. The average bot also funds research lines. It has 22 years to finish both chapters.
@@ -412,14 +414,6 @@ Do not report a feature as finished just because its new path works once. Check 
 ## Open work
 
 Planned and agreed with Puti, not built yet:
-
-**Grandma's timeline (next up, agreed 2026-10-26).** Most players forget Grandma, and they should feel it, but today a forgetful player sees nothing, so they never learn what they missed.
-- Her life goes on with or without you: a yearly timeline of her own events (80th birthday, the shrimp club elects her, her knee, learning video calls, selling Grandpa's boat Maryam, a friend's funeral, moving to a smaller flat). Each one resolves as "you were there" (recent Grandma hours or a yes to her moment) or "you heard later / you missed it". Show it on the You page.
-- Saying no to a Grandma moment (`MOMENTS`) leaves a line in her history (e.g. "Grandma took the bus to the clinic. She said the driver was nice."), not only in the log.
-- Her six letter stories (`GP_STORY`) show as untold slots until earned; the ending lists the missed ones as "Stories she never told you".
-- After a few months with no Grandma time she calls once ("You don't have to come. I just wanted to hear about the shrimp."). No penalty.
-- The ending's Grandma section adds up hours with her, moments you were there for, and moments you missed.
-- Grandma time pushes easy-going (drive−) only; never care.
 
 **Small leftovers from the 2026-10-27 final pass**
 - "Check shrimp" wraps to two lines in the six-button own-tank grid at 360–390 px (drop the icon at narrow widths).
