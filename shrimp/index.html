@@ -4775,7 +4775,7 @@ function updateMarket(){
   var ssig='sh'+safeToStock(G,T)+'|'+Math.round(G.money)+'|'+G.sel+'|'+G.tanks.length+'|'+G.stats.sold+'|'+G.kits.stock+'|'+G.kitPrice+'|'+Math.round(allN(G));
   if(cache.shopsig!==ssig){
     cache.shopsig=ssig;
-    $('shopshrimp').mhtml=(!T.had&&!safeToStock(G,T)?'<p class="hint">Stocking waits for a cycled tank: ammonia and nitrite 0, nitrate ≤ 20 ppm, KH ≥ 2.</p>':'')+PACKS.map(function(p,i){var gk=G.stats.sold>0||G.opt.all;if(i>=2&&!gk)return '';return '<div class="item"><div><h3>'+p.name+'</h3><p>'+p.note+(gk?' Grade ~'+p.g+' ·':'')+' 90-day adults.</p></div><button class="btn" data-act="buy" data-i="'+i+'"'+(G.money<p.cost||(!T.had&&!safeToStock(G,T))?' disabled':'')+'>'+aed(p.cost)+'</button></div>';}).join('');
+    $('shopshrimp').mhtml=(!T.had&&!safeToStock(G,T)?'<p class="hint">Stocking waits for a cycled tank: ammonia and nitrite 0, nitrate ≤ 20 ppm, KH ≥ 2.</p>':'')+PACKS.map(function(p,i){var gk=G.stats.sold>0||G.opt.all;return '<div class="item"><div><h3>'+p.name+'</h3><p>'+p.note+(gk?' Grade ~'+p.g+' ·':'')+' 90-day adults.</p></div><button class="btn" data-act="buy" data-i="'+i+'"'+(G.money<p.cost||(!T.had&&!safeToStock(G,T))?' disabled':'')+'>'+aed(p.cost)+'</button></div>';}).join('');
     var sup='';
     if(RV())sup='<p class="explain">Your standard tanks arrive cycled. New shrimp packs go into the tank with the fewest shrimp.</p>';
     else if(G.tanks.length<2)sup='';

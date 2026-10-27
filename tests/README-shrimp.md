@@ -920,7 +920,7 @@ Shown later, when it's needed:
 - Day 1: no tab bar while there is only one tab (`body.onetab`), no speed buttons until the ammonia bottle, no room temperature until the water first runs warm or cold (`ob.temp`), no bills line before shrimp.
 - Water button from the cycled step (or when the cycle stalls), not from the test kit. Sell from the first shrimp it can sell, not a grey "Ready in ~86 d" from day 34. Clean glass waits for shrimp.
 - Nutrition bar from the first babies. The water chip only shows when the water isn't fine (tap still toggles numbers). "+1/d" shrimp only after the first hatch.
-- Buy shrimp: Cherry and Sakura first, the two pricier kinds and the "Grade ~N" lines after the first sale. The first buy goes back to the Tank tab.
+- Buy shrimp: all four kinds from the start (Puti, 27 Oct). The "Grade ~N" lines show after the first sale. The first buy goes back to the Tank tab.
 - Water care: New water GH and KH sliders from the first time GH or KH is low (`ob.mins`).
 - Colony: grade bars and the grade line from the first sale. Readings charts from the first babies.
 - Gear: Runs itself first. Temperature when the water runs warm or cold, Room and filter when a tank gets crowded or 100 are sold (`ob.room`), Decor and Treats with the first babies, everything once kits open. "Show completed equipment" only when something is done.
