@@ -519,5 +519,15 @@ var d=newGame();d.day=730;d.ps.t=4e6;if(playVal(d,'drive')!=null)throw Error('A 
 `);
 if(!/psNote\('tw',p\[0\]\)/.test(html)||!/psNote\('help'/.test(html)||!/psNote\('chart'/.test(html)||!/G\.ps\.help\+\+/.test(html)||!/psNote\('tw','kitPrice'\)/.test(html))throw Error('Setting, ? and chart opens must reach G.ps');
 count++;console.log('PASS sliders, kit price, ? and charts all count toward know');
+check('Pass 111 text: an 80 L tank, kit cost lines say cost to make',`
+var g=newGame();g.money=1e6;var t=g.tanks[0];t.volTier=1;t.vol=40;if(!buyUpgrade(g,t,'tank'))throw Error('Tank upgrade failed');
+if(g.log[g.log.length-1].t!=='Moved to an 80 L tank')throw Error('Article before 80: '+g.log[g.log.length-1].t);
+if(!PAINS.pain_copy.ch[2][2].mat||PAINS.pain_copy.ch[2][2].mat<=1)throw Error('Undercut still raises the cost of each kit');
+`);
+if(/Kits '\+Math\.round\(\(po\.mat/.test(html)||!html.includes("'Each kit costs '+Math.round((po.mat-1)*100)+'% more to make'"))throw Error('Pain kit cost must read as the cost to make a kit, not its price');
+if(!html.includes("'% for '+a.days+' day'+(a.days===1?'':'s')")||!html.includes("' day'+(left===1?'':'s')+' left")||!html.includes("(storeCount(G)===1?' store · ':' stores · ')"))throw Error('One day, one store: singular forms');
+if(!html.includes("return c[0].indexOf(a)>=0?'':m;"))throw Error('A story choice that names its price should not repeat it as Costs');
+if(!/#milestone-actions>\[data-act=sandbox\],#milestone-actions>\[data-act=sandbox\]~\.btn\{flex:1 1 40%\}/.test(html)||!html.includes("(sty?'\\u00a0· '+sty.name:'')"))throw Error('Win card buttons share the row, the ending subtitle never starts a line with ·');
+count++;console.log('PASS Pass 111 singulars, story costs once, win card buttons and ending title');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

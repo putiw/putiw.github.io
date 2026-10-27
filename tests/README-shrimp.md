@@ -851,3 +851,24 @@ Bots after: strong 2,651 (dictator ending), kind 3,301 (garden village), average
 - New balance checks (69): seven traits and the migration, the stuck review, the win card buttons, no Grandma care pushes, drive balance, the random-chooser null test (all medians within ±0.05: drive 0.00, means −0.03, know −0.02, kin 0.00, care 0.00, risk 0.01, control 0.00), every ending family reachable, know and control from play. The spotlight sweep checks the play-stat hooks.
 - Bots, seed 7, before → after: strong 2,681 → 2,479 (empire_dictator), kind 3,658 → 3,698 (garden_village), average Earth 6,580 → 6,441 and Space 7,964 → 7,852 (question_prof). Nobody insolvent.
 - BUILD 2026-10-27-traits7.
+
+## Pass 111: final logic and layout pass
+
+Logic and text (checked in Playwright on early, mid, late and won snapshots: win card, Keep playing, the Space hand-off from both, cull and treat at every stage, old Oct 26 saves with ego and reach, choice previews leaving the real game untouched):
+- Growing pains: the kit material line said "Kits 12% dearer" under "Undercut them on price", which reads as a price rise. It now says what the number is, "Each kit costs 12% more to make" (and "less to make" for home-grown moss).
+- Story choices that put their price in the label ("Fund the engineers, AED 50M") no longer repeat it underneath as "Costs AED 50M". Other costs still show.
+- Singulars: "Reach +50% for 1 day" (daily reel), "1 store", "about 1 day left" on a Lab study, and "Moved to an 80 L tank" in the log.
+- Nothing else found: no runtime errors, NaN or undefined in 91 average-bot snapshots across every tab and every button (monkey), the strong and kind runs, or the old saves run forward 100 days.
+
+Layout (360, 390, 1280):
+- Short text no longer leaves one word on its last line: `text-wrap: balance` on headings, buttons, labels and summaries, `pretty` on paragraphs, list items and small print.
+- Win card: Keep playing and New game share the row equally, Hear Grandma's new dream spans the row under them. The ending title keeps "·" with the word before it.
+- Lab research lines: the field name no longer squeezes into three lines next to the counts (counts drop to their own line), and "+ PhD student" is no longer cut off; the label wraps, the price never does.
+- Shrimpcoin numbers: two even columns, so long values ("1.09B, 21.8M people and a few countries") take two lines instead of five.
+- Sliders on phones: label column 96 px (92 px with 12.5 px labels under 370 px), so "New water GH" and "Keep in tanks" stay on one line.
+- Food choice and QC strictness buttons fill their row. A project with Turn it down keeps its price button level with the title.
+
+Not changed: "Check shrimp" still wraps in the six-button own-tank grid (only fix is dropping the icon); the Rewilding and A place of your own cards still have no fold arrow (they are rebuilt with innerHTML, folding needs the shut state carried through); the professor ending's From the tank line speaks of space before Space starts (story text).
+
+Bots, seed 7, unchanged: strong 2,479 (empire_dictator), kind 3,698 (garden_village), average Earth 6,441 and Space 7,852 (question_prof). Nobody insolvent. Balance checks 71.
+- BUILD 2026-10-27-final.
