@@ -111,10 +111,11 @@ var h=newGame();h.humans=6e7;h.day=900;h.tr={drive:-10,care:-4};treeDay(h);if(!t
 var q=newGame();q.tr={know:8,care:6};q.emp.won=4000;if(!spaceOpen(q))throw Error('Space for the curious');q.tr={drive:10,means:-6};q.emp.trees={};if(spaceOpen(q))throw Error('Not for climbers');
 var l=newGame();l.humans=6e7;l.day=900;l.tr={know:8,kin:-8,drive:6};treeDay(l);if(!treeHas(l,'lab'))throw Error('Designer lab for use and tool');
 `);
-check('a house that runs itself, piece by piece, for you or for Grandma',`
-var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.money=1e6;if(!houseOffer(g))throw Error('Offer');buyHouse(g);if(!g.me.house.land)throw Error('Land');
-if(buyHouse(g))throw Error('Walls need a who');if(!buyHouse(g,'gp'))throw Error('Walls');for(var hh=17;hh<23;hh++)setHour(g,hh,'house');g.me.next=g.day;personalDay(g);if(!g.me.house.hp)throw Error('Working on it');
-while(houseNext(g))buyHouse(g);if(!g.me.house.complete||treesFor(g).indexOf('rewild')<0||gpLines(g).join().indexOf('Grandma lives')<0)throw Error('Complete');
+check('Grandma’s place: three paid steps, the last opens the land; the old house chain is gone',`
+var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.me.on=1;g.money=1e6;if(houseOffer(g))throw Error('Old house card');if(!gplaceOffer(g))throw Error('Offer');
+if(!buyGplace(g)||landOpen(g))throw Error('Balcony');if(!buyGplace(g)||landOpen(g))throw Error('House');if(!buyGplace(g)||!landOpen(g))throw Error('Land');if(buyGplace(g))throw Error('Nothing after the land');
+if(Math.round(g.money)!==1e6-294000)throw Error('Paid '+(1e6-g.money));
+g.tanks[0].pop=[{age:120,n:10,g:40},{age:20,n:4,g:30}];var o=landOwn(g);if(o.adults!==10||o.young!==4)throw Error('Own '+JSON.stringify(o));landTake(g,3,1);o=landOwn(g);if(o.adults!==7||o.young!==3)throw Error('Take '+JSON.stringify(o));
 `);
 check('late cards ask once and leave a line',`
 var g=newGame();g.humans=2e9;var c=milestoneConditions(g);if(!c.c_cash||c.c_war!==undefined||c.c_water!==undefined||c.c_last!==undefined)throw Error('Thresholds');
@@ -256,7 +257,7 @@ if(shopOk(g,SHOPS[3])||shopOk(g,SHOPS[4]))throw Error('Mall flagship and megasto
 `);
 check('Grandma asks you to look at land once you have sent her AED 500k',`
 var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;personalDay(g);g.me.on=1;g.me.sent=5e5;g.money=1e6;if(!milestoneConditions(g).gp_land)throw Error('Offer at 500k');
-storyChoose(g,'gp_land',0);if(!frozen(g)||frozenText(g).indexOf('land')<0)throw Error('A month away');var d0=g.day;while(g.day<d0+31){g.day++;landDay(g);}if(!g.me.house||!g.me.house.land||!houseOffer(g))throw Error('She finds land');
+storyChoose(g,'gp_land',0);if(!frozen(g)||frozenText(g).indexOf('land')<0)throw Error('A month away');var d0=g.day;while(g.day<d0+31){g.day++;landDay(g);}if(!landOpen(g))throw Error('She finds land');
 g.money=-100;if(brokeOpts(g).some(function(x){return x[2]==='save';}))throw Error('No envelope after the land');if(gpLines(g).join().indexOf('fig tree')<0)throw Error('Ending line');
 var h=newGame();h.tanks[0].feeder=1;h.tanks[0].autoWC=1;personalDay(h);h.me.on=1;h.me.sent=5e5;h.money=2e6;storyChoose(h,'gp_land',1);if(frozen(h))throw Error('No means no trip');h.day=h.me.tour;if(!milestoneConditions(h).gp_scam)throw Error('The scam call');h.emp.infOn=1;var i0=h.emp.inf,m0=h.money;storyChoose(h,'gp_scam',0);if(!(h.emp.inf>i0)||Math.abs(m0-h.money-5e5)>1)throw Error('Paid back and on every newspaper');if(gpLines(h).join().indexOf('paid back')<0)throw Error('Scam line');
 `);
