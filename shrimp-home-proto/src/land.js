@@ -73,7 +73,7 @@ function mk(pb,ax,ay){return {c:pb.cv(),ax:ax,ay:ay,w:pb.w,h:pb.h,pb:pb};}
 // ----- Puti's art (src/pixart.js), loaded once -----
 var IMG={},ART={ready:false,failed:false};
 var MF=(typeof PIXMETA==='object'&&PIXMETA)?PIXMETA:{};
-function loadArt(){var src=(typeof PIXSRC==='object'&&PIXSRC)?PIXSRC:{},keys=Object.keys(src),left=keys.length;
+function loadArt(){var src=Object.assign({},(typeof PIXSRC==='object'&&PIXSRC)?PIXSRC:{},(typeof ANIMSRC==='object'&&ANIMSRC)?ANIMSRC:{}),keys=Object.keys(src),left=keys.length;
   if(!left){ART.failed=true;prepArt();return;}
   keys.forEach(function(k){var im=new Image();im.onload=function(){if(--left===0)prepArt();};im.onerror=function(){ART.failed=true;if(--left===0)prepArt();};im.src=src[k];IMG[k]=im;});}
 function imgPix(im,sx,sy,w,h){var c=document.createElement('canvas');c.width=w;c.height=h;var x=c.getContext('2d');try{x.drawImage(im,sx,sy,w,h,0,0,w,h);}catch(e){}return new Uint32Array(x.getImageData(0,0,w,h).data.buffer);}
@@ -659,18 +659,8 @@ defObj('trap',{solid:false,name:'Shrimp trap',spr:null,hit:function(o){return [o
 // ----- creatures: pixel sprites with dark outlines, facing right (mirrored for left) -----
 // -- birds. Each has its real colour patches. Poses: 0 perched, 1 pecking, 2 wings up, 3 wings down
 var BIRDS=[
- {id:'sparrow',name:'House sparrow',len:13,body:'#a07850',back:'#7a5634',belly:'#d9ccb2',head:'#8a8a86',cheek:'#e8e0cf',throat:'#2b2622',beak:'#3a3530',where:['feeder','ground'],hint:'Comes to any feeder',w:10,stage:0},
- {id:'bulbul',name:'White-eared bulbul',len:16,body:'#b8ad97',back:'#9c917b',belly:'#e6e0d2',head:'#2a2622',cheek:'#f2efe6',vent:'#f2c230',beak:'#2a2622',where:['feeder','tree','window'],hint:'Comes to any feeder',w:8,stage:0},
- {id:'dove',name:'Laughing dove',len:17,body:'#c69a86',back:'#a9806c',belly:'#e3c7b6',head:'#c9a596',wing:'#8fa0ad',neck:'#7a4a3a',beak:'#4a3a35',where:['ground'],hint:'Pecks seed under the feeder',w:6,stage:0},
- {id:'myna',name:'Common myna',len:17,body:'#5f4433',back:'#4c3628',belly:'#7a5a46',head:'#2a2420',eye:'#f2c230',beak:'#f2c230',wingspot:'#f1ece0',where:['ground','lawn'],hint:'Walks about on the lawn',w:5,stage:1},
- {id:'sunbird',name:'Purple sunbird',len:11,body:'#3c2f63',back:'#2f2550',belly:'#4a3a78',head:'#3c2f63',beak:'#1e1a2e',curve:1,where:['flowers'],hint:'Visits flowers',w:4,stage:1,need:'flowers'},
- {id:'hoopoe',name:'Hoopoe',len:19,body:'#e3a56e',back:'#d29660',belly:'#ecbf93',head:'#e3a56e',crest:1,bars:1,beak:'#2a2420',curve:1,where:['lawn'],hint:'Likes a short lawn',w:3,stage:2,need:'short'},
- {id:'beeeater',name:'Green bee-eater',len:18,body:'#4fae4a',back:'#3f9a3c',belly:'#7cc35a',head:'#c7b23a',throat:'#3fa7d6',mask:1,beak:'#1e1e1e',pins:1,where:['fence','meadow'],hint:'Likes long grass and a fence to sit on',w:3,stage:2,need:'long'},
- {id:'wagtail',name:'White wagtail',len:16,body:'#9a9a96',back:'#8a8a86',belly:'#f4f2ec',head:'#f4f2ec',cap:'#262422',throat:'#262422',beak:'#262422',wag:1,where:['water','path'],hint:'Near water and paths',w:3,stage:2,need:'water'},
- {id:'parakeet',name:'Rose-ringed parakeet',len:20,body:'#5cbf4a',back:'#4aa83c',belly:'#7cd06a',head:'#5cbf4a',beak:'#d23b2b',ring:1,longtail:1,where:['tree'],hint:'Lives in the trees',w:3,stage:3,need:'trees'},
- {id:'roller',name:'Indian roller',len:19,body:'#a57f7a',back:'#3aa0c8',belly:'#9fb6c8',head:'#4aa9c9',wing:'#24438f',beak:'#2a2420',where:['fence','tree'],hint:'Rare, sits on fences out on the land',w:1,stage:3},
- {id:'kingfisher',name:'Common kingfisher',len:14,body:'#e67d2e',back:'#2a8fd1',belly:'#e98a3c',head:'#2a8fd1',throat:'#f4efe4',beak:'#1e1e1e',dagger:1,where:['water'],hint:'Rare, by the stream',w:1,stage:3,need:'stream'},
- {id:'heron',name:'Grey heron',len:30,body:'#9aa2a6',back:'#8a9297',belly:'#e7e7e2',head:'#f0efe9',cap:'#262422',beak:'#e0b23a',tall:1,where:['water'],hint:'Rare, stands in shallow water',w:1,stage:2,need:'water'}];
+ {id:'bulbul',name:'White-eared bulbul',len:16,where:['feeder','tree','window'],hint:'Comes to any feeder',w:8,stage:0},
+ {id:'myna',name:'Common myna',len:17,where:['ground','lawn','feeder'],hint:'Walks about on the lawn',w:5,stage:0}];
 var BIRD={};BIRDS.forEach(function(b){BIRD[b.id]=b;});
 function birdPB(B,pose){var L=Math.round(B.len*1.45),tall=!!B.tall,W=L+16,H=tall?Math.round(L*1.7):L+8,pb=new PB(W,H),s=L/18,fly=pose>=2;
   var bx=Math.round(W/2-1),by=tall?Math.round(H*0.5):H-Math.round(7*s)-1,peck=pose===1;
@@ -697,7 +687,13 @@ function birdPB(B,pose){var L=Math.round(B.len*1.45),tall=!!B.tall,W=L+16,H=tall
   pb.set(hx+1.3*s,hy-0.6*s,B.eye||'#1a1612');
   var bl=Math.round((B.dagger?6:B.curve?5:tall?7:3)*s);for(var q=0;q<bl;q++){var yy=Math.round(hy+(B.curve?q*q/(bl*1.6):q*0.15));pb.set(hx+hr+q,yy,B.beak);if(q<bl/2)pb.set(hx+hr+q,yy+1,B.beak);}
   ink(pb);return pb;}
-function birdSpr(id,pose,face){var t=CACHE.bird[id]||(CACHE.bird[id]=[]);return cached(t,pose*2+(face<0?1:0),function(){var pb=birdPB(BIRD[id],pose);if(face<0)pb=pb.flipX();return mk(pb,Math.round(pb.w/2),pb.h-1);});}
+var AM=function(kind,n){return (typeof ANIMMETA==='object'&&ANIMMETA[kind]&&ANIMMETA[kind][n])||null;};
+function animFrame(kind,n,pose,ph,fps){var m=AM(kind,n);if(!m)return 0;var p=m.poses[pose]||m.poses[Object.keys(m.poses)[0]];return p[0]+(Math.floor(ph*fps)%p[1]+p[1])%p[1];}
+function animSpr(key,m,i,face,ax,ay){var im=IMG[key];if(!im||!m)return null;var c=document.createElement('canvas');c.width=m.w;c.height=m.h;var x=c.getContext('2d');x.imageSmoothingEnabled=false;
+  if(face<0){x.translate(m.w,0);x.scale(-1,1);}x.drawImage(im,i*m.w,0,m.w,m.h,0,0,m.w,m.h);return {c:c,ax:face<0?m.w-ax:ax,ay:ay,w:m.w,h:m.h};}
+var BIRD_HIP={bulbul:44,myna:48};
+function birdSpr(id,pose,face){var m=AM('birds',id);if(m&&IMG['an-bird-'+id]){var t=CACHE.bird[id]||(CACHE.bird[id]=[]);return cached(t,pose*2+(face<0?1:0),function(){return animSpr('an-bird-'+id,m,pose,face,BIRD_HIP[id]||m.w/2,m.h-13);});}
+  var B=BIRD[id];var t=CACHE.bird[id]||(CACHE.bird[id]=[]);return cached(t,pose*2+(face<0?1:0),function(){var pb=birdPB(B,0);if(face<0)pb=pb.flipX();return mk(pb,Math.round(pb.w/2),pb.h-1);});}
 // -- chickens
 var HENS=[
  {id:'white',name:'White hen',body:'#f7f3ea',wing:'#e3dccc',tail:'#efe9dc',egg:'white',hint:'Lays white eggs',price:40},
@@ -722,19 +718,20 @@ function henPB(kind,pose){var H=HEN[kind]||HEN.white,pb=new PB(44,40),lift=pose=
   pb.rect(hx-2,hy-6,5,2,'#d23b2b');pb.set(hx-2,hy-7,'#d23b2b');pb.set(hx,hy-7,'#d23b2b');pb.set(hx+2,hy-7,'#d23b2b');
   pb.rect(hx+2,hy+3,2,3,'#d23b2b');pb.poly([[hx+4,hy-1],[hx+8,hy],[hx+4,hy+2]],'#e8b03a');pb.set(hx+1,hy-1,'#1a1612');
   ink(pb);return pb;}
-function henSpr(kind,pose,face){var t=CACHE.hen[kind]||(CACHE.hen[kind]=[]);return cached(t,pose*2+(face<0?1:0),function(){var pb=henPB(kind,pose);if(face<0)pb=pb.flipX();return mk(pb,face<0?pb.w-20:19,38);});}
+var HEN_SHEET={white:'white',brown:'brown',speckled:'speckled',blue:'blue',wild:'jungle'};
+function henSpr(kind,pose,face){var hn=HEN_SHEET[kind]||'white',m=AM('hens',hn);if(m&&IMG['an-hen-'+hn]){var t0=CACHE.hen[kind]||(CACHE.hen[kind]=[]);return cached(t0,'a'+pose*2+(face<0?1:0),function(){return animSpr('an-hen-'+hn,m,pose,face,24,m.h-3);});}
+  var t=CACHE.hen[kind]||(CACHE.hen[kind]=[]);return cached(t,pose*2+(face<0?1:0),function(){var pb=henPB(kind,pose);if(face<0)pb=pb.flipX();return mk(pb,face<0?pb.w-20:19,38);});}
 var EGG_COL={white:'#f7f3ea',brown:'#c98a52',cream:'#ecdcb6',speckled:'#e9dcc4',blue:'#a9cfd3'};
 function eggSpr(kind){return cached(CACHE.egg,kind,function(){var pb=new PB(9,11),c=EGG_COL[kind]||EGG_COL.white;pb.ell(4.5,6,3.6,4.6,c);pb.set(3,3,lt(c,0.5));pb.set(3,4,lt(c,0.4));pb.rect(4,9,3,1,dk(c,0.2));if(kind==='speckled'){pb.set(5,5,'#6b4a34');pb.set(3,7,'#6b4a34');pb.set(6,8,'#6b4a34');}ink(pb);return mk(pb,4,10);});}
 // -- fish (for the catch, the book and the pond)
 var FISH=[
- {id:'minnow',name:'Minnow',body:'#c9cfc6',back:'#8f9a88',stripe:'#3a3f38',len:[4,8],where:'both',hint:'Common in the stream and the lake',w:10},
- {id:'goby',name:'Stream goby',body:'#b39a74',back:'#7a6448',mottle:1,bighead:1,len:[3,6],where:'stream',hint:'Sits on stones in the stream',w:7},
- {id:'loach',name:'Loach',body:'#c6b48c',back:'#8a7a58',spots:1,long:1,barbels:1,len:[6,11],where:'stream',hint:'Hides in the gravel',w:5},
- {id:'chub',name:'Pale chub',body:'#dcdcd6',back:'#9ab0b6',bars:'#8fb0d6',fins:'#e07a5a',len:[8,15],where:'stream',hint:'Shiny, quick, in the stream',w:4},
- {id:'barb',name:'Barb',body:'#d9b45a',back:'#a98a3a',dots:1,len:[5,9],where:'both',hint:'Gold with black spots',w:4},
- {id:'eel',name:'Eel',body:'#7a7448',back:'#4f4a2c',eel:1,len:[30,60],where:'stream',hint:'Rare, at the bottom of the stream',w:0.6},
- {id:'tilapia',name:'Tilapia',body:'#a9b29c',back:'#6f7a64',bars:'#59624f',fins:'#d26a5a',deep:1,len:[10,22],where:'lake',hint:'Big and slow, in the lake',w:6},
- {id:'carp',name:'Mirror carp',body:'#d8a95a',back:'#9a7434',scales:1,barbels:1,deep:1,len:[20,45],where:'lake',hint:'Rare, the big one in the lake',w:1.2}];
+ {id:'green-tiger-barb',name:'Green tiger barb',len:[3,6],where:'both',hint:'Green and quick, in schools',w:8},
+ {id:'black-neon-tetra',name:'Black neon tetra',len:[2,4],where:'stream',hint:'A bright line down a black side',w:8},
+ {id:'ember-tetra',name:'Ember tetra',len:[1.5,2.5],where:'stream',hint:'Small and orange',w:9},
+ {id:'serpae-tetra',name:'Serpae tetra',len:[3,4.5],where:'both',hint:'Red with a black shoulder spot',w:6},
+ {id:'black-phantom-tetra',name:'Black phantom tetra',len:[3,4.5],where:'lake',hint:'Grey with a black patch',w:5},
+ {id:'rosy-tetra',name:'Rosy tetra',len:[3,4.5],where:'lake',hint:'Pink with a tall fin',w:5},
+ {id:'tricolor-swordtail',name:'Tricolour swordtail',len:[5,8],where:'both',hint:'Rare. Orange, black and white, with a sword',w:1.5}];
 var FISHI={};FISH.forEach(function(f){FISHI[f.id]=f;});
 function fishPB(F){var W=46,H=22,pb=new PB(W,H),cy=11;
   if(F.eel){for(var x=2;x<44;x++){var y=Math.round(cy+Math.sin(x*0.3)*3);pb.rect(x,y-2,1,5,F.body);pb.set(x,y-2,F.back);pb.set(x,y-1,F.back);}pb.set(42,Math.round(cy+Math.sin(42*0.3)*3)-1,'#1a1612');ink(pb);return pb;}
@@ -751,7 +748,8 @@ function fishPB(F){var W=46,H=22,pb=new PB(W,H),cy=11;
   pb.rect(bx+bl-5,cy-2,2,2,'#f4f0e6');pb.set(bx+bl-4,cy-2,'#1a1612');
   if(F.barbels){pb.set(bx+bl+1,cy+2,'#2a2420');pb.set(bx+bl+2,cy+3,'#2a2420');}
   ink(pb);return pb;}
-function fishSpr(id){return cached(CACHE.fish,id,function(){var pb=fishPB(FISHI[id]||FISH[0]);return mk(pb,23,21);});}
+function fishSpr(id,fr,face){var m=AM('fish',id);fr=fr||0;face=face||1;if(m&&IMG['an-fish-'+id])return cached(CACHE.fish,id+':'+fr+':'+face,function(){return animSpr('an-fish-'+id,m,fr,face,Math.round(m.w/2),Math.round(m.h/2));});
+  return cached(CACHE.fish,id,function(){var pb=fishPB(FISHI[id]||FISH[0]);return mk(pb,23,21);});}
 var FINDS=[{id:'crab',name:'Freshwater crab',hint:'Sometimes climbs into the trap'},{id:'snail',name:'Pond snail',hint:'Rides in on the trap'},{id:'nymph',name:'Dragonfly nymph',hint:'Lives under stones'},{id:'leaf',name:'Old leaf',hint:'Leaves drift into the trap'},{id:'bottle',name:'Old glass bottle',hint:'Rare. Someone lost it a long time ago'}];
 var FINDI={};FINDS.forEach(function(f){FINDI[f.id]=f;});
 function findPB(id){var pb=new PB(30,22);
@@ -1136,7 +1134,7 @@ function stepBirds(dt){var me=L.me,dg=L.dog;L.spawnT+=dt;var still=meStill(),per
     else{var k2=clamp(b.t/b.dur,0,1);b.x=lerp(b.fx,b.tx,k2);b.y=lerp(b.fy,b.ty,k2*k2);if(k2>=1)b.gone=true;}}
   compact(L.birds,'gone');}
 function compact(a,flag){var n=0;for(var i=0;i<a.length;i++){if(!a[i][flag])a[n++]=a[i];}a.length=n;}
-function birdPose(b){if(b.st!=='stay'||b.spot.hover)return (Math.floor(b.ph*14)%2)?2:3;return b.peck&&Math.sin(b.ph*9)>0?1:0;}
+function birdPose(b){if(b.st!=='stay'||b.spot.hover)return animFrame('birds',b.sp,'fly',b.ph,12);if(b.peck)return animFrame('birds',b.sp,Math.sin(b.ph*0.9)>-0.3?'peck':'hop',b.ph,8);return animFrame('birds',b.sp,'idle',b.ph,4);}
 function hitBird(wx,wy){var best=null,bd=34;L.birds.forEach(function(b){if(b.st!=='stay'&&b.st!=='in')return;var d=Math.hypot(b.x-wx,b.y-10-wy);if(d<bd){bd=d;best=b;}});return best;}
 function watchBird(b){var me=L.me;if(me&&me.moving){me.path=[];me.moving=false;me.act=null;}L.watch={b:b,t:0};b.stay=Math.max(b.stay,b.t+3);faceTo(b.x,b.y);sfx('click');
   if(!LS().seen.watch)LS().seen.watch=1;}
@@ -1178,7 +1176,7 @@ function grainStep(c,g){var F=L.grainField,m=M(),w=m.w,tx=Math.floor(c.x/T),ty=M
   if(!F||(Math.abs(tx-gx)<=1&&Math.abs(ty-gy)<=1)){c.tx=g.x-(g.x>c.x?5:-5);c.ty=g.y;return;}
   var best=-1,bv=F[ty*w+tx];for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++){if(!dx&&!dy)continue;var nx=tx+dx,ny=ty+dy;if(nx<0||ny<0||nx>=w||ny>=m.h)continue;var v=F[ny*w+nx];if(v<bv&&canStep(tx,ty,nx,ny)){bv=v;best=ny*w+nx;}}
   if(best<0){c.tx=g.x;c.ty=g.y;return;}c.tx=(best%w)*T+T/2;c.ty=((best/w)|0)*T+T/2+8;}
-function chickPose(c){if(c.st==='walk'||c.st==='run')return Math.floor(c.ph*(c.st==='run'?14:8))%2;if(c.st==='peck'||c.st==='eat')return Math.sin(c.ph*10)>0?2:3;if(c.st==='flap')return 4;return 3;}
+function chickPose(c){var n=HEN_SHEET[c.wild?'wild':c.kind]||'white';if(c.st==='walk')return animFrame('hens',n,'walk',c.ph,8);if(c.st==='run'||c.st==='flap')return animFrame('hens',n,'run',c.ph,14);if(c.st==='peck'||c.st==='eat')return animFrame('hens',n,'peck',c.ph,7);return animFrame('hens',n,'idle',c.ph,3);}
 function hitChick(wx,wy,list,r){var best=null,bd=r;Object.keys(list).forEach(function(k){var c=list[k],d=Math.hypot(c.x-wx,c.y-16-wy);if(d<bd){bd=d;best=c;}});return best;}
 
 // ----- particles -----
@@ -1211,9 +1209,7 @@ function pondOK(x,y){var tx=Math.floor(x/T),ty=Math.floor(y/T);if(waterKind(tx,t
   return pondAt(x+14,y)&&pondAt(x-14,y)&&pondAt(x,y+12)&&pondAt(x,y-12);}
 function stepPondFish(dt){for(var fi=0;fi<L.fishA.length;fi++){var f=L.fishA[fi];f.ph+=dt;f.a+=Math.sin(f.ph*0.7)*dt*0.9;var nx=f.x+Math.cos(f.a)*18*dt,ny=f.y+Math.sin(f.a)*11*dt;if(pondOK(nx,ny)){f.x=nx;f.y=ny;}else f.a+=Math.PI*0.6;}}
 var PFCOL={};
-function drawPondFish(x){for(var fi=0;fi<L.fishA.length;fi++){var f=L.fishA[fi];if(!inView(f.x,f.y,30))continue;var F=FISHI[f.kind]||FISH[0],len=clamp(8+(f.len||8)*0.5,9,26),ca=Math.cos(f.a),sa=Math.sin(f.a),col=PFCOL[F.id]||(PFCOL[F.id]=dk(F.back,0.35));x.globalAlpha=0.6;
-  for(var k=0;k<len;k++){var w=k<len*0.2?1:k<len*0.75?2:1,px=f.x+ca*(len/2-k),py=f.y+sa*(len/2-k)*0.6;wrect(x,px-w/2,py-w/2,w,w,col);}
-  var tail=Math.sin(f.ph*8)*2,tx=f.x-ca*(len/2+2),ty=f.y-sa*(len/2+2)*0.6;wrect(x,tx-1-sa*tail,ty-1+ca*tail,3,2,col);x.globalAlpha=1;}}
+function drawPondFish(x){for(var fi=0;fi<L.fishA.length;fi++){var f=L.fishA[fi];if(!inView(f.x,f.y,40))continue;var F=FISHI[f.kind]||FISH[0],face=Math.cos(f.a)<0?-1:1;x.globalAlpha=0.85;drawSpr(x,fishSpr(F.id,animFrame('fish',F.id,'swim',f.ph,8),face),f.x,f.y);x.globalAlpha=1;}}
 
 // ----- world <-> screen. The canvas has one pixel per art pixel; CSS scales it up crisp (image-rendering: pixelated) -----
 function sxOf(wx){return Math.round(wx)-L.cdx;}
@@ -1412,7 +1408,7 @@ function landFish(water){var pool=FISH.filter(function(F){return F.where==='both
   var bk=LS().bucket,canKeep=(L.pondTiles||[]).length>0&&bk.length<3&&LS().pond.length+bk.length<10;
   openSheet({title:F.name,mount:function(el){el.innerHTML='<div class="fishcv"></div><p class="sub">'+len+' cm.'+(canKeep?' Let it go, or take it home for your pond.':(L.pondTiles||[]).length?(bk.length>=3?' The bucket’s full. Take them to the pond first.':''):'')+'</p><div class="btns"><button class="btn" data-go>Let it go</button>'+(canKeep?'<button class="btn primary" data-keep>Put it in the bucket</button>':'')+'</div>';
     var box=el.querySelector('.fishcv'),w=Math.min(el.clientWidth||320,520);box.style.cssText='width:'+w+'px;max-width:100%;height:110px;border-radius:10px;border:1px solid var(--line);margin:0 auto 8px;background:#89d8e4;display:flex;align-items:center;justify-content:center;overflow:hidden';
-    var sc=F.eel?4:5;box.appendChild(spriteCanvas(fishSpr(F.id),sc,Math.min(w-10,46*sc),22*sc));
+    var fs=fishSpr(F.id),sc=Math.max(1,Math.floor(Math.min((w-10)/fs.w,4)));box.appendChild(spriteCanvas(fs,sc,fs.w*sc,fs.h*sc));
     bookAdd('fish',F.id,{where:water==='stream'?'the stream':'the lake',cm:len});
     el.querySelector('[data-go]').onclick=function(){closeSheet();sfx('splash');var fb=L.fishing;if(fb)puff('drop',fb.x,fb.y,10,{speed:40,up:30,life:0.6});};
     var kb=el.querySelector('[data-keep]');if(kb)kb.onclick=function(){bk.push({kind:F.id,len:len});closeSheet();sfx('plop');if(!LS().seen.bucket){LS().seen.bucket=1;toast('Take it home and tap your pond to let it in.',3600);}updateStat(true);save();};}});}
@@ -1668,7 +1664,7 @@ function regBook(){
   bookCat('birds',{title:'Birds',order:2,entries:BIRDS.map(function(B){return {id:B.id,name:B.name,hint:B.hint,draw:function(x,w,h){bookDraw(x,birdSpr(B.id,0,1),w,h);}};})});
   bookCat('fish',{title:'Fish',order:3,entries:FISH.map(function(F){return {id:F.id,name:F.name,hint:F.hint,draw:function(x,w,h){bookDraw(x,fishSpr(F.id),w,h);}};})});
   bookCat('finds',{title:'Stream finds',order:4,entries:FINDS.map(function(f){return {id:f.id,name:f.name,hint:f.hint,draw:function(x,w,h){bookDraw(x,findSpr(f.id),w,h);}};})});
-  var coop=HENS.map(function(Hn){return {id:'hen-'+Hn.id,name:Hn.name,hint:Hn.hint,draw:function(x,w,h){bookDraw(x,henSpr(Hn.id,3,1),w,h);}};});
+  var coop=HENS.map(function(Hn){return {id:'hen-'+Hn.id,name:Hn.name,hint:Hn.hint,draw:function(x,w,h){bookDraw(x,henSpr(Hn.id,0,1),w,h);}};});
   [['white','White egg','From a white hen'],['brown','Brown egg','From a brown hen'],['speckled','Speckled egg','From a speckled hen'],['blue','Blue egg','From a blue egg hen'],['cream','Small cream egg','From a wild junglefowl']].forEach(function(e){coop.push({id:'egg-'+e[0],name:e[1],hint:e[2],draw:function(x,w,h){bookDraw(x,eggSpr(e[0]),w,h);}});});
   bookCat('coop',{title:'Chickens and eggs',order:5,entries:coop});}
 
@@ -1696,4 +1692,11 @@ window.LAND={L:L,T:T,stats:function(){return S.land.stats;},toWorld:fromCss,camF
   waterKind:waterKind,tileOf:tileOf,objSprite:objSprite,oX:oX,oBase:oBase,
   _dbg:{flood:flood,pathFor:pathFor,smoothPath:smoothPath,losClear:losClear,nearestReachable:nearestReachable,tilesTo:tilesTo,repaintTile:repaintTile,renderGround:function(){var t=performance.now();renderGround();return performance.now()-t;},flushGround:function(){var t=performance.now();drainRepaint(1e9);return performance.now()-t;},catDecide:catDecide,catRoom:catRoom,composeTile:function(tx,ty){return composeTile(M(),tx,ty);}},
   _spr:{cat:catSpr,hen:henSpr,bird:birdSpr,grandma:grandmaSpr,fish:fishSpr,find:findSpr,egg:eggSpr,mower:mowerSpr,obj:function(k,o){var d=OBJ[k];o=o||{};var q={k:k,tx:0,ty:0,fw:o.fw||d.fw,fh:o.fh||d.fh,seed:o.seed||5,v:o.v,s:o.s,i:o.i==null?-1:o.i,gm:o.gm};return d.spr(q);}}};
+// ----- #full: open straight on the land, fully upgraded, with every hen and her fish (for previews) -----
+window.landFull=function(){ensureLand();if(S.stage<3||!S.land.map)landSetStage(3);var l=S.land;S.cash=Math.max(S.cash||0,1000000);
+  ['white','brown','speckled','blue'].forEach(function(k){if(!l.hens.some(function(h){return h.kind===k;}))l.hens.push({id:'h'+(++l.oid),kind:k});});
+  l.pond=FISH.map(function(F){return {kind:F.id,len:F.len[1]};});
+  resetRuntime();save(true);setTab('home');updateHeader();};
+window.addEventListener('load',function(){if(location.hash==='#full')setTimeout(function(){try{landFull();}catch(e){console.error(e);}},50);});
 })();
+

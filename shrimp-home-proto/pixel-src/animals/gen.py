@@ -211,6 +211,37 @@ def jungle_tail(g):
 
 # ---------------------------------------------------------------- birds
 
+def rot_pixels(src, ang, px, py):
+    """Rotate pixel art about (px, py) by ang degrees (positive = clockwise on screen, head down for a right-facing bird).
+    RotSprite-style: upscale 4x, rotate nearest, then take the most common colour in each 4x4 block, so lines stay clean."""
+    if not ang:
+        return [r[:] for r in src]
+    H, W = len(src), len(src[0])
+    k = 4
+    a = math.radians(ang)
+    ca, sa = math.cos(a), math.sin(a)
+    out = blank(W, H)
+    for y in range(H):
+        for x in range(W):
+            votes = {}
+            for sy in range(k):
+                for sx in range(k):
+                    fx, fy = x + (sx + 0.5) / k - px, y + (sy + 0.5) / k - py
+                    ux, uy = fx * ca + fy * sa + px, -fx * sa + fy * ca + py
+                    ix, iy = int(math.floor(ux)), int(math.floor(uy))
+                    p = src[iy][ix] if 0 <= iy < H and 0 <= ix < W else T
+                    votes[p] = votes.get(p, 0) + 1
+            best = max(votes.items(), key=lambda kv: kv[1])
+            # keep a pixel if at least 6 of 16 samples are filled, so thin ink lines survive
+            filled = sum(v for p, v in votes.items() if p[3])
+            if filled >= 6:
+                cand = max(((p, v) for p, v in votes.items() if p[3]), key=lambda kv: kv[1])
+                out[y][x] = cand[0]
+            else:
+                out[y][x] = T
+    return out
+
+
 def bird_frame(src, spec, pose, t):
     g0 = grid(src)
     H0, W0 = len(g0), len(g0[0])
@@ -218,62 +249,43 @@ def bird_frame(src, spec, pose, t):
     W, H = W0 + 2 * pad, H0 + 2 * pad
     g = blank(W, H)
     legtop = spec['legtop']
-    hx0 = spec['headx']
-    body = [[g0[y][x] if y < legtop else T for x in range(W0)] for y in range(H0)]
-    legs = [[g0[y][x] if y >= legtop else T for x in range(W0)] for y in range(H0)]
-    head = blank(W0, H0)
-    hcx, hcy, hrx, hry = spec['headell']
-    for y in range(H0):
-        for x in range(W0):
-            if body[y][x][3] and ((x - hcx) / hrx) ** 2 + ((y - hcy) / hry) ** 2 <= 1:
-                head[y][x] = body[y][x]
-                body[y][x] = T
-    by, hdx, hdy, tdy, showlegs, wing = 0, 0, 0, 0, True, None
+    lx0, lx1 = spec['legx']
+    isleg = lambda x, y: y >= legtop and lx0 <= x <= lx1
+    up = [[T if isleg(x, y) else g0[y][x] for x in range(W0)] for y in range(H0)]
+    legs = [[g0[y][x] if isleg(x, y) else T for x in range(W0)] for y in range(H0)]
+    hipx, hipy = spec['hip']
+    ang, by, showlegs, wing = 0, 0, True, None
     if pose == 'idle':
-        tdy = [0, 1, 1, 1, 0, 0][t % 6]
-        hdy = [0, 0, 0, 0, 0, 0][t % 6]
+        ang = [0, 0, -4, -6, -4, 0][t % 6]
     elif pose == 'peck':
-        hdx, hdy = [(0, 0), (1, 4), (2, 8), (2, 8), (1, 4)][t % 5]
-        tdy = [0, -1, -2, -2, -1][t % 5]
+        ang = [0, 14, 28, 30, 14][t % 5]
     elif pose == 'hop':
         by = [0, 1, -3, -5, -3, 0][t % 6]
+        ang = [0, 4, -4, -6, -4, 0][t % 6]
         showlegs = t % 6 in (0, 1, 5)
-        tdy = [0, 0, 2, 3, 2, 0][t % 6]
     elif pose == 'fly':
         by = [-4, -6, -4, -2][t % 4]
+        ang = -4
         showlegs = False
         wing = ['up', 'mid', 'down', 'mid'][t % 4]
+    # big padded canvas so a rotated tail or head never leaves the frame
+    P = 12
+    big = blank(W0 + 2 * P, H0 + 2 * P)
+    paste(big, up, P, P)
+    big = rot_pixels(big, ang, hipx + P, hipy + P)
     ox, oy = pad, pad
     if showlegs:
         sink = 1 if (pose == 'hop' and t % 6 == 1) else 0
         paste(g, legs, ox, oy + max(by, 0))
         by += sink
     else:
-        # tucked feet under the belly
         for (fx, fy) in spec['tuck']:
             put(g, ox + fx, oy + fy + by, spec['foot'])
             put(g, ox + fx + 1, oy + fy + by, spec['foot'])
             put(g, ox + fx, oy + fy + by + 1, A)
             put(g, ox + fx + 1, oy + fy + by + 1, A)
-    tx = spec['tailx']
-    for x in range(W0):
-        off = round(tdy * (tx - x) / tx) if (tdy and x < tx) else 0
-        for y in range(H0):
-            p = body[y][x]
-            if p[3]:
-                put(g, ox + x, oy + by + y + off, p)
-    if hdx or hdy:
-        pts = []
-        cx, cy = spec['neck']
-        for i in range(5):
-            f = i / 4
-            pts += disc_pts(cx + hdx * f, cy + hdy * f, spec['neckr'])
-        pts = [p for p in set(pts)]
-        for (x, y) in pts:
-            put(g, ox + x, oy + by + y, spec['neckc'])
-        outline(g, [(ox + x, oy + by + y) for x, y in pts], A)
-    paste(g, head, ox + hdx, oy + by + hdy)
-    if wing in ('up', 'mid', 'down'):
+    paste(g, big, ox - P, oy - P + by)
+    if wing:
         draw_wing(g, spec, ox, oy + by, wing, front=True)
     return g
 
@@ -349,11 +361,11 @@ def fill_poly(poly):
 
 
 BIRDS = {
-    'bulbul': dict(layer='White eared bulbul', legtop=25, headx=33, heady=14, tailx=18, taily=17, headell=(41, 7, 12, 8.5),
+    'bulbul': dict(layer='White eared bulbul', legtop=25, headx=33, heady=14, tailx=18, taily=17, headell=(41, 7, 12, 8.5), hip=(32, 24), legx=(24, 42),
                    neck=(36, 11), neckr=3.5, neckc=(34, 28, 26, 255), shoulder=(30, 10), wingL=20,
                    wingc=((121, 103, 85, 255), (90, 78, 68, 255), (150, 132, 112, 255)),
                    tuck=[(27, 24), (35, 24)], foot=(34, 28, 26, 255)),
-    'myna': dict(layer='common myna', legtop=31, headx=35, heady=13, tailx=22, taily=24, headell=(46.5, 6, 11.5, 8),
+    'myna': dict(layer='common myna', legtop=31, headx=35, heady=13, tailx=22, taily=24, headell=(46.5, 6, 11.5, 8), hip=(36, 30), legx=(27, 46),
                  neck=(39, 11), neckr=4, neckc=(20, 16, 19, 255), shoulder=(30, 17), wingL=22,
                  wingc=((90, 78, 68, 255), (34, 28, 26, 255), (66, 57, 52, 255)),
                  tuck=[(30, 31), (37, 31)], foot=(249, 163, 27, 255)),

@@ -3,7 +3,7 @@
 import os, shutil, re, sys
 ROOT=os.path.dirname(os.path.abspath(__file__))
 SRC=os.path.join(ROOT,'src'); DIST=os.path.join(ROOT,'dist')
-ORDER=['sprites.js','netart.js','pixart.js','core.js','ink.js','sound.js','shrimpart.js','genetics.js','breed.js','tank.js','toys.js','land.js','book.js','try.js','main.js']
+ORDER=['sprites.js','netart.js','pixart.js','animart.js','core.js','ink.js','sound.js','shrimpart.js','genetics.js','breed.js','tank.js','toys.js','land.js','book.js','try.js','main.js']
 shell=open(os.path.join(SRC,'shell.html')).read()
 css=open(os.path.join(SRC,'style.css')).read()
 for extra in sorted(os.listdir(SRC)):
