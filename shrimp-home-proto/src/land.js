@@ -1356,7 +1356,8 @@ function onTap(wx,wy,cx,cy){var t=tileOf(wx,wy),m=M(),me=L.me;if(!me)return;
   var b=hitBird(wx,wy);if(b){watchBird(b);return;}
   if(L.dog&&hitThing(L.dog.x,L.dog.y-28,wx,wy,34)){petDog();return;}
   if(L.cat&&hitThing(L.cat.x,L.cat.y-(L.cat.st==='paw'?30:16),wx,wy,30)){petCat();return;}
-  var wc=hitChick(wx,wy,L.wildA,30);if(wc){goCatch(wc);return;}
+  if(LS().carry){var co=objsOf('coop')[0];if(inHenYard(wx,wy)||(co&&interactAt(wx,wy)===co)){var tt=passable(t[0],t[1])?t:null;if(!tt){var st=tileOf(me.x,me.y),FF=flood(st[0],st[1]);tt=nearestReachable(FF,wx,wy,3);}if(tt){walkTo(tt,null,null,function(){dropHen(wx,wy);});return;}}}
+  var wc=hitChick(wx,wy,L.wildA,30);if(wc){if(LS().carry||LS().bucket.length){toast('Your hands are full.');sfx('nope');return;}goCatch(wc);return;}
   var hc=hitChick(wx,wy,L.henA,28);if(hc){henFlap(hc);return;}
   var o=interactAt(wx,wy);if(o&&useObj(o))return;
   var g=mget(m,t[0],t[1]);
@@ -1396,6 +1397,7 @@ function tapWater(wx,wy,t){var k=waterKind(t[0],t[1]),bk=LS().bucket;
   if(k===W_POND){if(bk.length){goBank(wx,wy,t,function(){releaseFish(wx,wy);});return;}
     goBank(wx,wy,t,function(){bubAt(wx,wy-10,'<b>Your pond</b><div>'+(LS().pond.length?plural(LS().pond.length,'fish')+' live here.':'No fish yet. Catch some in the stream or the lake and bring them here.')+'</div>');});return;}
   if(L.tool==='rod'){goFish(wx,wy,t);return;}
+  if(bk.length&&(k===W_STREAM||k===W_LAKE)){goBank(wx,wy,t,function(){freeFish(wx,wy,k);});return;}
   if(k===W_STREAM){goBank(wx,wy,t,function(){trapMenu(t,wx,wy);});return;}
   goBank(wx,wy,t,function(){bubAt(wx,wy-10,'<b>The lake</b><div>Fish here with the rod.</div>');});}
 
@@ -1449,9 +1451,12 @@ function goCatch(c){var me=L.me;if(!pecking(c)){toast('Wait till it pecks the gr
   if(!LS().seen.sneak){LS().seen.sneak=1;toast('Creeping up…');}}
 var WILD_KINDS=[['wild',3],['brown',3],['white',2],['speckled',2],['blue',1]];
 function newWild(){var l=LS(),tot=0,r;WILD_KINDS.forEach(function(k){tot+=k[1];});r=Math.random()*tot;var kind='wild';for(var i=0;i<WILD_KINDS.length;i++){r-=WILD_KINDS[i][1];if(r<0){kind=WILD_KINDS[i][0];break;}}return {id:'w'+(++l.oid),kind:kind};}
-function catchWild(c){if(!objsOf('coop').length){c.st='run';c.t=0;c.dur=1.4;var ax=c.x-L.me.x,ad=Math.abs(ax)||1;chickGo(c,c.x+ax/ad*T*2.5,c.y,L.wildPx||henArea());sfx('flap');toast('She needs somewhere to live. Build a coop first (Build, Yard).',3600);return;}var l=LS();faceTo(c.x,c.y);l.wild=l.wild.filter(function(w){return w.id!==c.id;});delete L.wildA[c.id];var id='h'+(++l.oid),kind=c.kind||'wild';l.hens.push({id:id,kind:kind});
+function catchWild(c){if(!objsOf('coop').length){c.st='run';c.t=0;c.dur=1.4;var ax=c.x-L.me.x,ad=Math.abs(ax)||1;chickGo(c,c.x+ax/ad*T*2.5,c.y,L.wildPx||henArea());sfx('flap');toast('She needs somewhere to live. Build a coop first (Build, Yard).',3600);return;}var l=LS();faceTo(c.x,c.y);l.wild=l.wild.filter(function(w){return w.id!==c.id;});delete L.wildA[c.id];var kind=c.kind||'wild';l.carry={kind:kind};
   puff('feather',c.x,c.y-16,10,{col:'#c4562a',speed:50,life:1.3});sfx('flap');sfx('cluck');syncAgents();
-  bookAdd('coop','hen-'+kind,{where:'the land'});toast('You caught a '+HEN[kind].name.toLowerCase()+'. She lives in the coop now.');save();}
+  bookAdd('coop','hen-'+kind,{where:'the land'});toast('You caught a '+HEN[kind].name.toLowerCase()+'. Carry her to the yard by the coop.',3600);updateStat(true);save();}
+function inHenYard(wx,wy){var a=henArea();return !!(a&&wx>=a.x0-T*0.5&&wx<=a.x1+T*0.5&&wy>=a.y0-T*0.5&&wy<=a.y1+T*0.5);}
+function dropHen(wx,wy){var l=LS();if(!l.carry)return;var kind=l.carry.kind,id='h'+(++l.oid);l.carry=null;l.hens.push({id:id,kind:kind});syncAgents();var c=L.henA[id];if(c){c.x=L.me.x+(L.me.dir==='left'?-30:30);c.y=L.me.y+4;c.st='run';c.t=0;c.dur=0.8;chickGo(c,c.x+(Math.random()-0.5)*T*2,c.y+T*0.6,henArea());}
+  sfx('flap');sfx('cluck');puff('feather',L.me.x,L.me.y-40,6,{col:HEN[kind].body,speed:40,life:1});toast('She’s in the yard.');updateStat(true);save();}
 
 // ----- the stream trap -----
 function trapsOn(){return objsOf('trap');}
@@ -1518,13 +1523,15 @@ function stepFishing(dt){var f=L.fishing;if(!f)return;f.t+=dt;var me=L.me;if(me&
   else if(f.st==='reel'){rodTip();f.x=lerp(f.x,L.tipX,dt*3);f.y=lerp(f.y,L.tipY+30,dt*3);if(f.t>0.9){f.st='idle';landFish(f.water);updateStat(true);}}}
 function landFish(water){var pool=FISH.filter(function(F){return F.where==='both'||F.where===water;}),tot=pool.reduce(function(a,F){return a+F.w;},0),r=Math.random()*tot,F=pool[0];
   for(var i=0;i<pool.length;i++){r-=pool[i].w;if(r<=0){F=pool[i];break;}}var len=Math.round(lerp(F.len[0],F.len[1],Math.random()));LS().stats.fish++;
-  var bk=LS().bucket,canKeep=(L.pondTiles||[]).length>0&&bk.length<3&&LS().pond.length+bk.length<10;
-  openSheet({title:F.name,mount:function(el){el.innerHTML='<div class="fishcv"></div><p class="sub">'+len+' cm.'+(canKeep?' Let it go, or take it home for your pond.':(L.pondTiles||[]).length?(bk.length>=3?' The bucket’s full. Take them to the pond first.':''):'')+'</p><div class="btns"><button class="btn" data-go>Let it go</button>'+(canKeep?'<button class="btn primary" data-keep>Put it in the bucket</button>':'')+'</div>';
+  var bk=LS().bucket,canKeep=bk.length<3&&LS().pond.length+bk.length<10&&!LS().carry;
+  openSheet({title:F.name,mount:function(el){el.innerHTML='<div class="fishcv"></div><p class="sub">'+len+' cm.'+(canKeep?' Let it go, or carry it to your pond.':bk.length>=3?' Your hands are full. Take them to the pond or the stream first.':LS().carry?' Your hands are full.':'')+'</p><div class="btns"><button class="btn" data-go>Let it go</button>'+(canKeep?'<button class="btn primary" data-keep>Carry it</button>':'')+'</div>';
     var box=el.querySelector('.fishcv'),w=Math.min(el.clientWidth||320,520);box.style.cssText='width:'+w+'px;max-width:100%;height:110px;border-radius:10px;border:1px solid var(--line);margin:0 auto 8px;background:#89d8e4;display:flex;align-items:center;justify-content:center;overflow:hidden';
     var fs=fishSpr(F.id),sc=Math.max(1,Math.floor(Math.min((w-10)/fs.w,4)));box.appendChild(spriteCanvas(fs,sc,fs.w*sc,fs.h*sc));
     bookAdd('fish',F.id,{where:water==='stream'?'the stream':'the lake',cm:len});
     el.querySelector('[data-go]').onclick=function(){closeSheet();sfx('splash');var fb=L.fishing;if(fb)puff('drop',fb.x,fb.y,10,{speed:40,up:30,life:0.6});};
-    var kb=el.querySelector('[data-keep]');if(kb)kb.onclick=function(){bk.push({kind:F.id,len:len});closeSheet();sfx('plop');if(!LS().seen.bucket){LS().seen.bucket=1;toast('Take it home and tap your pond to let it in.',3600);}updateStat(true);save();};}});}
+    var kb=el.querySelector('[data-keep]');if(kb)kb.onclick=function(){bk.push({kind:F.id,len:len});closeSheet();sfx('plop');if(!LS().seen.bucket){LS().seen.bucket=1;toast('Walk to your pond and tap it to let it in, or tap the stream to let it go.',3800);}updateStat(true);save();};}});}
+function freeFish(wx,wy,k){var l=LS(),n=l.bucket.length;if(!n)return;l.bucket=[];sfx('splash');puff('drop',wx,wy,12,{speed:60,up:50,life:0.7});puff('ring',wx,wy+4,1,{speed:0,life:1.2,r:1.4});
+  toast(n===1?'Back in the '+(k===W_LAKE?'lake':'stream')+'.':n+' fish back in the '+(k===W_LAKE?'lake':'stream')+'.');updateStat(true);save();}
 function releaseFish(wx,wy){var l=LS(),n=l.bucket.length;if(!n)return;l.bucket.forEach(function(f){l.pond.push(f);});l.bucket=[];syncAgents();sfx('splash');puff('drop',wx,wy,14,{speed:60,up:50,life:0.7});puff('ring',wx,wy+4,1,{speed:0,life:1.2,r:1.4});
   toast(n===1?'It’s in the pond now.':n+' fish in the pond now.');updateStat(true);save();}
 
@@ -1717,7 +1724,8 @@ function updateStat(force){var el=$('lstat');if(!el)return;var l=LS(),html='',eg
   else if(L.tool==='build'&&L.removing)html='Tap or drag over things you built to take them away.';
   else if(b)html=b.ground?esc(b.name)+': tap a tile, or drag to paint. '+fmtA(b.price)+' a tile.':'Tap where the '+esc(b.name.toLowerCase())+' goes. '+fmtA(b.price)+'.';
   else if(L.tool==='build')html='Pick something to build. Drag the map to look around.';
-  else if(l.bucket.length)html='<span>Bucket: '+plural(l.bucket.length,'fish','fish')+'. Tap your pond to let '+(l.bucket.length>1?'them':'it')+' in.</span>';
+  else if(l.carry)html='<span>Carrying a '+esc(HEN[l.carry.kind].name.toLowerCase())+'. Tap the yard by the coop to put her down.</span>';
+  else if(l.bucket.length)html='<span>Carrying '+plural(l.bucket.length,'fish','fish')+'. Tap your pond to let '+(l.bucket.length>1?'them':'it')+' in, or the stream to let '+(l.bucket.length>1?'them':'it')+' go.</span>';
   else if(eggsN)html='<span>Basket: '+plural(eggsN,'egg')+'</span><button class="btn sm" data-sell>Sell · '+fmtA(eggsN)+'</button><button class="btn sm" data-gm>Give Grandma</button>';
   else if(L.tool==='mow')html='Walk over the grass to cut it. Hold and drag to steer.';
   else if(L.tool==='grain')html=S.stage>=3?'Throw grain, step back. Tap a chicken while it pecks.':'Tap the ground to throw grain.';
@@ -1814,7 +1822,10 @@ function draw(){var x=L.x,m=M(),cv=L.cv,i;L.cdx=Math.round(L.cam.x);L.cdy=Math.r
   for(i=0;i<L.birds.length;i++){var b2=L.birds[i];if(b2.win||onGround(b2))continue;drawBird(x,b2);}
   if(L.bfl)for(i=0;i<L.bfl.length;i++){var f=L.bfl[i];drawSpr(x,bflySpr(f.c,f.rest>0?(Math.sin(f.ph*3)>0.6?1:0):Math.floor(f.ph*16)%2),Math.round(f.x),Math.round(f.y));}
   drawParts(x);drawFishing(x);drawLight(x);drawBuildHints(x);drawWatch(x);
-  if(L.me&&LS().bucket.length&&!L.me.sit)drawSpr(x,bucketSpr(1),L.me.x,L.me.y-118+Math.round(Math.sin(L.rt*3)));}
+  drawCarry(x);}
+function drawCarry(x){var me=L.me,l=LS();if(!me||me.sit)return;var side=me.dir==='left'?-1:me.dir==='right'?1:0,hx=me.x+side*10,hy=me.y-48,bob=Math.round(Math.sin(L.rt*6)*(me.moving?1.5:0.5));
+  if(l.carry){var hs=henSpr(l.carry.kind,animFrame('hens',HEN_SHEET[l.carry.kind]||'white',Math.sin(L.rt*1.7)>0.85?'run':'idle',L.rt,10),me.dir==='left'?-1:1);if(hs)drawSpr(x,hs,hx,hy+16+bob);}
+  else if(l.bucket.length){for(var i=0;i<Math.min(3,l.bucket.length);i++){var F=FISHI[l.bucket[i].kind]||FISH[0],fs=fishSpr(F.id,animFrame('fish',F.id,'swim',L.rt+i,14),me.dir==='left'?-1:1);if(fs)drawSpr(x,fs,hx+(i-(Math.min(3,l.bucket.length)-1)/2)*8,hy+bob-i*5);}}}
 // light from the player's own clock: blue night, warm dawn and dusk, plain day. Lanterns glow after dark
 var LIGHT_K=[[0,[92,104,168]],[5,[92,104,168]],[6.2,[205,160,150]],[7.5,[255,236,212]],[9,[255,255,255]],[16.8,[255,255,255]],[18.3,[255,206,160]],[19.6,[180,146,172]],[21,[92,104,168]],[24,[92,104,168]]];
 function lightNow(){var d=new Date(),h=d.getHours()+d.getMinutes()/60;if(L.hourOverride!=null)h=L.hourOverride;for(var i=0;i<LIGHT_K.length-1;i++){var a=LIGHT_K[i],b=LIGHT_K[i+1];if(h>=a[0]&&h<=b[0]){var t=(h-a[0])/(b[0]-a[0]||1);return {h:h,c:[0,1,2].map(function(k){return Math.round(a[1][k]+(b[1][k]-a[1][k])*t);})};}}return {h:h,c:[255,255,255]};}
