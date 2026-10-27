@@ -182,7 +182,8 @@ function natShapes(m){var N={stream:false,lake:null,pond:null},x,y,i,ok;
     var bx=(x+0.5-P.cx)/P.rx,by=(y+0.5-P.cy)/P.ry,inP=bx*bx+by*by<1,isP=m.g[i]===G_WATER&&(!m.wb||!m.wb[i]||m.wb[i]===W_POND);if(inP!==isP){ok=false;break;}}N.pond=ok?P:null;}
   return N;}
 // 1 natural water, 2 the stream's sand, 0 anything else
-function natKind(m,x,y){var N=L.nat;if(!N||x<0||y<0||x>=m.w||y>=m.h)return 0;var i=y*m.w+x,g=m.g[i];if(g===G_SAND)return N.stream?2:0;if(g!==G_WATER)return 0;var k=m.wb&&m.wb[i];
+function painted(m,i){var P=L.pmask;if(!P||P.length!==m.w*m.h){P=L.pmask=new Uint8Array(m.w*m.h);(LS().edits||[]).forEach(function(e){if(!e.k||e.k.indexOf('g-')!==0)return;for(var y=e.ty;y<e.ty+e.fh;y++)for(var x=e.tx;x<e.tx+e.fw;x++)P[y*m.w+x]=1;});}return P[i];}
+function natKind(m,x,y){var N=L.nat;if(!N||x<0||y<0||x>=m.w||y>=m.h)return 0;var i=y*m.w+x,g=m.g[i];if(g===G_SAND)return N.stream&&!painted(m,i)?2:0;if(g!==G_WATER)return 0;var k=m.wb&&m.wb[i];
   if(k===W_STREAM)return N.stream?1:0;if(k===W_LAKE)return N.lake?1:0;
   if(N.pond&&(!k||k===W_POND)){var P=N.pond,bx=(x+0.5-P.cx)/P.rx,by=(y+0.5-P.cy)/P.ry;if(bx*bx+by*by<1)return 1;}return 0;}
 // how far into natural water a point is (tiles), as a field that is 0.5 at the bank. sc, sw: the stream's middle and width here
@@ -920,7 +921,7 @@ function buildStage(n){var l=S.land;l.oid=l.oid||0;var g=genStage(n);l.stage=n;l
   if(n>=2&&!l.hens.length){l.hens.push({id:'h'+(++l.oid),kind:'white'});l.hens.push({id:'h'+(++l.oid),kind:'brown'});var bk=S.book.coop||(S.book.coop={});['white','brown'].forEach(function(k){if(!bk['hen-'+k])bk['hen-'+k]={day:Math.floor(S.day),where:'came with the house'};});}
   if(n<3){l.wild=[];}if(n===3&&!l.wild.length){for(var i=0;i<3;i++)l.wild.push({id:'w'+(++l.oid)});}
   l.me=null;resetRuntime();}
-function resetRuntime(){L.groundOK=false;resetSprites();WALLC={};L.henPx=undefined;L.wildPx=null;L.hints=null;L.birds=[];L.henA={};L.wildA={};L.fishA=[];L.grain=[];L.parts=[];L.fishing=null;L.watch=null;L.labels=[];closeBub();
+function resetRuntime(){L.groundOK=false;L.pmask=null;resetSprites();WALLC={};L.henPx=undefined;L.wildPx=null;L.hints=null;L.birds=[];L.henA={};L.wildA={};L.fishA=[];L.grain=[];L.parts=[];L.fishing=null;L.watch=null;L.labels=[];closeBub();
   L.me=null;L.dog=null;L.cat=null;L.trail=[];L.pass=null;L.camSet=false;L.steer=null;L.marker=null;L.camFree=false;if(L.mower){L.mower.stop();L.mower=null;}}
 window.landSetStage=function(n){n=clamp(n|0,0,STAGES.length-1);ensureLand();S.stage=n;buildStage(n);save();updateHeader();if(activeTab==='home'&&L.shown){mountHome();}modCall('stageChanged',n);};
 
@@ -1242,10 +1243,11 @@ function localXY(e){var r=L.cv.getBoundingClientRect();return [e.clientX-r.left,
 function onDown(e){if(!L.cv)return;e.preventDefault();try{L.cv.setPointerCapture(e.pointerId);}catch(_){}var p=localXY(e);closeBub();
   L.ptr={id:e.pointerId,down:true,sx:p[0],sy:p[1],cx:p[0],cy:p[1],lx:p[0],ly:p[1],t0:performance.now(),mode:null,st:0};}
 function onMove(e){var P=L.ptr;if(!P||!P.down||e.pointerId!==P.id)return;e.preventDefault();var p=localXY(e),dx=p[0]-P.lx,dy=p[1]-P.ly;P.cx=p[0];P.cy=p[1];
-  if(!P.mode&&Math.hypot(p[0]-P.sx,p[1]-P.sy)>10)P.mode=L.tool==='build'?'pan':'steer';
+  if(!P.mode&&Math.hypot(p[0]-P.sx,p[1]-P.sy)>10){var gb=L.tool==='build'&&L.buildSel&&BUILDI[L.buildSel];P.mode=gb&&gb.ground?'paint':L.tool==='build'?'pan':'steer';if(P.mode==='paint'){var w0=fromCss(P.sx,P.sy),t0=tileOf(w0[0],w0[1]);paintGround(gb,t0[0],t0[1],true);P.lt=t0;}}
+  if(P.mode==='paint'){var gb2=BUILDI[L.buildSel],w1=fromCss(p[0],p[1]),t1=tileOf(w1[0],w1[1]);if(gb2&&(!P.lt||t1[0]!==P.lt[0]||t1[1]!==P.lt[1])){var a0=P.lt||t1,n=Math.max(Math.abs(t1[0]-a0[0]),Math.abs(t1[1]-a0[1]),1);for(var k=1;k<=n;k++)paintGround(gb2,Math.round(a0[0]+(t1[0]-a0[0])*k/n),Math.round(a0[1]+(t1[1]-a0[1])*k/n),true);P.lt=t1;}}
   if(P.mode==='pan'){L.camFree=true;L.cam.x-=dx/L.cpa;L.cam.y-=dy/L.cpa;clampCam();L.dirty=true;}
   P.lx=p[0];P.ly=p[1];}
-function onUp(e){var P=L.ptr;if(!P||e.pointerId!==P.id)return;P.down=false;
+function onUp(e){var P=L.ptr;if(!P||e.pointerId!==P.id)return;P.down=false;if(P.mode==='paint'){groundDone();sfx('thud');}
   if(P.mode===null&&e.type!=='pointercancel'){var w=fromCss(P.cx,P.cy);onTap(w[0],w[1],P.cx,P.cy);}
   P.mode=null;}
 function stepPointer(){var P=L.ptr;if(!P||!P.down)return;var now=performance.now();
@@ -1455,18 +1457,37 @@ var BUILD=[
  {k:'bookshelf',name:'Bookshelf',price:150,where:[G_FLOOR],stage:0},
  {k:'armchair',name:'Armchair',price:200,where:[G_FLOOR],stage:0,o:{v:'b'}},
  {k:'lamp',name:'Lamp',price:50,where:[G_FLOOR],stage:0}];
+// ground: paint one tile at a time, or drag to paint a run. The edges against the neighbours are worked out on the fly
+var GROUND_ON=[G_GRASS,G_MEADOW,G_DIRT,G_STONE,G_SAND,G_STEP,G_TILE,G_FLOOR,G_WATER];
+[{k:'g-grass',name:'Lawn',edit:G_GRASS,price:2},{k:'g-meadow',name:'Long grass',edit:G_MEADOW,price:2},{k:'g-dirt',name:'Dirt',edit:G_DIRT,price:1},
+ {k:'g-sand',name:'Sand',edit:G_SAND,price:3},{k:'g-stone',name:'Stone paving',edit:G_STONE,price:8},{k:'g-floor',name:'Wood deck',edit:G_FLOOR,price:10},
+ {k:'g-tile',name:'Terracotta tiles',edit:G_TILE,price:10},{k:'g-water',name:'Pond water',edit:G_WATER,price:12}].reverse().forEach(function(b){b.ground=1;b.stage=0;b.where=GROUND_ON;BUILD.unshift(b);});
 var BUILDI={};BUILD.forEach(function(b){BUILDI[b.k]=b;});
-function buildList(){var m=M(),has={};m.g.forEach(function(g){has[g]=1;});return BUILD.filter(function(b){return S.stage>=b.stage&&b.where.some(function(g){return has[g];});});}
+function buildList(){var m=M(),has={};m.g.forEach(function(g){has[g]=1;});return BUILD.filter(function(b){if(b.ground)return S.stage>=1&&(has[G_GRASS]||has[G_MEADOW]||has[G_TILE]||has[G_STONE]);return S.stage>=b.stage&&b.where.some(function(g){return has[g];});});}
 function itemSize(b){var o=b.o||{},d=OBJ[b.k]||{};return [b.fw||o.fw||d.fw||1,b.fh||o.fh||d.fh||1];}
 function anchorFor(b,tx,ty){var sz=itemSize(b);return [tx-Math.floor((sz[0]-1)/2),ty-Math.floor((sz[1]-1)/2)];}
 function occupied(x,y){var c=[L.me,L.dog,L.cat];for(var i=0;i<c.length;i++){var a=c[i];if(!a)continue;var t=tileOf(a.x,a.y);if(t[0]===x&&t[1]===y)return true;}return false;}
-function canPlace(b,ax,ay){var sz=itemSize(b),m=M(),flat=OBJ[b.k]&&OBJ[b.k].flat;if(b.max&&objsOf(b.k).length>=b.max)return false;
+function inRoom(x,y){var m=M();return (m.rooms||[]).some(function(r){return x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h;});}
+function groundEdit(x,y){return (LS().edits||[]).filter(function(e){return x>=e.tx&&x<e.tx+e.fw&&y>=e.ty&&y<e.ty+e.fh;})[0];}
+function canGround(b,x,y){var m=M(),g=mget(m,x,y);if(GROUND_ON.indexOf(g)<0||inRoom(x,y))return false;
+  if(g===b.edit&&!(g===G_WATER&&waterKind(x,y)!==W_POND))return false;
+  var e=groundEdit(x,y);if(e&&!(e.fw===1&&e.fh===1))return false;
+  var o=objAtTile(x,y,true);if(o&&!o.deco)return false;if(occupied(x,y)&&(b.edit===G_WATER||g===G_WATER))return false;return true;}
+function canPlace(b,ax,ay){if(b.ground)return canGround(b,ax,ay);var sz=itemSize(b),m=M(),flat=OBJ[b.k]&&OBJ[b.k].flat;if(b.max&&objsOf(b.k).length>=b.max)return false;
   for(var y=ay;y<ay+sz[1];y++)for(var x=ax;x<ax+sz[0];x++){var g=mget(m,x,y);if(b.where.indexOf(g)<0)return false;
     var o=objAtTile(x,y,true);if(o&&!o.deco){var of=OBJ[o.k]&&OBJ[o.k].flat;if(b.edit||flat?true:!of)return false;}
     if(b.edit&&edits(x,y))return false;if(!flat&&!b.edit&&occupied(x,y))return false;if(b.edit===G_WATER&&occupied(x,y))return false;}
   return true;}
 function edits(x,y){return (LS().edits||[]).some(function(e){return x>=e.tx&&x<e.tx+e.fw&&y>=e.ty&&y<e.ty+e.fh;});}
-function placeAt(b,ax,ay){if(!canPlace(b,ax,ay)){sfx('nope');return false;}if(!spend(b.price,b.name.toLowerCase()))return false;var m=M(),sz=itemSize(b),l=LS();
+function paintGround(b,x,y,quiet){if(!canGround(b,x,y)){if(!quiet)sfx('nope');return false;}if(!spend(b.price,b.name.toLowerCase()))return false;var m=M(),l=LS(),i=mi(m,x,y),e=groundEdit(x,y),wasW=mget(m,x,y)===G_WATER;
+  if(!e){e={k:b.k,tx:x,ty:y,fw:1,fh:1,prev:[[mget(m,x,y),m.gh[i],m.wb?m.wb[i]||0:0]],price:b.price};(l.edits=l.edits||[]).push(e);}else{e.k=b.k;e.price=b.price;}
+  if(b.edit===G_WATER)setWater(m,x,y,W_POND);else{mset(m,x,y,b.edit,b.edit===G_MEADOW?1:0);if(m.wb)m.wb[i]=0;}
+  if(e.prev[0][0]===b.edit&&(b.edit!==G_WATER||e.prev[0][2]===W_POND||!e.prev[0][2]))l.edits=l.edits.filter(function(q){return q!==e;});
+  l.objs=l.objs.filter(function(o){return !(o.deco&&o.tx===x&&o.ty===y);});
+  L.pmask=null;repaintAround(x,y,1,1);if(b.edit===G_WATER||wasW)syncAgents();
+  if(!quiet)sfx('thud');puff('dust',(x+0.5)*T,(y+1)*T-8,quiet?3:6,{speed:30,life:0.4});L.groundDirty=true;L.dirty=true;return true;}
+function groundDone(){if(!L.groundDirty)return;L.groundDirty=false;computePass();computeSpots();L.hints=null;save();}
+function placeAt(b,ax,ay){if(b.ground){var ok=paintGround(b,ax,ay,false);groundDone();return ok;}if(!canPlace(b,ax,ay)){sfx('nope');return false;}if(!spend(b.price,b.name.toLowerCase()))return false;var m=M(),sz=itemSize(b),l=LS();
   if(b.edit){var prev=[];for(var y=ay;y<ay+sz[1];y++)for(var x=ax;x<ax+sz[0];x++){prev.push([mget(m,x,y),m.gh[mi(m,x,y)]]);if(b.edit===G_WATER)setWater(m,x,y,W_POND);else mset(m,x,y,b.edit,m.gh[mi(m,x,y)]);}
     (l.edits=l.edits||[]).push({k:b.k,tx:ax,ty:ay,fw:sz[0],fh:sz[1],prev:prev,price:b.price});l.objs=l.objs.filter(function(o){return !(o.deco&&o.tx>=ax&&o.tx<ax+sz[0]&&o.ty>=ay&&o.ty<ay+sz[1]);});
     repaintAround(ax,ay,sz[0],sz[1]);if(b.edit===G_WATER)syncAgents();}
@@ -1476,18 +1497,25 @@ function placeAt(b,ax,ay){if(!canPlace(b,ax,ay)){sfx('nope');return false;}if(!s
 function removeThing(o,e){var l=LS(),m=M();
   if(o){l.objs=l.objs.filter(function(q){return q!==o;});var b=BUILDI[o.k];earn(Math.floor((b?b.price:0)/2),'refund');
     if(OBJ[o.k].flat)for(var y=o.ty;y<o.ty+o.fh;y++)for(var x=o.tx;x<o.tx+o.fw;x++)repaintTile(x,y);if(o.k==='fence')resetSprites();}
-  else if(e){var j=0;for(var y2=e.ty;y2<e.ty+e.fh;y2++)for(var x2=e.tx;x2<e.tx+e.fw;x2++){var p=e.prev[j++];mset(m,x2,y2,p[0],p[1]);if(m.wb)m.wb[mi(m,x2,y2)]=0;}l.edits=l.edits.filter(function(q){return q!==e;});earn(Math.floor(e.price/2),'refund');
-    repaintAround(e.tx,e.ty,e.fw,e.fh);if(e.k==='pond')syncAgents();}
+  else if(e){var j=0;for(var y2=e.ty;y2<e.ty+e.fh;y2++)for(var x2=e.tx;x2<e.tx+e.fw;x2++){var p=e.prev[j++];mset(m,x2,y2,p[0],p[1]);if(m.wb)m.wb[mi(m,x2,y2)]=p[2]||0;}l.edits=l.edits.filter(function(q){return q!==e;});L.pmask=null;earn(Math.floor(e.price/2),'refund');
+    repaintAround(e.tx,e.ty,e.fw,e.fh);if(e.k==='pond'||e.k==='g-water'||e.prev.some(function(p){return p[0]===G_WATER;}))syncAgents();}
   sfx('pop');computePass();computeSpots();L.hints=null;L.dirty=true;save();}
 function tapBuild(wx,wy,t,cx,cy){var b=L.buildSel&&BUILDI[L.buildSel];
-  if(b){var a=anchorFor(b,t[0],t[1]);if(!canPlace(b,a[0],a[1])){toast('It doesn’t fit there.');sfx('nope');return;}placeAt(b,a[0],a[1]);return;}
+  if(b){var a=b.ground?t:anchorFor(b,t[0],t[1]);if(!canPlace(b,a[0],a[1])){if(!(b.ground&&mget(M(),t[0],t[1])===b.edit))toast(b.ground&&inRoom(t[0],t[1])?'Not inside the house.':'It doesn’t fit there.');sfx('nope');return;}placeAt(b,a[0],a[1]);return;}
   var o=null,ob=LS().objs;for(var i=ob.length-1;i>=0;i--){var q=ob[i];if(q.built&&t[0]>=q.tx&&t[0]<q.tx+q.fw&&t[1]>=q.ty&&t[1]<q.ty+q.fh){o=q;break;}}
   var e=(LS().edits||[]).filter(function(q){return t[0]>=q.tx&&t[0]<q.tx+q.fw&&t[1]>=q.ty&&t[1]<q.ty+q.fh;})[0];
   if(o){var bi=BUILDI[o.k];showBub(cx,cy,'<b>'+esc(bi?bi.name:o.k)+'</b><div class="btns"><button class="btn" data-rm>Take it away · '+fmtA(Math.floor((bi?bi.price:0)/2))+' back</button></div>',function(el){el.querySelector('[data-rm]').onclick=function(){closeBub();removeThing(o,null);};});return;}
   if(e){showBub(cx,cy,'<b>'+esc(BUILDI[e.k].name)+'</b><div class="btns"><button class="btn" data-rm>Take it away · '+fmtA(Math.floor(e.price/2))+' back</button></div>',function(el){el.querySelector('[data-rm]').onclick=function(){closeBub();removeThing(null,e);};});return;}
   if(objAtTile(t[0],t[1],true))toast('That came with the place.');else toast('Pick something first.');}
+var GROUND_SW={};GROUND_SW[G_GRASS]='#6abe30';GROUND_SW[G_MEADOW]='#4f9a2c';GROUND_SW[G_DIRT]='#b07a46';GROUND_SW[G_SAND]='#e3cf96';GROUND_SW[G_STONE]='#9badb7';GROUND_SW[G_FLOOR]='#b6733f';GROUND_SW[G_TILE]='#c8714a';GROUND_SW[G_WATER]='#5fcde4';
+function groundIcon(b){var m=M(),c=document.createElement('canvas');c.width=56;c.height=36;var x=c.getContext('2d');x.imageSmoothingEnabled=false;
+  if(L.gcv&&L.groundOK)for(var i=0;i<m.g.length;i++){var tx=i%m.w,ty=Math.floor(i/m.w);if(m.g[i]!==b.edit||inRoom(tx,ty))continue;if(b.edit===G_WATER&&waterKind(tx,ty)!==W_POND&&waterKind(tx,ty)!==W_STREAM)continue;
+    var ok=true;for(var dy=-1;dy<=1&&ok;dy++)for(var dx=-1;dx<=1;dx++)if(mget(m,tx+dx,ty+dy)!==b.edit){ok=false;break;}if(!ok)continue;
+    x.drawImage(L.gcv,tx*T,ty*T+Math.round(T*0.22),T,Math.round(T*0.56),0,0,56,36);return c;}
+  x.fillStyle=GROUND_SW[b.edit]||'#888';x.fillRect(0,0,56,36);return c;}
 function itemIcon(b){var c=document.createElement('canvas'),d=Math.min(2,window.devicePixelRatio||1);c.width=56*d;c.height=36*d;c.style.width='56px';c.style.height='36px';var x=c.getContext('2d');x.imageSmoothingEnabled=false;
-  var s;if(b.edit===G_STEP){var pb=new PB(28,18);pb.rect(0,0,28,18,'#6abe30');pb.ell(9,9,6,4,'#9badb7');pb.ell(20,10,5,3.5,'#9badb7');pb.set(7,7,'#cbdbfc');s=mk(pb,14,18);}
+  var s;if(b.ground){var gi=groundIcon(b);if(gi){x.drawImage(gi,0,0,c.width,c.height);return c;}}
+  if(b.edit===G_STEP){var pb=new PB(28,18);pb.rect(0,0,28,18,'#6abe30');pb.ell(9,9,6,4,'#9badb7');pb.ell(20,10,5,3.5,'#9badb7');pb.set(7,7,'#cbdbfc');s=mk(pb,14,18);}
   else if(b.edit===G_WATER){var pw=new PB(28,18);pw.rect(0,0,28,18,'#6abe30');pw.ell(14,9,11,6,'#5fcde4');pw.rect(9,6,6,1,'#cbdbfc');s=mk(pw,14,18);}
   else{var sz=itemSize(b),o={k:b.k,tx:0,ty:0,fw:sz[0],fh:sz[1],seed:17,v:(b.o&&b.o.v!=null)?b.o.v:0,s:0.6,i:-1};try{s=OBJ[b.k].spr(o);}catch(e){}}
   if(s){var sc=Math.min(56*d/s.w,36*d/s.h),k=sc>=1?Math.floor(sc):sc;x.drawImage(s.c,Math.round((c.width-s.w*k)/2),Math.round((c.height-s.h*k)/2),Math.round(s.w*k),Math.round(s.h*k));}return c;}

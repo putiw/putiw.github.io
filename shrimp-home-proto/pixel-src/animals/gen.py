@@ -407,6 +407,9 @@ def sheet(frames):
     return im, w, h
 
 
+HEN_ANIM = None
+
+
 def main(hens_path, fb_path, out):
     os.makedirs(out, exist_ok=True)
     man = {'hens': {}, 'birds': {}, 'fish': {}}
@@ -415,12 +418,19 @@ def main(hens_path, fb_path, out):
     her_hen = layer(hens, 'Layer 1')
     parts = hen_parts(her_hen)
     poses = {'idle': 4, 'walk': 4, 'peck': 5, 'run': 4}
+    # her own white hen animation, when given, replaces the generated frames for every breed
+    mine = None
+    if HEN_ANIM and os.path.exists(HEN_ANIM):
+        ha = read(HEN_ANIM)
+        from ase import flatten
+        mine = [grid(flatten(ha, i)) for i in range(len(ha['frames']))]
+        poses = {t['name']: t['to'] - t['frm'] + 1 for t in ha['tags']}
     for name, (cmap, extra) in breeds().items():
         frames, rows = [], {}
         for pose, n in poses.items():
             rows[pose] = [len(frames), n]
             for t in range(n):
-                f = hen_frame(parts, pose, t)
+                f = [r[:] for r in mine[len(frames)]] if mine else hen_frame(parts, pose, t)
                 src = [r[:] for r in f]
                 f = recolour(f, cmap)
                 if extra:
@@ -453,4 +463,6 @@ def main(hens_path, fb_path, out):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) > 4:
+        HEN_ANIM = sys.argv[4]
     main(*sys.argv[1:4])
