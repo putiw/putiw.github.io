@@ -783,7 +783,7 @@ function grandmaPB(f){var pb=new PB(64,86),SK='#ffc2a1',SK2='#f0a888',HA='#c4c7c
   [[26,24],[34,24]].forEach(function(e){pb.rect(e[0],e[1],4,3,'#f6f3fa');pb.rect(e[0]+1,e[1],2,3,K);pb.rect(e[0]-1,e[1]-2,6,1,K);pb.rect(e[0]-1,e[1]+3,6,1,K);pb.rect(e[0]-1,e[1]-1,1,4,K);pb.rect(e[0]+4,e[1]-1,1,4,K);});
   pb.rect(31,24,2,1,K);pb.rect(29,31,6,1,K);pb.set(28,30,K);pb.set(35,30,K);
   ink(pb);return pb;}
-function grandmaSpr(f){return cached(CACHE.gma,f,function(){return mk(grandmaPB(f),32,82);});}
+function grandmaSpr(f){return cached(CACHE.gma,f,function(){return charSpr('grandma','sit-knit',f,1,false)||mk(grandmaPB(f),32,82);});}
 // -- Pierre, Puti's tuxedo cat. Drawn the way her dog is: one dark outline that black fur melts into, three tones of white,
 // chunky legs. Long and stretchy like her pose sheet: walks, lies stretched out, sits, and stands up to reach the tank glass
 var PW1='#fbfaf6',PW2='#e9e8e3',PW3='#c7c6cc',PW4='#a3a2ab',PB2='#2a272d',PB1='#423f47',POL='#21181b',PEYE='#c6d84a',PNOSE='#e8919b',PBEAN='#f0a08a';
@@ -849,7 +849,16 @@ function catStandPB(f,front){var pb=new PB(48,96),la=front?4:(f?4:12),ra=front?6
   catFur(pb,41+f,0);if(front){catFace(pb,24,30,0,false);}
   else{pb.ell(24,30,11,10,PB2);pb.poly([[13,27],[14,16],[20,22]],PB2);pb.poly([[28,22],[34,16],[35,27]],PB2);pb.rect(17,37,14,3,PW2);pb.rect(20,24,8,1,PB1);}
   ink(pb);if(front)whiskers(pb,24,30);return pb;}
-function catSpr(pose,f,face){var t=CACHE.cat[pose]||(CACHE.cat[pose]=[]);return cached(t,f*2+(face<0?1:0),function(){var pb;
+// Pierre and Grandma from her files (cat-pierre.aseprite, grandma.aseprite) when loaded
+function charSpr(n,tag,f,face,flip){var m=AM('chars',n);if(!m||!IMG['an-'+n])return null;var p=m.poses[tag];if(!p)return null;var i=p[0]+(f%p[1]);
+  return animSpr('an-'+n,m,i,flip&&face<0?-1:1,m.ax,m.ay);}
+function catSpr(pose,f,face){var t=CACHE.cat[pose]||(CACHE.cat[pose]=[]);
+  if(AM('chars','pierre')&&IMG['an-pierre'])return cached(t,'p'+f*2+(face<0?1:0),function(){
+    if(pose==='walk')return charSpr('pierre',face<0?'walk-left':'walk-right',f,face,false);
+    if(pose==='nap')return charSpr('pierre','nap',f,face,true);
+    if(pose==='reach'||pose==='paw')return charSpr('pierre','look-up',0,face,true);
+    return charSpr('pierre','sit',f,face,true);});
+  return cached(t,f*2+(face<0?1:0),function(){var pb;
   if(pose==='walk'){pb=catWalkPB(f);if(face<0)pb=pb.flipX();return mk(pb,face<0?pb.w-38:38,49);}
   if(pose==='sit'){pb=catSitPB(f);return mk(pb,24,60);}
   if(pose==='nap'){pb=catNapPB(f);if(face<0)pb=pb.flipX();return mk(pb,pb.w/2,32);}
