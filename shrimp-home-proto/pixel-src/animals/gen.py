@@ -222,28 +222,23 @@ def bird_frame(src, spec, pose, t):
     body = [[g0[y][x] if y < legtop else T for x in range(W0)] for y in range(H0)]
     legs = [[g0[y][x] if y >= legtop else T for x in range(W0)] for y in range(H0)]
     head = blank(W0, H0)
+    hcx, hcy, hrx, hry = spec['headell']
     for y in range(H0):
         for x in range(W0):
-            if body[y][x][3] and x >= hx0 and y <= spec['heady']:
+            if body[y][x][3] and ((x - hcx) / hrx) ** 2 + ((y - hcy) / hry) ** 2 <= 1:
                 head[y][x] = body[y][x]
-                body[y][x] = T
-    tail = blank(W0, H0)
-    for y in range(H0):
-        for x in range(W0):
-            if body[y][x][3] and x <= spec['tailx'] and y >= spec['taily']:
-                tail[y][x] = body[y][x]
                 body[y][x] = T
     by, hdx, hdy, tdy, showlegs, wing = 0, 0, 0, 0, True, None
     if pose == 'idle':
-        tdy = [0, 0, 1, 1, 0, 0][t % 6]
-        hdy = [0, 0, 0, 0, 1, 0][t % 6]
+        tdy = [0, 1, 1, 1, 0, 0][t % 6]
+        hdy = [0, 0, 0, 0, 0, 0][t % 6]
     elif pose == 'peck':
         hdx, hdy = [(0, 0), (1, 4), (2, 8), (2, 8), (1, 4)][t % 5]
         tdy = [0, -1, -2, -2, -1][t % 5]
     elif pose == 'hop':
         by = [0, 1, -3, -5, -3, 0][t % 6]
         showlegs = t % 6 in (0, 1, 5)
-        tdy = [0, 0, 1, 2, 1, 0][t % 6]
+        tdy = [0, 0, 2, 3, 2, 0][t % 6]
     elif pose == 'fly':
         by = [-4, -6, -4, -2][t % 4]
         showlegs = False
@@ -260,8 +255,13 @@ def bird_frame(src, spec, pose, t):
             put(g, ox + fx + 1, oy + fy + by, spec['foot'])
             put(g, ox + fx, oy + fy + by + 1, A)
             put(g, ox + fx + 1, oy + fy + by + 1, A)
-    paste(g, tail, ox, oy + by + tdy)
-    paste(g, body, ox, oy + by)
+    tx = spec['tailx']
+    for x in range(W0):
+        off = round(tdy * (tx - x) / tx) if (tdy and x < tx) else 0
+        for y in range(H0):
+            p = body[y][x]
+            if p[3]:
+                put(g, ox + x, oy + by + y + off, p)
     if hdx or hdy:
         pts = []
         cx, cy = spec['neck']
@@ -349,11 +349,11 @@ def fill_poly(poly):
 
 
 BIRDS = {
-    'bulbul': dict(layer='White eared bulbul', legtop=25, headx=33, heady=14, tailx=16, taily=17,
+    'bulbul': dict(layer='White eared bulbul', legtop=25, headx=33, heady=14, tailx=18, taily=17, headell=(41, 7, 12, 8.5),
                    neck=(36, 11), neckr=3.5, neckc=(34, 28, 26, 255), shoulder=(30, 10), wingL=20,
                    wingc=((121, 103, 85, 255), (90, 78, 68, 255), (150, 132, 112, 255)),
                    tuck=[(27, 24), (35, 24)], foot=(34, 28, 26, 255)),
-    'myna': dict(layer='common myna', legtop=31, headx=35, heady=13, tailx=18, taily=24,
+    'myna': dict(layer='common myna', legtop=31, headx=35, heady=13, tailx=22, taily=24, headell=(46.5, 6, 11.5, 8),
                  neck=(39, 11), neckr=4, neckc=(20, 16, 19, 255), shoulder=(30, 17), wingL=22,
                  wingc=((90, 78, 68, 255), (34, 28, 26, 255), (66, 57, 52, 255)),
                  tuck=[(30, 31), (37, 31)], foot=(249, 163, 27, 255)),

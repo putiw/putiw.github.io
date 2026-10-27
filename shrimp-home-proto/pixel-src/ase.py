@@ -111,3 +111,40 @@ if __name__ == '__main__':
         for c in a['frames'][fi]['cels']:
             print('  frame', fi, 'layer', c['layer'], a['layers'][c['layer']]['name'], 'at', c['x'], c['y'], c['w'], c['h'])
             flatten(a, fi, {c['layer']}).save(f'{out}/f{fi}_L{c["layer"]}.png')
+
+
+def write(path, frames, tags=(), durations=None, layer_name='art'):
+    """Write a 32-bit RGBA .aseprite: one layer, one cel per frame, tags = [(name, from, to)]."""
+    W, H = frames[0].size
+    durations = durations or [120] * len(frames)
+
+    def chunk(t, data):
+        return struct.pack('<IH', len(data) + 6, t) + data
+
+    def s(txt):
+        b = txt.encode()
+        return struct.pack('<H', len(b)) + b
+
+    body = b''
+    for i, im in enumerate(frames):
+        chunks = []
+        if i == 0:
+            # color profile none, layer, tags
+            chunks.append(chunk(0x2004, struct.pack('<HHHHHHB3s', 3, 0, 0, 0, 0, 0, 255, b'\0\0\0') + s(layer_name)))
+            if tags:
+                td = struct.pack('<H8s', len(tags), b'\0' * 8)
+                for (n, a, z) in tags:
+                    td += struct.pack('<HHBH6s3sB', a, z, 0, 0, b'\0' * 6, b'\0\0\0', 0) + s(n)
+                chunks.append(chunk(0x2018, td))
+        im = im.convert('RGBA')
+        bb = im.getbbox()
+        if bb:
+            c = im.crop(bb)
+            data = struct.pack('<HhhBHh5s', 0, bb[0], bb[1], 255, 2, 0, b'\0' * 5) + struct.pack('<HH', c.width, c.height) + zlib.compress(c.tobytes())
+            chunks.append(chunk(0x2005, data))
+        cb = b''.join(chunks)
+        body += struct.pack('<IHHH2sI', 16 + len(cb), 0xF1FA, min(len(chunks), 0xFFFF), durations[i], b'\0\0', len(chunks)) + cb
+    hdr = struct.pack('<IHHHHHIHII', 128 + len(body), 0xA5E0, len(frames), W, H, 32, 1, 100, 0, 0)
+    hdr += struct.pack('<B3sHBBhhHH', 0, b'\0\0\0', 0, 1, 1, 0, 0, 16, 16)
+    hdr += b'\0' * (128 - len(hdr))
+    open(path, 'wb').write(hdr + body)
