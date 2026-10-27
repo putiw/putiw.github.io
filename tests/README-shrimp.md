@@ -983,3 +983,14 @@ Step 1 of the tab cleanup agreed on 28 Oct.
 - The Packed / orders / Cash lasts strip under the header is gone (no growth summary on screen). The bottleneck read stays behind the paid consultants. The idle-cash and "what slows growth" hints now glow the cash, tapping the guide bar opens the sheet, and the ? Ideas line opens it too.
 - Checked in Playwright at 360 and 390 px on the first kit, first farm and million owners snapshots (strong bot, seed 7: WIN day 2,338, empire_dictator, same as Pass 116), every tab plus the sheet. Layout scanner: only the known 2px win chart label. Balance 76 (new header and sheet check), academy 10, me 46.
 BUILD 2026-10-28-money.
+
+## Pass 120: Kits tab in three cards (28 Oct)
+
+Step 2 of the tab cleanup.
+
+- Kits: price, profit and orders a day at that price, sold a day and stock. Owners, survival, referrals and cost per kit sit behind More numbers. The adoption ceiling left Kits, it shows on the Regions card now ("Up to 62% of them want a tank, 1.2M people"). Packed yesterday and farm shrimp left too, they're under Making kits.
+- Making kits (was Packing & staff, data-k `staff`): the packing table and its tools, Pack 1 / Pack 10, Keep in tanks, the capacity line ("Packing up to N kits a day", always on top, also when the old manual tools fold away), packers, machines, farm shrimp yesterday, then Quality checks as a section (`#qccard` is a plain div now, How strict row included). Header number: kits a day, or "by hand". Shown as soon as kits open.
+- Kit development: unchanged, one project at a time, finished ones under Done.
+- Sales staff got their own card in Ads (`c-sales`, data-k `sales`, opens on reveal). `c-staff` no longer switches title and content with the tab; staff render builds packing into `e-staff` and sales and shop managers into `e-sales` regardless of the open tab. Wages sheet line for sales points at `c-sales`.
+- Guide steps that pointed at the Kits or Quality checks card (first kit, tools, QC round, kit wait) point at Making kits.
+- Balance 77 (new Kits layout check), academy 10, me 46. Checked in Playwright at 360 and 390 px on first kit, first farm, million owners and win.

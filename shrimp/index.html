@@ -591,25 +591,28 @@ h1,h2,h3,h4,summary,button,.btn,label,th,.scope-label{text-wrap:balance}p,li,sma
   <div class="card phase-note" id="business-guide"><h2 id="business-title"></h2><p class="sub" id="business-body"></p><p class="hint" id="business-roadmap"></p><div class="btns" id="business-actions"></div></div>
   <div class="card" id="lab-card" hidden><div class="hd"><h2>Breeding laboratory</h2><small id="lab-score"></small></div><p class="sub" id="lab-description"></p><div class="btns"><button class="btn" data-act="lab-certify" id="lab-certify">Certify this colony</button></div></div>
   <div class="card" id="wincard" hidden></div>
-  <div class="card coll" data-k="staff" id="c-staff"><div class="hd"><h2>Packing &amp; staff</h2><small id="e-staffsum"></small></div>
-    <p class="sub explain">Build packing capacity as orders grow. Hatcheries supply shrimp. These workers and machines turn them into kits. Wages are charged each day.</p>
-    <div id="e-staff"></div></div>
-  <div class="card coll" data-k="qc" id="qccard" hidden><div class="hd"><h2>Quality checks</h2><small id="qc-sum"></small></div><div id="qc-body"></div></div>
+  <div class="card coll" data-k="staff" id="c-staff" hidden><div class="hd"><h2>Making kits</h2><small id="e-staffsum"></small></div>
+    <p class="sub explain">Packers and machines turn shrimp into kits. A better packing table or the AI camera makes each packer faster. Staff are paid daily.</p>
+    <div id="kit-steps" hidden></div>
+    <p class="hint" id="e-kithint"></p>
+    <div class="packrow" id="kit-packrow"><button class="btn primary" data-act="pack" data-n="1" id="btn-pack1">Pack 1</button><button class="btn" data-act="pack" data-n="10" id="btn-pack10">Pack 10</button><button class="btn" data-act="kitprice" hidden id="btn-kitprice">Market price</button></div>
+    <div class="ctl" id="row-maxN"><label for="s-maxN">Keep in tanks</label><input type="range" id="s-maxN" min="1" max="8" step="0.5"><span class="v" id="v-maxN"></span></div>
+    <p class="hint explain" id="h-maxN">Keep in tanks is shrimp per litre left in your tanks. The rest go into kits, and the packing station only packs shrimp above it. About 3 keeps breeding fast.</p>
+    <div id="e-staff"></div>
+    <div id="qccard" hidden><h3 class="track">Quality checks · <span id="qc-sum"></span></h3><div id="qc-body"></div></div></div>
+  <div class="card coll" data-k="sales" id="c-sales" hidden><div class="hd"><h2>Sales staff</h2><small id="e-salessum"></small></div>
+    <p class="sub explain">Salespeople sell tank shrimp every day, each one brings 25% more shrimp and kit customers, up to 4. Each shop manager runs 4 shops, shops without one work at half strength. Paid daily.</p>
+    <div id="e-sales"></div></div>
   <div class="card coll" data-k="korder" id="kordercard" hidden><div class="hd"><h2>Bulk kit order</h2><small id="ko-due"></small></div><p class="sub" id="ko-text"></p><div class="btns" id="ko-btns"></div></div>
-  <div class="card coll" data-k="kits" id="c-kits"><div class="hd"><h2>Starter kits</h2><small id="e-kitsum"></small></div>
+  <div class="card coll" data-k="kits" id="c-kits"><div class="hd"><h2>Kits</h2><small id="e-kitsum"></small></div>
     <div class="lock" id="e-kitlock"></div>
     <div id="e-kitbody">
-      <div id="kit-steps" hidden></div>
       <p class="sub explain" id="kit-sub">Kit = small tank + food + <strong>8 young shrimp</strong>. <strong>Living kits count toward the goal</strong> (+ referrals, influence ✦); <strong>dead kits cost influence ✦</strong>. Breeders and bought shrimp never packed.</p>
       <div class="ctl" id="kit-pricerow"><label for="s-kitPrice">Kit price</label><input type="range" id="s-kitPrice" min="100" max="600" step="10"><span class="v" id="v-kitPrice"></span></div>
       <p class="hint" id="kit-margin"></p>
       <div class="kv" id="e-kv"></div>
-      <div class="ctl" id="row-maxN"><label for="s-maxN">Keep in tanks</label><input type="range" id="s-maxN" min="1" max="8" step="0.5"><span class="v" id="v-maxN"></span></div>
-      <p class="hint explain" id="h-maxN">Keep in tanks is shrimp per litre left in your tanks. The rest go into kits, and the packing station only packs shrimp above it. About 3 keeps breeding fast.</p>
       <div id="kit-design"></div>
       <div id="battery-kit-upgrade" hidden></div>
-      <p class="hint" id="e-kithint"></p>
-      <div class="packrow"><button class="btn primary" data-act="pack" data-n="1" id="btn-pack1">Pack 1</button><button class="btn" data-act="pack" data-n="10" id="btn-pack10">Pack 10</button><button class="btn" data-act="kitprice" hidden id="btn-kitprice">Market price</button></div>
       <details class="more" id="e-kvmore" hidden><summary>More numbers</summary><div class="kv" id="e-kv2"></div></details>
     </div>
   </div>
@@ -1979,7 +1982,7 @@ var MILESTONES={
   tanks2:{intro:1,title:"More tanks",body:"One tank can only hold so many shrimp. A second tank means more breeders and more shrimp to sell.\n\nKits need 60 L of tanks with shrimp in them, the farm license 3 tanks that run themselves. Try it: Gear, Another tank. It takes bacteria from Tank 1, no cycling.",tab:"up"},
   health:{intro:1,title:"A health check",body:"Shrimp get sick sometimes, bad molts, infections, tiny flatworms that come in with new shrimp. Find the sick ones, look at what's wrong, pick the cure.\n\nIf you leave it, it spreads, colour fades and more die every day. Leave it long enough and the whole tank dies. Try it: tap the tank, then Check shrimp.",tab:"tank"},
   qc:{intro:1,title:"Quality checks",body:"A kit with a sick shrimp dies in someone\u2019s living room, and they don\u2019t buy another one.\n\nBefore shrimp get packed, test the water, look them over and salt dip the batch. By hand for now, once a month. Later you can buy a machine for each step.",tab:"emp"},
-  tools:{intro:1,title:"Automate one step",body:"Five taps a kit gets old fast. Each packing tool takes over one step.\n\nGet all five and you have a packing station, it packs a kit a day and you can hire packers. Try it: the first tool on the Starter kits card.",tab:"emp"},
+  tools:{intro:1,title:"Automate one step",body:"Five taps a kit gets old fast. Each packing tool takes over one step.\n\nGet all five and you have a packing station, it packs a kit a day and you can hire packers. Try it: the first tool under Making kits.",tab:"emp"},
   station:{intro:1,title:"The packing station",body:"All five tools on one table. It packs a kit a day now, you can still pack by hand too.\n\nPackers cost AED 35 a day each and pack about 3 more a day. Only hire when orders are more than you can keep up with, Packing & staff in Kits.",tab:"emp"},
   bulk:{intro:1,title:"Bulk orders",body:"Sometimes schools, hotels or hospitals want a lot of kits at once, for a better price.\n\nThey only show up when you can pack more than your customers buy. If you accept, part of each day's packing goes to the order until it's full, then it ships.",tab:"emp"},
   worldtab:{intro:1,title:"The World tab",body:"Kit buyers only come from regions you opened, and not everyone there wants a tank.\n\nRegions add people. University, Media, Politics and Nature make more of them want one. Some things cost money, some need ✦, people who owe you a favour.",tab:"world"},
@@ -3968,7 +3971,6 @@ function packTableHTML(dem){var E=G.emp,w=E.kitWip||{},st=w.steps||{},spareN=Mat
 function updateQC(){var c=$('qccard');if(!c)return;var show=kitsOpen(G)&&(G.kits.sold>=QC_FROM||qc(G).rounds>0);c.hidden=!show;if(!show)return;
  var q=qc(G),ok=Math.round((1-sickKitRate(G))*100),man=qcManual(G),due=qcDue(G),age=q.last==null?null:Math.floor(G.day-q.last),h='';
  setT('qc-sum',ok+'% ship healthy');
- h+='<p class="sub">Kits shipping healthy: <b>'+ok+'%</b>.</p>';
  var allAuto=QC_STEPS.every(function(s){return q.own[s.id];});if(!allAuto)h+='<div class="psteps">'+QC_STEPS.map(function(s){var own=q.own[s.id],fresh=!own&&!s.auto&&q.last!=null&&qcFresh(G)>0;return '<span class="pstep'+(own?' auto':fresh?' done':'')+(s.auto&&!own?' off':'')+'"><span class="pk">'+(own?'auto':fresh?'✓':'')+'</span>'+s.short+'</span>';}).join('')+'</div>';
  if(man.length){h+='<div class="item"><div><h3>'+(q.last==null?'No checks yet':due?'Check is overdue':(age===0?'Checked today':'Checked '+age+' day'+(age===1?'':'s')+' ago'))+'</h3><p class="explain">'+man.map(function(s){return s.name.toLowerCase();}).join(', ').replace(/^./,function(x){return x.toUpperCase();})+'. A round is good for '+QC_DAYS+' days.</p></div><button class="btn'+(due?' primary':'')+'" data-act="qc-round">QC round</button></div>';}
  else h+='<p class="hint">All five checks run by machine: water, look, dip, hold and lab.</p>';
@@ -4015,7 +4017,8 @@ var HELP={
  equipcard:'Upgrades are for the selected tank. Bigger tanks swing less and hold more shrimp. The fan cools by evaporation, Gulf summer rooms reach about 29 °C, too warm for shrimp. Mossy rocks give shrimplets somewhere to hide and graze, the 40% is for babies under 30 days. Driftwood grows biofilm they graze all day. Almond leaves steep tannins for healthy molts. Stem plants and floaters feed on nitrate, so water changes go further. Spinach fills them up, bee pollen is protein for berried females.',
  tankscard:'Each new tank needs cycling or a bacteria starter. More tanks, more breeders.',
  autocard:'Runs every day for every tank that has the gear.',
- qccard:'A sick kit dies in someone’s home and costs influence ✦. One QC round lasts 30 days. Stricter checks throw out more shrimp, so each kit costs more, but fewer die. You can buy a machine for each step.',
+ 'c-staff':'Packers, tools and machines make kits from spare shrimp. A sick kit dies in someone’s home and costs influence ✦, the quality check catches them. One QC round lasts 30 days. Stricter checks throw out more shrimp, so each kit costs more, but fewer die. You can buy a machine for each step.',
+ 'c-sales':'Salespeople and shop managers. Each salesperson brings 25% more customers, up to 4.',
  'c-kits':'Every kit takes 8 shrimp at least 20 days old, never breeders or bought ones.',
  'c-owners':'How the tanks you sold are doing. Thriving owners refer friends, struggling ones give up.',
  supcard:'Bulk supplies cost less per use. Standard tanks arrive cycled, and new shrimp packs go into the tank with the fewest shrimp.',
@@ -4072,7 +4075,7 @@ document.addEventListener('click',function(e){if(SPOT&&SPOT.on)return;var c=e.ta
 // Every section and tab gets a spotlight the first time it appears on screen.
 var SPOT_INFO={'me-gplace':'Grandma’s place. A bigger flat, a house, then land with a stream you can walk around.','coin-card':'Mangroves are open. Plant a tree on the old shrimp-pond coast when you like. Others start planting too.','hard-card':'The homes left are hard to reach for reasons that have nothing to do with shrimp. First decide what everyone means, then the groups, one at a time.','rl-card':'Fund researchers in as many fields as you like, every year until you stop. What they find is luck.','feedcard':'Pick the food and how much they get. The Feed button up top feeds them.','wccard':'How much water a change swaps, and what the new water is like. The Water button up top does the change.','wtcard':'All your test kit readings. Tap one to see what moves it.','carecard':'Health checks when someone looks sick, and treats.','colcard':'Ages and colour grades of everyone in the tank.','charts':'How the water and the colony changed, day by day.','logcard':'Everything that happened lately.','next-card':'Something to save for, it makes the tank better or bigger.','ordercard':'A pet shop wants shrimp. They pay more, but want a set number by a deadline.','buycard':'Buy shrimp here. They stay as breeders, you never sell them.','sellcard':'Sell what\u2019s ready and set your price. The sales rules work fine as they are.','excelcard':'An Excel course gets you charts of where your money goes.','fincard':'Income, spending and cash, day by day.','adscard':'Ads bring more buyers.','equipcard':'Upgrades for the tank you have selected.','tankscard':'Add more tanks for more breeders.','supcard':'Buy supplies in bulk.','autocard':'How much the auto feeder gives and how often the water gets changed.','ovcard':'Every tank in one table, tap a row to open it.','recipecard':'One set of settings for every tank.','c-kits':'A small tank with 8 young shrimp. You pack them and sell them.','qccard':'Check the shrimp before they go into kits, so kits don’t die.','c-staff':'Tools, packers and machines that pack kits.','consultcard':'Pay for a report on what’s slowing you down.','kordercard':'A big buyer wants a lot of kits at once.','c-proj':'Things you can do. Some cost money, some need ✦, people who owe you a favour. Nothing here is required.','c-shops':'Mall stores make people in a region trust you, so word of mouth there spreads faster. Small shops sell shrimp and a few kits.','c-farms':'Grow racks and hatcheries breed shrimp for kits. 8 shrimp make 1 kit, breeding costs AED 12 a kit. Idle farms still pay upkeep. Each extra farm of a type costs 9% more.','lab-card':'Certify your best colony so the farms copy it.','operations-card':'How much stock and cash to keep on hand.','c-owners':'How the tanks you sold are doing.','c-reg':'Open new parts of the world to more buyers.','c-op':'Pick a message for the Ministry to spread. Public mood sets how many people want a tank and how fast word spreads.','ripplecard':'A customer\u2019s satire newsletter about your business.','academy-card':'Fund researchers in six fields. Together they are your lab.','space-card':'Grandma’s next dream.'};
 // Cards you don't need to act on never pop a spotlight. Their ? explains them.
-var SPOT_QUIET=['feedcard','wccard','wtcard','colcard','charts','logcard','equipcard','supcard','autocard','ovcard','fincard','excelcard','next-card','tankscard','operations-card','c-proj','lab-card','ripplecard','c-owners','consultcard','c-staff','rl-card','wagecard'];
+var SPOT_QUIET=['feedcard','wccard','wtcard','colcard','charts','logcard','equipcard','supcard','autocard','ovcard','fincard','excelcard','next-card','tankscard','operations-card','c-proj','lab-card','ripplecard','c-owners','consultcard','c-staff','c-sales','rl-card','wagecard'];
 var SPOT_TAB={market:'Trade is open.',up:'Gear is open. Upgrades for your tank.',promote:'The Ads tab is open.',emp:'Kits are open. Pack and sell starter kits.',world:'World is open. Regions, owners and the bigger picture.',research:'The Lab tab is open. The university, research lines and school projects.',space:'Space is open.'};
 function spotShown(e){return e.getClientRects().length>0&&!e.hidden&&!(e.parentElement&&e.parentElement.closest('details:not([open]),[hidden]'));}
 function spotWatch(){var o=G.opt;if(o.all||G.progress.queue[0]==='intro'||TVLOCK||!$('hcheck').hidden||afterOpen())return;
@@ -4339,7 +4342,7 @@ function wageLines(G){var E=G.emp,st=E.staff,td=pd(G,'grad')?0.5:1,hil=E.hil||[]
   var pack=st.pack*STAFF.pack.pay+(E.legacyPacking||0)*0.05+kept(['Kiki']);PACK_LINES.forEach(function(l,i){pack+=lineCount(G,i)*l.up;});
   var sales=(st.aiSales?Math.min(300,1+0.00005*E.soldToday)*td:st.sales*staffPay(G,'sales'))+(st.aiMgr?2.5*shopCount(G)*td:st.mgr*STAFF.mgr.pay)+kept(['Luca','Gema','Mimi']);
   var tech=st.aiTech?1.5*G.tanks.length:st.tech*STAFF.tech.pay;
-  return [['Packing',pack,'emp','c-staff'],['Sales and shop managers',sales,'promote','c-staff'],['Tank technicians',tech,'up',''],['Research',academyOpen(G)?rlYearAll(G)/365:0,'research','academy-card'],['Mall stores, rent and staff',storeDayCost(G),'promote','c-shops']].filter(function(l){return l[1]>0.5;});}
+  return [['Packing',pack,'emp','c-staff'],['Sales and shop managers',sales,'promote','c-sales'],['Tank technicians',tech,'up',''],['Research',academyOpen(G)?rlYearAll(G)/365:0,'research','academy-card'],['Mall stores, rent and staff',storeDayCost(G),'promote','c-shops']].filter(function(l){return l[1]>0.5;});}
 function renderFin(){if(!FS)return;if(!finOpen(G)){closeFin();return;}
   var fc=$('fincard');fc.hidden=!G.excel;var fk=Math.floor(G.day);if(G.excel&&fk!==cache.fink){cache.fink=fk;updateFinance();}
   updateConsult();
@@ -4912,7 +4915,7 @@ function updateKitOrder(){var o=G.korder,c=$('kordercard');c.hidden=!o||activeTa
 function updateEmpire(){
   updateConsult();updateKitOrder();updateKitDesign();updateQC();
   var E=G.emp,open=kitsOpen(G),late=pd(G,'farmlic');
-  var ord=['c-kits','qccard','c-farms','c-staff','c-proj','c-shops','c-reg','c-op'];
+  var ord=['c-kits','c-farms','c-staff','c-proj','c-shops','c-reg','c-op'];
   ord.forEach(function(id,i){var el=$(id);if(el.style.order!==String(i+1))el.style.order=i+1;});
   $('e-kitlock').hidden=open;$('e-kitbody').hidden=!open;
   var batteryBox=$('battery-kit-upgrade');batteryBox.hidden=!open||!E.batteryKitUnlocked;if(!batteryBox.hidden)batteryBox.mhtml='<div class="item"><div><h3>A battery air pump in every kit</h3><p>'+(E.batteryKit?'Included':'Optional add-on')+' · AED 35 more to produce each kit · '+(E.batteryKit?Math.round(baseKitQuality(G)*100)+'% → '+Math.round(effectiveQuality(G)*100)+'%':'current '+Math.round(effectiveQuality(G)*100)+'%')+' survival. Adds up to 2 percentage points.</p></div><button class="btn '+(E.batteryKit?'':'primary')+'" data-act="battery-kit" aria-pressed="'+!!E.batteryKit+'">'+(E.batteryKit?'Remove backup':'Add to kits')+'</button></div>';
@@ -4922,11 +4925,9 @@ function updateEmpire(){
     var dem=kitDemand(G),K=kitCap(G);
     setT('e-kitsum',big(G.kits.stock)+' in stock');
     var rk=rate(G,'_ks');var kv=[['Orders/day',dem<10?trim(dem,1):big(dem)],['Sold/day (7d)',rk<10?trim(rk,1):big(rk)],['In stock',big(G.kits.stock)],
-      ['Packed yesterday',packCap(G)?big(E.packed)+' / '+big(packCap(G))+' max':'by hand'],
-      ['Farm shrimp yesterday',big(E.prod)+' / '+big(farmCap(G)*KIT_SHRIMP)+' max'],['Shrimp waiting',big(E.rawShrimp)],
       ['Owners',big(Math.floor(G.humans))+' (+'+big(rate(G,'_own'))+'/d)'],['Kit survival',Math.round(effectiveQuality(G)*100)+'%'],['Owners thriving',Math.round(welfare(G)*100)+'%'],['Referrals/owner',(E.beta*100).toFixed(1)+'%/day'],
-      ['Cost per kit',aed(productionUnitCost(G))],['Adoption ceiling',Math.round(ceilEff(G)*100)+'% × '+big(popOpen(G))+' = '+big(K)]];
-    var KEY={'In stock':1,'Owners':1,'Cost per kit':1},kvh=function(a){return a.map(function(x){return '<span>'+x[0]+'</span><span>'+x[1]+'</span>';}).join('');};
+      ['Cost per kit',aed(productionUnitCost(G))]];
+    var KEY={'Sold/day (7d)':1,'In stock':1},kvh=function(a){return a.map(function(x){return '<span>'+x[0]+'</span><span>'+x[1]+'</span>';}).join('');};
     var h=kvh(kv.filter(function(x){return KEY[x[0]];})),h2=kvh(kv.filter(function(x){return !KEY[x[0]];}));
     if(kitStage(G)>=2&&cache.ekv!==h){cache.ekv=h;$('e-kv').mhtml=h;}
     if(kitStage(G)>=2&&cache.ekv2!==h2){cache.ekv2=h2;$('e-kv2').innerHTML=h2;}$('e-kvmore').hidden=kitStage(G)<2;
@@ -4935,40 +4936,41 @@ function updateEmpire(){
     setT('e-kithint','Spare shrimp: '+big(Math.floor(spare))+' · a kit takes '+KIT_SHRIMP+(G.money<kitMaterials(G)?' and '+aed(kitMaterials(G))+' of materials':'')+'.'+(packCap(G)>0&&stEx<KIT_SHRIMP&&spare>=KIT_SHRIMP?' Station idle: only '+big(stEx)+' above Keep in tanks.':''));
     var ks=kitStage(G),w=E.kitWip||{mat:0,shrimp:0},stepMode=!stationDone(G);
     var mg=G.kitPrice/(G.vat?1.05:1)-productionUnitCost(G);var kpLock=G.kits.sold<50&&!G.emp.won,kps=$('s-kitPrice');kps.disabled=kpLock;if(document.activeElement!==kps&&+kps.value!==G.kitPrice){kps.value=G.kitPrice;setT('v-kitPrice','AED '+G.kitPrice);}setT('kit-margin',kpLock?'Fixed for your first 50 kits.':G.emp.won?'Everyone has a tank. Farms stop breeding new kit stock. Sell the ones you don\u2019t need to save upkeep.':ks?(mg<0?'Loss ':'Profit ')+aed(Math.abs(mg))+'/kit · ~'+(dem<10?trim(dem,1):big(dem))+' orders/day at this price':'');$('kit-margin').style.color=mg<0?'var(--bad)':'';
-    $('kit-steps').hidden=!stepMode;$('kit-sub').hidden=ks===0;$('kit-pricerow').hidden=ks===0;$('kit-margin').hidden=ks===0;$('row-maxN').hidden=!(G.kits.sold>=10||G.opt.all);$('h-maxN').hidden=$('row-maxN').hidden;$('e-kv').hidden=ks===0;var machines=pd(G,'autopackm');document.querySelector('#c-kits .packrow').hidden=stepMode||machines;$('e-kithint').hidden=machines;$('btn-pack1').hidden=stepMode;$('btn-pack10').hidden=stepMode;$('btn-kitprice').hidden=true;
-    if(ks<2){var kv1=[['Orders/day',dem<10?trim(dem,1):big(dem)],['In stock',big(G.kits.stock)],['Owners',big(Math.floor(G.humans))]];var h1=kv1.map(function(x){return '<span>'+x[0]+'</span><span>'+x[1]+'</span>';}).join('');if(cache.ekv!==h1){cache.ekv=h1;$('e-kv').mhtml=h1;}}
+    $('kit-steps').hidden=!stepMode;$('kit-sub').hidden=ks===0;$('kit-pricerow').hidden=ks===0;$('kit-margin').hidden=ks===0;$('row-maxN').hidden=!(G.kits.sold>=10||G.opt.all);$('h-maxN').hidden=$('row-maxN').hidden;$('e-kv').hidden=ks===0;var machines=pd(G,'autopackm');$('kit-packrow').hidden=stepMode||machines;$('e-kithint').hidden=machines;$('btn-pack1').hidden=stepMode;$('btn-pack10').hidden=stepMode;$('btn-kitprice').hidden=true;
+    if(ks<2){var kv1=[['In stock',big(G.kits.stock)],['Owners',big(Math.floor(G.humans))]];var h1=kv1.map(function(x){return '<span>'+x[0]+'</span><span>'+x[1]+'</span>';}).join('');if(cache.ekv!==h1){cache.ekv=h1;$('e-kv').mhtml=h1;}}
     if(stepMode)setT('e-kithint','');
     if(stepMode){var kh=packTableHTML(dem);if($('kit-steps').dataset.sig!==kh){$('kit-steps').dataset.sig=kh;$('kit-steps').mhtml=kh;}}
     var pl1='Pack 1<small>'+aed(kitMaterials(G))+' · '+KIT_SHRIMP+' shrimp</small>',pl10='Pack 10<small>'+aed(kitMaterials(G)*10)+' · '+KIT_SHRIMP*10+' shrimp</small>';$('btn-pack1').mhtml=pl1;$('btn-pack10').mhtml=pl10;
     $('btn-pack1').disabled=G.money<kitMaterials(G)||spareKitShrimp(G)+(E.rawShrimp||0)<KIT_SHRIMP;$('btn-pack10').disabled=G.money<kitMaterials(G)*10||spareKitShrimp(G)+(E.rawShrimp||0)<KIT_SHRIMP*10;
   }
-  var st=E.staff,stsig='st'+Math.floor(capitalReserve(G))+activeTab+JSON.stringify(E.proj)+JSON.stringify(st)+Math.round(G.money/50)+Math.round(E.inf)+shopCount(G)+pd(G,'aiconsult')+kitsOpen(G)+G.tanks.length+'|'+G.kits.sold+'|'+farmCap(G)+'|'+JSON.stringify(E.packLines)+E.showEarlierPacking;
+  var st=E.staff,stsig='st'+Math.floor(capitalReserve(G))+JSON.stringify(E.proj)+JSON.stringify(st)+Math.round(G.money/50)+Math.round(E.inf)+shopCount(G)+pd(G,'aiconsult')+kitsOpen(G)+G.tanks.length+'|'+G.kits.sold+'|'+farmCap(G)+'|'+JSON.stringify(E.packLines)+E.showEarlierPacking+'|'+Math.round(E.prod||0)+'|'+Math.round(E.rawShrimp||0);
   if(cache.estaff!==stsig){
-    cache.estaff=stsig;var h='';
+    cache.estaff=stsig;var h='',hs='',capLine='';
     var row=function(role,desc){var n=st[role];return itemHTML(STAFF[role].pl+(n?' ×'+n:''),desc+' · '+aed(staffPay(G,role))+'/d each'+(role==='sales'&&!kitsOpen(G)?', part-time until kits open':'')+(payrollPreview(G,role)?'. '+payrollPreview(G,role):''),'<div class="hb">'+bbtn('hire','data-role="'+role+'" data-d="-1" aria-label="Let one go"','−',n>0)+bbtn('hire','data-role="'+role+'" data-d="1"','+ Hire',(role!=='pack'||st.tier>0)&&G.money>=corporateTaxReserve(G)+Math.max(7*staffPay(G,role),7*fixedOverhead(G)+7*staffPay(G,role)),true)+'</div>');};
-    if(activeTab==='promote'&&st.aiSales)h+=itemHTML('AI sales agents','Sell every day from every tank. Customers +100%, like four salespeople. About '+aed(Math.min(300,1+0.00005*E.soldToday))+'/day in tokens.','<button class="btn" disabled>Running</button>');
-    else if(activeTab==='promote'&&salesOpen(G))h+=row('sales','+25% customers each, up to 4');
-    if(activeTab==='emp'&&!st.tier)h+='<p class="hint">Packers need a complete packing station: buy the five packing tools on the Starter kits card ('+toolsHave(G)+' of 5).</p>';
-    else if(activeTab==='emp'){
-      var selfK=(st.tier===1?1:4)*(pd(G,'aicam')?2:1),mach=packingMachineCap(G),capT=packCap(G);h+='<p class="sub pack-now">Packing up to <b>'+big(capT)+' kit'+(capT===1?'':'s')+' a day</b>'+(mach>capT*0.9?'.</p>':': '+selfK+' by you at the station'+(st.pack?', '+big(st.pack*PACK_TIERS[st.tier].per*(pd(G,'aicam')?2:1))+' by '+st.pack+' packer'+(st.pack>1?'s':''):', no packers')+(mach>0?', '+big(mach)+' by machines':'')+'.</p>');
+    if(st.aiSales)hs+=itemHTML('AI sales agents','Sell every day from every tank. Customers +100%, like four salespeople. About '+aed(Math.min(300,1+0.00005*E.soldToday))+'/day in tokens.','<button class="btn" disabled>Running</button>');
+    else if(salesOpen(G))hs+=row('sales','+25% customers each, up to 4');
+    if(!st.tier){if(toolsHave(G))h+='<p class="hint">Packers need all five packing tools ('+toolsHave(G)+' of 5).</p>';}
+    else{
+      var selfK=(st.tier===1?1:4)*(pd(G,'aicam')?2:1),mach=packingMachineCap(G),capT=packCap(G);capLine='<p class="sub pack-now">Packing up to <b>'+big(capT)+' kit'+(capT===1?'':'s')+' a day</b>'+(mach>capT*0.9?'.</p>':': '+selfK+' by you at the station'+(st.pack?', '+big(st.pack*PACK_TIERS[st.tier].per*(pd(G,'aicam')?2:1))+' by '+st.pack+' packer'+(st.pack>1?'s':''):', no packers')+(mach>0?', '+big(mach)+' by machines':'')+'.</p>');
       if(G.kits.sold>=10||st.pack)h+=row('pack','About '+(PACK_TIERS[st.tier].per*(pd(G,'aicam')?2:1))+' kits/day each');
       var nt=PACK_TIERS[st.tier+1];if(nt&&G.kits.sold>=20)h+=itemHTML(nt.name,nt.note,bbtn('packtier','',cost2(nt.m,nt.i),G.money>=nt.m+capitalReserve(G)&&E.inf>=nt.i,true,E.inf>=nt.i?nt.m+capitalReserve(G):0));
     }
-    if(activeTab==='emp'&&packingMachineCap(G)>=400&&!st.pack)h='<details><summary>Earlier manual packing tools</summary>'+h+'</details>';
+    if(packingMachineCap(G)>=400&&!st.pack)h='<details><summary>Earlier manual packing tools</summary>'+h+'</details>';h=capLine+h;
     var sn=shopCount(G),man=st.aiMgr?sn:Math.min(sn,st.mgr*4);
-    if(activeTab==='promote'&&st.aiMgr)h+=itemHTML('AI shop managers','Run every shop at full strength. About '+aed(2.5)+' of tokens per shop per day.','<button class="btn" disabled>Running</button>');
-    else if(activeTab==='promote'&&(sn>0||st.mgr>0))h+=row('mgr',man+' of '+sn+' shops managed');
-    if(activeTab==='promote'&&pd(G,'aiconsult')){
-      if(!st.aiSales){var ready=pd(G,'drones');h+=itemHTML('Replace salespeople with AI agents',ready?(st.sales?'Your '+st.sales+' salespeople lose their jobs. ':'')+'AI agents sell instead, you pay per token. One-time setup.':'Needs three machines first, from Projects: the AI shrimp counting camera, the automatic packaging machine and a delivery drone fleet.',ready?bbtn('ai','data-role="sales"',aed(3000),G.money>=3000,true):'<button class="btn" disabled>Locked</button>');}
-      if(!st.aiMgr)h+=itemHTML('Replace shop managers with AI agents',(st.mgr?'Your '+st.mgr+' shop managers lose their jobs. ':'')+'Every shop gets managed, at a token bill that grows with the number of shops. One-time setup.',bbtn('ai','data-role="mgr"',aed(20000),G.money>=20000,true));
+    if(st.aiMgr)hs+=itemHTML('AI shop managers','Run every shop at full strength. About '+aed(2.5)+' of tokens per shop per day.','<button class="btn" disabled>Running</button>');
+    else if(sn>0||st.mgr>0)hs+=row('mgr',man+' of '+sn+' shops managed');
+    if(pd(G,'aiconsult')){
+      if(!st.aiSales){var ready=pd(G,'drones');hs+=itemHTML('Replace salespeople with AI agents',ready?(st.sales?'Your '+st.sales+' salespeople lose their jobs. ':'')+'AI agents sell instead, you pay per token. One-time setup.':'Needs three machines first, from Projects: the AI shrimp counting camera, the automatic packaging machine and a delivery drone fleet.',ready?bbtn('ai','data-role="sales"',aed(3000),G.money>=3000,true):'<button class="btn" disabled>Locked</button>');}
+      if(!st.aiMgr)hs+=itemHTML('Replace shop managers with AI agents',(st.mgr?'Your '+st.mgr+' shop managers lose their jobs. ':'')+'Every shop gets managed, at a token bill that grows with the number of shops. One-time setup.',bbtn('ai','data-role="mgr"',aed(20000),G.money>=20000,true));
 
     }
-    if(activeTab==='emp'&&pd(G,'autopackm')&&!PACK_LINES.some(function(l,i){return lineCount(G,i)>0;}))h+=itemHTML('Automatic packaging machine','20 kits/day, no staff. Packers now optional.','<button class="btn" disabled>Running</button>');
-    var topLine=-1;PACK_LINES.forEach(function(l,i){if(lineCount(G,i))topLine=i;});PACK_LINES.forEach(function(l,i){if(activeTab!=='emp'||!lineReady(G,i)||(!E.showEarlierPacking&&i<topLine))return;h+=itemHTML(l.name+(lineCount(G,i)?' ×'+lineCount(G,i):''),'Packs '+big(l.out)+' kits/day from '+big(l.out*KIT_SHRIMP)+' shrimp. Upkeep '+aed(l.up)+'/day. No packing wages. '+purchaseForecast(G,lineCost(G,i),0,l.out,l.up),bbtn('line','data-tier="'+i+'"',aed(lineCost(G,i)),G.money>=lineCost(G,i)+capitalReserve(G)+7*l.up,true,lineCost(G,i)+capitalReserve(G)+7*l.up));});
-    if(activeTab==='emp'&&E.legacyPacking)h+='<p class="hint">Existing-save packing: '+big(E.legacyPacking)+' kits/day. Your old farms retain their matching packing capacity. New farms need separate equipment.</p>';
-    if(activeTab==='emp'&&topLine>0)h+='<button class="btn" data-act="earlier-packing">'+(E.showEarlierPacking?'Hide earlier packing lines':'Show earlier packing lines')+'</button>';
-    $('e-staff').mhtml=h;
-    var packingPayroll=st.pack*STAFF.pack.pay+(E.legacyPacking||0)*.05;PACK_LINES.forEach(function(l,i){packingPayroll+=lineCount(G,i)*l.up;});var shownPayroll=activeTab==='promote'?staffCost(G)-packingPayroll:packingPayroll;setT('e-staffsum','AED '+big(Math.round(Math.max(0,shownPayroll)))+'/d');
+    if(pd(G,'autopackm')&&!PACK_LINES.some(function(l,i){return lineCount(G,i)>0;}))h+=itemHTML('Automatic packaging machine','20 kits/day, no staff. Packers now optional.','<button class="btn" disabled>Running</button>');
+    var topLine=-1;PACK_LINES.forEach(function(l,i){if(lineCount(G,i))topLine=i;});PACK_LINES.forEach(function(l,i){if(!lineReady(G,i)||(!E.showEarlierPacking&&i<topLine))return;h+=itemHTML(l.name+(lineCount(G,i)?' ×'+lineCount(G,i):''),'Packs '+big(l.out)+' kits/day from '+big(l.out*KIT_SHRIMP)+' shrimp. Upkeep '+aed(l.up)+'/day. No packing wages. '+purchaseForecast(G,lineCost(G,i),0,l.out,l.up),bbtn('line','data-tier="'+i+'"',aed(lineCost(G,i)),G.money>=lineCost(G,i)+capitalReserve(G)+7*l.up,true,lineCost(G,i)+capitalReserve(G)+7*l.up));});
+    if(E.legacyPacking)h+='<p class="hint">Existing-save packing: '+big(E.legacyPacking)+' kits/day. Your old farms retain their matching packing capacity. New farms need separate equipment.</p>';
+    if(topLine>0)h+='<button class="btn" data-act="earlier-packing">'+(E.showEarlierPacking?'Hide earlier packing lines':'Show earlier packing lines')+'</button>';
+    if(farmCap(G)>0)h+='<p class="hint">Farm shrimp yesterday: '+big(E.prod)+' of '+big(farmCap(G)*KIT_SHRIMP)+' max · waiting to be packed: '+big(E.rawShrimp)+'.</p>';
+    $('e-staff').mhtml=h;$('e-sales').mhtml=hs;
+    var packingPayroll=st.pack*STAFF.pack.pay+(E.legacyPacking||0)*.05;PACK_LINES.forEach(function(l,i){packingPayroll+=lineCount(G,i)*l.up;});var pcap=packCap(G);setT('e-staffsum',pcap?big(pcap)+' a day':'by hand');setT('e-salessum','AED '+big(Math.round(Math.max(0,staffCost(G)-packingPayroll)))+'/d');
   }
   var op=E.op;$('c-op').hidden=!pd(G,'ministry');
   if(pd(G,'ministry')){
@@ -5053,7 +5055,7 @@ function updateEmpire(){
     cache.ereg=rsig;
     setT('e-regsum',big(popOpen(G))+' people reachable');
     var opn=REGIONS.filter(function(r){return regOpen(G,r.id);}).map(function(r){return r.name;});
-    $('e-regions').innerHTML=(opn.length?'<p class="explain">Open: '+opn.join(', ')+'.</p>':'')+REGIONS.map(function(r){
+    $('e-regions').innerHTML='<p class="sub">Up to '+Math.round(ceilEff(G)*100)+'% of them want a tank, '+big(kitCap(G))+' people.</p>'+(opn.length?'<p class="explain">Open: '+opn.join(', ')+'.</p>':'')+REGIONS.map(function(r){
       if(regOpen(G,r.id))return '';
       if(r===nr){var rc=regionCost(G,r),ok=G.money>=rc+capitalReserve(G)&&E.inf>=r.i;return itemHTML(r.name,big(r.pop)+' people.'+(ok?'':etaTxt(rc,r.i)),bbtn('region','',cost2(rc,r.i),ok,true,E.inf>=r.i?rc+capitalReserve(G):0));}
       return '';
@@ -5193,7 +5195,7 @@ function renderCore(){if(G&&G.flash){toast(G.flash);G.flash=null;}if(G&&G.emp&&G
 }
 // Newly revealed sections take turns: one stays open and marked new, while the
 // rest wait folded until the player closes the current section.
-var OPEN_ON_REVEAL={qc:1,care:1,startcard:1,buy:1,kits:1,korder:1,order:1,equipment:1,tanks:1,proj:1,staff:1,sell:1,colcard:1,excelcard:1,fin:1,ovcard:1,farms:1};
+var OPEN_ON_REVEAL={qc:1,care:1,startcard:1,buy:1,kits:1,korder:1,order:1,sales:1,equipment:1,tanks:1,proj:1,staff:1,sell:1,colcard:1,excelcard:1,fin:1,ovcard:1,farms:1};
 function promoteCardReveal(o){
   if(o.activeCard||!o.cardQueue||!o.cardQueue.length)return;
   var ix=o.cardQueue.findIndex(function(x){return x.tab===activeTab;});if(ix<0)return;
@@ -5278,9 +5280,9 @@ function guideTarget(){
       return {key:'bad'+bi+'_'+bt.slice(0,24).replace(/[^a-z]/gi,'')+'_'+Math.floor(G.day/30),tab:'tank',sel:G.sel!==bi&&G.tanks.length>1&&!RV()?'.tchip[data-sel="'+bi+'"]':bad.act==='wc'?'#tb-wc':bad.act==='feed'?'#tb-feed':null,text:bt};}}}
   if(allN(G)<1&&!kitsOpen(G))return {key:'rebuy'+(G.stats.wiped||0),tab:'market',card:'buy',sel:'[data-act="buy"]',text:'Your shrimp are gone. Buy new ones in Trade, and feed them when Feed glows.'};
   var stepMode=$('kit-steps')&&!$('kit-steps').hidden;
-  if(stepMode&&firstKitWaits(G)&&G.emp.kitWip&&G.emp.kitWip.mat)return {key:'kitwait',tab:'emp',card:'kits',text:'Your first kit is waiting for '+KIT_SHRIMP+' spare shrimp aged 20+ days (you have '+Math.floor(spareKitShrimp(G))+'). Keep them, don\u2019t sell. Selling is paused until this kit is packed.'};
-  if(G.kits.sold<1&&!(G.emp.handPacked||0)&&G.kits.stock<1&&stepMode)return {key:'kitstep',tab:'emp',card:'kits',sel:'#btn-handstep',text:'Starter kits are open. Pack your first kit at the packing table in Kits: five steps, one tap each.'};
-  if(qcDue(G)&&G.kits.sold>=QC_FROM&&!qc(G).rounds&&(t=guideOk({key:'qc'+(qc(G).rounds||0),soft:!!qc(G).rounds,tab:'emp',card:'qccard',sel:'[data-act="qc-round"]',text:qc(G).rounds?'Time for this month\u2019s quality check in Kits.':'Kits need a quality check. Do a QC round in Kits.',skip:true})))return t;
+  if(stepMode&&firstKitWaits(G)&&G.emp.kitWip&&G.emp.kitWip.mat)return {key:'kitwait',tab:'emp',card:'staff',text:'Your first kit is waiting for '+KIT_SHRIMP+' spare shrimp aged 20+ days (you have '+Math.floor(spareKitShrimp(G))+'). Keep them, don\u2019t sell. Selling is paused until this kit is packed.'};
+  if(G.kits.sold<1&&!(G.emp.handPacked||0)&&G.kits.stock<1&&stepMode)return {key:'kitstep',tab:'emp',card:'staff',sel:'#btn-handstep',text:'Kits are open. Pack your first kit at the packing table in Kits: five steps, one tap each.'};
+  if(qcDue(G)&&G.kits.sold>=QC_FROM&&!qc(G).rounds&&(t=guideOk({key:'qc'+(qc(G).rounds||0),soft:!!qc(G).rounds,tab:'emp',card:'staff',sel:'[data-act="qc-round"]',text:qc(G).rounds?'Time for this month\u2019s quality check in Kits.':'Kits need a quality check. Do a QC round in Kits.',skip:true})))return t;
   if(G.order&&!G.order.taken)return {key:'order'+(G.order.i||0),hideHere:1,tab:'market',card:'order',sel:'[data-act="order-take"]',text:'A pet shop wants shrimp. Take the order in Trade.'};
   if(G.order&&G.order.taken&&$('ord-btns')&&$('ord-btns').querySelector('[data-act="order-deliver"]:not([disabled])'))return {key:'orderd'+(G.order.i||0),tab:'market',card:'order',sel:'[data-act="order-deliver"]',text:'The pet shop order is ready. Deliver it in Trade.'};
   if(!open){
@@ -5297,10 +5299,10 @@ function guideTarget(){
   if(G.korder&&!G.korder.taken)return {key:'ko'+G.korder.i,hideHere:1,tab:'emp',card:'korder',sel:'[data-act="korder-take"]',text:G.korder.who+' wants '+big(G.korder.n)+' kits. Accept or skip in Kits.'};
   if(!farm){
     // Growth steps the player can take right now come first, then packing by hand.
-    var pk=G.kits.stock<1&&!packCap(G)&&spareKitShrimp(G)>=KIT_SHRIMP&&G.money>=kitMaterials(G)?{key:'pack'+Math.min(G.kits.sold,5),tab:'emp',card:'kits',sel:'#btn-handstep',text:'No kits in stock. Pack one at the packing table in Kits, orders only come in when you have stock.'}:null;
+    var pk=G.kits.stock<1&&!packCap(G)&&spareKitShrimp(G)>=KIT_SHRIMP&&G.money>=kitMaterials(G)?{key:'pack'+Math.min(G.kits.sold,5),tab:'emp',card:'staff',sel:'#btn-handstep',text:'No kits in stock. Pack one at the packing table in Kits, orders only come in when you have stock.'}:null;
     if(pk&&G.kits.sold<3)return pk;
-    if(qcDue(G)&&G.kits.sold>=QC_FROM&&qc(G).rounds&&(t=guideOk({key:'qc'+(qc(G).rounds||0),soft:true,tab:'emp',card:'qccard',sel:'[data-act="qc-round"]',text:'Time for this month\u2019s quality check in Kits.',skip:true}))&&!pk)return t;
-    var tl=nextTool(G);if(tl&&G.kits.sold>=3&&G.money>=tl.cost+kitMaterials(G)+capitalReserve(G)&&(t=guideOk({key:'tool'+tl.id,soft:true,tab:'emp',card:'kits',text:toolsHave(G)?'Another packing tool takes over the next step: '+tl.tool.toLowerCase()+'.':'Packing every kit by hand gets slow. A '+tl.tool.toLowerCase()+' in Kits does one of the five steps for you.'})))return t;
+    if(qcDue(G)&&G.kits.sold>=QC_FROM&&qc(G).rounds&&(t=guideOk({key:'qc'+(qc(G).rounds||0),soft:true,tab:'emp',card:'staff',sel:'[data-act="qc-round"]',text:'Time for this month\u2019s quality check in Kits.',skip:true}))&&!pk)return t;
+    var tl=nextTool(G);if(tl&&G.kits.sold>=3&&G.money>=tl.cost+kitMaterials(G)+capitalReserve(G)&&(t=guideOk({key:'tool'+tl.id,soft:true,tab:'emp',card:'staff',text:toolsHave(G)?'Another packing tool takes over the next step: '+tl.tool.toLowerCase()+'.':'Packing every kit by hand gets slow. A '+tl.tool.toLowerCase()+' in Kits does one of the five steps for you.'})))return t;
     var st0=G.emp.staff;if(st0.tier&&!st0.pack&&kitDemand(G)>packCap(G)*0.8&&G.money>=staffPay(G,'pack')*30&&(t=guideOk({key:'packer',tab:'emp',card:'staff',sel:'[data-act="hire"][data-role="pack"][data-d="1"]',text:'Orders are coming in faster than you can pack. Hire a packer in Kits.'})))return t;
     if(G.kits.sold>=10){
       var lic=PROJ.find(function(p){return p.id==='farmlic';});
@@ -5699,7 +5701,7 @@ function renderProgression(){
  var tabs=document.querySelector('.tabs-in');tabs.insertBefore($('tab-emp'),$('tab-promote'));
  document.querySelector('.biznav').hidden=true;
  var move=function(id,tab,show){var el=$(id),parent=$('p-'+tab);if(el.parentNode!==parent)parent.appendChild(el);el.hidden=!show;el.style.order='';};
- move('c-kits','emp',open);move('c-staff',activeTab==='promote'?'promote':'emp',activeTab!=='promote'?open&&!!E.staff.tier:salesOpen(G)&&!salesDone(G));$('c-staff').querySelector('h2').textContent=activeTab==='promote'?'Sales staff':'Packing & staff';$('c-staff').querySelector('p.sub').textContent=activeTab==='promote'?'Salespeople sell tank shrimp every day, each one brings 25% more shrimp and kit customers, up to 4. Each shop manager runs 4 shops, shops without one work at half strength. Paid daily.':'Packers and machines turn shrimp into kits. A better packing table or the AI camera makes each packer faster. Staff paid daily.';$('operations-card').hidden=!(hasFarm&&Object.keys(E.farms).reduce(function(t,k){return t+(E.farms[k]||0);},0)>=2);setT('ops-sum',E.inventoryDays+' days stock');move('c-farms','up',open&&pd(G,'farmlic'));move('lab-card','up',false);
+ move('c-kits','emp',open);move('c-staff','emp',open);move('c-sales','promote',salesOpen(G)&&!salesDone(G));$('operations-card').hidden=!(hasFarm&&Object.keys(E.farms).reduce(function(t,k){return t+(E.farms[k]||0);},0)>=2);setT('ops-sum',E.inventoryDays+' days stock');move('c-farms','up',open&&pd(G,'farmlic'));move('lab-card','up',false);
  move('adscard','promote',rv('sell'));move('c-shops','promote',rv('eshops'));move('c-reg','world',rv('ereg'));move('c-op','promote',pd(G,'ministry'));
  var em=G.humans>=1e6&&!G.opt.all;$('earlymkt').hidden=!em;$('earlymkt').style.order='5';if(em){setT('earlymkt',G.opt.earlyMkt?'Hide early marketing tools ‹':'Early marketing tools: ads ›');if(!G.opt.earlyMkt){$('adscard').hidden=true;}}move('c-owners','world',rv('ereg'));
  move('c-proj',inBiz?activeTab:'emp',inBiz&&rv('eproj'));if($('c-proj').dataset.empty)$('c-proj').hidden=true;
@@ -5717,7 +5719,7 @@ function renderProgression(){
  else if(activeTab!=='space'){$('tankchips').hidden=G.tanks.length<2||!!G.recipe||ownTank(G);}
  $('inventory-days').value=String(E.inventoryDays);$('reserve-days').value=String(E.reserveDays);setT('operating-plan','Overhead '+aed(fixedOverhead(G))+'/day · reserve '+aed(operatingReserve(G))+' · '+aed(productionUnitCost(G))+'/kit');
  var lq=G.labQuality||0,lc=labCandidate(G),better=lc>lq+.001;setT('lab-score',Math.round(lq*100)+' certified');setT('lab-description','Certified: '+Math.round(lq*100)+', +'+(lq*4).toFixed(1)+' kit survival. Your tanks today: '+Math.round(lc*100)+(better?', certify to lock it in.':'.'));$('lab-certify').disabled=!better;setT('lab-certify',better?'Certify at '+Math.round(lc*100)+', +'+((lc-lq)*4).toFixed(1)+' survival':'Certified, nothing better yet');
- var order={'kordercard':0,'consultcard':7,'c-kits':1,'c-staff':2,'c-proj':3,'operations-card':4,'kit-market-link':6,'c-farms':1,'lab-card':4,'adscard':1,'c-shops':4,'c-reg':1,'c-op':4};Object.keys(order).forEach(function(id){if($(id))$(id).style.order=order[id];});
+ var order={'kordercard':0,'consultcard':7,'c-kits':1,'c-staff':2,'c-sales':2,'c-proj':3,'operations-card':4,'kit-market-link':6,'c-farms':1,'lab-card':4,'adscard':1,'c-shops':4,'c-reg':1,'c-op':4};Object.keys(order).forEach(function(id){if($(id))$(id).style.order=order[id];});
  if(!hasFarm&&$('legacy-equipment')){var lw=$('legacy-equipment');Array.from(lw.children).forEach(function(el){if(el.tagName!=='SUMMARY')$('p-up').insertBefore(el,lw);});lw.remove();}
  if(hasFarm&&!$('legacy-equipment')){var wrap=document.createElement('details');wrap.id='legacy-equipment';wrap.className='card';wrap.innerHTML='<summary class="hd"><h2>Your home tanks</h2><small id="legacy-sum"></small></summary>';wrap.hidden=true;$('p-up').appendChild(wrap);Array.from($('p-up').children).forEach(function(el){if(el!==wrap&&['c-farms','lab-card','c-proj','business-guide'].indexOf(el.id)<0)wrap.appendChild(el);});wrap.style.order='5';}
  if($('legacy-equipment'))$('legacy-equipment').hidden=hasFarm&&G.tanks.every(function(t){return t.feeder&&t.autoWC;});

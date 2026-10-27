@@ -548,5 +548,12 @@ if(/h2::before\{content:'(▾|)'/.test(html)||!html.includes(".card>.hd h2::befo
 if(!/<div id="fs-body">\s*<details class="card" id="consultcard"/.test(html)||!html.includes('<details class="card" id="operations-card"')||html.indexOf('id="operations-card"')<html.indexOf('id="finsheet"')||!html.includes('id="wagecard"'))throw Error('Consultants, Operating controls and Wages live in the Money sheet, not Kits');
 if(html.includes("$('business-strip').mhtml")||html.includes("Consultants in Kits"))throw Error('No growth strip, no consultants in Kits');
 count++;console.log('PASS Pass 119 card headers and Money sheet');
+// Pass 120: Kits tab is three cards: Kits, Making kits (packing + quality checks), Kit development; sales staff have their own card in Ads
+{const kitsSec=html.slice(html.indexOf('<section class="panel" id="p-emp"'),html.indexOf('<section class="panel" id="p-world"'));
+ const make=kitsSec.slice(kitsSec.indexOf('id="c-staff"'),kitsSec.indexOf('id="c-sales"'));
+ if(!make.includes('<h2>Making kits</h2>')||!make.includes('id="kit-steps"')||!make.includes('id="qccard"')||!make.includes('id="kit-packrow"')||kitsSec.includes('class="card coll" data-k="qc"'))throw Error('Making kits holds packing and quality checks');
+ if(!kitsSec.includes('<h2>Kits</h2>')||!html.includes('id="c-sales"')||html.includes("activeTab==='promote'?'Sales staff'"))throw Error('Kits card renamed, sales staff in their own card');
+ if(html.includes("['Adoption ceiling',")||html.includes("['Packed yesterday',"))throw Error('Ceiling lives with Regions, packing numbers with Making kits');}
+count++;console.log('PASS Pass 120 Kits tab in three cards');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
