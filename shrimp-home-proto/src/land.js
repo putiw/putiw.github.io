@@ -1216,7 +1216,15 @@ function pondAt(x,y){return waterKind(Math.floor(x/T),Math.floor(y/T))===W_POND;
 function pondOK(x,y){var tx=Math.floor(x/T),ty=Math.floor(y/T);if(waterKind(tx,ty)!==W_POND)return false;
   if(L.nat&&L.nat.pond&&natKind(M(),tx,ty)===1)return natW(x/T,y/T,-99,0)>0.5+0.25*NAT_K;
   return pondAt(x+14,y)&&pondAt(x-14,y)&&pondAt(x,y+12)&&pondAt(x,y-12);}
-function stepPondFish(dt){for(var fi=0;fi<L.fishA.length;fi++){var f=L.fishA[fi];f.ph+=dt;f.a+=Math.sin(f.ph*0.7)*dt*0.9;var nx=f.x+Math.cos(f.a)*18*dt,ny=f.y+Math.sin(f.a)*11*dt;if(pondOK(nx,ny)){f.x=nx;f.y=ny;}else f.a+=Math.PI*0.6;}}
+// the whole fish has to stay in the water: nose, tail, back and belly, not just its middle.
+// A fish that is out anyway (a new pond shape, an old save) swims back to where it started.
+function fishFits(f,x,y){if(f.loose)return pondOK(x,y);var m=AM('fish',f.kind),hw=m?m.w/2-5:12,hh=m?m.h/2-6:6;return pondOK(x,y)&&pondOK(x+hw,y)&&pondOK(x-hw,y)&&pondOK(x,y+hh)&&pondOK(x,y-hh);}
+// a spot near where it started where the whole fish fits; ponds too small for it let it go by its middle only
+function fishHome(f){var best=null,bd=1e9;for(var k=0;k<200;k++){var x=f.x+(Math.random()-0.5)*T*6,y=f.y+(Math.random()-0.5)*T*6;if(fishFits(f,x,y)){var d=Math.hypot(x-f.x,y-f.y);if(d<bd){bd=d;best=[x,y];}}}return best;}
+function stepPondFish(dt){for(var fi=0;fi<L.fishA.length;fi++){var f=L.fishA[fi];f.ph+=dt;if(f.hx==null||(!fishFits(f,f.hx,f.hy)&&!f.loose)){var hp=fishHome(f);if(hp){f.hx=hp[0];f.hy=hp[1];}else{f.hx=f.x;f.hy=f.y;f.loose=1;}}
+  if(!fishFits(f,f.x,f.y)){var dx=f.hx-f.x,dy=f.hy-f.y,d=Math.hypot(dx,dy)||1;f.a=Math.atan2(dy,dx);f.x+=dx/d*Math.min(d,30*dt);f.y+=dy/d*Math.min(d,30*dt);continue;}
+  f.a+=Math.sin(f.ph*0.7)*dt*0.9;var nx=f.x+Math.cos(f.a)*18*dt,ny=f.y+Math.sin(f.a)*11*dt;
+  if(fishFits(f,nx,ny)){f.x=nx;f.y=ny;}else{f.a+=Math.PI*(0.75+Math.random()*0.5);}}}
 var PFCOL={};
 function drawPondFish(x){for(var fi=0;fi<L.fishA.length;fi++){var f=L.fishA[fi];if(!inView(f.x,f.y,40))continue;var F=FISHI[f.kind]||FISH[0],face=Math.cos(f.a)<0?-1:1;x.globalAlpha=0.85;drawSpr(x,fishSpr(F.id,animFrame('fish',F.id,'swim',f.ph,8),face),f.x,f.y);x.globalAlpha=1;}}
 
