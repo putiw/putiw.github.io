@@ -8,13 +8,19 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 import ase
 from PIL import Image
 
-src, layout, out = sys.argv[1:4]
+# python3 build.py <keyframes dir> <outdir>: yard, plants and furniture sheets, the items she redrew
+kd, out = sys.argv[1:3]
 os.makedirs(out, exist_ok=True)
-a = ase.read(src)
-lay = [f for f in json.load(open(layout)) if f['file'] == 'yard'][0]
-WANT = {'coop': 'coop', 'rock-rock-1': 'rock', 'rock-rock-3': 'bigrock', 'feeder-post-full': 'feeder', 'feeder-hanging-full': 'feederhang'}
+SHEETS = {
+    'yard': {'coop': 'coop', 'rock-rock-1': 'rock', 'rock-rock-3': 'bigrock', 'feeder-post-full': 'feeder', 'feeder-hanging-full': 'feederhang'},
+    'plants': {'bush': 'bush', 'flower-bed': 'flowers'},
+    'furniture': {'sofa': 'sofa', 'coffeetable': 'lowtable', 'rug-shaggy': 'rug'},
+}
 meta = {}
-for it in lay['items']:
+for sheet, WANT in SHEETS.items():
+  a = ase.read(os.path.join(kd, sheet + '.aseprite'))
+  lay = [f for f in json.load(open(os.path.join(kd, '_layout.json'))) if f['file'] == sheet][0]
+  for it in lay['items']:
     if it['name'] not in WANT:
         continue
     li = [i for i, L in enumerate(a['layers']) if L['name'] == it['title']]
@@ -49,5 +55,6 @@ for it in lay['items']:
             m['perch'] = [[min(row) - fx + 1, tray - fy], [max(row) - fx - 1, tray - fy], [0, sy0 - 10 - fy]] if row else []
     im.save(f'{out}/yd-{name}.png')
     meta[name] = m
+
 json.dump(meta, open(f'{out}/yard.json', 'w'), indent=1)
 print(json.dumps(meta))

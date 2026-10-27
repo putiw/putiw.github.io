@@ -24,3 +24,14 @@ for a in ['water.mp3','music.mp3','catch-shrimp-1.mp3','catch-shrimp-2.mp3']:
     for d in [os.path.join(ROOT,'assets'),os.path.join(ROOT,'..','shrimp')]:
         if os.path.exists(os.path.join(d,a)):shutil.copy(os.path.join(d,a),os.path.join(DIST,a));break
 print('built dist/index.html',len(out),'bytes')
+# the game copy: the land inside Universal Shrimp (no Book, no Try; game.js links it to the game). Written next to the game.
+if '--game' in sys.argv:
+    G_ORDER=[f for f in ORDER if f not in ('book.js','try.js','main.js')]+['game.js','main.js']
+    gjs=[]
+    for f in G_ORDER:
+        p=os.path.join(SRC,f)
+        if os.path.exists(p): gjs.append('/* ---- %s ---- */\n'%f+open(p).read())
+    gout=shell.replace('/*CSS*/',css).replace('/*JS*/','window.GAME_MODE=1;\n'+'\n'.join(gjs)).replace('<title>Shrimp Home Prototype</title>','<title>Grandma’s land</title>')
+    dest=os.path.join(ROOT,'..','shrimp','home.html')
+    open(dest,'w').write(skel+gout+'</body></html>')
+    print('built',os.path.normpath(dest),len(gout),'bytes')

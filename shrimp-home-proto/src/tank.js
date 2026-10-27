@@ -116,7 +116,7 @@ function tvSpot(kind){var W=TV.W||300,H=TV.H||150,sand=TV.H*0.8,L=tvBase();
   var wood=TV.T&&TV.T.scape.find(function(i){return i.k==='wood';});if(kind==='wood'&&wood){var d=DECOR_SIZE.wood,p=f2s(wood.x+(Math.random()-0.5)*d.w*wood.s*0.55,wood.y-d.h*wood.s*0.62);return {surf:'wood',x:p[0],y:p[1]};}
   return {surf:'sand',x:W*(0.06+Math.random()*0.86),y:sand+H*(0.02+Math.random()*0.08)};}
 // the net hangs in the top-left corner; tank shrimp keep out from under it so it's clear which ones are in it
-function offNet(x,y,sc){if(!TV.W||typeof netRect!=='function')return y;var r=netRect(),L=tvBase()*(sc||1);if(x>r.x-L*0.5&&x<r.x+r.w+L*0.5&&y<r.y+r.h+L*0.3)return r.y+r.h+L*0.3+Math.random()*L*0.3;return y;}
+function offNet(x,y,sc){if(!TV.W||typeof netRect!=='function')return y;if(!netList().length&&!TV.fly.length)return y;var r=netRect(),L=tvBase()*(sc||1);if(x>r.x-L*0.5&&x<r.x+r.w+L*0.5&&y<r.y+r.h+L*0.3)return r.y+r.h+L*0.3+Math.random()*L*0.3;return y;}
 function newAgent(ind,near){var r=Math.random(),sp=tvSpot(r<0.12?'glassL':r<0.2?'glassR':r<0.32?'wood':'sand');if(near){sp={surf:'sand',x:clamp(near.x+rnd(-14,14),8,TV.W-8),y:TV.H*0.8+TV.H*rnd(0.02,0.1)};}sp.y=offNet(sp.x,sp.y);
   var a={id:ind.id,ind:ind,x:sp.x,y:sp.y,surf:sp.surf,tx:sp.x,ty:sp.y,ang:0,av:0,face:Math.random()<0.5?1:-1,faceT:1,intent:'graze',left:Math.random()*3,ph:Math.random()*10,rp:0,sp:0,speed:0};a.faceT=a.face;a.ang=restAngle(a);agentSpec(a);return a;}
 function agentSpec(a){var i=a.ind;a.spec=specOf(i);a.berried=!!i.eggs;a.sc=(a.spec.juv===2?0.36:a.spec.juv===1?0.62:1)*(a.spec.size||1);}
@@ -283,7 +283,7 @@ function netBar(){var el=$('netbar');if(!el)return;var N=netList();if(!N.length|
 function netStep(dt){var b=netBox();netList().forEach(function(e,k){var q=TV.netAg[e.ind.id];if(!q)return;q.ph+=dt;q.left-=dt;if(q.left<=0){var sp=netSpot(k);q.tx=sp[0];q.ty=sp[1];q.left=1.4+Math.random()*3.4;}
     q.x=clamp(q.x,b.x0,b.x1);q.y=clamp(q.y,b.y0,b.y1);var dx=q.tx-q.x,dy=q.ty-q.y,d=Math.hypot(dx,dy);if(d>1){var m=Math.min(d,dt*tvBase()*0.22);q.x+=dx/d*m;q.y+=dy/d*m;if(Math.abs(dx)>2)q.face=dx>0?-1:1;q.sp=1;}else q.sp=0;});
   TV.fly.forEach(function(f){f.t+=dt;if(f.t>=f.dur&&!f.over){f.over=1;if(f.done)f.done();}});TV.fly=TV.fly.filter(function(f){return !f.over;});}
-function drawNet(x,g,t){if(!ART_READY||!IMG.net)return;var N=netList(),base=tvBase(),r=netRect();
+function drawNet(x,g,t){if(!ART_READY||!IMG.net)return;var N=netList(),base=tvBase(),r=netRect();if(!N.length&&!TV.fly.length)return;
   x.save();x.globalAlpha=N.length||TV.fly.some(function(f){return f.kind==='in';})?1:0.55;x.drawImage(IMG.net,r.x,r.y,r.w,r.h);x.restore();
   N.forEach(function(e,k){var q=TV.netAg[e.ind.id];if(!q){if(TV.fly.some(function(f){return f.ind===e.ind;}))return;var sp=netSpot(k);q=TV.netAg[e.ind.id]={x:sp[0],y:sp[1],tx:sp[0],ty:sp[1],face:Math.random()<0.5?1:-1,ph:Math.random()*10,left:Math.random()*2};}
     var spec=q.spec||(q.spec=specOf(e.ind));x.save();x.globalAlpha=0.96;drawShrimp(x,{x:q.x,y:q.y,ang:Math.sin(q.ph*1.3)*0.06,face:q.face,spec:spec,berried:!!e.ind.eggs,surf:'water',intent:'swim',rp:q.ph*(q.sp?6:2),ph:q.ph,sp:q.sp?base*0.2:0},base*spec_sc(e.ind)*netScale(),t);x.restore();});

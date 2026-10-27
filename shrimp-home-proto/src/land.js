@@ -539,7 +539,7 @@ defObj('tallplant',{base:40,name:'Plant',spr:function(o){var pb=new PB(48,112),r
   pb.rect(10,76,28,32,PAL.CAB);pb.rect(10,76,28,3,'#5b86a0');pb.rect(10,104,28,4,'#2f4d5c');pb.rect(12,80,3,22,'#5b86a0');pb.rect(33,80,2,24,'#36586a');pb.rect(8,74,32,3,'#5b86a0');
   ink(pb);return mk(pb,24,108);}});
 // -- cream sofa with sage, blue and grey cushions
-defObj('sofa',{fw:3,base:52,name:'Sofa',spr:function(o){var W=192,pb=new PB(W,74),CR=PAL.CREAM,CS='#ddd3bd',CD='#c8bda5';
+defObj('sofa',{fw:3,base:52,name:'Sofa',spr:function(o){var ys=yardSpr('sofa');if(ys)return ys;var W=192,pb=new PB(W,74),CR=PAL.CREAM,CS='#ddd3bd',CD='#c8bda5';
   pb.rect(10,8,W-20,34,CR);pb.rect(10,8,W-20,3,'#fbf8f0');pb.rect(10,36,W-20,6,CS);
   pb.rect(4,26,W-8,34,CR);pb.rect(4,52,W-8,8,CS);pb.rect(4,58,W-8,2,CD);
   for(var s=1;s<3;s++)pb.rect(4+Math.round((W-8)*s/3),28,1,24,CD);
@@ -552,12 +552,16 @@ defObj('sofa',{fw:3,base:52,name:'Sofa',spr:function(o){var W=192,pb=new PB(W,74
   cush.forEach(function(c,i){var x=26+i*36+(i%2),y=12+(i%2?1:0);for(var q=1;q<29;q++){b.set(x+q,y-1,INKc);b.set(x+q,y+24,INKc);}for(var q2=1;q2<23;q2++){b.set(x-1,y+q2,INKc);b.set(x+30,y+q2,INKc);}});
   var sp=mk(b,W/2,70);sp.seat={x:-40,y:-32};return sp;}});
 // -- pale shaggy rug (flat)
-defObj('rug',{flat:true,fw:5,fh:3,name:'Rug',spr:function(o){var W=o.fw*64,H=o.fh*64,pb=new PB(W,H),r=mulberry32(o.seed||9),m=10;
+defObj('rug',{flat:true,fw:5,fh:3,name:'Rug',keyOf:function(o){return 'g'+o.fw+'x'+o.fh;},spr:function(o){var ys=yardSpr('rug');
+  if(ys){var W=o.fw*64,H=o.fh*64,c=document.createElement('canvas');c.width=W;c.height=H;var x=c.getContext('2d'),sw=ys.w,sh=ys.h,b=Math.min(28,Math.floor(Math.min(sw,sh)/3)),dw=W-2,dh=H-2;x.imageSmoothingEnabled=false;
+    var sxs=[0,b,sw-b,sw],sys=[0,b,sh-b,sh],dxs=[1,1+b,1+dw-b,1+dw],dys=[1,1+b,1+dh-b,1+dh];
+    for(var j=0;j<3;j++)for(var i=0;i<3;i++)x.drawImage(ys.c,sxs[i],sys[j],sxs[i+1]-sxs[i],sys[j+1]-sys[j],dxs[i],dys[j],dxs[i+1]-dxs[i],dys[j+1]-dys[j]);
+    return {c:c,ax:W/2,ay:H,w:W,h:H};}var W=o.fw*64,H=o.fh*64,pb=new PB(W,H),r=mulberry32(o.seed||9),m=10;
   for(var y=m;y<H-m;y++)for(var x=m;x<W-m;x++){var e=Math.min(x-m,W-m-1-x,y-m,H-m-1-y);if(e<2&&hash2(x,y,5)<0.35)continue;pb.set(x,y,hash2(x>>1,y,7)<0.12?'#f6f2ea':hash2(x,y>>1,8)<0.1?'#dcd5c5':'#ebe6da');}
   for(var x2=m+8;x2<W-m-8;x2++){pb.set(x2,m+7,'#d7cfbd');pb.set(x2,H-m-8,'#d7cfbd');}for(var y2=m+8;y2<H-m-7;y2++){pb.set(m+7,y2,'#d7cfbd');pb.set(W-m-8,y2,'#d7cfbd');}
   ink(pb);return mk(pb,W/2,H);}});
 // -- low oval wooden table
-defObj('lowtable',{fw:2,base:50,name:'Table',spr:function(o){var pb=new PB(128,40);pb.rect(18,22,4,14,'#6b4226');pb.rect(106,22,4,14,'#6b4226');pb.rect(30,24,3,10,'#5a3a22');pb.rect(95,24,3,10,'#5a3a22');
+defObj('lowtable',{fw:2,base:50,name:'Table',spr:function(o){var ys=yardSpr('lowtable');if(ys)return ys;var pb=new PB(128,40);pb.rect(18,22,4,14,'#6b4226');pb.rect(106,22,4,14,'#6b4226');pb.rect(30,24,3,10,'#5a3a22');pb.rect(95,24,3,10,'#5a3a22');
   pb.ell(64,16,56,11,'#8e4f26');pb.ell(64,13,56,11,'#c68450');for(var g=0;g<5;g++)pb.rect(24+g*17,9+(g%3)*3,12,1,'#b0703f');pb.ell(52,9,22,3,'#d9a066');
   pb.rect(78,6,10,7,'#f1ebdb');pb.rect(80,5,6,1,'#f1ebdb');pb.rect(88,8,2,3,'#f1ebdb');pb.rect(79,7,8,2,'#8e4f26');pb.rect(38,10,16,4,'#446b7d');pb.rect(38,10,16,1,'#5b86a0');
   ink(pb);return mk(pb,64,36);}});
@@ -619,13 +623,13 @@ defObj('oak',{base:56,name:'Tree',keyOf:function(o){return 'k'+(o.v||0);},spr:fu
   var P=new PB(74,96),src=imgPix(im,0,0,74,90);P.d.set(src,0);var v=o.v||0;if(v===1){P.recolor('#99e550','#6abe30');P.recolor('#6abe30','#4b8f3a');}else if(v===2){P.recolor('#99e550','#b9e070');P.recolor('#37946e','#3f8a5e');}
   var out=new PB(74,96);shadowPB(out,37,90,24,5,60);out.blit(P,0,0);return mk(out,37,89);}});
 // -- bushes for the hedge and the garden
-defObj('bush',{base:58,name:'Bush',spr:function(o){var pb=new PB(66,48),r=mulberry32(o.seed||3);shadowPB(pb,33,44,28,4,55);
+defObj('bush',{base:58,name:'Bush',spr:function(o){var ys=yardSpr('bush');if(ys)return ys;var pb=new PB(66,48),r=mulberry32(o.seed||3);shadowPB(pb,33,44,28,4,55);
   [[33,30,26,15,'#4b692f'],[20,28,15,13,'#37946e'],[46,27,16,13,'#37946e'],[33,22,20,14,'#6abe30'],[25,18,10,8,'#6abe30'],[42,17,11,8,'#99e550']].forEach(function(e){pb.ell(e[0]+(r()-0.5)*4,e[1]+(r()-0.5)*3,e[2],e[3],e[4]);});
   for(var k=0;k<40;k++){var x=8+Math.floor(r()*50),y=8+Math.floor(r()*34);if(pb.on(x,y)&&((pb.get(x,y)>>>24)===255))pb.set(x,y,r()<0.5?'#99e550':'#37946e');}
   if(o.v===1||o.v===2){var fc=o.v===1?'#d77bba':'#ffffff';for(var f=0;f<9;f++){var fx=10+Math.floor(r()*46),fy=10+Math.floor(r()*26);if(pb.on(fx,fy)){pb.set(fx,fy,fc);pb.set(fx+1,fy,fc);}}}
   return mk(pb,33,44);}});
 var FLC=['#d95763','#fbf236','#d77bba','#ffffff','#639bff'];
-defObj('flowers',{base:56,name:'Flower bed',spr:function(o){var pb=new PB(60,44),r=mulberry32((o.seed||1)+(o.v||0)*13),fc=FLC[(o.v||0)%FLC.length],fc2=FLC[((o.v||0)+2)%FLC.length];
+defObj('flowers',{base:56,name:'Flower bed',spr:function(o){var ys=yardSpr('flowers');if(ys)return ys;var pb=new PB(60,44),r=mulberry32((o.seed||1)+(o.v||0)*13),fc=FLC[(o.v||0)%FLC.length],fc2=FLC[((o.v||0)+2)%FLC.length];
   for(var f=0;f<8;f++){var x=8+f*6+Math.floor(r()*3),h=8+Math.floor(r()*12);pb.rect(x,30-h,1,h,'#37946e');pb.rect(x-2,30-Math.floor(h*0.5),2,1,'#6abe30');var c=f%3===2?fc2:fc;pb.rect(x-1,29-h,3,3,c);pb.set(x,30-h,'#fbf236');}
   pb.rect(4,30,52,12,'#8f563b');pb.rect(4,30,52,2,'#c68450');pb.rect(6,32,48,3,'#663931');pb.rect(4,40,52,2,'#663931');ink(pb);return mk(pb,30,42);}});
 defObj('vegbed',{fw:3,fh:2,base:56,name:'Vegetable bed',spr:function(o){var W=184,H=112,pb=new PB(W,H),r=mulberry32(21);pb.rect(0,10,W,H-10,'#8f563b');pb.rect(0,10,W,3,'#c68450');pb.rect(6,16,W-12,H-28,'#663931');
@@ -1629,13 +1633,14 @@ function tapMove(t){var o=L.moveObj;
   if(t[0]>=o.tx&&t[0]<o.tx+o.fw&&t[1]>=o.ty&&t[1]<o.ty+o.fh){L.moveObj=null;L.hints=null;L.dirty=true;updateStat(true);return;}
   var ax=t[0]-Math.floor((o.fw-1)/2),ay=t[1]-Math.floor((o.fh-1)/2);if(!canMove(o,ax,ay)){toast('It doesn’t fit there.');sfx('nope');return;}
   moveTo(o,ax,ay);L.moveObj=null;updateStat(true);}
+function gridCols(n){if(n<=4)return Math.max(1,n);var best=4,bw=9;[3,4,5].forEach(function(c){var r=n%c,w=r?c-r:0;if(w<bw||(w===bw&&c===4)){bw=w;best=c;}});return best;}
 function renderBuildPal(pal){var list=buildList(),cats=BCAT.filter(function(c){return list.some(function(b){return b.cat===c.id;});});
   if(!L.buildCat||!cats.some(function(c){return c.id===L.buildCat;}))L.buildCat=cats.length?cats[0].id:null;
   var items=list.filter(function(b){return b.cat===L.buildCat;});
   pal.innerHTML='<div class="bcats" role="tablist">'+cats.map(function(c){return '<button class="bcat" role="tab" data-cat="'+c.id+'" aria-pressed="'+(!L.removing&&!L.moving&&L.buildCat===c.id)+'">'+esc(c.name)+'</button>';}).join('')+
     '<button class="bcat bmv" data-mmode aria-pressed="'+!!L.moving+'">Move</button><button class="bcat brm" data-rmode aria-pressed="'+!!L.removing+'">Remove</button></div>'+
     (L.moving?'<div class="bnote">Tap a thing to pick it up, then tap where it goes. Moving is free.</div>':L.removing?'<div class="bnote">Tap something you built or painted to take it away. You get half back.</div>':
-    '<div class="bgrid">'+items.map(function(b){return '<button data-item="'+b.id+'" aria-pressed="'+(L.buildSel===b.id)+'"><span class="pi"></span><b>'+esc(b.name)+'</b><small>'+fmtA(b.price)+(b.ground?' a tile':'')+'</small></button>';}).join('')+'</div>');
+    '<div class="bgrid" style="grid-template-columns:repeat('+gridCols(items.length)+',minmax(0,1fr))">'+items.map(function(b){return '<button data-item="'+b.id+'" aria-pressed="'+(L.buildSel===b.id)+'"><span class="pi"></span><b>'+esc(b.name)+'</b><small>'+fmtA(b.price)+(b.ground?' a tile':'')+'</small></button>';}).join('')+'</div>');
   pal.querySelectorAll('[data-cat]').forEach(function(bt){bt.onclick=function(){L.buildCat=bt.dataset.cat;L.removing=false;L.moving=false;L.moveObj=null;L.buildSel=null;sfx('click');renderBuildPal(pal);updateStat(true);L.hints=null;L.dirty=true;};});
   pal.querySelector('[data-mmode]').onclick=function(){L.moving=!L.moving;L.removing=false;L.moveObj=null;L.buildSel=null;L.hints=null;sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
   var rm=pal.querySelector('[data-rmode]');rm.onclick=function(){L.removing=!L.removing;L.moving=false;L.moveObj=null;L.buildSel=null;sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
@@ -1808,8 +1813,16 @@ function draw(){var x=L.x,m=M(),cv=L.cv,i;L.cdx=Math.round(L.cam.x);L.cdy=Math.r
   // up in the air: birds on perches and flying, butterflies, bits
   for(i=0;i<L.birds.length;i++){var b2=L.birds[i];if(b2.win||onGround(b2))continue;drawBird(x,b2);}
   if(L.bfl)for(i=0;i<L.bfl.length;i++){var f=L.bfl[i];drawSpr(x,bflySpr(f.c,f.rest>0?(Math.sin(f.ph*3)>0.6?1:0):Math.floor(f.ph*16)%2),Math.round(f.x),Math.round(f.y));}
-  drawParts(x);drawFishing(x);drawBuildHints(x);drawWatch(x);
+  drawParts(x);drawFishing(x);drawLight(x);drawBuildHints(x);drawWatch(x);
   if(L.me&&LS().bucket.length&&!L.me.sit)drawSpr(x,bucketSpr(1),L.me.x,L.me.y-118+Math.round(Math.sin(L.rt*3)));}
+// light from the player's own clock: blue night, warm dawn and dusk, plain day. Lanterns glow after dark
+var LIGHT_K=[[0,[92,104,168]],[5,[92,104,168]],[6.2,[205,160,150]],[7.5,[255,236,212]],[9,[255,255,255]],[16.8,[255,255,255]],[18.3,[255,206,160]],[19.6,[180,146,172]],[21,[92,104,168]],[24,[92,104,168]]];
+function lightNow(){var d=new Date(),h=d.getHours()+d.getMinutes()/60;if(L.hourOverride!=null)h=L.hourOverride;for(var i=0;i<LIGHT_K.length-1;i++){var a=LIGHT_K[i],b=LIGHT_K[i+1];if(h>=a[0]&&h<=b[0]){var t=(h-a[0])/(b[0]-a[0]||1);return {h:h,c:[0,1,2].map(function(k){return Math.round(a[1][k]+(b[1][k]-a[1][k])*t);})};}}return {h:h,c:[255,255,255]};}
+function drawLight(x){var Lt=lightNow(),c=Lt.c;if(c[0]>=254&&c[1]>=254&&c[2]>=254)return;var W=L.VW+40,H=L.VH+40;
+  x.save();x.globalCompositeOperation='multiply';x.fillStyle='rgb('+c[0]+','+c[1]+','+c[2]+')';x.fillRect(-20,-20,W,H);x.restore();
+  var dark=1-(c[0]+c[1]+c[2])/765;if(dark<0.12)return;x.save();x.globalCompositeOperation='lighter';
+  objsOf('lantern').forEach(function(o){var px=oX(o)-L.cdx,py=oBase(o)-64-L.cdy,r=90,g=x.createRadialGradient(px,py,4,px,py,r);g.addColorStop(0,'rgba(255,200,110,'+(0.55*dark).toFixed(3)+')');g.addColorStop(1,'rgba(255,200,110,0)');x.fillStyle=g;x.fillRect(px-r,py-r,r*2,r*2);});
+  x.restore();}
 // eggs in the nest, Grandma in her chair: drawn after their furniture
 OBJ.coop.live=function(x,o){var s=objSprite(o),eg=LS().eggs;if(!s||!s.nest)return;for(var i=0;i<Math.min(eg.length,6);i++)drawSpr(x,eggSpr(eg[i]),oX(o)+s.nest.x+4+i*5,oBase(o)+s.nest.y+2+(i%2));};
 OBJ.armchair.live=function(x,o){if(!o.gm)return;drawSpr(x,grandmaSpr(Math.floor(L.rt*2.2)%2),oX(o)-2,oBase(o)-2);};

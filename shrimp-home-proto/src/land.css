@@ -49,3 +49,11 @@
 .bnote{font-size:12.5px;color:var(--ink-2);padding:4px 2px 2px}
 .bcat.bmv{margin-left:auto}
 .bcat.brm{margin-left:0}
+/* group chips fill their rows evenly: no lone chip, no gap at the end */
+.bcats{flex-wrap:wrap;overflow:visible}
+.bcats .bcat{flex:1 1 auto;text-align:center}
+.bcat.bmv,.bcat.brm{margin-left:0}
+/* in the game: the back button sits where the date was, tight header */
+body.in-game .top .brand{gap:8px}
+body.in-game #tb-back{flex:0 0 auto}
+body.in-game .top .brand .date{margin-left:auto}

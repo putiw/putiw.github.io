@@ -232,3 +232,8 @@ Puti asked for walking up and down: the dog only had side, standing and sitting 
 - The river keeps its curved banks unless more than 5% of its tiles are changed; tiles you painted are left out of that count. (One changed tile used to switch the curved banks off for the whole river, which drew grass squares on the banks.)
 - Grain is drawn as fat yellow seeds with a dark edge and a shadow.
 - Rare birds: 1 bird in 20 (5% per arrival when one can come), still never more than one at a time.
+- Her plants and furniture (27 Oct, `keyframes/plants.aseprite`, `furniture.aseprite`): bush, flower bed, sofa, coffee table and shaggy rug come from her sheets (`pixel-src/yard/build.py` now cuts yard, plants and furniture). The rug stretches by its edges to any size.
+- Light follows the player's clock (`drawLight`): blue night, warm dawn and dusk, lanterns glow after dark. `LAND.L.hourOverride` to test.
+- The tank's net only shows while something is in it or flying into it.
+- Build grid columns are picked so the last row is full; group chips stretch to fill their rows.
+- Game build: `python3 build.py --game` writes `../shrimp/home.html` with `src/game.js` and without Book and Try. Copy it to the game branch (`shrimp-prelaunch-fixes`). See the game's AGENTS.md, "Grandma's land".
