@@ -177,6 +177,9 @@ These come from Puti's feedback. Treat them as requirements.
 - Highlight rings sit inside the element, so they never touch neighbours. Leave at least 10 px between buttons and the content under them.
 - It must fit a 360 px phone with no horizontal scroll and no cut-off labels.
 
+**Choices**
+- A choice button shows only what it costs (money, money a day, influence ✦, kits), so the player knows if they can pick it. What it does shows on the What happened card afterwards (`choiceFx` with `all`).
+
 **Writing**
 - Write all player-facing text in Puti's voice: short, plain, comma-spliced, no build-up. No "AI vibe" phrasing, no flourishes ("a testament to", "embark", "journey").
 - Patterns she flags as Claude-style, so don't write them: "X, so you don't have to", "for good", "by itself" / "on its own", "Nothing fancy, nothing wrong" style pairs, feel-good punchlines like "Finally, a ... that matters", poetic lists ("photos, classrooms, hospital rooms, a lighthouse"), slogan or life-lesson aphorisms ("less netting, more numbers"), chicken-soup-for-the-soul morals tied onto the end, and "Label. Description" lines. No quote marks around narration. A good line people would repeat is fine, she likes quotes, it just can't be the uplifting life-lesson kind.
@@ -315,13 +318,13 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 
 In game days, best play is about 7 years and casual play about 15.
 
-Latest bot results (seed 7, 27 Oct, Pass 112):
+Latest bot results (seed 7, 27 Oct, Pass 112; strong and average rerun in Pass 116):
 
 | Bot | Result |
 |---|---|
-| Strong, cold answers (default) | Earth won on day 2,393, empire_dictator |
+| Strong, cold answers (default) | Earth won on day 2,338, empire_dictator (Pass 116) |
 | Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 3,641, question_prof |
-| Average, curious and kind (default) | Earth on day 6,413, space done by day 7,824, garden_hermit |
+| Average, curious and kind (default) | Earth on day 6,525, space done by day 7,936, garden_hermit (Pass 116) |
 | Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,349, no Space (24 Oct, not rerun in Pass 110) |
 
 All bots use campaigns (when ✦ is plentiful), films, Shrimpcoin, shops and mall stores. The average bot also funds research lines. It has 22 years to finish both chapters.

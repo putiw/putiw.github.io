@@ -524,7 +524,7 @@ var g=newGame();g.money=1e6;var t=g.tanks[0];t.volTier=1;t.vol=40;if(!buyUpgrade
 if(g.log[g.log.length-1].t!=='Moved to an 80 L tank')throw Error('Article before 80: '+g.log[g.log.length-1].t);
 if(!PAINS.pain_copy.ch[2][2].mat||PAINS.pain_copy.ch[2][2].mat<=1)throw Error('Undercut still raises the cost of each kit');
 `);
-if(/Kits '\+Math\.round\(\(po\.mat/.test(html)||!html.includes("'Each kit costs '+Math.round((po.mat-1)*100)+'% more to make'"))throw Error('Pain kit cost must read as the cost to make a kit, not its price');
+if(/Kits '\+Math\.round\(\(po\.mat/.test(html)||!html.includes("'Each kit costs '+Math.round((pa.mat-1)*100)+'% more to make'"))throw Error('Pain kit cost must read as the cost to make a kit, not its price');
 if(!html.includes("'% for '+a.days+' day'+(a.days===1?'':'s')")||!html.includes("' day'+(left===1?'':'s')+' left")||!html.includes("(storeCount(G)===1?' store · ':' stores · ')"))throw Error('One day, one store: singular forms');
 if(!html.includes("return c[0].indexOf(a)>=0?'':m;"))throw Error('A story choice that names its price should not repeat it as Costs');
 if(!/#milestone-actions>\[data-act=sandbox\],#milestone-actions>\[data-act=sandbox\]~\.btn\{flex:1 1 40%\}/.test(html)||!html.includes("(sty?'\\u00a0· '+sty.name:'')"))throw Error('Win card buttons share the row, the ending subtitle never starts a line with ·');

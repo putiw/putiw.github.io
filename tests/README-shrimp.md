@@ -945,3 +945,13 @@ Grandma's land (source on `shrimp-proto`, rebuilt into `shrimp/home.html`):
 
 Tests: balance 71, academy 10, me 46 (string checks updated; me tests sell a kit before the You page). Land: toys and net pass. Bots not rerun (not a deploy).
 BUILD 2026-10-27-opening.
+
+## Pass 116: A steady screen, cost-only choices, demand in the middle game (27 Oct)
+
+- The page no longer jumps when something above what you're looking at appears or goes away. iPhone Safari has no scroll anchoring, so the game does it: before and after every render and once a frame it notes where the thing you last tapped (or the first card under the header) sits, and if the page didn't scroll but that thing moved, scrolls it back (`anchorCheck`). Off during spotlights, the tank lock and health checks. Native `overflow-anchor` is off so Chrome doesn't do it twice. Checked in Playwright: a two-line guide bar plus a 120 px block appearing above the view leave the card under it at the same spot.
+- The Shrimp Times and note flashes drop in from the very top of the screen, over the header, instead of under it.
+- Story choices show only what they cost: AED, AED a day, influence ✦, kits. What they do (orders while the fix is set up, kit cost, refunds, survival, mood, money) is on the What happened card after the pick. The growing-pain buttons used to say "Orders slow for 140 days", which read as if the fix slowed orders. It's the problem that costs orders until the fix is in place; the aftermath now says that.
+- Demand in the middle game: growing pains multiplied orders by 0.35 each, also while a card was queued, and stacked (0.12 with two). In the average bot one or two were active from about 8k to 3M owners (day 1,100 to 2,400), so orders sat at a third or less. Now an undecided problem gives 0.6, a fix being set up 0.85, and they don't stack (the worst one counts). Breeding only slows (0.8) while a problem waits for a decision.
+- Average bot owners: year 4 105k (was 64k), year 5 592k (was 480k). Earth 6,525 / Space 7,936 garden_hermit (was 6,581 / 7,992 on the opening pass). Strong: WIN 2,338 empire_dictator (was 2,393). Kind and cold bots not rerun.
+- Tests: balance 71, academy 10, me 46 (pain checks updated: open 0.6, set-up 0.85, no stacking).
+BUILD 2026-10-27-steady.
