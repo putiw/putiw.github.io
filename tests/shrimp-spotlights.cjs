@@ -12,11 +12,12 @@ const snaps=JSON.parse(fs.readFileSync(process.env.SPOT_RUN||require('os').tmpdi
    const targets=await p.evaluate(()=>{var o=[];document.querySelectorAll('main .card[id]').forEach(c=>{if(SPOT_INFO[c.id]&&spotShown(c))o.push('#'+c.id);});return o;});
    targets.push('TAB');targets.push('#tb-wc');
    for(const tg of targets){
-    const ok=await p.evaluate((a)=>{var el=a.tg==='TAB'?document.querySelector('.tabs [data-tab="'+a.tab+'"]'):document.querySelector(a.tg);if(!el||!el.getClientRects().length)return false;window.scrollTo(0,0);spotWatch.last=0;SPOTQ.length=0;SPOT=null;spotlight(el,'Test: '+(el.id||a.tab));return true;},{tg,tab});
+    const ok=await p.evaluate((a)=>{var el=a.tg==='TAB'?document.querySelector('.tabs [data-tab="'+a.tab+'"]'):document.querySelector(a.tg);if(!el||!el.getClientRects().length)return false;window.scrollTo(0,0);spotWatch.last=0;G.progress.lastAck=null;SPOTQ.length=0;SPOT=null;spotlight(el,'Test: '+(el.id||a.tab));return true;},{tg,tab});
     if(!ok)continue;await p.waitForTimeout(1900);
     const r=await p.evaluate((a)=>{var el=SPOT&&SPOT.el;if(!el)return {err:'no spot'};var e=el.getBoundingClientRect(),g=$('spot-ring').getBoundingClientRect(),t=$('spot-tip').getBoundingClientRect(),B=spotBars(),fixed=!!el.closest('.tabs,.top');
       var vis=Math.min(e.bottom,fixed?innerHeight:B.bot)-Math.max(e.top,fixed?0:B.top);return {ready:SPOT.ready,e:[e.top,e.bottom].map(Math.round),ring:[g.top,g.bottom].map(Math.round),tip:[t.top,t.bottom].map(Math.round),vis:Math.round(vis),h:Math.round(e.height),B:[Math.round(B.top),Math.round(B.bot)],tipOverRing:t.bottom>g.top+4&&t.top<g.bottom-4};},{});
     n++;const name=sk.replace(/ /g,'_')+'-'+tab+'-'+tg.replace('#','');
+    if(r.err){console.log('NOSPOT',sk,tab,tg,JSON.stringify(await p.evaluate(()=>({q:SPOTQ.length,ok:introOK(),mc:!$('milestone-card').hidden,key:G.progress.queue[0],tv:TVLOCK,hc:!$('hcheck').hidden,ts:!$('tsheet').hidden}))));continue;}
     const problems=[];if(!r.ready)problems.push('not ready');if(r.vis<Math.min(r.h,80))problems.push('target not visible');if(Math.abs(r.ring[0]-Math.max(r.e[0]-6,r.B[0]+2))>8&&!(tg==='TAB'||tg==='#tb-wc'))problems.push('ring top off');if(r.tipOverRing&&r.h<300)problems.push('tip covers ring');
     if(problems.length){bad.push(name+' '+problems.join(',')+' '+JSON.stringify(r));await p.screenshot({path:(process.env.SPOT_OUT||require('os').tmpdir()+'/shrimp-spots')+'/'+name+'.png'});}
     await p.evaluate(()=>{if(SPOT&&SPOT.ready)spotClose();});await p.waitForTimeout(100);}

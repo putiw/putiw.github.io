@@ -1234,3 +1234,8 @@ BUILD 2026-10-28-feel.
 ## Pass 149: The farm takes the extra tanks when the first farm is built (29 Oct)
 - Puti had 8 barns and still four 640 L tanks. The tanks only went to the farm when the owntank story card was answered, and that card waited behind other story cards. Now `ownTankNow` runs as soon as the card's condition is met (first farm, `farmBuilt`), and on load for saves where the card is still waiting. The card just tells you.
 - New balance check for both paths. Balance 91, academy 10, me 46.
+
+## Deploy 29 Oct (BUILD breeders): Passes 144-149
+- Bots, seed 7: strong 2,388 empire_dictator (was 2,428), kind 3,198 question_prof (3,187), average Earth 6,581 / Space 7,992 garden_hermit (6,525 / 7,936). No INSOLVENT.
+- Spotlight sweep 114 checked. One ring-offset flag on the tall Trade sales card at first farm; two targets skipped where the harness's own previous spotlight closed late. `shrimp-spotlights.cjs` now clears `progress.lastAck` before each test spotlight (Pass 147 gap) and logs a missing spotlight instead of crashing.
+- Monkey 28,057 taps, 0 problems.
