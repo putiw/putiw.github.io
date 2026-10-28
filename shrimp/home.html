@@ -3582,7 +3582,7 @@ window.addEventListener('load',function(){var fr=location.hash==='#fresh'||windo
 if(!window.GAME_MODE)return;
 DAY_SEC=86400;                      // a second is a second
 SAVE_KEY='shrimp-land-v1';
-var P=window.parent!==window?window.parent:null;
+var P=window.parent!==window?window.parent:(window.TEST_PARENT||null);   // the test page stands in for the company in the same page
 function post(m){if(!P)return;m.land=1;try{P.postMessage(m,'*');}catch(e){}}
 window.GAME_POST=post;
 // no browser feel inside the game: no pinch zoom, no long-press menu (Puti, 28 Oct)

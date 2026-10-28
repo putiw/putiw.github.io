@@ -1171,3 +1171,17 @@ BUILD 2026-10-28-feel.
 - Grandma's armchair lines no longer have Grandpa alive ("Your grandpa says hello", "wants to see the stream").
 - gp_land: no newspaper land listings, she's saved for land near water with room for hens. Doesn't fire once you own the land. gp_scam: no gala, borrowed suit or face in the papers, no influence or mood from it. Its test changed to match.
 - Balance 87, academy 10, me 46. In Playwright on home.html: 3 hens give 3 eggs a day, 87 after 40 winter days (33 gone off), 45 in August, 45 after 860 days away. Drag-mowing 17 tiles paid AED 17 after the pause. Birds rendered side by side. Bots, spotlights and monkey not run (no balance change in the company).
+
+## Pass 140: Grandma's land look, Pierre's walk, Grandma one thing at a time (28 Oct)
+
+- You tab Grandma card: after time away one thing shows at a time, with "N more after this." Mailed money is one envelope, "Collect AED X".
+- Land header: ‹ back, cash, a Home / Tank switch, sound. The title card ("Land with a stream · 1 tank of 6") and the bottom tabs are gone in the game. Clock chip, ?, + and −, and the tools sit on the map. The map starts one zoom step out.
+- Tools are pixel icons in small slots (boot, mower, bowl of grain, rod, hammer). Exported for Puti to redraw: `shrimp-home-art/ui/tool-icons.aseprite`.
+- Grass: calmer greens with slow soft patches. Grass now grows on game days.
+- Millie, the dog, Pierre and Grandma (with her armchair) at 1.5x. Fresh land floor 5x4. Bigger tap areas for the pets.
+- Mowing coins pop at the mower, +AED over Millie when Grandma pays. Grain on the ground is small kernels. Up to 8 eggs in the nest.
+- New birds: firecrest (9 cm, rare), great tit (14 cm), magpie (45 cm). Legs stay on in hops for every bird. New fish: Siamese algae eater (stream), clown killifish (lake). All frames checked for cut-offs.
+- Pierre walks on her frames 6-14 and 16-19 at 15 fps, moving only by her per-frame positions (loop 37 px), head and shoulders bob as she set them.
+- Previewed by Puti in artifacts (land test page, Pierre walk editor). The land test page showed blank in the iPhone artifact viewer (inside an iframe there); in the game the land runs as its own page. Not checked on an iPhone.
+- Balance 87, academy 10, me 46. Bots: strong 2,428 (same), kind 3,187 (same), average Earth 6,525 / space 7,936 (6,497 / 7,908, seed noise). Spotlight sweep 118 checked, all good. Monkey skipped at Puti's say (too slow).
+- Deployed.

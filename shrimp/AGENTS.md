@@ -141,8 +141,15 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - Eggs run on the company's clock (`eggClock`, `eggDay`, game day from the `cash` message, `GDAY`): every hen lays one egg a game day, so time that flies in the company fills the coop. Coop eggs go off after 28 days in winter down to 14 in summer (`outdoorT`, `eggLife`, wear in `eggW`), collected eggs keep. Away over 40 days, the coop holds only the last 40 days. Eggs sell for AED 3 (`EGG_AED`). Collecting says how many had gone off.
 - Mowing pays: Grandma gives AED 1 a tile, up to 300 tiles a game day (`mowPay`, `mowSettle`, `MOW_CAP`), paid 3 s after the mower stops, on a tool change or on Back.
 - Bird sizes follow real length, bill to tail, at 2.5 art px a cm (`BIRD_PXCM`, `birdK`, `shrinkSpr`): sunbird 10 cm, bulbul 18, myna 23 (as drawn), kingfisher 24, hoopoe 27, parakeet 40. Hens are not on that scale yet (a hen is drawn about the size of a myna).
-- Anything else that ticks in `day` (grass, feeders, wild chickens) is real-day slow in the game.
+- Grass grows a step a game day (`grassClock`, `growGrass`): staying on the land it stays cut, time in the company grows it back. Feeders and wild chickens still tick in `day`, real-day slow in the game.
+- Look (Pass 140): no title card in the game. One header row: ‹ back (icon only under 410 px), cash, Home / Tank switch (`#lseg`), sound. Bottom tabs are hidden. On the map: clock chip top left (`#lclock`), ? top right, + and − bottom right (`ZOOMS`, `ZDEF` one step out, saved in `LS().zoom`), tools as small pixel-icon slots bottom left (`toolIcon`, `.tslot`). Puti has the icons as `shrimp-home-art/ui/tool-icons.aseprite` to redraw; swap her art in for `toolIcon` when she sends it.
+- Millie, the dog, Pierre and Grandma with her armchair are drawn 1.5x (`CHK`, `drawSprK`), nearest pixel. A fresh land's floor patch is 5x4 tiles. Hens and other furniture are not scaled.
+- Grass is calmed in `calmGrass`: her three greens pulled together and a slow tint (`lowF`). Only her exact grass colours change.
+- Mowing pops a coin per paid tile and shows +AED over Millie. Thrown grain is a few small kernels per bit. The nest shows up to 8 eggs.
+- Pierre's walk (`PW_POS`, `PW_LOOP`, `PW_FPS`, `catStep`): her frames 6-14 and 16-19 from `cat-pierre.aseprite`, positions and head set by Puti in the walk editor (head moves bake into the `walk` pose in `pixel-src/chars/add_pierre.py`, head and shoulders move together). He moves only by what each frame says.
+- Birds: firecrest, great tit and magpie added, legs stay on through hops. Fish: Siamese algae eater and clown killifish. `pixel-src/animals/add_birds.py` regenerates every bird and the new fish from `tmp/fishandbird.aseprite` and checks no frame is cut off.
 - Grandpa is dead on the land too: her armchair lines talk about him in the past.
+- The You tab Grandma card shows one thing at a time with "N more after this." and mailed money as one envelope (`gt-mail-all`).
 - No Next bar in the game (Pass 125): guide lines go to the ? popup only, the button glow stays.
 
 ## How to read Puti's requests
@@ -401,6 +408,7 @@ Do not report a feature as finished just because its new path works once. Check 
 - **Locked sliders with live steppers.** The − and + buttons next to a slider kept changing a locked kit price. Steppers check `inp.disabled` and fade with it; any new locked control must disable its steppers too.
 - **The guide jumping the page.** Centring the guided card on every cue pulled the page away from what the player was reading. The guide scrolls once per cue (`applyGuide.scrolled`), to the glowing button, only if it's off screen.
 - **A step that can't happen while Sell drains what it needs.** The first kit waited for 8 spare shrimp while the header Sell sold them. When a step waits for shrimp, say so in NEXT and hide the action that undoes it (`firstKitWaits`).
+- **A quote that kills a page.** An apostrophe in "can't" inside a single-quoted JS string stopped a whole preview page. Check the page runs (`node --check` or one headless load) after every text edit to script strings.
 - **Caching sprites before they decode.** In a test page, shrimp bodies were cached before the images loaded on a phone, so only legs showed. Never cache a drawing until every image it uses has loaded.
 
 **Sim and tests**
