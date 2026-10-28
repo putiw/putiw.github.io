@@ -1159,3 +1159,5 @@ BUILD 2026-10-28-feel.
 - From a million owners the "Early marketing tools" link and the Advertising card sit at the bottom of Ads; the unbought social media manager hides with them.
 - Not changed: news notes still cover the header while they show. Content showing above the header in Safari is the iOS status bar over the page (env top inset is 0 there), not a gap in the game.
 - Balance 87, academy 10, me 46, layout scan 1 item (2 px on the win World tab, also before). Bots, spotlights and monkey not run.
+- Review by a separate agent, then fixed: film choices were still side by side (`.item .hb` flex beat `.forkb`), now one row each with the cost under them. Water chip goes inline only when water numbers are off (they cut the tank chips). Gear buy buttons back to green like every other tab, groups stay flat. Social media manager button green like Hire. `itemHTML` also stacks when the button text is long (AED + ✦ costs). Wait line left-aligned. Price chip "Avg AED X" so the grade hint fits at 360 px.
+- Left: "0 more stores to go" still shows once malls are full. Propaganda-style rows show "Turn it down" above the price (it lives in the description).
