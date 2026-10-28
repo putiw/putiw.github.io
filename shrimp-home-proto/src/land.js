@@ -346,10 +346,25 @@ function paintFlats(x,cx,cy){var ob=LS().objs||[];for(var i=0;i<ob.length;i++){v
   if(cx>=0&&(cx<o.tx||cx>=o.tx+o.fw||cy<o.ty||cy>=o.ty+o.fh))continue;var sp=objSprite(o);if(!sp)continue;
   x.drawImage(sp.c,Math.round((o.tx+o.fw/2)*T-sp.ax),Math.round((o.ty+o.fh)*T-sp.ay));}}
 function bucketKey(m,i){return isGrass(m.g[i])?bucketOf(m.gh[i]):-1;}
+// calmer lawn (Puti, 28 Oct: the grass read as noise at full screen). Her three greens are pulled closer together, the teal
+// strokes most, and a slow tint drifts over the land (about 3 tiles across, a little yellower or deeper), so a field reads
+// as one lawn with soft patches instead of the same tile over and over. Only her exact grass colours change.
+var CG_D=cu('#4f9f4c'),CG_L=cu('#87cf48'),CG_O=cu('#94a24c'),CG_Y=cu('#9cc23e'),CG_N=cu('#3f8f43');
+function mixU(c,t,k){var r=c&255,g=(c>>>8)&255,b=(c>>>16)&255,r2=t&255,g2=(t>>>8)&255,b2=(t>>>16)&255;
+  return ((255<<24)|(Math.round(b+(b2-b)*k)<<16)|(Math.round(g+(g2-g)*k)<<8)|Math.round(r+(r2-r)*k))>>>0;}
+function lowF(wx,wy){var S2=190,cx=Math.floor(wx/S2),cy=Math.floor(wy/S2),fx=wx/S2-cx,fy=wy/S2-cy;fx=fx*fx*(3-2*fx);fy=fy*fy*(3-2*fy);
+  var a=hash2(cx,cy,6151),b=hash2(cx+1,cy,6151),c=hash2(cx,cy+1,6151),d=hash2(cx+1,cy+1,6151);return a+(b-a)*fx+(c-a)*fy+(a-b-c+d)*fx*fy;}
+function calmGrass(o,tx,ty){var q=[lowF(tx*64,ty*64),lowF(tx*64+64,ty*64),lowF(tx*64,ty*64+64),lowF(tx*64+64,ty*64+64)];
+  for(var y=0;y<64;y++)for(var x=0;x<64;x++){var i=y*64+x,c=o[i];
+    if(c===GD_)c=CG_D;else if(c===GL_)c=CG_L;else if(c===GO_)c=CG_O;else if(c!==GB_)continue;
+    var fx=x/64,fy=y/64,v=q[0]+(q[1]-q[0])*fx+(q[2]-q[0])*fy+(q[0]-q[1]-q[2]+q[3])*fx*fy;
+    // banded so it stays pixel art: four steps of tint, with a dither between steps
+    var t=(v-0.5)*2,k=Math.abs(t)*0.16,st=Math.floor(k*25+((x+y)&1)*0.5)/25;
+    o[i]=st>0?mixU(c,t>0?CG_Y:CG_N,st):c;}}
 var TILE_IMG=null,TILE_U=null;
 function paintTileInto(x,m,tx,ty){if(!TILE_IMG){TILE_IMG=x.createImageData(64,64);TILE_U=new Uint32Array(TILE_IMG.data.buffer);}
   var g=mget(m,tx,ty),mk=L.tmk&&L.tmk[mi(m,tx,ty)],o=mk&&isGrass(g)?maskedTile(m,tx,ty,mk):composeTile(m,tx,ty);
-  if(isGrass(g))tuftsInto(o,m,tx,ty);if(g===G_STEP)stepStonesInto(o,tx,ty);if(g===G_SAND)pebblesInto(o,tx,ty);TILE_U.set(o);
+  if(isGrass(g))tuftsInto(o,m,tx,ty);if(gClass(g)>0||mk)calmGrass(o,tx,ty);if(g===G_STEP)stepStonesInto(o,tx,ty);if(g===G_SAND)pebblesInto(o,tx,ty);TILE_U.set(o);
   // outside the place is notebook paper, with an ink line along the edge, like the frame on her room drawings
   if(g===G_VOID){var K=cu(PAL.K),nb=function(dx,dy){var v=mget(m,tx+dx,ty+dy);return v!==G_VOID&&v!=null;};
     if(nb(0,-1))for(var a=0;a<64*2;a++)TILE_U[a]=K;if(nb(0,1))for(var b2=64*62;b2<64*64;b2++)TILE_U[b2]=K;
@@ -722,7 +737,10 @@ var BIRDS=[
  {id:'hoopoe',cm:27,name:'Hoopoe',len:19,where:['lawn','ground'],hint:'Rare. Probes the lawn for grubs',w:0.25,stage:0,rare:1},
  {id:'parakeet',cm:40,name:'Rose-ringed parakeet',len:24,where:['tree','feeder'],hint:'Rare. Loud, in the trees',w:0.25,stage:0,rare:1},
  {id:'sunbird',cm:10,name:'Purple sunbird',len:16,where:['flowers','feeder','tree'],hint:'Rare. Comes to flowers',w:0.25,stage:0,rare:1},
- {id:'kingfisher',cm:24,name:'Arabian collared kingfisher',len:22,where:['water','fence','tree'],hint:'Rare. Watches the water',w:0.2,stage:0,rare:1}];
+ {id:'kingfisher',cm:24,name:'Arabian collared kingfisher',len:22,where:['water','fence','tree'],hint:'Rare. Watches the water',w:0.2,stage:0,rare:1},
+ {id:'tit',cm:14,name:'Great tit',where:['feeder','tree','fence'],hint:'Comes to the feeder',w:3,stage:0},
+ {id:'magpie',cm:45,name:'Magpie',where:['lawn','ground','fence'],hint:'Walks about on the lawn, loud',w:1.5,stage:0},
+ {id:'firecrest',cm:9,name:'Firecrest',where:['tree','flowers','feeder'],hint:'Rare. Tiny, in the bushes',w:0.25,stage:0,rare:1}];
 var BIRD={};BIRDS.forEach(function(b){BIRD[b.id]=b;});
 function birdPB(B,pose){var L=Math.round(B.len*1.45),tall=!!B.tall,W=L+16,H=tall?Math.round(L*1.7):L+8,pb=new PB(W,H),s=L/18,fly=pose>=2;
   var bx=Math.round(W/2-1),by=tall?Math.round(H*0.5):H-Math.round(7*s)-1,peck=pose===1;
@@ -756,7 +774,7 @@ function animSpr(key,m,i,face,ax,ay){var im=IMG[key];if(!im||!m)return null;var 
 var BIRD_HIP={bulbul:44,myna:48};
 // her bird files are all drawn about the same size; scale each to its real length, bill to tail, 2.5 art px a cm
 // (the myna stays as drawn). BIRD_ART is the drawn length in art px, measured off her idle frame (28 Oct).
-var BIRD_PXCM=2.5,BIRD_ART={bulbul:52,myna:57,hoopoe:71,parakeet:105,sunbird:69,kingfisher:99};
+var BIRD_PXCM=2.5,BIRD_ART={bulbul:52,myna:57,hoopoe:71,parakeet:105,sunbird:69,kingfisher:99,tit:91,magpie:103,firecrest:53};
 function birdK(id){var B=BIRD[id];return B&&B.cm&&BIRD_ART[id]?Math.min(1,B.cm*BIRD_PXCM/BIRD_ART[id]):1;}
 function shrinkSpr(s,k){if(!s||k>=0.999)return s;var w=Math.max(1,Math.round(s.w*k)),h=Math.max(1,Math.round(s.h*k)),c=document.createElement('canvas');c.width=w;c.height=h;var x=c.getContext('2d');
   x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.drawImage(s.c,0,0,w,h);
@@ -1309,11 +1327,12 @@ function hitChick(wx,wy,list,r){var best=null,bd=r;Object.keys(list).forEach(fun
 
 // ----- particles -----
 function puff(kind,x,y,n,o){o=o||{};for(var i=0;i<n;i++){var a=Math.random()*6.283,s=(o.speed||40)*(0.4+Math.random());L.parts.push({k:kind,x:x,y:y,vx:Math.cos(a)*s+(o.vx||0),vy:Math.sin(a)*s*0.6-(o.up||0),life:0,max:(o.life||0.7)*(kind==='heart'?1:(0.6+Math.random()*0.6)),col:o.col,r:o.r||1,g:o.g});}}
-function stepParts(dt){var a=L.parts,n=0;for(var i=0;i<a.length;i++){var p=a[i];p.life+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;var dr=p.k==='clip'?3.5:p.k==='feather'?1.2:p.k==='heart'?0:2;p.vx*=Math.max(0,1-dr*dt);
+function stepParts(dt){var a=L.parts,n=0;for(var i=0;i<a.length;i++){var p=a[i];p.life+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;var dr=p.k==='coin'?0.6:p.k==='clip'?3.5:p.k==='feather'?1.2:p.k==='heart'?0:2;p.vx*=Math.max(0,1-dr*dt);
   p.vy=p.vy*Math.max(0,1-dr*dt)+(p.k==='drop'?300:p.k==='feather'?16:p.k==='seed'?(p.g||240):p.k==='clip'?60:0)*dt;if(p.life<p.max)a[n++]=p;}a.length=n;}
 function drawParts(x){for(var i=0;i<L.parts.length;i++)drawPart(x,L.parts[i]);x.globalAlpha=1;}
 function drawPart(x,p){var a=1-p.life/p.max;x.globalAlpha=clamp(a*1.5,0,1);
-  if(p.k==='clip')wrect(x,p.x,p.y,2,1,p.col||'#6abe30');
+  if(p.k==='coin'){var cx=Math.round(p.x),cy=Math.round(p.y);wrect(x,cx-2,cy-3,5,7,'#21181b');wrect(x,cx-3,cy-2,7,5,'#21181b');wrect(x,cx-2,cy-2,5,5,'#fbf236');wrect(x,cx-1,cy-2,1,4,'#fff6a8');wrect(x,cx+1,cy-1,1,3,'#d9a320');}
+  else if(p.k==='clip')wrect(x,p.x,p.y,2,1,p.col||'#6abe30');
   else if(p.k==='feather'){wrect(x,p.x,p.y,3,1,p.col||'#f7f3ea');wrect(x,p.x+1,p.y+1,1,1,'#9badb7');}
   else if(p.k==='ring'){var rr=(4+(1-a)*18)*p.r;x.globalAlpha=clamp(0.85*a,0,1);x.fillStyle='#ffffff';for(var q=0;q<RING.length;q+=2){x.fillRect(Math.round(p.x+RING[q][0]/9*rr)-L.cdx,Math.round(p.y+RING[q][1]/9*rr*0.45)-L.cdy,1,1);}}
   else if(p.k==='drop')wrect(x,p.x,p.y,1,2,'#cbdbfc');
@@ -1439,8 +1458,8 @@ var WFL_HEX=['#fbf236','#ffffff','#d77bba','#639bff'];
 // or on a tool change or leaving.
 var MOW_AED=1,MOW_CAP=300;
 function gameDay(){var d=window.GAME_MODE?window.GDAY:S.day;return d==null||!isFinite(d)?null:Math.floor(d);}
-function mowPay(){var l=LS(),d=gameDay();if(d==null)return;if(l.mowD!==d){l.mowD=d;l.mowN=0;}if(l.mowN>=MOW_CAP)return;l.mowN++;L.mowOwe=(L.mowOwe||0)+MOW_AED;if(l.mowN>=MOW_CAP)L.mowFull=1;}
-function mowSettle(){var n=L.mowOwe||0;if(!n)return;L.mowOwe=0;earn(n,'mowing');sfx('coin');toast(L.mowFull?'Grandma paid '+fmtA(n)+'. That’s 300 tiles, enough lawn for today.':'Grandma paid '+fmtA(n)+' for the lawn.');L.mowFull=0;save();}
+function mowPay(){var l=LS(),d=gameDay();if(d==null)return;if(l.mowD!==d){l.mowD=d;l.mowN=0;}if(l.mowN>=MOW_CAP)return;l.mowN++;L.mowOwe=(L.mowOwe||0)+MOW_AED;if(L.me&&(L.coinT||0)<performance.now()){L.coinT=performance.now()+180;mowerPos();L.parts.push({k:'coin',x:L.mpX+(Math.random()-0.5)*10,y:L.mpY-16,vx:(Math.random()-0.5)*14,vy:-46,life:0,max:0.75});sfx('coin',{v:0.35});}if(l.mowN>=MOW_CAP)L.mowFull=1;}
+function mowSettle(){var n=L.mowOwe||0;if(!n)return;L.mowOwe=0;earn(n,'mowing');if(L.me)showLabel('+'+fmtA(n),L.me.x,L.me.y-90);toast(L.mowFull?'Grandma paid '+fmtA(n)+'. That’s 300 tiles, enough lawn for today.':'Grandma paid '+fmtA(n)+' for the lawn.');L.mowFull=0;save();}
 function stepMow(dt){var me=L.me;if(L.mowWait>0&&!L.mower){L.mowWait-=dt;if(L.mowWait<=0)mowSettle();}if(L.tool!=='mow'||!me){if(L.mower){L.mower.stop();L.mower=null;}mowSettle();return;}
   var cut=0;if(me.moving){var tx=Math.floor(me.x/T),ty=Math.floor((me.y-4)/T);mowerPos();cut+=mowTile(tx,ty)+mowTile(Math.floor(L.mpX/T),Math.floor(L.mpY/T));
     // grass you can't stand on (under a bush, by a fence) is cut as you go past it
@@ -1708,14 +1727,23 @@ var TOOLS=[
  {id:'grain',name:'Grain',svg:'<path d="M3.5 9.5h9l-1.2 5H4.7z"/><path d="M12.5 10.5l4-3.2"/><path d="M6 6.5l.01 0M9 5l.01 0M11 7l.01 0M7.5 3.5l.01 0"/>'},
  {id:'rod',name:'Rod',svg:'<path d="M4 17.5L15.5 3"/><path d="M15.5 3c1.3 5 1 9-1.4 11.5"/><circle cx="13.9" cy="15.6" r="1.4"/>'},
  {id:'build',name:'Build',svg:'<path d="M11.5 3.5l5 5-2.2 2.2-5-5z"/><path d="M10.6 7.4l-6.6 6.6 2.2 2.2 6.6-6.6"/>'}];
+// tool icons as small pixel drawings in the land's own ink and palette (Puti, 28 Oct: the line icons felt like a form)
+function toolIcon(id){var p=new PB(22,22),R='#d04648',R2='#e8796b',W='#f4f0e6',G='#5a6066',G2='#9badb7',B='#8f563b',B2='#b8794a',Y='#fbf236',K='#2b2622',GR='#6abe30';
+  if(id==='walk'){p.rect(4,6,6,7,R);p.rect(4,11,13,5,R);p.ell(16,13.5,3.2,2.5,R);p.rect(5,7,4,1,R2);p.rect(12,12,4,1,R2);p.rect(3,16,17,2,W);p.rect(3,17,17,1,'#cfc6b4');p.set(8,12,W);p.set(10,11,W);p.set(12,11,W);}
+  else if(id==='mow'){p.line(14,10,18,3,G);p.line(15,10,19,3,G);p.rect(17,2,4,2,K);p.rect(2,10,13,5,R);p.rect(4,8,8,2,R2);p.rect(3,11,11,1,R2);p.ell(5,16,2.3,2.3,K);p.ell(12,16,2.3,2.3,K);p.set(5,16,G2);p.set(12,16,G2);p.set(1,18,GR);p.set(2,17,GR);p.set(18,18,GR);p.set(19,17,GR);}
+  else if(id==='grain'){p.ell(11,13,7,6.5,'#d9b382');p.rect(7,4,8,4,'#d9b382');p.rect(6,7,10,1,R);p.rect(8,9,6,1,'#c49a64');p.ell(9,15,2,1.5,'#c49a64');p.set(9,3,Y);p.set(12,2,Y);p.set(14,4,Y);p.set(11,4,Y);p.set(17,9,Y);p.set(18,11,Y);}
+  else if(id==='rod'){p.line(2,19,15,3,B);p.line(3,19,16,3,B);p.line(2,18,7,12,B2);p.ell(6,15,2,2,G);p.set(6,15,G2);p.line(16,3,17,12,G2);p.ell(17,14.5,2.2,2.6,W);p.rect(15,12,5,2,R);}
+  else if(id==='build'){p.rect(9,8,3,12,B);p.rect(9,8,1,12,B2);p.rect(3,3,15,5,G2);p.rect(3,3,15,1,W);p.rect(15,3,3,5,G);p.rect(3,6,15,1,G);p.rect(2,4,1,3,G2);}
+  ink(p);return p;}
 function mapTool(t){return t==='look'||!t?'walk':t;}
 function toolsHere(){var m=M(),has={},wild=false;m.g.forEach(function(g){has[g]=1;});if(m.wb)m.wb.forEach(function(k){if(k===W_STREAM||k===W_LAKE)wild=true;});
   return TOOLS.filter(function(t){if(t.id==='mow')return has[G_GRASS]||has[G_MEADOW];if(t.id==='grain')return S.stage>=2;if(t.id==='rod')return wild;return true;});}
 function mountHome(){var p=$('p-home');ensureLand();
   p.innerHTML='<div class="card hcard"><div class="hd"><h2 id="h-name"></h2><small id="h-sub"></small><button class="qh" id="h-help" aria-label="How the home works">?</button></div><div class="hmove" id="h-move"></div></div>'+
-   '<div class="landwrap pixland" id="lwrap"><canvas id="land-cv"></canvas></div><div class="ltools" id="ltools"></div><div class="palette lpal" id="lpal" hidden></div><div class="lstat" id="lstat"></div>';
+   '<div class="landwrap pixland" id="lwrap"><canvas id="land-cv"></canvas><div class="lzoom"><button class="lzb" id="lz-in" aria-label="Zoom in">+</button><button class="lzb" id="lz-out" aria-label="Zoom out">−</button></div><button class="lzb lhelp" id="lz-help" aria-label="How the land works">?</button></div><div class="ltools" id="ltools"></div><div class="palette lpal" id="lpal" hidden></div><div class="lstat" id="lstat"></div>';
   L.cv=$('land-cv');L.sizedCv=null;L.cv.addEventListener('pointerdown',onDown);L.cv.addEventListener('pointermove',onMove);L.cv.addEventListener('pointerup',onUp);L.cv.addEventListener('pointercancel',onUp);
   L.cv.addEventListener('contextmenu',function(e){e.preventDefault();});
+  $('lz-in').onclick=function(){setZoom(1);};$('lz-out').onclick=function(){setZoom(-1);};$('lz-help').onclick=function(){$('h-help').onclick();};
   $('h-help').onclick=function(){openPop('<div class="sheet-hd"><h2>Home</h2><button class="btn sm" onclick="closePop()">Close</button></div>'+
     '<p><b>Walk:</b> tap where Millie should go, or hold and drag to steer her. Tap a thing and she walks over and uses it: a tank, the feeder, the coop, Grandma, the bench. The dog comes along. Tap him or Pierre to say hi.</p>'+
     '<p><b>Birds:</b> sit on the bench or keep still and they come closer. Tap one and stay still while the ring fills. It goes in the book.</p>'+
@@ -1724,10 +1752,11 @@ function mountHome(){var p=$('p-home');ensureLand();
     '<p><b>Rod:</b> tap the stream or the lake. Tap again when the float goes under. Keep the fish in the bucket and tap your pond to let them in.</p>'+
     '<p><b>Shrimp trap:</b> with Walk, tap the stream. Check it after a few hours.</p>'+
     '<p><b>Build:</b> pick something, then tap where it goes. Drag to look around. Tap a thing you built to take it away.</p>');};
-  var tl=$('ltools');tl.innerHTML=toolsHere().map(function(t){return '<button class="btn" data-tool="'+t.id+'" aria-pressed="false"><svg viewBox="0 0 20 20" aria-hidden="true">'+t.svg+'</svg>'+t.name+'</button>';}).join('');
+  var tl=$('ltools');tl.innerHTML=toolsHere().map(function(t){return '<button class="tslot" data-tool="'+t.id+'" aria-pressed="false" aria-label="'+t.name+'"><canvas class="ticon" width="22" height="22" data-icon="'+t.id+'"></canvas><b>'+t.name+'</b></button>';}).join('');
+  tl.querySelectorAll('canvas[data-icon]').forEach(function(c){var x=c.getContext('2d');x.imageSmoothingEnabled=false;x.drawImage(toolIcon(c.dataset.icon).cv(),0,0);});
   L.tool=mapTool(L.tool);if(!toolsHere().some(function(t){return t.id===L.tool;}))L.tool='walk';
   tl.querySelectorAll('[data-tool]').forEach(function(b){b.onclick=function(){setTool(b.dataset.tool);sfx('click');};});
-  computePass();if(!L.me)placeChars();renderCard();updateStat(true);setTool(L.tool,true);sizeCanvas();syncAgents();computeSpots();
+  computePass();if(!L.me)placeChars();renderCard();zoomBtns();updateStat(true);setTool(L.tool,true);sizeCanvas();syncAgents();computeSpots();
   if(!L.camSet){L.camSet=true;camFocus(L.me.x,L.me.y-40);}
   var l=LS();if(l.seen.refund){toast('Your old decorations were packed up. '+fmtA(l.seen.refund)+' back.',3800);l.seen.refund=0;}}
 function setTool(id,quiet){id=mapTool(id);if(L.cv&&!toolsHere().some(function(t){return t.id===id;})){if(!quiet)toast(id==='rod'?'No fish here yet. Wait for the land with the stream.':'Not here yet.');id='walk';}
@@ -1737,10 +1766,14 @@ function setTool(id,quiet){id=mapTool(id);if(L.cv&&!toolsHere().some(function(t)
   if(!quiet)sizeCanvas();updateStat(true);}
 // one canvas pixel per art pixel, scaled up by CSS: a whole number of screen pixels per art pixel where the screen allows
 // (2 on 3x phones), 1.5 on 2x phones, about 44 CSS px per tile either way
+var ZOOMS=[0.5,0.7,1,1.4,2];
+function zoomK(){var z=LS().zoom;return ZOOMS[z==null?2:clamp(z,0,ZOOMS.length-1)];}
+function setZoom(d){var l=LS(),z=clamp((l.zoom==null?2:l.zoom)+d,0,ZOOMS.length-1);if(z===l.zoom||(l.zoom==null&&z===2))return;l.zoom=z;sfx('click');sizeCanvas();zoomBtns();save();}
+function zoomBtns(){var a=$('lz-in'),b=$('lz-out'),z=LS().zoom==null?2:LS().zoom;if(a)a.disabled=z>=ZOOMS.length-1;if(b)b.disabled=z<=0;}
 function pickCpa(dpr){var d=dpr*0.6875;if(d>=1.75)return Math.round(d)/dpr;if(d>=1.2)return 1.5/dpr;return 1/dpr;}
 function sizeCanvas(){var wrap=$('lwrap');if(!wrap||!L.cv)return;var W=wrap.clientWidth,top=wrap.getBoundingClientRect().top,pal=$('lpal'),palH=pal&&!pal.hidden?78:0;
   var tb=document.querySelector('.tabs'),tabsH=tb?tb.getBoundingClientRect().height:62,tl=$('ltools'),toolsH=(tl?tl.offsetHeight:50)+14;var H=Math.round(clamp(window.innerHeight-top-toolsH-34-palH-tabsH-10,250,660));
-  var dpr=window.devicePixelRatio||1,cpa=pickCpa(dpr);if(Math.abs(H-L.cssH)<3&&W===L.cssW&&L.x&&L.sizedCv===L.cv&&cpa===L.cpa)return;L.sizedCv=L.cv;
+  var dpr=window.devicePixelRatio||1,cpa=pickCpa(dpr)*zoomK();if(Math.abs(H-L.cssH)<3&&W===L.cssW&&L.x&&L.sizedCv===L.cv&&cpa===L.cpa)return;L.sizedCv=L.cv;
   var mid=L.VW?[L.cam.x+L.VW/2,L.cam.y+L.VH/2]:null;L.cssW=W;L.cssH=H;L.dpr=dpr;L.cpa=cpa;L.s=1;L.cv.style.height=H+'px';L.cv.width=Math.max(1,Math.round(W/cpa));L.cv.height=Math.max(1,Math.round(H/cpa));L.VW=L.cv.width;L.VH=L.cv.height;
   if(mid){L.cam.x=mid[0]-L.VW/2;L.cam.y=mid[1]-L.VH/2;}L.x=L.cv.getContext('2d',{alpha:false});L.x.imageSmoothingEnabled=false;clampCam();L.dirty=true;}
 function homeSub(){var l=LS(),n=Math.min(S.tanks.length,STAGES[S.stage].tanks),bits=[plural(n,'tank')+' of '+STAGES[S.stage].tanks];if(l.hens.length&&S.stage>=2)bits.push(plural(l.hens.length,'hen'));if(l.pond.length)bits.push(plural(l.pond.length,'fish','fish')+' in the pond');var birds=Object.keys(S.book.birds||{}).length;if(birds)bits.push(plural(birds,'bird')+' seen');return bits.join(' · ');}
@@ -1868,7 +1901,10 @@ function drawLight(x){var Lt=lightNow(),c=Lt.c;if(c[0]>=254&&c[1]>=254&&c[2]>=25
   objsOf('lantern').forEach(function(o){var px=oX(o)-L.cdx,py=oBase(o)-64-L.cdy,r=90,g=x.createRadialGradient(px,py,4,px,py,r);g.addColorStop(0,'rgba(255,200,110,'+(0.55*dark).toFixed(3)+')');g.addColorStop(1,'rgba(255,200,110,0)');x.fillStyle=g;x.fillRect(px-r,py-r,r*2,r*2);});
   x.restore();}
 // eggs in the nest, Grandma in her chair: drawn after their furniture
-OBJ.coop.live=function(x,o){var s=objSprite(o),eg=LS().eggs;if(!s||!s.nest)return;for(var i=0;i<Math.min(eg.length,6);i++)drawSpr(x,eggSpr(eg[i]),oX(o)+s.nest.x+4+i*5,oBase(o)+s.nest.y+2+(i%2));};
+// up to 8 eggs in a little pile, back row first (the count is in the line under the map)
+OBJ.coop.live=function(x,o){var s=objSprite(o),eg=LS().eggs;if(!s||!s.nest||!eg.length)return;var n=Math.min(eg.length,8),w=s.nest.w||30,bx=oX(o)+s.nest.x+Math.round(w/2),by=oBase(o)+s.nest.y+2,front=Math.min(4,n),back=n-front;
+  function row(k0,cnt,dy,sh){for(var k=0;k<cnt;k++)drawSpr(x,eggSpr(eg[k0+k]),bx+Math.round((k-(cnt-1)/2)*8)+sh-4,by-dy);}
+  row(front,back,3,4);row(0,front,0,0);};
 OBJ.armchair.live=function(x,o){if(!o.gm)return;drawSpr(x,grandmaSpr(Math.floor(L.rt*2.2)%2),oX(o)-2,oBase(o)-2);};
 // draw at full rate while things move, 30 fps for small animals, 8 fps when only water and Grandma's needles move
 function busy(){var me=L.me,dg=L.dog,c=L.cat;return L.dirty||L.camMoving||(me&&me.moving)||(dg&&(dg.run||dg.hop>0))||(c&&(c.st==='walk'||c.hop>0||c.reach>0))||L.parts.length>0||(L.fishing&&L.fishing.st!=='idle')||!!L.watch||!!L.marker||!!(L.ptr&&L.ptr.down);}
@@ -1912,6 +1948,11 @@ function eggW(){var l=LS();if(!l.eggW)l.eggW=[];while(l.eggW.length<l.eggs.lengt
 function eggDay(d){var l=LS();if(S.stage<2||!stageHas('coop'))return;var w=eggW(),inc=1/eggLife(outdoorT(d)),ke=[],kw=[];
   for(var i=0;i<l.eggs.length;i++){if(w[i]+inc>=1){l.eggsOff=(l.eggsOff||0)+1;continue;}ke.push(l.eggs[i]);kw.push(w[i]+inc);}
   l.hens.forEach(function(h){if(ke.length<400){ke.push(HEN[h.kind].egg);kw.push(0);}});l.eggs=ke;l.eggW=kw;}
+// grass grows a step a game day (Puti, 28 Oct): staying on the land, time is real and the lawn stays cut; go back to the
+// company, let time fly, and it's long again when you come back
+function growGrass(n){var m=M();if(!m||n<=0)return;for(var i=0;i<m.g.length;i++){var g=m.g[i];if(isGrass(g)){var h=Math.min(1,m.gh[i]+n*(g===G_MEADOW?0.05:0.04));if(h!==m.gh[i]){m.gh[i]=h;if(L.groundOK&&L.gbk)touchTile(i%m.w,(i/m.w)|0,true);}}}}
+function grassClock(){if(!window.GAME_MODE||!S.land||!S.land.map)return;var gd=gameDay();if(gd==null)return;var l=LS();
+  if(l.grassAt==null||l.grassAt>gd||l.grassAt<gd-4000){l.grassAt=gd;return;}var n=gd-l.grassAt;if(n<1)return;l.grassAt=gd;growGrass(Math.min(n,30));save();}
 // whole game days since the last go. Away more than 40 days: what was in the coop has gone off, only the last 40 days lay
 function eggClock(){if(!S.land||!S.land.map)return;var gd=window.GAME_MODE?window.GDAY:S.day;if(gd==null||!isFinite(gd))return;gd=Math.floor(gd);var l=LS();
   if(l.eggV!==2){l.eggV=2;l.eggAt=gd;eggW();return;}
@@ -1925,17 +1966,19 @@ var MOD={name:'land',
   // for about a minute and a half and is long again after six or so, the coop fills in about seven, a full
   // feeder lasts about a quarter of an hour.
   day:function(d){if(!S.land||!S.land.map)return;var l=LS(),m=l.map;
-    for(var i=0;i<m.g.length;i++){var g=m.g[i];if(isGrass(g)){m.gh[i]=Math.min(1,m.gh[i]+(g===G_MEADOW?0.05:0.04));if(L.groundOK&&L.gbk)touchTile(i%m.w,(i/m.w)|0,true);}}
+    if(!window.GAME_MODE)growGrass(1);
     l.objs.forEach(function(o){if(o.k==='feeder'||o.k==='wfeeder')o.s=Math.max(0,(o.s||0)-0.02);});
     if(S.stage===3&&l.wild.length<4&&Math.random()<0.6){l.wild.push(newWild());if(L.shown)syncAgents();}},
-  tick:function(dd,ds){try{eggClock();}catch(e){}if(L.shown&&activeTab==='home'&&!document.hidden)try{frame(ds);}catch(e){if(!L.err){L.err=1;console.error('land frame',e);}}},
+  tick:function(dd,ds){try{eggClock();grassClock();}catch(e){}if(L.shown&&activeTab==='home'&&!document.hidden)try{frame(ds);}catch(e){if(!L.err){L.err=1;console.error('land frame',e);}}},
   show:function(){L.shown=true;mountHome();},
   hide:function(){mowSettle();L.shown=false;closeBub();if(L.mower){L.mower.stop();L.mower=null;}L.watch=null;if(L.ptr)L.ptr.down=false;},
   render:function(){if(L.shown){renderCard();updateStat(true);}},
   stageChanged:function(){}};
 registerMod(MOD);registerTab('home',MOD);
 // for tests, the Try tab and the Dev tab
-window.LAND={settle:function(){mowSettle();},L:L,T:T,stats:function(){return S.land.stats;},toWorld:fromCss,camFocus:camFocus,setTool:function(t){setTool(mapTool(t));},BIRDS:BIRDS,FISH:FISH,HENS:HENS,spawnBird:spawnBird,computeSpots:computeSpots,objs:function(){return S.land.objs;},
+window.LAND={settle:function(){mowSettle();},
+  // for the test page: a coop by Millie and three hens
+  testCoop:function(){var l=LS(),me=L.me||{x:5*T,y:5*T};if(!l.objs.some(function(o){return o.k==='coop';}))l.objs.push(mkObj('coop',Math.floor(me.x/T)+1,Math.floor(me.y/T)+1));l.hens=['white','brown','blue'].map(function(k){return {id:'h'+(++l.oid),kind:k};});resetRuntime();save(true);setTab('home');},L:L,T:T,stats:function(){return S.land.stats;},toWorld:fromCss,camFocus:camFocus,setTool:function(t){setTool(mapTool(t));},BIRDS:BIRDS,FISH:FISH,HENS:HENS,spawnBird:spawnBird,computeSpots:computeSpots,objs:function(){return S.land.objs;},
   me:function(){return L.me;},dog:function(){return L.dog;},cat:function(){return L.cat;},map:function(){return M();},passable:passable,ready:function(){return ART.ready&&L.groundOK;},
   screenOf:function(wx,wy){return toCss(wx,wy);},tapWorld:function(wx,wy){var c=toCss(wx,wy);onTap(wx,wy,c[0],c[1]);},walkTile:function(tx,ty){return walkTo([tx,ty],null,null,null);},
   waterKind:waterKind,tileOf:tileOf,objSprite:objSprite,oX:oX,oBase:oBase,

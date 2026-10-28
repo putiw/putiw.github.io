@@ -44,8 +44,14 @@ function clock(){var d=new Date();return d.toLocaleDateString('en-GB',{weekday:'
 var _uh=updateHeader;updateHeader=function(){_uh();var b=$('b-date');if(b)b.textContent=clock();var s=$('b-sub');if(s)s.textContent='';};
 function shell(){['tb-info'].forEach(function(id){var e=$(id);if(e)e.remove();});var tag=document.querySelector('.devtag');if(tag)tag.remove();var sp=$('speed');if(sp)sp.remove();
   document.querySelectorAll('.tabs [data-tab="book"],.tabs [data-tab="try"]').forEach(function(b){b.remove();});
-  var row=document.querySelector('.top .brand');if(row&&!$('tb-back')){var bb=document.createElement('button');bb.className='btn sm';bb.id='tb-back';bb.type='button';bb.textContent='Back to the company';bb.onclick=function(){try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};row.insertBefore(bb,row.firstChild);}
+  var row=document.querySelector('.top .brand');if(row&&!$('tb-back')){var bb=document.createElement('button');bb.className='btn sm';bb.id='tb-back';bb.type='button';bb.innerHTML='<span aria-hidden="true">‹</span><i> Company</i>';bb.setAttribute('aria-label','Back to the company');bb.onclick=function(){try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};row.insertBefore(bb,row.firstChild);}
+  // one header row: back, cash, the Home / Tank switch, sound (Puti, 28 Oct: the big bottom tabs took room from the map)
+  if(row&&!$('lseg')){var mo=$('b-money');if(mo)row.insertBefore(mo,$('tb-mute'));var sg=document.createElement('div');sg.className='lseg';sg.id='lseg';sg.setAttribute('role','tablist');
+    sg.innerHTML='<button type="button" data-seg="home">Home</button><button type="button" data-seg="tank">Tank</button>';row.insertBefore(sg,$('tb-mute'));
+    var td=$('tankdot');if(td)sg.querySelector('[data-seg="tank"]').appendChild(td);
+    sg.querySelectorAll('[data-seg]').forEach(function(b){b.onclick=function(){sfx('click');setTab(b.dataset.seg);};});}
   document.body.classList.add('in-game');}
+var _setTab=setTab;setTab=function(t,arg){var r=_setTab.apply(this,arguments);document.querySelectorAll('#lseg [data-seg]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.seg===activeTab));});return r;};
 
 // ----- start: the land, from empty the first time; time that passed while away is caught up -----
 var _save=save;save=function(now){if(S)S.savedAt=Date.now();return _save(now);};

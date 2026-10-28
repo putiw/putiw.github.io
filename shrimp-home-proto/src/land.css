@@ -57,3 +57,46 @@
 body.in-game .top .brand{gap:8px}
 body.in-game #tb-back{flex:0 0 auto}
 body.in-game .top .brand .date{margin-left:auto}
+/* tool bar as a game hotbar (28 Oct): pixel icons in square slots, the picked one lifts and goes warm */
+.ltools{display:flex;justify-content:center;gap:8px;margin:10px 0 6px}
+.tslot{flex:0 1 62px;min-width:0;height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 2px 3px;
+  background:#fbf8f1;border:2px solid #21181b;border-radius:10px;box-shadow:0 3px 0 #21181b;cursor:pointer;transition:transform .08s,box-shadow .08s,background .08s;-webkit-tap-highlight-color:transparent}
+.tslot .ticon{width:33px;height:33px;image-rendering:pixelated;image-rendering:crisp-edges}
+.tslot b{font:700 10.5px/1 var(--font-body);color:#21181b;letter-spacing:.01em}
+.tslot:active{transform:translateY(2px);box-shadow:0 1px 0 #21181b}
+.tslot[aria-pressed="true"]{background:#ffe58a;transform:translateY(-2px);box-shadow:0 5px 0 #21181b}
+/* zoom and help sit on the map */
+.landwrap{position:relative}
+.lzoom{position:absolute;right:8px;bottom:8px;display:flex;flex-direction:column;gap:6px;z-index:5}
+.lzb{width:36px;height:36px;border-radius:9px;border:2px solid #21181b;background:#fbf8f1;color:#21181b;font:800 20px/1 var(--font-body);box-shadow:0 2px 0 #21181b;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.lzb:active{transform:translateY(1px);box-shadow:0 1px 0 #21181b}
+.lzb:disabled{opacity:.4;box-shadow:none}
+.lzb.lhelp{position:absolute;right:8px;top:8px;z-index:5;font-size:16px}
+/* in the game: no title card (the place name and tank count were dev info), Home and Tank are a small switch in the header */
+body.in-game .hcard{display:none}
+body.in-game .top .r1{display:none}
+body.in-game nav.tabs{display:none}
+body.in-game .top .brand{display:flex;align-items:center;gap:8px}
+body.in-game #b-money{font:800 17px/1 var(--font-body);font-variant-numeric:tabular-nums;color:#21181b;white-space:nowrap}
+body.in-game .top .brand .date{display:none}
+.lseg{display:flex;margin-left:auto;border:2px solid #21181b;border-radius:10px;overflow:hidden;box-shadow:0 2px 0 #21181b;flex:0 0 auto}
+.lseg button{position:relative;border:0;background:#fbf8f1;color:#21181b;font:700 12.5px/1 var(--font-body);padding:7px 11px;cursor:pointer}
+.lseg button+button{border-left:2px solid #21181b}
+.lseg button[aria-pressed="true"]{background:#ffe58a}
+.lseg .dot{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:#d04648}
+body.in-game #tb-back{padding:6px 10px;font-size:12.5px}
+body.in-game #tb-back,body.in-game #tb-mute{border:2px solid #21181b;background:#fbf8f1;color:#21181b;box-shadow:0 2px 0 #21181b;border-radius:10px;font-weight:700}
+body.in-game #tb-back span{font-size:17px;line-height:0;position:relative;top:1px}
+body.in-game #tb-mute{width:36px;height:34px;flex:0 0 auto}
+/* the header row fits 360 px with a long cash figure */
+body.in-game .top .brand{flex-wrap:nowrap}
+body.in-game #b-money{min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:clip}
+@media (max-width:410px){
+  body.in-game #tb-back{padding:6px 8px;font-size:12px}
+  body.in-game #b-money{font-size:15px}
+  .lseg button{padding:7px 8px;font-size:12px}
+  body.in-game #tb-mute{width:32px}
+  body.in-game .top .brand{gap:6px}
+}
+body.in-game #tb-back i{font-style:normal}
+@media (max-width:410px){body.in-game #tb-back i{display:none}body.in-game #tb-back{width:36px;padding:6px 0;justify-content:center}body.in-game #b-money{font-size:16px}}
