@@ -818,7 +818,7 @@ var PROJ=[
   {id:'filtercart',c:'fork',a:'emp',fk:'filter',name:'Monthly cartridges',d:'Money every day. Each swap throws away the bacteria living in the old one, and some tanks crash after a change.',m:5e4,i:0,h:-2,req:function(G){return G.humans>=1e4;},end:'A monthly filter cartridge in every home.'},
   {id:'foodopen',c:'fork',a:'emp',fk:'food',name:'Publish a simple recipe',d:'Blanched spinach, pollen, a pinch of algae. Some owners will overfeed. Word of mouth up a little.',m:0,i:0,h:1,req:function(G){return G.humans>=1e5;},eff:function(E){E.beta+=0.002;}},
   {id:'foodpods',c:'fork',a:'emp',fk:'food',name:'Sell measured food pods',d:'Overfeeding kills more shrimp than anything, a pod is the right amount. Only your pods fit, money every day.',m:3e5,i:0,h:-1,req:function(G){return G.humans>=1e5;},end:'Your food pods in every kitchen.'},
-  {id:'careplanfree',c:'fork',a:'emp',fk:'careplan',name:'Free care plan for every owner',d:'Every living tank gets a check-in call each month. It costs you AED 0.50 a tank a month, for as long as they keep it. More tanks thrive.',m:5e5,i:0,h:2,req:function(G){return pd(G,'app')&&G.humans>=1e6;},end:'Every owner gets a call when the tank looks off. Nobody pays for it.'},
+  {id:'careplanfree',c:'fork',a:'emp',fk:'careplan',name:'Free care plan for every owner',d:'Every living tank gets a check-in call each month. It costs you AED 0.10 a tank a month, for as long as they keep it. More tanks thrive.',m:5e5,i:0,h:2,req:function(G){return pd(G,'app')&&G.humans>=1e6;},end:'Every owner gets a call when the tank looks off. Nobody pays for it.'},
   {id:'careplanpaid',c:'fork',a:'emp',fk:'careplan',name:'Sell a monthly care plan',d:'The calls cost money, the fee pays for them and then some. You set the fee in Owners’ tanks, more people sign up when it’s cheap and people like you.',m:5e5,i:0,h:-1,req:function(G){return pd(G,'app')&&G.humans>=1e6;},end:'Your care plan is a line on a billion bank statements.'},
   {id:'foodfactory',c:'biz',name:'Shrimp food factory',d:'Your own pellets, made next to the hatchery. Owners buy their food from you, four times as much as now.',m:2e6,i:0,req:function(G){return hasFarm(G,'hatch');},end:'Your food factory runs next to the hatchery, day and night.'},
   {id:'retrainpack',c:'fork',a:'emp',fk:'layoff',name:'Retrain them as farm techs',d:'Everyone keeps a job. You pay for training and wages you don\u2019t strictly need.',m:30000,i:0,h:2,mood:2,req:function(G){return false;},end:'Old packers running the night shift at the farms.'},
@@ -1368,7 +1368,7 @@ function setKitDesign(G,d){if(d<0||d>designMax(G))return false;wb(G).design=d;re
 function regionMix(G){var t=0,c=0,h=0;REGIONS.forEach(function(r){if(regOpen(G,r.id)){t+=r.pop;c+=r.pop*(r.cold||0);h+=r.pop*(r.hot||0);}});return t?{cold:c/t,hot:h/t}:{cold:0,hot:1};}
 function commitOf(price){return clamp(Math.sqrt(price/KIT_REF),0.5,1.05);}
 // Care plan: free for every living tank (you pay the calls), or a monthly fee the player sets; who pays depends on the fee and the public mood.
-var PLAN_COST=0.5,PLAN_P0=15,PLAN_WEL=0.05,PLAN_FEES=[5,60];
+var PLAN_COST=0.1,PLAN_P0=15,PLAN_WEL=0.05,PLAN_FEES=[5,60];
 function planFee(G){return G.emp.planFee==null?15:G.emp.planFee;}
 function setPlanFee(G,v){if(!pd(G,'careplanpaid'))return false;G.emp.planFee=clamp(Math.round(v/5)*5,PLAN_FEES[0],PLAN_FEES[1]);return true;}
 function planShare(G){if(pd(G,'careplanfree'))return 1;if(!pd(G,'careplanpaid'))return 0;return clamp(appeal(G)*1.4,0.2,1)*Math.exp(-planFee(G)/PLAN_P0);}
