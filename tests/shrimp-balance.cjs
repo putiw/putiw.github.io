@@ -632,5 +632,10 @@ var g=newGame();g.tanks[0].had=1;g.stats.sold=100;g.emp.staff.sales=1;g.tanks.fo
 `);
 if(!html.includes("fire('excel500'")||!html.includes('<h2>Quality checks</h2>')||!html.includes('Optional. Checks catch sick shrimp'))throw Error('Pass 135: Excel spotlight and optional QC card');
 if(!html.includes("&&!(hasSales(G)&&G.tanks.every(function(t){return t.set.autoSell;}))"))throw Error('Pass 135: top Sell hides with salespeople');
+// Puti's standing requests (29 Oct). Don't remove these under a general rule without asking her.
+check('Breeders go up to one per litre of the biggest tank',`var G=newGame();if(keepMax(G)!==100)throw Error('min 100');G.tanks[0].vol=320;if(keepMax(G)!==320)throw Error('320 L gives 320');G.tanks[0].set.keep=300;migrate(G);if(G.tanks[0].set.keep!==300)throw Error('migrate clamps to 100');`);
+if(!/function renderTankSheet[\s\S]{0,900}it\('feeder','Auto feeder'[\s\S]{0,200}it\('autoWC'/.test(html))throw Error('Puti: the new-tank sheet offers the auto feeder and auto water changer');
+if(!html.includes("else if(G.tanks.length<2||T.cycledAt!=null)sup='';"))throw Error('Puti: no seed bacteria rows for a cycled tank');
+count++;console.log('PASS new-tank sheet offers auto gear, no seed rows for cycled tanks');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

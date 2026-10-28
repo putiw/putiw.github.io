@@ -1223,3 +1223,10 @@ BUILD 2026-10-28-feel.
 - Now cards, spotlights and notes all wait for 15 s of play since the last new thing (`introOK`), and each one restarts that clock (`introMark`: spotlight close, note shown, newsflash shown, card closed). Paused time doesn't count. Urgent cards and `now:1` spotlights skip it.
 - Browser check: paused 17 s real after a spotlight, the queued one didn't show; after 16 s of play it did.
 - Balance 88 (gap check updated), academy 10, me 46.
+
+## Pass 148: Breeders scale with the tank, new-tank sheet sells auto gear again (29 Oct)
+- Breeders slider max is one per litre of your biggest tank, at least 100 (`keepMax`; slider and `migrate` follow it). Puti's 320 L tanks plateaued at about 590 shrimp because only 100 breeders were kept and Sell age 60 sells the rest before they breed at 75 days.
+- The new-tank sheet offers the auto feeder and auto water changer again. Pass 115 had removed them as a route nudge; Puti had asked for them (Pass 81).
+- Supplies: Bacteria starter and Seed from rows only for a tank that isn't cycled (every new tank is seeded, so they were dead rows).
+- New checks lock both of Puti's requests in `shrimp-balance`. AGENTS.md: ask before removing anything she asked for.
+- Browser check: 320 L tank gives a Breeders max of 320, the Tank 2 sheet shows both buy buttons. Balance 90, academy 10, me 46.
