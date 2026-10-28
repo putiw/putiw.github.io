@@ -1067,3 +1067,11 @@ BUILD 2026-10-28-feel.
 - First try charged AED 0.50 a tank a month for the calls: the average bot (free plan) was about 230 days slower over six seeds and missed Space on half of them. With and without the welfare part showed the call cost was the cause. At 0.10, seeds 3, 7, 23, 31 average 6,315 against 6,126 in Pass 126, and Space finishes on all four.
 - Bots, seed 7: strong cold Earth day 2,445 (Pass 126: 2,454), takes the paid plan; at the win care is AED 870M a day against 490M from kits. Strong kind 3,195 (3,223). Average Earth 6,413, Space 7,824 (6,525 / 7,936). No INSOLVENT.
 - Balance 82 (new Pass 127 check: needs the app, free raises welfare and costs the calls, no fee on the free plan, dearer or disliked means fewer pay, fee capped, paid earns, traits), academy 10, me 46. No browser here: the fee row is syntax checked only.
+
+## Pass 128: Pre-deploy checks, land Go on Tank 1 (28 Oct)
+
+- Grandma's land: the Go button moves from the You tab to a card under the tank view, on Tank 1 only (`renderLandRow`, `#landcard`), because the land's tank is Tank 1. The You tab card keeps the buy rows and says Tank 1 lives there. Puti 28 Oct.
+- First browser look at Passes 126 and 127, Playwright at 360 and 390 px on the million owners and win snapshots (strong bot seed 7: WIN day 2,445, empire_dictator, same as Pass 127), with the care plan undecided, free and paid. No sideways scroll or cut labels on Tank, Gear, Kits, World, You. Farm and packing line Sell 1 and Sell all: first tap shows "Tap again to confirm" and pays nothing, second pays and toasts "Sold for AED ...". Older farms and older packing lines folds open with their sell rows; "Show earlier packing lines" is gone. Fork question shows at a million owners. Owners' tanks Care plan line on free and paid; fee − and + step by 5 and stop at 5 and 60. Finance sheet says Food and tank care, fits at 360. Land card Go opens the land, back closes it, the You tab has no Go. No page errors.
+- Old packing lines sell for billions (a robotic line AED 12.6B at 67 owned): not a bug, lines cost 1.2× more each, so that is half what the 67th cost.
+- Spotlight sweep: 114 checked, all good. Layout scanner: only the known 2px win chart label. No monkey test in tests/. Balance 82, academy 10, me 46.
+
