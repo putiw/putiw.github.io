@@ -1,5 +1,5 @@
 """python3 add_pierre.py <cat-pierre.aseprite> <src/animart.js>
-Puti's new Pierre (28 Oct): walk-left is frames 5-20, frame 20 repeats 19 so the walk uses 5-19.
+Puti's new Pierre (28 Oct): walk-left is frames 5-20; 20 repeats 19 and she left out 5, so the walk is 6-19.
 Writes the whole sheet and the poses into animart.js without rebuilding the rest. The game mirrors walk-left to walk right."""
 import sys, os, json, io, base64
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -14,6 +14,8 @@ poses = {t['name']: [t['frm'], t['to'] - t['frm'] + 1] for t in a['tags']}
 wl = poses['walk-left']
 # drop repeated frames at the end of the walk (19 and 20 are the same drawing)
 while wl[1] > 1 and list(fr[wl[0] + wl[1] - 1].getdata()) == list(fr[wl[0] + wl[1] - 2].getdata()): wl[1] -= 1
+# Puti, 28 Oct: frame 5 is left out too, the walk is 6-19
+wl[0] += 1; wl[1] -= 1
 for i, f in enumerate(fr):
     bb = f.getbbox()
     assert not bb or (bb[0] > 0 and bb[1] > 0 and bb[2] < w and bb[3] < h), ('frame', i + 1, 'touches the edge')
