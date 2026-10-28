@@ -20,7 +20,7 @@ wl[0] += 1; wl[1] -= 1
 # a raised front fills the row it leaves from the row under it. These become the 'walk' pose, after her own frames.
 # frames 6-19 without 15 (Puti, 28 Oct, try it without), 1-based as in Aseprite
 WALK = [6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19]
-HEAD = [0, 0, -1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1]
+HEAD = [0, 0, -1, -1, 0, 1, 1, 0, -1, -1, 0, 1, 1]
 FX, FY = 34, 35
 def bob(f, dy):
     if not dy: return f.copy()

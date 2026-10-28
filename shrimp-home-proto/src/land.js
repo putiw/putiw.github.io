@@ -1205,7 +1205,7 @@ function catDecide(){var c=L.cat,r=catRoom();if(!c||!r)return;var roll=Math.rand
 function catIdle(){var c=L.cat;c.st='sit';c.t=0;c.dur=3+Math.random()*4;}
 // Pierre's walk as Puti set it in the walk editor (28 Oct): where he stands on each walk frame in art px, how far one cycle
 // goes, 15 frames a second. He moves only by what the frame says, so the paws on the ground stay put. Drawn at CHK.
-var PW_POS=[0,2,4,8,12,14,16,19,20,23,28,31,35],PW_LOOP=37,PW_FPS=15;   // frame 15 left out too: 6-14, 16-19
+var PW_POS=[0,2,4,8,12,13,15,19,20,25,28,29,33],PW_LOOP=37,PW_FPS=15;   // frame 15 left out too: 6-14, 16-19
 function pwAlong(p){var n=Math.floor(p/PW_POS.length),k=Math.floor(p)%PW_POS.length;return n*PW_LOOP+PW_POS[k];}
 function catStep(c,dt){var p0=c.wp||0,p1=p0+dt*PW_FPS,d=pwAlong(p1)-pwAlong(p0);c.wp=p1%PW_POS.length;return Math.max(0,d)*CHK;}
 function stepCat(dt){var c=L.cat;if(!c)return;c.anim+=dt;if(c.hop>0)c.hop=Math.max(0,c.hop-dt);if(c.reach>0){c.reach=Math.max(0,c.reach-dt);return;}c.t+=dt;
