@@ -8,6 +8,10 @@ SAVE_KEY='shrimp-land-v1';
 var P=window.parent!==window?window.parent:null;
 function post(m){if(!P)return;m.land=1;try{P.postMessage(m,'*');}catch(e){}}
 window.GAME_POST=post;
+// no browser feel inside the game: no pinch zoom, no long-press menu (Puti, 28 Oct)
+['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,function(e){e.preventDefault();},{passive:false});});
+document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});
+document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea')))e.preventDefault();});
 
 // ----- money: the company's cash -----
 spend=function(n,what){if(n<=0)return true;if(S.cash<n){toast('Not enough cash for '+what+'.');sfx('nope');return false;}

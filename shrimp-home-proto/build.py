@@ -16,7 +16,7 @@ out=shell.replace('/*CSS*/',css).replace('/*JS*/','\n'.join(js))
 assert '</script>' not in '\n'.join(js), 'a JS file contains </script>'
 os.makedirs(DIST,exist_ok=True)
 open(os.path.join(DIST,'artifact.html'),'w').write(out)
-skel='<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style></head><body>'
+skel='<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><style>html,body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;touch-action:manipulation;-webkit-text-size-adjust:100%}img,canvas{-webkit-user-drag:none}input,textarea{-webkit-user-select:text;user-select:text}:root{color-scheme:light;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style></head><body>'
 open(os.path.join(DIST,'index.html'),'w').write(skel+out+'</body></html>')
 # the water and music loops: assets/ here, or the game's copies when this sits in the repo
 # (the catch sounds are Puti's, from Shrimp Tanks)

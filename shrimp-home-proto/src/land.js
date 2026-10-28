@@ -678,7 +678,8 @@ defObj('wall',{base:60,name:'Wall',keyOf:function(o){var msk=wallMask(o);return 
     else{pb.rect(x0,fy0+H-10,x1-x0,10,F2);pb.rect(x0,fy0+H-10,x1-x0,1,FD);for(var q=0;q<4;q++)pb.set(x0+((q*17+o.tx*5)%Math.max(1,x1-x0)),fy0+12+q*13,F2);}
     pb.rect(x0,base-2,x1-x0,2,FD);}
   // the top: the wall's thickness seen from above, reaching up to the wall behind
-  var cy=base-H-cap,top=(msk&4)?cy-64:cy;pb.rect(L0,top,R0-L0,cy+cap-top,C);
+  // the wide cap stays at this tile; only the wall's own width reaches back to the one behind (a corner used to grow a wide shoulder)
+  var cy=base-H-cap,top=(msk&4)?cy-64:cy;pb.rect(L0,cy,R0-L0,cap,C);
   if(msk&4)pb.rect(Math.max(0,cx-12),top,Math.min(64,cx+12)-Math.max(0,cx-12),cy-top+cap,C);pb.rect(L0,cy+cap-2,R0-L0,2,CD);
   ink(pb);return mk(pb,32,base);}});
 defObj('gate',{fw:2,base:46,name:'Gate',walk:true,spr:function(o){var pb=new PB(128,64),base=56;[2,120].forEach(function(x){pb.rect(x,base-46,6,46,'#a8673a');pb.rect(x,base-46,2,46,'#c68450');});
@@ -793,6 +794,8 @@ var FISH=[
  {id:'black-phantom-tetra',name:'Black phantom tetra',len:[3,4.5],where:'lake',hint:'Grey with a black patch',w:5},
  {id:'rosy-tetra',name:'Rosy tetra',len:[3,4.5],where:'lake',hint:'Pink with a tall fin',w:5},
  {id:'tricolor-swordtail',name:'Tricolour swordtail',len:[5,8],where:'both',hint:'Rare. Orange, black and white, with a sword',w:1.5}];
+// Every fish is its own size: most near the middle of the species' range, now and then a big one (Puti, 28 Oct: records).
+function fishLen(F){var a=F.len[0],b=F.len[1],k=(Math.random()+Math.random()+Math.random())/3;if(Math.random()<0.04)k=1+Math.random()*0.15;return Math.round((a+(b-a)*k)*10)/10;}
 var FISHI={};FISH.forEach(function(f){FISHI[f.id]=f;});
 function fishPB(F){var W=46,H=22,pb=new PB(W,H),cy=11;
   if(F.eel){for(var x=2;x<44;x++){var y=Math.round(cy+Math.sin(x*0.3)*3);pb.rect(x,y-2,1,5,F.body);pb.set(x,y-2,F.back);pb.set(x,y-1,F.back);}pb.set(42,Math.round(cy+Math.sin(42*0.3)*3)-1,'#1a1612');ink(pb);return pb;}
@@ -1536,11 +1539,12 @@ function stepFishing(dt){var f=L.fishing;if(!f)return;f.t+=dt;var me=L.me;if(me&
   else if(f.st==='miss'){if(f.t>0.4){f.st='idle';updateStat(true);}}
   else if(f.st==='reel'){rodTip();f.x=lerp(f.x,L.tipX,dt*3);f.y=lerp(f.y,L.tipY+30,dt*3);if(f.t>0.9){f.st='idle';landFish(f.water);updateStat(true);}}}
 function landFish(water){var pool=FISH.filter(function(F){return F.where==='both'||F.where===water;}),tot=pool.reduce(function(a,F){return a+F.w;},0),r=Math.random()*tot,F=pool[0];
-  for(var i=0;i<pool.length;i++){r-=pool[i].w;if(r<=0){F=pool[i];break;}}var len=Math.round(lerp(F.len[0],F.len[1],Math.random()));LS().stats.fish++;
+  for(var i=0;i<pool.length;i++){r-=pool[i].w;if(r<=0){F=pool[i];break;}}var len=fishLen(F);LS().stats.fish++;var best=LS().fishBest||(LS().fishBest={}),prev=best[F.id],rec=prev==null||len>prev;if(rec)best[F.id]=len;
+  var recT=prev==null?'':rec?' Your biggest '+F.name.toLowerCase()+' yet, the last best was '+prev+' cm.':' Your best is '+prev+' cm.';
   var bk=LS().bucket,canKeep=bk.length<1&&LS().pond.length+bk.length<10&&!LS().carry;
-  openSheet({title:F.name,mount:function(el){el.innerHTML='<div class="fishcv"></div><p class="sub">'+len+' cm.'+(canKeep?' Let it go, or carry it to your pond.':bk.length>=1?' Your hands are full. Take the other one to the pond or the stream first.':LS().carry?' Your hands are full.':'')+'</p><div class="btns"><button class="btn" data-go>Let it go</button>'+(canKeep?'<button class="btn primary" data-keep>Carry it</button>':'')+'</div>';
-    var box=el.querySelector('.fishcv'),w=Math.min(el.clientWidth||320,520);box.style.cssText='width:'+w+'px;max-width:100%;height:110px;border-radius:10px;border:1px solid var(--line);margin:0 auto 8px;background:#89d8e4;display:flex;align-items:center;justify-content:center;overflow:hidden';
-    var fs=fishSpr(F.id),sc=Math.max(1,Math.floor(Math.min((w-10)/fs.w,4)));box.appendChild(spriteCanvas(fs,sc,fs.w*sc,fs.h*sc));
+  openSheet({title:F.name,mount:function(el){el.innerHTML='<div class="fishcv"></div><p class="sub">'+len+' cm.'+recT+(canKeep?' Let it go, or carry it to your pond.':bk.length>=1?' Your hands are full. Take the other one to the pond or the stream first.':LS().carry?' Your hands are full.':'')+'</p><div class="btns"><button class="btn" data-go>Let it go</button>'+(canKeep?'<button class="btn primary" data-keep>Carry it</button>':'')+'</div>';
+    var box=el.querySelector('.fishcv'),w=Math.min(el.clientWidth||320,520);box.style.cssText='width:'+w+'px;max-width:100%;height:124px;border-radius:10px;border:1px solid var(--line);margin:0 auto 8px;background:#89d8e4;display:flex;align-items:center;justify-content:center;overflow:hidden';
+    var fs=fishSpr(F.id),sc=Math.max(1,Math.floor(Math.min((w-16)/fs.w,(124-16)/fs.h,4)));box.appendChild(spriteCanvas(fs,sc,fs.w*sc,fs.h*sc));
     bookAdd('fish',F.id,{where:water==='stream'?'the stream':'the lake',cm:len});
     el.querySelector('[data-go]').onclick=function(){closeSheet();sfx('splash');var fb=L.fishing;if(fb)puff('drop',fb.x,fb.y,10,{speed:40,up:30,life:0.6});};
     var kb=el.querySelector('[data-keep]');if(kb)kb.onclick=function(){bk.push({kind:F.id,len:len});closeSheet();sfx('plop');if(!LS().seen.bucket){LS().seen.bucket=1;toast('Walk to your pond and tap it to let it in, or tap the stream to let it go.',3800);}updateStat(true);save();};}});}
@@ -1881,6 +1885,12 @@ function regBook(){
   [['white','White egg','From a white hen'],['brown','Brown egg','From a brown hen'],['speckled','Speckled egg','From a speckled hen'],['blue','Blue egg','From a blue egg hen'],['cream','Small cream egg','From a wild junglefowl']].forEach(function(e){coop.push({id:'egg-'+e[0],name:e[1],hint:e[2],draw:function(x,w,h){bookDraw(x,eggSpr(e[0]),w,h);}});});
   bookCat('coop',{title:'Chickens and eggs',order:5,entries:coop});}
 
+// Eggs. In the prototype a day is 20 s and each hen lays on 30% of days. In the game a day is a real day, so that was
+// one egg every three real days and Puti never saw one (28 Oct): there each hen gets a go every two real hours instead.
+function layEggs(n,p){var l=LS();if(S.stage<2||!stageHas('coop'))return;for(var k=0;k<n;k++)l.hens.forEach(function(h){if(l.eggs.length<12&&Math.random()<(h.kind==='wild'?p*0.66:p))l.eggs.push(HEN[h.kind].egg);});}
+var EGG_EVERY=1/12;
+function eggClock(){if(!window.GAME_MODE||!S.land||!S.land.map)return;var l=LS();if(l.eggAt==null||l.eggAt>S.day){l.eggAt=S.day;return;}
+  var n=Math.floor((S.day-l.eggAt)/EGG_EVERY);if(n<1)return;l.eggAt+=n*EGG_EVERY;var e0=l.eggs.length;layEggs(Math.min(n,12),0.6);if(l.eggs.length!==e0){if(L.shown)updateStat(true);save();}}
 // ----- module -----
 var MOD={name:'land',
   init:function(){ensureLand();L.tool=mapTool(LS().tool);regBook();loadArt();window.addEventListener('resize',function(){if(L.shown){sizeCanvas();}});},
@@ -1889,10 +1899,10 @@ var MOD={name:'land',
   // feeder lasts about a quarter of an hour.
   day:function(d){if(!S.land||!S.land.map)return;var l=LS(),m=l.map;
     for(var i=0;i<m.g.length;i++){var g=m.g[i];if(isGrass(g)){m.gh[i]=Math.min(1,m.gh[i]+(g===G_MEADOW?0.05:0.04));if(L.groundOK&&L.gbk)touchTile(i%m.w,(i/m.w)|0,true);}}
-    if(S.stage>=2&&stageHas('coop'))l.hens.forEach(function(h){if(l.eggs.length<12&&Math.random()<(h.kind==='wild'?0.2:0.3))l.eggs.push(HEN[h.kind].egg);});
+    if(!window.GAME_MODE)layEggs(1,0.3);
     l.objs.forEach(function(o){if(o.k==='feeder'||o.k==='wfeeder')o.s=Math.max(0,(o.s||0)-0.02);});
     if(S.stage===3&&l.wild.length<4&&Math.random()<0.6){l.wild.push(newWild());if(L.shown)syncAgents();}},
-  tick:function(dd,ds){if(L.shown&&activeTab==='home'&&!document.hidden)try{frame(ds);}catch(e){if(!L.err){L.err=1;console.error('land frame',e);}}},
+  tick:function(dd,ds){try{eggClock();}catch(e){}if(L.shown&&activeTab==='home'&&!document.hidden)try{frame(ds);}catch(e){if(!L.err){L.err=1;console.error('land frame',e);}}},
   show:function(){L.shown=true;mountHome();},
   hide:function(){L.shown=false;closeBub();if(L.mower){L.mower.stop();L.mower=null;}L.watch=null;if(L.ptr)L.ptr.down=false;},
   render:function(){if(L.shown){renderCard();updateStat(true);}},
