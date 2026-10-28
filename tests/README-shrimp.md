@@ -1138,3 +1138,11 @@ BUILD 2026-10-28-feel.
 - Early game check: average-bot money to day 300 is identical before and after today's passes, nothing in the early sim changed.
 - Balance 87, academy 10, me 46. Checked at 360 px.
 - Deployed bc2e28e. Before it: bots 2,428 / 3,187 / 6,497 (unchanged), spotlight sweep 119 checked all good, monkey 28,061 taps, 0 problems.
+
+## Pass 137: Fed bars go with the feeders, ads and choices one per row, social media manager under Sales staff (28 Oct)
+
+- Fed and Nutrition at the top hide once every tank has an auto feeder (same rule as the top Feed button, `actNeed(G).feed`). They come back with Feed if a tank goes hungry or badly fed.
+- Advertising: one ad per row (`.adlist`, `.adline`), name and "Reach +N% for D days. note" on the left, price or "N d left" on the right. The separate reach paragraph under the buttons is gone, its text is in the rows.
+- Choices (`forkHTML`): each option is one full-width button, name left, cost right (`.fopt`), no box inside the box. Border 1.5 px. Only name and cost show before the pick, as before. Film choices (`forkb`) are full-width rows too.
+- Social media manager moved out of the Ads projects list (`a:'staff'`) into the Sales staff card, under Salespeople, from the moment sales open. After hiring: "Mimi runs your accounts", Hired, until the AI consultancy.
+- Balance 87 (two markup checks updated), academy 10, me 46. Ads, Sales staff and the breeder choice checked at 360 and 390 px. Bots, spotlights and monkey not run.

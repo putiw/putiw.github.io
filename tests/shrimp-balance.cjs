@@ -526,7 +526,7 @@ if(g.log[g.log.length-1].t!=='Moved to an 80 L tank')throw Error('Article before
 if(!PAINS.pain_copy.ch[2][2].mat||PAINS.pain_copy.ch[2][2].mat<=1)throw Error('Undercut still raises the cost of each kit');
 `);
 if(/Kits '\+Math\.round\(\(po\.mat/.test(html)||!html.includes("'Each kit costs '+Math.round((pa.mat-1)*100)+'% more to make'"))throw Error('Pain kit cost must read as the cost to make a kit, not its price');
-if(!html.includes("'% for '+a.days+' day'+(a.days===1?'':'s')")||!html.includes("' day'+(left===1?'':'s')+' left")||!html.includes("(storeCount(G)===1?' store · ':' stores · ')"))throw Error('One day, one store: singular forms');
+if(!html.includes("d=a.days+' day'+(a.days===1?'':'s')")||!html.includes("' day'+(left===1?'':'s')+' left")||!html.includes("(storeCount(G)===1?' store · ':' stores · ')"))throw Error('One day, one store: singular forms');
 if(!html.includes("return c[0].indexOf(a)>=0?'':m;"))throw Error('A story choice that names its price should not repeat it as Costs');
 if(!/#milestone-actions>\[data-act=sandbox\],#milestone-actions>\[data-act=sandbox\]~\.btn\{flex:1 1 40%\}/.test(html)||!html.includes("(sty?'\\u00a0· '+sty.name:'')"))throw Error('Win card buttons share the row, the ending subtitle never starts a line with ·');
 count++;console.log('PASS Pass 111 singulars, story costs once, win card buttons and ending title');
@@ -559,7 +559,7 @@ count++;console.log('PASS Pass 120 Kits tab in three cards');
 // Pass 121: Ads holds Ads, Shops, Sales staff, Marketing + Campaigns, Regions; World holds Shaping the world, Owners' tanks, the coast card, The Shrimp Times
 if(html.includes('id="c-op"')||!/<div id="e-proj"><\/div>\s*<div id="op-wrap" hidden>/.test(html))throw Error('Campaigns live inside the Marketing development card');
 if(!html.includes("move('c-reg','promote',rv('ereg'))")||!html.includes('<div id="coin-island"></div>'))throw Error('Regions in Ads, Shrimp Island in the coast card');
-if(!html.includes('class="treats adrow"')||!html.includes('<details class="store-close"><summary>Close stores</summary>'))throw Error('One-off ads as a button row, store closing in a fold');
+if(!html.includes('class="btn adline"')||!html.includes('<details class="store-close"><summary>Close stores</summary>'))throw Error('One-off ads one per row, store closing in a fold');
 count++;console.log('PASS Pass 121 Ads and World tabs');
 // Pass 123: text fixes. No free bottleneck lines in the Next bar, ceiling and working-capital alerts only with consultants
 for(const k of ["key:'packer'","key:'farmtier'","key:'reg1'","key:'lic'","key:'rack'","var descriptions={","in Business","after a project in Gear","40× speed unlocked","Grow racks start at AED 2,000","Hatcheries &amp; breeding"])if(html.includes(k))throw Error('Text fix not applied: '+k);
