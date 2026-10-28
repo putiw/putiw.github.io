@@ -594,5 +594,10 @@ var m2=k.money;setPlanFee(k,15);k.emp.op.m=0.5;planDay(k);if(!(k.money>m2))throw
 if(TRAIT_TAGS.careplanfree.kin<=0||TRAIT_TAGS.careplanpaid.know<=0)throw Error('Care plan traits');
 `);
 if(!html.includes("data-act=\"planfee\"")&&!html.includes("bbtn('planfee'"))throw Error('Pass 127: fee stepper');
+check('Pass 130: Grandma pays AED 15 for the first babies, social media manager opens with sales staff',`
+var g=newGame();g.stats.born=1;var m=g.money;checkGoals(g);if(g.money-m!==15||!(g.today.loans>=15))throw Error('Grandma gift in Loans and gifts');if(!g.log.some(function(l){return /Grandma sent AED 15/.test(l.t||l.m||l);}))throw Error('Gift is logged');
+var sm=PROJ.find(p=>p.id==='social'),k=newGame();k.stats.sold=59;if(sm.req(k))throw Error('Not before sales staff');k.stats.sold=60;if(!sm.req(k)||!salesOpen(k))throw Error('Opens with sales staff');
+`);
+if(!html.includes('Grandma sent AED 15. For the babies')||html.includes('the defaults work fine')||html.includes('id="h-ice"'))throw Error('Pass 130: copy and stable cooling');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

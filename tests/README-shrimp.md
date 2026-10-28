@@ -1082,3 +1082,11 @@ BUILD 2026-10-28-feel.
 - Checks after every action: page and console errors, `G.money` finite, no negative or NaN shrimp counts, no NaN in `G.emp`, `render()` every 10 actions, overlays open 30+ actions and 5+ s, `scrollWidth > innerWidth`. One line per stage, then each problem with the last 20 actions. Json to `MONKEY_OUT`.
 - First tries flagged two harness mistakes, not game bugs: story cards ignore taps for 500 ms (`SETTLE_MS`), and spotlights need time to settle before a tap closes them. The monkey now lets the timers run and counts time as well as taps.
 - Run on 8f7fb52, seed 7: 14 stages, 28,048 taps, 0 problems, 450 s. `MONKEY_SELFTEST=1` catches the planted NaN. No game change, BUILD unchanged. Balance 82, academy 10, me 46.
+
+## Pass 130: Grandma's baby money, stable cooling, tidier sales card (28 Oct)
+
+- The first-babies goal pays when the first shrimplet hatches (was 5), files under Loans and gifts (was Shrimp sales) and logs "Grandma sent AED 15 for the babies, get them something nice to eat". The Babies chapter card says the same.
+- Cheap cooling is one button. Its sub line holds the state (AED 1 · −X °C for about a day, or Melting · N h left · −X °C), so nothing below it jumps. The hint under it and its fan line are gone.
+- Sales card: rules summary reads Sales rules · Tank 1 (no "the defaults work fine"). The sell box shows N ready · AED X and N buyers left this week (Only ... when stock beats buyers); the button just says Sell. Under the price, one line Prime adult, grade N next to the Average AED X chip. The mood advice moved into Sales details. Labels don't wrap.
+- Social media manager opens with the sales staff card (`salesOpen`, 60 sold or 30 kits), was 30 sold.
+- Balance 83, academy 10, me 46. Sell card and cooling checked at 360 px, no console errors. Bots, spotlights and monkey not run.
