@@ -1146,3 +1146,16 @@ BUILD 2026-10-28-feel.
 - Choices (`forkHTML`): each option is one full-width button, name left, cost right (`.fopt`), no box inside the box. Border 1.5 px. Only name and cost show before the pick, as before. Film choices (`forkb`) are full-width rows too.
 - Social media manager moved out of the Ads projects list (`a:'staff'`) into the Sales staff card, under Salespeople, from the moment sales open. After hiring: "Mimi runs your accounts", Hired, until the AI consultancy.
 - Balance 87 (two markup checks updated), academy 10, me 46. Ads, Sales staff and the breeder choice checked at 360 and 390 px. Bots, spotlights and monkey not run.
+
+## Pass 138: UI review fixes (28 Oct)
+
+- Top Sell with nothing to sell ("Ready in ~5 d", "Buyers next week") is a plain grey line, not a grey button (`#tb-sell.wait`).
+- With Fed and Nutrition hidden, the water chip sits on the tank chips row (`#chiprow`, CSS `:has(#vitals[hidden])`).
+- Kit price while fixed: "Kit price · AED 250" and the line under it, no dead slider (`.ctl.locked`).
+- `itemHTML`: a description over 110 characters puts the button under the text (`.item.long`), so long Kit development rows don't wrap into a narrow column.
+- Gear: groups are labels, not boxes inside the card. Buy buttons are outline, not green.
+- Shops: full regions at 100% trust share one "Full" line.
+- Price chip reads "Use average, AED X". "Nothing ready" in Sell is a plain line (`.sellsum.empty`).
+- From a million owners the "Early marketing tools" link and the Advertising card sit at the bottom of Ads; the unbought social media manager hides with them.
+- Not changed: news notes still cover the header while they show. Content showing above the header in Safari is the iOS status bar over the page (env top inset is 0 there), not a gap in the game.
+- Balance 87, academy 10, me 46, layout scan 1 item (2 px on the win World tab, also before). Bots, spotlights and monkey not run.
