@@ -160,6 +160,7 @@ Her messages usually name a symptom, give one example, and sketch a fix ("maybe 
 These come from Puti's feedback. Treat them as requirements.
 
 **Progress and goals**
+- Salespeople leave the shrimp this week's packing needs (`kitHold`), sell the rest and culls, and sell everything when there's no cash to pack. Default, no toggle (Pass 131).
 - No goal card. Ideas live in the ? popup as loose suggestions (automate, more room, make the tank nicer), never an exact item to save for, never prices, counts or cash targets. Players pick their own order. Never mention something whose tab isn't open yet. Soft "Meanwhile" guide hints also go in the popup; the guide bar above the tank is only for a real next step.
 - Do things by hand first, then automate one piece at a time.
 - There should always be something to do or improve, not one button and done.
@@ -210,6 +211,7 @@ These come from Puti's feedback. Treat them as requirements.
 Run this before every push. Each line is something Puti asked for. If a line fails, fix it before anything else. Tests: `node tests/shrimp-balance.cjs`, `node tests/shrimp-academy.cjs`, `node tests/shrimp-me.cjs`, then the bots (Pacing targets). By hand means open the game in a browser at 390 px wide.
 
 **Look and layout**
+- [ ] Text that changes with state (button subs, sell box, price foot) stays one line so nothing jumps (Pass 130, by hand at 360 px).
 - [ ] Light mode only, Inter font, every card header the same height, 8 px between cards, no sideways scroll at 360 and 390 px (by hand, every tab).
 - [ ] Top bar: `?` top right from the start, settings inside it, the person button beside it once free time opens, both 34×30 and lined up (by hand).
 - [ ] Spotlights go in this order: pause and dim the whole screen so nothing can be tapped, glide the page to the thing, then cut the ring around it, show the tip and buzz (Android only, iPhone Safari has no vibration for web pages). The ring sits on the card the text talks about, the card sits between the header and the tab bar with room for the tip, never two within 15 s, never while cleaning or a health check is open, never on a card inside a closed section. Check with `node tests/shrimp-spotlights.cjs` after a strong bot run.
