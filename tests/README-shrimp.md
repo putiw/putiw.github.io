@@ -1208,3 +1208,7 @@ BUILD 2026-10-28-feel.
 ## Pass 144: Sell line counts down to the buyer reset (28 Oct)
 - When the week's buyers are used up, the top Sell line reads "Buyers back in N d" (days until the weekly reset, `G.day%7`) instead of "Buyers next week".
 - Balance 88, academy 10, me 46.
+
+## Pass 145: Water pill on its own row once Feed is automatic (28 Oct)
+- With an auto feeder the Fed/Nutrition bars hide, and the water pill used to sit alone on the right under the speed buttons. Now it fills the row and reads "Water  change soon" in one line (`.readrow:has(>#vitals[hidden])`). Checked at 390 px.
+- Balance 88, academy 10, me 46.
