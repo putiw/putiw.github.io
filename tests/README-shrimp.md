@@ -1197,3 +1197,8 @@ BUILD 2026-10-28-feel.
 - The Pack above slider hides once only the home tank is left (`ownTank` or `tankGone`).
 - Balance 88, academy 10, me 46. Bots: strong 2,428, kind 3,187 (both same), average finishes both chapters. Spotlight sweep 118 all good. Monkey 28,052 taps, 0 problems.
 - Deployed.
+
+## Pass 143: New water GH/KH shows with the KH warning, Water test card (28 Oct)
+- New water GH and KH (`o.mins`) now open at KH under 2.5, the same point the "KH is down to" alert fires. Before they opened at 2, so the alert told you to fix KH with nothing to set.
+- "Water test & bacteria" card is now "Water test".
+- Balance 88, academy 10, me 46.

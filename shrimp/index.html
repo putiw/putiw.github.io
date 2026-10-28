@@ -497,7 +497,7 @@ h1,h2,h3,h4,summary,button,.btn,label,th,.scope-label{text-wrap:balance}p,li,sma
       <div class="btns"><button class="btn" data-act="ice" id="btn-ice">Float a frozen water bottle<small id="ice-sub"></small></button></div></div>
     </div>
     <details class="card" id="wtcard" open>
-      <summary><h2>Water test &amp; bacteria</h2><small id="b-tankline"></small></summary>
+      <summary><h2>Water test</h2><small id="b-tankline"></small></summary>
       <div id="gauges"></div>
       <p class="hint explain">Tap a water reading to see what raises or lowers it.</p>
       <div id="wt-bac"><hr>
@@ -3880,7 +3880,7 @@ function updateReveal(){
   if(G.stats.born>0&&!o.hatch){o.hatch=1;}
   // Silent flags: the temperature and room parts of Gear (and room temp in the header) wait until they matter.
   if(!o.temp&&G.tanks.some(function(t){return t.had&&(t.chem.temp>26.5||t.chem.temp<21);}))o.temp=1;
-  if(!o.mins&&G.tanks.some(function(t){return t.had&&(t.chem.kh<2||t.chem.gh<5);}))o.mins=1;
+  if(!o.mins&&G.tanks.some(function(t){return t.had&&(t.chem.kh<2.5||t.chem.gh<5);}))o.mins=1;
   if(!o.room&&(G.tanks.length>1||G.tanks.some(function(t){return t.had&&(t.volTier>0||totalN(t)/t.vol>=2.5);})||G.stats.sold>=100))o.room=1;
 }
 // The top Feed / Water / Sell buttons stay while they can still matter: Feed until every tank has an auto feeder, Water until every tank has an auto water changer, Sell until the shrimp all go into kits (the Trade tab closes then)
