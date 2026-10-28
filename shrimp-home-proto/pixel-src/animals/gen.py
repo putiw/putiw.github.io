@@ -276,7 +276,7 @@ def bird_frame(src, spec, pose, t, alt=None):
     elif pose == 'hop':
         by = [0, 1, -3, -5, -3, 0][t % 6]
         ang = [0, 4, -4, -6, -4, 0][t % 6]
-        showlegs = t % 6 in (0, 1, 5)
+        showlegs = True   # legs stay on in the air and go up with the body (Puti, 28 Oct: they vanished mid-hop)
     elif pose == 'fly':
         by = [-4, -6, -4, -2][t % 4]
         ang = -4
@@ -290,7 +290,7 @@ def bird_frame(src, spec, pose, t, alt=None):
     ox, oy = pad + ex, pad + ey
     if showlegs:
         sink = 1 if (pose == 'hop' and t % 6 == 1) else 0
-        paste(g, legs, ox, oy + max(by, 0))
+        paste(g, legs, ox, oy + by)
         by += sink
     else:
         for (fx, fy) in spec['tuck']:

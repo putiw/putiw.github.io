@@ -41,7 +41,7 @@ if(typeof toyEnd==='function'){var _end=toyEnd;toyEnd=function(){var r=_end.appl
 
 // ----- the header: back to the company, today's real time -----
 function clock(){var d=new Date();return d.toLocaleDateString('en-GB',{weekday:'short'})+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
-var _uh=updateHeader;updateHeader=function(){_uh();var b=$('b-date');if(b)b.textContent=clock();var s=$('b-sub');if(s)s.textContent='';};
+var _uh=updateHeader;updateHeader=function(){_uh();var b=$('b-date');if(b)b.textContent=clock();var lc=$('lclock');if(lc){lc.hidden=false;lc.textContent=clock();}var s=$('b-sub');if(s)s.textContent='';};
 function shell(){['tb-info'].forEach(function(id){var e=$(id);if(e)e.remove();});var tag=document.querySelector('.devtag');if(tag)tag.remove();var sp=$('speed');if(sp)sp.remove();
   document.querySelectorAll('.tabs [data-tab="book"],.tabs [data-tab="try"]').forEach(function(b){b.remove();});
   var row=document.querySelector('.top .brand');if(row&&!$('tb-back')){var bb=document.createElement('button');bb.className='btn sm';bb.id='tb-back';bb.type='button';bb.innerHTML='<span aria-hidden="true">‹</span><i> Company</i>';bb.setAttribute('aria-label','Back to the company');bb.onclick=function(){try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};row.insertBefore(bb,row.firstChild);}
