@@ -5523,11 +5523,13 @@ function renderMe(){var M=G.me,b=$('tb-me');if(!M)return;b.hidden=!M.on;b.classL
  setT('me-hint',M.moved?'You live in the capital now. Checking on Grandma is a call. Seeing her is the yearly trip home.':'');
  var v=Math.round(M.visits||0),c=Math.round(M.calls||0);setT('me-gsum',M.trip>now?'Away with Grandma until '+gtFmt(M.trip):v||c?[v?v+(v===1?' visit':' visits'):'',c?c+(c===1?' call':' calls'):''].filter(Boolean).join(' · '):'');
  if(activeTab!=='me')GT_OPEN=0;var T=gtOf(G),m=M.cur&&momentById(M.cur.id),mh='<div class="me-mbtn gt-top"><button class="btn primary'+(M.call?' need':'')+'" data-act="gt-check">Check on Grandma</button></div>';
- if(GT_OPEN){var any=0;if(GT_LAST)mh+='<p class="gt-last">'+GT_LAST+'</p>';
-  if(M.call==='lesson'){any=1;mh+='<div class="me-mom gp-call"><p><b>Grandma called.</b> “Can I tell you the only thing I know about business? Don’t be scared of growing. Supply is how many shrimp you have and how many kits you can pack. Demand is how many orders come in. Keep those two even and you can grow as big as you like.”</p><div class="me-mbtn"><button class="btn primary" data-act="gp-call-ok">Thanks, Grandma</button></div></div>';}
-  if(m){any=1;var yc=m.cost?' · '+aed(m.cost(G)):'';mh+='<div class="me-mom"><p>'+m.t+'</p><div class="me-mbtn"><button class="btn" data-act="mom-yes">'+m.yes+yc+'</button><button class="btn" data-act="mom-no">'+m.no+'</button></div></div>';}
-  T.q.forEach(function(it){var e=gtEv(it.k);if(!e)return;any=1;mh+='<div class="me-mom"><p>'+gtText(e,G,it)+'</p><div class="me-mbtn">'+e.a.map(function(o,k){var c=gtCost(o,G);return '<button class="btn" data-act="gt-ans" data-k="'+it.key+'" data-i="'+k+'"'+(c>G.money?' disabled':'')+'>'+o[0]+(c?' · '+aed(c):'')+'</button>';}).join('')+'</div></div>';});
-  T.mail.forEach(function(x,k){any=1;mh+='<div class="me-mom"><p>'+x.t+', AED '+x.amt+'.</p><div class="me-mbtn"><button class="btn" data-act="gt-mail" data-i="'+k+'">Collect AED '+x.amt+'</button></div></div>';});
+ if(GT_OPEN){var any=0,its=[];if(GT_LAST)mh+='<p class="gt-last">'+GT_LAST+'</p>';
+  if(M.call==='lesson'){any=1;its.push('<div class="me-mom gp-call"><p><b>Grandma called.</b> “Can I tell you the only thing I know about business? Don’t be scared of growing. Supply is how many shrimp you have and how many kits you can pack. Demand is how many orders come in. Keep those two even and you can grow as big as you like.”</p><div class="me-mbtn"><button class="btn primary" data-act="gp-call-ok">Thanks, Grandma</button></div></div>');}
+  if(m){any=1;var yc=m.cost?' · '+aed(m.cost(G)):'';its.push('<div class="me-mom"><p>'+m.t+'</p><div class="me-mbtn"><button class="btn" data-act="mom-yes">'+m.yes+yc+'</button><button class="btn" data-act="mom-no">'+m.no+'</button></div></div>');}
+  T.q.forEach(function(it){var e=gtEv(it.k);if(!e)return;any=1;its.push('<div class="me-mom"><p>'+gtText(e,G,it)+'</p><div class="me-mbtn">'+e.a.map(function(o,k){var c=gtCost(o,G);return '<button class="btn" data-act="gt-ans" data-k="'+it.key+'" data-i="'+k+'"'+(c>G.money?' disabled':'')+'>'+o[0]+(c?' · '+aed(c):'')+'</button>';}).join('')+'</div></div>');});
+  // a long time away: one thing at a time, mailed money in one envelope, and a count of what's left (Puti, 28 Oct)
+  if(T.mail.length){any=1;var mt=T.mail.reduce(function(a,x){return a+x.amt;},0);its.push('<div class="me-mom"><p>'+(T.mail.length===1?T.mail[0].t+', AED '+T.mail[0].amt+'.':'Grandma mailed you money. '+T.mail.map(function(x){return x.t.replace(' from Grandma','')+', AED '+x.amt;}).join('. ')+'.')+'</p><div class="me-mbtn"><button class="btn" data-act="gt-mail-all">Collect AED '+mt+'</button></div></div>');}
+  if(its.length)mh+=its[0]+(its.length>1?'<p class="hint gt-more">'+(its.length-1)+' more after this.</p>':'');
   if(!any&&!GT_LAST)mh+='<p class="hint" style="margin:0">'+GT_FINE[T.n%GT_FINE.length]+'</p>';}
  var L=G.emp.gpLoan;if(L&&!L.paid)mh+='<div class="me-mom" style="margin-top:10px"><p>You still owe Grandma '+aed(L.amt)+'. She hasn\u2019t mentioned it.</p><div class="me-mbtn"><button class="btn" data-act="gp-pay"'+(G.money<L.amt?' disabled':'')+'>Pay her back, '+aed(L.amt)+'</button></div></div>';
  if(cache.mem!==mh){cache.mem=mh;$('me-moment').innerHTML=mh;}
@@ -6013,6 +6015,7 @@ function initControls(){
     if(a==='day-pick'){if(setPick(G,b.dataset.id)){cache.mepk=null;render();}return;}
     if(a==='gt-check'){gtCheck(G);GT_OPEN=1;GT_LAST='';cache.mem=null;cache.meh=null;render();return;}
     if(a==='gt-ans'){var gr=gtAnswer(G,b.dataset.k,+b.dataset.i);if(gr){GT_LAST=gr;cache.mem=null;cache.meh=null;render();}else toast('Not enough cash for that');return;}
+    if(a==='gt-mail-all'){var gt2=0,TT=gtOf(G);while(TT.mail.length)gt2+=gtCollect(G,0)||0;if(gt2){toast('Collected AED '+gt2);cache.mem=null;render();}return;}
     if(a==='gt-mail'){var ga=gtCollect(G,+b.dataset.i);if(ga){toast('Collected AED '+ga);cache.mem=null;render();}return;}
     if(a==='me-send'){G.me.send=+b.dataset.v||0;cache.mepk=null;render();return;}
     if(a==='me-pick'){if(mePick(G,b.dataset.id,b.dataset.lane)){cache.mepk=null;render();}return;}
