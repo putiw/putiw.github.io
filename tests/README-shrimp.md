@@ -1120,3 +1120,11 @@ BUILD 2026-10-28-feel.
 - Balance 86, academy 10, me 46. Checked at 360 and 390 px at first kit, farm license and 100 owners, no sideways scroll, no console errors.
 - Review by a separate agent, then fixed: spare line reads "N ready to pack · M kept to breed", packers row drops "you pack N", QC steps say "no tool yet" (was "not done"), Strict and staff pay don't break inside "AED 6", the packing table subtitle drops orders/day (it was cut off at 360 px), "1 of 5 tools" dropped since "Packers need all five packing tools" says it. Kept: grey card header (every header matches), the hand packing table at first kit (by hand first), "Checked N days ago" with a plain button until it's overdue.
 - Monkey on the Pass 133 build: 27,110 taps, 1 problem, the win stage reloaded because BUILD changed mid-run and the monkey tapped "A newer version". Not a game bug.
+
+## Pass 135: Kit extras split, optional QC card, Sell hides with salespeople, Excel at AED 500 (28 Oct)
+
+- Kit design levels are gone. Kit extras switch on and off one by one (`KIT_EXTRAS`, `wb(G).on`, `setKitExtra`, `kitextra` action): Java moss +AED 36 a kit (needs moss in your tank, 50 kits), a nerite snail +8 (50 kits), driftwood +20 (wood in your tank, 50 kits), plants +30 (100k owners, plants in your tank). Quality and welfare add up per extra; all four together match the old Planted kit (+0.04 quality, +0.12 welfare). Offered in Kit development as before ("No upfront cost, you can take it out any time"), toggled under "In every kit" in the Kits card. Old saves: Moss and snail keeps moss and snail on, Planted keeps plants on.
+- Quality checks are their own card, last on the Kits tab, with "Optional. Checks catch sick shrimp before kits ship, so more kits live." The guide hint for the first round is soft and says it's optional. The ? text moved with it.
+- Top Sell hides once salespeople sell from every tank.
+- First time cash reaches AED 500 without the Excel course, a spotlight points at it in Trade (`ob.excel500`); the card shows from then on.
+- Balance 87, academy 10, me 46. Bots unchanged (2,428 / 3,187 / 6,497, they don't use extras). Kits tab checked at 360 px.

@@ -202,8 +202,10 @@ check('owners’ tanks: welfare, kit design, climate, feed, water and shrimp pri
 var g=newGame();g.ob.kit=1;g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.kits.sold=60;g.humans=2e5;g.money=5e8;g.emp.regions=['auh','dxb','uae','gcc','mena','eu'];
 if(!(regionMix(g).cold>0.3))throw Error('Europe should bring cold winters');
 var before=welfareTarget(g);if(!buyWelfare(g,'winter'))throw Error('Winter kits');if(!(welfareTarget(g)>before))throw Error('Winter kits should help');
-var m0=kitMaterials(g);if(buyWelfare(g,'moss'))throw Error('Moss kits need moss in your own tank first');g.tanks[0].moss=1;if(!buyWelfare(g,'moss'))throw Error('Moss kits');if(kitMaterials(g)!==m0+12||kitDesign(g)!==1)throw Error('Moss kits cost AED 12 more');
-setKitDesign(g,0);if(kitMaterials(g)!==m0)throw Error('Basic design should drop the extra cost');
+var m0=kitMaterials(g);if(buyWelfare(g,'moss'))throw Error('Moss kits need moss in your own tank first');g.tanks[0].moss=1;if(!buyWelfare(g,'moss'))throw Error('Moss kits');if(Math.abs(kitMaterials(g)-m0-36)>1e-9)throw Error('Java moss costs AED 36 more');
+if(!buyWelfare(g,'snail')||Math.abs(kitMaterials(g)-m0-44)>1e-9)throw Error('Snail AED 8 more');if(buyWelfare(g,'wood'))throw Error('Driftwood needs wood in your tank');g.tanks[0].wood=1;if(!buyWelfare(g,'wood')||Math.abs(kitMaterials(g)-m0-64)>1e-9)throw Error('Driftwood AED 20 more');
+setKitExtra(g,'moss',0);if(Math.abs(kitMaterials(g)-m0-28)>1e-9)throw Error('Moss off drops its cost');setKitExtra(g,'snail',0);setKitExtra(g,'wood',0);if(Math.abs(kitMaterials(g)-m0)>1e-9)throw Error('All off is a basic kit');
+var o=newGame();o.emp.wb={design:1,moss:5};if(!wb(o).on.moss||!wb(o).on.snail||!wbHas(o,'snail'))throw Error('Old moss-and-snail saves keep both');
 g.kitPrice=100;g.emp.commit=commitOf(100);if(!(welfareTarget(g)<0.6))throw Error('Very cheap kits should lower welfare');
 g.emp.wel=0.3;var h=g.humans;welfareDay(g);if(!(g.humans<h&&g.emp.lapsed>0))throw Error('Struggling owners should lapse');
 g.emp.wel=0.9;if(!(welfareMult(g)>1.1))throw Error('Thriving owners should refer more');
@@ -550,7 +552,7 @@ count++;console.log('PASS Pass 119 card headers and Money sheet');
 // Pass 120: Kits tab is three cards: Kits, Making kits (packing + quality checks), Kit development; sales staff have their own card in Ads
 {const kitsSec=html.slice(html.indexOf('<section class="panel" id="p-emp"'),html.indexOf('<section class="panel" id="p-world"'));
  const make=kitsSec.slice(kitsSec.indexOf('id="c-staff"'),kitsSec.indexOf('id="c-sales"'));
- if(!make.includes('<h2>Making kits</h2>')||!make.includes('id="kit-steps"')||!make.includes('id="qccard"')||!make.includes('id="kit-packrow"')||kitsSec.includes('class="card coll" data-k="qc"'))throw Error('Making kits holds packing and quality checks');
+ if(!make.includes('<h2>Making kits</h2>')||!make.includes('id="kit-steps"')||make.includes('id="qccard"')||!make.includes('id="kit-packrow"')||!kitsSec.includes('class="card coll" data-k="qc" id="qccard"'))throw Error('Making kits holds packing, quality checks are their own optional card (Pass 135)');
  if(!kitsSec.includes('<h2>Kits</h2>')||!html.includes('id="c-sales"')||html.includes("activeTab==='promote'?'Sales staff'"))throw Error('Kits card renamed, sales staff in their own card');
  if(html.includes("['Adoption ceiling',")||html.includes("['Packed yesterday',"))throw Error('Ceiling lives with Regions, packing numbers with Making kits');}
 count++;console.log('PASS Pass 120 Kits tab in three cards');
@@ -617,5 +619,10 @@ var hi=0;for(d=365;d<730;d+=5){g.day=d;hi=Math.max(hi,roomT(g,d));}if(!(hi>29))t
 var k=newGame();k.emp.kitsOpened=1;k.emp.staff.tier=2;k.emp.staff.pack=2;k.money=1e5;k.humans=5000;k.tanks[0].pop=[{age:90,n:12,g:50}];if(!(packCap(k)>1))throw Error('Packers');
 for(var i=0;i<4;i++)packDay(k);if(k.emp.packLow<3)throw Error('Short days counted');k.tanks[0].pop=[{age:90,n:2000,g:50}];packDay(k);if(k.emp.packLow)throw Error('Reset when packing works');
 `);
+check('Pass 135: top Sell hides when salespeople sell every tank, Excel spotlight at AED 500, QC card is optional',`
+var g=newGame();g.tanks[0].had=1;g.stats.sold=100;g.emp.staff.sales=1;g.tanks.forEach(function(t){t.set.autoSell=true;});
+`);
+if(!html.includes("fire('excel500'")||!html.includes('<h2>Quality checks</h2>')||!html.includes('Optional. Checks catch sick shrimp'))throw Error('Pass 135: Excel spotlight and optional QC card');
+if(!html.includes("&&!(hasSales(G)&&G.tanks.every(function(t){return t.set.autoSell;}))"))throw Error('Pass 135: top Sell hides with salespeople');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
