@@ -1195,4 +1195,5 @@ BUILD 2026-10-28-feel.
 - "Keep in tanks" is now "Pack above" everywhere in game text (slider, hint, limit line, packLow alert, Making kits help).
 - The Keep/Pack above limit line only shows with no farm breeding (`keepBlocks` needs `farmCap<1`). Without that the average bot stopped buying farms and failed to finish.
 - The Pack above slider hides once only the home tank is left (`ownTank` or `tankGone`).
-- Balance 88, academy 10, me 46. Bots: strong 2,428, kind 3,187 (both same), average finishes both chapters. Spotlight sweep and monkey not run yet.
+- Balance 88, academy 10, me 46. Bots: strong 2,428, kind 3,187 (both same), average finishes both chapters. Spotlight sweep 118 all good. Monkey 28,052 taps, 0 problems.
+- Deployed.
