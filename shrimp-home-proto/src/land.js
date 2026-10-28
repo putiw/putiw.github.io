@@ -947,7 +947,8 @@ function charSpr(n,tag,f,face,flip){var m=AM('chars',n);if(!m||!IMG['an-'+n])ret
   return animSpr('an-'+n,m,i,flip&&face<0?-1:1,m.ax,m.ay);}
 function catSpr(pose,f,face){var t=CACHE.cat[pose]||(CACHE.cat[pose]=[]);
   if(AM('chars','pierre')&&IMG['an-pierre'])return cached(t,'p'+f*2+(face<0?1:0),function(){
-    if(pose==='walk')return charSpr('pierre',face<0?'walk-left':'walk-right',f,face,false);
+    // her 15-frame walk (28 Oct) faces left; walking right is the same frames mirrored
+    if(pose==='walk')return charSpr('pierre','walk-left',f,-face,true);
     if(pose==='nap')return charSpr('pierre','nap',f,face,true);
     if(pose==='reach'||pose==='paw')return charSpr('pierre','look-up',0,face,true);
     return charSpr('pierre','sit',f,face,true);});
@@ -1207,7 +1208,7 @@ function stepCat(dt){var c=L.cat;if(!c)return;c.anim+=dt;if(c.hop>0)c.hop=Math.m
     if(c.q.length){var tg=c.q[0],dx=tg[0]-c.x,dy=tg[1]-c.y,d=Math.hypot(dx,dy),v=52*dt;if(d<=v){c.x=tg[0];c.y=tg[1];c.q.shift();}else{c.x+=dx/d*v;c.y+=dy/d*v;if(Math.abs(dx)>0.5)c.face=dx>0?1:-1;}}
     else{var th=c.then;c.then=null;c.st='sit';c.t=0;c.dur=2;if(th)th(true);}return;}
   if(c.t>c.dur){if(c.st==='nap'){c.st='sit';c.t=0;c.dur=2+Math.random()*2;return;}if(c.st==='paw'){c.tank=null;}catDecide();}}
-function catFrame(){var c=L.cat,p='sit',f=0;if(c.reach>0)p='reach';else if(c.hop>0)p='sit';else if(c.st==='walk'){p='walk';f=Math.floor(c.anim*7)%4;}else if(c.st==='nap'){p='nap';f=Math.floor(c.anim/1.6)%2;}else if(c.st==='paw'){p='paw';f=Math.floor(c.anim/0.35)%2;}else f=(c.anim%4)<0.18?1:0;L.cfPose=p;L.cfIdx=f;}
+function catFrame(){var c=L.cat,p='sit',f=0;if(c.reach>0)p='reach';else if(c.hop>0)p='sit';else if(c.st==='walk'){p='walk';var wp=AM('chars','pierre'),wn=wp&&wp.poses['walk-left']?wp.poses['walk-left'][1]:4;f=Math.floor(c.anim*(wn>4?12:7))%wn;}else if(c.st==='nap'){p='nap';f=Math.floor(c.anim/1.6)%2;}else if(c.st==='paw'){p='paw';f=Math.floor(c.anim/0.35)%2;}else f=(c.anim%4)<0.18?1:0;L.cfPose=p;L.cfIdx=f;}
 function petCat(){var c=L.cat;if(!c)return;if(c.on||c.st==='walk'||c.st==='paw'){c.hop=0.45;}else{c.reach=1.4;}if(c.st==='nap'){c.st='sit';c.t=0;c.dur=2.5;}puff('heart',c.x,c.y-(c.reach>0?100:c.on?44:56),1,{speed:0,up:26,life:1.1});sfx('pop',{v:0.5});if(!LS().seen.cat){LS().seen.cat=1;toast('Pierre likes that.');}}
 
 // ----- camera: follows Millie softly -----
@@ -1769,10 +1770,11 @@ function setTool(id,quiet){id=mapTool(id);if(L.cv&&!toolsHere().some(function(t)
   if(!quiet)sizeCanvas();updateStat(true);}
 // one canvas pixel per art pixel, scaled up by CSS: a whole number of screen pixels per art pixel where the screen allows
 // (2 on 3x phones), 1.5 on 2x phones, about 44 CSS px per tile either way
-var ZOOMS=[0.5,0.7,1,1.4,2];
-function zoomK(){var z=LS().zoom;return ZOOMS[z==null?2:clamp(z,0,ZOOMS.length-1)];}
-function setZoom(d){var l=LS(),z=clamp((l.zoom==null?2:l.zoom)+d,0,ZOOMS.length-1);if(z===l.zoom||(l.zoom==null&&z===2))return;l.zoom=z;sfx('click');sizeCanvas();zoomBtns();save();}
-function zoomBtns(){var a=$('lz-in'),b=$('lz-out'),z=LS().zoom==null?2:LS().zoom;if(a)a.disabled=z>=ZOOMS.length-1;if(b)b.disabled=z<=0;}
+var ZOOMS=[0.5,0.7,1,1.4,2],ZDEF=1;   // starts one step out (Puti, 28 Oct, with Millie at 1.5x)
+function zoomI(){var z=LS().zoom;return z==null?ZDEF:clamp(z,0,ZOOMS.length-1);}
+function zoomK(){return ZOOMS[zoomI()];}
+function setZoom(d){var l=LS(),z0=zoomI(),z=clamp(z0+d,0,ZOOMS.length-1);if(z===z0)return;l.zoom=z;sfx('click');sizeCanvas();zoomBtns();save();}
+function zoomBtns(){var a=$('lz-in'),b=$('lz-out'),z=zoomI();if(a)a.disabled=z>=ZOOMS.length-1;if(b)b.disabled=z<=0;}
 function pickCpa(dpr){var d=dpr*0.6875;if(d>=1.75)return Math.round(d)/dpr;if(d>=1.2)return 1.5/dpr;return 1/dpr;}
 function sizeCanvas(){var wrap=$('lwrap');if(!wrap||!L.cv)return;var W=wrap.clientWidth,top=wrap.getBoundingClientRect().top,pal=$('lpal'),palH=pal&&!pal.hidden?78:0;
   var tb=document.querySelector('.tabs'),tabsH=tb?tb.getBoundingClientRect().height:62,tl=$('ltools'),toolsH=tl&&tl.parentNode&&tl.parentNode.id==='lwrap'?4:(tl?tl.offsetHeight:50)+14;var H=Math.round(clamp(window.innerHeight-top-toolsH-34-palH-tabsH-10,250,660));
@@ -1877,7 +1879,9 @@ function draw(){var x=L.x,m=M(),cv=L.cv,i;L.cdx=Math.round(L.cam.x);L.cdy=Math.r
   if(L.groundOK){var sx0=Math.max(0,L.cdx),sy0=Math.max(0,L.cdy),sx1=Math.min(W,L.cdx+cv.width),sy1=Math.min(H,L.cdy+cv.height);if(sx1>sx0&&sy1>sy0)x.drawImage(L.gcv,sx0,sy0,sx1-sx0,sy1-sy0,sx0-L.cdx,sy0-L.cdy,sx1-sx0,sy1-sy0);}
   if(!ART.ready)return;
   drawWater(x);drawPondFish(x);drawWindowFeeders(x);
-  if(L.grain.length){for(i=0;i<L.grain.length;i++){var g=L.grain[i];var gx=Math.round(g.x)-L.cdx,gy=Math.round(g.y)-L.cdy;x.fillStyle='rgba(30,22,8,0.4)';x.fillRect(gx-4,gy+4,10,3);x.fillStyle='#2e2010';x.fillRect(gx-3,gy-3,8,8);x.fillRect(gx-4,gy-2,10,6);x.fillStyle='#f7c948';x.fillRect(gx-3,gy-2,8,6);x.fillRect(gx-2,gy-3,6,8);x.fillStyle='#c98f22';x.fillRect(gx-2,gy+2,7,2);x.fillStyle='#fff6c2';x.fillRect(gx-1,gy-2,3,2);}}
+  // thrown grain: each bit is a few small kernels, not one blob (Puti, 28 Oct: they read as burgers)
+  if(L.grain.length){for(i=0;i<L.grain.length;i++){var g=L.grain[i];if(g.s==null)g.s=Math.floor(Math.random()*1e6);var gx=Math.round(g.x)-L.cdx,gy=Math.round(g.y)-L.cdy;
+    for(var q=0;q<4;q++){var kx=gx+Math.round((hash2(g.s,q,71)-0.5)*12),ky=gy+Math.round((hash2(g.s,q,73)-0.5)*6),lie=hash2(g.s,q,79)<0.5;x.fillStyle='#8a6226';x.fillRect(kx,ky+1,lie?3:2,1);x.fillStyle='#e8c25a';x.fillRect(kx,ky,lie?3:2,lie?1:2);if(!lie){x.fillStyle='#fff2b0';x.fillRect(kx,ky,1,1);}}}}
   drawMarker(x);
   NIT=0;SORTED.length=0;var ob=LS().objs;
   for(i=0;i<ob.length;i++){var o=ob[i],d=OBJ[o.k];if(!d||d.flat||d.wall)continue;var by=oBase(o),ox=oX(o);if(ox<L.cam.x-260||ox>L.cam.x+L.VW+260||by<L.cam.y-60||by>L.cam.y+L.VH+300)continue;addIt(by,I_OBJ,o,0);}
