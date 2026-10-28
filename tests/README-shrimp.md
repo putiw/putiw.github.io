@@ -1075,3 +1075,10 @@ BUILD 2026-10-28-feel.
 - Old packing lines sell for billions (a robotic line AED 12.6B at 67 owned): not a bug, lines cost 1.2× more each, so that is half what the 67th cost.
 - Spotlight sweep: 114 checked, all good. Layout scanner: only the known 2px win chart label. No monkey test in tests/. Balance 82, academy 10, me 46.
 
+
+## Pass 129: Monkey test (28 Oct)
+
+- New `tests/shrimp-monkey.cjs`: random taps on every snapshot of a strong-bot run json plus a new game, 390 px, over http, clock at speed 1 or 4. Taps visible buttons (sometimes disabled ones), switches tabs including You, folds details and `.coll` cards, moves sliders and number inputs, types into text inputs, opens and closes the Money sheet, closes story cards, after-popups and sheets when they block. Spotlights stubbed (`spotlight`, `spotNext`). `landShow` and `endGame` are stubbed too, as a net behind the skip list.
+- Checks after every action: page and console errors, `G.money` finite, no negative or NaN shrimp counts, no NaN in `G.emp`, `render()` every 10 actions, overlays open 30+ actions and 5+ s, `scrollWidth > innerWidth`. One line per stage, then each problem with the last 20 actions. Json to `MONKEY_OUT`.
+- First tries flagged two harness mistakes, not game bugs: story cards ignore taps for 500 ms (`SETTLE_MS`), and spotlights need time to settle before a tap closes them. The monkey now lets the timers run and counts time as well as taps.
+- Run on 8f7fb52, seed 7: 14 stages, 28,048 taps, 0 problems, 450 s. `MONKEY_SELFTEST=1` catches the planted NaN. No game change, BUILD unchanged. Balance 82, academy 10, me 46.
