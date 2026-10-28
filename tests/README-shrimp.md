@@ -1128,3 +1128,12 @@ BUILD 2026-10-28-feel.
 - Top Sell hides once salespeople sell from every tank.
 - First time cash reaches AED 500 without the Excel course, a spotlight points at it in Trade (`ob.excel500`); the card shows from then on.
 - Balance 87, academy 10, me 46. Bots unchanged (2,428 / 3,187 / 6,497, they don't use extras). Kits tab checked at 360 px.
+
+## Pass 136: Sales card tidy, sales staff before kits, bold waiting note (28 Oct)
+
+- Sales staff card was empty before kits: `updateEmpire` only ran once kits opened. It now also runs once `salesOpen`. The card's two near-identical explanations are now one, behind ?.
+- Trade card renamed Sales (was Colony & sales), the histogram fold is "Ages of your shrimp". Sales rules are always open (no fold). The card's own Sell button is gone, the top Sell does it; the sell box keeps "N ready · AED X" and buyers left ("1 buyer").
+- Sliders: sell age 45–100 days (full price is reached at 100, `ageFactor`), breeders 5–100. Old saves clamp into those ranges in `migrate`.
+- Babies card: "they don't get sold", "sold at 60 days old" and "keep them alive" in bold (`bold` on the milestone, `setEmphasisText`).
+- Early game check: average-bot money to day 300 is identical before and after today's passes, nothing in the early sim changed.
+- Balance 87, academy 10, me 46. Checked at 360 px.
