@@ -1104,3 +1104,9 @@ BUILD 2026-10-28-feel.
 - Fix: chapter cards now wait in `progress.soon` until 15 s of play (`CARD_GAP`, `storyClock`) after the last card was closed (`progress.lastAck`). Story cards also wait for that and for no chapter pending, on top of their old two-minute and 30-day gaps. Broke, game over, illness, crash, win, intro and ten years still show at once (`CARD_NOW`). Queued spotlights also wait 15 s after any card closes (`cardResume`); spotlights a card asks for itself (`now:1`) still show right away.
 - Babies card adds: bought shrimp are breeders and don't get sold, babies sell at 60 days old, about two months away, sell age is under Sales rules in Trade, until then keep them alive. Checked at 360 px.
 - Balance 85, academy 10, me 46. Bots: strong 2,392 (was 2,445), kind 3,184 (3,195), average Earth 6,497 / space 7,908 (6,413 / 7,824), all within seed noise. Spotlights and monkey not run.
+
+## Pass 133: Packers short of shrimp get a spotlight, a safe first summer (28 Oct)
+
+- `packDay` counts `emp.packLow`: days the packers had kits to pack and cash for them but packed under a fifth of their capacity. After 3 such days in a row a spotlight (paused, dimmed) points at Keep in tanks in Making kits, or the Kits tab if that card isn't on screen. Text: if a tank sits at or under Keep in tanks with spare shrimp, lower it or let the colony grow; otherwise not enough shrimp, more breeders and tanks make more babies. Once only (`ob.packLow`). While it lasts the Making kits summary reads "N of M a day".
+- `roomT` caps the room at 28.3 °C for the first year (clock < 365, from 20 Oct to 20 Oct), hot spells included, so tanks stay under the 28.5 °C heat-damage start. From the second summer hot spells can push past it again.
+- Balance 86, academy 10, me 46. Bots: strong 2,428 (2,392), kind 3,187 (3,184), average Earth 6,497 / space 7,908 (same). Spotlight shown at 360 px. Spotlight sweep passed on the Pass 132 build, monkey rerun on this one.

@@ -611,5 +611,11 @@ g.ps.t+=11000;detectMilestones(g);if(g.progress.queue[0]!=='kits')throw Error('S
 g.ps.t+=1000;g.money=-1e6;g.emp.broke=1;var p=g.progress;p.seen.gameover=false;if(CARD_NOW.indexOf('broke')<0||CARD_NOW.indexOf('gameover')<0)throw Error('Urgent cards skip the gap');
 `);
 if(!html.includes('The babies can be sold at 60 days old'))throw Error('Pass 132: waiting note on the Babies card');
+check('Pass 133: first summer stays under 28.5 °C, the second can be hotter; packers short of shrimp are counted',`
+var g=newGame();g.hot={until:400,add:3};for(var d=0;d<365;d+=5){g.day=d;if(roomT(g,d)>28.3+1e-9)throw Error('First summer too hot on day '+d);}
+var hi=0;for(d=365;d<730;d+=5){g.day=d;hi=Math.max(hi,roomT(g,d));}if(!(hi>29))throw Error('Second summer can get hot');
+var k=newGame();k.emp.kitsOpened=1;k.emp.staff.tier=2;k.emp.staff.pack=2;k.money=1e5;k.humans=5000;k.tanks[0].pop=[{age:90,n:12,g:50}];if(!(packCap(k)>1))throw Error('Packers');
+for(var i=0;i<4;i++)packDay(k);if(k.emp.packLow<3)throw Error('Short days counted');k.tanks[0].pop=[{age:90,n:2000,g:50}];packDay(k);if(k.emp.packLow)throw Error('Reset when packing works');
+`);
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
