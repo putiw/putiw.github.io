@@ -2097,7 +2097,7 @@ function detectMilestones(G){
   if(!p.wait)p.wait=[];if(!p.soon)p.soon=[];
   Object.keys(MILESTONES).forEach(function(k){if(conditions[k]&&!p.seen[k]){p.seen[k]=true;markEvent(G);if(!G.opt.all||k==='win'){if(storyWaits(k)){if(STORY_FIRST.indexOf(k)>=0)p.wait.unshift(k);else p.wait.push(k);}else if(CARD_NOW.indexOf(k)>=0)p.queue.push(k);else p.soon.push(k);}if(k==='farm')p.home='emp';}});
   // Chapter cards wait for 15 s of play after the last card, story cards wait for that too and for no chapter card pending.
-  var now=storyClock(G),rested=p.lastAck==null||now-p.lastAck>=CARD_GAP||now<p.lastAck;
+  var now=storyClock(G),rested=(p.lastAck==null||now-p.lastAck>=CARD_GAP||now<p.lastAck)&&!(typeof SPOT!=='undefined'&&SPOT&&SPOT.on);
   if(p.soon.length&&!p.queue.length&&rested){p.queue.push(p.soon.shift());rested=false;}
   // one story card at a time, about two minutes of play apart
 if(p.nextStory!=null&&p.nextStory-now>300000)p.nextStory=now;
@@ -4151,7 +4151,7 @@ function spotWatch(){var o=G.opt;if(o.all||G.progress.queue[0]==='intro'||TVLOCK
  var fcash=$('b-cash');if(!o.spotSeen.finsheet&&finOpen(G)&&fcash&&spotShown(fcash)){o.spotSeen.finsheet=1;spotlight(fcash,'Tap your cash for money over time and what each team costs a day.');return;}
  var c=cards.find(function(c){return !o.spotSeen[c.id]&&spotShown(c);});if(c){o.spotSeen[c.id]=1;spotlight(c,SPOT_INFO[c.id]);}}
 function spotOpenCard(el){if(el.tagName==='DETAILS'&&!el.classList.contains('coll')){el.open=true;return;}if(!el.classList||!el.classList.contains('coll'))return;var o=G.opt,k=el.dataset.k;el.classList.remove('queued','shut');if(o.shut)o.shut[k]=false;o.cardQueue=(o.cardQueue||[]).filter(function(x){return x.k!==k;});o.activeCard={k:k,tab:activeTab};if(el.tagName==='DETAILS')el.open=true;}
-function spotClose(){if(SPOT&&SPOT.on&&!SPOT.ready)return;$('spot').hidden=true;var wc=$('spot-btn');if(wc)wc.remove();spotWatch.last=Date.now();var p=SPOT&&SPOT.on?SPOT.prev:null;SPOT=null;if(p!=null)setSpeed(p);if(SPOTQ.length)setTimeout(spotNext,250);}
+function spotClose(){if(SPOT&&SPOT.on&&!SPOT.ready)return;$('spot').hidden=true;var wc=$('spot-btn');if(wc)wc.remove();spotWatch.last=Date.now();if(SPOT&&SPOT.on){var pg=ensureProgress(G),sc=storyClock(G);if(pg.lastAck==null||pg.lastAck<sc)pg.lastAck=sc;}var p=SPOT&&SPOT.on?SPOT.prev:null;SPOT=null;if(p!=null)setSpeed(p);if(SPOTQ.length)setTimeout(spotNext,250);}
 
 // ----- Care card: health checks and treats -----
 // ----- Tank view: a small animated picture of a tank, drawn from a sample of the real colony -----
@@ -5733,7 +5733,7 @@ function renderMilestone(){
   var p=ensureProgress(G),key=p.queue[0],card=$('milestone-card');
   if(!key&&G.emp.won&&!p.sandbox&&!p.reviewing&&!G.space.started)key='win';
   // Never pop a card (and move the screen) while the player is cleaning the glass or in a check.
-  if(key&&(TVLOCK||HC||SB||QCR||TS||afterOpen())){card.hidden=true;return;}
+  if(key&&(TVLOCK||HC||SB||QCR||TS||afterOpen()||(SPOT&&SPOT.on&&CARD_NOW.indexOf(key)<0))){card.hidden=true;return;}
   card.hidden=!key;if(!key){renderMilestone.last=null;return;}
   if(speed){CARD_HOLD=speed;setSpeed(0);}if(renderMilestone.last!==key){renderMilestone.last=key;$('milestone-letter').open=false;if(key==='intro'){var pn=$('player-name');if(pn&&!pn.value){try{pn.value=G.name||localStorage.getItem('shrimp-name')||'';}catch(e){pn.value=G.name||'';}}var pbi=$('player-bday');if(pbi){try{var sb=localStorage.getItem('shrimp-bday');if(sb)pbi.value=sb;}catch(e){}}}setTimeout(function(){var tb=document.querySelector('.top');window.scrollTo({top:Math.max(0,card.getBoundingClientRect().top+window.scrollY-(tb?tb.getBoundingClientRect().height:0)-8),behavior:'instant'});$('milestone-title').focus({preventScroll:true});},0);}var m=MILESTONES[key];setT('milestone-scope',key==='gameover'?'Your ending':key==='intro'?'Chapter 1 · A gift from Grandma':m.chapter?m.chapter+' · time paused':m.intro?'New · time paused':m.story?'Story · time paused':'Milestone · time paused');card.classList.toggle('ms-intro',!!m.intro);card.classList.toggle('ms-story',!!m.story);setT('milestone-title',key==='win'?hardWinTitle(G):m.title);$('name-row').hidden=key!=='intro';var body=N(G,(m.bodyFn?m.bodyFn(G):m.body)+(m.more?'\n\n'+m.more(G):''));
   if(key==='tenyears'){var anniversary=G.story.anniversary;body+=' '+(anniversary&&anniversary.owners!=null?'Together, you reached '+big(anniversary.owners)+' shrimp keepers in your first decade.':'Not everyone yet.');}

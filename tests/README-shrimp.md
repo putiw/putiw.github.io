@@ -1212,3 +1212,8 @@ BUILD 2026-10-28-feel.
 ## Pass 145: Water pill on its own row once Feed is automatic (28 Oct)
 - With an auto feeder the Fed/Nutrition bars hide, and the water pill used to sit alone on the right under the speed buttons. Now it fills the row and reads "Water  change soon" in one line (`.readrow:has(>#vitals[hidden])`). Checked at 390 px.
 - Balance 88, academy 10, me 46.
+
+## Pass 146: Cards wait 15 s after a spotlight too (28 Oct)
+- The 15 s gap only ran card to card and card to spotlight. A spotlight (money sheet) could be followed at once by a card (Your time). Now closing a spotlight restarts the card clock (`spotClose` sets `progress.lastAck`), no card is queued while a spotlight is open, and a queued card waits under an open spotlight unless it's urgent (`CARD_NOW`).
+- Browser check: card held during the spotlight and right after, shows after 16 s of play.
+- Balance 88, academy 10, me 46.
