@@ -1083,7 +1083,7 @@ function lineTop(G){var t=G.emp.lineStage==null?-1:G.emp.lineStage;PACK_LINES.fo
 function lineSalvage(G,i){var n=lineCount(G,i);return n?Math.round(scaledCost(PACK_LINES[i].cost,n-1,1.2)*autoDisc(G)*0.5):0;}
 function lineSellAll(G,i){var n=lineCount(G,i),s=0;for(var k=n-1;k>=0;k--)s+=Math.round(scaledCost(PACK_LINES[i].cost,k,1.2)*autoDisc(G)*0.5);return s;}
 function sellLine(G,i,all){var l=PACK_LINES[i],E=G.emp;if(!l||lineCount(G,i)<1)return 0;E.lineStage=lineTop(G);var n=0,cash=0;do{var c=lineSalvage(G,i);if(!i)E.staff.lines--;else E.packLines[l.id]--;earn(G,c,'equipment');cash+=c;n++;}while(all&&lineCount(G,i)>0);log(G,'Sold '+(n>1?n+' × '+l.name.toLowerCase()+'s':'a '+l.name.toLowerCase())+' for AED '+Math.round(cash).toLocaleString('en-US'));return cash||1;}
-function packingMachineCap(G){var n=pd(G,'autopackm')?20:0;PACK_LINES.forEach(function(l,i){n+=lineCount(G,i)*l.out;});return (n+(G.emp.legacyPacking||0))*automationFactor(G)*(1+0.06*rlFound(G,'auto'));}
+function packingMachineCap(G){var n=pd(G,'autopackm')&&!G.emp.machOff?20:0;PACK_LINES.forEach(function(l,i){n+=lineCount(G,i)*l.out;});return (n+(G.emp.legacyPacking||0))*automationFactor(G)*(1+0.06*rlFound(G,'auto'));}
 function adReady(G,a){if(a.id==='fb')return true;if(a.id==='expo'&&G.kits.sold<100)return false;if(a.id==='yt'&&G.kits.sold<1000)return false;if(a.id==='web'&&G.kits.sold<10&&G.stats.sold<500)return false;var need={ig:10,shelf:30,web:60,reel:60,expo:100,yt:300};return G.stats.sold>=(need[a.id]||0)&&(!a.req||pd(G,a.req));}
 var FAST_PROFIT=3000;
 // Real-time pacing: about 30 min for a perfect run, 90 min for an average player, 2.5 h for a careful one.
@@ -1168,6 +1168,7 @@ function kitDemand(G){
   return Math.min((kitAware(G)+G.emp.beta*opMult(G)*welfareMult(G)*wordOfMouth(G)*trust(G)*G.humans)*painMult(G)*(1+salesBoost(G))*sat*Math.pow(KIT_REF/G.kitPrice,2)*workMult(G)/hhDiv(G),room/(effectiveQuality(G)*HH_AVG)+1);
 }
 function kitSupply(G){return Math.min(packCap(G),farmCap(G)+tankSurplusKits(G)+(G.emp.rawShrimp||0)/KIT_SHRIMP);}
+function keepBlocks(G){if(tankSurplusKits(G)>=1)return null;var have=0,keep=0;G.tanks.forEach(function(T){have+=totalN(T);keep+=packAbove(G,T);});return have>=KIT_SHRIMP&&keep>0?{have:have,keep:keep}:null;}
 function tankSurplusKits(G){var t=0;G.tanks.forEach(function(T){t+=Math.max(0,Math.floor((totalN(T)-packAbove(G,T))/KIT_SHRIMP));});return t;}
 function bestKitPrice(G){var sup=Math.max(0.5,kitSupply(G)+G.kits.stock/14),d=kitDemand(G);if(d<=0)return G.kitPrice;
   var p=G.kitPrice*Math.sqrt(d/sup),lo=Math.max(100,Math.ceil(productionUnitCost(G)*(G.vat?1.05:1)*1.2/10)*10);return clamp(Math.round(p/10)*10,Math.min(lo,600),600);}
@@ -1181,6 +1182,7 @@ function bottleneck(G){
   if(!pc)r={k:'packing',d:'Limit: packing. Nobody packs kits daily.',f:'Pack by hand, then buy a packing bench in Kits.'};
   else if(pc<Math.min(d,fc+(E.rawShrimp||0)/KIT_SHRIMP))r={k:'packing',d:'Limit: packing. Packs '+big(pc)+'/day, breeding supports '+big(fc)+'.',f:'More packers or machines in Kits.'};
   else if(G.money<operatingReserve(G)+productionUnitCost(G))r={k:'cash',d:'Limit: cash. Production pauses to protect your reserve.',f:'Earn cash first, or lower the reserve under Money.'};
+  else if(keepBlocks(G)){var kb=keepBlocks(G);r={k:'keep',d:'Limit: Keep in tanks. Your tanks have '+big(kb.have)+' shrimp, it keeps '+big(kb.keep)+'. Packing only takes what is above it.',f:'Lower Keep in tanks in Kits, or let the colony grow.'};}
   else r={k:'shrimp',d:'Limit: breeding. Supports '+big(fc)+' kits/day, orders '+big(d)+'.',f:'Add farms in Gear.'};
  }
  else if(wordOfMouth(G)<0.75&&G.humans>=2e4)r={k:'demand',d:'Limit: marketing. Only '+Math.round(wordOfMouth(G)*100)+'% of the word of mouth you could have is reaching people. The bigger you get, the more marketing it takes.',f:'More stores, ads and brand work in Ads.'};
@@ -5003,7 +5005,7 @@ function updateEmpire(){
     var pl1='Pack 1<small>'+aed(kitMaterials(G))+' · '+KIT_SHRIMP+' shrimp</small>',pl10='Pack 10<small>'+aed(kitMaterials(G)*10)+' · '+KIT_SHRIMP*10+' shrimp</small>';$('btn-pack1').mhtml=pl1;$('btn-pack10').mhtml=pl10;
     $('btn-pack1').disabled=G.money<kitMaterials(G)||spareKitShrimp(G)+(E.rawShrimp||0)<KIT_SHRIMP;$('btn-pack10').disabled=G.money<kitMaterials(G)*10||spareKitShrimp(G)+(E.rawShrimp||0)<KIT_SHRIMP*10;
   }
-  var st=E.staff,stsig='st'+(G.humans>=1e6)+!!G.opt.earlyMkt+Math.floor(capitalReserve(G))+JSON.stringify(E.proj)+JSON.stringify(st)+Math.round(G.money/50)+Math.round(E.inf)+shopCount(G)+pd(G,'aiconsult')+kitsOpen(G)+G.tanks.length+'|'+G.kits.sold+'|'+farmCap(G)+'|'+JSON.stringify(E.packLines)+E.showEarlierPacking+'|'+Math.round(E.prod||0)+'|'+Math.round(E.rawShrimp||0);
+  var st=E.staff,stsig='st'+(G.humans>=1e6)+!!G.opt.earlyMkt+Math.floor(capitalReserve(G))+JSON.stringify(E.proj)+JSON.stringify(st)+Math.round(G.money/50)+Math.round(E.inf)+shopCount(G)+pd(G,'aiconsult')+kitsOpen(G)+G.tanks.length+'|'+G.kits.sold+'|'+farmCap(G)+'|'+JSON.stringify(E.packLines)+E.showEarlierPacking+'|'+Math.round(E.prod||0)+'|'+Math.round(E.rawShrimp||0)+'|'+!!E.machOff+'|'+(keepBlocks(G)?Math.round(keepBlocks(G).have/50)+'k'+keepBlocks(G).keep:'');
   if(cache.estaff!==stsig){
     cache.estaff=stsig;var h='',hs='',capLine='';
     var row=function(role,desc){var n=st[role];return itemHTML(STAFF[role].pl+(n?' ×'+n:''),desc+' · '+aed(staffPay(G,role)).replace(' ','\u00a0')+'/d each'+(role==='sales'&&!kitsOpen(G)?', part-time until kits open':'')+(payrollPreview(G,role)?'. '+payrollPreview(G,role):''),'<div class="hb">'+bbtn('hire','data-role="'+role+'" data-d="-1" aria-label="Let one go"','−',n>0)+bbtn('hire','data-role="'+role+'" data-d="1"','+ Hire',(role!=='pack'||st.tier>0)&&G.money>=corporateTaxReserve(G)+Math.max(7*staffPay(G,role),7*fixedOverhead(G)+7*staffPay(G,role)),true)+'</div>');};
@@ -5013,6 +5015,7 @@ function updateEmpire(){
     if(!st.tier){if(toolsHave(G))h+='<p class="hint">Packers need all five packing tools.</p>';}
     else{
       var selfK=(st.tier===1?1:4)*(pd(G,'aicam')?2:1),mach=packingMachineCap(G),capT=packCap(G);capLine=mach<=0?'':'<p class="sub pack-now">Packing up to <b>'+big(capT)+' kit'+(capT===1?'':'s')+' a day</b>'+(mach>capT*0.9?'.</p>':': '+selfK+' by you at the station'+(st.pack?', '+big(st.pack*PACK_TIERS[st.tier].per*(pd(G,'aicam')?2:1))+' by '+st.pack+' packer'+(st.pack>1?'s':''):', no packers')+(mach>0?', '+big(mach)+' by machines':'')+'.</p>');
+      var kbk=keepBlocks(G);if(kbk)capLine+='<p class="sub">Nothing to pack. Your tanks have '+big(kbk.have)+' shrimp, Keep in tanks keeps '+big(kbk.keep)+'.</p>';
       if(G.kits.sold>=10||st.pack)h+=row('pack',(PACK_TIERS[st.tier].per*(pd(G,'aicam')?2:1))+' kits a day each');
       var nt=PACK_TIERS[st.tier+1];if(nt&&G.kits.sold>=20)h+=itemHTML(nt.name,nt.note,bbtn('packtier','',cost2(nt.m,nt.i),G.money>=nt.m+capitalReserve(G)&&E.inf>=nt.i,true,E.inf>=nt.i?nt.m+capitalReserve(G):0));
     }
@@ -5025,7 +5028,7 @@ function updateEmpire(){
       if(!st.aiMgr)hs+=itemHTML('Replace shop managers with AI agents',(st.mgr?'Your '+st.mgr+' shop managers lose their jobs. ':'')+'Every shop gets managed, at a token bill that grows with the number of shops. One-time setup.',bbtn('ai','data-role="mgr"',aed(20000),G.money>=20000,true));
 
     }
-    if(pd(G,'autopackm')&&!PACK_LINES.some(function(l,i){return lineCount(G,i)>0;}))h+=itemHTML('Automatic packaging machine','20 kits/day, no staff. Packers now optional.','<button class="btn" disabled>Running</button>');
+    if(pd(G,'autopackm')&&!PACK_LINES.some(function(l,i){return lineCount(G,i)>0;}))h+=itemHTML('Automatic packaging machine',E.machOff?'Stopped. Start it again any time.':'20 kits/day, no staff. Packers now optional.',bbtn('machtog','',E.machOff?'Start':'Stop',true,!!E.machOff));
     var topLine=-1;PACK_LINES.forEach(function(l,i){if(lineCount(G,i))topLine=i;});PACK_LINES.forEach(function(l,i){if(!lineReady(G,i)||i<topLine)return;var ln=lineCount(G,i);h+=itemHTML(l.name+(ln?' ×'+ln:''),'Packs '+big(l.out)+' kits/day from '+big(l.out*KIT_SHRIMP)+' shrimp. Upkeep '+aed(l.up)+'/day. No packing wages. '+purchaseForecast(G,lineCost(G,i),0,l.out,l.up),bbtn('line','data-tier="'+i+'"',aed(lineCost(G,i)),G.money>=lineCost(G,i)+capitalReserve(G)+7*l.up,true,lineCost(G,i)+capitalReserve(G)+7*l.up),ln?sellRow('line','data-tier="'+i+'"',ln,lineSalvage(G,i),lineSellAll(G,i)):'');});
     var oldL=PACK_LINES.map(function(l,i){return i;}).filter(function(i){return i<topLine&&lineCount(G,i)>0;});
     if(oldL.length)h+='<details class="old-tier"><summary>Older packing lines still running: '+oldL.map(function(i){return lineCount(G,i)+' × '+PACK_LINES[i].name.toLowerCase();}).join(', ')+'</summary>'+oldL.map(function(i){var l=PACK_LINES[i],ln=lineCount(G,i);return itemHTML(l.name+' ×'+ln,big(ln*l.out)+' kits a day, '+aed(ln*l.up)+'/d upkeep.','',sellRow('line','data-tier="'+i+'"',ln,lineSalvage(G,i),lineSellAll(G,i)));}).join('')+'</details>';
@@ -5380,10 +5383,11 @@ function guideTarget(){
     return pk||wait('Kits sell as orders arrive.');
   }
   if(E.won)return null;
-  if(consultHas(G,'fix')){var b=bottleneck(G),m={packing:['emp','staff'],shrimp:['up','farms'],ceiling:['promote','reg'],demand:['promote','ads'],cash:['emp','kits'],paused:['up','farms']}[b&&b.k];
+  if(consultHas(G,'fix')){var b=bottleneck(G),m={packing:['emp','staff'],shrimp:['up','farms'],ceiling:['promote','reg'],demand:['promote','ads'],cash:['emp','kits'],paused:['up','farms'],keep:['emp','kits']}[b&&b.k];
     if(m){var bsel=null;
       if(b.k==='shrimp'){var bf=null;for(var bi2=FARMS.length-1;bi2>=0;bi2--){if(farmBuyable(G,FARMS[bi2])){bf=FARMS[bi2];break;}}if(bf)bsel='[data-act="farm"][data-id="'+bf.id+'"]';}
       else if(b.k==='packing'){var bp=projAvail(G).find(function(p){return p.id==='aicam'||p.id==='autopackm';});if(bp){m=[projTab(bp),'proj'];bsel='[data-act="proj"][data-id="'+bp.id+'"]';}else{for(var bl=PACK_LINES.length-1;bl>=0;bl--)if(lineReady(G,bl)){bsel='[data-act="line"][data-tier="'+bl+'"]';break;}if(!bsel)bsel='[data-act="hire"][data-role="pack"][data-d="1"]';}}
+      else if(b.k==='keep')bsel='#s-maxN';
       else if(b.k==='demand')bsel='[data-act="ad"]:not([disabled])';
       else if(b.k==='ceiling')bsel='[data-act="region"]';
       else if(b.k==='paused')bsel='[data-act="farm-resume"]';
@@ -6040,6 +6044,7 @@ function initControls(){
     if(a==='excel'){if(!G.excel&&G.money>=100){pay(G,100,'supplies');G.excel=1;log(G,'Finished an online Excel course. Your books are in order.');toast('Finance tracking unlocked');cache.fink=null;}}
     if(a==='movie'){if(greenlight(G,+b.dataset.cut||0))toast('Greenlit '+MOVIES[G.emp.movie.n][0]+'. Premiere in 30 days.');cache.eproj=null;}
     if(a==='consult'){if(buyConsult(G,b.dataset.k)){toast(CONSULT[b.dataset.k].name+' bought');render();}}
+    if(a==='machtog'){G.emp.machOff=!G.emp.machOff;toast(G.emp.machOff?'Packaging machine stopped':'Packaging machine running');cache.estaff=null;}
     if(a==='hire'){if(hire(G,b.dataset.role,+b.dataset.d))toast((+b.dataset.d>0?'Hired a ':'Let go a ')+STAFF[b.dataset.role].name.toLowerCase());cache.estaff=null;}
     if(a==='ai'){if(goAI(G,b.dataset.role))toast('AI agents are now running '+(b.dataset.role==='sales'?'sales':'your shops'));cache.estaff=null;}
     if(a==='packtier'){if(buyPackTier(G))toast('Packing upgraded');cache.estaff=null;}

@@ -1185,3 +1185,8 @@ BUILD 2026-10-28-feel.
 - Previewed by Puti in artifacts (land test page, Pierre walk editor). The land test page showed blank in the iPhone artifact viewer (inside an iframe there); in the game the land runs as its own page. Not checked on an iPhone.
 - Balance 87, academy 10, me 46. Bots: strong 2,428 (same), kind 3,187 (same), average Earth 6,525 / space 7,936 (6,497 / 7,908, seed noise). Spotlight sweep 118 checked, all good. Monkey skipped at Puti's say (too slow).
 - Deployed.
+
+## Pass 141: packaging machine Stop/Start, Keep in tanks named as the limit (28 Oct)
+- Automatic packaging machine in Making kits has Stop / Start (`G.emp.machOff`). Stopped, it adds 0 to `packingMachineCap`.
+- When every tank is at or under Keep in tanks, the limit line says "Limit: Keep in tanks. Your tanks have X shrimp, it keeps Y." instead of "Limit: breeding... Add farms" (`keepBlocks`, kind `keep`). Making kits shows "Nothing to pack" with the same numbers. Consultant fix points at the slider.
+- Balance 87, academy 10, me 46.
