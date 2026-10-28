@@ -1096,3 +1096,11 @@ BUILD 2026-10-28-feel.
 - Default, no toggle. Once kits are open and someone packs, the daily auto-sell (`doSell` with a `hold` from `kitHold(G)`) keeps back what this week's packing will use: kits short of the stock target plus a week of demand, capped by packers × 7, by kits the cash can pay for (after `productionCashFloor`) and minus farm `rawShrimp`. Only a tank's packable excess (above `packAbove`, non-breeders) is held, filled tank by tank like `packDay`. No cash to pack, nothing is held. Culls still sell. Sell by hand is unchanged.
 - The auto-sell toggle reads "Salespeople sell from this tank, packing goes first" once packing runs.
 - Balance 84, academy 10, me 46. Strong and average bots unchanged (neither hires salespeople, so the rule isn't exercised by bots). Kind bot, spotlights and monkey not run.
+
+## Pass 132: 15 s between cards, a note on what to wait for (28 Oct)
+
+- Playthrough to the first farm (average bot, seed 7, timed with the bot's play seconds at max speed): cycle 17 s, babies 44 s, first sale 127 s, kits 346 s, first farm 924 s, cash AED 200–370 until kits and AED 90 right after the first kit. Never broke. Strong bot: farm on day 484. The only long empty stretch is babies to first sale (about 80 s, days 51–118).
+- Clusters it found: kits chapter then the fight invite 10 s later, first kit plus me_intro within a day, the farm chapter and the rival story on the same day, the Ads tab and the sale chapter 3 s apart.
+- Fix: chapter cards now wait in `progress.soon` until 15 s of play (`CARD_GAP`, `storyClock`) after the last card was closed (`progress.lastAck`). Story cards also wait for that and for no chapter pending, on top of their old two-minute and 30-day gaps. Broke, game over, illness, crash, win, intro and ten years still show at once (`CARD_NOW`). Queued spotlights also wait 15 s after any card closes (`cardResume`); spotlights a card asks for itself (`now:1`) still show right away.
+- Babies card adds: bought shrimp are breeders and don't get sold, babies sell at 60 days old, about two months away, sell age is under Sales rules in Trade, until then keep them alive. Checked at 360 px.
+- Balance 85, academy 10, me 46. Bots: strong 2,392 (was 2,445), kind 3,184 (3,195), average Earth 6,497 / space 7,908 (6,413 / 7,824), all within seed noise. Spotlights and monkey not run.

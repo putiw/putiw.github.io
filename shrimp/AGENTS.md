@@ -169,6 +169,7 @@ These come from Puti's feedback. Treat them as requirements.
 - Bought shrimp are breeders and are never sold by the sales rules. The one exception: you can take any shrimp out by hand with Cull in Check shrimp, it sells as a cull.
 
 **Revealing things**
+- Cards wait 15 s of play after the last card (`CARD_GAP`, `progress.soon`), queued spotlights 15 s after a card closes. Only urgent cards skip it (`CARD_NOW`).
 - Reveal one new thing at a time, and only when it's needed. Before the first shrimp the player sees only the cycle card, the test kit, ammonia, the speed buttons (from the bottle) and the Water button (from the cycled step). The full reveal order is in Pass 115 of `tests/README-shrimp.md`; keep new things behind a real need (`ob.temp`, `ob.room`, `ob.mins`, first babies, first sale, 10 kits).
 - A tab bar with one tab is hidden. A dead button (grey with a countdown) is hidden until it can do something.
 - Every new section gets a spotlight, not a toast. Toasts are only for small confirmations ("Added ammonia").
@@ -324,13 +325,13 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 
 In game days, best play is about 7 years and casual play about 15.
 
-Latest bot results (seed 7, 28 Oct, Pass 127):
+Latest bot results (seed 7, 28 Oct, Pass 132):
 
 | Bot | Result |
 |---|---|
-| Strong, cold answers (default) | Earth won on day 2,445, empire_dictator (2,338 in Pass 123) |
-| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 3,195, question_prof (3,208) |
-| Average, curious and kind (default) | Earth on day 6,413, space done by day 7,824, garden_hermit (6,525 / 7,936) |
+| Strong, cold answers (default) | Earth won on day 2,392, empire_dictator (2,445 in Pass 127) |
+| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 3,184, question_prof (3,195) |
+| Average, curious and kind (default) | Earth on day 6,497, space done by day 7,908, garden_hermit (6,413 / 7,824) |
 
 Seed noise is big: over seeds 3–43 the average bot's Earth day ranges 5,700–6,640 on the same build, and strong seed 19 goes broke on day 252 on both the old and new build. Compare a few seeds before reading anything into one run.
 | Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,349, no Space (24 Oct, not rerun in Pass 110) |

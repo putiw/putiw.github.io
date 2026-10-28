@@ -49,7 +49,7 @@ console.log('PASS delayed charts and advertising can fold when first revealed');
 if(!html.includes('.coll.queued>:not(.hd){display:none!important}')||!html.includes('function promoteCardReveal(o)')||!html.includes('o.cardQueue.push({k:k,tab:activeTab})')||!html.includes('promoteCardReveal(o);render();')||!html.includes('var PROJ_SHOW=1,'))throw Error('New content should queue one at a time, focus the active card and advance when dismissed');
 console.log('PASS newly revealed cards queue one at a time and fold other sections');
 check('fresh starts preserve milestones; high-speed batches stop at a boundary',`
-var g=readyGame(),t=g.tanks[0];t.chem.bacA=t.chem.bacB=bacTarget(t);t.chem.nh=t.chem.no2=0;rememberCycle(g,t);
+var g=readyGame(),t=g.tanks[0];t.chem.bacA=t.chem.bacB=bacTarget(t);t.chem.nh=t.chem.no2=0;rememberCycle(g,t);g.progress.lastAck=null;
 for(var i=0;i<400;i++)stepGame(g);
 if(g.progress.queue[0]!=='cycle'||g.day!==0||g.step!==1)throw Error('Skipped milestone boundary');
 var before=clock(g);stepGame(g);if(clock(g)!==before)throw Error('Continued while pending');
@@ -101,8 +101,8 @@ var g=readyGame();g.fin=[{shrimp:1000,farms:-100,logistics:-20,equipment:-9000,s
 if(operatingNet(g)!==800)throw Error('Capital expense counted as payroll');
 `);
 check('queued milestones survive a saved-game round trip',`
-var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;detectMilestones(g);var saved=JSON.parse(JSON.stringify(g));migrate(saved);
-if(!saved.progress.queue.includes('kits')||!progressionBlocked(saved))throw Error('Lost kit handoff');
+var g=readyGame();g.progress.lastAck=null;g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;detectMilestones(g);var saved=JSON.parse(JSON.stringify(g));migrate(saved);
+if(!saved.progress.queue.concat(saved.progress.soon).includes('kits')||!progressionBlocked(saved))throw Error('Lost kit handoff');
 var clock0=clock(saved);for(var i=0;i<120;i++)stepGame(saved);if(clock(saved)!==clock0)throw Error('Offline progression bypassed pause');
 `);
 check('legacy victory does not accrue offline overhead before review',`
@@ -604,5 +604,12 @@ var g=newGame();g.emp.kitsOpened=1;g.emp.staff.tier=1;g.emp.staff.sales=1;g.mone
 var h=kitHold(g);if(!(h[0]>0))throw Error('Holds for packing');if(doSell(g,T,true,undefined,true,h[0]).normal!==0)throw Error('Nothing sold while packing needs it');if(!(doSell(g,T,true,undefined,true,0).normal>0))throw Error('Sells without a hold');
 g.money=0;if(kitHold(g)[0]!==0)throw Error('No cash, no hold');var k=newGame();if(kitHold(k)[0]!==0)throw Error('No hold before kits');
 `);
+check('Pass 132: cards wait 15 s of play after the last one, urgent ones do not',`
+var g=newGame();acknowledgeMilestone(g);g.progress.lastAck=null;g.ps={t:100000};g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;detectMilestones(g);if(g.progress.queue[0]!=='sale')throw Error('First card now');
+acknowledgeMilestone(g);g.ps.t+=5000;detectMilestones(g);if(g.progress.queue.length||g.progress.soon[0]!=='kits')throw Error('Second card waits');
+g.ps.t+=11000;detectMilestones(g);if(g.progress.queue[0]!=='kits')throw Error('Second card after 15 s');acknowledgeMilestone(g);
+g.ps.t+=1000;g.money=-1e6;g.emp.broke=1;var p=g.progress;p.seen.gameover=false;if(CARD_NOW.indexOf('broke')<0||CARD_NOW.indexOf('gameover')<0)throw Error('Urgent cards skip the gap');
+`);
+if(!html.includes('The babies can be sold at 60 days old'))throw Error('Pass 132: waiting note on the Babies card');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
