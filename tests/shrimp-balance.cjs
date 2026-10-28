@@ -599,5 +599,10 @@ var g=newGame();g.stats.born=1;var m=g.money;checkGoals(g);if(g.money-m!==15||!(
 var sm=PROJ.find(p=>p.id==='social'),k=newGame();k.stats.sold=59;if(sm.req(k))throw Error('Not before sales staff');k.stats.sold=60;if(!sm.req(k)||!salesOpen(k))throw Error('Opens with sales staff');
 `);
 if(!html.includes('Grandma sent AED 15. For the babies')||html.includes('the defaults work fine')||html.includes('id="h-ice"'))throw Error('Pass 130: copy and stable cooling');
+check('Pass 131: salespeople leave the shrimp this week\'s packing needs, sell when there is no cash to pack',`
+var g=newGame();g.emp.kitsOpened=1;g.emp.staff.tier=1;g.emp.staff.sales=1;g.money=5000;g.humans=500;g.packPerL=0.5;var T=g.tanks[0];T.set.autoSell=true;T.set.keep=5;T.pop=[{age:90,n:60,g:50}];
+var h=kitHold(g);if(!(h[0]>0))throw Error('Holds for packing');if(doSell(g,T,true,undefined,true,h[0]).normal!==0)throw Error('Nothing sold while packing needs it');if(!(doSell(g,T,true,undefined,true,0).normal>0))throw Error('Sells without a hold');
+g.money=0;if(kitHold(g)[0]!==0)throw Error('No cash, no hold');var k=newGame();if(kitHold(k)[0]!==0)throw Error('No hold before kits');
+`);
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

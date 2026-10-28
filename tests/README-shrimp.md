@@ -1090,3 +1090,9 @@ BUILD 2026-10-28-feel.
 - Sales card: rules summary reads Sales rules · Tank 1 (no "the defaults work fine"). The sell box shows N ready · AED X and N buyers left this week (Only ... when stock beats buyers); the button just says Sell. Under the price, one line Prime adult, grade N next to the Average AED X chip. The mood advice moved into Sales details. Labels don't wrap.
 - Social media manager opens with the sales staff card (`salesOpen`, 60 sold or 30 kits), was 30 sold.
 - Balance 83, academy 10, me 46. Sell card and cooling checked at 360 px, no console errors. Bots, spotlights and monkey not run.
+
+## Pass 131: Salespeople leave shrimp for packing (28 Oct)
+
+- Default, no toggle. Once kits are open and someone packs, the daily auto-sell (`doSell` with a `hold` from `kitHold(G)`) keeps back what this week's packing will use: kits short of the stock target plus a week of demand, capped by packers × 7, by kits the cash can pay for (after `productionCashFloor`) and minus farm `rawShrimp`. Only a tank's packable excess (above `packAbove`, non-breeders) is held, filled tank by tank like `packDay`. No cash to pack, nothing is held. Culls still sell. Sell by hand is unchanged.
+- The auto-sell toggle reads "Salespeople sell from this tank, packing goes first" once packing runs.
+- Balance 84, academy 10, me 46. Strong and average bots unchanged (neither hires salespeople, so the rule isn't exercised by bots). Kind bot, spotlights and monkey not run.
