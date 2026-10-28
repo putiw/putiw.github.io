@@ -1110,3 +1110,11 @@ BUILD 2026-10-28-feel.
 - `packDay` counts `emp.packLow`: days the packers had kits to pack and cash for them but packed under a fifth of their capacity. After 3 such days in a row a spotlight (paused, dimmed) points at Keep in tanks in Making kits, or the Kits tab if that card isn't on screen. Text: if a tank sits at or under Keep in tanks with spare shrimp, lower it or let the colony grow; otherwise not enough shrimp, more breeders and tanks make more babies. Once only (`ob.packLow`). While it lasts the Making kits summary reads "N of M a day".
 - `roomT` caps the room at 28.3 °C for the first year (clock < 365, from 20 Oct to 20 Oct), hot spells included, so tanks stay under the 28.5 °C heat-damage start. From the second summer hot spells can push past it again.
 - Balance 86, academy 10, me 46. Bots: strong 2,428 (2,392), kind 3,187 (3,184), average Earth 6,497 / space 7,908 (same). Spotlight shown at 360 px. Spotlight sweep passed on the Pass 132 build, monkey rerun on this one.
+
+## Pass 134: Making kits card reordered (28 Oct)
+
+- Header: "Packed N of M today" (was "M a day"), by hand before packers.
+- Order: packing table (by hand), Keep in tanks, one line "N spare · M above this line" (materials when short), the ? text, Pack 1 / Pack 10, packers. "Station idle: only N above Keep in tanks" is gone, the line under the slider says it.
+- Packers row: "8 kits a day each, you pack 4". The "Packing up to N kits a day: ..." sentence only shows once machines pack.
+- Quality checks: the round row first, then How strict, then a fold "What a round checks · N of 5 by machine" with one row per step (by hand, done by hand, by machine, not done), then the next tool to buy. The five step chips are gone.
+- Balance 86, academy 10, me 46. Checked at 360 and 390 px at first kit, farm license and 100 owners, no sideways scroll, no console errors.
