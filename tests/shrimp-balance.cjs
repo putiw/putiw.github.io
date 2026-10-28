@@ -68,9 +68,8 @@ if(hire(g,'sales',1))throw Error('Unsafe hire');g.money=10000;if(!hire(g,'sales'
 check('construction reserves, mothball, restart and sale are consistent',`
 var g=readyGame(),f=FARMS.find(x=>x.id==='rack');g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.emp.proj.farmlic=1;g.money=f.cost;
 if(buyFarm(g,'rack'))throw Error('Spent working capital');g.money=10000;if(!buyFarm(g,'rack'))throw Error('Build failed');
-if(farmCap(g)!==1)throw Error('Wrong capacity');changeFarm(g,'rack','pause');if(farmCap(g)!==0||farmOverhead(g)!==0)throw Error('Mothball charges');
-g.money=0;if(changeFarm(g,'rack','resume'))throw Error('Unsafe restart');g.money=10000;changeFarm(g,'rack','resume');var cash=g.money;changeFarm(g,'rack','sell');
-if(g.money<=cash||farmCap(g)||g.emp.pausedFarms.rack>g.emp.farms.rack)throw Error('Sale inconsistent');
+if(farmCap(g)!==1)throw Error('Wrong capacity');if(changeFarm(g,'rack','pause'))throw Error('No pausing farms');var cash=g.money;changeFarm(g,'rack','sell');
+if(g.money<=cash||farmCap(g)||g.emp.farms.rack)throw Error('Sale inconsistent');
 `);
 check('automatic inventory respects reserve, target and zero-demand endgame',`
 var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.emp.farms.barn=5;g.emp.inventoryDays=3;g.money=10000;var r=operatingReserve(g);empireDay(g);
@@ -572,5 +571,18 @@ if(!html.includes('<div id="rp-sci" hidden><h3 class="track">Science</h3>')||!ht
 if(html.includes('People start buying mud')||!html.includes('var AI_MGR_DAY=40;')||!html.includes("only as spots open up in your reach")||html.includes('vv.offsetTop'))throw Error('Pass 125: carbon line, token bills, reach-limit orders line, no lifted tab bar');
 if(!/maximum-scale=1,user-scalable=no/.test(html)||!html.includes('gesturestart'))throw Error('Pass 125: no pinch zoom in the game');
 console.log('PASS Pass 125 feel and text fixes');
+check('Pass 126: farms jump to any opened bigger kind, sell one or all, packing lines sell, care income from living tanks',`
+var g=newGame();g.money=1e12;g.emp.proj.farmlic=1;g.emp.kitsOpened=1;g.kits.sold=500;
+if(!buyFarm(g,'rack')||!buyFarm(g,'shed'))throw Error('Rack straight to warehouse');if(buyFarm(g,'barn')||buyFarm(g,'rack'))throw Error('No smaller kinds once bigger');
+if(!buyFarm(g,'shed')||!buyFarm(g,'shed'))throw Error('More warehouses');var all=farmSellAll(g,FARMS[2]),m=g.money;if(changeFarm(g,'shed','sellall')!==all||g.money-m!==all||g.emp.farms.shed)throw Error('Sell all warehouses');
+g.emp.farms={hatch:1};g.emp.proj.sun=1;if(!hasFarm(g,'hatch')||!hasFarm(g,'shed')||hasFarm(g,'mhatch'))throw Error('hasFarm counts bigger kinds');g.emp.farms={mhatch:1};if(!hasFarm(g,'hatch'))throw Error('Hatchery projects stay open with a mega hatchery');
+var h=newGame();h.money=1e12;h.emp.proj.autopackm=1;h.kits.sold=1e5;h.emp.farms={mhatch:2};if(!buyLine(h,0)||!buyLine(h,0)||!buyLine(h,1))throw Error('Lines');var s=lineSellAll(h,0),m2=h.money;sellLine(h,0,true);if(h.emp.staff.lines||h.money-m2!==s)throw Error('Sell all robotic lines');
+if(!lineReady(h,1)||!buyLine(h,1))throw Error('Selling old lines keeps the tier open');var c1=lineSalvage(h,1);sellLine(h,1);if(h.emp.packLines.hall!==1||c1!==Math.round(scaledCost(8e6,1,1.2)*autoDisc(h)*0.5))throw Error('Sell one hall at half');
+var k=newGame();k.emp.kitsOpened=1;k.humans=1e9;k.emp.wel=1;var full=careGoods(k);k.emp.wel=0.5;if(Math.abs(careGoods(k)/full-0.5)>1e-9)throw Error('Only living tanks buy');
+if(topupShrimp(k)!==0)throw Error('Top-ups need spare farm output');k.emp.farms={mhatch:10};k.fin=[{_ks:0}];if(!(topupShrimp(k)>0)||topupShrimp(k)>farmCap(k)*KIT_SHRIMP)throw Error('Top-ups from spare output');
+var a=foodRate(k);k.emp.proj.app=1;if(Math.abs(foodRate(k)-a-CARE_TESTS)>1e-12)throw Error('Test refills with the care app');
+`);
+if(html.includes('Mothballed ')||html.includes('is mothballed'))throw Error('No mothball wording');
+if(!html.includes("['foodsales','Food and tank care',1]")||html.includes('earlier-packing'))throw Error('Pass 126: finance line and packing fold');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

@@ -100,7 +100,7 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **Gala causes** (`GALA_FOR`, `galaLines`): `buyProj(G,'gala',cause)`.
 - **Story choice previews** (`choiceFx(key,i,all)`, `showAfter`, `storyShowDesc`): before the pick only the label and its cost show (AED, ✦, a month away), not the description. What happened (the description and the effects) comes after, in a popup the player has to close (`#after`, the game waits under it). Fork projects work the same way (name and cost, then `p.d` in the popup), and hard-part options show their news line after. Chapters, the intro, the space dream, win, game over and broke keep their text up front.
 - **Gear scope** (`G.opt.upAll`): with several tanks one switch at the top of Equipment picks This tank / All tanks. Decor and treats sit under `h3.track` headings.
-- **Ladders** (`topIdx`, `farmBuyable`, `farmNext`, `FARM_AT`, `shopBuyable`): farms and shops open one tier at a time and the older tier stops being sold. Small shops stop once the first mall store opens.
+- **Ladders** (`topIdx`, `farmBuyable`, `farmNext`, `FARM_AT`, `shopBuyable`, `hasFarm`, `lineTop`): any farm kind bigger than your top one can be bought once its kits-sold gate opens, no need to own the one below (Pass 126); smaller kinds stop being sold. Projects that need a hatchery use `hasFarm(G,'hatch')` (that kind or bigger). Packing lines show your top tier and up; the next line tier needs one you've had (`E.lineStage`). Selling is by hand only (Puti, 28 Oct: no auto swap): farms and lines have Sell 1 and Sell all at half the price paid, two taps (`sellRow`, `changeFarm` 'sell'/'sellall', `sellLine`); older kinds sit in an Older farms / Older packing lines fold. Small shops stop once the first mall store opens.
 - **Research merge** (`rlStaff`, `academyDay`, `scienceFork`): one Research card on the Lab tab (`academy-card`). Staff raise the research rate. The "pay to keep postdocs" fork waits for two postdocs and four papers.
 - **Your day hours** (`workPer`, `HOUR_STEPS`, `hoursDay`): work hours move kit and shrimp demand, hour milestones fire events. Grandma calls with a short supply-and-demand lesson at about 3 kits a day (`M.call='lesson'`, the person button rings).
 - **Tab layout** (28 Oct, Passes 119-122): tabs are Tank, Gear, Trade, Kits, Ads, World and Lab (`TAB_NAME`), plus the You page under the person button. Kits: Kits (price, profit, stock; rest under More numbers), Making kits (`c-staff`: packing table, tools, Pack buttons, Keep in tanks, capacity line, packers, machines, Quality checks as a section `#qccard`), Kit development. Ads: Ads (one-off ads as a button row, online shop folds once bought), Shops (one line per region with one Open button, Close stores fold), Sales staff (`c-sales`, `e-sales`), Marketing development with the campaign desk inside (`#op-wrap`, ✦ stays in Ads), Regions (shows the ceiling). World: The hard part, Shaping the world, Owners' tanks, the coast card (Mangroves / Shrimpcoin plus Shrimp Island in `#coin-island`), other trees, The Shrimp Times last with a Science section (`newsLine(G,t,1)`). The Lab tab opens at 3,000 kits sold (`ACADEMY_AT`) with one merged Research card and the school and university projects. Trade hides once the farms run things (`labMode`). Money over time, Consultants, Operating controls and Wages live in the Money sheet behind the header cash once kits open (`finOpen`, `openFin`, `wageLines`). The readings chart hides once the farm takes your tanks. `projTab(p)` decides where a project shows up; the sim still uses `projectArea` for gating. Player word for racks, barns and hatcheries is farm.
@@ -127,6 +127,7 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **Late cards** (`CARDS3`): data-driven story cards, `[label, result, traits, effect, ending line]`. A card only if different people would really choose differently, otherwise a headline (`HEADLINES`). Story cards and Shrimp Times stories take turns, each 30 s to 2 min of play apart, and a choice's own story comes right after it. Always use `newsLine`/`newsEvent`, never push to `R.log` directly.
 - **Notes, not news** (`noteLine`, `NOTE_KINDS`, `paperOpen`, `updateNotes`, `#noteflash`): The Shrimp Times only prints once the World tab is there (`paperOpen`: World or the Lab open, or 10k+ people). Before that any `newsLine` becomes a "Word gets around" note. Personal things never go in the paper: Your day milestones are `noteLine(G,'day',t)`, Grandma is `noteLine(G,'grandma',t)`, small buzz about the kits is `noteLine(G,'word',t)`. Notes show one at a time as a banner like the newsflash with their own masthead, at least 12 s apart, never over a card, spotlight, cleaning or a check. Tapping a Your day or Grandma note opens the You page. `HOUR_NOTE` picks the channel for each Your day line; the viral video and the streaming show are news.
 - **Income after Earth** (`foodIncome`, `sideIncome`): new income comes from things already built and shows as one finance line, never a new screen or button.
+- **Food and tank care** (Pass 126, `foodRate`, `careGoods`, `topupShrimp`, `spareFarmShrimp`, `CARE_*`): the Finance line `foodsales`. Only homes with a living tank buy (homes × welfare): food from the first kit (×2 with the factory, pods on top), moss and plants once you have a shop or store, water test refills with the care app. Struggling tanks buy 10-shrimp top-ups twice a year at AED 40, only from farm output the kits don't use. 40% of the goods part is paid back as supplies. Income moves shrimp → kits → care: about 1–3% of kit income early, 10–15% at half of Earth, more than kits once reach is full.
 
 ### Grandma's land (27 Oct)
 
@@ -243,7 +244,7 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] Shrimp videos are driven (`drive`), and there is no ego or reach trait any more (Pass 110).
 
 **Your own tank, Oct 26 (check these stay true)**
-- The header shrimp count is everyShrimp(G): tanks plus farmStock (shrimp waiting + about 60 days of hatchery output on the racks). Tap-hold title splits it. Farms can only be bought or sold, no mothball/restart (old saves with paused farms restart on load).
+- The header shrimp count is everyShrimp(G): tanks plus farmStock (shrimp waiting + about 60 days of hatchery output on the racks). Tap-hold title splits it. Farms can only be bought or sold, no pausing (old saves with paused farms are sold on load). Don't use the word mothball in the game.
 - The farm license (grow racks) needs 50 kits sold and Tanks 1-3 stocked with an auto feeder and auto water changer each (allStarterAuto). Buying the first farm of any kind brings the owntank card: extra tanks go to the farm, tank 1 keeps 20.
 - Mangroves (the coin card, titled "Mangroves" until shrimpcoin launches) open at 10,000 kits sold (TREES_AT). A tap plants one tree (COIN_BATCH=1). Others copy: TREE_SPREAD 0.2% of all trees a day (x2 with the mangrove project), a mangrove gala buys seedlings with its money (treesFromGala), and after launch the coin-price gap adds more. Trees others plant before the coin make no coins; your own pre-coin trees mint a year after planting once the honest coin launches.
 - The own-tank jobs (Gravel, Sponge, Trim, Pests) are ported from the Shrimp Home Prototype: vacuum tube that follows the finger with a bucket (babies get sucked in, tap them back), the sponge as its own sheet with a bucket of old tank water and flow meter, scissors through stems and moss with floating cuttings, tweezers for snails and flatworms. They finish through careDone; the vacuum does not change water (no water change).
@@ -304,7 +305,7 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] Dyed shrimp, fight nights, the investor, three favours, the routes deal is the point of no return, the police way back costs almost everything.
 - [ ] Mira reacts to dye, fight night, her scholarship, the investor, the year after the police.
 - [ ] Academia or industry: pay postdocs more to stay (rare discoveries, Wonder) or hire them into the company (cheaper kits, Use, opens the designer lab).
-- [ ] Shrimp food income (more with the food factory) and water, power and freight income keep paying after Earth. Space's last world is always reachable.
+- [ ] Food and tank care income (only living tanks, more with the food factory) and water, power and freight income keep paying after Earth. Space's last world is always reachable.
 - [ ] No "Affordable in about…" lines anywhere.
 
 **Text**
@@ -320,13 +321,15 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 
 In game days, best play is about 7 years and casual play about 15.
 
-Latest bot results (seed 7, 28 Oct, Pass 123):
+Latest bot results (seed 7, 28 Oct, Pass 126):
 
 | Bot | Result |
 |---|---|
-| Strong, cold answers (default) | Earth won on day 2,338, empire_dictator |
-| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 3,208, question_prof |
-| Average, curious and kind (default) | Earth on day 6,525, space done by day 7,936, garden_hermit |
+| Strong, cold answers (default) | Earth won on day 2,454, empire_dictator (2,338 in Pass 123) |
+| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 3,223, question_prof (3,208) |
+| Average, curious and kind (default) | Earth on day 6,525, space done by day 7,936, garden_hermit (same) |
+
+Seed noise is big: over seeds 3–43 the average bot's Earth day ranges 5,700–6,640 on the same build, and strong seed 19 goes broke on day 252 on both the old and new build. Compare a few seeds before reading anything into one run.
 | Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,349, no Space (24 Oct, not rerun in Pass 110) |
 
 All bots use campaigns (when ✦ is plentiful), films, Shrimpcoin, shops and mall stores. The average bot also funds research lines. It has 22 years to finish both chapters.
@@ -427,9 +430,7 @@ Left from that review, not done:
 - The `mkt` lever line ("You can make more kits than people order...") is a taught-once lever (`leversTaught`), kept on purpose.
 - Old saves keep their old lab stories on the front page of The Shrimp Times; only new ones go to Science.
 
-**Late game economy (asked 28 Oct, new chat)**
-- From about half of Earth, growth should slow and the player should be able to slow spending too: sell old farms and packing lines, buy any farm level directly.
-- Income should shift over time: shrimp, then kits, then tank-related things that aren't tanks (shrimp food is one idea). A new Finance income line for it. Puti asked what Claude thinks; agree the design with her before building.
+**Late game economy: built in Pass 126** (not deployed). Left: a care subscription was left out (it would need a new choice). The bots never sell farms or lines, so selling is only covered by `shrimp-balance`. The Gear and Making kits sell rows were not looked at in a browser.
 
 **Small leftovers from the 2026-10-27 final pass**
 - "Check shrimp" wraps to two lines in the six-button own-tank grid at 360–390 px (drop the icon at narrow widths).
