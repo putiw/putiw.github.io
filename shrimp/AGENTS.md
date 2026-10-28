@@ -180,7 +180,7 @@ These come from Puti's feedback. Treat them as requirements.
 - Bought shrimp are breeders and are never sold by the sales rules. The one exception: you can take any shrimp out by hand with Cull in Check shrimp, it sells as a cull.
 
 **Revealing things**
-- Cards wait 15 s of play after the last card (`CARD_GAP`, `progress.soon`), queued spotlights 15 s after a card closes. Only urgent cards skip it (`CARD_NOW`).
+- Anything new (cards, spotlights, notes, news) waits 15 s of play after the last new thing, on one clock (`introOK`, `introMark`, `progress.lastAck`, `CARD_GAP`). Paused time doesn't count, so nothing new comes while paused. Only urgent cards (`CARD_NOW`) and `now:1` spotlights (the pause-button one) skip it (Pass 147).
 - Reveal one new thing at a time, and only when it's needed. Before the first shrimp the player sees only the cycle card, the test kit, ammonia, the speed buttons (from the bottle) and the Water button (from the cycled step). The full reveal order is in Pass 115 of `tests/README-shrimp.md`; keep new things behind a real need (`ob.temp`, `ob.room`, `ob.mins`, first babies, first sale, 10 kits).
 - A tab bar with one tab is hidden. A dead button (grey with a countdown) is hidden until it can do something.
 - Every new section gets a spotlight, not a toast. Toasts are only for small confirmations ("Added ammonia").

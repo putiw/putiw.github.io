@@ -252,7 +252,7 @@ var m1=kitMaterials(g);setQCStrict(g,2);if(!(kitMaterials(g)>m1))throw Error('St
 `);
 if(html.includes("needs '+big(nextLine.sold)")||html.includes('show up once your first three tanks')||html.includes('Bacteria starter unlocks when'))throw Error('Unlock rules should not be shown');
 if(!html.includes("bar.hidden=true;\n  if(!g)return;")||!html.includes("$('ideas-now').hidden=!soft"))throw Error('Guide lines belong in the ? popup, never a bar over the game (Puti, 28 Oct)');
-if(!html.includes("if(SPOT||SPOTQ.length||Date.now()-(spotWatch.last||0)<15000)return;"))throw Error('One spotlight at a time');
+if(!html.includes("if(SPOT||SPOTQ.length||!introOK())return;")||!html.includes("if(!s.now&&!introOK())"))throw Error('One spotlight at a time');
 check('player decides: room-based gates, any mix of tanks',`
 var g=readyGame();g.stats.sold=KIT_UNLOCK;var t=g.tanks[0];t.had=1;t.vol=80;t.volTier=2;t.pop=[{age:100,n:20,g:60}];if(!kitsOpen(g))throw Error('One 80 L tank should be enough room for kits');
 t.vol=40;t.volTier=1;if(kitsOpen(g))throw Error('Kits still need some room');

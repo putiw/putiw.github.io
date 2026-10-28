@@ -1217,3 +1217,9 @@ BUILD 2026-10-28-feel.
 - The 15 s gap only ran card to card and card to spotlight. A spotlight (money sheet) could be followed at once by a card (Your time). Now closing a spotlight restarts the card clock (`spotClose` sets `progress.lastAck`), no card is queued while a spotlight is open, and a queued card waits under an open spotlight unless it's urgent (`CARD_NOW`).
 - Browser check: card held during the spotlight and right after, shows after 16 s of play.
 - Balance 88, academy 10, me 46.
+
+## Pass 147: One 15 s gap for everything new, on play time (28 Oct)
+- Puti: paused, she still got kit packing, a Grandma note and the back room card one after another. Cards ran on play time but spotlights (15 s) and notes (12 s) ran on real time, each with its own gap.
+- Now cards, spotlights and notes all wait for 15 s of play since the last new thing (`introOK`), and each one restarts that clock (`introMark`: spotlight close, note shown, newsflash shown, card closed). Paused time doesn't count. Urgent cards and `now:1` spotlights skip it.
+- Browser check: paused 17 s real after a spotlight, the queued one didn't show; after 16 s of play it did.
+- Balance 88 (gap check updated), academy 10, me 46.

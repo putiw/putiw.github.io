@@ -3497,8 +3497,8 @@ function checkBuild(){if(!/^https?:/.test(location.protocol)||document.hidden)re
 setTimeout(checkBuild,60000);setInterval(checkBuild,15*60000);
 var NOTE_LAST=0,NOTE_T=null;
 function updateNotes(){var Q=G&&G.notes;if(!Q||Q.seen>=Q.list.length)return;var e=$('noteflash');if(!e||!e.hidden||!$('newsflash').hidden)return;
- if(Date.now()-NOTE_LAST<12000)return;if(!$('milestone-card').hidden||(SPOT&&SPOT.on)||TVLOCK||HC||SB||QCR||(typeof TS!=='undefined'&&TS)||(typeof FS!=='undefined'&&FS))return;
- if(Q.list.length-Q.seen>3)Q.seen=Q.list.length-3;var x=Q.list[Q.seen++];NOTE_LAST=Date.now();
+ if(Date.now()-NOTE_LAST<12000||!introOK())return;if(!$('milestone-card').hidden||(SPOT&&SPOT.on)||TVLOCK||HC||SB||QCR||(typeof TS!=='undefined'&&TS)||(typeof FS!=='undefined'&&FS))return;
+ if(Q.list.length-Q.seen>3)Q.seen=Q.list.length-3;var x=Q.list[Q.seen++];NOTE_LAST=Date.now();introMark();
  e.className='newsflash noteflash nk-'+x.k;flashTop(e);flashSwipe();e.dataset.k=x.k;setT('nt-mast',NOTE_KINDS[x.k]||'');setT('nt-head',x.t);var you=$('tb-me')&&!$('tb-me').hidden;setT('nt-go',x.k!=='word'&&you?'Tap to open your page ›':'');
  e.hidden=false;e.classList.remove('on');void e.offsetWidth;e.classList.add('on');clearTimeout(NOTE_T);NOTE_T=setTimeout(function(){e.classList.remove('on');setTimeout(function(){if(!e.classList.contains('on'))e.hidden=true;},400);},8500);}
 // News and notes drop in from the very top of the screen, over the header, like a phone notification.
@@ -3508,7 +3508,7 @@ function flashSwipe(){document.querySelectorAll('.newsflash').forEach(function(e
  e.addEventListener('pointermove',function(ev){if(y0==null)return;dy=Math.min(0,ev.clientY-y0);if(dy<-4)e.style.transform='translate(-50%,'+dy+'px)';});
  var end=function(){if(y0==null)return;y0=null;e.style.transition='';e.style.transform='';if(dy<-28){e.dataset.swiped=1;e.classList.remove('on');setTimeout(function(){if(!e.classList.contains('on'))e.hidden=true;},300);}};
  e.addEventListener('pointerup',end);e.addEventListener('pointercancel',end);});}
-function newsFlash(t){flashSwipe();var e=$('newsflash');if(!e)return;var ne=$('noteflash');if(ne&&!ne.hidden){ne.classList.remove('on');ne.hidden=true;}setT('nf-head',t);var nfm=e.querySelector('.nf-mast');if(nfm&&G)nfm.textContent='The Shrimp Times · '+dateOf(G.day);flashTop(e);e.hidden=false;e.classList.remove('on');void e.offsetWidth;e.classList.add('on');clearTimeout(NF);NF=setTimeout(function(){e.classList.remove('on');setTimeout(function(){if(!e.classList.contains('on'))e.hidden=true;},400);},9000);}
+function newsFlash(t){if(G)introMark();flashSwipe();var e=$('newsflash');if(!e)return;var ne=$('noteflash');if(ne&&!ne.hidden){ne.classList.remove('on');ne.hidden=true;}setT('nf-head',t);var nfm=e.querySelector('.nf-mast');if(nfm&&G)nfm.textContent='The Shrimp Times · '+dateOf(G.day);flashTop(e);e.hidden=false;e.classList.remove('on');void e.offsetWidth;e.classList.add('on');clearTimeout(NF);NF=setTimeout(function(){e.classList.remove('on');setTimeout(function(){if(!e.classList.contains('on'))e.hidden=true;},400);},9000);}
 var noticeQueue=[];function toast(msg){if(noticeQueue[noticeQueue.length-1]!==msg)noticeQueue.push(msg);if(!toastT)showNotice();}
 function showNotice(){if(!noticeQueue.length||(renderMilestone.last==='tenyears'&&$('milestone-card')&&!$('milestone-card').hidden)){noticeQueue=[];toastT=null;return;}var msg=noticeQueue.shift(),e=$('toast');e.textContent=msg;e.classList.add('on');toastT=setTimeout(function(){e.classList.remove('on');toastT=null;showNotice();},msg.length>70?6000:2400);}
 
@@ -4102,9 +4102,12 @@ var SPOT_T={look:function(){return document.getElementById('tankview');},market:
  eproj:'silent',eshops:'silent',ereg:'silent',efarm:'silent',excel500:spotTo('excelcard','market'),packLow:function(){var r=$('row-maxN');return r&&spotShown(r)?r:spotTo('c-staff','emp')();}};
 var SPOT_MSG={look:'Tap the tank to check your shrimp up close or clean the glass.',wc:'Water care is open. Change some water to clear out waste and bring KH and GH back up.',sell:'The Ads tab is open. Ads bring more buyers.',up:'Gear is open. Upgrades for your tank live here.',
  speed4:'4× speed is open. Your first farm is running.',speed12:'12× speed is open.',speed40:'40× speed is open.',eproj:'Projects are open. Some cost money, some need ✦.',eshops:'Shops are open. More places sell your kits.',ereg:'Regions are open. Open new ones to reach more people.',efarm:'Farms are open. They breed shrimp for kits.'};
+// One clock for anything new (cards, spotlights, notes, news): 15 s of play since the last one. Paused time doesn't count.
+function introOK(){var p=ensureProgress(G),n=storyClock(G);return p.lastAck==null||n-p.lastAck>=CARD_GAP||n<p.lastAck;}
+function introMark(){var p=ensureProgress(G),n=storyClock(G);if(p.lastAck==null||p.lastAck<n)p.lastAck=n;}
 function spotlight(target,text){if(G.opt.all)return;SPOTQ.push({t:target,text:text});if(!SPOT){SPOT={wait:1};setTimeout(function(){if(SPOT&&SPOT.wait)SPOT=null;spotNext();},60);}}
 function spotNext(){if(SPOT&&SPOT.on)return;var s=SPOTQ[0];if(!s){SPOT=null;return;}
- var gap=s.now?0:15000-(Date.now()-(spotWatch.last||0));if(gap>0){SPOT={wait:1};setTimeout(function(){SPOT=null;spotNext();},gap);return;}
+ if(!s.now&&!introOK()){SPOT={wait:1};setTimeout(function(){SPOT=null;spotNext();},700);return;}
  if(!$('milestone-card').hidden||!$('hcheck').hidden||!$('tsheet').hidden||!$('finsheet').hidden||TVLOCK){SPOT={wait:1};setTimeout(function(){SPOT=null;spotNext();},700);return;}
  SPOTQ.shift();var el=typeof s.t==='function'?s.t():s.t;if(!el||!spotShown(el)){spotNext();return;}
  // 1 freeze: pause and block the screen  2 camera: glide to the thing  3 spotlight it, with a small buzz
@@ -4144,14 +4147,14 @@ function spotWatch(){var o=G.opt;if(o.all||G.progress.queue[0]==='intro'||TVLOCK
  // shrimp are in but time is stopped: show the play button first, before anything else
  if(!o.pauseTold&&!kitsOpen(G)&&speed===0&&allN(G)>=1&&!SPOT&&!SPOTQ.length&&$('milestone-card').hidden){var pb=document.querySelector('#speed [data-speed="1"]');if(pb&&spotShown(pb)){o.pauseTold=1;o.nudge=1;SPOTQ.unshift({t:pb,text:'The game is paused. Tap 1× to let time run, your shrimp only eat, grow and breed while it does.',now:1});spotNext();return;}}
  // feeding and water run themselves: a short guided look at culling, once
- var T0c=G.tanks[0];if(!o.cullTour&&!o.cullGuided&&T0c&&T0c.feeder&&T0c.autoWC&&activeTab==='tank'&&!SPOT&&!SPOTQ.length&&$('milestone-card').hidden&&Date.now()-(spotWatch.last||0)>=15000&&cullSample(T0c,1).length){var tvc=$('tankview');if(tvc&&spotShown(tvc)){o.cullTour=1;spotlight(tvc,'Feeding and water run themselves now, so you can work on colour. Tap the tank, then Check shrimp, and pick out the ones you don\u2019t want breeding.');return;}}
+ var T0c=G.tanks[0];if(!o.cullTour&&!o.cullGuided&&T0c&&T0c.feeder&&T0c.autoWC&&activeTab==='tank'&&!SPOT&&!SPOTQ.length&&$('milestone-card').hidden&&introOK()&&cullSample(T0c,1).length){var tvc=$('tankview');if(tvc&&spotShown(tvc)){o.cullTour=1;spotlight(tvc,'Feeding and water run themselves now, so you can work on colour. Tap the tank, then Check shrimp, and pick out the ones you don\u2019t want breeding.');return;}}
  // one new thing at a time, with some play in between
- if(SPOT||SPOTQ.length||Date.now()-(spotWatch.last||0)<15000)return;
+ if(SPOT||SPOTQ.length||!introOK())return;
  var t=tabs.find(function(t){return !o.spotSeen['tab-'+t.dataset.tab];});if(t){o.spotSeen['tab-'+t.dataset.tab]=1;var msg=SPOT_TAB[t.dataset.tab],pn=$('p-'+t.dataset.tab),fc=pn&&Array.from(pn.querySelectorAll('.card[id]')).find(function(c){return SPOT_INFO[c.id]&&SPOT_QUIET.indexOf(c.id)<0&&!o.spotSeen[c.id]&&!c.hidden&&!c.closest('[hidden]:not(.panel)');});if(fc){o.spotSeen[fc.id]=1;msg+=' '+SPOT_INFO[fc.id];}spotlight(t,msg);return;}
  var fcash=$('b-cash');if(!o.spotSeen.finsheet&&finOpen(G)&&fcash&&spotShown(fcash)){o.spotSeen.finsheet=1;spotlight(fcash,'Tap your cash for money over time and what each team costs a day.');return;}
  var c=cards.find(function(c){return !o.spotSeen[c.id]&&spotShown(c);});if(c){o.spotSeen[c.id]=1;spotlight(c,SPOT_INFO[c.id]);}}
 function spotOpenCard(el){if(el.tagName==='DETAILS'&&!el.classList.contains('coll')){el.open=true;return;}if(!el.classList||!el.classList.contains('coll'))return;var o=G.opt,k=el.dataset.k;el.classList.remove('queued','shut');if(o.shut)o.shut[k]=false;o.cardQueue=(o.cardQueue||[]).filter(function(x){return x.k!==k;});o.activeCard={k:k,tab:activeTab};if(el.tagName==='DETAILS')el.open=true;}
-function spotClose(){if(SPOT&&SPOT.on&&!SPOT.ready)return;$('spot').hidden=true;var wc=$('spot-btn');if(wc)wc.remove();spotWatch.last=Date.now();if(SPOT&&SPOT.on){var pg=ensureProgress(G),sc=storyClock(G);if(pg.lastAck==null||pg.lastAck<sc)pg.lastAck=sc;}var p=SPOT&&SPOT.on?SPOT.prev:null;SPOT=null;if(p!=null)setSpeed(p);if(SPOTQ.length)setTimeout(spotNext,250);}
+function spotClose(){if(SPOT&&SPOT.on&&!SPOT.ready)return;$('spot').hidden=true;var wc=$('spot-btn');if(wc)wc.remove();spotWatch.last=Date.now();if(SPOT&&SPOT.on)introMark();var p=SPOT&&SPOT.on?SPOT.prev:null;SPOT=null;if(p!=null)setSpeed(p);if(SPOTQ.length)setTimeout(spotNext,250);}
 
 // ----- Care card: health checks and treats -----
 // ----- Tank view: a small animated picture of a tank, drawn from a sample of the real colony -----
