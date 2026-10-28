@@ -948,7 +948,7 @@ function charSpr(n,tag,f,face,flip){var m=AM('chars',n);if(!m||!IMG['an-'+n])ret
 function catSpr(pose,f,face){var t=CACHE.cat[pose]||(CACHE.cat[pose]=[]);
   if(AM('chars','pierre')&&IMG['an-pierre'])return cached(t,'p'+f*2+(face<0?1:0),function(){
     // her 15-frame walk (28 Oct) faces left; walking right is the same frames mirrored
-    if(pose==='walk')return charSpr('pierre','walk-left',f,-face,true);
+    if(pose==='walk')return charSpr('pierre',AM('chars','pierre').poses.walk?'walk':'walk-left',f,-face,true);
     if(pose==='nap')return charSpr('pierre','nap',f,face,true);
     if(pose==='reach'||pose==='paw')return charSpr('pierre','look-up',0,face,true);
     return charSpr('pierre','sit',f,face,true);});
@@ -1203,12 +1203,17 @@ function catDecide(){var c=L.cat,r=catRoom();if(!c||!r)return;var roll=Math.rand
   if(roll<0.7){var sun=catSunSpot();if(sun){var stl=tileOf(sun[0],sun[1]);catGo(stl,sun[0],sun[1],function(){c.st='nap';c.t=0;c.dur=14+Math.random()*20;});return;}}
   var ts=catTiles();if(!ts.length)return catIdle();var t=pick(ts);catGo(t,(t[0]+0.2+Math.random()*0.6)*T,(t[1]+0.4+Math.random()*0.4)*T,function(){c.st='sit';c.t=0;c.dur=3+Math.random()*5;});}
 function catIdle(){var c=L.cat;c.st='sit';c.t=0;c.dur=3+Math.random()*4;}
+// Pierre's walk as Puti set it in the walk editor (28 Oct): where he stands on each walk frame in art px, how far one cycle
+// goes, 15 frames a second. He moves only by what the frame says, so the paws on the ground stay put. Drawn at CHK.
+var PW_POS=[0,2,4,8,12,14,16,19,20,23,28,31,35],PW_LOOP=37,PW_FPS=15;   // frame 15 left out too: 6-14, 16-19
+function pwAlong(p){var n=Math.floor(p/PW_POS.length),k=Math.floor(p)%PW_POS.length;return n*PW_LOOP+PW_POS[k];}
+function catStep(c,dt){var p0=c.wp||0,p1=p0+dt*PW_FPS,d=pwAlong(p1)-pwAlong(p0);c.wp=p1%PW_POS.length;return Math.max(0,d)*CHK;}
 function stepCat(dt){var c=L.cat;if(!c)return;c.anim+=dt;if(c.hop>0)c.hop=Math.max(0,c.hop-dt);if(c.reach>0){c.reach=Math.max(0,c.reach-dt);return;}c.t+=dt;
   if(c.st==='walk'){if(c.on){var f=c.on;c.on=null;c.x=clamp(c.x,f.tx*T+10,(f.tx+f.fw)*T-10);c.y=(f.ty+f.fh)*T+16;}
-    if(c.q.length){var tg=c.q[0],dx=tg[0]-c.x,dy=tg[1]-c.y,d=Math.hypot(dx,dy),v=52*dt;if(d<=v){c.x=tg[0];c.y=tg[1];c.q.shift();}else{c.x+=dx/d*v;c.y+=dy/d*v;if(Math.abs(dx)>0.5)c.face=dx>0?1:-1;}}
+    if(c.q.length){var tg=c.q[0],dx=tg[0]-c.x,dy=tg[1]-c.y,d=Math.hypot(dx,dy),v=catStep(c,dt);if(d<=v){c.x=tg[0];c.y=tg[1];c.q.shift();}else{c.x+=dx/d*v;c.y+=dy/d*v;if(Math.abs(dx)>0.5)c.face=dx>0?1:-1;}}
     else{var th=c.then;c.then=null;c.st='sit';c.t=0;c.dur=2;if(th)th(true);}return;}
   if(c.t>c.dur){if(c.st==='nap'){c.st='sit';c.t=0;c.dur=2+Math.random()*2;return;}if(c.st==='paw'){c.tank=null;}catDecide();}}
-function catFrame(){var c=L.cat,p='sit',f=0;if(c.reach>0)p='reach';else if(c.hop>0)p='sit';else if(c.st==='walk'){p='walk';var wp=AM('chars','pierre'),wn=wp&&wp.poses['walk-left']?wp.poses['walk-left'][1]:4;f=Math.floor(c.anim*(wn>4?12:7))%wn;}else if(c.st==='nap'){p='nap';f=Math.floor(c.anim/1.6)%2;}else if(c.st==='paw'){p='paw';f=Math.floor(c.anim/0.35)%2;}else f=(c.anim%4)<0.18?1:0;L.cfPose=p;L.cfIdx=f;}
+function catFrame(){var c=L.cat,p='sit',f=0;if(c.reach>0)p='reach';else if(c.hop>0)p='sit';else if(c.st==='walk'){p='walk';f=Math.floor(c.wp||0)%PW_POS.length;}else if(c.st==='nap'){p='nap';f=Math.floor(c.anim/1.6)%2;}else if(c.st==='paw'){p='paw';f=Math.floor(c.anim/0.35)%2;}else f=(c.anim%4)<0.18?1:0;L.cfPose=p;L.cfIdx=f;}
 function petCat(){var c=L.cat;if(!c)return;if(c.on||c.st==='walk'||c.st==='paw'){c.hop=0.45;}else{c.reach=1.4;}if(c.st==='nap'){c.st='sit';c.t=0;c.dur=2.5;}puff('heart',c.x,c.y-(c.reach>0?100:c.on?44:56),1,{speed:0,up:26,life:1.1});sfx('pop',{v:0.5});if(!LS().seen.cat){LS().seen.cat=1;toast('Pierre likes that.');}}
 
 // ----- camera: follows Millie softly -----

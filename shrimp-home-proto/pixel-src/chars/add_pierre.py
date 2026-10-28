@@ -16,6 +16,27 @@ wl = poses['walk-left']
 while wl[1] > 1 and list(fr[wl[0] + wl[1] - 1].getdata()) == list(fr[wl[0] + wl[1] - 2].getdata()): wl[1] -= 1
 # Puti, 28 Oct: frame 5 is left out too, the walk is 6-19
 wl[0] += 1; wl[1] -= 1
+# her head numbers from the walk editor (28 Oct): the front (head and shoulders, x 0-34, y 0-35) moves up or down as one piece,
+# a raised front fills the row it leaves from the row under it. These become the 'walk' pose, after her own frames.
+# frames 6-19 without 15 (Puti, 28 Oct, try it without), 1-based as in Aseprite
+WALK = [6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19]
+HEAD = [0, 0, -1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1]
+FX, FY = 34, 35
+def bob(f, dy):
+    if not dy: return f.copy()
+    o = f.copy(); front = f.crop((0, 0, FX + 1, FY + 1))
+    o.paste((0, 0, 0, 0), (0, 0, FX + 1, FY + 1))
+    if dy < 0: o.paste(f.crop((0, FY, FX + 1, FY + 1)), (0, FY))
+    o.alpha_composite(front, (0, dy)) if dy < 0 else None
+    if dy > 0:
+        o.alpha_composite(front.crop((0, 0, FX + 1, FY + 1 - dy)), (0, dy))
+    return o
+walk = [bob(fr[n - 1], HEAD[k]) for k, n in enumerate(WALK)]
+assert len(walk) == len(HEAD), (len(walk), len(HEAD))
+poses['walk'] = [len(fr), len(walk)]
+fr = fr + walk
+im = Image.new('RGBA', (w * len(fr), h))
+for i, f in enumerate(fr): im.alpha_composite(f, (i * w, 0))
 for i, f in enumerate(fr):
     bb = f.getbbox()
     assert not bb or (bb[0] > 0 and bb[1] > 0 and bb[2] < w and bb[3] < h), ('frame', i + 1, 'touches the edge')
