@@ -138,7 +138,11 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **Tank**: the land's "Your tank" follows the game's tank 1 (`landOwn`: adults at 75 days, young, mean grade). Shrimp netted out of it there (moved to another tank there, or sold there) leave tank 1 (`landTake`). Finishing a tank job there counts as care (`careDone`).
 - **Time** on the land is real time (a second is a second, days are real days) and the light follows the player's clock. Time away is caught up when it opens, up to 30 days.
 - The land saves in its own localStorage key `shrimp-land-v1`.
-- Hens lay on their own clock in the game (`eggClock`, a go every 2 real hours), because the land's `day` hook only fires once a real day there. Anything else that ticks in `day` (grass, feeders, wild chickens) is real-day slow in the game too.
+- Eggs run on the company's clock (`eggClock`, `eggDay`, game day from the `cash` message, `GDAY`): every hen lays one egg a game day, so time that flies in the company fills the coop. Coop eggs go off after 28 days in winter down to 14 in summer (`outdoorT`, `eggLife`, wear in `eggW`), collected eggs keep. Away over 40 days, the coop holds only the last 40 days. Eggs sell for AED 3 (`EGG_AED`). Collecting says how many had gone off.
+- Mowing pays: Grandma gives AED 1 a tile, up to 300 tiles a game day (`mowPay`, `mowSettle`, `MOW_CAP`), paid 3 s after the mower stops, on a tool change or on Back.
+- Bird sizes follow real length, bill to tail, at 2.5 art px a cm (`BIRD_PXCM`, `birdK`, `shrinkSpr`): sunbird 10 cm, bulbul 18, myna 23 (as drawn), kingfisher 24, hoopoe 27, parakeet 40. Hens are not on that scale yet (a hen is drawn about the size of a myna).
+- Anything else that ticks in `day` (grass, feeders, wild chickens) is real-day slow in the game.
+- Grandpa is dead on the land too: her armchair lines talk about him in the past.
 - No Next bar in the game (Pass 125): guide lines go to the ? popup only, the button glow stays.
 
 ## How to read Puti's requests

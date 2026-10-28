@@ -1162,3 +1162,12 @@ BUILD 2026-10-28-feel.
 - Review by a separate agent, then fixed: film choices were still side by side (`.item .hb` flex beat `.forkb`), now one row each with the cost under them. Water chip goes inline only when water numbers are off (they cut the tank chips). Gear buy buttons back to green like every other tab, groups stay flat. Social media manager button green like Hire. `itemHTML` also stacks when the button text is long (AED + ✦ costs). Wait line left-aligned. Price chip "Avg AED X" so the grade hint fits at 360 px.
 - Left: "0 more stores to go" still shows once malls are full. Propaganda-style rows show "Turn it down" above the price (it lives in the description).
 - Follow-up: "Turn it down" sits beside the price as an equal button (`projBtns`, `.nopick`), not inside the description. Shops reads "A store in every fifth mall in your regions." once no malls are left (was "0 more stores to go").
+
+## Pass 139: Grandma's land: eggs on the company clock, paid mowing, real bird sizes, a plainer land event (28 Oct)
+
+- Eggs: one per hen per game day, on the company's clock (the game now sends `day` with cash). Coop eggs go off after 28 days in winter, 14 in summer (outdoor shade temperature). Over 40 days away, only the last 40 days are in the coop. Eggs sell for AED 3 (was 1). "N eggs in the basket. M had gone off."
+- Mowing: Grandma pays AED 1 a tile, up to 300 a game day, paid in one go 3 s after the mower stops ("Grandma paid AED 17 for the lawn."). The Mow help line says so and drops bee-eaters (there are none).
+- Birds scaled to real length at 2.5 art px a cm, myna as drawn: sunbird x0.36, kingfisher x0.61, bulbul x0.87, hoopoe x0.95, parakeet x0.95. Shrink is smooth then alpha snapped, so edges stay hard.
+- Grandma's armchair lines no longer have Grandpa alive ("Your grandpa says hello", "wants to see the stream").
+- gp_land: no newspaper land listings, she's saved for land near water with room for hens. Doesn't fire once you own the land. gp_scam: no gala, borrowed suit or face in the papers, no influence or mood from it. Its test changed to match.
+- Balance 87, academy 10, me 46. In Playwright on home.html: 3 hens give 3 eggs a day, 87 after 40 winter days (33 gone off), 45 in August, 45 after 860 days away. Drag-mowing 17 tiles paid AED 17 after the pause. Birds rendered side by side. Bots, spotlights and monkey not run (no balance change in the company).
