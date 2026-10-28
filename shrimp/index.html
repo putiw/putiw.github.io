@@ -2142,7 +2142,7 @@ function breederProtection(T){var result=new Map(),left=(T.set.keep||0)-boughtAd
  return result;}
 function spareKitShrimp(G){var n=0;G.tanks.forEach(function(t){var p=breederProtection(t);t.pop.forEach(function(k){if(k.age>=20&&!k.b)n+=Math.max(0,Math.floor(k.n-(p.get(k)||0)));});});return n;}
 // Short reason on the Sell button when nothing can be sold.
-function sellWhyNot(G){if(allN(G)<1)return 'No shrimp';if(hungover(G))return 'Hungover, no sales today';if(sellableStock(G)>0&&demandLeft(G)<1)return 'Buyers next week';var next=Infinity;G.tanks.forEach(function(t){var p=breederProtection(t);t.pop.forEach(function(k){if(k.n-(p.get(k)||0)>=1)next=Math.min(next,Math.max(0,Math.max(45,t.set.sellAge)-k.age));});if(t.clutches.length)next=Math.min(next,Math.min.apply(null,t.clutches.map(function(c){return c.due-clock(G)+Math.max(45,t.set.sellAge);})));});return isFinite(next)?'Ready in ~'+Math.max(1,Math.ceil(next))+' d':'Growing';}
+function sellWhyNot(G){if(allN(G)<1)return 'No shrimp';if(hungover(G))return 'Hungover, no sales today';if(sellableStock(G)>0&&demandLeft(G)<1)return 'Buyers back in '+(7-G.day%7)+' d';var next=Infinity;G.tanks.forEach(function(t){var p=breederProtection(t);t.pop.forEach(function(k){if(k.n-(p.get(k)||0)>=1)next=Math.min(next,Math.max(0,Math.max(45,t.set.sellAge)-k.age));});if(t.clutches.length)next=Math.min(next,Math.min.apply(null,t.clutches.map(function(c){return c.due-clock(G)+Math.max(45,t.set.sellAge);})));});return isFinite(next)?'Ready in ~'+Math.max(1,Math.ceil(next))+' d':'Growing';}
 function saleForecast(G){
   var stock=sellableStock(G);if(stock>0)return Math.round(stock)+' ready · '+Math.round(demandLeft(G))+' buyers left this week.';
   var next=Infinity,protectedN=0;

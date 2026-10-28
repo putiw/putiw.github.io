@@ -1204,3 +1204,7 @@ BUILD 2026-10-28-feel.
 - Balance 88, academy 10, me 46.
 - Bots: strong 2,428, kind 3,187 (both same), average Earth 6,525 / space 7,936 (same). Spotlight sweep 118 all good. Monkey 28,050 taps, 0 problems.
 - Deployed (BUILD water-test).
+
+## Pass 144: Sell line counts down to the buyer reset (28 Oct)
+- When the week's buyers are used up, the top Sell line reads "Buyers back in N d" (days until the weekly reset, `G.day%7`) instead of "Buyers next week".
+- Balance 88, academy 10, me 46.
