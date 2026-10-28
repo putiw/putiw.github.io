@@ -1137,3 +1137,4 @@ BUILD 2026-10-28-feel.
 - Babies card: "they don't get sold", "sold at 60 days old" and "keep them alive" in bold (`bold` on the milestone, `setEmphasisText`).
 - Early game check: average-bot money to day 300 is identical before and after today's passes, nothing in the early sim changed.
 - Balance 87, academy 10, me 46. Checked at 360 px.
+- Deployed bc2e28e. Before it: bots 2,428 / 3,187 / 6,497 (unchanged), spotlight sweep 119 checked all good, monkey 28,061 taps, 0 problems.
