@@ -619,13 +619,14 @@ var hi=0;for(d=365;d<730;d+=5){g.day=d;hi=Math.max(hi,roomT(g,d));}if(!(hi>29))t
 var k=newGame();k.emp.kitsOpened=1;k.emp.staff.tier=2;k.emp.staff.pack=2;k.money=1e5;k.humans=5000;k.tanks[0].pop=[{age:90,n:12,g:50}];if(!(packCap(k)>1))throw Error('Packers');
 for(var i=0;i<4;i++)packDay(k);if(k.emp.packLow<3)throw Error('Short days counted');k.tanks[0].pop=[{age:90,n:2000,g:50}];packDay(k);if(k.emp.packLow)throw Error('Reset when packing works');
 `);
-check('Pass 141: Keep in tanks shows as the limit, the packaging machine can be stopped',`
+check('Pass 141: Pack above shows as the limit, the packaging machine can be stopped',`
 var g=newGame();g.emp.proj=g.emp.proj||{};g.emp.proj.autopackm=1;if(!pd(g,'autopackm'))g.emp.proj.autopackm={done:1};
 var on=packingMachineCap(g);g.emp.machOff=1;if(!(on>=20)||packingMachineCap(g)!==0)throw Error('Stopped machine packs nothing: '+on);g.emp.machOff=0;
 g.packPerL=4.5;g.tanks[0].vol=640;g.tanks[0].pop=[{age:90,n:1220,g:50}];var kb=keepBlocks(g);if(!kb||kb.keep<2880||kb.have<1220)throw Error('Under Keep in tanks is the block');
 g.packPerL=1;if(keepBlocks(g))throw Error('Lower keep frees shrimp');
-if(!html.includes("data-act=\\"machtog\\"")&&!html.includes("bbtn('machtog'"))throw Error('Stop button');
 `);
+if(!html.includes("bbtn('machtog'")||!html.includes('<label for="s-maxN">Pack above</label>'))throw Error('Stop button and Pack above label (Pass 141)');
+if(!html.includes("$('row-maxN').hidden=!(G.kits.sold>=10||G.opt.all)||ownTank(G)||tankGone(G);"))throw Error('Pack above hides once only the home tank is left');
 check('Pass 135: top Sell hides when salespeople sell every tank, Excel spotlight at AED 500, QC card is optional',`
 var g=newGame();g.tanks[0].had=1;g.stats.sold=100;g.emp.staff.sales=1;g.tanks.forEach(function(t){t.set.autoSell=true;});
 `);

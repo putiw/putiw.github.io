@@ -596,9 +596,9 @@ h1,h2,h3,h4,summary,button,.btn,label,th,.scope-label{text-wrap:balance}p,li,sma
   <div class="card coll" data-k="staff" id="c-staff" hidden><div class="hd"><h2>Making kits</h2><small id="e-staffsum"></small></div>
     <p class="sub explain">Packers and machines turn shrimp into kits. A better packing table or the AI camera makes each packer faster. Staff are paid daily.</p>
     <div id="kit-steps" hidden></div>
-    <div class="ctl" id="row-maxN"><label for="s-maxN">Keep in tanks</label><input type="range" id="s-maxN" min="1" max="8" step="0.5"><span class="v" id="v-maxN"></span></div>
+    <div class="ctl" id="row-maxN"><label for="s-maxN">Pack above</label><input type="range" id="s-maxN" min="1" max="8" step="0.5"><span class="v" id="v-maxN"></span></div>
     <p class="hint" id="e-kithint"></p>
-    <p class="hint explain" id="h-maxN">Keep in tanks is shrimp per litre left in your tanks to breed. Packing only takes shrimp above it. About 3 keeps breeding fast.</p>
+    <p class="hint explain" id="h-maxN">Pack above is shrimp per litre left in your tanks to breed. Packing only takes shrimp above it. About 3 keeps breeding fast.</p>
     <div class="packrow" id="kit-packrow"><button class="btn primary" data-act="pack" data-n="1" id="btn-pack1">Pack 1</button><button class="btn" data-act="pack" data-n="10" id="btn-pack10">Pack 10</button><button class="btn" data-act="kitprice" hidden id="btn-kitprice">Market price</button></div>
     <div id="e-staff"></div>
     </div>
@@ -1168,7 +1168,7 @@ function kitDemand(G){
   return Math.min((kitAware(G)+G.emp.beta*opMult(G)*welfareMult(G)*wordOfMouth(G)*trust(G)*G.humans)*painMult(G)*(1+salesBoost(G))*sat*Math.pow(KIT_REF/G.kitPrice,2)*workMult(G)/hhDiv(G),room/(effectiveQuality(G)*HH_AVG)+1);
 }
 function kitSupply(G){return Math.min(packCap(G),farmCap(G)+tankSurplusKits(G)+(G.emp.rawShrimp||0)/KIT_SHRIMP);}
-function keepBlocks(G){if(tankSurplusKits(G)>=1)return null;var have=0,keep=0;G.tanks.forEach(function(T){have+=totalN(T);keep+=packAbove(G,T);});return have>=KIT_SHRIMP&&keep>0?{have:have,keep:keep}:null;}
+function keepBlocks(G){if(farmCap(G)>=1||tankSurplusKits(G)>=1)return null;var have=0,keep=0;G.tanks.forEach(function(T){have+=totalN(T);keep+=packAbove(G,T);});return have>=KIT_SHRIMP&&keep>0?{have:have,keep:keep}:null;}
 function tankSurplusKits(G){var t=0;G.tanks.forEach(function(T){t+=Math.max(0,Math.floor((totalN(T)-packAbove(G,T))/KIT_SHRIMP));});return t;}
 function bestKitPrice(G){var sup=Math.max(0.5,kitSupply(G)+G.kits.stock/14),d=kitDemand(G);if(d<=0)return G.kitPrice;
   var p=G.kitPrice*Math.sqrt(d/sup),lo=Math.max(100,Math.ceil(productionUnitCost(G)*(G.vat?1.05:1)*1.2/10)*10);return clamp(Math.round(p/10)*10,Math.min(lo,600),600);}
@@ -1182,7 +1182,7 @@ function bottleneck(G){
   if(!pc)r={k:'packing',d:'Limit: packing. Nobody packs kits daily.',f:'Pack by hand, then buy a packing bench in Kits.'};
   else if(pc<Math.min(d,fc+(E.rawShrimp||0)/KIT_SHRIMP))r={k:'packing',d:'Limit: packing. Packs '+big(pc)+'/day, breeding supports '+big(fc)+'.',f:'More packers or machines in Kits.'};
   else if(G.money<operatingReserve(G)+productionUnitCost(G))r={k:'cash',d:'Limit: cash. Production pauses to protect your reserve.',f:'Earn cash first, or lower the reserve under Money.'};
-  else if(keepBlocks(G)){var kb=keepBlocks(G);r={k:'keep',d:'Limit: Keep in tanks. Your tanks have '+big(kb.have)+' shrimp, it keeps '+big(kb.keep)+'. Packing only takes what is above it.',f:'Lower Keep in tanks in Kits, or let the colony grow.'};}
+  else if(keepBlocks(G)){var kb=keepBlocks(G);r={k:'keep',d:'Limit: Pack above. Your tanks have '+big(kb.have)+' shrimp, packing starts at '+big(kb.keep)+'.',f:'Lower Pack above in Kits, or let the colony grow.'};}
   else r={k:'shrimp',d:'Limit: breeding. Supports '+big(fc)+' kits/day, orders '+big(d)+'.',f:'Add farms in Gear.'};
  }
  else if(wordOfMouth(G)<0.75&&G.humans>=2e4)r={k:'demand',d:'Limit: marketing. Only '+Math.round(wordOfMouth(G)*100)+'% of the word of mouth you could have is reaching people. The bigger you get, the more marketing it takes.',f:'More stores, ads and brand work in Ads.'};
@@ -3869,7 +3869,7 @@ function updateReveal(){
   if(G.stats.sold>0||(had&&sellableStock(G)>0))fire('sell','Ads tab open: ads bring buyers.');
   if(had&&(G.ob.feeds>=3||G.stats.born>0||G.stats.sold>0||T0.chem.temp>27.5||T0.chem.temp<20))fire('up','Gear tab open.');
   if(G.stats.born>0&&(G.ob.feeds||0)>=1)fire('look','Tap the tank to check your shrimp up close or clean the glass.');
-    if(kitsOpen(G)&&(G.emp.packLow||0)>=3&&packCap(G)){var pc=packCap(G),pk=Math.round(G.emp.packed||0),lim=G.tanks.some(function(t){return t.had&&totalN(t)-packAbove(G,t)<KIT_SHRIMP&&spareTankShrimp(t)>=KIT_SHRIMP;});fire('packLow','Your packers can do '+cnt(pc)+' kit'+(pc>1?'s':'')+' a day, they packed '+pk+'. '+(lim?'They only take shrimp above Keep in tanks, and your tanks are at or under it. Lower it, or let the colony grow.':'There aren’t enough shrimp for that. More breeders and more tanks make more babies.'));}
+    if(kitsOpen(G)&&(G.emp.packLow||0)>=3&&packCap(G)){var pc=packCap(G),pk=Math.round(G.emp.packed||0),lim=G.tanks.some(function(t){return t.had&&totalN(t)-packAbove(G,t)<KIT_SHRIMP&&spareTankShrimp(t)>=KIT_SHRIMP;});fire('packLow','Your packers can do '+cnt(pc)+' kit'+(pc>1?'s':'')+' a day, they packed '+pk+'. '+(lim?'Your tanks are at or under Pack above, so nothing is spare. Lower it, or let the colony grow.':'There aren’t enough shrimp for that. More breeders and more tanks make more babies.'));}
     if(!G.excel&&G.money>=500)fire('excel500','AED 500 in the bank. An online Excel course in Trade, AED 100, shows you where the money goes.');
     if(farmBuilt(G))fire('speed4','4× is now available: your first farm is running.');if(maxSpeed(G)>=12)fire('speed12','12× is now available: a million owners and a profitable automated business.');if(maxSpeed(G)>=40)fire('speed40','40× is now available: everyone on Earth has a tank.');
   if(kitsOpen(G)){var E0=G.emp,sc0=shopCount(G);
@@ -4074,7 +4074,7 @@ var HELP={
  equipcard:'Upgrades are for the selected tank. Bigger tanks swing less and hold more shrimp. The fan cools by evaporation, Gulf summer rooms reach about 29 °C, too warm for shrimp. Mossy rocks give shrimplets somewhere to hide and graze, the 40% is for babies under 30 days. Driftwood grows biofilm they graze all day. Almond leaves steep tannins for healthy molts. Stem plants and floaters feed on nitrate, so water changes go further. Spinach fills them up, bee pollen is protein for berried females.',
  tankscard:'Each new tank needs cycling or a bacteria starter. More tanks, more breeders.',
  autocard:'Runs every day for every tank that has the gear.',
- 'c-staff':'Packers, tools and machines make kits from spare shrimp. Packing only takes shrimp above Keep in tanks.',
+ 'c-staff':'Packers, tools and machines make kits from spare shrimp. Packing only takes the shrimp over Pack above.',
  'qccard':'A sick kit dies in someone’s home and costs influence ✦. A QC round catches some of them and lasts 30 days. Stricter checks throw out more shrimp, so each kit costs more, but fewer die. You can buy a machine for each step. Skipping it is fine, more kits just die.',
  'c-sales':'Salespeople sell tank shrimp every day, each one brings 25% more shrimp and kit customers, up to 4. Each shop manager runs 4 shops, shops without one work at half strength. Paid daily.',
  'c-kits':'Every kit takes 8 shrimp at least 20 days old, never breeders or bought ones.',
@@ -4998,7 +4998,7 @@ function updateEmpire(){
     setT('e-kithint',packCap(G)>0&&(G.kits.sold>=10||G.opt.all)?big(stEx)+' ready to pack · '+big(Math.max(0,Math.floor(spare)-stEx))+' kept to breed'+mats:'Spare shrimp: '+big(Math.floor(spare))+' · a kit takes '+KIT_SHRIMP+mats);
     var ks=kitStage(G),w=E.kitWip||{mat:0,shrimp:0},stepMode=!stationDone(G);
     var mg=G.kitPrice/(G.vat?1.05:1)-productionUnitCost(G);var kpLock=G.kits.sold<50&&!G.emp.won,kps=$('s-kitPrice');kps.disabled=kpLock;$('kit-pricerow').classList.toggle('locked',kpLock);if(document.activeElement!==kps&&+kps.value!==G.kitPrice){kps.value=G.kitPrice;setT('v-kitPrice','AED '+G.kitPrice);}setT('kit-margin',kpLock?'Fixed for your first 50 kits.':G.emp.won?'Everyone has a tank. Farms stop breeding new kit stock. Sell the ones you don\u2019t need to save upkeep.':ks?(mg<0?'Loss ':'Profit ')+aed(Math.abs(mg))+'/kit · '+(dem<Math.max(1,rk*0.2)&&rk>=1?'~'+(rk<10?trim(rk,1):big(rk))+' orders/day, only as spots open up in your reach':'~'+(dem<10?trim(dem,1):big(dem))+' orders/day at this price'):'');$('kit-margin').style.color=mg<0?'var(--bad)':'';
-    $('kit-steps').hidden=!stepMode;$('kit-sub').hidden=ks===0;$('kit-pricerow').hidden=ks===0;$('kit-margin').hidden=ks===0;$('row-maxN').hidden=!(G.kits.sold>=10||G.opt.all);$('h-maxN').hidden=$('row-maxN').hidden;$('e-kv').hidden=ks===0;var machines=pd(G,'autopackm');$('kit-packrow').hidden=stepMode||machines;$('e-kithint').hidden=machines;$('btn-pack1').hidden=stepMode;$('btn-pack10').hidden=stepMode;$('btn-kitprice').hidden=true;
+    $('kit-steps').hidden=!stepMode;$('kit-sub').hidden=ks===0;$('kit-pricerow').hidden=ks===0;$('kit-margin').hidden=ks===0;$('row-maxN').hidden=!(G.kits.sold>=10||G.opt.all)||ownTank(G)||tankGone(G);$('h-maxN').hidden=$('row-maxN').hidden;$('e-kv').hidden=ks===0;var machines=pd(G,'autopackm');$('kit-packrow').hidden=stepMode||machines;$('e-kithint').hidden=machines;$('btn-pack1').hidden=stepMode;$('btn-pack10').hidden=stepMode;$('btn-kitprice').hidden=true;
     if(ks<2){var kv1=[['In stock',big(G.kits.stock)],['Owners',big(Math.floor(G.humans))]];var h1=kv1.map(function(x){return '<span>'+x[0]+'</span><span>'+x[1]+'</span>';}).join('');if(cache.ekv!==h1){cache.ekv=h1;$('e-kv').mhtml=h1;}}
     if(stepMode)setT('e-kithint','');
     if(stepMode){var kh=packTableHTML(dem);if($('kit-steps').dataset.sig!==kh){$('kit-steps').dataset.sig=kh;$('kit-steps').mhtml=kh;}}
@@ -5015,7 +5015,7 @@ function updateEmpire(){
     if(!st.tier){if(toolsHave(G))h+='<p class="hint">Packers need all five packing tools.</p>';}
     else{
       var selfK=(st.tier===1?1:4)*(pd(G,'aicam')?2:1),mach=packingMachineCap(G),capT=packCap(G);capLine=mach<=0?'':'<p class="sub pack-now">Packing up to <b>'+big(capT)+' kit'+(capT===1?'':'s')+' a day</b>'+(mach>capT*0.9?'.</p>':': '+selfK+' by you at the station'+(st.pack?', '+big(st.pack*PACK_TIERS[st.tier].per*(pd(G,'aicam')?2:1))+' by '+st.pack+' packer'+(st.pack>1?'s':''):', no packers')+(mach>0?', '+big(mach)+' by machines':'')+'.</p>');
-      var kbk=keepBlocks(G);if(kbk)capLine+='<p class="sub">Nothing to pack. Your tanks have '+big(kbk.have)+' shrimp, Keep in tanks keeps '+big(kbk.keep)+'.</p>';
+      var kbk=keepBlocks(G);if(kbk)capLine+='<p class="sub">Nothing to pack. Your tanks have '+big(kbk.have)+' shrimp, packing starts at '+big(kbk.keep)+'.</p>';
       if(G.kits.sold>=10||st.pack)h+=row('pack',(PACK_TIERS[st.tier].per*(pd(G,'aicam')?2:1))+' kits a day each');
       var nt=PACK_TIERS[st.tier+1];if(nt&&G.kits.sold>=20)h+=itemHTML(nt.name,nt.note,bbtn('packtier','',cost2(nt.m,nt.i),G.money>=nt.m+capitalReserve(G)&&E.inf>=nt.i,true,E.inf>=nt.i?nt.m+capitalReserve(G):0));
     }

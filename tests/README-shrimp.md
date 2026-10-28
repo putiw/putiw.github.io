@@ -1190,3 +1190,9 @@ BUILD 2026-10-28-feel.
 - Automatic packaging machine in Making kits has Stop / Start (`G.emp.machOff`). Stopped, it adds 0 to `packingMachineCap`.
 - When every tank is at or under Keep in tanks, the limit line says "Limit: Keep in tanks. Your tanks have X shrimp, it keeps Y." instead of "Limit: breeding... Add farms" (`keepBlocks`, kind `keep`). Making kits shows "Nothing to pack" with the same numbers. Consultant fix points at the slider.
 - Balance 87, academy 10, me 46.
+
+## Pass 142: Pack above (28 Oct)
+- "Keep in tanks" is now "Pack above" everywhere in game text (slider, hint, limit line, packLow alert, Making kits help).
+- The Keep/Pack above limit line only shows with no farm breeding (`keepBlocks` needs `farmCap<1`). Without that the average bot stopped buying farms and failed to finish.
+- The Pack above slider hides once only the home tank is left (`ownTank` or `tankGone`).
+- Balance 88, academy 10, me 46. Bots: strong 2,428, kind 3,187 (both same), average finishes both chapters. Spotlight sweep and monkey not run yet.
