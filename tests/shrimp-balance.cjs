@@ -584,5 +584,15 @@ var a=foodRate(k);k.emp.proj.app=1;if(Math.abs(foodRate(k)-a-CARE_TESTS)>1e-12)t
 `);
 if(html.includes('Mothballed ')||html.includes('is mothballed'))throw Error('No mothball wording');
 if(!html.includes("['foodsales','Food and tank care',1]")||html.includes('earlier-packing'))throw Error('Pass 126: finance line and packing fold');
+check('Pass 127: care plan fork, free costs calls and raises welfare, paid fee set by the player, fewer pay when dear or disliked',`
+var g=newGame();g.emp.kitsOpened=1;g.humans=2e6;if(PROJ.find(p=>p.id==='careplanfree').req(g))throw Error('Needs the care app');g.emp.proj.app=1;if(!forkOpts('careplan').every(p=>p.req(g))||!FORK_Q.careplan)throw Error('Care plan fork');
+var t0=welfareTarget(g);g.emp.proj.careplanfree=1;if(Math.abs(welfareTarget(g)-t0-PLAN_WEL)>1e-9&&welfareTarget(g)<0.99)throw Error('Free plan raises welfare');if(setPlanFee(g,30))throw Error('No fee on the free plan');
+var m=g.money;planDay(g);if(!(g.money<m))throw Error('Free plan costs the calls');
+var k=newGame();k.emp.kitsOpened=1;k.humans=2e6;k.emp.proj.app=1;k.emp.proj.careplanpaid=1;k.emp.op.m=0.5;var s15=planShare(k);setPlanFee(k,40);var s40=planShare(k);if(!(s40<s15)||planFee(k)!==40)throw Error('Dearer, fewer pay');
+setPlanFee(k,999);if(planFee(k)!==60)throw Error('Fee capped');k.emp.op.m=0.2;if(!(planShare(k)<s40))throw Error('Disliked, fewer pay');
+var m2=k.money;setPlanFee(k,15);k.emp.op.m=0.5;planDay(k);if(!(k.money>m2))throw Error('Paid plan earns after the calls');
+if(TRAIT_TAGS.careplanfree.kin<=0||TRAIT_TAGS.careplanpaid.know<=0)throw Error('Care plan traits');
+`);
+if(!html.includes("data-act=\"planfee\"")&&!html.includes("bbtn('planfee'"))throw Error('Pass 127: fee stepper');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

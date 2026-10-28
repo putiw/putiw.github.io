@@ -55,7 +55,7 @@ window.ENDING_TEST_DATA = {
         {
           "id": "labyou",
           "label": "Name it after you",
-          "description": "Donors recognize your name and back the lab. More ✦ every day than any other naming deal.",
+          "description": "Donors recognize your name and back the lab. More influence ✦ every day than any other naming deal.",
           "traits": {
             "drive": 1
           },
@@ -266,7 +266,7 @@ window.ENDING_TEST_DATA = {
         {
           "id": "cullschool",
           "label": "Give them to schools",
-          "description": "Healthy, just not red enough to sell. Teachers set up class tanks. You lose the sales, ✦ every day.",
+          "description": "Healthy, just not red enough to sell. Teachers set up class tanks. You lose some sales, but you gain a little influence ✦ every day.",
           "traits": {
             "kin": 1,
             "means": 0.3
@@ -335,6 +335,34 @@ window.ENDING_TEST_DATA = {
           },
           "heart": -1,
           "endingLine": "Your food pods in every kitchen."
+        }
+      ]
+    },
+    {
+      "id": "careplan",
+      "question": "Owners want someone to call when a tank looks wrong.",
+      "options": [
+        {
+          "id": "careplanfree",
+          "label": "Free care plan for every owner",
+          "description": "Every living tank gets a check-in call each month. It costs you AED 0.50 a tank a month, for as long as they keep it. More tanks thrive.",
+          "traits": {
+            "kin": 0.4,
+            "know": -0.4
+          },
+          "heart": 2,
+          "endingLine": "Every owner gets a call when the tank looks off. Nobody pays for it."
+        },
+        {
+          "id": "careplanpaid",
+          "label": "Sell a monthly care plan",
+          "description": "The calls cost money, the fee pays for them and then some. You set the fee in Owners’ tanks, more people sign up when it’s cheap and people like you.",
+          "traits": {
+            "kin": -0.4,
+            "know": 0.4
+          },
+          "heart": -1,
+          "endingLine": "Your care plan is a line on a billion bank statements."
         }
       ]
     },
@@ -449,7 +477,7 @@ window.ENDING_TEST_DATA = {
     },
     {
       "id": "waste",
-      "question": "Cleaning the water from your hatcheries costs a lot.",
+      "question": "Cleaning the water from your farms costs a lot.",
       "options": [
         {
           "id": "wasteclean",

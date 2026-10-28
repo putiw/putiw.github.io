@@ -818,6 +818,8 @@ var PROJ=[
   {id:'filtercart',c:'fork',a:'emp',fk:'filter',name:'Monthly cartridges',d:'Money every day. Each swap throws away the bacteria living in the old one, and some tanks crash after a change.',m:5e4,i:0,h:-2,req:function(G){return G.humans>=1e4;},end:'A monthly filter cartridge in every home.'},
   {id:'foodopen',c:'fork',a:'emp',fk:'food',name:'Publish a simple recipe',d:'Blanched spinach, pollen, a pinch of algae. Some owners will overfeed. Word of mouth up a little.',m:0,i:0,h:1,req:function(G){return G.humans>=1e5;},eff:function(E){E.beta+=0.002;}},
   {id:'foodpods',c:'fork',a:'emp',fk:'food',name:'Sell measured food pods',d:'Overfeeding kills more shrimp than anything, a pod is the right amount. Only your pods fit, money every day.',m:3e5,i:0,h:-1,req:function(G){return G.humans>=1e5;},end:'Your food pods in every kitchen.'},
+  {id:'careplanfree',c:'fork',a:'emp',fk:'careplan',name:'Free care plan for every owner',d:'Every living tank gets a check-in call each month. It costs you AED 0.50 a tank a month, for as long as they keep it. More tanks thrive.',m:5e5,i:0,h:2,req:function(G){return pd(G,'app')&&G.humans>=1e6;},end:'Every owner gets a call when the tank looks off. Nobody pays for it.'},
+  {id:'careplanpaid',c:'fork',a:'emp',fk:'careplan',name:'Sell a monthly care plan',d:'The calls cost money, the fee pays for them and then some. You set the fee in Owners’ tanks, more people sign up when it’s cheap and people like you.',m:5e5,i:0,h:-1,req:function(G){return pd(G,'app')&&G.humans>=1e6;},end:'Your care plan is a line on a billion bank statements.'},
   {id:'foodfactory',c:'biz',name:'Shrimp food factory',d:'Your own pellets, made next to the hatchery. Owners buy their food from you, four times as much as now.',m:2e6,i:0,req:function(G){return hasFarm(G,'hatch');},end:'Your food factory runs next to the hatchery, day and night.'},
   {id:'retrainpack',c:'fork',a:'emp',fk:'layoff',name:'Retrain them as farm techs',d:'Everyone keeps a job. You pay for training and wages you don\u2019t strictly need.',m:30000,i:0,h:2,mood:2,req:function(G){return false;},end:'Old packers running the night shift at the farms.'},
   {id:'layoffpack',c:'fork',a:'emp',fk:'layoff',name:'Let them go',d:'The robots do the work now. Two weeks\u2019 pay each, the rest goes into more kits.',m:0,i:0,h:-2,req:function(G){return false;}},
@@ -833,7 +835,7 @@ var PROJ=[
   {id:'landwet',c:'fork',a:'up',fk:'land',name:'Drain a wetland',d:'Cheap, flat, already wet, nobody farms it. Mega hatcheries cost 38% less. Birds stop there on the way south.',m:0,i:0,h:-3,req:function(G){return hasFarm(G,'hatch')&&G.kits.sold>=5000;},later:{d:240,t:'The birds that used to stop at the old wetland fly on now. Nobody knows where they go.'},end:'A filled wetland, and birds that don’t stop anymore.'}
 ];
 // Choices: two answers to one problem. The question shows once above both.
-var FORK_Q={science:'Companies are offering your postdocs three times their pay.',labname:'The university wants to name the new marine lab after someone.',study:'A university wants to run a big study on shrimp and stress.',gene:'Your lab found the gene behind the cherry red.',paper:'The Shrimp Times makes fun of you every week.',welfare:'Lawmakers want a pet welfare law, it would cover shrimp too.',fish:'Fishing towns lose work as more people keep shrimp as pets. The crews need new jobs.',breeder:'A small breeder down the road sells kits too.',ship:'Some shrimp die in the mail.',culls:'Low-grade shrimp pile up at the farms.',filter:'The kit filter could be built better.',food:'Owners keep asking what to feed.',layoff:'The robots can do the packers\u2019 jobs now.',reviews:'Your shop page only has a few reviews.',kids:'A children\u2019s TV channel wants your ads. The same money would buy kits for schools.',data:'An ad company wants to buy your owner data.',waste:'Cleaning the water from your farms costs a lot.',land:'The next mega hatchery needs a lot of land.'};
+var FORK_Q={science:'Companies are offering your postdocs three times their pay.',labname:'The university wants to name the new marine lab after someone.',study:'A university wants to run a big study on shrimp and stress.',gene:'Your lab found the gene behind the cherry red.',paper:'The Shrimp Times makes fun of you every week.',welfare:'Lawmakers want a pet welfare law, it would cover shrimp too.',fish:'Fishing towns lose work as more people keep shrimp as pets. The crews need new jobs.',breeder:'A small breeder down the road sells kits too.',ship:'Some shrimp die in the mail.',culls:'Low-grade shrimp pile up at the farms.',filter:'The kit filter could be built better.',food:'Owners keep asking what to feed.',careplan:'Owners want someone to call when a tank looks wrong.',layoff:'The robots can do the packers\u2019 jobs now.',reviews:'Your shop page only has a few reviews.',kids:'A children\u2019s TV channel wants your ads. The same money would buy kits for schools.',data:'An ad company wants to buy your owner data.',waste:'Cleaning the water from your farms costs a lot.',land:'The next mega hatchery needs a lot of land.'};
 function forkDone(G,fk){return PROJ.some(function(x){return x.fk===fk&&G.emp.proj[x.id];});}
 function forkOpts(fk){return PROJ.filter(function(x){return x.fk===fk;});}
 // Heart: what kind of company you ran. Never shown as a number, the ending shows it.
@@ -1365,9 +1367,16 @@ function buyWelfare(G,id){var x=wbItem(id),E=G.emp;if(!x||wbHas(G,id)||!kitsOpen
 function setKitDesign(G,d){if(d<0||d>designMax(G))return false;wb(G).design=d;return true;}
 function regionMix(G){var t=0,c=0,h=0;REGIONS.forEach(function(r){if(regOpen(G,r.id)){t+=r.pop;c+=r.pop*(r.cold||0);h+=r.pop*(r.hot||0);}});return t?{cold:c/t,hot:h/t}:{cold:0,hot:1};}
 function commitOf(price){return clamp(Math.sqrt(price/KIT_REF),0.5,1.05);}
+// Care plan: free for every living tank (you pay the calls), or a monthly fee the player sets; who pays depends on the fee and the public mood.
+var PLAN_COST=0.5,PLAN_P0=15,PLAN_WEL=0.05,PLAN_FEES=[5,60];
+function planFee(G){return G.emp.planFee==null?15:G.emp.planFee;}
+function setPlanFee(G,v){if(!pd(G,'careplanpaid'))return false;G.emp.planFee=clamp(Math.round(v/5)*5,PLAN_FEES[0],PLAN_FEES[1]);return true;}
+function planShare(G){if(pd(G,'careplanfree'))return 1;if(!pd(G,'careplanpaid'))return 0;return clamp(appeal(G)*1.4,0.2,1)*Math.exp(-planFee(G)/PLAN_P0);}
+function planHomes(G){return G.humans/HH_AVG*welfare(G)*planShare(G);}
+function planDay(G){var h=planHomes(G);if(h<1)return;if(pd(G,'careplanpaid'))earn(G,h*planFee(G)/30,'foodsales');pay(G,h*PLAN_COST/30,'logistics');}
 function welfareParts(G){var E=G.emp,mix=regionMix(G),q=effectiveQuality(G),c=E.commit==null?1:E.commit;
- return {care:q*(1-0.6*sickKitRate(G)),commit:c,design:designW(G)+(pd(G,'almond')?0.02:0)-(pd(G,'filtercart')?0.03:0)+(pd(G,'foodpods')?0.01:0),feed:wbHas(G,'feed')?0.02:0,cold:wbHas(G,'winter')?0:mix.cold*0.3,heat:E.hw?mix.hot*0.18*(wbHas(G,'alerts')?0.2:1):0};}
-function welfareTarget(G){var p=welfareParts(G);return clamp(p.care*p.commit+p.design+p.feed-p.cold-p.heat+clamp((G.emp.heart||0)*0.003,-0.04,0.04),0.05,0.99);}
+ return {care:q*(1-0.6*sickKitRate(G)),commit:c,design:designW(G)+(pd(G,'almond')?0.02:0)-(pd(G,'filtercart')?0.03:0)+(pd(G,'foodpods')?0.01:0),feed:wbHas(G,'feed')?0.02:0,cold:wbHas(G,'winter')?0:mix.cold*0.3,heat:E.hw?mix.hot*0.18*(wbHas(G,'alerts')?0.2:1):0,plan:planShare(G)*PLAN_WEL};}
+function welfareTarget(G){var p=welfareParts(G);return clamp(p.care*p.commit+p.design+p.feed+p.plan-p.cold-p.heat+clamp((G.emp.heart||0)*0.003,-0.04,0.04),0.05,0.99);}
 function welfare(G){return G.emp.wel==null?0.6:G.emp.wel;}
 function welfareMult(G){return 0.7+0.5*welfare(G);}
 function waterUse(G){return G.humans*0.86;}
@@ -2347,7 +2356,7 @@ function trAdd(G,o){if(!o)return;var t=G.tr||(G.tr={}),a=trAbsOf(G);for(var k in
 var TRAIT_TAGS={nannies:{drive:.3},posters:{drive:.5,control:.5},songs:{drive:.3,control:.5},buypol:{control:.5,means:-1},haven:{means:-1,drive:.3},hamster:{drive:.5,kin:-.5},
  sciacad:{care:.5,control:-.5,drive:-.3},sciind:{drive:1,control:.5},labgrandpa:{drive:-1},labyou:{drive:1},studyopen:{means:.3,drive:-.3},studybuy:{means:-.3},geneshare:{care:.7,drive:-.3},genepatent:{drive:.7},
  paperfree:{control:-.5},paperbuy:{control:.5,drive:.5},lawback:{kin:.5,means:.5,control:-.5},lawbribe:{control:.5,means:-.5,kin:-.5},retrain:{care:-.5,drive:-.3},harbors:{drive:.7},
- coop:{care:-.5,control:-.5,drive:-.3},buyout:{drive:1,control:.5},shipwarm:{kin:1,know:.3,means:.3},shipcheap:{kin:-1,means:-.3,know:-.3},cullschool:{kin:1,means:.3},cullfeed:{kin:-2},filterlast:{care:-.3,drive:-.3,means:.3},filtercart:{kin:-.3},foodopen:{kin:.5},foodpods:{kin:-.3},
+ coop:{care:-.5,control:-.5,drive:-.3},buyout:{drive:1,control:.5},shipwarm:{kin:1,know:.3,means:.3},shipcheap:{kin:-1,means:-.3,know:-.3},cullschool:{kin:1,means:.3},cullfeed:{kin:-2},filterlast:{care:-.3,drive:-.3,means:.3},filtercart:{kin:-.3},foodopen:{kin:.5},foodpods:{kin:-.3},careplanfree:{kin:.4,know:-.4},careplanpaid:{kin:-.4,know:.4},
  retrainpack:{means:1,care:-.3},layoffpack:{means:-.5,care:.2},revreal:{drive:-.5,risk:-.3,means:.3},revfake:{drive:.5,means:-.5},kidsads:{drive:1},kidsfree:{care:.7,drive:-.3},datasell:{drive:.5,means:-.5},datakeep:{care:-.3,drive:-.2,means:.3},wasteclean:{kin:.5,means:.3},wastedump:{kin:-1},landfarm:{kin:.5,means:.5},landwet:{kin:-1.5}};
 var STORY_TAGS={ev_mira:[{kin:.5,care:-.3},{know:.3},{drive:.3}],ev_paper:[{kin:.3},{drive:-.3},{drive:.5,risk:.5}],ev_rival:[{drive:.7,risk:.3},{kin:.5},{risk:-.5,drive:-.5}],ev_ai:[{control:-.5},{care:-.3,drive:-.3}],ev_school:[{care:-.5},{care:-.2},{drive:.3}],ev_marine:[{care:.5},{care:-.5}],ev_stars:[{drive:-.3}],
  owntank:[{}],me_burnout:[{drive:-1,risk:-.5},{drive:1,risk:.5}],dye_offer:[{means:-1,risk:.5},{know:.3,kin:.5,drive:-.3},{kin:-.5,means:.5,know:-.3,drive:-.2}],fight_invite:[{kin:-1,risk:.5,means:-.5},{kin:.3,risk:-.3}],wash_offer:[{},{means:.5,risk:-.5,drive:-.3}]};
@@ -3262,7 +3271,7 @@ function foodIncome(G){return careGoods(G)+topupShrimp(G)/CARE_TOPUP_N*CARE_TOPU
 // Water, power and freight: big things you built earn a little.
 function sideIncome(G){var E=G.emp,h=G.humans,c3=E.c3||{},t=E.tree||{},x=0;if(c3.c_water===0||(E.hard&&E.hard.picks.water&&E.hard.picks.water.desal))x+=h*0.0004;if(t.lm_water)x+=h*0.0002;if(t.lm_med)x+=h*0.0003;if(t.isl_pass)x+=50000;if(pd(G,'solar'))x+=farmCap(G)*0.5;return x;}
 var SIDE_NEWS=[{k:'topup',ok:function(G){return topupShrimp(G)>=1000;},t:'Owners whose colony thins out buy ten shrimp to top it up. The farms breed them on racks the kits don’t need.'},{k:'solar',ok:function(G){return pd(G,'solar');},t:'Your farms sell their spare power to the grid. A wind farm in Inner Mongolia joins next spring.'},{k:'desal',ok:function(G){return (G.emp.c3||{}).c_water===0||!!(G.emp.hard&&G.emp.hard.picks.water&&G.emp.hard.picks.water.desal);},t:'Your desalination plants sell water to three coastal cities.'},{k:'freight',ok:function(G){return !!(G.emp.tree&&(G.emp.tree.lm_water||G.emp.tree.lm_med));},t:'Hospitals and water companies pay your trucks to carry their boxes.'}];
-function incomeDay(G){var f=foodIncome(G),x=sideIncome(G),E=G.emp,N=E.sideNews||(E.sideNews={});if(f>0){earn(G,f,'foodsales');pay(G,careGoods(G)*CARE_COST,'supplies');}if(x>0)earn(G,x,'side');SIDE_NEWS.forEach(function(n){if(!N[n.k]&&n.ok(G)){N[n.k]=1;newsLine(G,n.t);}});}
+function incomeDay(G){var f=foodIncome(G),x=sideIncome(G),E=G.emp,N=E.sideNews||(E.sideNews={});if(f>0){earn(G,f,'foodsales');pay(G,careGoods(G)*CARE_COST,'supplies');}planDay(G);if(x>0)earn(G,x,'side');SIDE_NEWS.forEach(function(n){if(!N[n.k]&&n.ok(G)){N[n.k]=1;newsLine(G,n.t);}});}
 var STORY_FIRST=['coin_offer','spaceDream'];
 function storyClock(G){return G.ps&&G.ps.t>0?G.ps.t:G.day*4000;}
 function storyWaits(k){var m=MILESTONES[k];return !!(m&&m.story&&k!=='broke'&&k!=='gameover'&&k!=='me_ill'&&k!=='crash');}
@@ -4780,12 +4789,15 @@ function updateOwners(){
   if(Math.round(P.design*100))lines.push([KIT_DESIGNS[kitDesign(G)],(P.design>=0?'+':'−')+Math.abs(Math.round(P.design*100)),'']);
   if(Math.round(P.feed*100))lines.push(['Fishmeal-free food','+'+Math.round(P.feed*100),'']);
   if(mix.cold>0.01)lines.push(['Winters',Math.round(P.cold*100)?'−'+Math.round(P.cold*100):'covered',Math.round(P.cold*100)?coldText(G):'Winter kits ship with a heater.',!!Math.round(P.cold*100)]);
+  if(P.plan>0.001)lines.push(['Care plan','+'+Math.round(P.plan*100),pd(G,'careplanfree')?'Free, every living tank.':Math.round(planShare(G)*100)+'% of living tanks pay.']);
   if(E.hw)lines.push(['Heat wave in '+E.hw.name,'−'+Math.round(P.heat*100),E.hw.left+' days left.'+(wbHas(G,'alerts')?' Alerts soften it.':''),1]);
   var h='<div class="kv">'+[['Thriving',big(H*w)+' tanks'],['Struggling',big(H*(1-w))+' tanks']].concat(E.lapsed>=1?[['Gave up so far',big(Math.floor(E.lapsed))]]:[]).concat([['Change water',big(waterUse(G))+' L/day'+(waterReuse(G)?' · '+Math.round(waterReuse(G)*100)+'% on plants':'')]]).map(function(x){return '<span>'+x[0]+'</span><span>'+x[1]+'</span>';}).join('')+'</div>';
   h+='<div class="ow-parts">'+(lines.some(function(x){return /^[+−]/.test(x[1]);})?'<small class="ow-unit">+ and − are points on thriving</small>':'')+lines.map(function(x){return '<div class="ow-line'+(x[3]?' bad':'')+'"><b>'+x[0]+'</b><span>'+x[1]+'</span>'+(x[2]?'<small>'+x[2]+'</small>':'')+'</div>';}).join('')+'</div>';
   if(w<0.55)h+='<p class="hint" style="color:var(--bad)">Below 55% thriving, some owners give up each day.</p>';
   else h+='<p class="hint explain">Thriving owners refer more friends: word of mouth ×'+welfareMult(G).toFixed(2)+'. The care guide and the app raise kit quality.</p>';
   if(false)h+='<div class="ow-design"><span>Kit design</span><div class="seg">'+KIT_DESIGNS.slice(0,designMax(G)+1).map(function(n,i){return '<button class="btn mini-seg'+(kitDesign(G)===i?' on':'')+'" data-act="kitdesign" data-d="'+i+'" aria-pressed="'+(kitDesign(G)===i)+'">'+n.replace(' kit','')+(i?' +'+(i===2?30:12):'')+'</button>';}).join('')+'</div></div>';
+  if(pd(G,'careplanpaid')){var pf=planFee(G),ph=planHomes(G);h+=itemHTML('Care plan fee','AED '+pf+' a month. '+big(ph)+' tanks pay, '+aed(ph*(pf-PLAN_COST)/30)+'/d after the calls.','<div class="mini">'+bbtn('planfee','data-d="-5"','−',pf>PLAN_FEES[0])+bbtn('planfee','data-d="5"','+',pf<PLAN_FEES[1])+'</div>');}
+  if(pd(G,'careplanfree'))h+='<p class="hint">Free care plan: '+big(planHomes(G))+' tanks, '+aed(planHomes(G)*PLAN_COST/30)+'/d in calls.</p>';
   var avail=WB.filter(function(x){return !x.design&&!wbHas(G,x.id)&&x.req(G);});
   h+=avail.map(function(x){var ok=x.m?G.money>=scM(G,x.m)+capitalReserve(G):E.inf>=si(G,x.i);return itemHTML(x.name,x.note,bbtn('wb','data-id="'+x.id+'"',x.m?aed(scM(G,x.m)):inf(x.i),ok,false));}).join('');
   var done=WB.filter(function(x){return wbHas(G,x.id);});if(done.length)h+='<details><summary>Done ('+done.length+')</summary>'+done.map(function(x){return '<p><b>'+x.name+'</b> · '+x.note+'</p>';}).join('')+'</details>';
@@ -6005,7 +6017,8 @@ function initControls(){
     if(a==='labtrade'){G.opt.labTrade=!G.opt.labTrade;}
     if(a==='earlymkt'){G.opt.earlyMkt=!G.opt.earlyMkt;}
     if(a==='wb'){if(buyWelfare(G,b.dataset.id)){var wx=wbItem(b.dataset.id);toast(wx.name+' started');cache.owh=null;cache.kdh=null;cache.eproj=null;}}
-    if(a==='kitdesign'){if(setKitDesign(G,+b.dataset.d)){cache.owh=null;cache.ekv=null;cache.kdh=null;}}
+    if(a==='planfee'){if(setPlanFee(G,planFee(G)+(+b.dataset.d)))cache.owh=null;}
+    else if(a==='kitdesign'){if(setKitDesign(G,+b.dataset.d)){cache.owh=null;cache.ekv=null;cache.kdh=null;}}
     if(a==='region'){var nr0=nextRegion(G);if(buyRegion(G)){toast('Expanded into '+nr0.name);cache.ereg=null;cache.eshop=null;cache.eproj=null;}}
     if(a==='addtank'){if(addTank(G)){var nt2=G.tanks[G.tanks.length-1];cache.upsig=null;lastChips='';if(nt2.seeded)openTankSheet(G.tanks.length-1);else toast('New tank ready. It needs cycling.');}}
     if(a==='ad'){if(addAd(G,b.dataset.id))toast('Campaign started');cache.adsig=null;}

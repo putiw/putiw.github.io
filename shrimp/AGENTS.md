@@ -128,6 +128,7 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **Notes, not news** (`noteLine`, `NOTE_KINDS`, `paperOpen`, `updateNotes`, `#noteflash`): The Shrimp Times only prints once the World tab is there (`paperOpen`: World or the Lab open, or 10k+ people). Before that any `newsLine` becomes a "Word gets around" note. Personal things never go in the paper: Your day milestones are `noteLine(G,'day',t)`, Grandma is `noteLine(G,'grandma',t)`, small buzz about the kits is `noteLine(G,'word',t)`. Notes show one at a time as a banner like the newsflash with their own masthead, at least 12 s apart, never over a card, spotlight, cleaning or a check. Tapping a Your day or Grandma note opens the You page. `HOUR_NOTE` picks the channel for each Your day line; the viral video and the streaming show are news.
 - **Income after Earth** (`foodIncome`, `sideIncome`): new income comes from things already built and shows as one finance line, never a new screen or button.
 - **Food and tank care** (Pass 126, `foodRate`, `careGoods`, `topupShrimp`, `spareFarmShrimp`, `CARE_*`): the Finance line `foodsales`. Only homes with a living tank buy (homes × welfare): food from the first kit (×2 with the factory, pods on top), moss and plants once you have a shop or store, water test refills with the care app. Struggling tanks buy 10-shrimp top-ups twice a year at AED 40, only from farm output the kits don't use. 40% of the goods part is paid back as supplies. Income moves shrimp → kits → care: about 1–3% of kit income early, 10–15% at half of Earth, more than kits once reach is full.
+- **Care plan** (Pass 127, fork `careplan`: `careplanfree` / `careplanpaid`, `planShare`, `planHomes`, `planDay`, `planFee`, `setPlanFee`, `PLAN_*`): opens with the care app at 1M owners, in the Kits tab with the other forks. Free: every living tank, you pay AED 0.50 a tank a month in calls (Distribution and customer support), welfare +5. Paid: the player sets the fee AED 5–60 a month with − and + in Owners' tanks; the share of living tanks that pay is mood × 1.4 (0.2–1) × e^(−fee/15), welfare +5 × that share, fees go to Food and tank care, calls still cost 0.50.
 
 ### Grandma's land (27 Oct)
 
@@ -430,7 +431,7 @@ Left from that review, not done:
 - The `mkt` lever line ("You can make more kits than people order...") is a taught-once lever (`leversTaught`), kept on purpose.
 - Old saves keep their old lab stories on the front page of The Shrimp Times; only new ones go to Science.
 
-**Late game economy: built in Pass 126** (not deployed). Left: a care subscription was left out (it would need a new choice). The bots never sell farms or lines, so selling is only covered by `shrimp-balance`. The Gear and Making kits sell rows were not looked at in a browser.
+**Late game economy: built in Passes 126 and 127** (not deployed). The bots never sell farms or lines, so selling is only covered by `shrimp-balance`. The Gear and Making kits sell rows were not looked at in a browser.
 
 **Small leftovers from the 2026-10-27 final pass**
 - "Check shrimp" wraps to two lines in the six-button own-tank grid at 360–390 px (drop the icon at narrow widths).
