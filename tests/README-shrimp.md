@@ -1038,3 +1038,15 @@ Step 4 of the tab cleanup.
 - Monkey: 250 random taps at 360 and 390 px on first kit, first farm, million owners and win, no page errors, no sideways scroll. Every card on Kits, Ads and World opens and closes on one tap.
 - First-kit guide checked: with Making kits closed, the Next step opens it and the packing table button shows.
 BUILD 2026-10-28-tabs. Merged into main.
+
+## Pass 125: Feel and text fixes (28 Oct)
+
+- No Next bar over the game. `applyGuide` keeps the bar hidden and puts the guide line (soft or not) in the ? popup (`ideas-now`), with the tab name when it's on another tab. The glow on the button or tab stays.
+- Tab bar: the visualViewport lift is gone. It moved the bar up by the keyboard height and could leave it stuck mid-screen. Now the bar hides while typing (`body.kbd`).
+- No browser feel: `maximum-scale=1,user-scalable=no`, pinch gestures blocked (`gesturestart`, two-finger `touchmove`), no long-press menu, no text select, no tap flash, no rubber-band (`overscroll-behavior:none`). Inputs still select. Same in the land (`build.py` skeleton, `game.js`).
+- Token bills: AI shop managers AED 40 a shop a day (was 2.50; a human manager is 230 for four shops), `AI_MGR_DAY`. AI sales agents AED 5 plus 2 fils per order, no cap (was capped at 300 a day), `aiSalesDay`.
+- Kits card at the reach limit said "~0 orders/day" while millions sold (orders only fill spots that open as owners drop out or reach grows). It now shows the 7-day rate: "~2.26M orders/day, only as spots open up in your reach".
+- News: the carbon credits line says why it pays you (the company files the paperwork for the ponds that closed because of you, the mud under mangroves holds carbon). The storm line says why regions get cheaper (less damage, cheaper insurance). The coral line says why (fewer trawlers dragging the seabed).
+- Land (source in `shrimp-proto`, `shrimp-home-proto/`): wall corners lost the wide shoulder that drew an extra block of cap (the cap only reaches back at the wall's own width). Hens lay on their own clock in the game: a go every two real hours, 60% (wild 40%), up to 12 in the coop; before, they only laid at the real-day roll, 30%, so almost never. The caught fish card fits the whole fish (scale by height too). Every fish has its own size to 0.1 cm (most near the middle, 4% a big one up to 15% over), and the card says when it's your biggest of that species (`fishBest`).
+- Balance 80 (token bill check now proportional, Pass 125 strings), academy 10, me 46. No browser here (Playwright download blocked): both pages pass a syntax check only; walls, fish card and tab bar not looked at in a browser.
+BUILD 2026-10-28-feel.

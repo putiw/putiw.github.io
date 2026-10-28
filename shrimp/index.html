@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="description" content="Grandma gives you her old shrimp tank. Breed shrimp, sell starter kits, and try to get one into every home on Earth.">
 <title>Universal Shrimp</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="icon-32.png?v=2"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=2"><link rel="apple-touch-icon" href="icon-180.png?v=2"><meta name="apple-mobile-web-app-title" content="Shrimp">
@@ -333,7 +333,7 @@ input,select,textarea{max-width:100%;min-width:0;box-sizing:border-box}.name-row
 @media(max-width:520px){#milestone-card{padding:10px 12px}#milestone-card h2{font-size:16px}#milestone-card .sub{font-size:13.5px;line-height:1.4}}
 .scope-label{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
 .coll>.hd:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
-.btn,.stp,#speed button,.tabs button,#guidebar,.top button{touch-action:manipulation}.newsflash{touch-action:none}html,body{overflow-anchor:none}.ctl .stp{min-height:36px}
+.btn,.stp,#speed button,.tabs button,#guidebar,.top button{touch-action:manipulation}.newsflash{touch-action:none}html,body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulation}img,canvas,svg{-webkit-user-drag:none}input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}body.kbd .tabs{display:none!important}html,body{overflow-anchor:none}.ctl .stp{min-height:36px}
 @media(max-width:400px){.tabs .tl-l{display:none}.tabs .tl-s{display:inline}}@media(max-width:480px){.st-l{display:none}#btn-settings{min-width:34px;font-size:14px;padding:3px 8px}.tabs button{font-size:10.5px;letter-spacing:-.01em;padding:5px 1px}.speed button.nx:not([aria-pressed="true"]){display:none}.btns{flex-wrap:wrap}.item{grid-template-columns:minmax(0,1fr) auto}.ctl{grid-template-columns:82px 30px minmax(0,1fr) 30px 58px}.brand{flex-wrap:wrap}.business-strip b{font-size:12px}.business-strip div:nth-child(n+4){display:none}}
 @media(max-width:480px){#space-card .item{grid-template-columns:1fr}#p-space .btn{white-space:normal}}
 @media(max-width:520px){.goalrow{gap:4px}.goalrow .goal-bar{flex-basis:36px}#b-goal-wide{display:none}#b-goal-short{display:inline}.dream-tracker>summary{max-width:132px}.dream-tracker small{display:none}}
@@ -1089,10 +1089,13 @@ function hasSales(G){return G.emp.staff.sales>0||G.emp.staff.aiSales;}
 function salesBoost(G){var st=G.emp.staff;return st.aiSales?1:0.25*Math.min(st.sales,4);}
 function packCap(G){var st=G.emp.staff;return (st.tier?(st.tier===1?1:4)+st.pack*PACK_TIERS[st.tier].per:0)*(pd(G,'aicam')?2:1)+packingMachineCap(G);}
 function lineCost(G,i){i=i||0;return scaledCost(PACK_LINES[i].cost,lineCount(G,i),1.2)*autoDisc(G);}
+// Token bills (Puti, 28 Oct: AED 2.50 a shop read as fake). A shop agent doing stock, orders, rotas and customer chats
+// burns a few million tokens a day, about AED 40. A sales agent costs about 2 fils of tokens per order it handles.
+var AI_MGR_DAY=40;function aiSalesDay(G){return 5+0.02*(G.emp.soldToday||0);}
 function staffCost(G){var st=G.emp.staff,c=0,td=pd(G,'grad')?0.5:1;
-  c+=st.aiSales?Math.min(300,1+0.00005*G.emp.soldToday)*td:st.sales*staffPay(G,'sales');
+  c+=st.aiSales?aiSalesDay(G)*td:st.sales*staffPay(G,'sales');
   c+=st.pack*STAFF.pack.pay;
-  c+=st.aiMgr?2.5*shopCount(G)*td:st.mgr*STAFF.mgr.pay;
+  c+=st.aiMgr?AI_MGR_DAY*shopCount(G)*td:st.mgr*STAFF.mgr.pay;
   c+=st.aiTech?1.5*G.tanks.length:st.tech*STAFF.tech.pay;
   PACK_LINES.forEach(function(l,i){c+=lineCount(G,i)*l.up;});c+=(G.emp.legacyPacking||0)*0.05;(G.emp.hil||[]).forEach(function(h){c+=h.pay;});return c;}
 function hire(G,role,d){var st=G.emp.staff;if(role==='sales'&&st.aiSales)return false;if(role==='mgr'&&st.aiMgr)return false;if(role==='tech'&&st.aiTech)return false;if(role==='pack'&&!st.tier&&d>0)return false;
@@ -1291,10 +1294,10 @@ var RIPPLE=[
  {at:6e7,t:'Turtle groups count fewer turtles drowned in shrimp nets.'},
  {big:1,bfx:'Ocean ranch upkeep −5%.',at:1e8,t:'Wild shrimp come back in some bays. Your ocean ranches get young shrimp cheaper.',fx:'upkeep'},
  {at:1.6e8,t:'Fewer lost nets wash up on the coast. Old shrimp boats get sold for scrap.'},
- {big:1,bfx:'New regions cost 10% less.',at:2.5e8,t:'A big storm hits the coast, and the new mangroves take a lot of it.',fx:'regions'},
- {big:1,bfx:'Carbon credits pay you every day.',at:4e8,t:'Banks decide mangroves are worth money because they store carbon. People start buying mud.',fx:'carbon'},
+ {big:1,bfx:'New regions cost 10% less.',at:2.5e8,t:'A big storm hits the coast. Towns behind the new mangroves lose less, and builders there pay less for insurance.',fx:'regions'},
+ {big:1,bfx:'Carbon credits pay you every day.',at:4e8,t:'Carbon buyers start paying for mangroves, the mud under them holds carbon for hundreds of years. Your company files the paperwork for the ponds that closed because of you.',fx:'carbon'},
  {at:6e8,t:'Old shrimp boat captains now run turtle tours. The turtles are fine with it.'},
- {big:1,at:9e8,t:'Coral reefs get brighter as the water clears up.'},
+ {big:1,at:9e8,t:'Fewer trawlers drag the seabed, and some reefs near the old shrimp grounds start to grow back.'},
  {big:1,at:1.2e9,t:'There is a little less carbon in the air. Scientists blame the mangroves.'},
  {at:1.4e9,t:'Shrimp cocktail sales drop 12%. The sauce company starts selling ketchup for fries.'},
  {at:1.6e9,t:'Buffets swap the shrimp for potatoes. The queue gets shorter.'},
@@ -3403,8 +3406,12 @@ function inf(n){return '✦ '+big(Math.round(n));}
 function cost2(m,i){return (m?aed(m):'')+(m&&i?' + ':'')+(i?inf(i):'');}
 function trim(n,d){return String(+Number(n).toFixed(d));}
 // iPhone Safari moves its toolbar while you scroll and the fixed tab bar can end up floating above the bottom. Pin it to what's really on screen.
-(function(){var vv=window.visualViewport;if(!vv)return;var fix=function(){var t=document.querySelector('.tabs');if(!t)return;var off=window.innerHeight-(vv.height+vv.offsetTop);t.style.transform=Math.abs(off)>1&&vv.scale<=1.01?'translateY('+(-off)+'px)':'';};vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);window.addEventListener('scroll',fix,{passive:true});})();
-var toastT=null,NF=null,BUILD='2026-10-28-tabs';
+// The tab bar stays at the bottom. It used to be lifted by the keyboard height and could stay stuck mid-screen
+// after the keyboard closed (Puti, 28 Oct), so now it hides while typing instead.
+(function(){var vv=window.visualViewport,fix=function(){var a=document.activeElement,typing=!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!/^(range|checkbox|radio|button)$/.test(a.type||''));document.body.classList.toggle('kbd',typing&&!!vv&&vv.height<window.innerHeight*0.8);var t=document.querySelector('.tabs');if(t&&t.style.transform)t.style.transform='';};if(vv){vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);}document.addEventListener('focusin',function(){setTimeout(fix,300);});document.addEventListener('focusout',function(){setTimeout(fix,50);setTimeout(fix,400);});})();
+// No browser feel: no pinch or double-tap zoom, no long-press menu outside text fields.
+(function(){var stop=function(e){e.preventDefault();};['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,stop,{passive:false});});document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea,[contenteditable]')))e.preventDefault();});})();
+var toastT=null,NF=null,BUILD='2026-10-28-feel';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
@@ -4343,7 +4350,7 @@ function closeFin(){if(!FS)return;var pv=FS.prev;FS=null;$('finsheet').hidden=tr
 // What each team costs a day. The lines add up to staffCost plus research and mall stores.
 function wageLines(G){var E=G.emp,st=E.staff,td=pd(G,'grad')?0.5:1,hil=E.hil||[],kept=function(w){return hil.reduce(function(t,h){return t+(w.indexOf(h.who)>=0?h.pay:0);},0);};
   var pack=st.pack*STAFF.pack.pay+(E.legacyPacking||0)*0.05+kept(['Kiki']);PACK_LINES.forEach(function(l,i){pack+=lineCount(G,i)*l.up;});
-  var sales=(st.aiSales?Math.min(300,1+0.00005*E.soldToday)*td:st.sales*staffPay(G,'sales'))+(st.aiMgr?2.5*shopCount(G)*td:st.mgr*STAFF.mgr.pay)+kept(['Luca','Gema','Mimi']);
+  var sales=(st.aiSales?aiSalesDay(G)*td:st.sales*staffPay(G,'sales'))+(st.aiMgr?AI_MGR_DAY*shopCount(G)*td:st.mgr*STAFF.mgr.pay)+kept(['Luca','Gema','Mimi']);
   var tech=st.aiTech?1.5*G.tanks.length:st.tech*STAFF.tech.pay;
   return [['Packing',pack,'emp','c-staff'],['Sales and shop managers',sales,'promote','c-sales'],['Tank technicians',tech,'up',''],['Research',academyOpen(G)?rlYearAll(G)/365:0,'research','academy-card'],['Mall stores, rent and staff',storeDayCost(G),'promote','c-shops']].filter(function(l){return l[1]>0.5;});}
 function renderFin(){if(!FS)return;if(!finOpen(G)){closeFin();return;}
@@ -4937,7 +4944,7 @@ function updateEmpire(){
     var spare=spareKitShrimp(G)+(E.rawShrimp||0);var stEx=0;G.tanks.forEach(function(t){stEx+=Math.min(Math.max(0,totalN(t)-packAbove(G,t)),spareTankShrimp(t));});stEx=Math.floor(stEx+(E.rawShrimp||0));
     setT('e-kithint','Spare shrimp: '+big(Math.floor(spare))+' · a kit takes '+KIT_SHRIMP+(G.money<kitMaterials(G)?' and '+aed(kitMaterials(G))+' of materials':'')+'.'+(packCap(G)>0&&stEx<KIT_SHRIMP&&spare>=KIT_SHRIMP?' Station idle: only '+big(stEx)+' above Keep in tanks.':''));
     var ks=kitStage(G),w=E.kitWip||{mat:0,shrimp:0},stepMode=!stationDone(G);
-    var mg=G.kitPrice/(G.vat?1.05:1)-productionUnitCost(G);var kpLock=G.kits.sold<50&&!G.emp.won,kps=$('s-kitPrice');kps.disabled=kpLock;if(document.activeElement!==kps&&+kps.value!==G.kitPrice){kps.value=G.kitPrice;setT('v-kitPrice','AED '+G.kitPrice);}setT('kit-margin',kpLock?'Fixed for your first 50 kits.':G.emp.won?'Everyone has a tank. Farms stop breeding new kit stock. Sell the ones you don\u2019t need to save upkeep.':ks?(mg<0?'Loss ':'Profit ')+aed(Math.abs(mg))+'/kit · ~'+(dem<10?trim(dem,1):big(dem))+' orders/day at this price':'');$('kit-margin').style.color=mg<0?'var(--bad)':'';
+    var mg=G.kitPrice/(G.vat?1.05:1)-productionUnitCost(G);var kpLock=G.kits.sold<50&&!G.emp.won,kps=$('s-kitPrice');kps.disabled=kpLock;if(document.activeElement!==kps&&+kps.value!==G.kitPrice){kps.value=G.kitPrice;setT('v-kitPrice','AED '+G.kitPrice);}setT('kit-margin',kpLock?'Fixed for your first 50 kits.':G.emp.won?'Everyone has a tank. Farms stop breeding new kit stock. Sell the ones you don\u2019t need to save upkeep.':ks?(mg<0?'Loss ':'Profit ')+aed(Math.abs(mg))+'/kit · '+(dem<Math.max(1,rk*0.2)&&rk>=1?'~'+(rk<10?trim(rk,1):big(rk))+' orders/day, only as spots open up in your reach':'~'+(dem<10?trim(dem,1):big(dem))+' orders/day at this price'):'');$('kit-margin').style.color=mg<0?'var(--bad)':'';
     $('kit-steps').hidden=!stepMode;$('kit-sub').hidden=ks===0;$('kit-pricerow').hidden=ks===0;$('kit-margin').hidden=ks===0;$('row-maxN').hidden=!(G.kits.sold>=10||G.opt.all);$('h-maxN').hidden=$('row-maxN').hidden;$('e-kv').hidden=ks===0;var machines=pd(G,'autopackm');$('kit-packrow').hidden=stepMode||machines;$('e-kithint').hidden=machines;$('btn-pack1').hidden=stepMode;$('btn-pack10').hidden=stepMode;$('btn-kitprice').hidden=true;
     if(ks<2){var kv1=[['In stock',big(G.kits.stock)],['Owners',big(Math.floor(G.humans))]];var h1=kv1.map(function(x){return '<span>'+x[0]+'</span><span>'+x[1]+'</span>';}).join('');if(cache.ekv!==h1){cache.ekv=h1;$('e-kv').mhtml=h1;}}
     if(stepMode)setT('e-kithint','');
@@ -4949,7 +4956,7 @@ function updateEmpire(){
   if(cache.estaff!==stsig){
     cache.estaff=stsig;var h='',hs='',capLine='';
     var row=function(role,desc){var n=st[role];return itemHTML(STAFF[role].pl+(n?' ×'+n:''),desc+' · '+aed(staffPay(G,role))+'/d each'+(role==='sales'&&!kitsOpen(G)?', part-time until kits open':'')+(payrollPreview(G,role)?'. '+payrollPreview(G,role):''),'<div class="hb">'+bbtn('hire','data-role="'+role+'" data-d="-1" aria-label="Let one go"','−',n>0)+bbtn('hire','data-role="'+role+'" data-d="1"','+ Hire',(role!=='pack'||st.tier>0)&&G.money>=corporateTaxReserve(G)+Math.max(7*staffPay(G,role),7*fixedOverhead(G)+7*staffPay(G,role)),true)+'</div>');};
-    if(st.aiSales)hs+=itemHTML('AI sales agents','Sell every day from every tank. Customers +100%, like four salespeople. About '+aed(Math.min(300,1+0.00005*E.soldToday))+'/day in tokens.','<button class="btn" disabled>Running</button>');
+    if(st.aiSales)hs+=itemHTML('AI sales agents','Sell every day from every tank. Customers +100%, like four salespeople. About '+aed(aiSalesDay(G))+'/day in tokens.','<button class="btn" disabled>Running</button>');
     else if(salesOpen(G))hs+=row('sales','+25% customers each, up to 4');
     if(!st.tier){if(toolsHave(G))h+='<p class="hint">Packers need all five packing tools ('+toolsHave(G)+' of 5).</p>';}
     else{
@@ -4959,7 +4966,7 @@ function updateEmpire(){
     }
     if(packingMachineCap(G)>=400&&!st.pack)h='<details><summary>Earlier manual packing tools</summary>'+h+'</details>';h=capLine+h;
     var sn=shopCount(G),man=st.aiMgr?sn:Math.min(sn,st.mgr*4);
-    if(st.aiMgr)hs+=itemHTML('AI shop managers','Run every shop at full strength. About '+aed(2.5)+' of tokens per shop per day.','<button class="btn" disabled>Running</button>');
+    if(st.aiMgr)hs+=itemHTML('AI shop managers','Run every shop at full strength. About '+aed(AI_MGR_DAY)+' of tokens per shop per day.','<button class="btn" disabled>Running</button>');
     else if(sn>0||st.mgr>0)hs+=row('mgr',man+' of '+sn+' shops managed');
     if(pd(G,'aiconsult')){
       if(!st.aiSales){var ready=pd(G,'drones');hs+=itemHTML('Replace salespeople with AI agents',ready?(st.sales?'Your '+st.sales+' salespeople lose their jobs. ':'')+'AI agents sell instead, you pay per token. One-time setup.':'Needs three machines first, from Projects: the AI shrimp counting camera, the automatic packaging machine and a delivery drone fleet.',ready?bbtn('ai','data-role="sales"',aed(3000),G.money>=3000,true):'<button class="btn" disabled>Locked</button>');}
@@ -5363,11 +5370,9 @@ function applyGuide(){
   document.querySelectorAll('.guide-btn,.guide-card,.tabs button.guide').forEach(function(e){e.classList.remove('guide-btn','guide-card','guide');});
   var inCard=!!(g&&g.hideHere&&g.tab===activeTab);
   if(g){bar.dataset.key=g.key;bar.dataset.gtab=g.tab||'';bar.dataset.card=g.card||'';}
-  var soft=!!(g&&g.soft&&g.text&&g.bar!==false),nw=soft?tabWords(g.text):'';$('ideas-now').hidden=!soft;setT('ideas-now',nw);$('ideas').hidden=$('ideas-k').hidden&&!soft;
-  if(!g||g.bar===false||!g.text||inCard||g.soft||!$('hcheck').hidden||(typeof TS!=='undefined'&&TS)||FS){bar.hidden=true;}
-  else{bar.hidden=false;bar.classList.toggle('soft',!!g.soft);setT('gb-k',g.label||(g.soft?'Meanwhile':'Next'));setT('gb-text',tabWords(g.text));
-    var go=g.tab&&g.tab!==activeTab?tabWords(TAB_NAME[g.tab])+' ›':'';setT('gb-go',go);$('gb-x').hidden=!g.skip;}
-  if(bar.hidden&&!inCard&&(!g||g.soft||g.bar===false||!g.text)&&$('hcheck').hidden&&!(typeof TS!=='undefined'&&TS)&&!FS){var svl=savingLine();if(svl){bar.hidden=false;bar.classList.add('soft');bar.dataset.gtab='';bar.dataset.card='';setT('gb-k','Next');setT('gb-text',svl);setT('gb-go','');$('gb-x').hidden=true;}}
+  // Puti, 28 Oct: no Next bar over the game. Its line lives in the ? popup, the glow on the button stays.
+  var soft=!!(g&&g.text&&g.bar!==false&&!inCard&&$('hcheck').hidden&&!(typeof TS!=='undefined'&&TS)&&!FS),nw=soft?tabWords(g.text)+(g.tab&&g.tab!==activeTab?' ('+tabWords(TAB_NAME[g.tab])+')':''):'';$('ideas-now').hidden=!soft;setT('ideas-now',nw);$('ideas').hidden=$('ideas-k').hidden&&!soft;
+  bar.hidden=true;
   if(!g)return;
   if(g.tab&&g.tab!==activeTab){var tb=document.querySelector('.tabs [data-tab="'+g.tab+'"]');if(tb&&!tb.hidden&&!g.soft&&!(g.tab==='up'&&o.visitedUp))tb.classList.add('guide');return;}
   if(g.soft&&!/^speed/.test(g.key))return;

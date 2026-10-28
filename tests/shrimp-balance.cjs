@@ -171,7 +171,7 @@ check('partial historical milestone records do not replay old tutorials on chain
 var g=readyGame();delete g.emp.chainVersion;g.day=2000;g.stats.sold=500;g.kits.sold=1000000;g.emp.farms.hatch=1;g.emp.won=2000;g.humans=WORLD;g.progress.seen={kit:true,farm:true,win:true};g.progress.queue=[];migrate(g);detectMilestones(g);if(g.progress.queue.some(x=>x!=='win'))throw Error('Replayed historical tutorial');
 `);
 check('AI sales retain the four-person bonus with a bounded operating bill', `
-var g=readyGame();g.emp.staff.sales=4;var boost=salesBoost(g);g.money=1000000;g.emp.proj.aiconsult=g.emp.proj.drones=1;if(!goAI(g,'sales')||g.emp.staff.sales||salesBoost(g)!==boost)throw Error('Automation lost capability');g.emp.soldToday=100000000;if(staffCost(g)>300)throw Error('Token bill exceeded cap');
+var g=readyGame();g.emp.staff.sales=4;var boost=salesBoost(g);g.money=1000000;g.emp.proj.aiconsult=g.emp.proj.drones=1;if(!goAI(g,'sales')||g.emp.staff.sales||salesBoost(g)!==boost)throw Error('Automation lost capability');g.emp.soldToday=100000000;if(staffCost(g)>100000000*0.05||staffCost(g)<100000)throw Error('Token bill should be about 2 fils per order (Pass 125), exceeded cap');
 `);
 check('Grandma opening pauses a fresh run until the tank is accepted', `
 var g=newGame(),cash=g.money;if(g.progress.queue[0]!=='intro'||stepGame(g)!==false||g.money!==cash||clock(g)!==0)throw Error('Intro did not pause');
@@ -250,7 +250,7 @@ g.money=1e6;if(buyQC(g,'look'))throw Error('Automation must be bought in order')
 var m1=kitMaterials(g);setQCStrict(g,2);if(!(kitMaterials(g)>m1))throw Error('Strict checks should cost more per kit');var rs=sickKitRate(g);setQCStrict(g,0);if(!(sickKitRate(g)>rs))throw Error('Relaxed checks should let more sick kits through');
 `);
 if(html.includes("needs '+big(nextLine.sold)")||html.includes('show up once your first three tanks')||html.includes('Bacteria starter unlocks when'))throw Error('Unlock rules should not be shown');
-if(!html.includes("if(!g||g.bar===false||!g.text||inCard||g.soft||"))throw Error('Soft hints belong in the popup, not the bar');
+if(!html.includes("bar.hidden=true;\n  if(!g)return;")||!html.includes("$('ideas-now').hidden=!soft"))throw Error('Guide lines belong in the ? popup, never a bar over the game (Puti, 28 Oct)');
 if(!html.includes("if(SPOT||SPOTQ.length||Date.now()-(spotWatch.last||0)<15000)return;"))throw Error('One spotlight at a time');
 check('player decides: room-based gates, any mix of tanks',`
 var g=readyGame();g.stats.sold=KIT_UNLOCK;var t=g.tanks[0];t.had=1;t.vol=80;t.volTier=2;t.pop=[{age:100,n:20,g:60}];if(!kitsOpen(g))throw Error('One 80 L tank should be enough room for kits');
@@ -569,5 +569,8 @@ var g=newGame();g.kits.sold=100;newsLine(g,'front');newsLine(g,'lab',1);var L=ri
 g.emp.later=[{d:0,t:'study',sci:1}];g.day=1;laterDay(g);if(!rip(g).log[2].sci)throw Error('later study news keeps the tag');
 `);
 if(!html.includes('<div id="rp-sci" hidden><h3 class="track">Science</h3>')||!html.includes("+l.fx.slice(1)+'.',1);"))throw Error('Science section and research finds tagged');
+if(html.includes('People start buying mud')||!html.includes('var AI_MGR_DAY=40;')||!html.includes("only as spots open up in your reach")||html.includes('vv.offsetTop'))throw Error('Pass 125: carbon line, token bills, reach-limit orders line, no lifted tab bar');
+if(!/maximum-scale=1,user-scalable=no/.test(html)||!html.includes('gesturestart'))throw Error('Pass 125: no pinch zoom in the game');
+console.log('PASS Pass 125 feel and text fixes');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
