@@ -716,13 +716,13 @@ defObj('trap',{solid:false,name:'Shrimp trap',spr:null,hit:function(o){return [o
 // ----- creatures: pixel sprites with dark outlines, facing right (mirrored for left) -----
 // -- birds. Each has its real colour patches. Poses: 0 perched, 1 pecking, 2 wings up, 3 wings down
 var BIRDS=[
- {id:'bulbul',name:'White-eared bulbul',len:16,where:['feeder','tree','window'],hint:'Comes to any feeder',w:8,stage:0},
- {id:'myna',name:'Common myna',len:17,where:['ground','lawn','feeder'],hint:'Walks about on the lawn',w:5,stage:0},
+ {id:'bulbul',cm:18,name:'White-eared bulbul',len:16,where:['feeder','tree','window'],hint:'Comes to any feeder',w:8,stage:0},
+ {id:'myna',cm:23,name:'Common myna',len:17,where:['ground','lawn','feeder'],hint:'Walks about on the lawn',w:5,stage:0},
  // rare: one of these at most at a time
- {id:'hoopoe',name:'Hoopoe',len:19,where:['lawn','ground'],hint:'Rare. Probes the lawn for grubs',w:0.25,stage:0,rare:1},
- {id:'parakeet',name:'Rose-ringed parakeet',len:24,where:['tree','feeder'],hint:'Rare. Loud, in the trees',w:0.25,stage:0,rare:1},
- {id:'sunbird',name:'Purple sunbird',len:16,where:['flowers','feeder','tree'],hint:'Rare. Comes to flowers',w:0.25,stage:0,rare:1},
- {id:'kingfisher',name:'Arabian collared kingfisher',len:22,where:['water','fence','tree'],hint:'Rare. Watches the water',w:0.2,stage:0,rare:1}];
+ {id:'hoopoe',cm:27,name:'Hoopoe',len:19,where:['lawn','ground'],hint:'Rare. Probes the lawn for grubs',w:0.25,stage:0,rare:1},
+ {id:'parakeet',cm:40,name:'Rose-ringed parakeet',len:24,where:['tree','feeder'],hint:'Rare. Loud, in the trees',w:0.25,stage:0,rare:1},
+ {id:'sunbird',cm:10,name:'Purple sunbird',len:16,where:['flowers','feeder','tree'],hint:'Rare. Comes to flowers',w:0.25,stage:0,rare:1},
+ {id:'kingfisher',cm:24,name:'Arabian collared kingfisher',len:22,where:['water','fence','tree'],hint:'Rare. Watches the water',w:0.2,stage:0,rare:1}];
 var BIRD={};BIRDS.forEach(function(b){BIRD[b.id]=b;});
 function birdPB(B,pose){var L=Math.round(B.len*1.45),tall=!!B.tall,W=L+16,H=tall?Math.round(L*1.7):L+8,pb=new PB(W,H),s=L/18,fly=pose>=2;
   var bx=Math.round(W/2-1),by=tall?Math.round(H*0.5):H-Math.round(7*s)-1,peck=pose===1;
@@ -754,7 +754,16 @@ function animFrame(kind,n,pose,ph,fps){var m=AM(kind,n);if(!m)return 0;var p=m.p
 function animSpr(key,m,i,face,ax,ay){var im=IMG[key];if(!im||!m)return null;var c=document.createElement('canvas');c.width=m.w;c.height=m.h;var x=c.getContext('2d');x.imageSmoothingEnabled=false;
   if(face<0){x.translate(m.w,0);x.scale(-1,1);}x.drawImage(im,i*m.w,0,m.w,m.h,0,0,m.w,m.h);return {c:c,ax:face<0?m.w-ax:ax,ay:ay,w:m.w,h:m.h};}
 var BIRD_HIP={bulbul:44,myna:48};
-function birdSpr(id,pose,face){var m=AM('birds',id);if(m&&IMG['an-bird-'+id]){var t=CACHE.bird[id]||(CACHE.bird[id]=[]);return cached(t,pose*2+(face<0?1:0),function(){return animSpr('an-bird-'+id,m,pose,face,m.ax||BIRD_HIP[id]||m.w/2,m.ay||m.h-13);});}
+// her bird files are all drawn about the same size; scale each to its real length, bill to tail, 2.5 art px a cm
+// (the myna stays as drawn). BIRD_ART is the drawn length in art px, measured off her idle frame (28 Oct).
+var BIRD_PXCM=2.5,BIRD_ART={bulbul:52,myna:57,hoopoe:71,parakeet:105,sunbird:69,kingfisher:99};
+function birdK(id){var B=BIRD[id];return B&&B.cm&&BIRD_ART[id]?Math.min(1,B.cm*BIRD_PXCM/BIRD_ART[id]):1;}
+function shrinkSpr(s,k){if(!s||k>=0.999)return s;var w=Math.max(1,Math.round(s.w*k)),h=Math.max(1,Math.round(s.h*k)),c=document.createElement('canvas');c.width=w;c.height=h;var x=c.getContext('2d');
+  x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.drawImage(s.c,0,0,w,h);
+  // keep the pixel look: alpha snaps to on or off after the smooth shrink
+  var d=x.getImageData(0,0,w,h),a=d.data;for(var i=3;i<a.length;i+=4){if(a[i]<110)a[i]=0;else{var f=255/a[i];a[i-3]=Math.min(255,a[i-3]*f);a[i-2]=Math.min(255,a[i-2]*f);a[i-1]=Math.min(255,a[i-1]*f);a[i]=255;}}x.putImageData(d,0,0);
+  return {c:c,ax:Math.round(s.ax*k),ay:Math.round(s.ay*k),w:w,h:h};}
+function birdSpr(id,pose,face){var m=AM('birds',id);if(m&&IMG['an-bird-'+id]){var t=CACHE.bird[id]||(CACHE.bird[id]=[]);return cached(t,pose*2+(face<0?1:0),function(){return shrinkSpr(animSpr('an-bird-'+id,m,pose,face,m.ax||BIRD_HIP[id]||m.w/2,m.ay||m.h-13),birdK(id));});}
   var B=BIRD[id];var t=CACHE.bird[id]||(CACHE.bird[id]=[]);return cached(t,pose*2+(face<0?1:0),function(){var pb=birdPB(B,0);if(face<0)pb=pb.flipX();return mk(pb,Math.round(pb.w/2),pb.h-1);});}
 // -- chickens
 var HENS=[
@@ -1423,16 +1432,22 @@ function dirVec(d){return d==='right'?[1,0]:d==='left'?[-1,0]:d==='down'?[0,1]:[
 // where the mower is: sets L.mpX, L.mpY
 function mowerPos(){var me=L.me,d=me.dir;L.mpX=me.x+(d==='right'?30:d==='left'?-30:0);L.mpY=me.y+(d==='down'?20:d==='up'?-14:2);}
 function mowTile(tx,ty){var m=M();if(tx<0||ty<0||tx>=m.w||ty>=m.h)return 0;var i=mi(m,tx,ty),g=m.g[i];if(!isGrass(g))return 0;var h=m.gh[i];if(h<=0.04)return 0;
-  m.gh[i]=0;touchTile(tx,ty);LS().stats.mowed++;mowerPos();puff('clip',L.mpX,L.mpY-4,Math.ceil(h*6),{speed:60,up:30,col:g===G_MEADOW?'#8f974a':'#6abe30',life:0.6});
+  m.gh[i]=0;touchTile(tx,ty);LS().stats.mowed++;mowPay();mowerPos();puff('clip',L.mpX,L.mpY-4,Math.ceil(h*6),{speed:60,up:30,col:g===G_MEADOW?'#8f974a':'#6abe30',life:0.6});
   if(g===G_MEADOW&&h>0.6&&Math.random()<0.3)puff('spark',L.mpX,L.mpY-6,1,{col:pick(WFL_HEX),speed:30});return h;}
 var WFL_HEX=['#fbf236','#ffffff','#d77bba','#639bff'];
-function stepMow(dt){var me=L.me;if(L.tool!=='mow'||!me){if(L.mower){L.mower.stop();L.mower=null;}return;}
+// Grandma pays AED 1 a tile mown, up to 300 tiles a game day (Puti, 28 Oct). Paid in one go 3 s after the mower stops,
+// or on a tool change or leaving.
+var MOW_AED=1,MOW_CAP=300;
+function gameDay(){var d=window.GAME_MODE?window.GDAY:S.day;return d==null||!isFinite(d)?null:Math.floor(d);}
+function mowPay(){var l=LS(),d=gameDay();if(d==null)return;if(l.mowD!==d){l.mowD=d;l.mowN=0;}if(l.mowN>=MOW_CAP)return;l.mowN++;L.mowOwe=(L.mowOwe||0)+MOW_AED;if(l.mowN>=MOW_CAP)L.mowFull=1;}
+function mowSettle(){var n=L.mowOwe||0;if(!n)return;L.mowOwe=0;earn(n,'mowing');sfx('coin');toast(L.mowFull?'Grandma paid '+fmtA(n)+'. That’s 300 tiles, enough lawn for today.':'Grandma paid '+fmtA(n)+' for the lawn.');L.mowFull=0;save();}
+function stepMow(dt){var me=L.me;if(L.mowWait>0&&!L.mower){L.mowWait-=dt;if(L.mowWait<=0)mowSettle();}if(L.tool!=='mow'||!me){if(L.mower){L.mower.stop();L.mower=null;}mowSettle();return;}
   var cut=0;if(me.moving){var tx=Math.floor(me.x/T),ty=Math.floor((me.y-4)/T);mowerPos();cut+=mowTile(tx,ty)+mowTile(Math.floor(L.mpX/T),Math.floor(L.mpY/T));
     // grass you can't stand on (under a bush, by a fence) is cut as you go past it
     for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++){var nx=tx+dx,ny=ty+dy;if(!passable(nx,ny)&&isGrass(mget(M(),nx,ny)))cut+=mowTile(nx,ny);}
     L.mowT=0.5;if(!L.mower)L.mower=sfxLoop('mower');}
   else L.mowT-=dt;
-  if(L.mower){if(L.mowT<=0){L.mower.stop();L.mower=null;}else L.mower.set(me.moving?clamp(0.35+cut*0.8,0,1):0.15);}
+  if(L.mower){if(L.mowT<=0){L.mower.stop();L.mower=null;L.mowWait=3;}else L.mower.set(me.moving?clamp(0.35+cut*0.8,0,1):0.15);}
   if(cut>0&&!LS().seen.mow){LS().seen.mow=1;}}
 
 // ----- feeders, eggs, Grandma -----
@@ -1440,11 +1455,11 @@ function fillFeeder(o){var p=o.k==='wfeeder'?wfeederPos(o):[oX(o),oBase(o)-70];
   if((o.s||0)>=0.95){bubAt(p[0],p[1],'<b>It’s full.</b>');return;}if(!spend(5,'seed'))return;o.s=1;sfx('pour');puff('seed',p[0],p[1]-6,14,{speed:24,up:14,life:0.6,g:160});
   if(!LS().seen.feeder){LS().seen.feeder=1;toast('Birds come while there’s seed. Keep still and they come closer.');}computeSpots();save();}
 function collectEggs(o){var l=LS(),n=l.eggs.length,s=objSprite(o),nx=oX(o)+(s&&s.nest?s.nest.x+15:0),ny=oBase(o)+(s&&s.nest?s.nest.y:-40);
-  if(n){var kinds={};l.eggs.forEach(function(k,j){l.basket[k]=(l.basket[k]||0)+1;kinds[k]=1;setTimeout(function(){sfx('egg');},j*110);});l.eggs=[];l.stats.eggs+=n;
-    puff('spark',nx,ny,8,{col:'#fbf236',speed:40,life:0.6});Object.keys(kinds).forEach(function(k){bookAdd('coop','egg-'+k,{where:STAGES[S.stage].name});});toast(plural(n,'egg')+' in the basket.');updateStat(true);save();}
+  if(n){var kinds={};l.eggs.forEach(function(k,j){l.basket[k]=(l.basket[k]||0)+1;kinds[k]=1;setTimeout(function(){sfx('egg');},j*110);});l.eggs=[];l.eggW=[];l.stats.eggs+=n;
+    puff('spark',nx,ny,8,{col:'#fbf236',speed:40,life:0.6});Object.keys(kinds).forEach(function(k){bookAdd('coop','egg-'+k,{where:STAGES[S.stage].name});});var off=l.eggsOff||0;l.eggsOff=0;toast(plural(n,'egg')+' in the basket.'+(off?' '+plural(off,'egg')+' had gone off.':''));updateStat(true);save();}
   coopBub(o,nx,ny-60);}
-var GM_LINES=['The red ones are getting redder.','Did you eat?','Don’t change all the water at once.','That sparrow comes every morning. I call him Lao Wang.','When I was your age I kept fish in a washing bowl.','Sit with me a bit.','Your grandpa says hello.','Shrimp don’t like loud music. I checked.','Pierre was at the tank again. He only watches.','The dog brought me a sock. I said thank you.'];
-function grandmaSays(o){var lines=GM_LINES.slice();if(S.stage>=3)lines.push('Your grandpa wants to see the stream.');if(S.stage>=2)lines.push('The hens are louder than your grandpa.');
+var GM_LINES=['The red ones are getting redder.','Did you eat?','Don’t change all the water at once.','That sparrow comes every morning. I call him Lao Wang.','When I was your age I kept fish in a washing bowl.','Sit with me a bit.','I still make two cups of tea some mornings.','Shrimp don’t like loud music. I checked.','Pierre was at the tank again. He only watches.','The dog brought me a sock. I said thank you.'];
+function grandmaSays(o){var lines=GM_LINES.slice();if(S.stage>=3)lines.push('Your grandpa would have fished this stream. Nothing in it’s big enough.');if(S.stage>=2)lines.push('The hens are louder than your grandpa’s radio.');
   var i=(L.gmI=(L.gmI==null?Math.floor(Math.random()*lines.length):L.gmI+1))%lines.length;bubAt(oX(o),oBase(o)-70,'<b>Grandma</b><div>'+esc(lines[i])+'</div>');sfx('click');}
 function coopBub(o,wx,wy){var l=LS(),n=l.hens.length,cnt={};l.hens.forEach(function(h){cnt[h.kind]=(cnt[h.kind]||0)+1;});
   var who=Object.keys(cnt).map(function(k){return cnt[k]+' '+HEN[k].name.toLowerCase()+(cnt[k]>1?'s':'');}).join(', ');
@@ -1704,7 +1719,7 @@ function mountHome(){var p=$('p-home');ensureLand();
   $('h-help').onclick=function(){openPop('<div class="sheet-hd"><h2>Home</h2><button class="btn sm" onclick="closePop()">Close</button></div>'+
     '<p><b>Walk:</b> tap where Millie should go, or hold and drag to steer her. Tap a thing and she walks over and uses it: a tank, the feeder, the coop, Grandma, the bench. The dog comes along. Tap him or Pierre to say hi.</p>'+
     '<p><b>Birds:</b> sit on the bench or keep still and they come closer. Tap one and stay still while the ring fills. It goes in the book.</p>'+
-    '<p><b>Mow:</b> walk over the grass and the mower cuts it. Short lawn brings hoopoes, long grass brings bee-eaters.</p>'+
+    '<p><b>Mow:</b> walk over the grass and the mower cuts it. Grandma pays AED 1 a tile, up to 300 a day. Short lawn brings hoopoes.</p>'+
     '<p><b>Grain:</b> tap the ground to throw some. Out on the land, step back and wait. When a wild chicken pecks the grain, tap it and Millie creeps up and catches it.</p>'+
     '<p><b>Rod:</b> tap the stream or the lake. Tap again when the float goes under. Keep the fish in the bucket and tap your pond to let them in.</p>'+
     '<p><b>Shrimp trap:</b> with Walk, tap the stream. Check it after a few hours.</p>'+
@@ -1744,7 +1759,7 @@ function updateStat(force){var el=$('lstat');if(!el)return;var l=LS(),html='',eg
   else if(L.tool==='build')html='Pick something to build. Drag the map to look around.';
   else if(l.carry)html='<span>Carrying a '+esc(HEN[l.carry.kind].name.toLowerCase())+'. Tap the yard by the coop to put her down.</span>';
   else if(l.bucket.length)html='<span>Carrying '+plural(l.bucket.length,'fish','fish')+'. Tap your pond to let '+(l.bucket.length>1?'them':'it')+' in, or the stream to let '+(l.bucket.length>1?'them':'it')+' go.</span>';
-  else if(eggsN)html='<span>Basket: '+plural(eggsN,'egg')+'</span><button class="btn sm" data-sell>Sell · '+fmtA(eggsN)+'</button><button class="btn sm" data-gm>Give Grandma</button>';
+  else if(eggsN)html='<span>Basket: '+plural(eggsN,'egg')+'</span><button class="btn sm" data-sell>Sell · '+fmtA(eggsN*EGG_AED)+'</button><button class="btn sm" data-gm>Give Grandma</button>';
   else if(L.tool==='mow')html='Walk over the grass to cut it. Hold and drag to steer.';
   else if(L.tool==='grain')html=S.stage>=3?'Throw grain, step back. Tap a chicken while it pecks.':'Tap the ground to throw grain.';
   else if(L.tool==='rod')html='Tap the stream or the lake to cast.';
@@ -1752,7 +1767,7 @@ function updateStat(force){var el=$('lstat');if(!el)return;var l=LS(),html='',eg
   else{var fe=l.objs.filter(function(o){return o.k==='feeder'||o.k==='wfeeder';}),empty=fe.length&&fe.every(function(o){return (o.s||0)<0.05;}),ready=trapsOn().some(trapReady),eg=l.eggs.length;
     html=me&&me.sit?'Tap a bird to watch it.':ready?'Something’s in the trap.':eg?plural(eg,'egg')+' in the coop.':empty?'The feeder’s empty. Tap it to fill.':!Object.keys(S.book.birds||{}).length?(stageHas('bench')?'Sit on the bench and birds come close. Tap one to watch it.':'Keep still and birds come closer. Tap one to watch it.'):'';}
   if(el._h===html)return;el._h=html;el.innerHTML=html;
-  var sb=el.querySelector('[data-sell]');if(sb)sb.onclick=function(){earn(eggsN,'eggs');l.basket={};sfx('coin');toast('Sold '+plural(eggsN,'egg')+' for '+fmtA(eggsN)+'.');updateStat(true);save();};
+  var sb=el.querySelector('[data-sell]');if(sb)sb.onclick=function(){earn(eggsN*EGG_AED,'eggs');l.basket={};sfx('coin');toast('Sold '+plural(eggsN,'egg')+' for '+fmtA(eggsN*EGG_AED)+'.');updateStat(true);save();};
   var gb=el.querySelector('[data-gm]');if(gb)gb.onclick=function(){l.basket={};toast('Grandma got '+plural(eggsN,'egg')+'. She’s making steamed egg.');updateStat(true);save();};}
 
 // ----- drawing (one canvas pixel per art pixel; nothing here allocates per frame) -----
@@ -1776,7 +1791,7 @@ function drawWater(x){var m=M(),x0=Math.max(0,Math.floor(L.cam.x/T)),y0=Math.max
   x.globalAlpha=1;}
 function drawWindowFeeders(x){var ob=LS().objs;for(var i=0;i<ob.length;i++){var o=ob[i];if(o.k!=='wfeeder')continue;var r=mainRoom(),px=oX(o),py=(r?r.y:o.ty)*T-30;if(!inView(px,py,80))continue;drawSpr(x,objSprite(o),px,py);var lvl=clamp(o.s||0,0,1),sh=Math.round(14*lvl);if(sh>0)wrect(x,px-15,py-4-sh,30,sh,'#d9a066');
   for(var j=0;j<L.birds.length;j++)if(L.birds[j].win)drawBird(x,L.birds[j]);}}
-function drawBird(x,b){var s=birdSpr(b.sp,birdPose(b),b.face);if(b.st==='stay'&&!b.spot.hover&&!b.win)drawSpr(x,shadowSpr(Math.max(4,Math.round(BIRD[b.sp].len*0.4)),2),b.x,b.y);drawSpr(x,s,b.x,b.y);}
+function drawBird(x,b){var s=birdSpr(b.sp,birdPose(b),b.face);if(b.st==='stay'&&!b.spot.hover&&!b.win)drawSpr(x,shadowSpr(Math.max(3,Math.round((BIRD[b.sp].cm||18)*0.45)),2),b.x,b.y);drawSpr(x,s,b.x,b.y);}
 function drawTrap(x,o){var cx=o.tx*T+T/2,cy=Math.round(o.ty*T+T/2+Math.sin(L.rt*2.2+o.tx)*1.5),bk=o.bank||[cx,cy+40];
   var n=Math.max(2,Math.round(Math.hypot(bk[0]-cx,bk[1]-cy)/3));x.fillStyle='#d8cfb8';for(var i=0;i<=n;i++){var t=i/n,sag=Math.sin(t*Math.PI)*6;x.fillRect(Math.round(cx+(bk[0]-cx)*t)-L.cdx,Math.round(cy+(bk[1]-cy)*t+sag)-L.cdy,1,1);}
   wrect(x,bk[0]-2,bk[1]-12,4,14,'#6b4226');wrect(x,bk[0]-2,bk[1]-12,4,1,'#8f563b');
@@ -1787,7 +1802,7 @@ function drawFishing(x){var f=L.fishing;if(!f||f.st==='idle')return;rodTip();var
   if(f.st==='bite'){x.save();x.beginPath();x.rect(Math.round(bx-6)-L.cdx,Math.round(by-12)-L.cdy,12,9);x.clip();drawSpr(x,bobberSpr(),bx,by);x.restore();}else drawSpr(x,bobberSpr(),bx,by);}
 // the watch ring: pixel dots, white all round, green as it fills
 var RING=[];(function(){for(var i=0;i<40;i++){var a=-Math.PI/2+i/40*Math.PI*2;RING.push([Math.round(Math.cos(a)*9),Math.round(Math.sin(a)*9)]);}})();
-function drawWatch(x){var w=L.watch;if(!w||!w.b)return;var b=w.b,k=clamp(w.t/1.5,0,1),cy=Math.round(b.y-Math.round(BIRD[b.sp].len*1.45)-16),cx=Math.round(b.x),n=Math.round(k*RING.length);
+function drawWatch(x){var w=L.watch;if(!w||!w.b)return;var s0,b=w.b,k=clamp(w.t/1.5,0,1),cy=Math.round(b.y-(s0=birdSpr(b.sp,0,1),s0?s0.ay:Math.round(BIRD[b.sp].len*1.45))-16),cx=Math.round(b.x),n=Math.round(k*RING.length);
   x.fillStyle='#fbf8f1';for(var i=0;i<RING.length;i++)x.fillRect(cx+RING[i][0]-1-L.cdx,cy+RING[i][1]-1-L.cdy,3,3);
   x.fillStyle='#2d6a4f';for(var j=0;j<n;j++)x.fillRect(cx+RING[j][0]-L.cdx,cy+RING[j][1]-L.cdy,2,2);}
 // a bird's name floats up over it for a moment (a little HTML tag, so the text stays sharp)
@@ -1887,10 +1902,22 @@ function regBook(){
 
 // Eggs. In the prototype a day is 20 s and each hen lays on 30% of days. In the game a day is a real day, so that was
 // one egg every three real days and Puti never saw one (28 Oct): there each hen gets a go every two real hours instead.
-function layEggs(n,p){var l=LS();if(S.stage<2||!stageHas('coop'))return;for(var k=0;k<n;k++)l.hens.forEach(function(h){if(l.eggs.length<12&&Math.random()<(h.kind==='wild'?p*0.66:p))l.eggs.push(HEN[h.kind].egg);});}
-var EGG_EVERY=1/12;
-function eggClock(){if(!window.GAME_MODE||!S.land||!S.land.map)return;var l=LS();if(l.eggAt==null||l.eggAt>S.day){l.eggAt=S.day;return;}
-  var n=Math.floor((S.day-l.eggAt)/EGG_EVERY);if(n<1)return;l.eggAt+=n*EGG_EVERY;var e0=l.eggs.length;layEggs(Math.min(n,12),0.6);if(l.eggs.length!==e0){if(L.shown)updateStat(true);save();}}
+// Eggs (Puti, 28 Oct): every hen lays one egg a game day, on the company's clock, so time that flies there fills the
+// coop here. Eggs in the coop go off after 2 to 4 weeks, sooner when it's hot (outdoor shade, Abu Dhabi: about
+// 19 °C in January, 36 °C in August). Collected eggs keep. l.eggW is each coop egg's wear, 0 new, 1 gone off.
+var EGG_AED=3;
+function outdoorT(d){return 27.5+8.5*Math.sin(2*Math.PI*(d-194)/365);}
+function eggLife(t){return clamp(28-(t-22)*14/12,14,28);}
+function eggW(){var l=LS();if(!l.eggW)l.eggW=[];while(l.eggW.length<l.eggs.length)l.eggW.push(0);if(l.eggW.length>l.eggs.length)l.eggW.length=l.eggs.length;return l.eggW;}
+function eggDay(d){var l=LS();if(S.stage<2||!stageHas('coop'))return;var w=eggW(),inc=1/eggLife(outdoorT(d)),ke=[],kw=[];
+  for(var i=0;i<l.eggs.length;i++){if(w[i]+inc>=1){l.eggsOff=(l.eggsOff||0)+1;continue;}ke.push(l.eggs[i]);kw.push(w[i]+inc);}
+  l.hens.forEach(function(h){if(ke.length<400){ke.push(HEN[h.kind].egg);kw.push(0);}});l.eggs=ke;l.eggW=kw;}
+// whole game days since the last go. Away more than 40 days: what was in the coop has gone off, only the last 40 days lay
+function eggClock(){if(!S.land||!S.land.map)return;var gd=window.GAME_MODE?window.GDAY:S.day;if(gd==null||!isFinite(gd))return;gd=Math.floor(gd);var l=LS();
+  if(l.eggV!==2){l.eggV=2;l.eggAt=gd;eggW();return;}
+  if(l.eggAt==null||l.eggAt>gd||l.eggAt<gd-4000){l.eggAt=gd;return;}var n=gd-l.eggAt;if(n<1)return;var e0=l.eggs.length;
+  if(n>40){l.eggsOff=(l.eggsOff||0)+l.eggs.length;l.eggs=[];l.eggW=[];}
+  for(var d=Math.max(l.eggAt+1,gd-39);d<=gd;d++)eggDay(d);l.eggAt=gd;if(L.shown)updateStat(true);save();}
 // ----- module -----
 var MOD={name:'land',
   init:function(){ensureLand();L.tool=mapTool(LS().tool);regBook();loadArt();window.addEventListener('resize',function(){if(L.shown){sizeCanvas();}});},
@@ -1899,17 +1926,16 @@ var MOD={name:'land',
   // feeder lasts about a quarter of an hour.
   day:function(d){if(!S.land||!S.land.map)return;var l=LS(),m=l.map;
     for(var i=0;i<m.g.length;i++){var g=m.g[i];if(isGrass(g)){m.gh[i]=Math.min(1,m.gh[i]+(g===G_MEADOW?0.05:0.04));if(L.groundOK&&L.gbk)touchTile(i%m.w,(i/m.w)|0,true);}}
-    if(!window.GAME_MODE)layEggs(1,0.3);
     l.objs.forEach(function(o){if(o.k==='feeder'||o.k==='wfeeder')o.s=Math.max(0,(o.s||0)-0.02);});
     if(S.stage===3&&l.wild.length<4&&Math.random()<0.6){l.wild.push(newWild());if(L.shown)syncAgents();}},
   tick:function(dd,ds){try{eggClock();}catch(e){}if(L.shown&&activeTab==='home'&&!document.hidden)try{frame(ds);}catch(e){if(!L.err){L.err=1;console.error('land frame',e);}}},
   show:function(){L.shown=true;mountHome();},
-  hide:function(){L.shown=false;closeBub();if(L.mower){L.mower.stop();L.mower=null;}L.watch=null;if(L.ptr)L.ptr.down=false;},
+  hide:function(){mowSettle();L.shown=false;closeBub();if(L.mower){L.mower.stop();L.mower=null;}L.watch=null;if(L.ptr)L.ptr.down=false;},
   render:function(){if(L.shown){renderCard();updateStat(true);}},
   stageChanged:function(){}};
 registerMod(MOD);registerTab('home',MOD);
 // for tests, the Try tab and the Dev tab
-window.LAND={L:L,T:T,stats:function(){return S.land.stats;},toWorld:fromCss,camFocus:camFocus,setTool:function(t){setTool(mapTool(t));},BIRDS:BIRDS,FISH:FISH,HENS:HENS,spawnBird:spawnBird,computeSpots:computeSpots,objs:function(){return S.land.objs;},
+window.LAND={settle:function(){mowSettle();},L:L,T:T,stats:function(){return S.land.stats;},toWorld:fromCss,camFocus:camFocus,setTool:function(t){setTool(mapTool(t));},BIRDS:BIRDS,FISH:FISH,HENS:HENS,spawnBird:spawnBird,computeSpots:computeSpots,objs:function(){return S.land.objs;},
   me:function(){return L.me;},dog:function(){return L.dog;},cat:function(){return L.cat;},map:function(){return M();},passable:passable,ready:function(){return ART.ready&&L.groundOK;},
   screenOf:function(wx,wy){return toCss(wx,wy);},tapWorld:function(wx,wy){var c=toCss(wx,wy);onTap(wx,wy,c[0],c[1]);},walkTile:function(tx,ty){return walkTo([tx,ty],null,null,null);},
   waterKind:waterKind,tileOf:tileOf,objSprite:objSprite,oX:oX,oBase:oBase,

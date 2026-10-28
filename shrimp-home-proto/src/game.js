@@ -31,7 +31,7 @@ function syncOwn(d){OWN=d;var T=ownT();if(!T||typeof newInd!=='function'||typeof
   if(yo.length<Y)add(Y-yo.length,false);else if(yo.length>Y)cut(yo,yo.length-Y);
   if(activeTab==='tank'&&typeof tvSync==='function')try{tvSync();}catch(e){}}
 window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||!S)return;
-  if(d.type==='cash'){S.cash=d.cash;updateHeader();}
+  if(d.type==='cash'){S.cash=d.cash;if(d.day!=null)window.GDAY=d.day;updateHeader();}
   if(d.type==='own')syncOwn(d);});
 // shrimp that leave your tank here leave it in the game too
 var _move=netMoveTo;netMoveTo=function(T2){var T=ownT(),N=netList(),a=0,y=0;if(T&&T2&&T2!==T)N.forEach(function(e){if(e.from===T.id){if(e.ind.age>=ADULT_DAYS)a++;else y++;}});_move(T2);if(a+y)post({type:'take',adults:a,young:y});};
@@ -44,7 +44,7 @@ function clock(){var d=new Date();return d.toLocaleDateString('en-GB',{weekday:'
 var _uh=updateHeader;updateHeader=function(){_uh();var b=$('b-date');if(b)b.textContent=clock();var s=$('b-sub');if(s)s.textContent='';};
 function shell(){['tb-info'].forEach(function(id){var e=$(id);if(e)e.remove();});var tag=document.querySelector('.devtag');if(tag)tag.remove();var sp=$('speed');if(sp)sp.remove();
   document.querySelectorAll('.tabs [data-tab="book"],.tabs [data-tab="try"]').forEach(function(b){b.remove();});
-  var row=document.querySelector('.top .brand');if(row&&!$('tb-back')){var bb=document.createElement('button');bb.className='btn sm';bb.id='tb-back';bb.type='button';bb.textContent='Back to the company';bb.onclick=function(){save(true);sfx('click');post({type:'back'});};row.insertBefore(bb,row.firstChild);}
+  var row=document.querySelector('.top .brand');if(row&&!$('tb-back')){var bb=document.createElement('button');bb.className='btn sm';bb.id='tb-back';bb.type='button';bb.textContent='Back to the company';bb.onclick=function(){try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};row.insertBefore(bb,row.firstChild);}
   document.body.classList.add('in-game');}
 
 // ----- start: the land, from empty the first time; time that passed while away is caught up -----
