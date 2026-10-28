@@ -637,5 +637,6 @@ check('Breeders go up to one per litre of the biggest tank',`var G=newGame();if(
 if(!/function renderTankSheet[\s\S]{0,900}it\('feeder','Auto feeder'[\s\S]{0,200}it\('autoWC'/.test(html))throw Error('Puti: the new-tank sheet offers the auto feeder and auto water changer');
 if(!html.includes("else if(G.tanks.length<2||T.cycledAt!=null)sup='';"))throw Error('Puti: no seed bacteria rows for a cycled tank');
 count++;console.log('PASS new-tank sheet offers auto gear, no seed rows for cycled tanks');
+check('the farm takes the extra tanks as soon as the first farm is built, before its card',`var G=newGame();G.tanks.push(newTank(1));G.tanks.push(newTank(2));G.tanks.forEach(function(t){t.pop=[{age:90,n:300,g:50}];});G.emp.farms.rack=1;if(!farmBuilt(G))throw Error('no farm');detectMilestones(G);if(G.tanks.length!==1)throw Error('tanks '+G.tanks.length);if(totalN(G.tanks[0])>20.5)throw Error('tank 1 keeps 20, has '+totalN(G.tanks[0]));var G2=newGame();G2.tanks.push(newTank(1));G2.emp.farms.rack=1;G2.progress.seen.owntank=true;detectMilestones(G2);if(G2.tanks.length!==1)throw Error('saves with the card waiting');`);
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

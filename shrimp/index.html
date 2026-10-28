@@ -2058,7 +2058,7 @@ function milestoneConditions(G){var t=G.tanks[0],p=ppm(t);return Object.assign({
 function storyChoose(G,key,i){var E=G.emp,m=MILESTONES[key],ch=storyChoices(G,key);if(!m||!ch||!ch[i])return false;
  if(CARDS3[key]){if(!card3Choose(G,key,i))return false;(G.story.choices||(G.story.choices={}))[key]=i;log(G,m.title+': '+ch[i][0].toLowerCase());return true;}
  if(m.opts||m.dyn){if(!(m.opts?m.pick(G,i):byeChoose(G,m.dyn,i)))return false;(G.story.choices||(G.story.choices={}))[key]=i;log(G,m.title+': '+ch[i][0].toLowerCase());return true;}
- if(key==='owntank'){G.me.keep='self';retireTanks(G);keepTwenty(G);G.sel=0;G.recipe=false;G.me.keepBase=(G.ps?G.ps.look+G.ps.treat:0)+G.me.happy+Math.floor((G.stats.wiped||0)/30);}
+ if(key==='owntank'){ownTankNow(G);G.me.keepBase=(G.ps?G.ps.look+G.ps.treat:0)+G.me.happy+Math.floor((G.stats.wiped||0)/30);}
  if(key==='me_burnout'&&i===0){G.me.burnt=Math.floor(G.day)+14;G.me.bo=0;G.me.hp=Math.min(100,(G.me.hp||80)+5);}
  if(key==='me_burnout'&&i===1){G.me.burnt=0;G.me.heavy=2;G.me.bo=80;G.me.hp=Math.max(0,(G.me.hp||80)-8);G.me.tired=Math.floor(G.day)+28;}
  if(key==='dye_offer'&&i===0){G.dye={on:1,day:Math.floor(G.day)};addHeart(G,-1);}
@@ -2095,7 +2095,8 @@ function migrateProgress(G){
 function detectMilestones(G){
   updateStory(G);var p=ensureProgress(G),conditions=milestoneConditions(G);
   if(!p.wait)p.wait=[];if(!p.soon)p.soon=[];
-  Object.keys(MILESTONES).forEach(function(k){if(conditions[k]&&!p.seen[k]){p.seen[k]=true;markEvent(G);if(!G.opt.all||k==='win'){if(storyWaits(k)){if(STORY_FIRST.indexOf(k)>=0)p.wait.unshift(k);else p.wait.push(k);}else if(CARD_NOW.indexOf(k)>=0)p.queue.push(k);else p.soon.push(k);}if(k==='farm')p.home='emp';}});
+  Object.keys(MILESTONES).forEach(function(k){if(conditions[k]&&!p.seen[k]){p.seen[k]=true;markEvent(G);if(!G.opt.all||k==='win'){if(storyWaits(k)){if(STORY_FIRST.indexOf(k)>=0)p.wait.unshift(k);else p.wait.push(k);}else if(CARD_NOW.indexOf(k)>=0)p.queue.push(k);else p.soon.push(k);}if(k==='farm')p.home='emp';if(k==='owntank')ownTankNow(G);}});
+  if(p.seen.owntank&&!(G.me&&G.me.keep==='self')&&farmBuilt(G)&&!G.emp.won)ownTankNow(G);
   // Chapter cards wait for 15 s of play after the last card, story cards wait for that too and for no chapter card pending.
   var now=storyClock(G),rested=(p.lastAck==null||now-p.lastAck>=CARD_GAP||now<p.lastAck)&&!(typeof SPOT!=='undefined'&&SPOT&&SPOT.on);
   if(p.soon.length&&!p.queue.length&&rested){p.queue.push(p.soon.shift());rested=false;}
@@ -2684,6 +2685,8 @@ function personalDay(G){var M=G.me;if(!M)return;var now=Math.floor(G.day);
 // Your own tank, after the industrial hatchery. Kept tanks get treats by hand, and happy treats that do nothing but make them happy.
 var HAPPY=[{id:'pea',name:'Blanched pea',cost:1,days:3},{id:'mulberry',name:'Mulberry leaf',cost:2,days:5},{id:'snow',name:'Snowflake food',cost:3,days:4}];
 function ownLevel(G){var M=G.me||{},d=(G.ps?G.ps.look+G.ps.treat+Math.floor((G.ps.care||0)/2):0)+(M.happy||0)+Math.floor((M.tq||0)*2)+Math.floor((G.stats.wiped||0)/30)-(M.keepBase||0);return d>=12?2:d>=3?1:0;}
+// The farm takes the extra tanks the moment the first farm is built, not when its story card gets its turn (Pass 149).
+function ownTankNow(G){if(!G.me)G.me=newMe();if(G.me.keep==='self')return;G.me.keep='self';retireTanks(G);keepTwenty(G);G.sel=0;G.recipe=false;}
 function retireTanks(G){if(G.tanks.length<2)return 0;var n=0;G.tanks.slice(1).forEach(function(t){n+=totalN(t);});G.emp.rawShrimp=(G.emp.rawShrimp||0)+n;G.tanks=[G.tanks[0]];G.sel=0;G.recipe=false;log(G,'The farm takes the extra tanks and '+Math.round(n)+' shrimp. Your first tank stays on the shelf');return n;}
 function ownTank(G){return !!(G.me&&G.me.keep==='self');}
 // One home tank left on an auto feeder (racks took the rest, or you keep it yourself): no hunger, nutrition or ration on screen, just food type and treats

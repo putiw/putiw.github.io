@@ -1230,3 +1230,7 @@ BUILD 2026-10-28-feel.
 - Supplies: Bacteria starter and Seed from rows only for a tank that isn't cycled (every new tank is seeded, so they were dead rows).
 - New checks lock both of Puti's requests in `shrimp-balance`. AGENTS.md: ask before removing anything she asked for.
 - Browser check: 320 L tank gives a Breeders max of 320, the Tank 2 sheet shows both buy buttons. Balance 90, academy 10, me 46.
+
+## Pass 149: The farm takes the extra tanks when the first farm is built (29 Oct)
+- Puti had 8 barns and still four 640 L tanks. The tanks only went to the farm when the owntank story card was answered, and that card waited behind other story cards. Now `ownTankNow` runs as soon as the card's condition is met (first farm, `farmBuilt`), and on load for saves where the card is still waiting. The card just tells you.
+- New balance check for both paths. Balance 91, academy 10, me 46.
