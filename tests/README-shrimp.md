@@ -1259,3 +1259,8 @@ BUILD 2026-10-28-feel.
 
 ## Deploy 29 Oct (BUILD land-clock): Passes 150-151
 - Two independent reviews; fixes from both are in Pass 151. Bots seed 7: strong 2,286, kind 3,031, average Earth 6,581 / Space 7,992. Spotlight sweep 117 checked, all good. Layout scan: one empty element 2 px wide on World at the win stage, not looked into. Monkey test removed.
+
+## Pass 152: Breeders label fits, a section is introduced once (29 Oct)
+- Breeders slider value overflowed its 66 px column ("0.5 per L · 10 in Tank 1"). Now two lines, "0.5 per L" over "10 kept". Worst case "4.8 per L / 1,250 kept" measures 58 px at 320-390 px.
+- An intro or chapter card that already explains a tab or section now counts as its spotlight (`INTRO_COVERS`, `introCovers` on Continue). Covered: cycle (Trade, Buy), kits (Kits tab, kits, packing), farm, ministry, hardpart, coin_offer, tanks2, health, qc, tools, station, bulk, worldtab (World tab, regions), ripple (Shrimp Times, also sets `rippleIntro` so "New issue" doesn't follow), me_intro. Spotlights already queued for those are dropped, `now:1` ones (pause, health "Tap the tank") stay.
+- Balance 94, academy 10, me 46. No bots or spotlight sweep yet (run before deploy).
