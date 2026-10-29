@@ -1064,7 +1064,7 @@ function nearestReachable(F,wx,wy,maxR){var m=M(),t=tileOf(wx,wy),best=-1,bd=1e9
   return best<0?null:[best%m.w,(best/m.w)|0];}
 
 // ----- Millie -----
-var ME_SPEED=210;
+var ME_SPEED=210,MOW_SPEED=330;   // the mower is quicker than a walk (Puti, 29 Oct: mowing felt slow)
 function placeChars(){var m=M(),l=LS(),st=l.me&&passable(l.me.tx,l.me.ty)?[l.me.tx,l.me.ty]:(m.start||[Math.floor(m.w/2),Math.floor(m.h/2)]);
   if(!passable(st[0],st[1])){for(var i=0;i<m.g.length;i++)if(L.pass[i]){st=[i%m.w,(i/m.w)|0];break;}}
   L.me={x:st[0]*T+T/2,y:st[1]*T+T/2+8,dir:'down',moving:false,path:[],anim:0,act:null,idle:0,sit:null,speed:ME_SPEED};
@@ -1075,7 +1075,7 @@ function meStop(){var me=L.me;if(!me)return;me.path=[];me.moving=false;me.act=nu
 // walk to a tile; then do act()
 function walkTo(goal,ex,ey,act,opt){var me=L.me;if(!me)return false;opt=opt||{};if(me.sit)standUp();var st=tileOf(me.x,me.y),F=flood(st[0],st[1]);
   if(!isFinite(F.dist[goal[1]*M().w+goal[0]])){var nr=nearestReachable(F,ex!=null?ex:(goal[0]+0.5)*T,ey!=null?ey:(goal[1]+0.5)*T,6);if(!nr)return false;goal=nr;ex=null;ey=null;}
-  var p=pathFor(me.x,me.y,goal,ex,ey,F);if(!p)return false;me.path=p;me.act=act||null;me.speed=opt.speed||(L.tool==='mow'?150:ME_SPEED);me.sneak=!!opt.sneak;
+  var p=pathFor(me.x,me.y,goal,ex,ey,F);if(!p)return false;me.path=p;me.act=act||null;me.speed=opt.speed||(L.tool==='mow'?MOW_SPEED:ME_SPEED);me.sneak=!!opt.sneak;
   if(!p.length){me.moving=false;if(act){me.act=null;act();}return true;}
   if(!me.moving){me.moving=true;}
   if(L.watch){L.watch=null;}return true;}
@@ -1335,12 +1335,12 @@ function hitChick(wx,wy,list,r){var best=null,bd=r;Object.keys(list).forEach(fun
 
 // ----- particles -----
 function puff(kind,x,y,n,o){o=o||{};for(var i=0;i<n;i++){var a=Math.random()*6.283,s=(o.speed||40)*(0.4+Math.random());L.parts.push({k:kind,x:x,y:y,vx:Math.cos(a)*s+(o.vx||0),vy:Math.sin(a)*s*0.6-(o.up||0),life:0,max:(o.life||0.7)*(kind==='heart'?1:(0.6+Math.random()*0.6)),col:o.col,r:o.r||1,g:o.g});}}
-function stepParts(dt){var a=L.parts,n=0;for(var i=0;i<a.length;i++){var p=a[i];p.life+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;var dr=p.k==='coin'?0.6:p.k==='clip'?3.5:p.k==='feather'?1.2:p.k==='heart'?0:2;p.vx*=Math.max(0,1-dr*dt);
-  p.vy=p.vy*Math.max(0,1-dr*dt)+(p.k==='drop'?300:p.k==='feather'?16:p.k==='seed'?(p.g||240):p.k==='clip'?60:0)*dt;if(p.life<p.max)a[n++]=p;}a.length=n;}
+function stepParts(dt){var a=L.parts,n=0;for(var i=0;i<a.length;i++){var p=a[i];p.life+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;var dr=p.k==='coin'?0.6:p.k==='clip'?2.2:p.k==='feather'?1.2:p.k==='heart'?0:2;p.vx*=Math.max(0,1-dr*dt);
+  p.vy=p.vy*Math.max(0,1-dr*dt)+(p.k==='drop'?300:p.k==='feather'?16:p.k==='seed'?(p.g||240):p.k==='clip'?150:0)*dt;if(p.life<p.max)a[n++]=p;}a.length=n;}
 function drawParts(x){for(var i=0;i<L.parts.length;i++)drawPart(x,L.parts[i]);x.globalAlpha=1;}
 function drawPart(x,p){var a=1-p.life/p.max;x.globalAlpha=clamp(a*1.5,0,1);
   if(p.k==='coin'){var cx=Math.round(p.x),cy=Math.round(p.y);wrect(x,cx-2,cy-3,5,7,'#21181b');wrect(x,cx-3,cy-2,7,5,'#21181b');wrect(x,cx-2,cy-2,5,5,'#fbf236');wrect(x,cx-1,cy-2,1,4,'#fff6a8');wrect(x,cx+1,cy-1,1,3,'#d9a320');}
-  else if(p.k==='clip')wrect(x,p.x,p.y,2,1,p.col||'#6abe30');
+  else if(p.k==='clip')wrect(x,p.x,p.y,2,p.r>1?2:1,p.col||'#6abe30');
   else if(p.k==='feather'){wrect(x,p.x,p.y,3,1,p.col||'#f7f3ea');wrect(x,p.x+1,p.y+1,1,1,'#9badb7');}
   else if(p.k==='ring'){var rr=(4+(1-a)*18)*p.r;x.globalAlpha=clamp(0.85*a,0,1);x.fillStyle='#ffffff';for(var q=0;q<RING.length;q+=2){x.fillRect(Math.round(p.x+RING[q][0]/9*rr)-L.cdx,Math.round(p.y+RING[q][1]/9*rr*0.45)-L.cdy,1,1);}}
   else if(p.k==='drop')wrect(x,p.x,p.y,1,2,'#cbdbfc');
@@ -1459,7 +1459,7 @@ function dirVec(d){return d==='right'?[1,0]:d==='left'?[-1,0]:d==='down'?[0,1]:[
 // where the mower is: sets L.mpX, L.mpY
 function mowerPos(){var me=L.me,d=me.dir;L.mpX=me.x+(d==='right'?30:d==='left'?-30:0);L.mpY=me.y+(d==='down'?20:d==='up'?-14:2);}
 function mowTile(tx,ty){var m=M();if(tx<0||ty<0||tx>=m.w||ty>=m.h)return 0;var i=mi(m,tx,ty),g=m.g[i];if(!isGrass(g))return 0;var h=m.gh[i];if(h<=0.04)return 0;
-  m.gh[i]=0;touchTile(tx,ty);LS().stats.mowed++;mowPay();mowerPos();puff('clip',L.mpX,L.mpY-4,Math.ceil(h*6),{speed:60,up:30,col:g===G_MEADOW?'#8f974a':'#6abe30',life:0.6});
+  m.gh[i]=0;touchTile(tx,ty);LS().stats.mowed++;mowPay();mowerPos();var gc=g===G_MEADOW?['#8f974a','#a7ad5c','#6f7a35']:['#6abe30','#8fd14f','#4b8f1f'];for(var c=0;c<3;c++)puff('clip',L.mpX,L.mpY-4,Math.ceil(h*3)+2,{speed:120,up:95,vx:(L.me.dir==='left'?60:L.me.dir==='right'?-60:0),col:gc[c],life:0.95,r:Math.random()<0.5?2:1});
   if(g===G_MEADOW&&h>0.6&&Math.random()<0.3)puff('spark',L.mpX,L.mpY-6,1,{col:pick(WFL_HEX),speed:30});return h;}
 var WFL_HEX=['#fbf236','#ffffff','#d77bba','#639bff'];
 // Grandma pays AED 1 a tile mown, up to 300 tiles a game day (Puti, 28 Oct). Paid in one go 3 s after the mower stops,
@@ -1769,7 +1769,7 @@ function mountHome(){var p=$('p-home');ensureLand();
   if(window.GAME_MODE&&typeof updateHeader==='function')updateHeader();
   var l=LS();if(l.seen.refund){toast('Your old decorations were packed up. '+fmtA(l.seen.refund)+' back.',3800);l.seen.refund=0;}}
 function setTool(id,quiet){id=mapTool(id);if(L.cv&&!toolsHere().some(function(t){return t.id===id;})){if(!quiet)toast(id==='rod'?'No fish here yet. Wait for the land with the stream.':'Not here yet.');id='walk';}
-  L.tool=id;LS().tool=id;closeBub();L.hints=null;L.dirty=true;if(id!=='rod'&&L.fishing)L.fishing=null;if(id!=='build')L.camFree=false;if(id==='mow'&&L.me)L.me.speed=150;else if(L.me)L.me.speed=ME_SPEED;
+  L.tool=id;LS().tool=id;closeBub();L.hints=null;L.dirty=true;if(id!=='rod'&&L.fishing)L.fishing=null;if(id!=='build')L.camFree=false;if(id==='mow'&&L.me)L.me.speed=MOW_SPEED;else if(L.me)L.me.speed=ME_SPEED;
   document.querySelectorAll('#ltools [data-tool]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.tool===id));});
   var pal=$('lpal');if(pal){if(id==='build'){renderBuildPal(pal);pal.hidden=false;}else{pal.hidden=true;L.buildSel=null;L.removing=false;L.moving=false;L.moveObj=null;}}
   if(!quiet)sizeCanvas();updateStat(true);}
