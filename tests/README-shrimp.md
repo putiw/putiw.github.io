@@ -1264,3 +1264,13 @@ BUILD 2026-10-28-feel.
 - Breeders slider value overflowed its 66 px column ("0.5 per L · 10 in Tank 1"). Now two lines, "0.5 per L" over "10 kept". Worst case "4.8 per L / 1,250 kept" measures 58 px at 320-390 px.
 - An intro or chapter card that already explains a tab or section now counts as its spotlight (`INTRO_COVERS`, `introCovers` on Continue). Covered: cycle (Trade, Buy), kits (Kits tab, kits, packing), farm, ministry, hardpart, coin_offer, tanks2, health, qc, tools, station, bulk, worldtab (World tab, regions), ripple (Shrimp Times, also sets `rippleIntro` so "New issue" doesn't follow), me_intro. Spotlights already queued for those are dropped, `now:1` ones (pause, health "Tap the tank") stay.
 - Balance 94, academy 10, me 46. No bots or spotlight sweep yet (run before deploy).
+
+## Pass 153: Late kind answers cost something again (29 Oct, branch shrimp-late-kind, for review)
+- Problem: past about a million owners, fixed prices sit at the 0.2% floor (`scM`), so the kind answer was always picked. At 5B owners the kind bot had AED 62B and AED 2B a day, the AED 50M engineers cost 0.06 days of income.
+- Share of income for a while (`needDues`, `duesAdd`, `duesDay`, `E.dues`, paid daily under Projects): Fund the engineers 1% for a year, Shops take them back 1% for a year, Battery pumps 2% for 6 months.
+- Share of ✦ (`needIF`): Clear the rivers 20%, Fund a wild reserve 15%. Days of income (`needDays`): Free replacements 3 days. Your time (`needAway`, `M.trip`): reef tours, two weeks away, the company runs at half.
+- Kind against kind: Shrimp in the rivers drops Leave it to the agencies. Shops take them back (kin +, own customers) or Clear the rivers (the rivers, the caught shrimp are frozen, kin −).
+- The data sale pays 3 days of income at least (`projGain`), so keeping it private costs something.
+- Backstop: a kind pick from 1M owners whose only cost is under 1% of cash counts half (heart for forks, positive means/care/kin for late cards), counted in `E.cheapK`. Two or more add an ending line: "Late on, most of the kind things were cheap, you could afford them." Nothing current hits it after the changes above.
+- Choice subs show the new costs (`choiceFx`: "Costs AED 20M a day for a year", "2 weeks away, the company runs at half").
+- Balance 95 (new Pass 153 check, trait profile test gets ✦), academy 10, me 46. Bots seed 7 unchanged (they don't pick late cards): strong 2,286, kind 3,031, average Earth 6,581 / Space 7,992.

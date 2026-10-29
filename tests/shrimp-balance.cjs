@@ -435,12 +435,12 @@ var o0=C.otrees;treesFromGala(h,4e6);if(C.otrees-o0!==1e6)throw Error('A mangrov
 if(!html.includes("$('legacy-equipment').hidden=hasFarm&&G.tanks.every(function(t){return t.feeder&&t.autoWC;})")||!html.includes("if(gc&&gc.closest('[hidden]:not(.panel)'))g=null;"))throw Error('Home gear stays until every tank runs itself, and the guide never points at a hidden card');
 if(!html.includes('data-act="hc-cull"')||!html.includes("a==='hc-cull'")||!html.includes('function openCull(i)')||!html.includes("careBack(v,x,T,t);"))throw Error('Cull is a choice in Check shrimp, and the care jobs live in the tank');
 check('traits read the balance of choices: a ruthless and a kind run end up apart on several axes',`
-function prof(cold){var g=readyGame();g.money=1e12;g.humans=1e7;g.kits.sold=1e6;g.emp.staff.pack=5;g.emp.staff.lines=1;g.me.sent=5e5;var x=function(a,b){return cold?a:b;};
+function prof(cold){var g=readyGame();g.money=1e12;g.emp.inf=1e6;g.humans=1e7;g.kits.sold=1e6;g.emp.staff.pack=5;g.emp.staff.lines=1;g.me.sent=5e5;var x=function(a,b){return cold?a:b;};
  [['ev_mira',2,0],['ev_rival',0,1],['ev_ai',0,1],['ev_marine',1,0],['ev_paper',2,1],['dye_offer',0,1],['fight_invite',0,1],['me_burnout',1,0],['coin_offer',1,0]].forEach(function(s){if(!storyChoose(g,s[0],x(s[1],s[2])))throw Error('Choice '+s[0]);});
  Object.keys(FORK_Q).forEach(function(fk){var o=forkOpts(fk).slice().sort(function(a,b){return (a.h||0)-(b.h||0);}),p=cold?o[0]:o[o.length-1];addHeart(g,p.h);trAdd(g,TRAIT_TAGS[p.id]);});
  Object.keys(PAINS).forEach(function(id){if(!painPick(g,id,x(2,0)))throw Error('Pain '+id);});
  if(!byeChoose(g,'pack',x(0,1)))throw Error('Bye');gpLand(g,!cold);partyGo(g,1,!cold);if(!gpScam(g,!cold))throw Error('Scam');
- [['c_cash',0,1],['c_power',2,0],['c_rivers',2,0],['c_many',1,0],['c_blackout',2,0],['c_prison',0,2],['c_fisher',0,2]].forEach(function(s){if(!card3Choose(g,s[0],x(s[1],s[2])))throw Error('Card '+s[0]);});
+ [['c_cash',0,1],['c_power',2,0],['c_rivers',0,1],['c_many',1,0],['c_blackout',2,0],['c_prison',0,2],['c_fisher',0,2]].forEach(function(s){if(!card3Choose(g,s[0],x(s[1],s[2])))throw Error('Card '+s[0]);});
  (cold?[['war','fund'],['poor','credit'],['no','ministers'],['water','desal']]:[['war','pay'],['hot','cool'],['water','wells'],['poor','breeders'],['care','carers'],['no','ask']]).forEach(function(s){var o=hardOp(hardGroup(s[0]),s[1]);trAdd(g,o.tr);addHeart(g,o.h||0);});
  for(var n=0;n<4;n++)trAdd(g,GALA_FOR[x('own','kids')].tr);
  return traitVals(g);}
@@ -645,5 +645,14 @@ if(!html.includes("d.type==='spend'&&d.n>0&&!frozen(G)"))throw Error('no spendin
 var home=require('fs').readFileSync(__dirname+'/../shrimp/home.html','utf8');if(home.indexOf('ADULT_DAYS=75;')<0||home.indexOf('DAY_SEC=1e15;')<0||home.indexOf("type:'give'")<0||home.indexOf('MOW_SPEED=330')<0)throw Error('Land: adult at 75, game days only, moves in go to the game, faster mower (Puti)');
 check('Pass 151 review: old big-tank breeders migrate to a safe per-litre value',`var O=newGame();O.tanks.push(newTank(1));O.tanks[0].vol=20;O.tanks[1].vol=320;O.tanks.forEach(function(t){t.set.keep=40;delete t.set.keepL;});O.packPerL=3;migrate(O);if(!(O.tanks[1].set.keepL<=0.5))throw Error('capped by old pack above: '+O.tanks[1].set.keepL);`);
 count++;console.log('PASS land: real time, game-day clock, adult at 75, frozen, faster mower');
+check('Pass 153: late kind answers cost a share of income, ✦ or time, cheap kindness counts half',`
+var g=readyGame();g.humans=6e9;g.money=2e10;g.fin=[];for(var i=0;i<7;i++)g.fin.push({kits:2e9});g.emp.inf=1e6;
+if(!card3Choose(g,'c_rivers',0))throw Error('shops take back');if(!(g.emp.dues&&g.emp.dues.length===1))throw Error('dues added');
+var m0=g.money;duesDay(g);if(Math.abs(m0-g.money-2e7)>1)throw Error('pays 1% of income a day: '+(m0-g.money));
+g.emp.dues[0].u=0;duesDay(g);if(g.emp.dues.length)throw Error('dues end');
+var f0=g.emp.inf;if(!card3Choose(g,'c_prison',1)||f0-g.emp.inf!==150000)throw Error('reserve takes 15% of ✦');
+g.me.on=1;g.me.trip=0;if(!card3Choose(g,'c_fisher',1)||!(g.me.trip>g.day))throw Error('reef tours take two weeks away');
+var d=PROJ.find(function(p){return p.id==='datasell';});if(projGain(g,d)<5e9)throw Error('data sale scales with income');
+var h=newGame();h.humans=2e6;h.money=1e12;var c0=h.emp.cheapK||0;if(!cheapKind(h,1e6)||cheapKind(h,2e10))throw Error('cheap under 1% of cash only');`);
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
