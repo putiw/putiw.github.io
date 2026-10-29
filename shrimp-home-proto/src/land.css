@@ -108,4 +108,4 @@ body.in-game #tb-back i{font-style:normal}
 .lclock{position:absolute;left:8px;top:8px;z-index:5;background:#fbf8f1;border:2px solid #21181b;border-radius:8px;box-shadow:0 2px 0 #21181b;padding:5px 8px;font:700 12px/1 var(--font-body);color:#21181b;font-variant-numeric:tabular-nums}
 @media (max-width:370px){.landwrap .tslot{width:40px;height:40px}.landwrap .tslot .ticon{width:28px;height:28px}.landwrap .ltools{gap:5px}}
 /* a card waiting at the company (Pass 151) */
-.lneed{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 104px);transform:translateX(-50%);z-index:60;max-width:calc(100% - 32px);padding:8px 14px;border:2px solid #21181b;border-radius:10px;background:#fff6d6;color:#21181b;font:600 13px/1.3 system-ui,sans-serif;box-shadow:0 2px 0 #21181b;text-align:center}
+.lneed{position:fixed;left:0;right:0;margin:0 auto;width:max-content;top:calc(env(safe-area-inset-top) + 104px);z-index:60;max-width:calc(100% - 32px);padding:8px 14px;border:2px solid #21181b;border-radius:10px;background:#fff6d6;color:#21181b;font:600 13px/1.3 system-ui,sans-serif;box-shadow:0 2px 0 #21181b;text-align:center}
