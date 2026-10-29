@@ -1239,3 +1239,8 @@ BUILD 2026-10-28-feel.
 - Bots, seed 7: strong 2,388 empire_dictator (was 2,428), kind 3,198 question_prof (3,187), average Earth 6,581 / Space 7,992 garden_hermit (6,525 / 7,936). No INSOLVENT.
 - Spotlight sweep 114 checked. One ring-offset flag on the tall Trade sales card at first farm; two targets skipped where the harness's own previous spotlight closed late. `shrimp-spotlights.cjs` now clears `progress.lastAck` before each test spotlight (Pass 147 gap) and logs a missing spotlight instead of crashing.
 - Monkey 28,057 taps, 0 problems.
+
+## Pass 150: Spotlight sweep measures only its own spotlight (29 Oct)
+- The "ring top off" on the Trade sales card at first farm was the sweep, not the game. The game's own cash spotlight (money sheet) cut in, and the sweep measured that header ring against the card rule. By hand the sales card ring sits 6 px outside the card as it should.
+- The sweep now stubs `spotWatch` and `introOK` in the page, closes its previous test spotlight properly, and checks that the open spotlight is the one it asked for. The five "no spotlight" skips were the same cause (notes firing and restarting the 15 s gap).
+- Sweep: 114 checked, all good, nothing skipped. No game change.
