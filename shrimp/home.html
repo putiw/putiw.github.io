@@ -301,7 +301,7 @@ body.in-game #tb-back i{font-style:normal}
 .lclock{position:absolute;left:8px;top:8px;z-index:5;background:#fbf8f1;border:2px solid #21181b;border-radius:8px;box-shadow:0 2px 0 #21181b;padding:5px 8px;font:700 12px/1 var(--font-body);color:#21181b;font-variant-numeric:tabular-nums}
 @media (max-width:370px){.landwrap .tslot{width:40px;height:40px}.landwrap .tslot .ticon{width:28px;height:28px}.landwrap .ltools{gap:5px}}
 /* a card waiting at the company (Pass 151) */
-.lneed{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 104px);transform:translateX(-50%);z-index:60;max-width:calc(100% - 32px);padding:8px 14px;border:2px solid #21181b;border-radius:10px;background:#fff6d6;color:#21181b;font:600 13px/1.3 system-ui,sans-serif;box-shadow:0 2px 0 #21181b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lneed{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 104px);transform:translateX(-50%);z-index:60;max-width:calc(100% - 32px);padding:8px 14px;border:2px solid #21181b;border-radius:10px;background:#fff6d6;color:#21181b;font:600 13px/1.3 system-ui,sans-serif;box-shadow:0 2px 0 #21181b;text-align:center}
 
 </style>
 <header class="top" id="top">
@@ -3076,10 +3076,12 @@ function dropHen(wx,wy){var l=LS();if(!l.carry)return;var kind=l.carry.kind,id='
 function trapsOn(){return objsOf('trap');}
 function trapMenu(t,wx,wy){var n=trapsOn().length,here=trapsOn().some(function(o){return o.tx===t[0]&&o.ty===t[1];});
   bubAt(wx,wy-14,'<b>The stream</b><div>Wild shrimp live under the stones.</div><div class="btns"><button class="btn primary" data-trap'+(n>=3||here?' disabled':'')+'>'+(n>=3?'Three traps is enough':here?'There’s one here':'Set a shrimp trap · AED 20')+'</button></div>',function(el){var b=el.querySelector('[data-trap]');if(b)b.onclick=function(){if(!spend(20,'a trap'))return;
-    var me=L.me,o=mkObj('trap',t[0],t[1],{set:S.day,bank:[me.x,me.y-10]});LS().objs.push(o);LS().stats.traps++;sfx('plop');puff('ring',t[0]*T+T/2,t[1]*T+T/2+4,1,{speed:0,life:1});closeBub();
+    var me=L.me,o=mkObj('trap',t[0],t[1],{set:S.day,at:Date.now(),bank:[me.x,me.y-10]});LS().objs.push(o);LS().stats.traps++;sfx('plop');puff('ring',t[0]*T+T/2,t[1]*T+T/2+4,1,{speed:0,life:1});closeBub();
     if(!LS().seen.trap){LS().seen.trap=1;toast('Check it after a few hours.');}save();};});}
-function trapReady(o){return S.day-(o.set||0)>=0.25;}
-function trapTap(o){if(trapReady(o)){openTrap(o);return;}var hrs=Math.max(1,Math.ceil((0.25-(S.day-(o.set||0)))*24));
+// traps run on real hours (Pass 151: land days are game days now, and barely move while you're here)
+var TRAP_MS=6*3600e3;function trapLeft(o){return o.at?TRAP_MS-(Date.now()-o.at):(0.25-(S.day-(o.set||0)))*86400e3;}
+function trapReady(o){return trapLeft(o)<=0;}
+function trapTap(o){if(trapReady(o)){openTrap(o);return;}var hrs=Math.max(1,Math.ceil(trapLeft(o)/3600e3));
   bubAt(o.tx*T+T/2,o.ty*T,'<b>Nothing yet</b><div>Check back in about '+plural(hrs,'hour')+'.</div><div class="btns"><button class="btn" data-out>Take the trap out</button></div>',function(el){el.querySelector('[data-out]').onclick=function(){LS().objs=LS().objs.filter(function(q){return q!==o;});sfx('plop');closeBub();save();};});}
 function rollFinds(){var out=[],r=Math.random();if(r<0.12)out.push('crab');else if(r<0.27)out.push('snail');else if(r<0.37)out.push('nymph');else if(r<0.57)out.push('leaf');else if(r<0.6)out.push('bottle');return out;}
 function spriteCanvas(s,scale,w,h){var c=document.createElement('canvas'),d=Math.min(2,window.devicePixelRatio||1);c.width=Math.round(w*d);c.height=Math.round(h*d);c.style.width=w+'px';c.style.height=h+'px';var x=c.getContext('2d');x.imageSmoothingEnabled=false;
@@ -3112,7 +3114,7 @@ function openTrap(o){var n=2+Math.floor(Math.random()*6),list=[];if(typeof breed
       finds.forEach(function(f){bookAdd('finds',f,{where:'the stream'});});
       var take=list.length&&typeof takeHome==='function';
       bt.innerHTML=(take?'<button class="btn primary" data-take>Take the shrimp home</button>':'')+'<button class="btn" data-go>'+(list.length?'Let them go':'Put it back')+'</button>';bt.hidden=false;
-      o.set=S.day;save();
+      o.set=S.day;o.at=Date.now();save();
       var tb=bt.querySelector('[data-take]');if(tb)tb.onclick=function(){closeSheet();setTimeout(function(){takeHome(list,'stream');},60);};
       bt.querySelector('[data-go]').onclick=function(){closeSheet();sfx('splash');puff('drop',o.tx*T+T/2,o.ty*T+T/2,10,{speed:60,up:50,life:0.6});};}}});}
 
@@ -3596,7 +3598,7 @@ document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length
 document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea')))e.preventDefault();});
 
 // ----- money: the company's cash -----
-var FROZEN='',NEED='';
+var FROZEN='',NEED='',SEQ=0;   // SEQ: our last take/give; an 'own' from before the game handled it is stale
 spend=function(n,what){if(n<=0)return true;if(FROZEN){toast(FROZEN,4200);sfx('nope');return false;}if(S.cash<n){toast('Not enough cash for '+what+'.');sfx('nope');return false;}
   S.cash-=n;post({type:'spend',n:n,what:what});updateHeader();save();return true;};
 earn=function(n,what){if(n<=0)return;S.cash+=n;post({type:'earn',n:n,what:what});updateHeader();save();};
@@ -3608,7 +3610,7 @@ function ownT(){return S.tanks[0]||null;}
 // Your tank is the game's Tank 1. The game decides births and deaths, the land keeps each shrimp it knows (colour,
 // name, age) and only adds or removes the difference, so nothing gets reset. Moves and sales here go to the game.
 function gOf(i){return Math.round(clamp(phOf(i).grade,0,7)/7*100);}
-function syncOwn(d){OWN=d;var T=ownT();if(!T||typeof newInd!=='function'||typeof GEN!=='object')return;T.name='Your tank';T.own=1;
+function syncOwn(d){if((d.seq||0)<SEQ)return;OWN=d;var T=ownT();if(!T||typeof newInd!=='function'||typeof GEN!=='object')return;T.name='Your tank';T.own=1;
   var A=Math.min(600,d.adults|0),Y=Math.min(600,d.young|0),N=netList(),
     mine=function(){return T.shrimp.concat(N.filter(function(e){return e.from===T.id;}).map(function(e){return e.ind;}));},ad=function(){return mine().filter(function(i){return i.age>=ADULT_DAYS;});},yo=function(){return mine().filter(function(i){return i.age<ADULT_DAYS;});};
   // shrimp in the net from Your tank still count as in it until they're moved or sold
@@ -3631,13 +3633,13 @@ if(typeof breedDay==='function'){var _bd=breedDay;breedDay=function(T,d){if(!T.o
 // the land's day is the game's day
 function gameTime(day){if(day==null||!isFinite(day))return;window.GDAY=day;if(S.gday==null||S.gday>day){S.gday=day;return;}var n=Math.floor(day)-Math.floor(S.gday);if(n>=1){S.gday=day;advance(Math.min(n,365));}}
 // a card waiting at the company, or frozen accounts
-function needBar(){var b=$('lneed');if(!NEED){if(b)b.remove();return;}if(!b){b=document.createElement('button');b.type='button';b.id='lneed';b.className='lneed';b.onclick=function(){try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};document.body.appendChild(b);}b.textContent=NEED+' ‹ Go back';}
+function needBar(){var b=$('lneed');if(!NEED){if(b)b.remove();return;}if(!b){b=document.createElement('button');b.type='button';b.id='lneed';b.className='lneed';b.onclick=function(){try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};document.body.appendChild(b);}b.textContent=NEED+' Tap to go back.';}
 window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||!S)return;
   if(d.type==='cash'){S.cash=d.cash;FROZEN=d.frozen||'';var nd=d.need||'';if(nd!==NEED){NEED=nd;needBar();}gameTime(d.day);updateHeader();}
   if(d.type==='own')syncOwn(d);});
 // shrimp that leave your tank here leave it in the game too
-var _move=netMoveTo;netMoveTo=function(T2){var T=ownT(),N=netList(),a=0,y=0,giv=[];if(T&&T2)N.forEach(function(e){if(T2!==T&&e.from===T.id){if(e.ind.age>=ADULT_DAYS)a++;else y++;}if(T2===T&&e.from!==T.id)giv.push({age:e.ind.age,g:gOf(e.ind)});});_move(T2);if(a+y)post({type:'take',adults:a,young:y});if(giv.length)post({type:'give',list:giv});};
-var _sell=sellShrimp;sellShrimp=function(T,i){var own=T===ownT(),ad=i.age>=ADULT_DAYS;var p=_sell(T,i);if(own)post({type:'take',adults:ad?1:0,young:ad?0:1});return p;};
+var _move=netMoveTo;netMoveTo=function(T2){var T=ownT(),N=netList(),a=0,y=0,giv=[];if(T&&T2)N.forEach(function(e){if(T2!==T&&e.from===T.id){if(e.ind.age>=ADULT_DAYS)a++;else y++;}if(T2===T&&e.from!==T.id)giv.push({age:e.ind.age,g:gOf(e.ind)});});_move(T2);if(a+y)post({type:'take',adults:a,young:y,seq:++SEQ});if(giv.length)post({type:'give',list:giv,seq:++SEQ});};
+var _sell=sellShrimp;sellShrimp=function(T,i){var own=T===ownT(),ad=i.age>=ADULT_DAYS;var p=_sell(T,i);if(own)post({type:'take',adults:ad?1:0,young:ad?0:1,seq:++SEQ});return p;};
 // care jobs count as caring for your tank in the game
 if(typeof toyEnd==='function'){var _end=toyEnd;toyEnd=function(){var r=_end.apply(this,arguments);try{if(S.tanks[S.sel]===ownT())post({type:'care'});}catch(e){}return r;};}
 
