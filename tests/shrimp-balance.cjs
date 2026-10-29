@@ -638,5 +638,11 @@ if(!/function renderTankSheet[\s\S]{0,900}it\('feeder','Auto feeder'[\s\S]{0,200
 if(!html.includes("else if(G.tanks.length<2||T.cycledAt!=null)sup='';"))throw Error('Puti: no seed bacteria rows for a cycled tank');
 count++;console.log('PASS new-tank sheet offers auto gear, no seed rows for cycled tanks');
 check('the farm takes the extra tanks as soon as the first farm is built, before its card',`var G=newGame();G.tanks.push(newTank(1));G.tanks.push(newTank(2));G.tanks.forEach(function(t){t.pop=[{age:90,n:300,g:50}];});G.emp.farms.rack=1;if(!farmBuilt(G))throw Error('no farm');detectMilestones(G);if(G.tanks.length!==1)throw Error('tanks '+G.tanks.length);if(totalN(G.tanks[0])>20.5)throw Error('tank 1 keeps 20, has '+totalN(G.tanks[0]));var G2=newGame();G2.tanks.push(newTank(1));G2.emp.farms.rack=1;G2.progress.seen.owntank=true;detectMilestones(G2);if(G2.tanks.length!==1)throw Error('saves with the card waiting');`);
+check('Pass 151: Tank 1 on the land breeds by the land rules, moved-in shrimp join it',`var G=newGame();G.me=newMe();G.me.on=1;var T=G.tanks[0];T.vol=20;T.pop=[{age:100,n:80,g:60}];if(landCrowd(G,T)!==0)throw Error('no land, no rule');G.me.gplace={land:1};if(!(Math.abs(landCrowd(G,T)-0.6)<1e-9))throw Error('80 in 20 L is 0.6 over: '+landCrowd(G,T));T.pop=[{age:100,n:40,g:60}];if(landCrowd(G,T)!==0)throw Error('40 in 20 L is fine');if(landGive(G,[{age:90,g:50},{age:10,g:20},{age:'x',g:1}])!==2||totalN(T)!==42)throw Error('give adds two');`);
+if(!html.includes("e.source!==f.contentWindow"))throw Error('land messages only from the land page');
+if(!html.includes("if(LAND.on){LAND.acc=(LAND.acc||0)+dt/21600000;"))throw Error('the company runs at real time on the land (Puti)');
+if(!html.includes("d.type==='spend'&&d.n>0&&!frozen(G)"))throw Error('no spending on the land while frozen');
+var home=require('fs').readFileSync(__dirname+'/../shrimp/home.html','utf8');if(home.indexOf('ADULT_DAYS=75;')<0||home.indexOf('DAY_SEC=1e15;')<0||home.indexOf("type:'give'")<0||home.indexOf('MOW_SPEED=330')<0)throw Error('Land: adult at 75, game days only, moves in go to the game, faster mower (Puti)');
+count++;console.log('PASS land: real time, game-day clock, adult at 75, frozen, faster mower');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

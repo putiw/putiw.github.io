@@ -133,7 +133,7 @@ var q=newGame();q.tr={know:8,care:6};q.emp.won=4000;if(!spaceOpen(q))throw Error
 var l=newGame();l.humans=6e7;l.day=900;l.tr={know:8,kin:-8,drive:6};treeDay(l);if(!treeHas(l,'lab'))throw Error('Designer lab for use and tool');
 `);
 check('Grandma’s place: three paid steps, the last opens the land; the old house chain is gone',`
-var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;g.kits.sold=Math.max(1,g.kits.sold);personalDay(g);g.me.on=1;g.money=1e6;if(houseOffer(g))throw Error('Old house card');if(!gplaceOffer(g))throw Error('Offer');
+var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;g.kits.sold=Math.max(1,g.kits.sold);personalDay(g);g.me.on=1;g.money=1e6;if(typeof houseOffer!=='undefined'||typeof HOUSE!=='undefined')throw Error('Old house card');if(!gplaceOffer(g))throw Error('Offer');
 if(!buyGplace(g)||landOpen(g))throw Error('Balcony');if(!buyGplace(g)||landOpen(g))throw Error('House');if(!buyGplace(g)||!landOpen(g))throw Error('Land');if(buyGplace(g))throw Error('Nothing after the land');
 if(Math.round(g.money)!==1e6-294000)throw Error('Paid '+(1e6-g.money));
 g.tanks[0].pop=[{age:120,n:10,g:40},{age:20,n:4,g:30}];var o=landOwn(g);if(o.adults!==10||o.young!==4)throw Error('Own '+JSON.stringify(o));landTake(g,3,1);o=landOwn(g);if(o.adults!==7||o.young!==3)throw Error('Take '+JSON.stringify(o));
