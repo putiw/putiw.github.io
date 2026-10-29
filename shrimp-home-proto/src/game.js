@@ -17,7 +17,7 @@ document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length
 document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea')))e.preventDefault();});
 
 // ----- money: the company's cash -----
-var FROZEN='',NEED='';
+var FROZEN='',NEED='',SEQ=0;   // SEQ: our last take/give; an 'own' from before the game handled it is stale
 spend=function(n,what){if(n<=0)return true;if(FROZEN){toast(FROZEN,4200);sfx('nope');return false;}if(S.cash<n){toast('Not enough cash for '+what+'.');sfx('nope');return false;}
   S.cash-=n;post({type:'spend',n:n,what:what});updateHeader();save();return true;};
 earn=function(n,what){if(n<=0)return;S.cash+=n;post({type:'earn',n:n,what:what});updateHeader();save();};
@@ -29,7 +29,7 @@ function ownT(){return S.tanks[0]||null;}
 // Your tank is the game's Tank 1. The game decides births and deaths, the land keeps each shrimp it knows (colour,
 // name, age) and only adds or removes the difference, so nothing gets reset. Moves and sales here go to the game.
 function gOf(i){return Math.round(clamp(phOf(i).grade,0,7)/7*100);}
-function syncOwn(d){OWN=d;var T=ownT();if(!T||typeof newInd!=='function'||typeof GEN!=='object')return;T.name='Your tank';T.own=1;
+function syncOwn(d){if((d.seq||0)<SEQ)return;OWN=d;var T=ownT();if(!T||typeof newInd!=='function'||typeof GEN!=='object')return;T.name='Your tank';T.own=1;
   var A=Math.min(600,d.adults|0),Y=Math.min(600,d.young|0),N=netList(),
     mine=function(){return T.shrimp.concat(N.filter(function(e){return e.from===T.id;}).map(function(e){return e.ind;}));},ad=function(){return mine().filter(function(i){return i.age>=ADULT_DAYS;});},yo=function(){return mine().filter(function(i){return i.age<ADULT_DAYS;});};
   // shrimp in the net from Your tank still count as in it until they're moved or sold
@@ -52,13 +52,13 @@ if(typeof breedDay==='function'){var _bd=breedDay;breedDay=function(T,d){if(!T.o
 // the land's day is the game's day
 function gameTime(day){if(day==null||!isFinite(day))return;window.GDAY=day;if(S.gday==null||S.gday>day){S.gday=day;return;}var n=Math.floor(day)-Math.floor(S.gday);if(n>=1){S.gday=day;advance(Math.min(n,365));}}
 // a card waiting at the company, or frozen accounts
-function needBar(){var b=$('lneed');if(!NEED){if(b)b.remove();return;}if(!b){b=document.createElement('button');b.type='button';b.id='lneed';b.className='lneed';b.onclick=function(){try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};document.body.appendChild(b);}b.textContent=NEED+' ‹ Go back';}
+function needBar(){var b=$('lneed');if(!NEED){if(b)b.remove();return;}if(!b){b=document.createElement('button');b.type='button';b.id='lneed';b.className='lneed';b.onclick=function(){try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};document.body.appendChild(b);}b.textContent=NEED+' Tap to go back.';}
 window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||!S)return;
   if(d.type==='cash'){S.cash=d.cash;FROZEN=d.frozen||'';var nd=d.need||'';if(nd!==NEED){NEED=nd;needBar();}gameTime(d.day);updateHeader();}
   if(d.type==='own')syncOwn(d);});
 // shrimp that leave your tank here leave it in the game too
-var _move=netMoveTo;netMoveTo=function(T2){var T=ownT(),N=netList(),a=0,y=0,giv=[];if(T&&T2)N.forEach(function(e){if(T2!==T&&e.from===T.id){if(e.ind.age>=ADULT_DAYS)a++;else y++;}if(T2===T&&e.from!==T.id)giv.push({age:e.ind.age,g:gOf(e.ind)});});_move(T2);if(a+y)post({type:'take',adults:a,young:y});if(giv.length)post({type:'give',list:giv});};
-var _sell=sellShrimp;sellShrimp=function(T,i){var own=T===ownT(),ad=i.age>=ADULT_DAYS;var p=_sell(T,i);if(own)post({type:'take',adults:ad?1:0,young:ad?0:1});return p;};
+var _move=netMoveTo;netMoveTo=function(T2){var T=ownT(),N=netList(),a=0,y=0,giv=[];if(T&&T2)N.forEach(function(e){if(T2!==T&&e.from===T.id){if(e.ind.age>=ADULT_DAYS)a++;else y++;}if(T2===T&&e.from!==T.id)giv.push({age:e.ind.age,g:gOf(e.ind)});});_move(T2);if(a+y)post({type:'take',adults:a,young:y,seq:++SEQ});if(giv.length)post({type:'give',list:giv,seq:++SEQ});};
+var _sell=sellShrimp;sellShrimp=function(T,i){var own=T===ownT(),ad=i.age>=ADULT_DAYS;var p=_sell(T,i);if(own)post({type:'take',adults:ad?1:0,young:ad?0:1,seq:++SEQ});return p;};
 // care jobs count as caring for your tank in the game
 if(typeof toyEnd==='function'){var _end=toyEnd;toyEnd=function(){var r=_end.apply(this,arguments);try{if(S.tanks[S.sel]===ownT())post({type:'care'});}catch(e){}return r;};}
 

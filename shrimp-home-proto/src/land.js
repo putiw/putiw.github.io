@@ -1521,10 +1521,12 @@ function dropHen(wx,wy){var l=LS();if(!l.carry)return;var kind=l.carry.kind,id='
 function trapsOn(){return objsOf('trap');}
 function trapMenu(t,wx,wy){var n=trapsOn().length,here=trapsOn().some(function(o){return o.tx===t[0]&&o.ty===t[1];});
   bubAt(wx,wy-14,'<b>The stream</b><div>Wild shrimp live under the stones.</div><div class="btns"><button class="btn primary" data-trap'+(n>=3||here?' disabled':'')+'>'+(n>=3?'Three traps is enough':here?'There’s one here':'Set a shrimp trap · AED 20')+'</button></div>',function(el){var b=el.querySelector('[data-trap]');if(b)b.onclick=function(){if(!spend(20,'a trap'))return;
-    var me=L.me,o=mkObj('trap',t[0],t[1],{set:S.day,bank:[me.x,me.y-10]});LS().objs.push(o);LS().stats.traps++;sfx('plop');puff('ring',t[0]*T+T/2,t[1]*T+T/2+4,1,{speed:0,life:1});closeBub();
+    var me=L.me,o=mkObj('trap',t[0],t[1],{set:S.day,at:Date.now(),bank:[me.x,me.y-10]});LS().objs.push(o);LS().stats.traps++;sfx('plop');puff('ring',t[0]*T+T/2,t[1]*T+T/2+4,1,{speed:0,life:1});closeBub();
     if(!LS().seen.trap){LS().seen.trap=1;toast('Check it after a few hours.');}save();};});}
-function trapReady(o){return S.day-(o.set||0)>=0.25;}
-function trapTap(o){if(trapReady(o)){openTrap(o);return;}var hrs=Math.max(1,Math.ceil((0.25-(S.day-(o.set||0)))*24));
+// traps run on real hours (Pass 151: land days are game days now, and barely move while you're here)
+var TRAP_MS=6*3600e3;function trapLeft(o){return o.at?TRAP_MS-(Date.now()-o.at):(0.25-(S.day-(o.set||0)))*86400e3;}
+function trapReady(o){return trapLeft(o)<=0;}
+function trapTap(o){if(trapReady(o)){openTrap(o);return;}var hrs=Math.max(1,Math.ceil(trapLeft(o)/3600e3));
   bubAt(o.tx*T+T/2,o.ty*T,'<b>Nothing yet</b><div>Check back in about '+plural(hrs,'hour')+'.</div><div class="btns"><button class="btn" data-out>Take the trap out</button></div>',function(el){el.querySelector('[data-out]').onclick=function(){LS().objs=LS().objs.filter(function(q){return q!==o;});sfx('plop');closeBub();save();};});}
 function rollFinds(){var out=[],r=Math.random();if(r<0.12)out.push('crab');else if(r<0.27)out.push('snail');else if(r<0.37)out.push('nymph');else if(r<0.57)out.push('leaf');else if(r<0.6)out.push('bottle');return out;}
 function spriteCanvas(s,scale,w,h){var c=document.createElement('canvas'),d=Math.min(2,window.devicePixelRatio||1);c.width=Math.round(w*d);c.height=Math.round(h*d);c.style.width=w+'px';c.style.height=h+'px';var x=c.getContext('2d');x.imageSmoothingEnabled=false;
@@ -1557,7 +1559,7 @@ function openTrap(o){var n=2+Math.floor(Math.random()*6),list=[];if(typeof breed
       finds.forEach(function(f){bookAdd('finds',f,{where:'the stream'});});
       var take=list.length&&typeof takeHome==='function';
       bt.innerHTML=(take?'<button class="btn primary" data-take>Take the shrimp home</button>':'')+'<button class="btn" data-go>'+(list.length?'Let them go':'Put it back')+'</button>';bt.hidden=false;
-      o.set=S.day;save();
+      o.set=S.day;o.at=Date.now();save();
       var tb=bt.querySelector('[data-take]');if(tb)tb.onclick=function(){closeSheet();setTimeout(function(){takeHome(list,'stream');},60);};
       bt.querySelector('[data-go]').onclick=function(){closeSheet();sfx('splash');puff('drop',o.tx*T+T/2,o.ty*T+T/2,10,{speed:60,up:50,life:0.6});};}}});}
 
