@@ -56,8 +56,8 @@ var before=clock(g);stepGame(g);if(clock(g)!==before)throw Error('Continued whil
 acknowledgeMilestone(g);stepGame(g);if(g.progress.queue.length)throw Error('Repeated milestone');
 `);
 check('old saves retain preferences and skip historical milestone spam',`
-var g=readyGame();delete g.progress;g.day=600;g.tanks[0].had=1;g.tanks[0].set.keep=20;g.stats.born=10;g.stats.sold=100;g.kits.sold=30;g.emp.farms.barn=1;
-migrate(g);detectMilestones(g);if(g.progress.queue.length||g.tanks[0].set.keep!==20||g.progress.home!=='emp')throw Error('Migration regressed');
+var g=readyGame();delete g.progress;g.day=600;g.tanks[0].had=1;delete g.tanks[0].set.keepL;g.tanks[0].set.keep=20;g.stats.born=10;g.stats.sold=100;g.kits.sold=30;g.emp.farms.barn=1;
+migrate(g);detectMilestones(g);if(g.progress.queue.length||keepN(g.tanks[0])!==20||g.progress.home!=='emp')throw Error('Migration regressed');
 `);
 check('bench is owner-operated; unsafe payroll cannot be hired',`
 var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=400;if(!buyPackTier(g)||!hasTool(g,'bag')||g.emp.staff.tier)throw Error('First packing tool failed');
@@ -77,7 +77,7 @@ if(g.money<r||g.kits.stock>Math.ceil(3*kitDemand(g)))throw Error('Inventory over
 g.humans=WORLD;g.emp.proj.last=1;g.emp.regions=REGIONS.map(x=>x.id);g.kits.stock=0;empireDay(g);if(g.emp.prod!==0)throw Error('Produced with no demand');
 `);
 check('manual kits protect actual adult breeder cohorts',`
-var g=readyGame(),t=g.tanks[0];g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=1000;t.set.keep=6;t.pop=[{age:100,n:6,g:30},{age:25,n:16,g:90}];
+var g=readyGame(),t=g.tanks[0];g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=1000;t.set.keepL=6/t.vol;t.pop=[{age:100,n:6,g:30},{age:25,n:16,g:90}];
 if(packKits(g,t,2)!==2||t.pop.find(x=>x.age===100).n!==6)throw Error('Ate breeders');
 `);
 check('lab certificate affects survival and never needs recurring tank care',`
@@ -194,7 +194,7 @@ check('clean-water lifespans and breeder slots filled from young shrimp',`
 var g=readyGame(),T=g.tanks[0];
 function survive(days){var s=1;for(var a=0;a<days;a++){var b=a<10?0.004:a<30?0.0015:a<75?0.0008:0.0004+(a>540?(a-540)*0.000069:0);s*=1-b;}return s;}
 if(Math.abs(survive(75)-0.9)>0.02||Math.abs(survive(365)-0.8)>0.02||Math.abs(survive(730)-0.2)>0.03)throw Error('Clean-water lifespan targets: 90% adult, 80% one year, 20% two years');
-T.pop=[{age:60,n:50,g:80},{age:90,n:5,g:80}];T.set.keep=40;T.set.sellAge=45;T.set.cull=0;
+T.pop=[{age:60,n:50,g:80},{age:90,n:5,g:80}];T.set.keepL=40/T.vol;T.set.sellAge=45;T.set.cull=0;
 var p=breederProtection(T),held=0;p.forEach(function(n){held+=n;});if(Math.round(held)!==40)throw Error('Young shrimp should fill breeder slots: held '+held);
 `);
 if(!html.includes("var old=rd(G,'longevity')?630:540,base=a<10?0.004:a<30?0.0015:a<75?0.0008:0.0004+(a>old?(a-old)*0.000069:0);"))throw Error('Mortality curve changed without updating the lifespan check');
@@ -214,7 +214,7 @@ g.emp.won=1;g.emp.farms={rack:3};var raw=g.emp.rawShrimp;empireDay(g);if(g.emp.r
 var w=WORLDS[0];if(!w.wild||!/let into|let them go|live free|released/.test(w.why))throw Error('Space worlds should end with free-living shrimp');
 `);
 check('hand packing, packing tools, health checks, treats and story choices',`
-var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=10000;var t=g.tanks[0];t.had=1;t.pop=[{age:60,n:80,g:80},{age:120,n:30,g:80}];t.set.keep=10;
+var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=10000;var t=g.tanks[0];t.had=1;t.pop=[{age:60,n:80,g:80},{age:120,n:30,g:80}];t.set.keepL=10/t.vol;
 var taps=0,r;do{r=handStep(g);taps++;}while(!r.kit&&taps<10);if(!r.kit||taps!==5||g.kits.stock!==1)throw Error('A hand-packed kit takes five taps: '+taps);
 if(!buyTool(g,'bag')||!buyTool(g,'catch'))throw Error('Tools');taps=0;do{r=handStep(g);taps++;}while(!r.kit&&taps<10);if(taps!==3)throw Error('Two tools should leave three taps: '+taps);
 ['o2','seal','box'].forEach(function(id){buyTool(g,id);});if(!stationDone(g)||g.emp.staff.tier!==1||packCap(g)!==1)throw Error('Five tools make the packing station');
@@ -258,7 +258,7 @@ var g=readyGame();g.stats.sold=KIT_UNLOCK;var t=g.tanks[0];t.had=1;t.vol=80;t.vo
 t.vol=40;t.volTier=1;if(kitsOpen(g))throw Error('Kits still need some room');
 `);
 check('hired salespeople sell surplus without an extra toggle',`
-var g=readyGame();g.stats.sold=5;g.money=5000;var t=g.tanks[0];t.had=1;t.pop=[{age:120,n:60,g:60},{age:30,n:20,g:60}];t.set.keep=20;
+var g=readyGame();g.stats.sold=5;g.money=5000;var t=g.tanks[0];t.had=1;t.pop=[{age:120,n:60,g:60},{age:30,n:20,g:60}];t.set.keepL=20/t.vol;
 if(!hire(g,'sales',1))throw Error('Hiring failed');if(!t.set.autoSell)throw Error('Hiring sales should switch on selling');
 var n0=totalN(t);dayRollover(g);if(!(totalN(t)<n0-1))throw Error('Salesperson did not sell surplus: '+n0+' -> '+totalN(t));
 `);
@@ -602,7 +602,7 @@ var sm=PROJ.find(p=>p.id==='social'),k=newGame();k.stats.sold=59;if(sm.req(k))th
 `);
 if(!html.includes('Grandma sent AED 15. For the babies')||html.includes('the defaults work fine')||html.includes('id="h-ice"'))throw Error('Pass 130: copy and stable cooling');
 check('Pass 131: salespeople leave the shrimp this week\'s packing needs, sell when there is no cash to pack',`
-var g=newGame();g.emp.kitsOpened=1;g.emp.staff.tier=1;g.emp.staff.sales=1;g.money=5000;g.humans=500;g.packPerL=0.5;var T=g.tanks[0];T.set.autoSell=true;T.set.keep=5;T.pop=[{age:90,n:60,g:50}];
+var g=newGame();g.emp.kitsOpened=1;g.emp.staff.tier=1;g.emp.staff.sales=1;g.money=5000;g.humans=500;var T=g.tanks[0];T.set.autoSell=true;T.set.keepL=0.25;T.pop=[{age:90,n:60,g:50}];
 var h=kitHold(g);if(!(h[0]>0))throw Error('Holds for packing');if(doSell(g,T,true,undefined,true,h[0]).normal!==0)throw Error('Nothing sold while packing needs it');if(!(doSell(g,T,true,undefined,true,0).normal>0))throw Error('Sells without a hold');
 g.money=0;if(kitHold(g)[0]!==0)throw Error('No cash, no hold');var k=newGame();if(kitHold(k)[0]!==0)throw Error('No hold before kits');
 `);
@@ -619,21 +619,21 @@ var hi=0;for(d=365;d<730;d+=5){g.day=d;hi=Math.max(hi,roomT(g,d));}if(!(hi>29))t
 var k=newGame();k.emp.kitsOpened=1;k.emp.staff.tier=2;k.emp.staff.pack=2;k.money=1e5;k.humans=5000;k.tanks[0].pop=[{age:90,n:12,g:50}];if(!(packCap(k)>1))throw Error('Packers');
 for(var i=0;i<4;i++)packDay(k);if(k.emp.packLow<3)throw Error('Short days counted');k.tanks[0].pop=[{age:90,n:2000,g:50}];packDay(k);if(k.emp.packLow)throw Error('Reset when packing works');
 `);
-check('Pass 141: Pack above shows as the limit, the packaging machine can be stopped',`
+check('Pass 141/151: breeders show as the limit, the packaging machine can be stopped',`
 var g=newGame();g.emp.proj=g.emp.proj||{};g.emp.proj.autopackm=1;if(!pd(g,'autopackm'))g.emp.proj.autopackm={done:1};
 var on=packingMachineCap(g);g.emp.machOff=1;if(!(on>=20)||packingMachineCap(g)!==0)throw Error('Stopped machine packs nothing: '+on);g.emp.machOff=0;
-g.packPerL=4.5;g.tanks[0].vol=640;g.tanks[0].pop=[{age:90,n:1220,g:50}];var kb=keepBlocks(g);if(!kb||kb.keep<2880||kb.have<1220)throw Error('Under Keep in tanks is the block');
-g.packPerL=1;if(keepBlocks(g))throw Error('Lower keep frees shrimp');
+g.tanks[0].set.keepL=4.5;g.tanks[0].vol=640;g.tanks[0].pop=[{age:90,n:1220,g:50}];var kb=keepBlocks(g);if(!kb||kb.keep<2880||kb.have<1220)throw Error('Under breeders is the block');
+g.tanks[0].set.keepL=0.2;if(keepBlocks(g))throw Error('Lower breeders frees shrimp');
 `);
-if(!html.includes("bbtn('machtog'")||!html.includes('<label for="s-maxN">Pack above</label>'))throw Error('Stop button and Pack above label (Pass 141)');
-if(!html.includes("$('row-maxN').hidden=!(G.kits.sold>=10||G.opt.all)||ownTank(G)||tankGone(G);"))throw Error('Pack above hides once only the home tank is left');
+if(!html.includes("bbtn('machtog'")||html.includes('s-maxN')||!html.includes('<label for="s-keepL">Breeders</label>'))throw Error('Stop button, one Breeders slider and no Pack above (Pass 141, 151)');
 check('Pass 135: top Sell hides when salespeople sell every tank, Excel spotlight at AED 500, QC card is optional',`
 var g=newGame();g.tanks[0].had=1;g.stats.sold=100;g.emp.staff.sales=1;g.tanks.forEach(function(t){t.set.autoSell=true;});
 `);
 if(!html.includes("fire('excel500'")||!html.includes('<h2>Quality checks</h2>')||!html.includes('Optional. Checks catch sick shrimp'))throw Error('Pass 135: Excel spotlight and optional QC card');
 if(!html.includes("&&!(hasSales(G)&&G.tanks.every(function(t){return t.set.autoSell;}))"))throw Error('Pass 135: top Sell hides with salespeople');
 // Puti's standing requests (29 Oct). Don't remove these under a general rule without asking her.
-check('Breeders go up to one per litre of the biggest tank',`var G=newGame();if(keepMax(G)!==100)throw Error('min 100');G.tanks[0].vol=320;if(keepMax(G)!==320)throw Error('320 L gives 320');G.tanks[0].set.keep=300;migrate(G);if(G.tanks[0].set.keep!==300)throw Error('migrate clamps to 100');`);
+check('Breeders are per litre, the same value keeps more in a bigger tank (Pass 151, Puti)',`var G=newGame();G.tanks.push(newTank(1));G.tanks[0].vol=320;G.tanks[1].vol=20;G.tanks.forEach(function(t){t.set.keepL=1;});if(keepN(G.tanks[0])!==320||keepN(G.tanks[1])!==20)throw Error('1 per L: '+keepN(G.tanks[0])+' '+keepN(G.tanks[1]));if(packAbove(G,G.tanks[1])!==keepN(G.tanks[1])*PACK_YOUNG)throw Error('Packing leaves the young');
+var O=newGame();O.tanks[0].vol=20;O.tanks[0].set.keep=30;delete O.tanks[0].set.keepL;migrate(O);if(O.tanks[0].set.keepL!==1.5)throw Error('old 30 in 20 L is 1.5 per L: '+O.tanks[0].set.keepL);if(SHARED_SET.indexOf('keepL')<0)throw Error('shared');`);
 if(!/function renderTankSheet[\s\S]{0,900}it\('feeder','Auto feeder'[\s\S]{0,200}it\('autoWC'/.test(html))throw Error('Puti: the new-tank sheet offers the auto feeder and auto water changer');
 if(!html.includes("else if(G.tanks.length<2||T.cycledAt!=null)sup='';"))throw Error('Puti: no seed bacteria rows for a cycled tank');
 count++;console.log('PASS new-tank sheet offers auto gear, no seed rows for cycled tanks');

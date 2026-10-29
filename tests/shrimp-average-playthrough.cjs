@@ -16,7 +16,7 @@ function act(name,fn){var ok=fn();if(ok){actions.push({day:G.day,name:name});ret
 function canSpend(cost){return G.money>=cost+Math.max(200,capitalReserve(G)*1.25);}
 function extraTanks(buy){if(!G.tanks[0].had)return;var T0=G.tanks[0];
  if(buy&&G.stats.sold>=1&&G.tanks.length<MAX_TANKS&&!(G.tanks.some(function(t){return !t.had;}))&&G.money>NEW_TANK_COST[G.tanks.length]+Math.max(300,capitalReserve(G)))addTank(G);
- for(var i=1;i<G.tanks.length;i++){var t=G.tanks[i],P=ppm(t);t.set.sellAge=T0.set.sellAge;t.set.keep=T0.set.keep;
+ for(var i=1;i<G.tanks.length;i++){var t=G.tanks[i],P=ppm(t);t.set.sellAge=T0.set.sellAge;t.set.keepL=T0.set.keepL;
   if(!t.had){if(t.cycledAt==null&&P.nh<.2&&P.no2<1){if(G.ob.doses<=0&&G.money>=40){pay(G,40,'supplies');G.ob.doses+=10;}addAmmonia(G,t);}if(t.chem.kh<2||P.no3>20)waterChange(G,t,50);
    if(safeToStock(G,t)&&totalN(T0)>=30)moveShrimp(G,T0,t,totalN(T0)/3);}
   else{if(!t.feeder)feed(G,t,.8);if(P.no3>18||t.chem.kh<2.5||t.chem.gh<5||(!t.autoWC&&G.day%7===0))waterChange(G,t,30);

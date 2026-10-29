@@ -9,7 +9,7 @@ var G=newGame(),events=[],snapshots={},last={};
 function note(k){detectMilestones(G);updateReveal();if(kitsOpen(G))G.emp.shownEmp=1;if(!last[k]){last[k]=1;events.push({event:k,day:G.day,money:Math.round(G.money),shrimp:Math.round(allN(G)),sold:G.stats.sold,kits:G.kits.sold,owners:Math.round(G.humans),inf:Math.round(G.emp.inf)});snapshots[k]=JSON.parse(JSON.stringify(G));}}
 function extraTanks(buy){if(!G.tanks[0].had)return;var T0=G.tanks[0];
  if(buy&&G.stats.sold>=1&&G.tanks.length<MAX_TANKS&&!(G.tanks.some(function(t){return !t.had;}))&&G.money>NEW_TANK_COST[G.tanks.length]+Math.max(300,capitalReserve(G)))addTank(G);
- for(var i=1;i<G.tanks.length;i++){var t=G.tanks[i],P=ppm(t);t.set.sellAge=T0.set.sellAge;t.set.keep=T0.set.keep;
+ for(var i=1;i<G.tanks.length;i++){var t=G.tanks[i],P=ppm(t);t.set.sellAge=T0.set.sellAge;t.set.keepL=T0.set.keepL;
   if(!t.had){if(t.cycledAt==null&&P.nh<.2&&P.no2<1){if(G.ob.doses<=0&&G.money>=40){pay(G,40,'supplies');G.ob.doses+=10;}addAmmonia(G,t);}if(t.chem.kh<2||P.no3>20)waterChange(G,t,50);
    if(safeToStock(G,t)&&totalN(T0)>=30)moveShrimp(G,T0,t,totalN(T0)/3);}
   else{if(!t.feeder)feed(G,t,.8);if(P.no3>18||t.chem.kh<2.5||t.chem.gh<5||(!t.autoWC&&G.day%7===0))waterChange(G,t,30);
@@ -48,7 +48,7 @@ if(kitsOpen(G)){
  if(E.staff.tier&&G.kits.sold>=10&&packCap(G)<Math.min(farmCap(G),kitDemand(G))&&afford(2000)&&E.staff.pack<4)hire(G,'pack',1);
  for(var li=0;li<PACK_LINES.length;li++)if(lineReady(G,li)&&packCap(G)<kitDemand(G)*1.3&&afford(lineCost(G,li)+PACK_LINES[li].up*30))buyLine(G,li);
  if(packingMachineCap(G)>kitDemand(G)*1.2&&E.staff.pack)hire(G,'pack',-1);
- if(!packCap(G)&&G.money>180&&G.kits.stock<Math.max(5,kitDemand(G)*7)&&totalN(T)>T.set.keep+10)packKits(G,T,1);
+ if(!packCap(G)&&G.money>180&&G.kits.stock<Math.max(5,kitDemand(G)*7)&&totalN(T)>keepN(T)+10)packKits(G,T,1);
  for(var id of ['guide','refer','precycle','farmlic','bulk','aicam','autopackm','app','brand','retention','partners','globalbrand','factory','hotline','ocean','recycle','arco']){var p=PROJ.find(x=>x.id===id);if(!pd(G,id)&&p.req(G)&&afford(pm(G,p)))buyProj(G,id);}
  if(G.kits.sold>=1)note('first kit');if(pd(G,'farmlic'))note('farm license');
  if(pd(G,'farmlic')){
