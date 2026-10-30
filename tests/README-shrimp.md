@@ -1311,3 +1311,7 @@ Replaces the shrimp-late-kind branch (Pass 153, dropped after an independent rev
 - The win strip ("Everyone has a tank.") now has a Look back button that opens the ending recap sheet (`review`). Before, the text told you to look back with nothing to tap.
 - `review` and Settings "Your years at the company" now open after the win too, not only after leaving the company.
 - Balance 98, academy 10, me 46.
+
+## Deploy 30 Oct (BUILD look-back): Pass 158
+- Bots seed 7 unchanged: strong 2,019, kind 3,183, average Earth 6,049 / Space 7,460 garden_hermit. Spotlight sweep 116 checked, all good.
+- Browser check at 390 px on the won snapshot, Kits tab, consultants in: strip reads "Everyone has a tank." with Look back, tap opens the recap. No console errors.
