@@ -1386,3 +1386,9 @@ Not done: the company Tank tab still draws its fixed plant art, it doesn't grow 
 | Average, Space | Earth 6,049, Space 7,460 | Earth 6,637, Space 8,048, garden_hermit, 42 min waiting |
 
 Average bot over five seeds (7, 11, 23, 31, 43), Earth day, old build (Pass 160) against new: 6,049/6,721/5,769/6,665/6,105 (mean 6,262) against 6,637/6,609/6,833/6,441/6,581 (mean 6,620). About 6% later and less spread. The bots run the tank at company speed (k = 1), so the economy didn't change on purpose; the shift is most likely the random stream reordering (Tank 1's day now runs before the company's), not looked into further. No INSOLVENT. Spotlight sweep: 116 checked, all good. Layout scan: one 2 px overflow on the World tab at the win (360 and 390 px), not looked at.
+
+## Pass 162: bots answer every card (30 Oct)
+
+Puti: bots should do exactly what players do. They used to close any card with choices that wasn't on a short list (owntank, coin offer, pains, Grandma's land, the scam, goodbye cards) without a pick, a thing no player can do. Now all three bots share `tests/shrimp-bot-cards.cjs`: the old specific picks first, then kind bots try every choice first to last, cold bots last to first, skipping choices that end the game; if nothing can be taken the log prints `STUCK`. The average bot now goes to both lab parties (`emp.party` 1 and 2 = go) and made 34 story choices.
+Found by it: the school-kits card built its choice labels with `big()`, a UI helper, inside the sim, so it crashed the moment a sim-only caller asked for its choices. Now `big` when it exists, `cnt` otherwise.
+Bots (seed 7), Pass 161 → 162: strong cold 2,102 → 2,218, strong kind 3,263 → 3,221, average Earth 6,637 → 6,553, Space 8,048 → 7,964. Space bot passes. No STUCK, no INSOLVENT. Fast tests: balance 104, academy 11, me 46. Not deployed.

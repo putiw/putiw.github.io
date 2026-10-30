@@ -361,6 +361,7 @@ Latest bot results (seed 7, 28 Oct, Pass 132):
 Seed noise is big: over seeds 3–43 the average bot's Earth day ranges 5,700–6,640 on the same build, and strong seed 19 goes broke on day 252 on both the old and new build. Compare a few seeds before reading anything into one run.
 | Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,349, no Space (24 Oct, not rerun in Pass 110) |
 
+Bots answer every card with choices the way a player must (Pass 162, `tests/shrimp-bot-cards.cjs`): never closed without a pick, kind bots try choices first to last, cold bots last to first, never a game-ending one. `STUCK` in a bot log means a card no player could answer. After Pass 162 (seed 7): strong cold 2,218, strong kind 3,221, average Earth 6,553 / Space 7,964, Space bot passes.
 All bots use campaigns (when ✦ is plentiful), films, Shrimpcoin, shops and mall stores. The average bot also funds research lines. It has 22 years to finish both chapters.
 
 When you change balance, run both bots and compare against these. Report the before and after numbers, and add them to `tests/README-shrimp.md`.

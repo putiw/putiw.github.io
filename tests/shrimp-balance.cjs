@@ -716,5 +716,7 @@ if(!html.includes("var PACE_T='Your tank runs at 1× on this tab'")||!html.inclu
 const home161=fs.readFileSync(path.join(__dirname,'../shrimp/home.html'),'utf8');
 if(!home161.includes('function applyOwn(T,d)')||!home161.includes("post({type:LEFT?'menu':'back'})")||!home161.includes("if(T.own&&OWN)return;"))throw Error('The land follows the game tank and has no way back after leaving');
 count++;console.log('PASS Pass 161 requests');
+['shrimp-playthrough','shrimp-average-playthrough','shrimp-space-playthrough'].forEach(function(f){if(!fs.readFileSync(path.join(__dirname,f+'.cjs'),'utf8').includes("require('./shrimp-bot-cards.cjs')"))throw Error('Bots answer every card, they never close one without a pick (Puti, 30 Oct): '+f);});
+count++;console.log('PASS bots pick on every card');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
