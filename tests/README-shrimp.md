@@ -1315,3 +1315,10 @@ Replaces the shrimp-late-kind branch (Pass 153, dropped after an independent rev
 ## Deploy 30 Oct (BUILD look-back): Pass 158
 - Bots seed 7 unchanged: strong 2,019, kind 3,183, average Earth 6,049 / Space 7,460 garden_hermit. Spotlight sweep 116 checked, all good.
 - Browser check at 390 px on the won snapshot, Kits tab, consultants in: strip reads "Everyone has a tank." with Look back, tap opens the recap. No console errors.
+
+## Pass 159: three more fish, a livelier dog and Millie (30 Oct, land only)
+
+- Fish from Puti's `tmp/fishandbird.aseprite`: glowlight rasbora (stream), Bolivian ram (lake, rare), zebra danio (both). In the catch, the book and the pond. `pixel-src/animals/add_fish.py` adds fish without touching the birds.
+- Dog, her 30 Oct frames in `characters/dog.aseprite` (46 frames, `pixel-src/chars/add_dog_millie.py`): standing he wags (32-35) when you stop by him, pet him or he runs over, and now and then turns his head to you or looks back (36, 37). Sitting he shifts between side, look back, half turned and front (38-40, 44, 13). After zoomies or a run over he sits and pants, tongue in and out (41/42, 43/44). Left alone a while, or with you standing still 20 s+ or sitting, he may curl up asleep (45) for 25-75 s; a pet or setting off wakes him, a bit slower than from sitting. Side frames flip for left; feet anchors per frame (`dogSide`, `dogAx`). Guide layers are left out by name (the feet line was switched on in her file). Old 32-frame sheets still work.
+- Millie, `millie_walk.aseprite` now 52 frames (her new frame 1, arms relaxed, shifts the rest by one; `MLay`). Standing she drifts between her two stands every few seconds and blinks (two blink frames made from her own eye and lash pixels, 52 and 53). millie2 rebuilt from the new frame 10.
+- Tests: frame check for every dog and Millie state, flipped and not, screenshots; balance and academy pass.

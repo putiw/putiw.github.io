@@ -152,7 +152,8 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - Grass is calmed in `calmGrass`: her three greens pulled together and a slow tint (`lowF`). Only her exact grass colours change.
 - Mowing pops a coin per paid tile and shows +AED over Millie. Thrown grain is a few small kernels per bit. The nest shows up to 8 eggs.
 - Pierre's walk (`PW_POS`, `PW_LOOP`, `PW_FPS`, `catStep`): her frames 6-14 and 16-19 from `cat-pierre.aseprite`, positions and head set by Puti in the walk editor (head moves bake into the `walk` pose in `pixel-src/chars/add_pierre.py`, head and shoulders move together). He moves only by what each frame says.
-- Birds: firecrest, great tit and magpie added, legs stay on through hops. Fish: Siamese algae eater and clown killifish. `pixel-src/animals/add_birds.py` regenerates every bird and the new fish from `tmp/fishandbird.aseprite` and checks no frame is cut off.
+- Birds: firecrest, great tit and magpie added, legs stay on through hops. Fish: Siamese algae eater and clown killifish, then (30 Oct) glowlight rasbora, Bolivian ram, zebra danio (`add_fish.py`).
+- Dog and Millie idle life (Pass 159, `add_dog_millie.py`): dog wags, glances, sits in several poses, pants after running, naps (`dogLife`, `dogNap`, `dogFrame`, `dogSide`, `dogAx`); Millie switches between her two stands and blinks (`meIdle`, `MLay`, frames 52-53 are generated blinks). `pixel-src/animals/add_birds.py` regenerates every bird and the new fish from `tmp/fishandbird.aseprite` and checks no frame is cut off.
 - Grandpa is dead on the land too: her armchair lines talk about him in the past.
 - The You tab Grandma card shows one thing at a time with "N more after this." and mailed money as one envelope (`gt-mail-all`).
 - No Next bar in the game (Pass 125): guide lines go to the ? popup only, the button glow stays.
