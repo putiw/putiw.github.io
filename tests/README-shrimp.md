@@ -1287,3 +1287,22 @@ Replaces the shrimp-late-kind branch (Pass 153, dropped after an independent rev
 - Balance 97, academy 10, me 46. Bots seed 7: strong 2,106 (same), kind 3,159 (same), average Earth 6,777 / Space 8,188 (6,749 / 8,160). Headless browser at 390 px: sheet blocks, ration and water care on tanks 1 and 2, You page order and Grandma open/close, no console errors. Spotlight sweep not run (the only Chromium here is single-process).
 
 ## Deploy 30 Oct (BUILD tank-gear): Passes 152-155
+
+## Pass 156: waste follows the shrimp, plants grow slower, review fixes (30 Oct)
+- Puti: poop kept coming after a tank crash. Mulm on your own tank now builds with the shrimp in it (`careDay`: full rate at 20+ shrimp, none in an empty tank), the sponge clogs mostly from that waste (20% rate when empty), no new flatworms without shrimp, snails only breed if some are there. Same on the land (`src/tank.js` on `shrimp-proto`, rebuilt `home.html`): gravel mulm and filter clog scale with shrimp, nothing builds in an empty tank.
+- Puti: plants grow ten times slower. Own tank `C.grow` 1/350 a day (was 1/35), land moss and stems a tenth of before.
+- Review fixes: shrimp added while the tank view had no size (another tab, a card on top) lined up along the top of the water, `tvSize` now places them again the first time the view gets a size, `tvSand` has the same 150 px fallback as `tvSpot`. Colony chart drops the sell line and the blue sellable bars once Trade is gone. "waiting to be packed: 0.7" now whole shrimp. Hours on the You page get thousands separators. Win card said "Done in ten years. Year 6", now "Done before year ten.". Shops card no longer repeats the stores-to-go count from its header.
+- Balance 97 (new 30 Oct checks: plants 1/350, no mulm or flatworms in an empty tank), academy 10, me 46. Strong bot seed 7 unchanged at 2,106. Layout scan: only the known 2 px element on World at the win stage.
+
+## Pass 157: the home tank, one kept number, fewer stray numbers (30 Oct)
+- Puti: the tank you keep goes back to 20 L when the farm takes over (`homeSmall` in `ownTankNow`, and in `migrate` for old saves with a bigger Tank 1, extras go to the farm). It can't be made bigger again (`upgradeCost` 'tank' is null for it). Once the farms sell everything (`farmCap>=10`, Trade gone) berries slow toward 50 shrimp (`homeCrowd`, `HOME_CAP`: 1 − (n/50)², none at 50). Clutches already carried can push it a little past 50, then it settles.
+- Water chip: when the only problem is heat it says Too warm / Too cold, no Water label.
+- Trade Breeders and Kits "kept to breed" show the same number, the breeders over every tank (`breedersAll`).
+- Owners' tanks: the Change water L/day row is gone.
+- Regions: the percent was the ceiling, not the share; now it's people who want one over people reachable, so it matches the people figure next to it.
+- Colony grade rows count every shrimp, the average stays adults.
+- Own-tank buttons stay one line at phone width (no icons in the six-button grid under 420 px, no wrapping).
+- Balance 98, academy 10, me 46. Strong bot seed 7: 2,019 (2,106; the home tank changes the random sequence, the economy doesn't use it). Home tank in the run: 20 L, 11 to 77 shrimp, 49 at the win.
+
+## Deploy 30 Oct (BUILD clean-tank): Passes 156-157
+- Bots seed 7: strong 2,019 (2,106), kind 3,183 (3,159), average Earth 6,049 / Space 7,460 garden_hermit (6,777 / 8,188; inside the 5,700-6,640 seed range). Spotlight sweep 116 checked, all good. Layout scan: only the known 2 px element on World at the win stage.

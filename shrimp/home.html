@@ -956,11 +956,12 @@ function mulmMean(T){var s=0;for(var i=0;i<MULM_N;i++)s+=T.mulm[i];return s/MULM
 function overgrowth(T){var o=0;for(var k in T.moss)T.moss[k].forEach(function(m){o=Math.max(o,m.len/m.max);});T.stems.forEach(function(st){o=Math.max(o,st.h/ (ART_H*(SAND_TOP-WATER_TOP)) );});return o;}
 function mulmWeight(T,i){var x=(i+0.5)/MULM_N*ART_W,w=0.7;T.scape.forEach(function(it){var d=DECOR_SIZE[it.k];if(!d)return;var hw=d.w*it.s/2;if(Math.abs(x-it.x)<hw+20)w+=0.45;});if(i<4||i>MULM_N-5)w+=0.5;return w;}
 // ---- daily tank care: mess builds up, water drifts ----
-function tankDay(T,d){var n=T.shrimp.length,eff=effectsOn();
-  for(var i=0;i<MULM_N;i++)T.mulm[i]=clamp(T.mulm[i]+(0.018+0.0007*n)*mulmWeight(T,i)*rnd(0.6,1.3),0,1);
-  T.flow=clamp(T.flow-0.021-(mulmMean(T)>0.6?0.01:0),0.05,1);
-  for(var k in T.moss)T.moss[k].forEach(function(m){m.len=Math.min(m.max*1.08,m.len+rnd(1.8,3.4));});
-  var surf=ART_H*(SAND_TOP-WATER_TOP)+18;T.stems.forEach(function(st){st.h=Math.min(surf+70,st.h+rnd(3,5.5));});
+// waste comes from the shrimp, an empty tank stays clean; plants grow ten times slower (Puti, 30 Oct)
+function tankDay(T,d){var n=T.shrimp.length,wf=Math.min(1,n/20),eff=effectsOn();
+  for(var i=0;i<MULM_N;i++)T.mulm[i]=clamp(T.mulm[i]+wf*0.018*mulmWeight(T,i)+0.0007*n*mulmWeight(T,i)*rnd(0.6,1.3),0,1);
+  T.flow=clamp(T.flow-0.021*(0.2+0.8*wf)-(mulmMean(T)>0.6?0.01:0),0.05,1);
+  for(var k in T.moss)T.moss[k].forEach(function(m){m.len=Math.min(m.max*1.08,m.len+rnd(0.18,0.34));});
+  var surf=ART_H*(SAND_TOP-WATER_TOP)+18;T.stems.forEach(function(st){st.h=Math.min(surf+70,st.h+rnd(0.3,0.55));});
   // pests
   var sn=T.pests.filter(function(p){return p.k==='snail';}).length,pl=T.pests.filter(function(p){return p.k==='planaria';}).length;
   if(sn>=2&&sn<30&&Math.random()<0.14)addPests(T,'snail',1);

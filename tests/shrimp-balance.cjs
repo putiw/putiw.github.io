@@ -403,7 +403,10 @@ var g=readyGame(),T=g.tanks[0];T.pop=[{n:80,age:120,g:40},{n:30,age:120,g:80},{n
 careDay(g);if(T.care&&T.care.mulm>0)throw Error('No care chores before your own tank');
 var moved=keepTwenty(g);if(Math.round(totalN(T))!==20||Math.round(moved)!==100||g.emp.rawShrimp<99)throw Error('Twenty stay home, the rest go to the farm: '+totalN(T)+' '+moved);
 if(T.pop.some(function(k){return k.g===40;}))throw Error('The best coloured adults stay');
-g.me=g.me||newMe();g.me.keep='self';for(var d=0;d<50;d++)careDay(g);var C=careOf(T);if(C.mulm<0.9||C.grow<0.9||C.sponge<0.6)throw Error('Mulm, growth and sponge build up by themselves');
+g.me=g.me||newMe();g.me.keep='self';for(var d=0;d<50;d++)careDay(g);var C=careOf(T);if(C.mulm<0.9||C.sponge<0.6)throw Error('Mulm and sponge build up by themselves');
+if(C.grow<0.1||C.grow>0.2)throw Error('Plants grow ten times slower, about 1/350 a day (Puti, 30 Oct): '+C.grow);
+T.pop=[];var m1=C.mulm=0.3;for(d=0;d<30;d++)careDay(g);if(C.mulm!==m1)throw Error('No new mulm in an empty tank, after a crash poop stops (Puti, 30 Oct)');
+var f0=C.pests.filter(function(p){return p.k==='flat';}).length;for(d=0;d<200;d++)careDay(g);if(C.pests.filter(function(p){return p.k==='flat';}).length!==f0)throw Error('No new flatworms without shrimp');
 var h=readyGame(),U=h.tanks[0];U.pop=[{n:5,age:120,g:30,b:1},{n:5,age:120,g:70}];var m0=h.money,r=cullPick(h,U,[{age:120,g:30,b:1},{age:120,g:70}]);if(r.n!==2||r.gave!==0||Math.round(totalN(U))!==8||U.pop.filter(function(k){return k.b;})[0].n!==4)throw Error('A bought one can be taken out');
 if(Math.abs(h.money-m0-(priceAt(30)+priceAt(70))*0.25)>0.01)throw Error('Bought and bred ones are both sold as culls');var V=readyGame().tanks[0];V.pop=[{n:10,age:90,g:50,b:1}];if(cullSample(V,12).length!==10)throw Error('Look over works from the first shrimp you buy');
 `);
@@ -664,6 +667,16 @@ if(!html.includes("lite||(!!T.feeder&&(id==='f-ration'||id==='h-ration'))"))thro
 if(!html.includes("if(a&&c.parentNode!==$('p-up'))$('autocard').after(c);"))throw Error('Puti: Water care moves under Automation once the tank changes its own water');
 if(!html.includes('<section class="panel" id="p-me" hidden><div class="card" id="me-gplace" hidden></div>'))throw Error('Puti: Grandma\'s place first on the You page');
 if(!html.includes("hh=GT_OPEN&&(lg.length||un)")||!html.includes("if(activeTab!=='me'){GT_OPEN=0;return;}"))throw Error('Puti: Grandma shows nothing until Check on Grandma, closed each visit');
+check('30 Oct: the home tank goes back to 20 L when the farm takes over, and slows its breeding near 50',`
+var g=readyGame(),T=g.tanks[0];T.volTier=4;T.vol=320;T.pop=[{n:200,age:120,g:80}];ownTankNow(g);if(T.vol!==20||Math.round(totalN(T))!==20)throw Error('20 L, 20 shrimp: '+T.vol+' '+totalN(T));g.money=1e6;if(upgradeCost(g,T,'tank')!=null||buyUpgrade(g,T,'tank'))throw Error('the home tank can not be made bigger again');
+if(homeCrowd(g,T)!==1)throw Error('no slowdown while shrimp still sell by hand');g.emp.farms[FARMS[FARMS.length-1].id]=1;
+T.pop=[{n:20,age:120,g:80}];var a=homeCrowd(g,T);T.pop=[{n:45,age:120,g:80}];var b=homeCrowd(g,T);T.pop=[{n:60,age:120,g:80}];var c=homeCrowd(g,T);if(!(a>0.8&&b<0.25&&c===0))throw Error('breeding slows toward 50: '+a+' '+b+' '+c);
+var o=readyGame();o.me=o.me||newMe();o.me.keep='self';o.tanks[0].volTier=5;o.tanks[0].vol=640;o.tanks[0].pop=[{n:3000,age:120,g:80}];migrate(o);if(o.tanks[0].vol!==20||Math.round(totalN(o.tanks[0]))!==20)throw Error('old saves shrink too');
+var k=readyGame();if(breedersAll(k)!==k.tanks.reduce(function(t,x){return t+keepN(x);},0))throw Error('one kept number');`);
+if(!html.includes("big(breedersAll(G))+' kept to breed'"))throw Error('Puti: Kits shows the same kept number as Trade');
+if(html.includes("['Change water',big(waterUse(G))"))throw Error('Puti: no Change water row in Owners tanks');
+if(!html.includes("gb[bandOf(k.g)]+=k.n;if(k.age>=75)"))throw Error('Puti: colony grade rows count every shrimp');
+if(!html.includes("Math.round(kitCap(G)/Math.max(1,popOpen(G))*100)+'% of them want a tank"))throw Error('Regions percent matches the people figure');
 count++;console.log('PASS 30 Oct requests');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

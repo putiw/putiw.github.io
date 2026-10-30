@@ -271,6 +271,8 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - Mangroves (the coin card, titled "Mangroves" until shrimpcoin launches) open at 10,000 kits sold (TREES_AT). A tap plants one tree (COIN_BATCH=1). Others copy: TREE_SPREAD 0.2% of all trees a day (x2 with the mangrove project), a mangrove gala buys seedlings with its money (treesFromGala), and after launch the coin-price gap adds more. Trees others plant before the coin make no coins; your own pre-coin trees mint a year after planting once the honest coin launches.
 - The own-tank jobs (Gravel, Sponge, Trim, Pests) are ported from the Shrimp Home Prototype: vacuum tube that follows the finger with a bucket (babies get sucked in, tap them back), the sponge as its own sheet with a bucket of old tank water and flow meter, scissors through stems and moss with floating cuttings, tweezers for snails and flatworms. They finish through careDone; the vacuum does not change water (no water change).
 - Culling lives inside Check shrimp: pick shrimp, tap Done looking, then choose Treat or Cull (with a ? that explains culling). The 16 you see stand for the tank: from scratch it takes 5 looks (CULL_ROUNDS), each covering a fifth, so each pick removes about adults/5/16 like it (cullEach). Once gone through, one look a month (CULL_MONTH) covers the whole tank. State is T.cull {cov, full}. Works from the first shrimp you buy. A one-time spotlight points at it once tank 1 has an auto feeder and auto water changer (G.opt.cullTour); the in-sheet 3-step guide shows until the first Treat or Cull (G.opt.cullGuided). Anything taken out there, bought or bred, sells as a cull. Normal selling never touches bought breeders.
+- The home tank is 20 L from the farm on (`homeSmall`, no bigger tank), and once the farms sell everything berries slow toward 50 shrimp (`homeCrowd`, Puti 30 Oct).
+- Mulm is shrimp waste: it builds with the shrimp in the tank and stops in an empty tank (after a crash), on the land too. Plants grow slowly, `C.grow` 1/350 a day (Puti, 30 Oct).
 - From the first hatchery: one home tank with 20 shrimp, and Gravel, Sponge, Trim and Pests are optional. No alerts, guide steps or glowing buttons for them, ever. The mess shows in the tank, that's all.
 
 **Last chapter and late game, Oct 26 (check these stay true)**
@@ -347,9 +349,9 @@ Latest bot results (seed 7, 28 Oct, Pass 132):
 
 | Bot | Result |
 |---|---|
-| Strong, cold answers (default) | Earth won on day 2,106, empire_dictator (Pass 154; 2,286 before) |
-| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 3,159, question_prof (Pass 154; 3,031 before) |
-| Average, curious and kind (default) | Earth on day 6,749, space done by day 8,160, garden_hermit (Pass 154; 6,581 / 7,992 before) |
+| Strong, cold answers (default) | Earth won on day 2,019, empire_dictator (30 Oct deploy; 2,106 before) |
+| Strong, kind answers (`BOT_HEART=kind`) | Earth won on day 3,183, question_prof (30 Oct deploy; 3,159 before) |
+| Average, curious and kind (default) | Earth on day 6,049, space done by day 7,460, garden_hermit (30 Oct deploy; 6,777 / 8,188 before) |
 
 Seed noise is big: over seeds 3–43 the average bot's Earth day ranges 5,700–6,640 on the same build, and strong seed 19 goes broke on day 252 on both the old and new build. Compare a few seeds before reading anything into one run.
 | Average, cold answers (`BOT_HEART=cold`) | Earth on day 5,349, no Space (24 Oct, not rerun in Pass 110) |
