@@ -1279,3 +1279,11 @@ Replaces the shrimp-late-kind branch (Pass 153, dropped after an independent rev
 - **Reach line** on Regions: "N homes want one, M have one" next to people reachable.
 - Balance 95 (new Pass 154 check), academy 10, me 46. Bots seed 7: strong 2,106 (2,286), kind 3,159 (3,031), average Earth 6,749 / Space 8,160 (6,581 / 7,992). The bots skip the income-share builds (`o.dues`); the average bot's harness now allows 24 game years (was 22). The remaining slowdown is the bots buying every new hard-part option; a player wouldn't.
 - Not done in a browser yet: the leave flow was checked headless at 390 px (Settings row, confirm, review card, tabs, review sheet), the late cards and the reading-time counter too. Spotlight sweep and layout scan not run. The Shrimp Times lines for the new hard-part options and the dues line in the Money sheet were not looked at.
+
+## Pass 155: Automated tanks, tank gear to finish, the You page (30 Oct, branch shrimp-late-game)
+- Ration hides on a tank with an auto feeder. Water care moves under Automation in Gear on a tank with an auto water changer, without the hand Change slider (Auto change does it). The heat guide points at Gear when the card is there.
+- Tanks 2 and 3 aren't finished without the auto feeder and auto water changer: Another tank shows and needs AED 460 (tank + gear), the sheet's Got it stays grey with "Buy both first" until both are in (`T.gearDue`, `gearDone`), a reload reopens the sheet.
+- You page: Grandma's place first. Grandma shows only Check on Grandma until you tap it, then everything (Her years, letters, loan, visits); closed again each time you come back. New What happened card under Your day logs hour milestones, design prizes, burnout and illness (`M.dlog`, newest first, empty on old saves).
+- Balance 97, academy 10, me 46. Bots seed 7: strong 2,106 (same), kind 3,159 (same), average Earth 6,777 / Space 8,188 (6,749 / 8,160). Headless browser at 390 px: sheet blocks, ration and water care on tanks 1 and 2, You page order and Grandma open/close, no console errors. Spotlight sweep not run (the only Chromium here is single-process).
+
+## Deploy 30 Oct (BUILD tank-gear): Passes 152-155

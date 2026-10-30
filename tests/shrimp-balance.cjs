@@ -654,5 +654,16 @@ var s7=readyGame();s7.fin=[];for(var j=0;j<7;j++)s7.fin.push({kits:1e6});for(var
 var L=readyGame();L.me.on=1;L.me.gplace={land:1};L.emp.hard={open:1,picks:{},goal:'home'};L.money=1e9;L.fin=g.fin;if(!canLeave(L))throw Error('can leave from the hard part');var tr0=(L.tr||{}).drive||0;if(!leaveCompany(L))throw Error('leave');if(!(L.left&&L.emp.ended&&L.emp.ended.kind==='left'))throw Error('left state');if(!(((L.tr||{}).drive||0)<tr0))throw Error('leaving is easy-going');stepGame(L);if(L.progress.queue[0]!=='left')throw Error('review card first');acknowledgeMilestone(L);if(progressionBlocked(L))throw Error('clock runs on the land');var d0=L.day;for(var k=0;k<40;k++)stepGame(L);if(!(L.day>d0))throw Error('days pass on the land');
 var P=readyGame();P.emp.regions.push('sa');P.emp.regDay={sa:0};P.day=100;P.humans=2e9;if(!cards3Cond(P).c_permit)throw Error('permit card');var pop0=popOpen(P);card3Choose(P,'c_permit',0);if(!(popOpen(P)<pop0))throw Error('waiting closes the region');
 var V=readyGame();V.me.on=1;V.me.hrs={videos:400};V.humans=1e6;var mv=V.money;videoDay(V);if(!(V.money>mv))throw Error('videos pay');`);
+// Puti, 30 Oct: tanks 2 and 3 need the auto feeder and water changer to finish, ration and water care move once automated, the You page
+check('30 Oct: a seeded tank needs the money for its auto gear, and the gear clears the flag',`
+var g=newGame();g.tanks[0].cycledAt=0;g.money=300;if(addTank(g))throw Error('150 for the tank is not enough, the gear is 310 more');g.money=460;if(!addTank(g))throw Error('460 buys tank and gear');var T=g.tanks[1];if(!T.gearDue)throw Error('flag');
+if(!buyUpgrade(g,T,'feeder')||!buyUpgrade(g,T,'autoWC'))throw Error('gear');if(T.gearDue)throw Error('flag cleared');
+var m=newGame();m.me=newMe();m.me.hrs={exercise:200};hoursDay(m);if(!(m.me.dlog&&m.me.dlog.length===1))throw Error('your day log');`);
+if(!html.includes("if(a==='ts-close'){if(TS&&gearDone(G.tanks[TS.i]))closeTankSheet();return;}"))throw Error('Puti: the new-tank sheet only closes once both are bought');
+if(!html.includes("lite||(!!T.feeder&&(id==='f-ration'||id==='h-ration'))"))throw Error('Puti: no Ration slider once the tank has an auto feeder');
+if(!html.includes("if(a&&c.parentNode!==$('p-up'))$('autocard').after(c);"))throw Error('Puti: Water care moves under Automation once the tank changes its own water');
+if(!html.includes('<section class="panel" id="p-me" hidden><div class="card" id="me-gplace" hidden></div>'))throw Error('Puti: Grandma\'s place first on the You page');
+if(!html.includes("hh=GT_OPEN&&(lg.length||un)")||!html.includes("if(activeTab!=='me'){GT_OPEN=0;return;}"))throw Error('Puti: Grandma shows nothing until Check on Grandma, closed each visit');
+count++;console.log('PASS 30 Oct requests');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
