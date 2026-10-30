@@ -551,7 +551,7 @@ defObj('tank',{fw:2,base:30,name:'Tank',keyOf:function(o){return o.fw+'|'+(o.v||
     for(var b=0;b<3;b++){var by=Y+g.h-2-((t*14+b*9)%(g.h-2));wrect(x,X+g.w-4,Math.round(by),1,1,'#e8f8fb');}
     var dirt=typeof mulmMean==='function'?Math.max(clamp((mulmMean(tk)-0.3)/0.6,0,1),clamp((0.6-tk.flow)/0.5,0,1)):0;
     if(dirt>0.05){x.save();x.globalAlpha=0.45*dirt;wrect(x,X,Y,g.w,g.h,'#6e5230');x.restore();}
-    if(typeof needs==='function'&&S.opt.toys==='need'&&needs(tk).length&&Math.floor(L.rt*2)%2===0){var cx=X+Math.round(g.w/2);wrect(x,cx-1,Y-24,3,8,'#fbf236');wrect(x,cx-1,Y-14,3,3,'#fbf236');wrect(x,cx-2,Y-25,5,1,INKc);}},
+    if(typeof needs==='function'&&S.opt.toys==='need'&&!tk.own&&needs(tk).length&&Math.floor(L.rt*2)%2===0){var cx=X+Math.round(g.w/2);wrect(x,cx-1,Y-24,3,8,'#fbf236');wrect(x,cx-1,Y-14,3,3,'#fbf236');wrect(x,cx-2,Y-25,5,1,INKc);}},
   hit:function(o){return [o.tx*T+2,oBase(o)-96,o.fw*T-4,100];},use:{side:'s'}});
 // -- black arc floor lamp (her living room)
 defObj('lamp',{base:40,name:'Lamp',spr:function(o){var pb=new PB(64,124),bx=20;pb.ell(bx,120,9,3,'#1b1a1e');pb.rect(bx-1,22,3,98,'#1b1a1e');

@@ -307,7 +307,7 @@ var tankMod={name:'tank',
   if(!S.tanks[S.sel])S.sel=0;tvSize();tvSync(true);tankMod.renderSide();netBar();tvStart();},
  renderSide:function(){if(activeTab!=='tank'||!$('tankside'))return;var T=S.tanks[S.sel];
   // tank chips
-  var slots=STAGES[S.stage].tanks,ch='';S.tanks.forEach(function(t,i){var nd=S.opt.toys==='need'&&needs(t).length;ch+='<button class="tchip" data-sel="'+i+'" aria-pressed="'+(i===S.sel)+'">'+esc(t.name)+(nd&&i!==S.sel?' <i class="dot" style="position:static;display:inline-block;width:7px;height:7px;border:0;border-radius:50%;background:var(--shrimp)"></i>':'')+'</button>';});
+  var slots=STAGES[S.stage].tanks,ch='';S.tanks.forEach(function(t,i){var nd=S.opt.toys==='need'&&!t.own&&needs(t).length;ch+='<button class="tchip" data-sel="'+i+'" aria-pressed="'+(i===S.sel)+'">'+esc(t.name)+(nd&&i!==S.sel?' <i class="dot" style="position:static;display:inline-block;width:7px;height:7px;border:0;border-radius:50%;background:var(--shrimp)"></i>':'')+'</button>';});
   if(S.tanks.length<slots)ch+='<button class="tchip" data-newtank>+ New tank</button>';$('tchips').innerHTML=ch;$('tchips').hidden=S.tanks.length<2&&S.tanks.length>=slots;
   capDefault();
   var side='',shut=S.opt.shut||(S.opt.shut={recent:true});
@@ -315,7 +315,7 @@ var tankMod={name:'tank',
   // jobs: only the most pressing one glows
   var nd=needs(T),ids=nd.map(function(n){return n.id;}),tray=S.opt.toys==='tray';var show=tray?TOYS.map(function(t){return t.id;}):ids;
   if(!TOY){var jb='';
-   if(show.length){jb+='<div class="toys">';TOYS.forEach(function(t){if(show.indexOf(t.id)<0)return;var n=nd.find(function(z){return z.id===t.id;});jb+='<button class="btn'+(n?' need':'')+(n&&n===nd[0]?' glow':'')+'" data-toy="'+t.id+'"><canvas data-icon="'+t.id+'" width="56" height="44"></canvas>'+t.name+'<small>'+(n?n.t:t.idle(T))+'</small></button>';});jb+='</div>';}
+   if(show.length){jb+='<div class="toys">';TOYS.forEach(function(t){if(show.indexOf(t.id)<0)return;var n=nd.find(function(z){return z.id===t.id;});jb+='<button class="btn'+(n?' need':'')+(n&&n===nd[0]&&!T.own?' glow':'')+'" data-toy="'+t.id+'"><canvas data-icon="'+t.id+'" width="56" height="44"></canvas>'+t.name+'<small>'+(n?n.t:t.idle(T))+'</small></button>';});jb+='</div>';}
    else jb+='<p class="hint">Nothing needs doing. The tank is fine for now.</p>';
    side+=card('jobs',tray?'Jobs':'Needs doing',nd.length?plural(nd.length,'job'):'all good',jb);}
   // wellbeing: one bar and a word; the parts are behind ?
