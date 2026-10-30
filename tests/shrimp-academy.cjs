@@ -45,4 +45,10 @@ var g=newGame();g.kits.sold=ACADEMY_AT;g.emp.farms.barn=1;g.money=Math.round(500
 check('space ending leaves unfinished Earth running and survives save/load',`
 var g=newGame();acknowledgeMilestone(g);g.opt.all=true;g.day=4000;g.space.started=true;g.space.won=4000;g.academy.level=2;g.academy.funded=100;g.academy.done.materials=1;startStudy(g,'water');g=migrate(JSON.parse(JSON.stringify(g)));for(var i=0;i<4;i++)stepGame(g);if(g.day!==4001||g.academy.active.progress!==1.25||progressionBlocked(g))throw Error('Space blocked Earth or research');
 `);
+check('Pass 160: keep observing does not block the seed ship, and the launch says what is missing',`
+var g=newGame();g.tr={know:8,care:6};g.day=3650;g.emp.won=3650;acknowledgeMilestone(g);requestSpaceDream(g);beginSpace(g);g.money=1e10;g.academy.level=2;g.academy.funded=999;g.academy.done.materials=1;g.academy.done.observe=1;g.academy.repeat=true;
+startStudy(g,'observe');for(var i=0;i<80&&g.academy.active&&g.academy.active.id==='observe';i++)academyDay(g);if(!g.academy.active||g.academy.active.id!=='water')throw Error('Water should start ahead of the repeat, got '+(g.academy.active&&g.academy.active.id));
+g.space.surveys.orbit=1;var m=launchMissing(g,'orbit');if(!m.some(function(t){return /Water buffering/.test(t);})||!m.some(function(t){return /mission crew, you have 0/.test(t);})||m.some(function(t){return /survey/.test(t);}))throw Error('Missing list '+m.join(' | '));
+g.academy.done.water=1;g.academy.done.algae=1;g.academy.knowledge=5000;g.academy.crew=200;if(launchMissing(g,'orbit').length||!launchColony(g,'orbit'))throw Error('Should launch');
+`);
 console.log(count+' academy and parallel chapter checks passed');

@@ -1323,3 +1323,46 @@ Replaces the shrimp-late-kind branch (Pass 153, dropped after an independent rev
 - Millie, `millie_walk.aseprite` now 52 frames (her new frame 1, arms relaxed, shifts the rest by one; `MLay`). Standing she drifts between her two stands every few seconds and blinks (two blink frames made from her own eye and lash pixels, 52 and 53). millie2 rebuilt from the new frame 10.
 - Tests: frame check for every dog and Millie state, flipped and not, screenshots; balance and academy pass.
 - Deploy (30 Oct): BUILD `2026-10-30-land-dog`; the land loads as `home.html?v=BUILD` so a new land isn't served from cache. The land's two catch sounds (`catch-shrimp-1.mp3`, `-2.mp3`) were missing from `shrimp/` and 404'd; copied in. index.html sim unchanged since the last deploy, so bots and the spotlight sweep were not rerun; fast suites pass and a 60 s monkey on the land (373 random taps, tool switches, forced sits and pants) gave no errors.
+
+## Pass 160: ending fixes from the 28-year Garden playthrough, plus header numbers (30 Oct)
+
+A. Traits
+1. Done. Labels say what is measured: drive life first / company first (headline company first / life first), know leaves settings alone / tinkers with everything (a tinkerer / hands off with settings), control moves on with gaps / finishes before moving on (thorough / quick to move on). Comment block, ending comments and AGENTS.md updated. No other player text used the old words.
+2. Done. One grey line under each trait bar that has a play part (`traitEv`): hours on work (or You page screen time), setting changes and ?/chart opens a year, % of optional things done when you moved on plus the weakest part, shrimp looks and culls, big buys and reserve days. Rows 34 to 48 px, text has a halo over the centre line. Checked at 390 px.
+3. Done. `prepNow` keeps its parts in `PREP_LAST`; `prepNote` stores per-part averages in `G.ps.prepP` next to `G.ps.prep` [sum,n] (old saves keep working, they just have no parts). The "fully kitted" clause only prints when control >= 0. The weakest part goes into the control evidence line ("least on stores").
+4. Done, reworded. `S.rdX` counts picks of the priciest option on late cards, not bets, so it stays out of risk: "picked the most expensive option N times out of M".
+
+B. Ending text
+5. Done. `endRateFb`: when the rate falls back to "N times in Y", the line is printed once. endTankLines was the only other caller and never doubled.
+6. Done. `headNet` is the header's net per day and the ending's. With net > 0: "N days of profit", with net < 0: "enough for N days of costs".
+7. Done. `tankLapsed` (crashed and left empty, green over 25% of the time, or a gap over 6 months) hides "You never stopped looking after your first tank" and the c_mytank "kept it going" line. The tank lifetime counts from when the farm took the other tanks (`S.ownD`), the line now says so.
+8. Done. Bug: `E.trees` is the tree map, so `c.trees+E.trees` was a string and the world list always said "none". Both places use `earthNums(G).mine`; under 1000 it says "You planted N yourself."
+9. Done. 13 was `gt.n` (every tap of Check on Grandma), 30 was `visits+calls`. Grandma section: "You visited Grandma V times and called her C times in Y, about ...". The world list drops the tap count. `visitLevel` 'many' now also needs 4 visits a year, 'some' 0.75 a year.
+10. Done. New finance category `family` "Sent to Grandma" for the weekly send and the 2% gifts. `personal` is now "Your home and life" (house steps, land, trips, days off and illness bills still go there, so "Your home" alone would have been wrong). Old saves keep their old totals under it.
+11. Done. `fmtA` uses the short form from 1M (galas line), Lab header and launch line use `shortN` for knowledge.
+12. Done. `endWorldList`: staff/Mira lines first, then 10 lines (story, hard part, coin and Grandma lines ahead of project ends, project ends by cost), "Show all N" fold for the rest, the closing line always shown. `END_EXCL` pairs: docks/seaweed, free/paid care plan, clear/green river; the exclusion also filters What changed on Earth.
+13. Done. Noor, not Mimi. Names are text only; `migrate` rewrites Mimi in queued later news, the paper log and the You history once (`G.mimiNoor`).
+
+C. Charts
+14. Done. X ticks every 5 years over 12 years, every 2 below, on multiples.
+15. Done. `ebig` has no trailing .0.
+
+D. Space
+16a. Done by reading and a sim check (no late save from that run): the false condition was `rd(water)`/`rd(algae)`. With Keep observing on, finishing an observation restarted observing, and while a project runs the Lab card shows only that project, so Water buffering never showed a Start button. Survey was not the problem (the launch card only shows once surveyed).
+16b. Done. `launchMissing` lists only what is missing under the Launch button (projects, survey, knowledge, mission crew, cash above the reserve).
+16c. Done. A.crew is mission crew (contracts and graduates). Lab header, Space text, launch line and the button say "mission crew".
+16d. Done. With Keep observing on and space started, the next of materials, water, algae starts instead of another observation (`spaceNeed`), and the Lab card says "Pause observing to start ...".
+16e. Done. Hint names only the missing projects, bracket gone.
+17. Done. Lab header counts positions like the rows ("12 PhD students, 6 postdocs", `rlSum`); a PI lab counted as 3 people before.
+
+E. Small UI
+18. Done. Open World tab and Contract 50 mission crew sit in one flex row with an 8 px gap.
+19. Partly. The pause button is set pressed whenever a card holds time. The money: after space starts, Earth is archived (kit and shrimp sales stop by design), but food and tank care and side income keep paying, and the weekly send to Grandma is 1-10% of cash. The header looked only at shrimp and kit sales, so it said "bills 50.4M/d" and hid both the income and the send. `headNoInc` now looks at every income line except gifts, so the header shows the real net. Average bot seed 7 after space: food and care +160M/d, side +7M/d, supplies and delivery -72M/d, sent to Grandma -157M/d. Not changed: whether the send should keep taking a share of a huge balance; that is a design call.
+20. Done. The ? button has a title and aria-label for ! and !!, and the popup opens with one line saying what the mark means.
+
+Also from Puti's message
+- Header money stays on one line (`#b-net` nowrap), no AED in the per-day part ("bills 74.3M/d"), header numbers one decimal at most (`hN`: 4.1B, 1.6B).
+- The green line under the cash counts owners once the goal bar is gone: "8.2B own a tank · 7.9B quit eating shrimp · 8B mangroves" (fits 390 px).
+- First lab party: it needed 500 shrimp in the tanks before day 900. Players who reach the farm before 500 in tanks, or are slow, never got it. Now 500 shrimp counting the farms, from day 90, before Europe opens. Second party unchanged (after Europe).
+
+Tests: balance 98, academy 11 (new: observing doesn't block the seed ship, launch lists what's missing), me 46. Browser at 390 px on the average bot's space snapshots: ending, header, Space card, no console errors.
