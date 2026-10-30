@@ -345,7 +345,7 @@ window.ENDING_TEST_DATA = {
         {
           "id": "careplanfree",
           "label": "Free care plan for every owner",
-          "description": "Every living tank gets a check-in call each month. It costs you AED 0.50 a tank a month, for as long as they keep it. More tanks thrive.",
+          "description": "Every living tank gets a check-in call each month. It costs you AED 0.10 a tank a month, for as long as they keep it. More tanks thrive.",
           "traits": {
             "kin": 0.4,
             "know": -0.4
@@ -562,64 +562,69 @@ window.ENDING_TEST_DATA = {
       "body": "Five billion tanks with a pump, a light and sometimes a heater use about 1% of the world’s electricity, dozens of power stations’ worth.",
       "options": [
         {
-          "label": "Low-power kits, AED 7.50 more a kit",
-          "description": "LED on a timer, a 1-watt pump, a heater only where it gets cold.",
+          "label": "Low-power kits",
+          "description": "LED on a timer, a 1-watt pump, a heater only where it gets cold. AED 7.50 more a kit, and the lines retool for four months, 10% fewer kits a day.",
           "traits": {
-            "care": 1,
-            "means": 0.5
+            "know": 0.5,
+            "care": 0.3,
+            "risk": -0.5
           },
           "endingLine": "Every new kit has a light on a timer and a pump that uses a watt."
         },
         {
-          "label": "Fund the engineers, AED 50M",
-          "description": "A pump that uses less than a phone charger.",
+          "label": "Fund the engineers",
+          "description": "A pump that uses less than a phone charger, in about a year. The utilities have to come in on it.",
           "traits": {
             "know": 0.3,
-            "risk": 0.3
+            "risk": 0.5,
+            "control": -0.3
           },
           "endingLine": "Shrimp pumps use less power than a phone charger now."
         },
         {
           "label": "Leave it to the power companies",
-          "description": "Kits stay cheap. They build more plants, mostly gas.",
+          "description": "Kits stay cheap. They build more plants, mostly gas. 5% more people want one this year.",
           "traits": {
+            "drive": 0.5,
             "care": -0.5,
-            "know": -0.3
+            "know": -0.5
           },
-          "endingLine": "Power companies built more plants for shrimp tanks, mostly gas."
+          "endingLine": "Power companies built six gas plants for shrimp tanks. The hot towns got hotter."
         }
       ]
     },
     {
       "id": "c_rivers",
       "title": "Shrimp in the rivers",
-      "body": "Some owners dump their shrimp when they get bored. Red shrimp breed in a few warm rivers now, one in Germany runs below a power plant.",
+      "body": "Some owners dump their shrimp when they get bored. Red shrimp breed in a few warm rivers now, one in Germany runs below a power plant. The river agencies want them out. The shops say most owners would hand them back if someone asked.",
       "options": [
         {
-          "label": "Shops take them back, AED 50M",
-          "description": "Any shop that sells your kits takes unwanted shrimp back, no questions asked.",
+          "label": "Shops take them back",
+          "description": "You pay the shops to run it, and stock goes to re-homing for six months, 15% fewer kits a day. The ones already in the rivers stay.",
           "traits": {
             "kin": 0.5,
-            "care": -0.3
+            "care": -0.5,
+            "risk": -0.3
           },
           "endingLine": "Unwanted shrimp go back to the shop, not the river."
         },
         {
-          "label": "Pay river teams, AED 20M",
-          "description": "They catch a lot of them, never all.",
+          "label": "Clear the rivers",
+          "description": "Permits and volunteers on every river. They catch most of them. The shrimp they catch are killed, an invasive species can’t go back in a river or a tank.",
           "traits": {
-            "kin": 0.5,
-            "care": 0.5
+            "care": 0.5,
+            "kin": -0.5,
+            "control": 0.5
           },
-          "endingLine": "River teams catch the red shrimp they can find."
+          "endingLine": "River teams cleared the red shrimp from the warm rivers. Most of them."
         },
         {
-          "label": "Leave it to the river agencies",
-          "description": "Your money stays in kits. The agencies catch some, and red shrimp spread to warm rivers on four continents.",
+          "label": "Leave them",
+          "description": "The red rivers are a tourist thing now. 3% more people want a tank in those countries. Your money stays in kits.",
           "traits": {
             "control": -0.5,
-            "care": -0.3,
-            "kin": -0.5
+            "kin": -0.5,
+            "risk": 0.3
           },
           "endingLine": "Red shrimp live in warm rivers on four continents."
         }
@@ -632,26 +637,30 @@ window.ENDING_TEST_DATA = {
       "options": [
         {
           "label": "Buy spares back for new kits",
-          "description": "Shops pay owners a little per shrimp, you pack them into kits.",
+          "description": "Shops pay owners a little per shrimp, you pack them into kits. Free stock, 10% more kits a day for a year.",
           "traits": {
-            "kin": 1
-          }
+            "kin": 0.5,
+            "know": 0.3
+          },
+          "endingLine": "Kit shrimp are second-hand now. Nobody minds."
         },
         {
           "label": "Sell them on as fish food",
-          "description": "Somebody has to.",
+          "description": "Somebody has to. The farms stay the only source.",
           "traits": {
-            "kin": -2,
+            "kin": -1.5,
             "drive": 0.3
           },
           "endingLine": "Spare pet shrimp end up as fish food."
         },
         {
           "label": "Let the price fall",
-          "description": "Cheap shrimp everywhere. Kits sell as a starter tank, not for the shrimp.",
+          "description": "Cheap shrimp everywhere. Kits sell as a starter tank, not for the shrimp. 5% fewer kits this year, and word gets around, 2% more want one.",
           "traits": {
-            "kin": -0.5,
-            "drive": -0.3
+            "kin": -0.3,
+            "drive": -0.5,
+            "control": -0.3,
+            "know": -0.3
           },
           "endingLine": "A shrimp costs nothing now, people give them away at weddings."
         }
@@ -663,31 +672,34 @@ window.ENDING_TEST_DATA = {
       "body": "A summer blackout, two days, no air conditioning. Rooms reach 38 °C. Cherry shrimp start dying above 30.",
       "options": [
         {
-          "label": "Battery pumps and a cooling guide, AED 30M",
-          "description": "Every owner in the city gets a battery air pump and the frozen-bottle trick.",
+          "label": "Battery pumps for the hot cities",
+          "description": "The cities hand out a battery air pump and the frozen-bottle trick before next summer. The owners who lost shrimp this time get nothing.",
           "traits": {
-            "care": -0.5,
-            "risk": -1,
-            "control": -0.3
+            "control": 0.5,
+            "risk": -0.5,
+            "care": 0.5
           },
           "endingLine": "Owners in hot cities keep a battery pump and a frozen bottle for the next blackout."
         },
         {
-          "label": "Free replacements, AED 45M",
-          "description": "New shrimp for everyone who lost theirs. Kits can now come with a battery pump.",
+          "label": "Free replacements",
+          "description": "New shrimp for everyone who lost theirs. Three days of farm output go to replacements, not kits. Kits can now come with a battery pump.",
           "traits": {
-            "means": 1,
-            "kin": 0.5
+            "means": 0.5,
+            "kin": 0.5,
+            "control": -0.3
           },
           "endingLine": "Everyone who lost shrimp in the blackout got new ones, and kits can come with a battery pump."
         },
         {
           "label": "A 24-hour help line",
-          "description": "Move the tank to the floor, float a frozen bottle, skip feeding.",
+          "description": "Move the tank to the floor, float a frozen bottle, skip feeding. Nothing else.",
           "traits": {
-            "control": 0.5
+            "control": -0.3,
+            "risk": 0.5,
+            "care": -0.5
           },
-          "endingLine": "A help line talked owners through the next blackout."
+          "endingLine": "A help line talked owners through the next blackout. Some tanks still died."
         }
       ]
     },
@@ -698,26 +710,30 @@ window.ENDING_TEST_DATA = {
       "options": [
         {
           "label": "Argue with them",
-          "description": "You go on TV with a planted tank. It goes fine.",
+          "description": "You go on TV with a planted tank. It goes fine. Sales unchanged.",
           "traits": {
-            "kin": -1,
-            "control": 0.3
+            "kin": -0.5,
+            "control": 0.5,
+            "risk": 0.2
           }
         },
         {
-          "label": "Fund a wild reserve, AED 20M",
-          "description": "A valley where shrimp live free.",
+          "label": "Fund a wild reserve",
+          "description": "You buy the valley out, and a government has to give it up. The farmers in it have to agree.",
           "traits": {
-            "kin": 1
+            "kin": 0.5,
+            "care": 0.3,
+            "risk": -0.3
           },
           "endingLine": "There’s a valley where shrimp live with no glass around them."
         },
         {
-          "label": "Agree with them",
-          "description": "Grandma says the shrimp might want to see what’s out there.",
+          "label": "Agree with them, on TV",
+          "description": "You say it: a tank is small. 10% fewer people want one this year.",
           "traits": {
             "kin": 0.5,
-            "drive": -0.3
+            "drive": -0.5,
+            "means": 0.5
           },
           "endingLine": "You agreed that tanks are tiny jails, and started thinking about where else shrimp could live."
         }
@@ -732,28 +748,31 @@ window.ENDING_TEST_DATA = {
           "label": "Offer him work at the hatchery",
           "description": "Steady pay. He’s still raising shrimp, just not catching them.",
           "traits": {
-            "means": 1,
-            "care": -0.5
+            "care": -0.5,
+            "drive": 0.3,
+            "control": 0.3
           },
           "endingLine": "Mira’s other grandpa works at your hatchery. He still calls them prawns."
         },
         {
-          "label": "Help him start reef tours, AED 300,000",
-          "description": "A small boat, visitors, the same coast. He’s back on the water.",
+          "label": "Help him start reef tours",
+          "description": "Two weeks away fixing the boat with him. Orders run at half while you’re gone, and Grandma’s windows pass.",
           "traits": {
-            "means": 1,
-            "care": -0.5
+            "drive": -0.5,
+            "means": 0.5,
+            "control": -0.3
           },
-          "endingLine": "Mira’s other grandpa takes visitors out to the reef."
+          "endingLine": "Mira’s other grandpa takes visitors out to the reef. Mira sends photos."
         },
         {
-          "label": "Visit him with Mira",
-          "description": "No offer, just an afternoon on the dock. He shows you how he mended nets.",
+          "label": "A fund for every crew that lost work",
+          "description": "He gets the same as every other crew, no more.",
           "traits": {
-            "care": -1,
-            "drive": -0.5
+            "care": 0.5,
+            "means": 0.5,
+            "kin": -0.3
           },
-          "endingLine": "You spent an afternoon on the dock with Mira’s other grandpa. He showed you how he mended nets."
+          "endingLine": "The fishing towns have a shrimp company to thank, and to blame."
         }
       ]
     },

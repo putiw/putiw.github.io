@@ -873,7 +873,7 @@ var NOTE_KINDS={day:'Your day',grandma:'Grandma',word:'Word gets around'};
 function noteLine(G,k,t){t=N(G,t);var Q=G.notes||(G.notes={list:[],seen:0});Q.list.push({k:NOTE_KINDS[k]?k:'word',t:t,d:Math.floor(G.day)});if(Q.list.length>30){var cut=Q.list.length-30;Q.list.splice(0,cut);Q.seen=Math.max(0,Q.seen-cut);}log(G,(k==='word'?'Word gets around: ':'')+t);G.log[G.log.length-1].note=1;}
 // sci marks a story for the Science section of The Shrimp Times (lab finds, funded studies, the university)
 function newsLine(G,t,sci){if(!paperOpen(G)){noteLine(G,'word',t);return;}t=N(G,t);newsPush(G,sci?{tx:t,sci:1}:{tx:t},t);}
-function laterDay(G){var E=G.emp;if(!E.later||!E.later.length)return;var now=Math.floor(G.day);E.later=E.later.filter(function(x){if(now<x.d)return true;if(x.t)newsLine(G,x.t,x.sci);if(x.m)moodAdd(G,x.m,5);if(x.c)E.ceil+=x.c;return false;});}
+function laterDay(G){var E=G.emp;if(!E.later||!E.later.length)return;var now=Math.floor(G.day);E.later=E.later.filter(function(x){if(now<x.d)return true;if(x.t)newsLine(G,x.t,x.sci);if(x.m)moodAdd(G,x.m,5);if(x.c)E.ceil+=x.c;if(x.fx)x.fx(G);return false;});}
 function autoDisc(G){return rd(G,'automation')?0.75:1;}
 function matAdj(G){return (pd(G,'shipwarm')?4:0)-(pd(G,'shipcheap')?4.5:0)+(pd(G,'almond')?1:0);}
 function taxRate(G){return pd(G,'haven')?0:G.emp.tree&&G.emp.tree.isl_nation?0.045:0.09;}
@@ -1167,7 +1167,7 @@ function addOwners(G,happyKits){var ppl=hhPeople(happyKits)*kindMult(G),cap=hard
 function kitDemand(G){
   var K=kitCap(G),room=K-G.humans;if(room<=0.5)return 0;
   var sat=Math.max(room/K,0.03);
-  return Math.min((kitAware(G)+G.emp.beta*opMult(G)*welfareMult(G)*wordOfMouth(G)*trust(G)*G.humans)*painMult(G)*(1+salesBoost(G))*sat*Math.pow(KIT_REF/G.kitPrice,2)*workMult(G)/hhDiv(G),room/(effectiveQuality(G)*HH_AVG)+1);
+  return Math.min((kitAware(G)+G.emp.beta*opMult(G)*welfareMult(G)*wordOfMouth(G)*trust(G)*G.humans)*painMult(G)*slowMult(G)*(1+salesBoost(G))*sat*Math.pow(KIT_REF/G.kitPrice,2)*workMult(G)/hhDiv(G),room/(effectiveQuality(G)*HH_AVG)+1);
 }
 function kitSupply(G){return Math.min(packCap(G),farmCap(G)+tankSurplusKits(G)+(G.emp.rawShrimp||0)/KIT_SHRIMP);}
 function keepBlocks(G){if(farmCap(G)>=1||tankSurplusKits(G)>=1)return null;var have=0,keep=0,br=0;G.tanks.forEach(function(T){have+=totalN(T);keep+=packAbove(G,T);br+=keepN(T);});return have>=KIT_SHRIMP&&keep>0?{have:have,keep:keep,br:br}:null;}
@@ -1478,6 +1478,7 @@ function rate(G,k,n){var f=(G.fin||[]).slice(-(n||7));if(!f.length)return 0;var 
 function netPerDay(G){var h=G.mh||[];if(h.length<3)return null;return (G.money-h[0])/h.length;}
 var FIN_CATS=[['shrimp','Shrimp sales',1],['kits','Kit sales',1],['carbon','Carbon credits',1],['deals','Deals and royalties',1],['foodsales','Food and tank care',1],['side','Water, power and freight',1],['work','Overtime and side income',1],['loans','Loans and gifts',1],['running','Electricity and heating',0],['food','Food',0],['water','Water changes',0],['supplies','Shrimp, kit packing and supplies',0],['equipment','Tanks and equipment',0],['ads','Advertising',0],['shops','Shops and rent',0],['farms','Shrimp breeding and farm upkeep',0],['projects','Projects, regions and galas',0],['staff','Staff wages and AI tokens',0],['logistics','Distribution and customer support',0],['research','Research grants and academic development',0],['space','Space missions and habitat construction',0],['tax','VAT and corporate tax',0],['personal','Personal',0],['debt','Loan repayments',0]];
 function gainInf(G,x){if(!G.emp.infOn)return;if(x>0&&G.me&&G.me.burnt>G.day)x*=0.5;G.emp.inf+=x;if(x>0)G.emp.infTotal+=x;var t=G.today||(G.today={});t._inf=(t._inf||0)+x;}
+function infIncome(G){var r=rate(G,'_inf',30);return Math.max(r,1000);}
 function pay(G,a,c){G.money-=a;var t=G.today||(G.today={});t[c]=(t[c]||0)-a;}
 function earn(G,a,c){G.money+=a;if(a>0)G.stats.earned=(G.stats.earned||0)+a;var t=G.today||(G.today={});t[c]=(t[c]||0)+a;if(G.vat&&(c==='shrimp'||c==='kits'))pay(G,a*5/105,'tax');}
 function log(G,t,T){G.log.push({d:Math.floor(G.day),t:(T&&G.tanks.length>1?T.name+': ':'')+t});if(G.log.length>60)G.log.shift();}
@@ -2997,6 +2998,16 @@ function houseLines(G){var H=G.me&&G.me.house;if(!H||!H.land)return [];if(!H.com
 function sideMoney(G,d){earn(G,Math.max(1000,dayIncome(G)*d),'deals');}
 function needM(n){var f=function(G){var c=scM(G,n);if(G.money<c)return false;pay(G,c,'projects');return true;};f.cost=n;return f;}
 function needI(n){var f=function(G){var c=si(G,n);if(G.emp.inf<c)return false;G.emp.inf-=c;return true;};f.inf=n;return f;}
+// Late costs (Pass 154): days of income (scales with the company), days of ✦ income (so spending ✦ first doesn't make it cheap),
+// your own time (M.trip, orders at half), and kits a day for a while (E.slow). A fixed AED price is no choice late.
+function needDays(n){var g=function(G){var c=Math.max(scM(G,1e6),dayIncome(G)*n);if(G.money<c)return false;pay(G,c,'projects');return true;};g.days=n;return g;}
+function needIDays(n){var g=function(G){var c=Math.max(si(G,1000),infIncome(G)*n);if(G.emp.inf<c)return false;G.emp.inf-=c;return true;};g.idays=n;return g;}
+function needAway(days){var g=function(G){var M=G.me;if(!M||!M.on){var c=Math.max(scM(G,3e5),dayIncome(G)*3);if(G.money<c)return false;pay(G,c,'projects');return true;}if(M.trip>G.day)return false;M.trip=Math.floor(G.day)+days;M.tripWhy='boat';return true;};g.away=days;return g;}
+function slowKits(G,f,days){var E=G.emp;(E.slow||(E.slow=[])).push({f:f,u:Math.floor(G.day)+days});}
+function slowMult(G){var E=G.emp,d=Math.floor(G.day),m=1;if(!E.slow)return 1;E.slow=E.slow.filter(function(x){return x.u>d;});E.slow.forEach(function(x){m*=1-x.f;});return m;}
+function later(G,days,t,fx){var E=G.emp;(E.later||(E.later=[])).push({d:Math.floor(G.day)+days,t:t,fx:fx});}
+function hardMul(G,id,x){var E=G.emp,m=E.hardMul||(E.hardMul={});m[id]=(m[id]||1)*x;}
+function seq(){var fs=Array.prototype.slice.call(arguments);var f=function(G){for(var i=0;i<fs.length;i++)if(fs[i](G)===false)return false;return true;};fs.forEach(function(x){for(var k in x)f[k]=x[k];});return f;}
 function both(a,b){var f=function(G){if(a(G)===false)return false;b(G);return true;};f.cost=a.cost||b.cost;f.inf=a.inf||b.inf;return f;}
 function ceilUp(x){return function(G){G.emp.ceil+=x;};}
 var CARDS3={
@@ -3004,29 +3015,29 @@ var CARDS3={
   ['Buy the good ones','Most of the workers keep their jobs. The taxpayers still pay for the ones that failed.',{means:-.5,drive:.7,care:-.3},function(G){sideMoney(G,15);},'You bought Pelagonia’s best hatcheries and kept most of the crews.'],
   ['Let the bank sell them off','Some workers lose their jobs. No public money goes into a failed boom.',{means:.5,drive:-.5},null,'Pelagonia’s bank sold the failed hatcheries for parts.']]},
  c_power:{at:5e9,title:'The electricity bill',body:'Five billion tanks with a pump, a light and sometimes a heater use about 1% of the world’s electricity, dozens of power stations’ worth.',ch:[
-  ['Low-power kits, AED 7.50 more a kit','LED on a timer, a 1-watt pump, a heater only where it gets cold.',{care:1,means:.5},function(G){G.emp.mat=(G.emp.mat||0)+7.5;},'Every new kit has a light on a timer and a pump that uses a watt.'],
-  ['Fund the engineers, AED 50M','A pump that uses less than a phone charger.',{know:.3,risk:.3},needM(5e7),'Shrimp pumps use less power than a phone charger now.'],
-  ['Leave it to the power companies','Kits stay cheap. They build more plants, mostly gas.',{care:-.5,know:-.3},null,'Power companies built more plants for shrimp tanks, mostly gas.']]},
- c_rivers:{at:5.5e9,title:'Shrimp in the rivers',body:'Some owners dump their shrimp when they get bored. Red shrimp breed in a few warm rivers now, one in Germany runs below a power plant.',ch:[
-  ['Shops take them back, AED 50M','Any shop that sells your kits takes unwanted shrimp back, no questions asked.',{kin:.5,care:-.3},needM(5e7),'Unwanted shrimp go back to the shop, not the river.'],
-  ['Pay river teams, AED 20M','They catch a lot of them, never all.',{kin:.5,care:.5},needM(2e7),'River teams catch the red shrimp they can find.'],
-  ['Leave it to the river agencies','Your money stays in kits. The agencies catch some, and red shrimp spread to warm rivers on four continents.',{control:-.5,care:-.3,kin:-.5},null,'Red shrimp live in warm rivers on four continents.']]},
+  ['Low-power kits','LED on a timer, a 1-watt pump, a heater only where it gets cold. AED 7.50 more a kit, and the lines retool for four months, 10% fewer kits a day.',{know:.5,care:.3,risk:-.5},function(G){G.emp.mat=(G.emp.mat||0)+7.5;slowKits(G,0.1,120);},'Every new kit has a light on a timer and a pump that uses a watt.'],
+  ['Fund the engineers','A pump that uses less than a phone charger, in about a year. The utilities have to come in on it.',{know:.3,risk:.5,control:-.3},seq(needDays(20),needIDays(30),function(G){later(G,365,'Shrimp pumps use less power than a phone charger now. The same chip runs the fans.',function(g){g.emp.mat=Math.max(0,(g.emp.mat||0)-3);hardMul(g,'hot',0.9);});}),'Shrimp pumps use less power than a phone charger now.'],
+  ['Leave it to the power companies','Kits stay cheap. They build more plants, mostly gas. 5% more people want one this year.',{drive:.5,care:-.5,know:-.5},function(G){G.emp.ceil+=0.05;later(G,365,'Six new gas plants. The power company thanks the shrimp.',function(g){hardMul(g,'hot',1.2);});},'Power companies built six gas plants for shrimp tanks. The hot towns got hotter.']]},
+ c_rivers:{at:5.5e9,title:'Shrimp in the rivers',body:'Some owners dump their shrimp when they get bored. Red shrimp breed in a few warm rivers now, one in Germany runs below a power plant. The river agencies want them out. The shops say most owners would hand them back if someone asked.',ch:[
+  ['Shops take them back','You pay the shops to run it, and stock goes to re-homing for six months, 15% fewer kits a day. The ones already in the rivers stay.',{kin:.5,care:-.5,risk:-.3},seq(needDays(10),function(G){slowKits(G,0.15,180);}),'Unwanted shrimp go back to the shop, not the river.'],
+  ['Clear the rivers','Permits and volunteers on every river. They catch most of them. The shrimp they catch are killed, an invasive species can’t go back in a river or a tank.',{care:.5,kin:-.5,control:.5},seq(needDays(5),needIDays(30)),'River teams cleared the red shrimp from the warm rivers. Most of them.'],
+  ['Leave them','The red rivers are a tourist thing now. 3% more people want a tank in those countries. Your money stays in kits.',{control:-.5,kin:-.5,risk:.3},function(G){G.emp.ceil+=0.03;later(G,730,'Red shrimp live in warm rivers on four continents now.',function(g){g.emp.riversLost=1;});},'Red shrimp live in warm rivers on four continents.']]},
  c_many:{at:6e9,title:'Too many shrimp',body:'Every tank breeds. Owners have hundreds and give them to friends, so fewer people buy kits.',ch:[
-  ['Buy spares back for new kits','Shops pay owners a little per shrimp, you pack them into kits.',{kin:1},function(G){var c=Math.max(1000,dayIncome(G)*5);if(G.money<c)return false;pay(G,c,'projects');},''],
-  ['Sell them on as fish food','Somebody has to.',{kin:-2,drive:.3},function(G){sideMoney(G,7.5);},'Spare pet shrimp end up as fish food.'],
-  ['Let the price fall','Cheap shrimp everywhere. Kits sell as a starter tank, not for the shrimp.',{kin:-.5,drive:-.3},null,'A shrimp costs nothing now, people give them away at weddings.']]},
+  ['Buy spares back for new kits','Shops pay owners a little per shrimp, you pack them into kits. Free stock, 10% more kits a day for a year.',{kin:.5,know:.3},seq(needDays(3),function(G){slowKits(G,-0.1,365);}),'Kit shrimp are second-hand now. Nobody minds.'],
+  ['Sell them on as fish food','Somebody has to. The farms stay the only source.',{kin:-1.5,drive:.3},function(G){sideMoney(G,7);moodAdd(G,-3,365);},'Spare pet shrimp end up as fish food.'],
+  ['Let the price fall','Cheap shrimp everywhere. Kits sell as a starter tank, not for the shrimp. 5% fewer kits this year, and word gets around, 2% more want one.',{kin:-.3,drive:-.5,control:-.3,know:-.3},function(G){slowKits(G,0.05,365);G.emp.ceil+=0.02;},'A shrimp costs nothing now, people give them away at weddings.']]},
  c_blackout:{at:6.5e9,title:'Blackout',body:'A summer blackout, two days, no air conditioning. Rooms reach 38 °C. Cherry shrimp start dying above 30.',ch:[
-  ['Battery pumps and a cooling guide, AED 30M','Every owner in the city gets a battery air pump and the frozen-bottle trick.',{care:-.5,risk:-1,control:-.3},needM(3e7),'Owners in hot cities keep a battery pump and a frozen bottle for the next blackout.'],
-  ['Free replacements, AED 45M','New shrimp for everyone who lost theirs. Kits can now come with a battery pump.',{means:1,kin:.5},needM(4.5e7),'Everyone who lost shrimp in the blackout got new ones, and kits can come with a battery pump.'],
-  ['A 24-hour help line','Move the tank to the floor, float a frozen bottle, skip feeding.',{control:.5},null,'A help line talked owners through the next blackout.']]},
- c_prison:{at:7e9,title:'Tiny jails',news:['You and the liberation group shout at each other on TV for an hour. Ratings are great.','A valley opens where shrimp live with no glass around them. The liberation group visits and says nothing.','You agree with the liberation group on live TV. Grandma calls and says she\u2019s proud of you.'],body:'A shrimp liberation group says every tank is a tiny jail. They’re not all wrong, a 20 L tank is small.',ch:[
-  ['Argue with them','You go on TV with a planted tank. It goes fine.',{kin:-1,control:.3},null,''],
-  ['Fund a wild reserve, AED 20M','A valley where shrimp live free.',{kin:1},needM(2e7),'There’s a valley where shrimp live with no glass around them.'],
-  ['Agree with them','Grandma says the shrimp might want to see what’s out there.',{kin:.5,drive:-.3},null,'You agreed that tanks are tiny jails, and started thinking about where else shrimp could live.']]},
+  ['Battery pumps for the hot cities','The cities hand out a battery air pump and the frozen-bottle trick before next summer. The owners who lost shrimp this time get nothing.',{control:.5,risk:-.5,care:.5},seq(needDays(10),needIDays(20)),'Owners in hot cities keep a battery pump and a frozen bottle for the next blackout.'],
+  ['Free replacements','New shrimp for everyone who lost theirs. Three days of farm output go to replacements, not kits. Kits can now come with a battery pump.',{means:.5,kin:.5,control:-.3},seq(needDays(5),function(G){slowKits(G,1,3);}),'Everyone who lost shrimp in the blackout got new ones, and kits can come with a battery pump.'],
+  ['A 24-hour help line','Move the tank to the floor, float a frozen bottle, skip feeding. Nothing else.',{control:-.3,risk:.5,care:-.5},null,'A help line talked owners through the next blackout. Some tanks still died.']]},
+ c_prison:{at:7e9,title:'Tiny jails',news:['You and the liberation group shout at each other on TV for an hour. Ratings are great.','A valley opens where shrimp live with no glass around them. The liberation group visits and says nothing.','You agree with the liberation group on live TV. Grandma calls and says she’s proud of you.'],body:'A shrimp liberation group says every tank is a tiny jail. They’re not all wrong, a 20 L tank is small.',ch:[
+  ['Argue with them','You go on TV with a planted tank. It goes fine. Sales unchanged.',{kin:-.5,control:.5,risk:.2},null,''],
+  ['Fund a wild reserve','You buy the valley out, and a government has to give it up. The farmers in it have to agree.',{kin:.5,care:.3,risk:-.3},seq(needDays(15),needIDays(40),function(G){(G.emp.tree||(G.emp.tree={})).rw_reserve=1;}),'There’s a valley where shrimp live with no glass around them.'],
+  ['Agree with them, on TV','You say it: a tank is small. 10% fewer people want one this year.',{kin:.5,drive:-.5,means:.5},function(G){slowKits(G,0.1,365);(G.emp.tree||(G.emp.tree={})).rw_agree=1;},'You agreed that tanks are tiny jails, and started thinking about where else shrimp could live.']]},
  c_fisher:{title:'The fishing family',body:'Mira’s other grandpa fished shrimp for a living. People who keep shrimp stopped eating them, the price fell, and he sold his boat. Mira asks if you knew.',cond:function(G){return G.humans>=1e7&&!!(G.story&&G.story.choices&&G.story.choices.ev_mira!=null);},ch:[
-  ['Offer him work at the hatchery','Steady pay. He’s still raising shrimp, just not catching them.',{means:1,care:-.5},null,'Mira’s other grandpa works at your hatchery. He still calls them prawns.'],
-  ['Help him start reef tours, AED 300,000','A small boat, visitors, the same coast. He’s back on the water.',{means:1,care:-.5},needM(300000),'Mira’s other grandpa takes visitors out to the reef.'],
-  ['Visit him with Mira','No offer, just an afternoon on the dock. He shows you how he mended nets.',{care:-1,drive:-.5},null,'You spent an afternoon on the dock with Mira’s other grandpa. He showed you how he mended nets.']]},
+  ['Offer him work at the hatchery','Steady pay. He’s still raising shrimp, just not catching them.',{care:-.5,drive:.3,control:.3},null,'Mira’s other grandpa works at your hatchery. He still calls them prawns.'],
+  ['Help him start reef tours','Two weeks away fixing the boat with him. Orders run at half while you’re gone, and Grandma’s windows pass.',{drive:-.5,means:.5,control:-.3},needAway(14),'Mira’s other grandpa takes visitors out to the reef. Mira sends photos.'],
+  ['A fund for every crew that lost work','He gets the same as every other crew, no more.',{care:.5,means:.5,kin:-.3},function(G){if(!needDays(G.emp.proj.retrain?5:10)(G))return false;moodAdd(G,4,180);},'The fishing towns have a shrimp company to thank, and to blame.']]},
  c_mytank:{title:'Your own tank',body:'Grandma’s old tank, the one you kept, is green and quiet. A few shrimp may still be hiding in the moss.',cond:function(G){return ownTank(G)&&G.day>=2920&&glassMean(G.tanks[0])>0.6;},ch:[
   ['Start it again','You clean the glass and restock it from the farm.',{kin:1},function(G){var T=G.tanks[0];T.glass=[];buyPackFree(T,0);},'You kept your first tank going, mostly.'],
   ['Leave it a while','It stays on the shelf, green. It is still yours.',{kin:-.5,drive:-.5,control:-.5},null,'The first tank went green around year eight and stayed that way for a long time.']]}};
@@ -3177,16 +3188,18 @@ function hardOf(G){var E=G.emp;if(!E.hard)E.hard={open:0,goal:'home',picks:{}};r
 function hardOpen(G){return !!(G.emp.hard&&G.emp.hard.open);}
 function hardGroup(id){return HARD.filter(function(g){return g.id===id;})[0];}
 function hardOp(g,id){return g.ops.filter(function(o){return o.id===id;})[0];}
-function hardEasy(){var t=0;HARD.forEach(function(g){t+=g.n;});return WORLD-t;}
+// A group's size can grow from earlier choices (Pass 154): E.hardMul[id], e.g. gas plants make Too hot 1.2x.
+function hardN(G,g){var m=G&&G.emp&&G.emp.hardMul;return g.n*(m&&m[g.id]||1);}
+function hardEasy(G){var t=0;HARD.forEach(function(g){t+=hardN(G,g);});return WORLD-t;}
 function hardCost(G,o){return o.days?scM(G,Math.max(1e6,Math.round(o.days*Math.max(1e5,dayIncome(G))/1e5)*1e5)):0;}
 // share of a group reached by one bought option, ramping in over its days
 function hardOpReach(G,o,p){if(!p||!o.f)return 0;if(p.start==null)return 0;return o.f*clamp((G.day-p.start)/(o.ramp||1),0,1);}
 function hardReach(G,g){var H=hardOf(G),P=H.picks[g.id]||{},r=0;g.ops.forEach(function(o){r+=hardOpReach(G,o,P[o.id]);});return Math.min(1,r);}
-function hardReached(G){var t=0;HARD.forEach(function(g){t+=g.n*hardReach(G,g);});return t;}
-function hardCap(G){return hardEasy()+hardReached(G);}
+function hardReached(G){var t=0;HARD.forEach(function(g){t+=hardN(G,g)*hardReach(G,g);});return t;}
+function hardCap(G){return hardEasy(G)+hardReached(G);}
 function hardTarget(G){var H=hardOf(G),gl=HARD_GOALS.filter(function(x){return x.id===H.goal;})[0]||HARD_GOALS[0];
  var dead=hardOf(G).picks.never&&hardOf(G).picks.never.deliver&&!hardOf(G).picks.never.deliver.quiet?hardGroup('never').n:0;
- if(gl.pct)return WORLD*gl.pct;if(gl.id==='want'){var t=WORLD;['no','never'].forEach(function(k){var g=hardGroup(k);t-=g.n*(1-hardReach(G,g));});return t;}return WORLD-dead;}
+ if(gl.pct)return WORLD*gl.pct;if(gl.id==='want'){var t=WORLD;['no','never'].forEach(function(k){var g=hardGroup(k);t-=hardN(G,g)*(1-hardReach(G,g));});return t;}return WORLD-dead;}
 function hardForced(G){var P=hardOf(G).picks;return !!((P.no&&P.no.ministers)||(P.never&&P.never.deliver)||(P.war&&P.war.fund)||(P.poor&&P.poor.credit));}
 function hardBuy(G,gid,oid){var H=hardOf(G),g=hardGroup(gid),o=g&&hardOp(g,oid);if(!H.open||!o||G.emp.won||G.emp.ended)return false;if(o.old)return false;var P=H.picks[gid]||(H.picks[gid]={});if(P[oid])return false;if(o.req&&!o.req(G))return false;
  if(g.war&&o.f&&Object.keys(P).some(function(k){var x=hardOp(g,k);return x&&x.f;}))return false;
@@ -3210,7 +3223,7 @@ function hardDay(G){var E=G.emp,H=hardOf(G),now=Math.floor(G.day);
  HARD.forEach(function(g){var P=H.picks[g.id]||{};g.ops.forEach(function(o){var p=P[o.id];if(!p)return;
   if(p.start==null&&o.chance&&Math.random()<o.chance){p.start=now;newsLine(G,o.news);}
   if(p.start==null&&o.delay&&now>=p.due){p.start=now;newsLine(G,o.news);}
-  if(o.direct&&p.start!=null){var tgt=g.n*hardOpReach(G,o,p),d=Math.min(tgt-(p.given||0),Math.max(0,Math.min(WORLD,hardCap(G))-G.humans));if(d>0){p.given=(p.given||0)+d;G.humans+=d;var kt=d/HH_AVG;G.kits.sold+=kt;if(o.pay)earn(G,kt*Math.max(0,G.kitPrice-productionUnitCost(G))*o.pay,'kits');}}
+  if(o.direct&&p.start!=null){var tgt=hardN(G,g)*hardOpReach(G,o,p),d=Math.min(tgt-(p.given||0),Math.max(0,Math.min(WORLD,hardCap(G))-G.humans));if(d>0){p.given=(p.given||0)+d;G.humans+=d;var kt=d/HH_AVG;G.kits.sold+=kt;if(o.pay)earn(G,kt*Math.max(0,G.kitPrice-productionUnitCost(G))*o.pay,'kits');}}
   if(o.scandal&&p.start!=null&&!p.sc&&now-p.start>=180){p.sc=1;if(Math.random()<.5){newsLine(G,o.scandal);moodAdd(G,-8,60);}}
   if(p.quiet&&now>=p.quiet){p.quiet=0;newsLine(G,o.news);newsLine(G,'Progress steady. People who die don’t need a tank.');if(G.me){G.me.gpSilent=now+365;}}
  });});
@@ -5560,7 +5573,7 @@ function renderMe(){var M=G.me,b=$('tb-me');if(!M)return;b.hidden=!M.on;b.classL
  if(laneOpen(G,'y')){var yl=laneList(G,'y');ph+='<h3 class="me-lane">Once a year <small>pick one</small></h3><div class="me-picks">'+PICKS.filter(function(p){return meCan(G,p.id,'y');}).map(function(p){return '<button class="btn" data-act="me-pick" data-lane="y" data-id="'+p.id+'" aria-pressed="'+(yl.indexOf(p.id)>=0)+'">'+p.name+'</button>';}).join('')+'</div>';}
  if(cache.mepk!==ph){cache.mepk=ph;$('me-picks').mhtml=ph;}
  setT('me-hint',M.moved?'You live in the capital now. Checking on Grandma is a call. Seeing her is the yearly trip home.':'');
- var v=Math.round(M.visits||0),c=Math.round(M.calls||0);setT('me-gsum',M.trip>now?'Away with Grandma until '+gtFmt(M.trip):v||c?[v?v+(v===1?' visit':' visits'):'',c?c+(c===1?' call':' calls'):''].filter(Boolean).join(' · '):'');
+ var v=Math.round(M.visits||0),c=Math.round(M.calls||0);setT('me-gsum',M.trip>now?(M.tripWhy==='boat'?'Away on the coast until ':'Away with Grandma until ')+gtFmt(M.trip):v||c?[v?v+(v===1?' visit':' visits'):'',c?c+(c===1?' call':' calls'):''].filter(Boolean).join(' · '):'');
  if(activeTab!=='me')GT_OPEN=0;var T=gtOf(G),m=M.cur&&momentById(M.cur.id),mh='<div class="me-mbtn gt-top"><button class="btn primary'+(M.call?' need':'')+'" data-act="gt-check">Check on Grandma</button></div>';
  if(GT_OPEN){var any=0,its=[];if(GT_LAST)mh+='<p class="gt-last">'+GT_LAST+'</p>';
   if(M.call==='lesson'){any=1;its.push('<div class="me-mom gp-call"><p><b>Grandma called.</b> “Can I tell you the only thing I know about business? Don’t be scared of growing. Supply is how many shrimp you have and how many kits you can pack. Demand is how many orders come in. Keep those two even and you can grow as big as you like.”</p><div class="me-mbtn"><button class="btn primary" data-act="gp-call-ok">Thanks, Grandma</button></div></div>');}
@@ -5585,7 +5598,7 @@ function rlFieldsHTML(){var L=rlines(G),A=G.academy,h='';
 var HARD_SURE=null;
 // The hard part runs as a short walk: first what "everyone" means, then the ten groups one at a time, each with room to
 // think. Groups already looked at fold into a list below, and the goal can still be changed from there.
-function hardGroupHTML(g,open){var H=hardOf(G),r=hardReach(G,g),P=H.picks[g.id]||{},left=g.n*(1-r),h='';
+function hardGroupHTML(g,open){var H=hardOf(G),r=hardReach(G,g),P=H.picks[g.id]||{},left=hardN(G,g)*(1-r),h='';
  var warTaken=g.war&&Object.keys(P).some(function(k){var x=hardOp(g,k);return x&&x.f;});
  g.ops.forEach(function(o){var p=P[o.id],st='';if(o.old&&!p)return;
   if(p){st=o.f?(p.start==null?(o.chance?'Waiting for something bigger than the war.':'Waiting, about '+Math.max(0,Math.ceil((p.due-G.day)/365))+' years.'):(Math.round(hardOpReach(G,o,p)/o.f*100)>=100?'Done.':Math.round(hardOpReach(G,o,p)/o.f*100)+'% of the way.')):'Done.';
@@ -5741,7 +5754,7 @@ var FX_NOTE={'dye_offer:0':'Pale shrimp sell for 90% more','dye_offer:1':'Shrimp
 function choiceFx(key,i,all){var ck=(all?'a':'c')+key+':'+i+':'+Math.round(G.money)+':'+Math.round(G.emp.inf);if(FXC[ck]!==undefined)return FXC[ck];var out='';
  try{var C=JSON.parse(JSON.stringify(G)),rr=Math.random,seed=7;Math.random=function(){seed=(seed*16807)%2147483647;return seed/2147483647;};var E0=G.emp,m0=G.money,inf0=E0.infOn?E0.inf:0,st0=G.kits.stock,h0=G.humans,md=function(g){return (g.emp.op&&g.emp.op.pend||[]).reduce(function(a,x){return a+x.d*x.left;},0)*100;},mo0=md(G);
   var ok=storyChoose(C,key,i);Math.random=rr;if(ok===false){out=false;}else{var p=[],dI=(C.emp.infOn?C.emp.inf:0)-inf0,dM=C.money-m0,dMo=md(C)-mo0,dS=C.kits.stock-st0,dH=C.humans-h0;
-  var q=function(t,neg){p.push(neg?'<span class="neg">'+t+'</span>':t);};if(!all){if(dM<=-1)q('Costs '+aed(-dM),1);if(dI<=-1)q('Costs '+big(-Math.round(dI))+' influence ✦',1);if(dS<=-1)q('Uses '+big(-dS)+' kits',1);
+  var q=function(t,neg){p.push(neg?'<span class="neg">'+t+'</span>':t);};if(!all){if(dM<=-1)q('Costs '+aed(-dM),1);if(dI<=-1)q('Costs '+big(-Math.round(dI))+' influence ✦',1);if(C.me&&G.me&&C.me.trip>G.day&&!(G.me.trip>G.day))q(Math.round((C.me.trip-Math.floor(G.day))/7)+' weeks away, orders at half',1);var sl=(C.emp.slow||[]).slice((E0.slow||[]).length);sl.forEach(function(x){var dd=x.u-Math.floor(G.day);q((x.f>0?Math.round(x.f*100)+'% fewer kits a day':Math.round(-x.f*100)+'% more kits a day')+' for '+(dd>=360?'a year':dd>=28?Math.round(dd/30)+' months':dd+' days'),x.f>0);});if(dS<=-1)q('Uses '+big(-dS)+' kits',1);
    // Before the pick a choice shows only what it costs, so the player knows if they can afford it. Money every day is a cost too. What it does comes afterwards.
    if(PAINS[key]){var po=PAINS[key].ch[i][2],pd0=painDayOf(G,po);if(pd0>0&&!po.refund)q('Then about '+aed(pd0)+' a day',1);}}else{
    if(PAINS[key]){var pa=PAINS[key].ch[i][2],pd1=painDayOf(G,pa);if(pa.d)q('Until it\u2019s in place, in '+pa.d+' days, the problem keeps costing you orders');else q('The problem stops costing you orders');if(pa.mat&&pa.mat>1)q('Each kit costs '+Math.round((pa.mat-1)*100)+'% more to make');if(pa.mat&&pa.mat<1)q('Each kit costs '+Math.round((1-pa.mat)*100)+'% less to make');if(pd1>0)q((pa.refund?'Refunds cost about ':'About ')+aed(pd1)+' a day');if(pa.q&&pa.q<0)q('More kits die');if(pa.q&&pa.q>0)q('More kits survive');if(pa.shell)q('Accounts can be frozen');}if(Math.abs(dI)>=1)q('✦ '+(dI>0?'+':'−')+big(Math.abs(Math.round(dI))));if(Math.abs(dM)>=1)q((dM>0?'+':'−')+aed(Math.abs(dM)));if(Math.abs(dMo)>=0.5)q('mood '+(dMo>0?'up':'down'));if(dS<=-1)q('−'+big(-dS)+' kits');if(dH>=1)q('+'+big(Math.round(dH))+' owners');if(FX_NOTE[key+':'+i])q(FX_NOTE[key+':'+i]);}out=p.join(' · ');}}catch(e){out='';}
