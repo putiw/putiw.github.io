@@ -777,6 +777,105 @@ window.ENDING_TEST_DATA = {
       ]
     },
     {
+      "id": "c_permit",
+      "title": "The permit",
+      "body": "South Asia wants its own licence before another kit is sold there. Water, animal health, packaging, three ministries. A year, they say, if the file is complete.",
+      "options": [
+        {
+          "label": "Wait for the licence",
+          "description": "A year. Nothing sells in South Asia until then. Everything else runs.",
+          "traits": {
+            "risk": -0.8,
+            "means": 0.3,
+            "control": 0.3
+          },
+          "endingLine": "You waited a year for the South Asia licence."
+        },
+        {
+          "label": "Hire a firm that knows people",
+          "description": "Four months. 1 in 5 that the Times finds out who the firm paid.",
+          "traits": {
+            "risk": 0.3,
+            "control": -0.5,
+            "know": -0.3
+          },
+          "endingLine": "A firm that knew people got you the South Asia licence in four months."
+        },
+        {
+          "label": "Ship under another company’s licence",
+          "description": "Sells from next month. 1 in 3, within two years, that every kit in the region is recalled.",
+          "traits": {
+            "risk": 0.5,
+            "means": -0.3,
+            "drive": 0.3
+          },
+          "endingLine": "You sold in South Asia under someone else’s licence."
+        }
+      ]
+    },
+    {
+      "id": "c_inspect",
+      "title": "The inspection",
+      "body": "The animal health inspector wants two weeks inside the mega hatchery, every line stopped, every tank sampled. Or last year’s numbers, which were fine.",
+      "options": [
+        {
+          "label": "Shut the lines for the audit",
+          "description": "Two weeks, 20% fewer kits a day. They find two things you didn’t know about.",
+          "traits": {
+            "risk": -0.5,
+            "control": 0.5,
+            "know": 0.3
+          },
+          "endingLine": "The inspector found two things. You fixed both."
+        },
+        {
+          "label": "Show them last year’s numbers",
+          "description": "The lines keep running. 1 in 4 that they come back unannounced.",
+          "traits": {
+            "risk": 0.5,
+            "means": -0.3,
+            "control": -0.3,
+            "know": -0.3
+          }
+        }
+      ]
+    },
+    {
+      "id": "c_green",
+      "title": "Green power where nobody needs it",
+      "body": "A year after the solar farms, the engineers ask: keep building, in places that have enough electricity but make it from coal and gas? Nothing to do with shrimp.\n\nA gigawatt of solar or wind costs about AED 4B and makes 2 TWh a year. The world uses 30,000 TWh, 60% of it from coal and gas. One percent of the world’s power is 150 GW, about AED 600B. Sold at grid price it pays back in 10 to 12 years. Given away, it never does.",
+      "options": [
+        {
+          "label": "Build 150 GW and sell the power",
+          "description": "10% of income for eight years. Income back from year 11, a new finance line. The coal plants close as the price drops.",
+          "traits": {
+            "know": 0.5,
+            "risk": 0.5,
+            "drive": 0.3
+          },
+          "endingLine": "You built 150 GW of solar and wind. The power pays for itself from year 11."
+        },
+        {
+          "label": "Build 150 GW and give it away",
+          "description": "10% of income for eight years, nothing back. The coal plants close faster.",
+          "traits": {
+            "care": 0.7,
+            "means": 0.5,
+            "drive": -0.5
+          },
+          "endingLine": "You gave 300 TWh a year away. Forty coal plants closed."
+        },
+        {
+          "label": "No, shrimp are the job",
+          "description": "The farms you built keep running. Nothing new.",
+          "traits": {
+            "control": 0.5,
+            "care": -0.7
+          }
+        }
+      ]
+    },
+    {
       "id": "c_mytank",
       "title": "Your own tank",
       "body": "Grandma’s old tank, the one you kept, is green and quiet. A few shrimp may still be hiding in the moss.",
