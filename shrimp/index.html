@@ -1695,7 +1695,7 @@ function dipFresh(G,i,bath){var T=G.tanks[i];if(!T||!T.fresh||G.money<DIP_COST)r
  T.fresh.risk*=0.5;log(G,'The dip was too short. Some flatworms may still be on them',T);return 'short';}
 // found: share of the sick shrimp the player spotted (0..1)
 function gmPaysCure(G,cost){return !G.opt.hcDone&&!(G.emp.healed>0)&&G.money<cost;}
-function treatIll(G,i,cure,found,bath){var T=G.tanks[i];if(!T||!T.ill)return false;var cu=CURES.filter(function(x){return x.id===cure;})[0];if(!cu)return false;if(gmPaysCure(G,cu.cost))log(G,'Grandma paid for the cure this time');else{if(G.money<cu.cost)return false;pay(G,cu.cost,'supplies');}
+function treatIll(G,i,cure,found,bath){var T=G.tanks[i];if(!T||!T.ill)return false;careMark(G,T);var cu=CURES.filter(function(x){return x.id===cure;})[0];if(!cu)return false;if(gmPaysCure(G,cu.cost))log(G,'Grandma paid for the cure this time');else{if(G.money<cu.cost)return false;pay(G,cu.cost,'supplies');}
  var ill=illById(T.ill.type);if(ill.cure!==cure){T.ill.tried=(T.ill.tried||0)+1;log(G,cu.name+' did not help',T);return 'wrong';}
  if(bath&&bath.loss>0){var lost=0;T.pop.forEach(function(k){var d=k.n*bath.loss;k.n-=d;lost+=d;});G.stats.died+=lost;}
  if(bath&&!bath.ok){T.ill.frac=Math.max(0.02,illFrac(T)*0.6);log(G,'The salt dip was too short. Some flatworms are still there',T);return 'partial';}
@@ -1731,9 +1731,11 @@ function quietDay(G){if(G.emp.won||G.emp.ended||progressionBlocked(G)||earthArch
  // weighted draw; if the pick can't happen right now, try the next one
  while(pool.length){var tot=0;pool.forEach(function(x){tot+=x.w;});var r=Math.random()*tot,k=0;for(var i=0;i<pool.length;i++){r-=pool[i].w;if(r<=0){k=i;break;}}var pick=pool.splice(k,1)[0],ln=G.log.length,l0=G.log[ln-1];if(pick.go(G)!==false){G.stats.quiet=(G.stats.quiet||0)+1;G.stats.lastQuiet=pick.id;var lg=G.log[G.log.length-1];if(lg&&lg!==l0&&!lg.note)G.flash=lg.t;break;}}
  markEvent(G);}
+function endStatsDay(G){var S=G.stats,T=G.tanks[0];if(ownTank(G)&&T){S.ownD=(S.ownD||0)+1;if(S.ownFrom==null)S.ownFrom=Math.floor(G.day);if(glassMean(T)>0.6)S.greenD=(S.greenD||0)+1;if(totalN(T)<1)S.emptyD=(S.emptyD||0)+1;}
+ if(G.me&&G.me.on){var y=Math.floor(G.day/365),W=S.wh||(S.wh=[]);W[y]=W[y]||[0,0];W[y][0]+=dayHours(G).work;W[y][1]++;}}
 function dayRollover(G){
   if(G.emp&&!G.emp.kitsOpened&&kitsOpen(G))G.emp.kitsOpened=1;
-  academyDay(G);rlDay(G);hardDay(G);careDay(G);coinDay(G);spaceDay(G);checkGoals(G);orderDay(G);kitOrderDay(G);personalDay(G);roundTwoDay(G);quietDay(G);prepDay(G);
+  academyDay(G);rlDay(G);endStatsDay(G);hardDay(G);careDay(G);coinDay(G);spaceDay(G);checkGoals(G);orderDay(G);kitOrderDay(G);personalDay(G);roundTwoDay(G);quietDay(G);prepDay(G);
   if(G.ps&&G.day>30){var sp=dailySpend(G);if(sp>0){if(G.money<10*sp)G.ps.thin++;else if(G.money>120*sp)G.ps.fat++;}}
   if(G.recipe)syncRecipe(G);
   G.fin=G.fin||[];var td=G.today||{};td.d=G.day-1;td.cash=Math.round(G.money);G.fin.push(td);if(G.fin.length>500)G.fin.shift();G.today={};chartDay(G,td);
@@ -3388,7 +3390,9 @@ function careOf(T){if(!T.care)T.care={mulm:0,sponge:0,grow:0,pests:[],seed:Math.
 function careDay(G){if(!careOn(G))return;var T=G.tanks[0];if(!T)return;var C=careOf(T);
  C.mulm=Math.min(1,C.mulm+1/45);C.sponge=Math.min(1,C.sponge+1/70);C.grow=Math.min(1,C.grow+1/35);
  if(C.pests.length<10&&Math.random()<1/12)C.pests.push({k:Math.random()<0.6?'snail':'flat',x:0.06+Math.random()*0.8,y:0.3+Math.random()*0.62,s:Math.floor(Math.random()*1e6)});}
-function careDone(G,kind){if(G.ps){G.ps.care=(G.ps.care||0)+1;if(ownTank(G))G.ps.hjob=(G.ps.hjob||0)+1;}G.stats.care=(G.stats.care||0)+1;}
+// The first tank's care, for the ending (Pass 154): how often, the longest gap, how many years green. Only Tank 1, only once the farm runs the rest.
+function careMark(G,T){if(!T||T!==G.tanks[0]||!ownTank(G))return;var S=G.stats,d=Math.floor(G.day);if(S.careLast!=null&&d-S.careLast>(S.careGap||0))S.careGap=d-S.careLast;if(S.careFrom==null)S.careFrom=d;S.careLast=d;S.careN=(S.careN||0)+1;}
+function careDone(G,kind){if(G.tanks[0])careMark(G,G.tanks[0]);if(G.ps){G.ps.care=(G.ps.care||0)+1;if(ownTank(G))G.ps.hjob=(G.ps.hjob||0)+1;}G.stats.care=(G.stats.care||0)+1;}
 // At the first hatchery the farm takes the other tanks; your own tank keeps 20 shrimp, the best coloured ones.
 function keepTwenty(G){var T=G.tanks[0];if(!T)return 0;var N=totalN(T);if(N<=20)return 0;var keep=20,pop=T.pop.slice().sort(function(a,b){return (b.age>=60)-(a.age>=60)||b.g-a.g;}),out=[];
  pop.forEach(function(k){var n=Math.min(k.n,keep);if(n>=1){var c={};for(var q in k)c[q]=k[q];c.n=Math.floor(n);keep-=c.n;out.push(c);}});
@@ -4348,7 +4352,7 @@ function tvLockInit(){var cv=$('tv-canvas'),st=null;
  document.addEventListener('touchmove',function(e){if(TVLOCK&&e.target.closest&&e.target.closest('#tankview'))e.preventDefault();},{passive:false});}
 function tvWipe(px,py){var T=TVM&&TVM.tank;if(!T||!T.glass)return;var cw=TVM.W/GLASS_W,ch=(TVM.H*0.78)/GLASS_H,py=py-TVM.H*0.22,R=Math.max(22,TVM.W*0.07),ch2=false;
  for(var gy=Math.max(0,Math.floor((py-R)/ch));gy<=Math.min(GLASS_H-1,Math.floor((py+R)/ch));gy++)for(var gx=Math.max(0,Math.floor((px-R)/cw));gx<=Math.min(GLASS_W-1,Math.floor((px+R)/cw));gx++){var cx=(gx+0.5)*cw,cy=(gy+0.5)*ch,d=Math.hypot(cx-px,cy-py);if(d>R)continue;var k=gy*GLASS_W+gx,v=T.glass[k];if(v>0){T.glass[k]=Math.max(0,Math.round(v*(d<R*0.6?0:0.4)*100)/100);ch2=true;}}
- if(ch2){T.glassV=(T.glassV||0)+1;G.stats.wiped=(G.stats.wiped||0)+1;}}
+ if(ch2){T.glassV=(T.glassV||0)+1;G.stats.wiped=(G.stats.wiped||0)+1;careMark(G,T);}}
 function updateTankView(){var card=$('tankview');if(!card)return;careRow();var T=G.tanks[G.sel]||G.tanks[0];if(labMode())T=G.tanks[0];
  if(!TVM)TVM=tvMake($('tv-canvas'),{n:24,gate:function(){return activeTab==='tank'&&!HC&&!SB&&!QCR;}});
  var N=totalN(T);setT('tv-cap',(T.ill&&N>=1&&!G.opt.hcDone&&!(G.emp.healed>0)&&$('tv-acts').hidden?'Some look sick · ':'')+T.name+' · '+(N>=1?cnt(N)+' shrimp':T.cycledAt!=null?'empty':G.ob&&G.ob.bottle?'cycling':'new tank, no bacteria yet'));
@@ -4365,7 +4369,7 @@ function shrimpSVG(kind,shade){var body=kind==='bact'?'#efc2bc':shade||'#d93a2b'
   (kind==='bact'?'<ellipse cx="23" cy="12.5" rx="10" ry="4.5" fill="#fff" opacity=".5"/>':'')+'</svg>';}
 var HC=null,SB=null,HCV=null;
 // Health check: the sick shrimp swim among healthy ones in the tank. Tap the ones that look unwell.
-function openHealth(i){var T=G.tanks[i];if(!T||totalN(T)<1)return;G.ob.looked=1;if(G.ps){G.ps.look++;if(ownTank(G))G.ps.hjob=(G.ps.hjob||0)+1;}var n=16,sick=T.ill?clamp(Math.round(illFrac(T)*n),2,9):0,s=cullSample(T,n).map(function(c){c.real=1;return c;});
+function openHealth(i){var T=G.tanks[i];if(!T||totalN(T)<1)return;G.ob.looked=1;careMark(G,T);if(G.ps){G.ps.look++;if(ownTank(G))G.ps.hjob=(G.ps.hjob||0)+1;}var n=16,sick=T.ill?clamp(Math.round(illFrac(T)*n),2,9):0,s=cullSample(T,n).map(function(c){c.real=1;return c;});
  if(!s.length)s=tvSample(T,40).filter(function(a){return a.age>=30;});if(!s.length)s=[{age:90,g:60}];var cells=[];for(var k=0;k<n;k++){var src=s[k<s.length?k:Math.floor(Math.random()*s.length)],dup=k>=s.length;cells.push({age:Math.max(75,src.age),g:Math.max(25,src.g),male:k%2===1,b:src.b?1:0,real:src.real&&!dup?1:0,sick:k<sick?T.ill.type:''});}
  for(var q=cells.length-1;q>0;q--){var w=Math.floor(Math.random()*(q+1)),tmp=cells[q];cells[q]=cells[w];cells[w]=tmp;}
  HC={i:i,type:T.ill?T.ill.type:null,step:'find',prevSpeed:speed,cells:cells,each:cullEach(G,T,cells.length)};setSpeed(0);$('hcheck').hidden=false;renderHealth();}
@@ -5178,11 +5182,29 @@ function endCharts(G){var C=G.chart;if(!C||!C.s||C.s.length<3)return '';var S=C.
  h+='<h3 class="end-ch">Who you became: '+traitHeadline(G)+'</h3><p class="end-cs">Your seven hidden traits at the end, from −1 to +1. From your choices and from how you played.</p>'+endTraits(G);
  var sp=endSpend(C);if(sp)h+='<h3 class="end-ch">Where the money went: '+sp.share+'% on '+(sp.top[0]==='other'?'everything else':(SPEND_NAMES[sp.top[0]]||sp.top[0]).toLowerCase())+'</h3><p class="end-cs">Total spent over the game, AED</p>'+sp.svg;
  return h+'</div>';}
-function endingHTML(G){var id=endingPick(G),X=ENDINGS[id]||ENDINGS.drift_shop,l=endingLines(G).concat(gpLines(G));if(X.next)l.unshift(X.next);if(X.last)l.push(X.last);
+// Lines made from the save (Pass 154): what you did, as numbers. Only the facts that happened, nothing judged.
+function endSpan(d){if(d<45)return d+' days';if(d<365)return Math.round(d/30)+' months';var y=Math.floor(d/365),m=Math.round((d%365)/30);if(m>=12){y++;m=0;}return y+(y===1?' year':' years')+(m?' and '+m+(m===1?' month':' months'):'');}
+function endRate(n,days){if(!n||!days)return '';var pm=n/(days/30);if(pm>=0.7)return pm>=1.4?'about '+Math.round(pm)+' times a month':'about once a month';if(pm>=0.25)return 'about once every '+Math.round(1/pm)+' months';return n+' time'+(n===1?'':'s')+' in '+endSpan(days);}
+function endTankLines(G){var S=G.stats||{},o=[],T=G.tanks[0],d=Math.floor(G.day);if(!ownTank(G)||!S.ownD)return o;
+ var n=S.careN||0;o.push(n?'You looked after your first tank '+endRate(n,S.ownD)+'.':'You never touched your first tank again after the farm took the others.');
+ var gap=Math.max(S.careGap||0,S.careLast!=null?d-S.careLast:S.ownD);if(gap>=120&&n)o.push('The longest you left it was '+endSpan(gap)+'.');
+ var c=T&&T.crashed||0;if(c)o.push('It crashed '+(c===1?'once':c===2?'twice':c+' times')+(totalN(T)>=1?'. You set it up again'+(c>1?' every time':'')+'.':'. You never set it up again.'));
+ if(S.greenD>=180)o.push('The glass was green for '+endSpan(S.greenD)+' of '+endSpan(S.ownD)+'.');else if(n&&S.ownD>=365)o.push('The glass stayed clean.');
+ return o;}
+function endWorldNums(G){var E=G.emp,o=[],c=E.coin||{},mine=(c.trees||0)+(E.trees||0),oth=c.otrees||0;if(mine>=1000)o.push('You planted '+shortN(mine)+' mangroves'+(oth>=1000?'. Other people planted '+shortN(oth)+' more.':'.'));else if(oth>=1000)o.push(shortN(oth)+' mangroves were planted because of your coin. You planted none yourself.');return o;}
+function endGrandmaNums(G){var M=G.me||{},T=M.gt,o=[];if(!M.on||!T)return o;var yrs=Math.max(1,Math.round(G.day/365)),ch=(M.visits||0)+(M.calls||0);if(ch)o.push('You checked on Grandma '+ch+' times in '+yrs+' years, '+endRate(ch,Math.floor(G.day))+'.');
+ var b=(T.log||[]).filter(function(x){return /birthday/i.test(x.t||'');}),bt=b.filter(function(x){return x.k==='there';}).length;if(b.length>=2)o.push('You were there for '+bt+' of her '+b.length+' birthdays.');
+ var told=Math.min(M.letters||0,GP_STORY.length),all=GP_STORY.length;if(told&&told<all)o.push('She told you '+told+' of her '+all+' stories.');else if(told>=all)o.push('She told you all '+all+' of her stories.');
+ if(M.sent>=1000)o.push('You sent her '+aed(M.sent)+(M.gplace&&M.gplace.land?', she bought land with it.':'.'));return o;}
+function endWorkNums(G){var S=G.stats||{},W=S.wh||[],o=[],h=W.filter(function(x){return x&&x[1]>60;}).map(function(x){return x[0]/x[1];});if(h.length>=2){var a=h.slice(0,Math.ceil(h.length/2)),b=h.slice(Math.ceil(h.length/2)),m=function(v){return v.reduce(function(p,q){return p+q;},0)/v.length;},a1=Math.round(m(a)),b1=Math.round(m(b));o.push(a1===b1?'You worked about '+a1+'-hour days the whole way.':'You worked '+a1+'-hour days at first, then '+b1+'.');}
+ if(G.ps&&(G.ps.tw||0)>=50)o.push('You changed a setting '+G.ps.tw+' times.');if(G.ps&&(G.ps.help||0)>=40)o.push('You wanted to know how things work, not just that they do.');return o;}
+function endMoneyNums(G){var o=[],inc=dayIncome(G);if(G.money>0&&inc>0){var dd=G.money/inc;o.push(dd>=3?'You had AED '+shortN(G.money)+' in the bank at the end, '+Math.round(dd)+' days of income.':'You spent the money as it came in.');}return o;}
+function endNumsHTML(G){var sec=[['From your first tank',endTankLines(G)],['Grandma',endGrandmaNums(G)],['You',endWorkNums(G).concat(endMoneyNums(G))]].filter(function(x){return x[1].length;});return sec.map(function(x){return '<h3>'+x[0]+'</h3><ul class="ending">'+x[1].map(function(t){return '<li>'+t+'</li>';}).join('')+'</ul>';}).join('');}
+function endingHTML(G){var id=endingPick(G),X=ENDINGS[id]||ENDINGS.drift_shop,l=endingLines(G).concat(endWorldNums(G)).concat(gpLines(G));if(X.next)l.unshift(X.next);if(X.last)l.push(X.last);
  var gp=(nm(G)?'Dear '+nm(G)+',<br><br>':'')+X.gp.replace('[visit]',END_VISIT[visitLevel(G)]).replace(/\s+$/,'')+(styleTop(G)?' '+STYLE_GP[styleTop(G).k][styleTop(G).pos?0:1]:''),lives=Object.keys(END_LIVES).filter(function(k){return k!==X.end;}).map(function(k){return END_LIVES[k];}),
   all=Object.keys(ENDINGS).map(function(k){return '<li'+(k===id?' class="here"':'')+'>'+ENDINGS[k].name+(k===id?' · you':'')+'</li>';}).join('');
  var sty=styleTop(G);return '<h3 class="end-name">'+X.name+(sty?'\u00a0· '+sty.name:'')+'</h3>'+earthHTML(G)+'<p>'+X.who+'</p>'+(sty?'<p>'+sty.text+'</p>':'')+endCharts(G)+'<h3>Mira</h3><p>'+X.mira+'</p>'+(l.length?'<h3>What the world looks like</h3><ul class="ending">'+l.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>':'')+
-  '<h3>A letter from Grandma</h3><p class="end-letter">'+gp+'</p><h3>From the tank</h3><p class="end-tank">'+X.tank+'</p>'+(lives.length?'<h3>Lives you didn’t live</h3><p>'+lives.join(', ').replace(/^./,function(c){return c.toUpperCase();})+'.</p>':'')+
+  '<h3>A letter from Grandma</h3><p class="end-letter">'+gp+'</p><h3>From the tank</h3><p class="end-tank">'+X.tank+'</p>'+endNumsHTML(G)+(lives.length?'<h3>Lives you didn’t live</h3><p>'+lives.join(', ').replace(/^./,function(c){return c.toUpperCase();})+'.</p>':'')+
   '<details class="end-all"><summary>All '+Object.keys(ENDINGS).length+' endings</summary><ol>'+all+'</ol></details>';}
 function updateUpgrades(){
   var T=TK();$('tankscard').hidden=!tankRoomOpen(G)||ownTank(G);
@@ -6023,7 +6045,7 @@ function initControls(){
     if(a==='dye-stop'){if(G.dye){G.dye.on=0;log(G,'Stopped dyeing the pale shrimp');}render();return;}
     if(a==='sell-co'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='Tap again, the game ends here';return;}earn(G,buyoutPrice(G),'deals');endGame(G,'sold');detectMilestones(G);setSpeed(0);render();return;}
     if(a==='gp-pay'){if(payGrandma(G)){toast('Grandma books the trip to the sea');cache.mem=null;render();}return;}
-    if(a==='treat-give'){if(giveTreat(G,0,b.dataset.id)){G.ps.treat++;cache.treatseg=null;render();}return;}
+    if(a==='treat-give'){if(giveTreat(G,0,b.dataset.id)){G.ps.treat++;careMark(G,G.tanks[0]);cache.treatseg=null;render();}return;}
     if(a==='happy-give'){if(giveHappy(G,b.dataset.id)){toast('They crowd around it');cache.treatseg=null;render();}return;}
     if(a==='brush'){BRUSH=b.dataset.id;cache.mepk=null;render();return;}
     if(a==='hr'){if(setHour(G,+b.dataset.h,BRUSH)){cache.mepk=null;render();}return;}
