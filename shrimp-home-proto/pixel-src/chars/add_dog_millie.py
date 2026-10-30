@@ -1,8 +1,8 @@
 """python3 add_dog_millie.py <characters dir> <src/animart.js>
 Puti's 30 Oct frames into animart.js, nothing else rebuilt.
 - dog.aseprite, 46 frames (guide layers left out): 0-31 as before; 32-35 stand, tail wagging; 36 stand, head to you;
-  37 stand, looking back; 38 sit, looking back; 39 sit, half turned; 40 sit; 41-42 sit, panting; 43 sit front, tongue out;
-  44 sit front; 45 asleep, curled up.
+  37 stand, looking back; 38-39 sit looking left, tail down/up; 40 sit looking right; 41-42 sit looking right, panting, tail up/down; 43 sit front, tongue out;
+  44 sit front; 45 asleep, curled up. 46 is made: 40 with the tail from 41.
 - millie_walk.aseprite, 52 frames: 0 stand, 1 stand with arms relaxed (new), right 2-13, left 14-25, 26 stand,
   down 27-38, 39 back, up 40-51. Two blinks made from her eye pixels go on the end: 52 = 0 blinking, 53 = 1 blinking.
 - millie2 (pixart.js: stand right, stand left, sit) is rebuilt from the new frames as build.py does."""
@@ -29,14 +29,18 @@ def frames(name):
 a, fr = frames('dog')
 fr = [f.crop((8, 8, 136, 136)) for f in fr]
 assert len(fr) == 46, len(fr)
+# 46 (made): her sitting look-right 40 with the raised tail from 41 (x < 64), no tongue, so he can wag without panting
+t = Image.new('RGBA', (128, 128)); t.alpha_composite(fr[40]); 
+up = fr[41].crop((0, 0, 64, 128)); t.paste(up, (0, 0))
+fr.append(t)
 im = Image.new('RGBA', (128 * len(fr), 128))
 for k, f in enumerate(fr):
     im.alpha_composite(f, (k * 128, 0))
 SRC['dog'] = uri(im)
 tags = {t['name']: [t['frm'], t['to'] - t['frm'] + 1] for t in a['tags']}
-tags.update({'wag': [32, 4], 'look-you': [36, 1], 'look-back': [37, 1], 'sit-look-back': [38, 1], 'sit-turn': [39, 1],
-             'sit-side': [40, 1], 'pant': [41, 2], 'sit-front-tongue': [43, 1], 'sit-front': [44, 1], 'sleep': [45, 1]})
-META['chars']['dog'] = {'w': 128, 'h': 128, 'n': 46, 'poses': tags}
+tags.update({'wag': [32, 4], 'look-you': [36, 1], 'look-back': [37, 1], 'sit-left': [38, 1], 'sit-left-tail-up': [39, 1],
+             'sit-right': [40, 1], 'pant-wag': [41, 2], 'sit-front-tongue': [43, 1], 'sit-front': [44, 1], 'sleep': [45, 1], 'sit-right-tail-up': [46, 1]})
+META['chars']['dog'] = {'w': 128, 'h': 128, 'n': 47, 'poses': tags}
 print('dog', len(fr), 'frames')
 
 # Millie

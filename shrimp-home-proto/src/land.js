@@ -1138,10 +1138,11 @@ function dogStep(dg,q,v,dt){if(!q.length)return true;var tg=q[0],dx=tg[0]-dg.x,d
 function dogSettle(dg){dg.st='stand';dg.t=0;dg.wt=1.2+Math.random()*4;dg.run=false;dg.gl=0;dg.sp=40;if(dg.bound)dg.wag=Math.max(dg.wag||0,0.6+Math.random()*1.6);faceDogTo(L.me.x);}
 // Puti's 30 Oct frames: tail wags, glances, sitting looks, panting after a run, a nap. Older sheets go without
 function dogNew(){var im=IMG.dog;return !!(im&&im.naturalWidth>=46*128);}
-function dogLife(dt){var dg=L.dog;if(dg.wag>0)dg.wag=Math.max(0,dg.wag-dt);if(dg.pant>0)dg.pant=Math.max(0,dg.pant-dt);
+function dogLife(dt){var dg=L.dog,me=L.me;if(me&&dg.bound&&dg.meMv&&!me.moving&&Math.hypot(me.x-dg.x,me.y-dg.y)<T*3&&(dg.st==='sit'||dg.st==='stand'))dg.wag=Math.max(dg.wag||0,1+Math.random()*1.5);if(me)dg.meMv=me.moving;
+  if(dg.wag>0)dg.wag=Math.max(0,dg.wag-dt);if(dg.pant>0)dg.pant=Math.max(0,dg.pant-dt);
   dg.lk=(dg.lk==null?2:dg.lk)-dt;if(dg.lk>0)return;
   if(dg.st==='stand'&&dg.dir==='side'&&!dg.wag){if(dg.gl){dg.gl=0;dg.lk=2+Math.random()*4;}else{dg.gl=Math.random()<0.55?36:37;dg.lk=0.7+Math.random()*1.6;}}
-  else if(dg.st==='sit'){var r=Math.random();dg.sp=r<0.4?40:r<0.6?44:r<0.75?38:r<0.88?39:13;dg.lk=2+Math.random()*5;}
+  else if(dg.st==='sit'){var r=Math.random();dg.sp=r<0.45?40:r<0.75?38:r<0.9?44:13;dg.lk=2+Math.random()*5;if(dg.bound&&dg.sp!==44&&dg.sp!==13&&Math.random()<0.3)dg.wag=0.8+Math.random()*1.4;}
   else{dg.gl=0;dg.lk=0.5;}}
 function dogNap(dg){if(!dogNew())return false;dg.st='nap';dg.t=0;dg.wt=25+Math.random()*50;dg.pant=0;return true;}
 var DOG_RUN=360,DOG_TROT=150;
@@ -1207,11 +1208,14 @@ function dogFrame(){var dg=L.dog;if(dg.hop>0)return 13;var nw=dogNew(),d=(MF.dog
   if(dg.run){if(d==='down')return 14+Math.floor(dg.anim*0.75)%8;if(d==='up')return 22+Math.floor(dg.anim*0.75)%8;return Math.floor(dg.anim)%13;}
   if(!nw){if(dg.st==='sit'||dg.st==='nap')return 13;return d==='down'?30:d==='up'?31:0;}
   if(dg.st==='nap')return 45;
-  if(dg.st==='sit'){var sp=dg.sp||40,fr=sp===44||sp===13;if(dg.pant>0){var k=Math.floor(dg.pant*5)%2;return fr?(k?43:44):(k?41:42);}return sp;}
+  // sitting: 38/39 look left, tail down/up; 40/46 look right, tail down/up; 41/42 pant with the tail going; front 13, 44, 43 tongue
+  if(dg.st==='sit'){var sp=dg.sp||40,fr=sp===44||sp===13,up=dg.wag>0&&Math.floor(dg.wag*6)%2===0;
+    if(dg.pant>0){var k=Math.floor(dg.pant*5)%2;return fr?(k?43:44):(k?41:42);}
+    if(sp===38)return up?39:38;if(fr)return sp;return up&&IMG.dog.naturalWidth>=47*128?46:40;}
   if(d==='down')return 30;if(d==='up')return 31;if(dg.wag>0)return 32+Math.floor(dg.wag*10)%4;return dg.gl||32;}
 // which frames are drawn side on (flipped when he faces left), and where his feet are in each
-function dogSide(i){return i<13||(i>=32&&i<=42)||i===45;}
-function dogAx(i){return i<13||(i>=32&&i<=37)?60:i>=38&&i<=42?68:i===45?58:71;}
+function dogSide(i){return i<13||(i>=32&&i<=42)||i>=45;}
+function dogAx(i){return i<13||(i>=32&&i<=37)?60:i>=38&&i<=42||i===46?68:i===45?58:71;}
 function petDog(){var dg=L.dog;if(!dg)return;var t0=L.lastPet||0,nw=performance.now();addLove(nw-t0>4000?1.2:0.3);L.lastPet=nw;if(!dg.bound){dogBind();dg.q=[];dogSettle(dg);}else{dg.left=Math.max(dg.left,dogInterest()*0.6);if(dg.st==='nap')dogSettle(dg);}dg.wag=2.5;if(dg.st!=='play'&&Math.random()<0.15+dogLove()*0.003){dogPlayStart();}dg.hop=0.5;puff('heart',dg.x,dg.y-56,1,{speed:0,up:26,life:1.1});sfx('pop',{v:0.6});if(!LS().seen.dog){LS().seen.dog=1;}}
 
 // ----- Pierre, Puti's cat: naps, strolls, and stands at the tank pawing at the glass. The dog leaves him alone -----
@@ -1856,7 +1860,7 @@ function drawMillie(x){var me=L.me;meFrame();var im=IMG[L.mfImg];if(!im||!im.nat
   var sit=!!me.sit;drawSpr(x,shadowSpr(25,7),me.x,me.y-(sit?2:1));x.drawImage(im,L.mfIdx*128,0,128,128,Math.round(me.x-64*CHK)-L.cdx,Math.round(me.y-(sit?116:126)*CHK)-L.cdy,Math.round(128*CHK),Math.round(128*CHK));
   if(L.tool==='rod'&&!me.moving&&!sit){rodTip();var d=me.dir,hx=me.x+(d==='right'?14:d==='left'?-14:12)*CHK,hy=me.y-48*CHK;pxLine(x,hx,hy,L.tipX,L.tipY,'#8f563b',2);}}
 function drawDog(x){var dg=L.dog,fi=dogFrame(),side=dogSide(fi),left=dg.face<0&&side,im=dogCanvas(left);if(!im)return;var ax=dogAx(fi);if(left)ax=128-ax;
-  var hop=dg.hop>0?Math.sin((1-dg.hop/0.5)*Math.PI)*16:0;drawSpr(x,shadowSpr(fi===45?34:fi>=38&&fi<=42?27:side?33:22,7),dg.x,dg.y-1);x.drawImage(im,fi*128,0,128,128,Math.round(dg.x-ax*CHK)-L.cdx,Math.round(dg.y-126*CHK-hop*CHK)-L.cdy,Math.round(128*CHK),Math.round(128*CHK));}
+  var hop=dg.hop>0?Math.sin((1-dg.hop/0.5)*Math.PI)*16:0;drawSpr(x,shadowSpr(fi===45?34:(fi>=38&&fi<=42)||fi===46?27:side?33:22,7),dg.x,dg.y-1);x.drawImage(im,fi*128,0,128,128,Math.round(dg.x-ax*CHK)-L.cdx,Math.round(dg.y-126*CHK-hop*CHK)-L.cdy,Math.round(128*CHK),Math.round(128*CHK));}
 function drawCat(x){var c=L.cat;catFrame();var s=catSpr(L.cfPose,L.cfIdx,c.face),hop=c.hop>0?Math.sin((1-c.hop/0.45)*Math.PI)*12:0;if(!c.on)drawSpr(x,shadowSpr(Math.round((L.cfPose==='nap'?30:L.cfPose==='walk'?24:21)*CHK),6),c.x,c.y-1);drawSprK(x,s,c.x,c.y-hop*CHK,CHK);}
 function drawWater(x){var m=M(),x0=Math.max(0,Math.floor(L.cam.x/T)),y0=Math.max(0,Math.floor(L.cam.y/T)),x1=Math.min(m.w-1,Math.ceil((L.cam.x+L.VW)/T)),y1=Math.min(m.h-1,Math.ceil((L.cam.y+L.VH)/T));x.fillStyle='#ffffff';
   for(var ty=y0;ty<=y1;ty++)for(var tx=x0;tx<=x1;tx++){if(m.g[ty*m.w+tx]!==G_WATER)continue;var k=(m.wb&&m.wb[ty*m.w+tx])||W_POND,flow=k===W_STREAM,len=k===W_SEA?6:5;
