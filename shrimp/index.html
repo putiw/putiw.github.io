@@ -1184,7 +1184,7 @@ function bestKitPrice(G){var sup=Math.max(0.5,kitSupply(G)+G.kits.stock/14),d=ki
   var p=G.kitPrice*Math.sqrt(d/sup),lo=Math.max(100,Math.ceil(productionUnitCost(G)*(G.vat?1.05:1)*1.2/10)*10);return clamp(Math.round(p/10)*10,Math.min(lo,600),600);}
 function bottleneck(G){
  if(!kitsOpen(G))return null;var E=G.emp,d=kitDemand(G),fc=farmCap(G),pc=packCap(G),sup=kitSupply(G),r;
- if(E.won)r={k:'complete',d:'Everyone has a tank.',f:'Look back at how you got here, or keep playing.'};
+ if(E.won)r={k:'complete',d:'Everyone has a tank.',f:'Look back at how you got here from Settings, or keep playing.'};
  else if(painMult(G)<1&&painNote(G))r={k:'pain',d:'Slowed: '+painNote(G)+'. Orders and breeding run at part speed until then.',f:'Nothing to do but wait, or keep building.'};
  else if(Object.keys(E.farms).some(function(k){return E.farms[k]>0;})&&!fc)r={k:'paused',d:'Limit: no farm is breeding.',f:'Build a farm, or sell spare assets for cash.'};
  else if(kitCap(G)-G.humans<Math.max(5,d*10))r=nextRegion(G)?{k:'ceiling',d:'Limit: reach. Almost everyone willing already owns a tank.',f:'Open the next region in Ads or raise adoption in World.'}:hardOpen(G)?{k:'ceiling',d:'Limit: the hard part. Every region is open, the homes left need something done about them first.',f:'Work through the groups in The hard part, in World.'}:{k:'ceiling',d:'Limit: reach. Every region is open and almost everyone willing already owns a tank.',f:'Raise adoption with Ads and World projects.'};
@@ -5904,7 +5904,7 @@ function renderProgression(){
  $('speed').title=maxSpeed(G)<4?'4×: after your first farm.':maxSpeed(G)<12?(G.emp.fastReady?'12×: at a million owners ('+big(Math.floor(G.humans))+' now).':'12×: after auto packing, a barn, 7 days of AED '+fmt(FAST_PROFIT)+'+ kit profit a day, then a million owners.'):maxSpeed(G)<40?'40×: once '+big(HARD_AT)+' people have a tank.':'';setT('business-roadmap','');
  var limit=open&&consultHas(G,'fix')?bottleneck(G):null,target=limit?{packing:'emp',shrimp:'up',ceiling:'promote',demand:'promote',cash:'emp',paused:'up'}[limit.k]:null,action=target&&target!==activeTab?'<button class="btn" data-act="navigate" data-tab="'+target+'">'+({emp:'Open Kits',up:'Open Gear',world:'Open World',promote:'Open Ads'}[target])+'</button>':'';$('business-actions').mhtml=action;
  $('business-strip').hidden=true;$('business-guide').hidden=!business||(!$('business-roadmap').textContent&&!$('business-actions').innerHTML);
- if(business){var net=operatingNet(G),run=cashRunway(G),d=kitDemand(G);['vitals','vwater','acts','tankchips','fold'].forEach(function(id){$(id).hidden=true;});var bt=bnText(G);$('astrip').hidden=!bt;setT('astrip',bt);lastAlerts='';}
+ if(business){var net=operatingNet(G),run=cashRunway(G),d=kitDemand(G);['vitals','vwater','acts','tankchips','fold'].forEach(function(id){$(id).hidden=true;});var bt=bnText(G);$('astrip').hidden=!bt;if(G.emp.won&&bt.indexOf('Everyone has a tank.')===0){if(!$('astrip').querySelector('[data-act=review]'))$('astrip').mhtml='<span class="tx">Everyone has a tank.</span><button class="btn" data-act="review">Look back</button>';}else setT('astrip',bt);lastAlerts='';}
  else if(activeTab!=='space'){$('tankchips').hidden=G.tanks.length<2||!!G.recipe||ownTank(G);}
  renderLandRow();
  $('inventory-days').value=String(E.inventoryDays);$('reserve-days').value=String(E.reserveDays);setT('operating-plan','Overhead '+aed(fixedOverhead(G))+'/day · reserve '+aed(operatingReserve(G))+' · '+aed(productionUnitCost(G))+'/kit');
@@ -6019,7 +6019,7 @@ function initControls(){
     promoteCardReveal(o);render();
   });
   document.querySelectorAll('.coll').forEach(function(c){var sh=G.opt.shut||{ads:true,sup:true,fin:true};if(!G.opt.shut)G.opt.shut=sh;c.classList.toggle('shut',!!sh[c.dataset.k]);});
-  $('btn-settings').addEventListener('click',function(){$('apop').hidden=true;$('tb-info').setAttribute('aria-expanded','false');var lr=$('leave-row'),ls=$('leave-sub'),rr=$('review-row');if(lr){lr.hidden=!canLeave(G);rr.hidden=!G.left;var lb=$('btn-leave');delete lb.dataset.sure;lb.textContent='Sell the company and go to the land';ls.hidden=true;}$('settings').hidden=false;$('settings-close').focus();});
+  $('btn-settings').addEventListener('click',function(){$('apop').hidden=true;$('tb-info').setAttribute('aria-expanded','false');var lr=$('leave-row'),ls=$('leave-sub'),rr=$('review-row');if(lr){lr.hidden=!canLeave(G);rr.hidden=!G.left&&!G.emp.won;var lb=$('btn-leave');delete lb.dataset.sure;lb.textContent='Sell the company and go to the land';ls.hidden=true;}$('settings').hidden=false;$('settings-close').focus();});
   $('settings-close').addEventListener('click',function(){$('settings').hidden=true;$('tb-info').focus();});
   $('settings').addEventListener('click',function(e){if(e.target===this)this.hidden=true;});
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!$('settings').hidden)$('settings').hidden=true;});
@@ -6186,7 +6186,7 @@ function initControls(){
     if(a==='ad'){if(addAd(G,b.dataset.id))toast('Campaign started');cache.adsig=null;}
     if(a==='leave-ask'){if(!canLeave(G))return;var sale=G.emp.offerOpen?buyoutPrice(G):Math.max(2e7,Math.round(incRef(G)*730/1e5)*1e5);if(!b.dataset.sure){b.dataset.sure='1';b.textContent='Tap again to sell for '+aed(sale);var ls2=$('leave-sub');ls2.hidden=false;ls2.textContent='The company is sold. You keep '+aed(sale)+', the first tank and the land. The world stays where it is. You read your years at the company first.';setTimeout(function(){delete b.dataset.sure;b.textContent='Sell the company and go to the land';ls2.hidden=true;},6000);return;}
       delete b.dataset.sure;if(leaveCompany(G)){$('settings').hidden=true;detectMilestones(G);save();render();}return;}
-    if(a==='review'){if(!G.left)return;$('settings').hidden=true;$('apop').hidden=true;var rb=$('review-box');if(!rb){rb=document.createElement('div');rb.id='review-box';rb.className='sheet';rb.innerHTML='<div class="sheet-in"><div class="sheet-hd"><h2>Your years at the company</h2><button type="button" class="rst" data-act="review-close">Close</button></div><div class="ending-box" id="review-in"></div></div>';document.body.appendChild(rb);}$('review-in').innerHTML=endingHTML(G);rb.hidden=false;return;}
+    if(a==='review'){if(!G.left&&!G.emp.won)return;$('settings').hidden=true;$('apop').hidden=true;var rb=$('review-box');if(!rb){rb=document.createElement('div');rb.id='review-box';rb.className='sheet';rb.innerHTML='<div class="sheet-in"><div class="sheet-hd"><h2>Your years at the company</h2><button type="button" class="rst" data-act="review-close">Close</button></div><div class="ending-box" id="review-in"></div></div>';document.body.appendChild(rb);}$('review-in').innerHTML=endingHTML(G);rb.hidden=false;return;}
     if(a==='review-close'){var rb2=$('review-box');if(rb2)rb2.hidden=true;return;}
     if(a==='reset'){
       var all=document.querySelectorAll('[data-act="reset"]');

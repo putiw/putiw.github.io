@@ -1306,3 +1306,8 @@ Replaces the shrimp-late-kind branch (Pass 153, dropped after an independent rev
 
 ## Deploy 30 Oct (BUILD clean-tank): Passes 156-157
 - Bots seed 7: strong 2,019 (2,106), kind 3,183 (3,159), average Earth 6,049 / Space 7,460 garden_hermit (6,777 / 8,188; inside the 5,700-6,640 seed range). Spotlight sweep 116 checked, all good. Layout scan: only the known 2 px element on World at the win stage.
+
+## Pass 158: Look back after the win is a real button
+- The win strip ("Everyone has a tank.") now has a Look back button that opens the ending recap sheet (`review`). Before, the text told you to look back with nothing to tap.
+- `review` and Settings "Your years at the company" now open after the win too, not only after leaving the company.
+- Balance 98, academy 10, me 46.
