@@ -1383,6 +1383,6 @@ Not done: the company Tank tab still draws its fixed plant art, it doesn't grow 
 |---|---|---|
 | Strong, cold | Earth day 2,019, empire_dictator | Earth day 2,102, empire_dictator |
 | Strong, kind | Earth day 3,183, question_prof | Earth day 3,263, question_prof |
-| Average, Space | Earth 6,049, Space 8,048 → was 7,460 | Earth 6,637, Space 8,048, garden_hermit, 42 min waiting |
+| Average, Space | Earth 6,049, Space 7,460 | Earth 6,637, Space 8,048, garden_hermit, 42 min waiting |
 
 Average bot over five seeds (7, 11, 23, 31, 43), Earth day, old build (Pass 160) against new: 6,049/6,721/5,769/6,665/6,105 (mean 6,262) against 6,637/6,609/6,833/6,441/6,581 (mean 6,620). About 6% later and less spread. The bots run the tank at company speed (k = 1), so the economy didn't change on purpose; the shift is most likely the random stream reordering (Tank 1's day now runs before the company's), not looked into further. No INSOLVENT. Spotlight sweep: 116 checked, all good. Layout scan: one 2 px overflow on the World tab at the win (360 and 390 px), not looked at.
