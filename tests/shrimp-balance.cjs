@@ -403,8 +403,8 @@ var g=readyGame(),T=g.tanks[0];T.pop=[{n:80,age:120,g:40},{n:30,age:120,g:80},{n
 careDay(g);if(T.care&&T.care.mulm>0)throw Error('No care chores before your own tank');
 var moved=keepTwenty(g);if(Math.round(totalN(T))!==20||Math.round(moved)!==100||g.emp.rawShrimp<99)throw Error('Twenty stay home, the rest go to the farm: '+totalN(T)+' '+moved);
 if(T.pop.some(function(k){return k.g===40;}))throw Error('The best coloured adults stay');
-g.me=g.me||newMe();g.me.keep='self';for(var d=0;d<50;d++)careDay(g);var C=careOf(T);if(C.mulm<0.9||C.sponge<0.6)throw Error('Mulm and sponge build up by themselves');
-if(C.grow<0.1||C.grow>0.2)throw Error('Plants grow ten times slower, about 1/350 a day (Puti, 30 Oct): '+C.grow);
+g.me=g.me||newMe();g.me.keep='self';for(var d=0;d<24;d++)careDay(g);var C=careOf(T);if(ownDue(g).some(function(k){return k!=='pests';}))throw Error('Nothing but pests due in the first 24 tank days: '+ownDue(g));
+for(d=24;d<32;d++)careDay(g);['gravel','sponge','trim'].forEach(function(k){if(ownDue(g).indexOf(k)<0)throw Error('Each job due about once a tank month (Pass 161): '+k+' '+JSON.stringify(C));});
 T.pop=[];var m1=C.mulm=0.3;for(d=0;d<30;d++)careDay(g);if(C.mulm!==m1)throw Error('No new mulm in an empty tank, after a crash poop stops (Puti, 30 Oct)');
 var f0=C.pests.filter(function(p){return p.k==='flat';}).length;for(d=0;d<200;d++)careDay(g);if(C.pests.filter(function(p){return p.k==='flat';}).length!==f0)throw Error('No new flatworms without shrimp');
 var h=readyGame(),U=h.tanks[0];U.pop=[{n:5,age:120,g:30,b:1},{n:5,age:120,g:70}];var m0=h.money,r=cullPick(h,U,[{age:120,g:30,b:1},{age:120,g:70}]);if(r.n!==2||r.gave!==0||Math.round(totalN(U))!==8||U.pop.filter(function(k){return k.b;})[0].n!==4)throw Error('A bought one can be taken out');
@@ -678,5 +678,43 @@ if(html.includes("['Change water',big(waterUse(G))"))throw Error('Puti: no Chang
 if(!html.includes("gb[bandOf(k.g)]+=k.n;if(k.age>=75)"))throw Error('Puti: colony grade rows count every shrimp');
 if(!html.includes("Math.round(kitCap(G)/Math.max(1,popOpen(G))*100)+'% of them want a tank"))throw Error('Regions percent matches the people figure');
 count++;console.log('PASS 30 Oct requests');
+// Pass 161: Tank 1's own clock, one shared tank with the land, monthly jobs, leaving after Space
+const OWN_SETUP=`function ownGame(){var g=readyGame(),T=g.tanks[0];T.had=1;T.cycledAt=0;T.feeder=1;T.autoWC=1;T.pop=[{n:30,age:120,g:60},{n:10,age:20,g:40}];g.me=g.me||newMe();g.me.on=1;g.me.keep='self';g.emp.farms.rack=1;g.money=1e6;g.tday=g.day;return g;}
+function run(g,n,k){for(var i=0;i<n;i++){g.progress.queue=[];g.emp.ended=null;stepGame(g,k);}}`;
+check('Pass 161: tank clock, 40x elsewhere moves Tank 1 a day per 40, the land and old saves',OWN_SETUP+`
+var g=readyGame();delete g.tday;run(g,8);if(g.tday!==g.day)throw Error('Before the farm the tank day is the company day');
+var h=ownGame();h.tday=h.day;var d0=h.day,t0=h.tday;run(h,4*40,1/40);if(h.day-d0!==40||Math.round(h.tday-t0)!==1)throw Error('At 40x the company moves 40 days, the tank one: '+(h.day-d0)+' '+(h.tday-t0));
+d0=h.day;t0=h.tday;run(h,4*3);if(h.day-d0!==3||h.tday-t0!==3)throw Error('On the land (real time) and at 1x both move together');
+var o=ownGame();o.day=900;delete o.tday;migrate(o);if(o.tday!==900)throw Error('Old saves start the tank clock at the company day');
+var T=h.tanks[0];waterChange(h,T,10);if(T.lastWC!==h.tday)throw Error('Tank stamps use tank days');
+if(td(h,T)!==h.tday||td(g,g.tanks[0])!==g.day)throw Error('td reads the right clock');
+var S=h.stats,n0=S.ownD||0;run(h,4*40,1/40);if((S.ownD||0)-n0!==1)throw Error('First tank stats count tank days: '+((S.ownD||0)-n0));`);
+check('Pass 161: one tank, the land draws the game state and its jobs come back',OWN_SETUP+`
+var g=ownGame(),T=g.tanks[0],C=careOf(T);C.mulm=0.6;C.sponge=0.55;C.grow=0.7;C.pests=[{k:'snail'},{k:'snail'},{k:'flat'}];
+var o=landOwn(g);if(o.ga.reduce(function(a,b){return a+b;},0)!==o.adults||o.gy.reduce(function(a,b){return a+b;},0)!==o.young)throw Error('Grade counts add up to the shrimp');
+if(o.ga[vgOf(60)]!==30||o.tday!==g.tday)throw Error('Grades are the tank view grades: '+o.ga);
+if(o.care.mulm!==0.6||o.care.snail!==2||o.care.flat!==1||!o.well||o.due.indexOf('gravel')<0||o.due.indexOf('pests')<0||o.decor!==null)throw Error('The mess, wellbeing and due jobs go to the land: '+JSON.stringify(o));
+var c0=g.stats.care||0;landTank(g,{mulm:0.05,sponge:0,grow:0.2,snail:1,flat:0,job:1,decor:{wood:1,plants:0,moss:1,leaves:0}});
+if(C.mulm!==0.05||C.sponge!==0||C.grow!==0.2||C.pests.length!==1||(g.stats.care||0)!==c0+1)throw Error('A job on the land is done in the game too');
+if(!T.wood||T.plants||!T.ldec||!landOwn(g).decor.wood)throw Error('The land decides the decor once, then the game sends it back');
+if(ownDue(g).length)throw Error('Nothing due after the jobs: '+ownDue(g));`);
+check('Pass 161: own-tank jobs about once a tank month, the tank stays fine between',OWN_SETUP+`
+var g=ownGame(),T=g.tanks[0],C=careOf(T);T.glass=null;C.mulm=C.sponge=C.grow=0;C.pests=[];for(var d=0;d<30;d++){g.tday++;glassGrow(g,T);careDay(g);}
+var gm=glassMean(T);if(gm<0.35||gm>0.75)throw Error('Glass about half green after a tank month: '+gm);
+if(ownWell(g).total<50)throw Error('A month of mess still reads Fine: '+ownWell(g).total);
+for(d=0;d<90;d++){g.tday++;glassGrow(g,T);careDay(g);}if(ownWell(g).total>=60)throw Error('Months of nothing shows: '+ownWell(g).total);`);
+check('Pass 161: leaving after Space and after the win, without the land too',OWN_SETUP+`
+var g=ownGame();g.emp.won=1;g.space=g.space||{};g.space.started=1;if(!canLeave(g))throw Error('Leaving is offered after Space');
+if(!leaveCompany(g)||!g.left||!landOpen(g))throw Error('Leaving works and brings the land');
+var h=ownGame();h.emp.won=1;if(!canLeave(h))throw Error('Leaving is offered after the win');
+var k=ownGame();k.emp.hard={open:1};if(!canLeave(k))throw Error('Leaving is offered from the hard part');
+var n=ownGame();if(canLeave(n))throw Error('Not before the hard part');`);
+if(html.includes('id="leave-row"')||!html.includes("h+=leaveHTML();")||!html.includes("return leaveHTML()+HARD_GOALS"))throw Error('Leaving is on the You tab and the hard part, not in Settings (Puti, 30 Oct)');
+if(!html.includes("body.left-on .tabs,body.left-on #speed{display:none!important}")||!html.includes("function landHide(){if(G&&G.left)return;"))throw Error('After leaving the land is all there is: no tabs, no back');
+if(!html.includes("#review-box .sheet-in{max-height:88vh"))throw Error('The recap scrolls');
+if(!html.includes("var PACE_T='Your tank runs at 1× on this tab'")||!html.includes("if(tankPace()&&v>1){SPEED_WANT=v;v=1;}"))throw Error('The Tank tab runs at 1x once the tank has its own clock');
+const home161=fs.readFileSync(path.join(__dirname,'../shrimp/home.html'),'utf8');
+if(!home161.includes('function applyOwn(T,d)')||!home161.includes("post({type:LEFT?'menu':'back'})")||!home161.includes("if(T.own&&OWN)return;"))throw Error('The land follows the game tank and has no way back after leaving');
+count++;console.log('PASS Pass 161 requests');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
