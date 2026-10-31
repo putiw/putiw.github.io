@@ -1409,3 +1409,7 @@ Not done: 6 (thin late tabs) and 7 (small Sell buttons) wait for Puti. Old saves
 ## Deploy (31 Oct, Pass 162 + 163, BUILD 2026-10-31-two-clocks)
 
 Before deploy: balance 107, academy 11, me 46, bots as in Pass 163, Space bot passes, spotlight sweep 116 all good, layout scan only the known 2 px win World chart label, monkey 60 random taps on six stages at 360 and 390 px with no page errors, NaN or sideways scroll.
+
+## Pass 164: plan for three big updates (31 Oct)
+
+Docs only, no game change. Puti's plan for player-made furniture on Grandma's land, additions to the hard part (Mira's cousin, a sourced ledger, late partial outcomes) and a new space chapter (research unlock during the hard part, Grandma frozen, the player as the ship's AI, a 100-flyby optimal stopping search over real and generated planets, then settlement) is in `shrimp/AGENTS.md`, Open work, with the order and which chats can run in parallel. The "Space only after everyone" rule is marked as changed by Puti, held until the unlock ships. No tests run.

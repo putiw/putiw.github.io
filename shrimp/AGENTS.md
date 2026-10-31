@@ -217,7 +217,7 @@ These come from Puti's feedback. Treat them as requirements.
 - There is one public mood (E.op.m), no audiences. Water and Fire were removed at Puti's request, don't bring them back.
 - Late game (from about a million owners, Pass 154): a fixed AED price is no choice. Late costs are days of income (`needDays`, `incRef`), days of ✦ income (`needIDays`), your time (`needAway`), kits a day for a while (`slowKits`), or a share of income for years (`duesAdd`). The fast answer pays now (more want one, cheaper kits) and the bill comes later in the Times or the hard part (`later`, `hardMul`). Some cards are kind against kind (the rivers, the fisher). No backstop, no ending verdict.
 - The player picks a path, nobody pushes it. Choices come as a question with a kind answer and a cold one (PROJ items with fk, question in FORK_Q). Cold answers are cheaper or faster. A hidden heart score (E.heart) adds up kind (+) and cold (−) picks, campaigns and film stories. It is never shown as a number. It slows or speeds the good Shrimp Times stories (heartMult), and the win card shows what the world became and Grandma's verdict. The monopoly/dictator path is allowed and valid.
-- Space opens only after everyone on Earth has a tank, never at year ten. Puti has asked for this twice, don't change it back.
+- Space opens only after everyone on Earth has a tank, never at year ten. Puti has asked for this twice, don't change it back. (31 Oct: Puti changed this herself for the new space chapter, see Open work. It holds until chat 4 there ships.)
 - Don't paint good and evil (不要脸谱化善恶). Every cold answer has a real logistical reason in its text, and every kind answer says what it costs. The ending says what each path cost, it doesn't judge.
 - World is split into University, Media, Politics and Nature, one thing per track at a time.
 - Films: the player picks what each film is really about. Effects are hidden, the Shrimp Times reviews it.
@@ -456,6 +456,47 @@ Do not report a feature as finished just because its new path works once. Check 
 ## Open work
 
 Planned and agreed with Puti, not built yet:
+
+**Three big updates (agreed 31 Oct).** One chat per row, in this order. Rows marked parallel touch different files and can run at the same time as row 3; rows 3 and 4 both edit index.html, never at once. Pull before pushing, both chats append to this file and the changelog.
+
+| # | Chat | Main file | Parallel |
+|---|---|---|---|
+| 1 | Recolour existing land items (palette swap) | land source (`shrimp-proto`, `shrimp-home-proto/`) | with 3 |
+| 2 | Furniture and tile editor | land source | with 3 |
+| 3 | Hard part additions | index.html | with 1 or 2 |
+| 4 | Research unlock and the space start | index.html | after 3 |
+| 5 | Space part 1, the planet search | new `shrimp/space.html` | after 4 |
+| 6 | Space part 2, settlement | space.html, reusing the land engine | last |
+
+*1 and 2, Grandma's land, players make their own things.*
+- Palette swap first: Puti's sprites use few colours, so any item, floor or wall can be recoloured per colour without redrawing. Saved per placed item type.
+- Editor: pick the type first (bed, chair, table, rug, floor, wall, fence...), the type decides behaviour (Grandma sits on chairs, the dog walks over rugs). Then the footprint (1x1, 2x1, 2x2). Then draw on a pixel grid at the land's art scale: pencil, fill, line, rect, circle, triangle, eraser, palette, edge and face colour for shapes, resize. Shapes stamp into pixels, no vector data. Sprite can be taller than its footprint. "Start from a copy" of any existing item.
+- Custom ground tiles get no auto edges (water, grass, sand, dirt edges are code). Floors and walls are fine.
+- Saves stay small (palette indices); check the land's localStorage size.
+
+*3, the hard part* (exists, see "The hard part" above). Keep the ten groups and their options. Add, don't replace. Puti rejected a region map: it turns real suffering into a puzzle you can win.
+- Mira's cousin back in their home country: one household trying to keep a tank (power cuts, water price, moving). Specific, not statistical. Your funding helps or doesn't at their scale. The most emotional piece, easiest to get wrong; plain, dry, no moralising.
+- The ledger: your fortune next to real costs (water access per person and similar), with a slider for how much you give. Your own life doesn't change until the slider is very high. Every number sourced (WHO, UNICEF, World Bank or a paper) with the source in a comment; no number goes in without one.
+- You fund, you don't fix: results arrive late, partial, sometimes fail. War can't be click-solved.
+- Make the sales drop plain: the half that can buy is saturated, the other half can't. Not a punishment, the market ends. Fully optional: making enough before, finding other income, going slowly, or leaving it are all fine.
+- The point to land, by numbers not words: life isn't equal (half the world can't keep a basic tank), and a fortune this size could change a lot without changing your own life.
+
+*4, the space unlock.* Replaces the current gate (`spaceOpen` after a finished goal, `spaceResearch` 40+ papers or a group).
+- Opens once the hard part is open and the player has sponsored enough science (research lines, papers, the academy). Not cash, not hard part progress. Exact threshold to set with the bots.
+- After that a standing button, any time, also after Earth is finished. Confirm screen: Earth ends, everything you have carries over.
+- After the start only two tabs: Grandma's land and Space.
+- Carried-over resources become points the player puts into fuel, scan instruments, robots and the like.
+- Decide in chat 4 how this sits with the current Space (search program, gene edit or terraform, seed ship, shrimp let go free), the seed ship launch needs, the Space bot and the professor ending line. Ask Puti before removing any of it.
+
+*5, Space part 1, the planet search* (optimal stopping).
+- Grandma always wanted to be an astronaut. She is in frozen sleep; the ship's AI (the player) makes every call. Before she sleeps she says what she wants from a planet (a river, birds, warmth, quiet); "best" is scored against that.
+- Flybys are cheap, braking is the commitment: braking at a star costs as much fuel as speeding up, so stopping means settling, turning back costs more than you have. Fuel for 100 flybys, stated plainly up front.
+- Map: black screen, pixel stars, pick the next one from a forward cone in range.
+- Scans cost fuel, each instrument is real: transit spectroscopy (atmosphere), radial velocity (mass, rocky or not), flare watch (red dwarf flares strip atmospheres), tidal lock. Look harder at fewer or glance at more.
+- Planets: mostly generated, from barely alive to paradise. Rare named stops with their real facts, from the Bohl, Lawrence, Lowry and Kaltenegger catalogue (MNRAS, 19 Mar 2026, 45 rocky habitable-zone worlds, 24 on the strict cut): Proxima Centauri b, TRAPPIST-1 e/f/g, LHS 1140 b, Kepler-442 b, TOI-700 e; K2-18 b as a possible ocean world with a disputed biosignature claim. Check each fact against a source when writing it.
+- After settling, show where the planet ranked against everything passed and everything after.
+
+*6, settlement.* Robots slowly terraform the planet into a second home, resource management. Reuse the land's tile engine (regolith to soil to grass). Scope later.
 
 **Tab cleanup and text fixes (28 Oct): done** in Passes 119 to 123, deployed 28 Oct. Rules that stay: no growth or bottleneck summary anywhere, bottleneck advice only from the paid consultants (the !! ceiling and working-capital alerts only while `consultHas`). Numbers live on the page where they're used (packing capacity under Making kits, reach in Ads, the ceiling on Regions). USD in the Lab is on purpose.
 Left from that review, not done:
