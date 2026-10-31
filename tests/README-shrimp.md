@@ -1413,3 +1413,15 @@ Before deploy: balance 107, academy 11, me 46, bots as in Pass 163, Space bot pa
 ## Pass 164: plan for three big updates (31 Oct)
 
 Docs only, no game change. Puti's plan for player-made furniture on Grandma's land, additions to the hard part (Mira's cousin, a sourced ledger, late partial outcomes) and a new space chapter (research unlock during the hard part, Grandma frozen, the player as the ship's AI, a 100-flyby optimal stopping search over real and generated planets, then settlement) is in `shrimp/AGENTS.md`, Open work, with the order and which chats can run in parallel. The "Space only after everyone" rule is marked as changed by Puti, held until the unlock ships. No tests run.
+
+## Pass 165: Colours on Grandma's land (31 Oct)
+
+Row 1 of the three big updates. Land source on `shrimp-proto` (`shrimp-home-proto/src/land.js`, `land.css`), `shrimp/home.html` rebuilt with `build.py --game` (checked the old build matched the game's copy first).
+- Build: Colours chip next to Move. Tap a thing or a ground: a bubble with its colours (most used, up to 16). Tap one, pick a DawnBringer 32 colour, Other (colour input), or As drawn. All as drawn resets the kind. Free.
+- One of a kind changes them all, also things that came with the place. Saved as hex pairs in `S.land.pal` (two items recoloured: about 80 bytes).
+- Grounds recolour at the texture, so grass and sand edges on neighbouring tiles follow. Room floors, deck, terracotta and paving are code-drawn and map per pixel.
+- Ground inside a room that isn't a floor can't be tapped. The bubble refits on screen when the choices open.
+- Test hooks: `LAND.objs()`, `LAND.pal()`, `LAND.look(tx,ty)`.
+- Checked headless at 390 px: armchair, lawn, stone paving recolour, survive a reload, no page errors. Fast suites pass (107, 11, 46).
+- Not covered: room back walls and caps, Grandma and animals, step stones, sand pebbles, live parts (feeder seed, coop eggs).
+
