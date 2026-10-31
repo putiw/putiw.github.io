@@ -1897,7 +1897,10 @@ function setTool(id,quiet){id=mapTool(id);if(L.cv&&!toolsHere().some(function(t)
   if(!quiet)sizeCanvas();updateStat(true);}
 // one canvas pixel per art pixel, scaled up by CSS: a whole number of screen pixels per art pixel where the screen allows
 // (2 on 3x phones), 1.5 on 2x phones, about 44 CSS px per tile either way
-var ZOOMS=[0.5,0.7,1,1.4,2],ZDEF=1;   // starts one step out (Puti, 28 Oct, with Millie at 1.5x)
+// Zoom in whole screen pixels (Pass 172, Puti: Millie's eyes kept changing shape). Every art pixel is ZDEV screen pixels,
+// people and pets 1.5x that, so at 2, 4 and 6 every pixel of everyone lands whole and her eyes keep their shape.
+// 1 is the far view: things stay sharp, people at 1.5 screen pixels are a little uneven there.
+var ZOOMS=[1,2,4,6],ZDEF=1;
 function zoomI(){var z=LS().zoom;return z==null?ZDEF:clamp(z,0,ZOOMS.length-1);}
 function zoomK(){return ZOOMS[zoomI()];}
 function setZoom(d){var l=LS(),z0=zoomI(),z=clamp(z0+d,0,ZOOMS.length-1);if(z===z0)return;l.zoom=z;sfx('click');sizeCanvas();zoomBtns();save();}
@@ -1905,8 +1908,8 @@ function zoomBtns(){var a=$('lz-in'),b=$('lz-out'),z=zoomI();if(a)a.disabled=z>=
 function pickCpa(dpr){var d=dpr*0.6875;if(d>=1.75)return Math.round(d)/dpr;if(d>=1.2)return 1.5/dpr;return 1/dpr;}
 function sizeCanvas(){var wrap=$('lwrap');if(!wrap||!L.cv)return;var W=wrap.clientWidth,top=wrap.getBoundingClientRect().top,pal=$('lpal'),palH=pal&&!pal.hidden?78:0;
   var tb=document.querySelector('.tabs'),tabsH=tb?tb.getBoundingClientRect().height:62,tl=$('ltools'),toolsH=tl&&tl.parentNode&&tl.parentNode.id==='lwrap'?4:(tl?tl.offsetHeight:50)+14;var H=Math.round(clamp(window.innerHeight-top-toolsH-34-palH-tabsH-10,250,660));
-  var dpr=window.devicePixelRatio||1,cpa=pickCpa(dpr)*zoomK();if(Math.abs(H-L.cssH)<3&&W===L.cssW&&L.x&&L.sizedCv===L.cv&&cpa===L.cpa)return;L.sizedCv=L.cv;
-  var mid=L.VW?[L.cam.x+L.VW/2,L.cam.y+L.VH/2]:null;L.cssW=W;L.cssH=H;L.dpr=dpr;L.cpa=cpa;L.s=1;L.cv.style.height=H+'px';L.cv.width=Math.max(1,Math.round(W/cpa));L.cv.height=Math.max(1,Math.round(H/cpa));L.VW=L.cv.width;L.VH=L.cv.height;
+  var dpr=window.devicePixelRatio||1,cpa=zoomK()/dpr;if(Math.abs(H-L.cssH)<3&&W===L.cssW&&L.x&&L.sizedCv===L.cv&&cpa===L.cpa)return;L.sizedCv=L.cv;
+  var mid=L.VW?[L.cam.x+L.VW/2,L.cam.y+L.VH/2]:null;L.cssW=W;L.cssH=H;L.dpr=dpr;L.cpa=cpa;L.s=1;L.cv.width=Math.max(1,Math.round(W/cpa));L.cv.height=Math.max(1,Math.round(H/cpa));L.cv.style.width=(L.cv.width*cpa)+'px';L.cv.style.height=(L.cv.height*cpa)+'px';L.VW=L.cv.width;L.VH=L.cv.height;
   if(mid){L.cam.x=mid[0]-L.VW/2;L.cam.y=mid[1]-L.VH/2;}L.x=L.cv.getContext('2d',{alpha:false});L.x.imageSmoothingEnabled=false;clampCam();L.dirty=true;}
 function homeSub(){var l=LS(),n=Math.min(S.tanks.length,STAGES[S.stage].tanks),bits=[plural(n,'tank')+' of '+STAGES[S.stage].tanks];if(l.hens.length&&S.stage>=2)bits.push(plural(l.hens.length,'hen'));if(l.pond.length)bits.push(plural(l.pond.length,'fish','fish')+' in the pond');var birds=Object.keys(S.book.birds||{}).length;if(birds)bits.push(plural(birds,'bird')+' seen');return bits.join(' · ');}
 function renderCard(){var nm=$('h-name');if(!nm)return;nm.textContent=STAGES[S.stage].name;$('h-sub').textContent=homeSub();var mv=$('h-move'),nx=STAGES[S.stage+1];

@@ -110,6 +110,8 @@ window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||!S)re
   if(d.type==='own')syncOwn(d);});
 // shrimp that leave your tank here leave it in the game too
 var _move=netMoveTo;netMoveTo=function(T2){var T=ownT(),N=netList(),a=0,y=0,giv=[];if(T&&T2)N.forEach(function(e){if(T2!==T&&e.from===T.id){if(e.ind.age>=ADULT_DAYS)a++;else y++;}if(T2===T&&e.from!==T.id)giv.push({age:e.ind.age,g:gOf(e.ind)});});_move(T2);if(a+y)post({type:'take',adults:a,young:y,seq:++SEQ});if(giv.length)post({type:'give',list:giv,seq:++SEQ});};
+// shrimp from the stream trap put in Your tank go to the game's Tank 1 too (Pass 172: they were dropped at the next sync)
+if(typeof addToTank==='function'){var _add=addToTank;addToTank=function(T,list,from){_add(T,list,from);var o=ownT();if(T&&o&&T===o&&list&&list.length)post({type:'give',list:list.map(function(i){return {age:i.age||0,g:gOf(i)};}),seq:++SEQ});};}
 var _sell=sellShrimp;sellShrimp=function(T,i){var own=T===ownT(),ad=i.age>=ADULT_DAYS;var p=_sell(T,i);if(own)post({type:'take',adults:ad?1:0,young:ad?0:1,seq:++SEQ});return p;};
 // care jobs count as caring for your tank in the game
 if(typeof toyEnd==='function'){var _end=toyEnd;toyEnd=function(){var r=_end.apply(this,arguments);try{report();}catch(e){}return r;};}
