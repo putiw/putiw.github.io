@@ -2699,7 +2699,7 @@ function gtDay(G){var M=G.me;if(!M||!M.on)return;var T=gtOf(G),now=Math.floor(G.
  // A window shuts once its day has passed and three minutes of play have gone by since it opened.
  T.q.slice().forEach(function(it){if(!it.stay&&now>=it.due&&rt-it.r0>=GT_RT)gtMiss(G,it);});}
 // Checking on her: shows what's waiting, counts as a visit at most every two weeks.
-function gtCheck(G){var M=G.me;if(!M||!M.on)return false;var T=gtOf(G),now=Math.floor(G.day);T.n++;if(now-(T.vis==null?-99:T.vis)>=14){T.vis=now;if(M.moved)M.calls++;else M.visits++;if(!(M.gpSilent>G.day))M.lt=(M.lt||0)+0.25;gtLetters(G);}
+function gtCheck(G){var M=G.me;if(!M||!M.on||G.voyage)return false;var T=gtOf(G),now=Math.floor(G.day);T.n++;if(now-(T.vis==null?-99:T.vis)>=14){T.vis=now;if(M.moved)M.calls++;else M.visits++;if(!(M.gpSilent>G.day))M.lt=(M.lt||0)+0.25;gtLetters(G);}
  T.chk=now;T.chkRt=gtNow(G);T.q.forEach(function(it){if(it.days==null)it.days=now-it.d0;});if(M.call==='gt')M.call=null;return true;}
 function gtAnswer(G,key,i){var T=gtOf(G),it=T.q.filter(function(x){return x.key===key;})[0],e=it&&gtEv(it.k),o=e&&e.a[i];if(!o)return false;var c=gtCost(o,G);if(c>G.money)return false;if(c)pay(G,c,'personal');
  gtShut(G,it);var t=typeof o[2]==='function'?o[2](G,it):o[2];if(o[3])gtLog(G,t,'there'),gtThere(G,o[3]);else{T.no++;trAdd(G,{drive:.3});gtLog(G,t,'no');}return t;}
@@ -2712,6 +2712,8 @@ function momentAnswer(G,yes){var M=G.me,c=M.cur,m=c&&momentById(c.id);if(!m)retu
  M.cur=null;log(G,yes?m.done:'You said no to Grandma this time');return true;}
 function personalDay(G){var M=G.me;if(!M)return;var now=Math.floor(G.day);
  if(!M.on){if(meReady(G)){M.on=1;M.next=now+7;M.mNext=now+20;}return;}
+ // Grandma sleeps on the ship after Leave Earth: no moments, calls or Check on Grandma events (Pass 171)
+ if(G.voyage){M.cur=null;if(M.call)M.call=null;return;}
  M.per=7;pickFromOld(M);dayMigrate(M);lifeDay(G);landDay(G);if(now>=M.next){M.next=now+M.per;personalWeek(G);}
  M.nl=M.nl||{};['y'].forEach(function(l){if(!laneOpen(G,l))return;if(M.nl[l]==null)M.nl[l]=now+lanePer(l);if(now>=M.nl[l]){M.nl[l]=now+lanePer(l);personalPeriod(G,l);}});
  var rt=G.ps&&G.ps.t>0?G.ps.t:now*3000;
@@ -5798,7 +5800,7 @@ function spaceSend(){var f=$('space-if'),V=G&&G.voyage;if(!f||!f.contentWindow||
 function spaceShow(){var ov=$('space-ov'),f=$('space-if');if(!ov||!G.voyage||!G.voyage.sealed)return;if(!f.src)f.src='space.html?v='+BUILD;else spaceSend();ov.hidden=false;document.body.classList.add('space-on');}
 function spaceHide(){var ov=$('space-ov');if(ov)ov.hidden=true;document.body.classList.remove('space-on');save(true);render();}
 window.addEventListener('message',function(e){var d=e.data,f=$('space-if');if(!d||!d.space||typeof G==='undefined'||!G||!f||e.source!==f.contentWindow)return;
- if(d.type==='ready')spaceSend();else if(d.type==='trip'){if(voyageTrip(G,d.trip))save(true);}else if(d.type==='back')spaceHide();});
+ if(d.type==='ready')spaceSend();else if(d.type==='trip'){if(voyageTrip(G,d.trip))save(true);}else if(d.type==='back'){spaceHide();if(landOpen(G))landShow();}});
 function landHide(){if(G&&G.left)return;var ov=$('land-ov');if(ov)ov.hidden=true;document.body.classList.remove('land-on');LAND.on=false;clearInterval(LAND.t);save(true);render();}
 window.addEventListener('message',function(e){var d=e.data,f=$('land-if');if(!d||!d.land||typeof G==='undefined'||!G||!f||e.source!==f.contentWindow)return;
  if(d.type==='ready')landSend();
@@ -5808,7 +5810,7 @@ window.addEventListener('message',function(e){var d=e.data,f=$('land-if');if(!d|
  else if(d.type==='give'){landGive(G,d.list);if(d.seq)LAND.seq=d.seq;landSend();}
  else if(d.type==='care'){careDone(G,'land');}
  else if(d.type==='tank'){landTank(G,d);if(d.seq)LAND.seq=d.seq;landSend();}
- else if(d.type==='back')landHide();
+ else if(d.type==='back'){landHide();if(G.voyage&&G.voyage.sealed)spaceShow();}
  else if(d.type==='menu'&&G.left)$('btn-settings').click();});
 // ----- You: free time and Grandma -----
 var meBack='tank';
@@ -5839,7 +5841,7 @@ function renderMe(){var M=G.me,b=$('tb-me');if(!M)return;b.hidden=!M.on;b.classL
  if(cache.mepk!==ph){cache.mepk=ph;$('me-picks').mhtml=ph;}
  setT('me-hint',M.moved?'You live in the capital now. Checking on Grandma is a call. Seeing her is the yearly trip home.':'');
  var v=Math.round(M.visits||0),c=Math.round(M.calls||0);setT('me-gsum',!GT_OPEN&&!(M.trip>now)?'':M.trip>now?(M.tripWhy==='boat'?'Away on the coast until ':'Away with Grandma until ')+gtFmt(M.trip):v||c?[v?v+(v===1?' visit':' visits'):'',c?c+(c===1?' call':' calls'):''].filter(Boolean).join(' · '):'');
- if(activeTab!=='me')GT_OPEN=0;var T=gtOf(G),m=M.cur&&momentById(M.cur.id),mh='<div class="me-mbtn gt-top"><button class="btn primary'+(M.call?' need':'')+'" data-act="gt-check">Check on Grandma</button></div>';
+ if(activeTab!=='me'||G.voyage)GT_OPEN=0;var T=gtOf(G),m=M.cur&&momentById(M.cur.id),mh=G.voyage?'<p class="gt-last">Grandma is asleep on the ship.</p>':'<div class="me-mbtn gt-top"><button class="btn primary'+(M.call?' need':'')+'" data-act="gt-check">Check on Grandma</button></div>';
  if(GT_OPEN){var any=0,its=[];if(GT_LAST)mh+='<p class="gt-last">'+GT_LAST+'</p>';
   if(M.call==='lesson'){any=1;its.push('<div class="me-mom gp-call"><p><b>Grandma called.</b> “Can I tell you the only thing I know about business? Don’t be scared of growing. Supply is how many shrimp you have and how many kits you can pack. Demand is how many orders come in. Keep those two even and you can grow as big as you like.”</p><div class="me-mbtn"><button class="btn primary" data-act="gp-call-ok">Thanks, Grandma</button></div></div>');}
   if(m){any=1;var yc=m.cost?' · '+aed(m.cost(G)):'';its.push('<div class="me-mom"><p>'+m.t+'</p><div class="me-mbtn"><button class="btn" data-act="mom-yes">'+m.yes+yc+'</button><button class="btn" data-act="mom-no">'+m.no+'</button></div></div>');}

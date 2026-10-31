@@ -801,5 +801,13 @@ if(!html.includes('voy:G.voyage?1:0')||!home.includes("VOY?'Space':'Company'"))t
 if(!html.includes('Preparing for settlement…')||!sp.includes('Preparing for settlement…'))throw Error('Pass 170: landing stops at Preparing for settlement');
 if(!home.includes('data-mir')||!home.includes("{id:'fence',name:'Fence'")||!home.includes('function gmSeats'))throw Error('Pass 170: land mirror tool, made fences, Grandma on made chairs');}
 count++;console.log('PASS Pass 170 cleanup after the planet search');
+check('Pass 171: Grandma sleeps on the ship, no Check on Grandma events after leaving Earth',`
+var g=readyGame();g.me=g.me||newMe();g.me.on=1;g.voyage={day:1,pts:{cash:0,sci:0,kits:0}};g.me.cur={id:'x',t:0,d:0};g.me.call='gt';var q0=JSON.stringify(gtOf(g).q);
+for(var i=0;i<400;i++){g.day+=1;personalDay(g);}if(g.me.cur||g.me.call||JSON.stringify(gtOf(g).q)!==q0||gtCheck(g))throw Error('Grandma events after leaving');
+`);
+{const sp=fs.readFileSync(path.join(__dirname,'../shrimp/space.html'),'utf8');
+if(/planets you passed|were better|Best of all/.test(sp)||!sp.includes('⌂ Home'))throw Error('Pass 171: no rank against other planets on landing, Home button on the ship');
+if(!html.includes("else if(d.type==='back'){spaceHide();if(landOpen(G))landShow();}")||!html.includes("if(G.voyage&&G.voyage.sealed)spaceShow();"))throw Error('Pass 171: ship Home goes to the land, the land goes back to the ship');}
+count++;console.log('PASS Pass 171 ship goes home to the land, landing has no rank');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

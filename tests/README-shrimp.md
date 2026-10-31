@@ -1488,3 +1488,13 @@ Tests: balance 114 (old checks for the dream hand-off, `spaceOpen` and old-Space
 
 Before deploy: balance 114, academy 9, me 46, space search 5, bots as in Pass 170, Space bot passes, spotlight sweep 116 all good, layout scan only the known 2 px win World chart label, monkey 60 random taps on six stages (start, first hatch, farm license, a million, win, landed ship) at 360 and 390 px with no page errors, NaN or sideways scroll. In the browser: leaving from the year 17 hard part hides the header goal; landing screen shows Preparing for settlement…; the land's back button reads ‹ Space. home.html and space.html are current. Not seen on a real phone.
 
+
+## Pass 171: the ship goes home to the land, no rank on landing, Grandma asleep (31 Oct)
+
+Puti, from the test save.
+1. Landing no longer says how many planets were better, and the rank chart is gone: the ship wouldn't know. One line instead: stopped at flyby N, distance from the Sun. `rankOf` stays in the sim for the tests and the Space bot.
+2. The ship's top-left button is ⌂ Home (was ‹ Space, which went to the company): it opens Grandma's land. After launch the land's ‹ Space opens the ship, so the company view is out of the loop once the ship has left. Before launch the land still goes back to the Space tab to pack the ship.
+3. After Leave Earth no Grandma moments, calls or Check on Grandma events: `personalDay` returns early and clears `M.cur`/`M.call`, `gtCheck` refuses, the You page says Grandma is asleep on the ship.
+
+Tests: balance 116 (new Pass 171 checks), academy 9, me 46, space search 5, Space bot passes. Browser at 390 px: launch, ship Home opens the land, land ‹ Space opens the ship, no page errors. Not deployed.
+Open question for Puti: the planet list has 7 of the 45 worlds in Bohl et al. 2026 (plus K2-18 b, which isn't in it), and TOI-715 b, one of the paper's two best targets, is missing. Grandma still sits in her armchair on the land while she sleeps on the ship.

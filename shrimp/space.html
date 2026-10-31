@@ -41,7 +41,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:15px/1
 </head>
 <body>
 <canvas id="sky"></canvas>
-<div id="top"><button class="back" id="back" aria-label="Back to Space">‹ Space</button><span id="fuel"></span><span id="wish"></span></div>
+<div id="top"><button class="back" id="back" aria-label="Grandma’s land">⌂ Home</button><span id="fuel"></span><span id="wish"></span></div>
 <div id="panel"></div>
 <script>
 // ==SPACE-SIM-START==
@@ -211,13 +211,13 @@ function show(){chips();if(!V||!T){panel.innerHTML='<p class="sub">Waiting for t
  h+=nextHTML();panel.innerHTML=h;draw();}
 function wishLine(p){return T.w.map(function(id){var w=WISH.filter(function(x){return x.id===id;})[0],f=wishFit(p,id);return w.name+', '+(f>=.8?'yes':f>=.3?'partly':'no');}).join('. ')+'.';}
 function wake(f){return f>=80?'Grandma wakes up, looks out for a long time and says it will do.':f>=60?'Grandma wakes up. She says it’s not what she pictured, then asks where the robots should start.':f>=40?'Grandma wakes up and asks if this is really it. Then she asks for her hat.':'Grandma wakes up, looks out and says nothing for a while. She asks for tea.';}
-function landHTML(){var p=here(T,V),R=rankOf(T,V),h='',nP=R.pass.length+1,nA=R.after.length;
+function landHTML(){var p=here(T,V),R=rankOf(T,V),h='';
  h+='<div class="hd"><h2>'+esc(p.name)+'</h2><small class="sub">'+STAR[p.star]+', '+lyS(p.ly)+'</small></div>';
  h+='<p>Fit for Grandma: <b>'+R.fit+'</b> of 100.</p><ul class="facts"><li><b>Heat</b> '+tempText(p.t)+'</li><li><b>Air</b> '+airText(p.air)+'</li><li><b>Water</b> '+waterText(p)+'</li><li><b>Ground</b> '+massText(p)+'</li><li><b>Star</b> '+(p.flare?'Flares often.':'Quiet.')+'</li><li><b>Days</b> '+(p.lock?'One side always faces the star.':'Days and nights.')+'</li><li><b>Life</b> '+(p.rocky||p.life?lifeText(p.life):'Nothing the ship can see.')+'</li></ul>';
  h+='<p>She asked for: '+wishLine(p)+'</p><p>'+wake(R.fit)+'</p>';
  
- var ttl=(R.place===1?'Best of the '+nP+' planets you passed.':'Number '+R.place+' of the '+nP+' planets you passed.')+' '+(nA?(R.betterAfter?R.betterAfter+' of the '+nA+' after it, with the fuel left, were better.':'None of the '+nA+' after it was better.'):'No fuel left to go further.');
- h+='<p class="ttl">'+ttl+'</p><canvas id="rank" aria-label="Fit of every planet passed and after"></canvas><p class="sub">Every planet in every star cone, up to where you stopped (grey) and as far as the fuel left would have gone (rings). '+(R.best?'Best of all: '+esc(R.best.name)+', '+R.best.f+', flyby '+R.best.s+'.':'')+'</p>';
+ // No rank against other planets (Puti, 31 Oct): the ship only knows what it looked at.
+ h+='<p class="sub">Stopped at flyby '+T.s+', '+lyS(p.ly)+' from the Sun.</p>';
  h+='<p>'+(!p.rocky?'No ground. '+(V.robots?V.robots+(V.robots===1?' robot waits':' robots wait')+' in orbit. ':''):(V.robots?V.robots+(V.robots===1?' robot starts':' robots start')+' on the ground. ':'No robots. ')+'Shrimp and moss go in first. ')+'</p><p class="prep">Preparing for settlement…</p>';
  return h;}
 function drawRank(c){var R=rankOf(T,V),w=c.clientWidth,h=c.clientHeight,d=DPR;c.width=w*d;c.height=h*d;var g=c.getContext('2d');g.setTransform(d,0,0,d,0,0);
