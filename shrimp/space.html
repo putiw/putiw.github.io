@@ -43,7 +43,9 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:15px/1
 .known{height:3.9em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;font-size:13px;line-height:1.3;margin:6px 0;cursor:pointer}
 #panel:not(.tall) .facts{margin:4px 0 0}
 .facts li{height:35px;margin:0;align-items:center;grid-template-columns:84px 1fr;font-size:13px;line-height:1.25;overflow:hidden}
-.facts li>span.v{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* one line each, swipe sideways to read the rest (Puti, 31 Oct) */
+.facts li>span.v{white-space:nowrap;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:6px 0;mask-image:linear-gradient(90deg,#000 88%,transparent)}
+.facts li>span.v::-webkit-scrollbar{display:none}
 #kfull{position:fixed;left:12px;right:12px;z-index:4;background:#0d0f18f2;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px;color:#c9c7bf}
 .facts .scan{font:inherit;font-size:13px;background:#1a1e2c;color:var(--ink);border:1px solid #343a50;border-radius:7px;padding:4px 9px;cursor:pointer;justify-self:start}
 .facts .scan:disabled{opacity:.4;cursor:default}
