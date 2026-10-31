@@ -116,7 +116,15 @@ function needBar(){var b=$('lneed');if(!NEED){if(b)b.remove();return;}if(!b){b=d
 window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||!S)return;
   if(d.type==='cash'){S.cash=d.cash;FROZEN=d.frozen||'';if(!!d.left!==!!LEFT||!!d.voy!==!!VOY){LEFT=d.left?1:0;VOY=d.voy?1:0;window.GM_AWAY=!!VOY;leftBack();}var nd=d.need||'';if(nd!==NEED){NEED=nd;needBar();}gameTime(d.day);updateHeader();}
   if(d.type==='own')syncOwn(d);
-  if(d.type==='job')jobFromGame(d.id);});
+  if(d.type==='job')jobFromGame(d.id);
+  if(d.type==='vis')landVis(!!d.on);
+  if(d.type==='mute')muteFromGame();});
+// One mute for the company, the land and Space (Pass 181): the game's 'shrimp-music' key, '0' is muted.
+// The game tells the land when it's shown or hidden; hidden, the land's sound stops, so only one page plays music.
+function gameMuted(){try{return localStorage.getItem('shrimp-music')==='0';}catch(e){return false;}}
+function muteFromGame(){var m=gameMuted();S.opt.sound=!m;sfxMute(m);if(AC&&!m&&!window.LAND_HID&&AC.state==='suspended')AC.resume();sfxAmbient();}
+function landVis(on){window.LAND_HID=!on;if(AC){try{if(!on)AC.suspend();else if(S.opt.sound&&!document.hidden)AC.resume();}catch(e){}}sfxAmbient();}
+window.addEventListener('storage',function(e){if(S&&e.key==='shrimp-music')muteFromGame();});
 // shrimp that leave your tank here leave it in the game too
 var _move=netMoveTo;netMoveTo=function(T2){var T=ownT(),N=netList(),a=0,y=0,giv=[];if(T&&T2)N.forEach(function(e){if(T2!==T&&e.from===T.id){if(e.ind.age>=ADULT_DAYS)a++;else y++;}if(T2===T&&e.from!==T.id)giv.push({age:e.ind.age,g:gOf(e.ind)});});_move(T2);if(a+y)post({type:'take',adults:a,young:y,seq:++SEQ});if(giv.length)post({type:'give',list:giv,seq:++SEQ});};
 // shrimp from the stream trap put in Your tank go to the game's Tank 1 too (Pass 172: they were dropped at the next sync)
@@ -173,7 +181,9 @@ var _setTab=setTab;setTab=function(t,arg){var r=_setTab.apply(this,arguments);do
 var _save=save;save=function(now){if(S)S.savedAt=Date.now();return _save(now);};
 var _toast=toast,quiet=0;toast=function(){if(quiet)return;return _toast.apply(this,arguments);};
 var _boot=boot;boot=function(data){quiet=1;try{_boot(data);}finally{quiet=0;}
-  shell();S.seen.hello=1;S.seen.cash1m=1;S.speed=1;S.opt.company='none';
+  shell();S.opt.sound=!gameMuted();$('tb-mute').classList.toggle('muted',!S.opt.sound);
+  $('tb-mute').onclick=function(){var m=!gameMuted();try{localStorage.setItem('shrimp-music',m?'0':'1');}catch(e){}S.opt.sound=!m;sfxUnlock();sfxMute(m);save();post({type:'mute',off:m?1:0});};
+  S.seen.hello=1;S.seen.cash1m=1;S.speed=1;S.opt.company='none';
   if(!S.land||!S.land.fresh){var c=S.cash;window.landFresh();S.cash=c;}
   S.stage=3;
   setTab(S.tab==='tank'?'tank':'home');updateHeader();save(true);post({type:'ready'});
