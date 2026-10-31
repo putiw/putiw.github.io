@@ -49,10 +49,11 @@ function sfxLoop(name){if(!AC||!S||!S.opt.sound)return {set:function(){},stop:fu
  try{if(name==='siphon'){var s=noiseSrc(),f=AC.createBiquadFilter();f.type='bandpass';f.frequency.value=700;f.Q.value=1.4;s.connect(f);f.connect(g);s.start();nodes.push(s);
    var lfo=AC.createOscillator(),lg=AC.createGain();lfo.frequency.value=7;lg.gain.value=260;lfo.connect(lg);lg.connect(f.frequency);lfo.start();nodes.push(lfo);}
   else if(name==='mower'){var o=AC.createOscillator(),f2=AC.createBiquadFilter();o.type='sawtooth';o.frequency.value=72;f2.type='lowpass';f2.frequency.value=420;o.connect(f2);f2.connect(g);o.start();nodes.push(o);var s2=noiseSrc(),f3=AC.createBiquadFilter();f3.type='bandpass';f3.frequency.value=2400;f3.Q.value=0.6;var g3=AC.createGain();g3.gain.value=0.25;s2.connect(f3);f3.connect(g3);g3.connect(g);s2.start();nodes.push(s2);}
+  else if(name==='wipe'){var s6=noiseSrc(),f6=AC.createBiquadFilter();f6.type='bandpass';f6.frequency.value=1900;f6.Q.value=0.8;s6.connect(f6);f6.connect(g);s6.start();nodes.push(s6);}
   else if(name==='bubbles'){var s3=noiseSrc(),f4=AC.createBiquadFilter();f4.type='lowpass';f4.frequency.value=380;f4.Q.value=6;s3.connect(f4);f4.connect(g);s3.start();nodes.push(s3);}
   else if(name==='wind'){var s4=noiseSrc(),f5=AC.createBiquadFilter();f5.type='lowpass';f5.frequency.value=500;s4.connect(f5);f5.connect(g);s4.start();nodes.push(s4);var l2=AC.createOscillator(),lg2=AC.createGain();l2.frequency.value=0.08;lg2.gain.value=250;l2.connect(lg2);lg2.connect(f5.frequency);l2.start();nodes.push(l2);}
  }catch(e){}
- var peak={siphon:0.22,mower:0.12,bubbles:0.16,wind:0.05}[name]||0.1;
+ var peak={siphon:0.22,mower:0.12,bubbles:0.16,wind:0.05,wipe:0.09}[name]||0.1;
  return {set:function(l){if(AC)g.gain.setTargetAtTime(peak*clamp(l,0,1),AC.currentTime,0.06);},stop:function(){if(!AC)return;g.gain.setTargetAtTime(0,AC.currentTime,0.08);setTimeout(function(){nodes.forEach(function(n){try{n.stop();}catch(e){}});g.disconnect();},500);}};}
 var OUTDOOR=null;
 function outdoorAmb(on){if(!AC)return;if(on&&!OUTDOOR){OUTDOOR=sfxLoop('wind');OUTDOOR.set(1);}else if(!on&&OUTDOOR){OUTDOOR.stop();OUTDOOR=null;}}

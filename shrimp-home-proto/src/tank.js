@@ -189,7 +189,7 @@ function tvDraw(){var x=TV.cv.getContext('2d'),W=TV.W,H=TV.H,T=TV.T,t=TV.t,g=tvG
   if(T.level<0.999){var wy=H*WATER_TOP+(1-T.level)*H*(SAND_TOP-WATER_TOP);var gr=x.createLinearGradient(0,0,0,wy);gr.addColorStop(0,'#e8f4f4');gr.addColorStop(1,'#d5ebee');x.fillStyle=gr;x.fillRect(0,0,W,wy);
     x.strokeStyle='rgba(90,150,170,.8)';x.lineWidth=1.4;x.beginPath();for(var px=0;px<=W;px+=6)x.lineTo(px,wy+Math.sin(px*0.08+t*2)*1.2);x.stroke();}
   if(TOY&&TOY.drawTop)TOY.drawTop(x,g,t);}
-function drawPests(x,T,t){var W=TV.W,H=TV.H;T.pests.forEach(function(p){var px=p.x*W,py=p.y*H;if(p.k==='snail'){var r=6*p.sz*Math.max(1,W/420);
+function drawPests(x,T,t){var W=TV.W,H=TV.H;T.pests.forEach(function(p){if(!(p.sz>0))p.sz=1;if(!isFinite(p.a))p.a=0;var px=p.x*W,py=p.y*H;if(!isFinite(px)||!isFinite(py))return;if(p.k==='snail'){var r=6*p.sz*Math.max(1,W/420);
    if(p.kind==='ramshorn')drawRamshorn(x,px,py,r*0.85,p.a);else drawBladder(x,px,py,r,p.a,t+p.id);}
   else{var len=11*p.sz*Math.max(1,W/420),ang=p.a;x.save();x.translate(px,py);x.rotate(ang);x.fillStyle='rgba(245,240,232,.92)';x.beginPath();x.moveTo(len/2,0);x.lineTo(len/2-2.6,-1.6);x.quadraticCurveTo(-len/3,-1.6,-len/2,0);x.quadraticCurveTo(-len/3,1.6,len/2-2.6,1.6);x.closePath();x.fill();x.strokeStyle='rgba(120,110,96,.9)';x.lineWidth=0.6;x.stroke();
    x.fillStyle=INK;x.beginPath();x.arc(len/2-2.4,-0.6,0.45,0,6.283);x.arc(len/2-2.4,0.6,0.45,0,6.283);x.fill();x.restore();}});}
@@ -315,7 +315,7 @@ var tankMod={name:'tank',
   // jobs: only the most pressing one glows
   var nd=needs(T),ids=nd.map(function(n){return n.id;}),tray=S.opt.toys==='tray';var show=tray?TOYS.map(function(t){return t.id;}):ids;
   if(!TOY){var jb='';
-   if(show.length){jb+='<div class="toys">';TOYS.forEach(function(t){if(show.indexOf(t.id)<0)return;var n=nd.find(function(z){return z.id===t.id;});jb+='<button class="btn'+(n?' need':'')+(n&&n===nd[0]&&!T.own?' glow':'')+'" data-toy="'+t.id+'"><canvas data-icon="'+t.id+'" width="56" height="44"></canvas>'+t.name+'<small>'+(n?n.t:t.idle(T))+'</small></button>';});jb+='</div>';}
+   if(show.length){jb+='<div class="toys">';TOYS.forEach(function(t){if(show.indexOf(t.id)<0||t.own&&!T.own)return;var n=nd.find(function(z){return z.id===t.id;});jb+='<button class="btn'+(n?' need':'')+(n&&n===nd[0]&&!T.own?' glow':'')+'" data-toy="'+t.id+'"><canvas data-icon="'+t.id+'" width="56" height="44"></canvas>'+t.name+'<small>'+(n?n.t:t.idle(T))+'</small></button>';});jb+='</div>';}
    else jb+='<p class="hint">Nothing needs doing. The tank is fine for now.</p>';
    side+=card('jobs',tray?'Jobs':'Needs doing',nd.length?plural(nd.length,'job'):'all good',jb);}
   // wellbeing: one bar and a word; the parts are behind ?
