@@ -239,6 +239,15 @@ These come from Puti's feedback. Treat them as requirements.
 - World is split into University, Media, Politics and Nature, one thing per track at a time.
 - Films: the player picks what each film is really about. Effects are hidden, the Shrimp Times reviews it.
 
+**The screen never moves when you press a button** (Puti, 31 Oct, Pass 180: her worst issue, a rule for all future work)
+- No scroll tied to a tap, ever. The only scrolls left are spotlights and the guide's once-per-cue scroll (skipped for 2 s after any tap), and a jump to a card when a link takes you to another tab (`finGo`, the earth line). Every `focus()` has `{preventScroll:true}`.
+- Every box keeps its size whatever its text or state. Buttons stay in the same spot: on the right of their row in a fixed 112 px column (`itemHTML`), never dropped under the text. Labels don't wrap (ellipsis), descriptions are two lines, the full text is behind ? (`data-ht`). `.btns` rows don't wrap.
+- A button you can't use right now keeps its space (`visibility:hidden`) instead of vanishing. Grids keep their column count.
+- A card that changes state (offer, running, done) keeps one skeleton: same rows, same button places. The running film shows the three cuts with the picked one marked; a running campaign keeps the offer list with the days left on its button. If states can't share rows, reserve the tallest state's height (`slotMin`).
+- Things that come and go float over the page instead of pushing it: the story card (`#milestone-card`, a fixed sheet), help (`#helpsheet`), the Aquascape panel, the land's build palette. The job bar and the care buttons share one slot under the tank on both pages (`#tv-slot`, `#jobslot`).
+- Header numbers sit in fixed-width tabular slots. A tap never lets the page get shorter under you (`floorKeep`, freed on tab change).
+- Check every UI change with `tests/shrimp-stable.cjs`.
+
 **Shrimp**
 - Lifespans: about 90% of babies reach adulthood, 80% reach a year, 20% reach two years.
 - Cycling takes 3–5 game weeks.
@@ -260,7 +269,7 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 - [ ] The sticky header covers everything above it, nothing scrolls through a gap at the top (by hand on a phone).
 - [ ] Water care opens the first time the tank actually needs a change (nitrate over 20, KH under 2.5, GH under 5, ammonia or nitrite showing). Its spotlight lights only the Water button in the header, not the whole header.
 - [ ] When Water care is introduced the Water button pulses with it.
-- [ ] Milestone cards scroll so their top sits under the header, not the middle.
+- [ ] Milestone cards are a fixed sheet over the page, nothing scrolls when one opens (Pass 180).
 
 **Tank and shrimp**
 - [ ] Newborn shrimp are small white dots, juveniles pale pink, adults their grade colour (by hand, tank view). The Chapter 2 Babies card says white dots that get redder with each molt.
@@ -402,6 +411,7 @@ Before adding or changing a feature, trace its existing state and every consumer
 3. Spotlight sweep in a real browser: `SPOT_RUN=<dir>/run-7.json node tests/shrimp-spotlights.cjs` after a strong bot run. Every spotlight on every tab at six stages.
    For Space changes, continue the strong bot's run with `ACADEMY_RUN=<dir>/run-7.json node tests/shrimp-space-playthrough.cjs` (leave, launch, search, land).
 4. Load the page at 390 px and 360 px wide and look at screenshots of every tab at several stages: the opening, first sale, kits, farm, a million owners, win, and the ending page. Check for console errors, overflow and cut-off text. For overflow, run `ACADEMY_RUN=<dir>/run-7.json node tests/shrimp-layout.cjs` first: start screen plus every snapshot at 320/360/390 px, every tab and details opened, flags anything wider than its card. Chromium only, so check date fields and other native inputs on an iPhone by hand. Load snapshots from the run json into the page (`G=snap;migrate(G);render()`).
+4b. Stable screen: `STABLE_RUN=<dir>/run-7.json node tests/shrimp-stable.cjs` after any UI change (390x844, presses every button at every stage, about 15 min with `STABLE_N=10`; `STABLE_STAGES`/`STABLE_TABS` to narrow it while working). Nothing may scroll or change the header.
 5. Sound needs a real http server (`python3 -m http.server` in `shrimp/`), `file://` can't fetch the mp3s.
 6. If you changed behaviour on purpose, update the matching test, and add a test for any new mechanic.
 7. Append a short section to `tests/README-shrimp.md`, bump `BUILD`, and keep this file's checklist true.
@@ -474,6 +484,8 @@ Do not report a feature as finished just because its new path works once. Check 
 ## Open work
 
 Planned and agreed with Puti, not built yet:
+
+**Stable screen, left over from Pass 180** (`tests/shrimp-stable.cjs` lists them): buying something that then leaves its list (equipment and treat rows once bought, projects, owner perks, coin buy) slides the next row into the button's place; the second tank adds the tank chips row to the header; the first gala adds the earth line to the header; opening the first store and the kit price − change their card's height; the first rack farm reshapes Farms. Decide with Puti whether bought rows should stay in place as Done.
 
 **Three big updates (agreed 31 Oct).** One chat per row, in this order. Rows marked parallel touch different files and can run at the same time as row 3; rows 3 and 4 both edit index.html, never at once. Pull before pushing, both chats append to this file and the changelog.
 

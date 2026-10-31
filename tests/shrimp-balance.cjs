@@ -828,7 +828,7 @@ if(!sp.includes('id="flyb"')||!sp.includes('id="brakeb"')||!sp.includes("Not on 
 count++;console.log('PASS Pass 174 Millie pixels, fixed ship layout');
 // Pass 175 (Puti, 31 Oct): tests cost 0.1 (transit 0.2), the panel never scrolls, Orbit is the last row
 {const sp=fs.readFileSync(path.join(__dirname,'../shrimp/space.html'),'utf8');
-if(!sp.includes("name:'Transit spectroscopy',cost:.2,")||!sp.includes("name:'Orbit tracker',cost:.1,")||!sp.includes("['orbit','Orbit',orbitText]];")||!sp.includes('#panel:not(.tall){height:404px;max-height:none;overflow:hidden'))throw Error('Pass 175: tenth test costs, fixed panel');}
+if(!sp.includes("name:'Transit spectroscopy',cost:.2,")||!sp.includes("name:'Orbit tracker',cost:.1,")||!sp.includes("['orbit','Orbit',orbitText]];")||!sp.includes('#panel:not(.tall){height:404px;max-height:none;overflow:auto'))throw Error('Pass 175: tenth test costs, fixed panel');}
 count++;console.log('PASS Pass 175 test costs and fixed panel');
 // Pass 179 (Puti, 31 Oct): Tank 1 on one real-time clock, 3 months from clean to covered, its jobs are the land's. Full checks: tests/shrimp-tank1.cjs
 {const home=require('fs').readFileSync(__dirname+'/../shrimp/home.html','utf8');

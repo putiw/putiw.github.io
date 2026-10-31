@@ -103,6 +103,9 @@ body.locked{overflow:hidden;overscroll-behavior:none}
 body.locked .lockzone{position:relative;z-index:41}
 body.locked .tabs{z-index:42}
 .lockbar{display:flex;gap:8px;align-items:center;background:var(--surface);border-radius:10px;padding:6px 8px;margin:0 0 8px}
+.jobslot{display:grid;margin:0 0 8px}.toys .btn[data-idle]{opacity:.55}.jobslot>*{grid-area:1/1;margin:0!important;min-width:0}.jobslot>.lockbar{visibility:hidden;align-self:start}.jobslot.on>.lockbar{visibility:visible}.jobslot.on>.toys,.jobslot.on>.toys *,.jobslot.net>.toys,.jobslot.net>.toys *,.jobslot.on>.netbar{visibility:hidden!important}.jobslot>.netbar{align-self:start;max-height:100%;overflow:auto}.jobslot>.jobnone{align-self:center;text-align:center}
+.lockbar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lockbar .btn{flex:0 0 auto;white-space:nowrap}
+#toypanel:not(:empty){position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:43;max-height:42vh;overflow:auto;padding:0 10px;max-width:580px;margin:0 auto}
 .netbar{display:flex;gap:6px 8px;align-items:center;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 8px;margin:-2px 0 8px}
 .netbar[hidden]{display:none}.netbar .nb-n{font:500 12.5px/1.3 var(--font-body);color:var(--ink-2);white-space:nowrap}.netbar .nb-n b{font-weight:600;color:var(--ink)}
 .netbar .nb-b{display:flex;gap:6px;flex-wrap:wrap;flex:1;justify-content:flex-end}
@@ -294,6 +297,7 @@ body.in-game #b-money{min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:cl
 body.in-game #tb-back i{font-style:normal}
 @media (max-width:410px){body.in-game #tb-back i{display:none}body.in-game #tb-back{width:36px;padding:6px 0;justify-content:center}body.in-game #b-money{font-size:16px}}
 /* tools sit on the map, bottom left, like the zoom buttons (28 Oct): small square slots, no labels, the line under the map says what the picked tool does */
+.landwrap .lpal{position:absolute;left:6px;right:6px;bottom:58px;z-index:6;margin:0;padding:6px!important;background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid var(--line);border-radius:10px;max-height:46%;overflow:auto!important;box-shadow:0 4px 14px rgba(0,0,0,.14)}.landwrap .lpal[hidden]{display:none}
 .landwrap .ltools{position:absolute;left:8px;bottom:8px;z-index:5;margin:0;gap:6px;justify-content:flex-start}
 .landwrap .tslot{flex:0 0 auto;width:44px;height:44px;padding:0;border-radius:9px;box-shadow:0 2px 0 #21181b}
 .landwrap .tslot .ticon{width:30px;height:30px}
@@ -1266,11 +1270,11 @@ function hobbyists(T){var n=T.shrimp.length;if(T.role!=='cull'||n<3||Math.random
   take.forEach(function(i){liftOut(T,i);});T.shrimp=T.shrimp.filter(function(i){return take.indexOf(i)<0;});S.stats.given=(S.stats.given||0)+k;tankLog(T,'A hobbyist took '+plural(k,'shrimp','shrimp')+', free');
   if(activeTab==='tank')toast('A hobbyist came by the '+(T.name==='Cull tank'?'cull tank':T.name)+' for '+plural(k,'shrimp','shrimp')+'. Free, for their own tank.',3200);if(T===TV.T)tvSync(true);}
 // the bar under the tank while there's something in the net
-function netBar(){var el=$('netbar');if(!el)return;var N=netList();if(!N.length||TOY){el.hidden=true;el.innerHTML='';el._h='';return;}
+function netBar(){var el=$('netbar');if(!el)return;var N=netList();if(!N.length||TOY){el.hidden=true;el.innerHTML='';el._h='';var js0=$('jobslot');if(js0)js0.classList.remove('net');return;}
   var T=S.tanks[S.sel],h='<span class="nb-n"><b>'+N.length+'</b> in the net</span><span class="nb-b">';
   if(!T||T.role!=='cull')h+='<button class="btn sm primary" data-net="cull">Move to cull tank</button>';
   S.tanks.forEach(function(t,ti){if(t.role==='cull'&&t!==T||t===T&&N.every(function(e){return e.from===t.id;}))return;h+='<button class="btn sm" data-net="'+ti+'">Move to '+esc(t.name)+'</button>';});
-  h+='<button class="btn sm" data-net="back">Put back</button></span>';if(el._h!==h){el.innerHTML=h;el._h=h;}el.hidden=false;}
+  h+='<button class="btn sm" data-net="back">Put back</button></span>';if(el._h!==h){el.innerHTML=h;el._h=h;}el.hidden=false;var js1=$('jobslot');if(js1)js1.classList.add('net');}
 function netStep(dt){var b=netBox();netList().forEach(function(e,k){var q=TV.netAg[e.ind.id];if(!q)return;q.ph+=dt;q.left-=dt;if(q.left<=0){var sp=netSpot(k);q.tx=sp[0];q.ty=sp[1];q.left=1.4+Math.random()*3.4;}
     q.x=clamp(q.x,b.x0,b.x1);q.y=clamp(q.y,b.y0,b.y1);var dx=q.tx-q.x,dy=q.ty-q.y,d=Math.hypot(dx,dy);if(d>1){var m=Math.min(d,dt*tvBase()*0.22);q.x+=dx/d*m;q.y+=dy/d*m;if(Math.abs(dx)>2)q.face=dx>0?-1:1;q.sp=1;}else q.sp=0;});
   TV.fly.forEach(function(f){f.t+=dt;if(f.t>=f.dur&&!f.over){f.over=1;if(f.done)f.done();}});TV.fly=TV.fly.filter(function(f){return !f.over;});}
@@ -1292,7 +1296,7 @@ var tankMod={name:'tank',
  day:function(d){S.tanks.forEach(function(T){tankDay(T,d);});netDay();if(activeTab==='tank'){tvSync();tankMod.renderSide();}var dot=$('tankdot');if(dot)dot.hidden=!(S.opt.toys==='need'&&anyNeeds());},
  show:function(){newLook();TV.capUntil=0;tankMod.render();tvStart();if(S.fromHome){S.fromHome=0;var tv=$('tv');if(tv){tv.classList.remove('fadein');void tv.offsetWidth;tv.classList.add('fadein');}}},
  hide:function(){tvStop();closeBubble();TV.hold=null;if(TOY)toyEnd();},
- render:function(){if(activeTab!=='tank')return;var el=$('p-tank');if(!el.querySelector('#tv-canvas')){el.innerHTML='<div class="tchips" id="tchips"></div><div class="lockzone" id="lockzone"><div class="lockbar" id="lockbar" hidden></div><div class="tv" id="tv"><canvas id="tv-canvas"></canvas><span class="tv-cap" id="tv-cap"></span></div><div class="netbar" id="netbar" hidden></div><div id="toypanel"></div></div><div id="tankside"></div>';
+ render:function(){if(activeTab!=='tank')return;var el=$('p-tank');if(!el.querySelector('#tv-canvas')){el.innerHTML='<div class="tchips" id="tchips"></div><div class="lockzone" id="lockzone"><div class="tv" id="tv"><canvas id="tv-canvas"></canvas><span class="tv-cap" id="tv-cap"></span></div><div class="jobslot" id="jobslot"><div class="toys" id="toybtns"></div><p class="hint jobnone" id="jobnone" hidden>Nothing needs doing. The tank is fine for now.</p><div class="netbar" id="netbar" hidden></div><div class="lockbar" id="lockbar"></div></div><div id="toypanel"></div></div><div id="tankside"></div>';
    TV.cv=$('tv-canvas');TV.L={};bindTv();}
   if(!S.tanks[S.sel])S.sel=0;tvSize();tvSync(true);tankMod.renderSide();netBar();tvStart();},
  renderSide:function(){if(activeTab!=='tank'||!$('tankside'))return;var T=S.tanks[S.sel];
@@ -1304,10 +1308,10 @@ var tankMod={name:'tank',
   var card=function(k,title,small,body,extra){return '<div class="card coll'+(shut[k]?' shut':'')+'" data-k="'+k+'"><div class="hd"><h2>'+title+'</h2><small>'+small+'</small>'+(extra||'')+'</div>'+body+'</div>';};
   // jobs: only the most pressing one glows
   var nd=needs(T),ids=nd.map(function(n){return n.id;}),tray=S.opt.toys==='tray';var show=tray?TOYS.map(function(t){return t.id;}):ids;
-  if(!TOY){var jb='';
-   if(show.length){jb+='<div class="toys">';TOYS.forEach(function(t){if(show.indexOf(t.id)<0||t.own&&!T.own)return;var n=nd.find(function(z){return z.id===t.id;});jb+='<button class="btn'+(n?' need':'')+(n&&n===nd[0]&&!T.own?' glow':'')+'" data-toy="'+t.id+'"><canvas data-icon="'+t.id+'" width="56" height="44"></canvas>'+t.name+'<small>'+(n?n.t:t.idle(T))+'</small></button>';});jb+='</div>';}
-   else jb+='<p class="hint">Nothing needs doing. The tank is fine for now.</p>';
-   side+=card('jobs',tray?'Jobs':'Needs doing',nd.length?plural(nd.length,'job'):'all good',jb);}
+  // Pass 180: the job buttons sit in a fixed slot under the tank. Every job this tank can have keeps its place, ones not needed now are invisible, and the job bar takes the same slot.
+  var jb='',any=false;TOYS.forEach(function(t){if(t.own&&!T.own)return;var on=show.indexOf(t.id)>=0,n=nd.find(function(z){return z.id===t.id;});if(on)any=true;jb+='<button class="btn'+(n?' need':'')+(n&&n===nd[0]&&!T.own?' glow':'')+'" data-toy="'+t.id+'"'+(on?'':' data-idle="1"')+'><canvas data-icon="'+t.id+'" width="56" height="44"></canvas>'+t.name+'<small>'+(n?n.t:t.idle(T))+'</small></button>';});
+  var tbx=$('toybtns');if(tbx&&tbx._h!==jb){tbx.innerHTML=jb;tbx._h=jb;tbx.querySelectorAll('canvas[data-icon]').forEach(function(cv){var t=TOYS.find(function(z){return z.id===cv.dataset.icon;});var x=fitCanvas(cv,28,22);cv.style.width='28px';cv.style.height='22px';t.icon(x,28,22);});}
+  if($('jobnone'))$('jobnone').hidden=true;
   // wellbeing: one bar and a word; the parts are behind ?
   if(scoreMode()){var wb=wellbeing(T),wt=wb.total,low=wt<50,open=!!TV.wbHelp;
    var bar='<div class="wbar"><i style="width:'+wt+'%;background:'+(wt>=75?'#2f7a45':wt>=50?'#7d9b53':'#b23a2e')+'"></i><b style="left:50%"></b></div>';
@@ -1357,7 +1361,7 @@ function bindTv(){var cv=TV.cv,down=null;
     else if(b.dataset.toy){sfx('click');toyStart(b.dataset.toy);}
     else if(b.dataset.dev==='wild'){var T2=S.tanks[S.sel];var list=[];for(var k=0;k<6;k++)list.push(breedWild());addToTank(T2,list,'stream');toast('6 wild shrimp added to '+T2.name);tvSync(true);tankMod.renderSide();}
     else if(b.dataset.rename!=null)renameTank();});}
-function renameTank(){var T=S.tanks[S.sel];openSheet({title:'Rename',keepTime:true,html:'<input id="rn-in" maxlength="24" style="width:100%;font:15px var(--font-body);padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2)"><div class="btns"><button class="btn primary" id="rn-ok">Save</button></div>',mount:function(el,api){var i=$('rn-in');i.value=T.name;i.focus();$('rn-ok').onclick=function(){var v=i.value.replace(/[<>]/g,'').trim();if(v)T.name=v.slice(0,24);api.close();};}});}
+function renameTank(){var T=S.tanks[S.sel];openSheet({title:'Rename',keepTime:true,html:'<input id="rn-in" maxlength="24" style="width:100%;font:15px var(--font-body);padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2)"><div class="btns"><button class="btn primary" id="rn-ok">Save</button></div>',mount:function(el,api){var i=$('rn-in');i.value=T.name;i.focus({preventScroll:true});$('rn-ok').onclick=function(){var v=i.value.replace(/[<>]/g,'').trim();if(v)T.name=v.slice(0,24);api.close();};}});}
 // Tap a shrimp to net it, tap one in the net to put it back. With a card open, a tap just closes it.
 function tvTap(p){if(TV.bubbleFor){closeBubble();return;}
   if(netList().length&&inNet(p)){var k=netAt(p);if(k>=0)netReturn(k);return;}
@@ -1378,7 +1382,7 @@ function openBubble(a){closeBubble();var i=a.ind,T=TV.T;TV.bubbleFor=i.id;var el
     if(k==='sell'&&!b.dataset.sure){b.dataset.sure='1';b.textContent='Tap again to sell · '+fmtA(shopPrice(i));setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent='Pet shop · '+fmtA(shopPrice(i));}},3000);return;}
     if(k==='sell'){liftOut(T,i);var pr=sellShrimp(T,i);sfx('coin');toast('Sold to the pet shop for '+fmtA(pr));closeBubble();tvSync(true);tankMod.renderSide();}
     else if(k==='move'){ex.innerHTML='<div class="btns">'+S.tanks.map(function(t,ti){return t===T?'':'<button class="btn" data-mv="'+ti+'">'+esc(t.name)+'</button>';}).join('')+'</div>';}
-    else if(k==='name'){ex.innerHTML='<div class="btns"><input maxlength="14" style="flex:1;min-width:0;font:14px var(--font-body);padding:6px 8px;border:1px solid var(--line);border-radius:8px" value="'+esc(i.name||'')+'"><button class="btn" data-nm>Save</button></div>';ex.querySelector('input').focus();}
+    else if(k==='name'){ex.innerHTML='<div class="btns"><input maxlength="14" style="flex:1;min-width:0;font:14px var(--font-body);padding:6px 8px;border:1px solid var(--line);border-radius:8px" value="'+esc(i.name||'')+'"><button class="btn" data-nm>Save</button></div>';ex.querySelector('input').focus({preventScroll:true});}
     else if(b.dataset.mv!=null){}});
   el.addEventListener('click',function(e){var mv=e.target.closest('[data-mv]');if(mv){var to=S.tanks[+mv.dataset.mv];liftOut(T,i);moveShrimp(i,T,to);toast('Moved to '+to.name);sfx('plop');closeBubble();tvSync(true);tankMod.renderSide();}
     var nm=e.target.closest('[data-nm]');if(nm){var v=el.querySelector('input').value.replace(/[^A-Za-z0-9 .'-]/g,'').trim().slice(0,14);i.name=v;closeBubble();toast(v?'Named '+v:'Name cleared');save();}});}
@@ -1393,10 +1397,10 @@ var TOYS=[
  {id:'trim',name:'Trim',idle:function(T){return overgrowth(T)>0.45?'growing':'neat';},icon:function(x,w,h){x.strokeStyle=INK;x.lineWidth=1.4;x.beginPath();x.arc(w*0.3,h*0.72,h*0.16,0,6.283);x.stroke();x.beginPath();x.arc(w*0.3,h*0.3,h*0.16,0,6.283);x.stroke();inkPath(x,[[w*0.4,h*0.64],[w*0.9,h*0.3]],{w:1.4,amp:0});inkPath(x,[[w*0.4,h*0.38],[w*0.9,h*0.72]],{w:1.4,amp:0});}},
  {id:'pests',name:'Pests',idle:function(T){var n=T.pests.length;return n?plural(n,'snail','snails'):'none';},icon:function(x,w,h){x.fillStyle='#8a4a30';x.beginPath();x.arc(w*0.55,h*0.6,h*0.22,0,6.283);x.fill();x.strokeStyle=INK;x.lineWidth=1.2;x.stroke();x.beginPath();x.arc(w*0.56,h*0.6,h*0.11,0,5.2);x.stroke();inkPath(x,[[w*0.18,h*0.08],[w*0.42,h*0.44]],{w:1.3,amp:0});inkPath(x,[[w*0.3,h*0.04],[w*0.46,h*0.42]],{w:1.3,amp:0});}},
  {id:'scape',name:'Aquascape',idle:function(T){return T.scape.length?plural(T.scape.length,'piece','pieces'):'empty';},icon:function(x,w,h){inkBlob(x,w*0.38,h*0.76,w*0.24,h*0.17,{fill:'#a9a9a3',seed:6,w:1.2});x.strokeStyle='#4f7f33';x.lineWidth=1.4;x.beginPath();x.moveTo(w*0.7,h*0.9);x.quadraticCurveTo(w*0.66,h*0.5,w*0.74,h*0.12);x.stroke();x.fillStyle='#7cbf4f';[0.3,0.5,0.7].forEach(function(t){x.beginPath();x.ellipse(w*0.72+(t*10%2?3:-3),h*(0.9-t*0.7),3,1.4,0.5,0,6.283);x.fill();});}}];
-function toyBar(html){var b=$('lockbar');if(!b)return;b.hidden=false;b.innerHTML=html;}
+function toyBar(html){var b=$('lockbar');if(!b)return;b.innerHTML=html;var js=$('jobslot');if(js)js.classList.add('on');}
 function lockOn(){document.body.classList.add('locked');if(!document.querySelector('.lockdim')){var d=document.createElement('div');d.className='lockdim';d.onclick=function(){if(TOY&&TOY.finish)TOY.finish();else if(TOY)toyEnd();};document.body.appendChild(d);}
-  var tv=$('tv');if(tv){tv.classList.add('locked');setTimeout(function(){var r=$('lockzone').getBoundingClientRect(),top=$('top').getBoundingClientRect().bottom+6;if(r.top<top||r.bottom>innerHeight-70)window.scrollBy({top:r.top-top,behavior:'smooth'});},30);}}
-function lockOff(){document.body.classList.remove('locked');var d=document.querySelector('.lockdim');if(d)d.remove();var tv=$('tv');if(tv)tv.classList.remove('locked');var b=$('lockbar');if(b){b.hidden=true;b.innerHTML='';}var tp=$('toypanel');if(tp)tp.innerHTML='';}
+  var tv=$('tv');if(tv)tv.classList.add('locked');}
+function lockOff(){document.body.classList.remove('locked');var d=document.querySelector('.lockdim');if(d)d.remove();var tv=$('tv');if(tv)tv.classList.remove('locked');var b=$('lockbar');if(b)b.innerHTML='';var js=$('jobslot');if(js)js.classList.remove('on');var tp=$('toypanel');if(tp)tp.innerHTML='';}
 function toyStart(id){if(TOY)toyEnd();var T=S.tanks[S.sel];closeBubble();
   if(id==='sponge')return openSponge(T);
   var mk={vac:vacToy,trim:trimToy,pests:pestToy,scape:scapeToy}[id];if(!mk)return;TOY=mk(T);TOY.id=id;TOY.T=T;hold();lockOn();if(TOY.start)TOY.start();tankMod.renderSide();}
@@ -3485,7 +3489,7 @@ function toolsHere(){var m=M(),has={},wild=false;m.g.forEach(function(g){has[g]=
   return TOOLS.filter(function(t){if(t.id==='mow')return has[G_GRASS]||has[G_MEADOW];if(t.id==='grain')return S.stage>=2;if(t.id==='rod')return wild;return true;});}
 function mountHome(){var p=$('p-home');ensureLand();
   p.innerHTML='<div class="card hcard"><div class="hd"><h2 id="h-name"></h2><small id="h-sub"></small><button class="qh" id="h-help" aria-label="How the home works">?</button></div><div class="hmove" id="h-move"></div></div>'+
-   '<div class="landwrap pixland" id="lwrap"><canvas id="land-cv"></canvas><div class="lzoom"><button class="lzb" id="lz-in" aria-label="Zoom in">+</button><button class="lzb" id="lz-out" aria-label="Zoom out">−</button></div><button class="lzb lhelp" id="lz-help" aria-label="How the land works">?</button><div class="lclock" id="lclock" hidden></div><div class="ltools" id="ltools" role="toolbar" aria-label="Tools"></div></div><div class="palette lpal" id="lpal" hidden></div><div class="lstat" id="lstat"></div>';
+   '<div class="landwrap pixland" id="lwrap"><canvas id="land-cv"></canvas><div class="lzoom"><button class="lzb" id="lz-in" aria-label="Zoom in">+</button><button class="lzb" id="lz-out" aria-label="Zoom out">−</button></div><button class="lzb lhelp" id="lz-help" aria-label="How the land works">?</button><div class="lclock" id="lclock" hidden></div><div class="ltools" id="ltools" role="toolbar" aria-label="Tools"></div><div class="palette lpal" id="lpal" hidden></div></div><div class="lstat" id="lstat"></div>';
   L.cv=$('land-cv');L.sizedCv=null;L.cv.addEventListener('pointerdown',onDown);L.cv.addEventListener('pointermove',onMove);L.cv.addEventListener('pointerup',onUp);L.cv.addEventListener('pointercancel',onUp);
   L.cv.addEventListener('contextmenu',function(e){e.preventDefault();});
   $('lz-in').onclick=function(){setZoom(1);};$('lz-out').onclick=function(){setZoom(-1);};$('lz-help').onclick=function(){$('h-help').onclick();};
@@ -3521,7 +3525,7 @@ function zoomK(){return ZOOMS[zoomI()];}
 function setZoom(d){var l=LS(),z0=zoomI(),z=clamp(z0+d,0,ZOOMS.length-1);if(z===z0)return;l.zoom=z;sfx('click');sizeCanvas();zoomBtns();save();}
 function zoomBtns(){var a=$('lz-in'),b=$('lz-out'),z=zoomI();if(a)a.disabled=z>=ZOOMS.length-1;if(b)b.disabled=z<=0;}
 function pickCpa(dpr){var d=dpr*0.6875;if(d>=1.75)return Math.round(d)/dpr;if(d>=1.2)return 1.5/dpr;return 1/dpr;}
-function sizeCanvas(){var wrap=$('lwrap');if(!wrap||!L.cv)return;var W=wrap.clientWidth,top=wrap.getBoundingClientRect().top,pal=$('lpal'),palH=pal&&!pal.hidden?78:0;
+function sizeCanvas(){var wrap=$('lwrap');if(!wrap||!L.cv)return;var W=wrap.clientWidth,top=wrap.getBoundingClientRect().top,pal=$('lpal'),palH=0;// Pass 180: the build palette floats over the map, the map keeps its size
   var tb=document.querySelector('.tabs'),tabsH=tb?tb.getBoundingClientRect().height:62,tl=$('ltools'),toolsH=tl&&tl.parentNode&&tl.parentNode.id==='lwrap'?4:(tl?tl.offsetHeight:50)+14;var H=Math.round(clamp(window.innerHeight-top-toolsH-34-palH-tabsH-10,250,660));
   var dpr=window.devicePixelRatio||1,cpa=zoomK()/dpr;if(Math.abs(H-L.cssH)<3&&W===L.cssW&&L.x&&L.sizedCv===L.cv&&cpa===L.cpa)return;L.sizedCv=L.cv;
   var mid=L.VW?[L.cam.x+L.VW/2,L.cam.y+L.VH/2]:null;L.cssW=W;L.cssH=H;L.dpr=dpr;L.cpa=cpa;L.s=1;// the canvas holds 2 pixels per art pixel (Pass 174), so people at 1.5x land on whole canvas pixels (3 per art pixel): Millie's eyes keep their shape

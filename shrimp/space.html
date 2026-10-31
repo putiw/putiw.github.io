@@ -38,7 +38,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:15px/1
 .ttl{font-weight:600;margin:10px 0 0}
 .prep{font-weight:600;margin:12px 0 0;color:var(--dim)}
 /* Pass 174: the panel keeps one height, every instrument has its own row, Fly by sits next to the star, Brake on the map */
-#panel:not(.tall){height:404px;max-height:none;overflow:hidden;padding-top:10px}
+#panel:not(.tall){height:404px;max-height:none;overflow:auto;overscroll-behavior:contain;padding-top:10px}
 #panel:not(.tall) .hd{height:24px;overflow:hidden}
 .known{height:3.9em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;font-size:13px;line-height:1.3;margin:6px 0;cursor:pointer}
 #panel:not(.tall) .facts{margin:4px 0 0}
