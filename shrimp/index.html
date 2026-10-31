@@ -398,7 +398,7 @@ h1,h2,h3,h4,summary,button,.btn,label,th,.scope-label{text-wrap:balance}p,li,sma
 #milestone-actions>[data-act=sandbox],#milestone-actions>[data-act=sandbox]~.btn{flex:1 1 40%}
 .rl-btns .btn{white-space:normal;padding:6px 5px;text-align:left}.rl-btns .btn small{white-space:nowrap}.rl-btns .rl-x{width:24px}@media(max-width:380px){.rl-btns .btn{padding:6px 4px;font-size:11.5px}.rl-btns .btn small{font-size:10px}.rl-btns .rl-x{width:22px}}
 .rl-hd{flex-wrap:wrap;row-gap:0}.rl-line>.rl-hd span{flex:1 1 auto}.rl-hd small{margin-left:auto}
-.coin-kv{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.coin-kv>*,.kv>*{text-wrap:balance}
+.coin-kv{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.ctl.hard-give{grid-template-columns:80px minmax(0,1fr) 44px;margin:8px 0}.hard-sales{margin:6px 0 10px}.coin-kv>*,.kv>*{text-wrap:balance}
 .item:has(.no-btn){align-items:start}
 .seg>button:not(.btn){flex:1 1 0}.ow-design .seg{flex:1 1 auto}
 @media(max-width:480px){.ctl{grid-template-columns:96px 30px minmax(0,1fr) 30px 58px}}@media(max-width:370px){.ctl{grid-template-columns:92px 30px minmax(0,1fr) 30px 58px}.ctl label{font-size:12.5px}}
@@ -3346,12 +3346,68 @@ function hardDay(G){var E=G.emp,H=hardOf(G),now=Math.floor(G.day);
   if(o.scandal&&p.start!=null&&!p.sc&&now-p.start>=180){p.sc=1;if(Math.random()<.5){newsLine(G,o.scandal);moodAdd(G,-8,60);}}
   if(p.quiet&&now>=p.quiet){p.quiet=0;newsLine(G,o.news);newsLine(G,'Progress steady. People who die don’t need a tank.');if(G.me){G.me.gpSilent=now+365;}}
  });});
+ var kd=kitDemand(G);if(kd>(H.pk||0))H.pk=kd;giveDay(G,H,now);
  if(!E.won&&!E.ended&&H.goal!=='stream'&&G.humans>=hardTarget(G)-0.5)hardWin(G);}
 function hardLines(G){var H=G.emp.hard;if(!H)return [];var o=[];HARD.forEach(function(g){var P=H.picks[g.id]||{};g.ops.forEach(function(x){var p=P[x.id];if(p&&(p.start!=null||!x.f)&&x.end)o.push(x.end);});});
  if(H.picks.never&&H.picks.never.deliver&&!H.picks.never.deliver.quiet)o.push('Mira read about the village in the forest. She stopped coming to the house.');
  if(H.goal==='stream')o.unshift('There’s a stream with wild shrimp in it a short walk from most homes now. Kids catch them with nets and let them go. Hardly anyone needs a tank anymore, and nobody minds.');
  else if(H.open){var gl=HARD_GOALS.filter(function(x){return x.id===H.goal;})[0];if(gl&&gl.id==='sheet')o.unshift('One tank per home, on average. One man in Shenzhen has 400 million of them.');if(gl&&gl.id==='none')o.unshift('You stopped counting homes. The groups you helped are still helped.');if(gl&&gl.id==='enough')o.unshift('Most homes have a tank. You decided that was enough.');}
- return o;}
+ return o.concat(giveLines(G)).concat(nourLines(G));}
+// ----- The ledger (Pass 166): your fortune next to what real things cost. Every number has its source here. -----
+var USD_AED=3.6725;// the dirham is pegged to the dollar at 3.6725 (Central Bank of the UAE)
+var LEDGER={
+ wash:28.4e9*USD_AED,// Basic water, sanitation and hygiene for everyone, capital cost about US$28.4B a year 2015-2030 (range 13.8-46.7). Hutton and Varughese 2016, World Bank WSP, The Costs of Meeting the 2030 SDG Targets on Drinking Water, Sanitation, and Hygiene.
+ safe:114e9*USD_AED,// Safely managed water and sanitation (SDG 6.1 and 6.2), about US$114B a year. Same report.
+ power:15e9*USD_AED,// Electricity for everyone in Africa by 2035, about US$15B a year. IEA, Financing Electricity Access in Africa (2025).
+ lifeLo:3500*USD_AED,lifeHi:5500*USD_AED,// Average cost per life saved, GiveWell top charities, 2022-2024 grants: US$3,500 (vitamin A) to 5,500 (malaria nets). givewell.org/charities/top-charities, updated Oct 2026.
+ noWater:2.1e9,// People without safely managed drinking water at home, 2024. WHO/UNICEF JMP, Progress on Household Drinking Water and Sanitation 2000-2024 (Aug 2025).
+ noPower:6.66e8,// People without electricity, 2023. Tracking SDG 7: The Energy Progress Report 2025.
+ africa:6e8// People in Africa without electricity, about 600 million. IEA, Financing Electricity Access in Africa (2025).
+};
+// What you give is a share of the company's daily profit, never below the cash it needs to run. It goes out in batches of about three months.
+// Each batch lands a year or two later, and not all of it arrives. A third each to water, power and health. You fund, you don't fix.
+var GIVE_LOSS=['A pipe contract stalls when the builder goes bust. The pipes sit in a yard.','Pumps break in the first dry season. Nobody nearby has the part.','A grant waits at a border for eight months.','An official takes a cut. The audit finds it a year later.','Solar kits arrive without the cables.'];
+function giveDay(G,H,now){var E=G.emp;if(E.won||E.ended||G.left)return;var q=H.gq||(H.gq=[]);
+ for(var i=q.length-1;i>=0;i--)if(now>=q[i].due)giveLand(G,H,q.splice(i,1)[0]);
+ if(H.give>0&&!frozen(G)){var a=Math.min(Math.max(0,operatingNet(G)||0)*H.give,Math.max(0,G.money-capitalReserve(G)));if(a>=1){pay(G,a,'projects');H.gv=(H.gv||0)+a;H.bt=(H.bt||0)+a;}}
+ if(H.bs==null)H.bs=now;
+ if(now-H.bs>=91){if(H.bt>=1)q.push({a:H.bt,due:now+365+Math.floor(Math.random()*365)});H.bt=0;H.bs=now;}}
+function giveLand(G,H,b){var bad=Math.random()<.15,f=bad?Math.random()*.3:.4+Math.random()*.5,r=b.a*f,t=r/3;H.got=(H.got||0)+r;H.lost=(H.lost||0)+b.a-r;
+ var lo=Math.floor(t/LEDGER.lifeHi),hi=Math.floor(t/LEDGER.lifeLo),wd=Math.floor(t/LEDGER.wash*365),pw=Math.floor(t/LEDGER.power*365),parts=[];
+ if(hi>=1)parts.push((lo===hi?'about '+cnt(hi):'about '+cnt(lo)+' to '+cnt(hi))+' lives saved');
+ if(wd>=1)parts.push(wd+(wd===1?' day':' days')+' of the world’s water and toilets bill');
+ if(pw>=1)parts.push(pw+(pw===1?' day':' days')+' of power lines in Africa');
+ newsLine(G,'Of '+fmtA(b.a)+' you gave a year or two ago, '+fmtA(r)+' arrived'+(parts.length?': '+parts.join(', '):'')+'.');
+ if(f<.6){var war=hardOf(G).picks.war,peace=war&&Object.keys(war).some(function(k){return war[k].start!=null;});newsLine(G,!peace&&Math.random()<.3?'Money for the river towns can’t get in while the war is on.':GIVE_LOSS[Math.floor(Math.random()*GIVE_LOSS.length)]);}
+ addHeart(G,.5);}
+function giveLines(G){var H=G.emp.hard;if(!H||!(H.gv>=1))return [];var w=(H.gq||[]).reduce(function(s,x){return s+x.a;},0)+(H.bt||0);return ['You gave '+fmtA(H.gv)+'. '+fmtA(H.got||0)+' of it arrived'+(w>=1?', '+fmtA(w)+' was still on its way':'')+'.'];}
+
+// ----- Nour, Mira's cousin (Pass 166): one household trying to keep a jar, back in the country Mira's family left. -----
+// Six cards over the hard part. What you fund helps her at her scale, or it doesn't.
+function nourOf(G){return G.emp.nour||(G.emp.nour={n:14});}
+function nourDue(G,d){var E=G.emp,H=E.hard;return !!(H&&H.open&&!E.won&&!E.ended&&!G.left&&G.story&&G.story.miraDay!=null&&!(H.picks.never&&H.picks.never.deliver)&&Math.floor(G.day)-(H.day||0)>=d);}
+function nourStarted(G,g,o){var p=(hardOf(G).picks[g]||{})[o];return !!(p&&p.start!=null);}
+MILESTONES.nour1={story:1,title:'Mira’s cousin',tab:'world',body:'Mira holds her phone up to your tank. On the screen is her cousin Nour, twelve, back in the country Mira’s family left. Nour has a jar with fourteen red shrimp in it, from a pet shop that buys your kits second hand.\n\nThe power there is on about six hours a day. When it goes off, so does the air pump. Nour wants to know what to do at night.',
+ opts:function(G){return [['Send her a battery air pump','It takes seven weeks and a customs fee her dad pays. Batteries cost money there too.','pump'],['Tell her to fill the jar with plants and feed less','Nour fills the jar with moss from a ditch and feeds every other day. She sends a photo every morning.','plants'],['Tell her shrimp can take a night without a pump','Mostly true. She stops asking.','fine']];},
+ pick:function(G,i){nourOf(G).how=['pump','plants','fine'][i];return true;}};
+MILESTONES.nour2={story:1,title:'Water on a truck',tab:'world',body:'',bodyFn:function(G){var H=hardOf(G),s='Nour’s family buys water from a truck. It fills a tank on the roof once a week, and the price went up again. A water change for the jar is half a bucket, and that’s half a bucket her mother doesn’t wash with.\n\nNour uses the water from rinsing rice.';
+ if(H.got>0)s+='\n\nSome of the water money you gave went to her district. It paid for a pipe that reaches the next street over, not hers.';
+ else if(nourStarted(G,'water','wells')||nourStarted(G,'water','desal')||nourStarted(G,'water','trucks'))s+='\n\nThe water you paid for went to villages a long way from her street. The truck on her street charges what it charged.';
+ return s;}};
+MILESTONES.nour3={story:1,title:'Summer',tab:'world',body:'',bodyFn:function(G){var N=nourOf(G),how=N.how,s='It’s 47 °C where Nour lives. The power is on four hours a day now.\n\n',d=0;
+ if(hardOpReach(G,hardOp(hardGroup('hot'),'grid'),(hardOf(G).picks.hot||{}).grid)>.5)s+='The solar farm you paid for is three hundred kilometres away. Her street gets two more hours of power than last summer, and the fan runs in the afternoon.';
+ else if(nourStarted(G,'hot','panel'))s+='A panel that came with someone’s kit is on her balcony now. It runs the fan over the jar, not the one over her bed.';
+ else{d=5;s+=(nourStarted(G,'hot','clay')?'She put the jar in a wet clay pot. It’s humid there, it doesn’t help much. ':'')+'Five shrimp died in a week. She keeps the rest in the bathroom, the coolest room in the flat.';}
+ if(how==='fine'){d+=2;s+='\n\nThe power was off a whole day in July. Two more died that night.';}else if(how==='pump')s+='\n\nThe battery pump runs every night, on batteries her dad brings home from work.';else s+='\n\nThe moss is doing what a pump would.';
+ if(!N.d3){N.d3=1;N.n=Math.max(2,N.n-d);}return s;}};
+MILESTONES.nour4={story:1,title:'Moving',tab:'world',body:'',bodyFn:function(G){return 'Nour’s family is moving to her uncle’s, in a city nine hours away by bus. The landlord sold the building. The jar has '+nourOf(G).n+' shrimp in it.';},
+ opts:function(G){var n=nourOf(G).n,k=Math.max(1,n-3);return [['Pay for a car instead of the bus','Her dad says yes on the third try. The jar rides on Nour’s lap with the air on, all '+n+' make it. He pays you back over a year, a little every month.','car'],['Let them take the bus','Nine hours, the jar in a wet towel on her knees. '+k+' of '+n+' make it.','bus'],['Tell her to give the jar to a friend','She gives it to the girl downstairs. She cries on the bus, Mira says, not about the shrimp.','gave']];},
+ pick:function(G,i){var N=nourOf(G);N.move=['car','bus','gave'][i];if(i===1)N.n=Math.max(1,N.n-3);if(i===2)N.n=3;return true;}};
+MILESTONES.nour5={story:1,title:'Generator hours',tab:'world',body:'',bodyFn:function(G){var N=nourOf(G),H=hardOf(G),s=(N.move==='gave'?'Nour started again with three shrimp from a man at the market.\n\n':'')+'Her uncle’s building runs on a generator. Families pay for it by the hour. Nour’s jar gets two hours of the pump a night, paid from her pocket money.\n\nShe sells babies to two kids on the fourth floor. It covers the generator.';
+ if(H.got>0&&H.give>=.25)s+='\n\nSome of what you gave went to solar for clinics in her country. Her uncle’s building isn’t a clinic.';
+ if(!N.d5){N.d5=1;N.n+=20;}return s;}};
+MILESTONES.nour6={story:1,title:'Nour is fifteen',tab:'world',body:'',bodyFn:function(G){return 'Nour is fifteen. She wants to study water engineering, and asks Mira if you think that’s a good idea.\n\nThe jar has about '+nourOf(G).n+' shrimp in it. She counts them for you on the call, slowly, and gets a different number twice.';}};
+function nourLines(G){var p=G.progress||{},s=p.seen||{};if(!s.nour1)return [];var N=G.emp.nour||{};return [s.nour6?'Nour wants to study water engineering. Her jar runs on two hours of generator a night.':N.move==='gave'?'Nour gave her jar away when her family moved. She kept a photo.':'Nour, Mira’s cousin, keeps a jar of shrimp through the power cuts.'];}
 
 // ----- Shrimpcoin: one coin for each mangrove tree planted -----
 // A green token. Companies, countries and people buy it to show off, then to trade it. You plant the trees, the coins come to you.
@@ -3414,7 +3470,7 @@ function coinDay(G){var C=coinOf(G),now=Math.floor(G.day);treesDay(G);if(!C.on)r
 function coinLaunch(G,honest){var C=coinOf(G);if(C.on)return false;C.on=1;C.honest=honest?1:0;C.day=Math.floor(G.day);coinPreMint(G);trAdd(G,honest?{kin:.5,know:.5}:{drive:1,means:-.5,know:-.3});log(G,'Launched shrimpcoin, one coin per mangrove tree');return true;}
 function coinLines(G){var C=G.emp.coin;if(!C||!C.on)return [];var o=[];var tt=C.trees+(C.otrees||0);if(tt>=1e6)o.push(cnt(tt)+' mangrove trees were planted for shrimpcoin'+(C.otrees>C.trees?', most of them by villages and farmers who did the sums':'')+(C.honest?'.':', and a lot of them only on paper.'));if(C.caught)o.push('Shrimpcoin is a word people use for a scam now.');else if(C.earned>C.spent*2&&C.earned>1e8)o.push('Shrimpcoin paid for a lot of the company’s later years.');return o;}
 
-function cards3Cond(G){var o={};Object.keys(CARDS3).forEach(function(k){var c=CARDS3[k];o[k]=!G.emp.won&&!G.emp.ended&&(c.cond?c.cond(G):G.humans>=c.at);});Object.keys(TREES).forEach(function(k){o['tree_'+k]=treeHas(G,k);});o.hardpart=hardOpen(G)&&!G.emp.won&&!G.emp.ended;o.coin_offer=G.humans>=1e8&&!G.emp.won&&!G.emp.ended;Object.keys(PAINS).forEach(function(id){o[id]=painOpen(G,id)&&kitsOpen(G);});o.gp_land=!!(G.me&&G.me.on&&(G.me.sent||0)>=5e5&&!(G.me.gpSilent>G.day))&&!landOpen(G)&&!G.emp.ended;o.gp_scam=!!(G.me&&G.me.tour&&G.day>=G.me.tour)&&!G.emp.ended;o.party1=qHad(G)&&G.day>=90&&(allN(G)>=500||everyShrimp(G)>=500)&&G.emp.regions.indexOf('eu')<0&&!G.emp.won&&!G.emp.ended;o.party2=G.emp.regions.indexOf('eu')>=0&&!!(G.me&&G.me.on)&&!G.emp.won&&!G.emp.ended;o.stream=streamReady(G)&&!G.emp.won&&!G.emp.ended;return o;}
+function cards3Cond(G){var o={};Object.keys(CARDS3).forEach(function(k){var c=CARDS3[k];o[k]=!G.emp.won&&!G.emp.ended&&(c.cond?c.cond(G):G.humans>=c.at);});Object.keys(TREES).forEach(function(k){o['tree_'+k]=treeHas(G,k);});o.hardpart=hardOpen(G)&&!G.emp.won&&!G.emp.ended;o.coin_offer=G.humans>=1e8&&!G.emp.won&&!G.emp.ended;Object.keys(PAINS).forEach(function(id){o[id]=painOpen(G,id)&&kitsOpen(G);});o.gp_land=!!(G.me&&G.me.on&&(G.me.sent||0)>=5e5&&!(G.me.gpSilent>G.day))&&!landOpen(G)&&!G.emp.ended;o.gp_scam=!!(G.me&&G.me.tour&&G.day>=G.me.tour)&&!G.emp.ended;o.party1=qHad(G)&&G.day>=90&&(allN(G)>=500||everyShrimp(G)>=500)&&G.emp.regions.indexOf('eu')<0&&!G.emp.won&&!G.emp.ended;o.party2=G.emp.regions.indexOf('eu')>=0&&!!(G.me&&G.me.on)&&!G.emp.won&&!G.emp.ended;o.stream=streamReady(G)&&!G.emp.won&&!G.emp.ended;[45,200,380,560,760,1000].forEach(function(d,i){o['nour'+(i+1)]=nourDue(G,d)&&(i===0||!!(G.progress&&G.progress.seen['nour'+i]));});return o;}
 function card3Choose(G,key,i){var c=CARDS3[key],x=c&&c.ch[i];if(!x)return false;if(x[3]&&x[3](G)===false)return false;trAdd(G,x[2]);if(c.news&&c.news[i])newsLine(G,c.news[i]);(G.emp.c3||(G.emp.c3={}))[key]=i;if(key==='c_blackout'&&i===1)G.emp.batteryKitUnlocked=true;return true;}
 function card3Lines(G){var o=[],C=G.emp.c3||{};for(var k in C){var x=CARDS3[k]&&CARDS3[k].ch[C[k]];if(k==='c_mytank'&&C[k]===0&&tankLapsed(G))continue;if(x&&x[4])o.push(x[4]);}return o.concat(hardLines(G)).concat(coinLines(G));}
 // Headlines, no choice: the world moving on without asking you.
@@ -5800,13 +5856,33 @@ function renderHard(){var c=$('hard-card');if(!c)return;var open=hardOpen(G)&&!G
   $('hard-body').mhtml=h;return;}
  var at=Math.min(H.at||0,HARD.length);
  h+='<div class="hard-goal"><p>Goal: <b>'+gl.t+'</b>, '+big(hardTarget(G))+' people</p>'+(H.gline?'<p class="hint">Grandma: '+H.gline+'</p>':'')+'</div>';
+ h+=hardSalesHTML(G,H);
  if(at<HARD.length){var g=HARD[at],P=H.picks[g.id]||{},picked=Object.keys(P).length>0,nx=HARD[at+1];
   h+=hardGroupHTML(g,true);
   h+='<div class="btns hard-next"><button class="btn'+(picked?' primary':'')+'" data-act="hard-next">'+(nx?(picked?'Next: ':'Leave them for now. Next: ')+nx.name:(picked?'That was the last group':'Leave them for now'))+'</button></div>';}
  var seen=HARD.slice(0,at);
  if(seen.length)h+='<details class="hard-seen"'+(at>=HARD.length?' open':'')+'><summary>'+(at>=HARD.length?'All the groups':'Groups so far')+' ('+seen.length+')</summary>'+seen.map(function(g){return hardGroupHTML(g,false);}).join('')+'</details>';
+ h+=hardLedgerHTML(G,H);
  h+='<details class="hard-re"><summary>Rethink the goal</summary>'+hardGoalsHTML(false)+'</details>';
  $('hard-body').mhtml=h;}
+// Pass 166: the sales drop said plainly, and the ledger.
+function hardSalesHTML(G,H){var kd=kitDemand(G),pk=Math.max(H.pk||0,kd);return '<p class="hint hard-sales">Orders a day: <b>'+big(Math.round(kd))+'</b>'+(pk>kd*1.05?', down from '+big(Math.round(pk)):'')+'. The half of the world that can buy a tank has one. Most of the rest can’t. Food and care keep paying. You don’t have to finish this, going slowly or stopping is fine.</p>';}
+function hardLedgerHTML(G,H){var g=H.give||0,net=Math.max(0,operatingNet(G)||0),yr=net*365*g,L=LEDGER,pct=Math.round(g*100);
+ var cov=function(x){var r=yr/x;return r>=2?(Math.floor(r*10)/10)+' times over':r>=.01?Math.round(r*100)+'%':'less than 1%';};
+ var life=g<.9?'No change. Same house, same car.':g<1?'No change. The company stops saving for anything new.':'No change. The company runs on what’s left each day.';
+ var w=(H.gq||[]).reduce(function(a,x){return a+x.a;},0)+(H.bt||0);
+ return '<details class="hard-led"><summary>The ledger</summary><div class="coin-kv">'+
+  '<span>Your company holds</span><b>'+aed(G.money)+'</b>'+
+  '<span>It makes, after costs</span><b>'+aed(net*365)+' a year</b>'+
+  '<span>Basic water, toilets and soap for everyone who lacks them</span><b>'+aed(L.wash)+' a year</b>'+
+  '<span>Electricity for everyone in Africa</span><b>'+aed(L.power)+' a year</b>'+
+  '<span>One life saved, through the cheapest proven charities</span><b>AED '+big(L.lifeLo)+' to '+big(L.lifeHi)+'</b></div>'+
+  '<div class="ctl hard-give"><label for="hard-give">Give away</label><input type="range" id="hard-give" min="0" max="100" step="5" value="'+pct+'"><span class="v">'+pct+'%</span></div>'+
+  '<div class="coin-kv"><span>That is</span><b>'+aed(yr)+' a year</b>'+
+  (g>0?'<span>The water bill</span><b>'+cov(L.wash)+'</b><span>The power bill</span><b>'+cov(L.power)+'</b><span>Lives, a year</span><b>about '+big(Math.floor(yr/3/L.lifeHi))+' to '+big(Math.floor(yr/3/L.lifeLo))+'</b>':'')+
+  '<span>Your life</span><b>'+life+'</b>'+
+  (H.gv>=1?'<span>Given so far</span><b>'+aed(H.gv)+'</b><span>Arrived</span><b>'+aed(H.got||0)+'</b><span>Lost on the way</span><b>'+aed(H.lost||0)+'</b><span>Still on its way</span><b>'+aed(w)+'</b>':'')+'</div>'+
+  '<p class="hint">A third each to water, power and health. It lands a year or two later, and not all of it arrives. '+big(L.noWater)+' people have no safe water at home, '+big(L.noPower)+' have no electricity. Sources: WHO and UNICEF 2025, Tracking SDG 7 2025, IEA 2025, World Bank 2016, GiveWell 2026.</p></details>';}
 function coinChart(C){var h=C.hist.slice(-365);if(h.length<2)return '<p class="hint">The price chart starts tomorrow.</p>';var W=320,H=120,L=34,B=18,mn=Math.min.apply(null,h),mx=Math.max.apply(null,h);if(mx-mn<0.01){mx+=0.5;mn=Math.max(0,mn-0.5);}
  var X=function(i){return L+(W-L-6)*i/(h.length-1);},Y=function(v){return 6+(H-B-6)*(1-(v-mn)/(mx-mn));},d=h.map(function(v,i){return (i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1);}).join(''),ch=h[h.length-1]/h[0]-1;
  var title='Shrimpcoin is '+(ch>=0?'up ':'down ')+Math.round(Math.abs(ch)*100)+'% over '+(h.length>=365?'the last year':h.length+' days');
@@ -6119,6 +6195,7 @@ function initControls(){
     $('s-'+p[0]).addEventListener('input',function(e){var v=parseFloat(e.target.value);p[2](v);psNote('tw',p[0]);if(p[0]!=='price'&&p[0]!=='kitPrice')shareNow();setT('v-'+p[0],p[3](v));cache.kvsig=null;render();});
   });
   $('s-move').addEventListener('input',function(e){e.target.dataset.touched=1;setT('v-move',e.target.value);});
+  document.addEventListener('input',function(e){if(e.target&&e.target.id==='hard-give'&&hardOpen(G)){var H=hardOf(G),v=+e.target.value/100;if(v!==(H.give||0)){if(!H.give&&v)log(G,'Started giving away '+Math.round(v*100)+'% of profit');else if(!v)log(G,'Stopped giving');H.give=v;render();save();}}});
   $('t-ac').addEventListener('change',function(e){G.ac=e.target.checked;log(G,G.ac?'Turned the room AC on':'Turned the room AC off');render();});
   $('t-autoSell').addEventListener('change',function(e){G.opt.autoSellTouched=1;psNote('tw','autoSell');TK().set.autoSell=e.target.checked;shareNow();});
   $('t-autoDose').addEventListener('change',function(e){TK().set.autoDose=e.target.checked;psNote('tw','autoDose');});

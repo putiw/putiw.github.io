@@ -1425,3 +1425,13 @@ Row 1 of the three big updates. Land source on `shrimp-proto` (`shrimp-home-prot
 - Checked headless at 390 px: armchair, lawn, stone paving recolour, survive a reload, no page errors. Fast suites pass (107, 11, 46).
 - Not covered: room back walls and caps, Grandma and animals, step stones, sand pebbles, live parts (feeder seed, coop eggs).
 
+## Pass 166: hard part additions (31 Oct)
+
+Row 3 of the three big updates. Added, nothing in the ten groups changed.
+1. Sales drop said plainly: a line under the goal, orders a day now against the top since the hard part opened, the half that can buy has a tank, most of the rest can't, food and care keep paying, stopping is fine.
+2. The ledger (collapsed, in the hard part): company cash, profit a year, then sourced costs. Basic water, sanitation and hygiene for everyone US$28.4B a year (Hutton and Varughese 2016, World Bank), power for everyone in Africa US$15B a year (IEA 2025), a life saved US$3,500 to 5,500 (GiveWell, Oct 2026), 2.1B without safe water at home (WHO/UNICEF JMP 2025), 666M without power (Tracking SDG 7 2025). AED at the 3.6725 peg. A give-away slider in 5% steps, share of daily profit. Your life line says no change until 90%. At the bot's hard part profit (about AED 120B a year), 50% covers 57% of the world's basic water bill.
+3. Giving lands late and partly: 91-day batches, 1 to 2 years, 40 to 90% arrives, 1 in 7 batches mostly lost with a dry reason (border, broken pumps, a cut, missing cables, the war). Small heart gain per batch. Nothing given by default, so the bots don't change.
+4. Nour, Mira's cousin: six cards (jar and power cuts with a choice, water on a truck, summer, moving with a choice, generator hours, fifteen). Hard part options and the ledger change her lines, mostly by not reaching her street.
+
+Tests: balance 109 (new Pass 166 check: giving maths, reserve, late batches, Nour order and counts, sources in comments, no em-dashes), academy 11, me 46. Average bot seed 7: Earth 6,777 to 6,805 (six more story cards), all six Nour cards fire. Browser at 360 px from the hard part snapshot: no sideways scroll, no page errors, slider updates the share.
+Not done: the ? popup for the hard part doesn't mention the ledger. Not checked by Puti: Nour's wording, the ledger's lines.

@@ -737,5 +737,31 @@ g.me.gplace={land:1};if(!tankClock(g)||!milestoneConditions(g).landtime)throw Er
 [[/si=hcWait\?-1:/,'the sick guide waits for the health card'],[/var n=Math\.max\(1,Math\.min\(16,Math\.floor\(totalN\(T\)\)\)\)/,'health check shows the colony when under 16'],[/function tankPace\(\)\{return false;\}/,'the Tank tab does not slow the company']].forEach(function(r){if(!r[0].test(html))throw Error('Pass 163: '+r[1]);});
 if(/Tap the tank, then Check shrimp to find the sick ones/.test(html))throw Error('Pass 163: no extra Check shrimp spotlight after the health card');
 count++;console.log('PASS Pass 163 requests');
+check('Pass 166: the ledger gives late and partly, Nour writes six times, the sales drop is plain',`
+var g=readyGame();g.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};g.money=1e10;g.day=0;
+operatingNet=function(){return 1e8;};capitalReserve=function(){return 1e9;};
+var H=hardOf(g);for(var d=0;d<30;d++){g.day=d;giveDay(g,H,d);}if(H.gv)throw Error('Nothing is given at 0%');
+H.give=.5;var m0=g.money;for(d=30;d<130;d++){g.day=d;giveDay(g,H,d);}
+if(!(Math.abs(H.gv-100*5e7)<1))throw Error('Half the profit a day: '+H.gv);if(Math.abs(m0-g.money-H.gv)>1)throw Error('Giving comes out of cash');
+if(!(H.gq.length===1&&H.gq[0].due>=121+365&&H.gq[0].due<121+730))throw Error('A batch lands a year or two later: '+JSON.stringify(H.gq));
+g.money=1e9+3e7;for(d=130;d<140;d++){g.day=d;giveDay(g,H,d);}if(g.money<1e9-1)throw Error('Giving never eats the cash the company needs');
+var gv=H.gv;for(d=140;d<1000;d++){g.day=d;giveDay(g,H,d);}
+if(!(H.got>0&&H.lost>0))throw Error('Some arrives, some is lost');var w=H.gq.reduce(function(a,x){return a+x.a;},0)+H.bt;if(Math.abs(H.got+H.lost+w-H.gv)>1)throw Error('Given = arrived + lost + on its way');
+if(!giveLines(g)[0]||!/arrived/.test(giveLines(g)[0]))throw Error('The ending reads what was given');
+['wash','safe','power','lifeLo','lifeHi','noWater','noPower','africa'].forEach(function(k){if(!(LEDGER[k]>0))throw Error('Ledger number missing: '+k);});
+var n=readyGame();n.story.miraDay=1;n.emp.hard={open:1,goal:'home',picks:{},day:0};n.day=44;var c=cards3Cond(n);if(c.nour1)throw Error('Nour waits 45 days');
+n.day=2000;c=cards3Cond(n);if(!c.nour1||c.nour2)throw Error('Nour cards come one after another');
+ensureProgress(n).seen.nour1=1;MILESTONES.nour1.pick(n,2);if(!cards3Cond(n).nour2)throw Error('then the next');
+var b3=MILESTONES.nour3.bodyFn(n);if(nourOf(n).n!==7||!/Two more died/.test(b3))throw Error('No pump, no grid: 7 left, got '+nourOf(n).n);MILESTONES.nour3.bodyFn(n);if(nourOf(n).n!==7)throw Error('Deaths count once');
+n.emp.hard.picks.hot={grid:{start:0,day:0}};var k=readyGame();k.story.miraDay=1;k.emp.hard={open:1,picks:{hot:{grid:{start:0}}},day:0};k.day=2000;if(!/solar farm you paid for/.test(MILESTONES.nour3.bodyFn(k))||nourOf(k).n!==14)throw Error('The grid helps her street');
+MILESTONES.nour4.pick(n,1);if(nourOf(n).n!==4)throw Error('The bus loses three');
+var x=readyGame();x.story.miraDay=1;x.emp.hard={open:1,goal:'home',picks:{never:{deliver:{start:0}}},day:0};x.day=2000;if(cards3Cond(x).nour1)throw Error('Mira stopped coming after the village');
+ensureProgress(n).seen.nour6=1;if(!/water engineering/.test(nourLines(n)[0]))throw Error('Nour in the ending');
+var txt=['nour1','nour2','nour3','nour4','nour5','nour6'].map(function(k){var m=MILESTONES[k];return (m.bodyFn?m.bodyFn(n):m.body)+(m.opts?JSON.stringify(m.opts(n)):'');}).join(' ')+GIVE_LOSS.join(' ');
+if(/—/.test(txt))throw Error('No em-dashes');
+`);
+if(!html.includes("h+=hardSalesHTML(G,H);")||!html.includes("down from ")||!html.includes('id="hard-give"')||!html.includes('Sources: WHO and UNICEF 2025'))throw Error('Pass 166: sales line, give slider and sources in the hard part');
+for(const src of ['Hutton and Varughese 2016','Financing Electricity Access in Africa','givewell.org','WHO/UNICEF JMP','Tracking SDG 7'])if(!html.includes(src))throw Error('Pass 166: ledger source missing in a comment: '+src);
+count++;console.log('PASS Pass 166 hard part additions in the page');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
