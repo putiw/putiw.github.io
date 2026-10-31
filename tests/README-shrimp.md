@@ -1549,3 +1549,7 @@ Puti: the sky had 69 stops, she wanted 300, and more than one good planet to cho
 2. Real nearby planets are mostly too hot, so few are good. To make sure there are several for any wishes: more life on warm wet rocky planets, a bit more warming from air, some close-in planets turning slowly instead of locked (like Mercury), fewer red dwarfs flaring. Over all 120 orders of her three wishes, at least 3 planets score 80 or more and at least 5 score 75 or more (new test). TOI-700 d can reach 100.
 3. Space bot: settles at its best seen minus 5.
 Tests: space search 6, balance 120, academy 9, me 46, Space bot lands on TOI-700 d. Not deployed.
+
+## Deploy (31 Oct, Pass 171 to 177, BUILD 2026-10-31-real-sky)
+
+Before deploy: balance 120, academy 9, me 46, space search 6. Bots, seed 7: strong cold 2,215, strong kind 3,213, average Earth 6,805 (door day 5,882), all the same as the last deploy. Space bot passes (lands on TOI-700 d). Spotlight sweep 116 all good, layout scan only the known 2 px win World chart label, monkey 60 random taps on six stages (start, first hatch, farm license, a million, win, landed ship) at 360 and 390 px with no page errors, NaN or sideways scroll. home.html matches a fresh `build.py --game` of shrimp-proto (c32ac30), space.html parses. Not seen on a real phone.
