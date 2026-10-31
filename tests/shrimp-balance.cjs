@@ -754,14 +754,14 @@ var n=readyGame();n.story.miraDay=1;n.emp.hard={open:1,goal:'home',picks:{},day:
 n.day=2000;c=cards3Cond(n);if(!c.nour1||c.nour2)throw Error('Nour cards come one after another');
 ensureProgress(n).seen.nour1=1;MILESTONES.nour1.pick(n,2);if(!cards3Cond(n).nour2)throw Error('then the next');
 var b3=MILESTONES.nour3.bodyFn(n);if(nourOf(n).n!==7||!/Two more died/.test(b3))throw Error('No pump, no grid: 7 left, got '+nourOf(n).n);MILESTONES.nour3.bodyFn(n);if(nourOf(n).n!==7)throw Error('Deaths count once');
-n.emp.hard.picks.hot={grid:{start:0,day:0}};var k=readyGame();k.story.miraDay=1;k.emp.hard={open:1,picks:{hot:{grid:{start:0}}},day:0};k.day=2000;if(!/solar farm you paid for/.test(MILESTONES.nour3.bodyFn(k))||nourOf(k).n!==14)throw Error('The grid helps her street');
+n.emp.hard.picks.hot={grid:{start:0,day:0}};var k=readyGame();k.story.miraDay=1;k.emp.hard={open:1,picks:{hot:{grid:{start:0}}},day:0};k.day=2000;if(!/Your solar farm/.test(MILESTONES.nour3.bodyFn(k))||nourOf(k).n!==14)throw Error('The grid helps her street');
 MILESTONES.nour4.pick(n,1);if(nourOf(n).n!==4)throw Error('The bus loses three');
 var x=readyGame();x.story.miraDay=1;x.emp.hard={open:1,goal:'home',picks:{never:{deliver:{start:0}}},day:0};x.day=2000;if(cards3Cond(x).nour1)throw Error('Mira stopped coming after the village');
 ensureProgress(n).seen.nour6=1;if(!/water engineering/.test(nourLines(n)[0]))throw Error('Nour in the ending');
 var txt=['nour1','nour2','nour3','nour4','nour5','nour6'].map(function(k){var m=MILESTONES[k];return (m.bodyFn?m.bodyFn(n):m.body)+(m.opts?JSON.stringify(m.opts(n)):'');}).join(' ')+GIVE_LOSS.join(' ');
 if(/—/.test(txt))throw Error('No em-dashes');
 `);
-if(!html.includes("h+=hardSalesHTML(G,H);")||!html.includes("down from ")||!html.includes('id="hard-give"')||!html.includes('Sources: WHO and UNICEF 2025'))throw Error('Pass 166: sales line, give slider and sources in the hard part');
+if(!html.includes("$('hard-sales').mhtml=won?'':hardSalesHTML(G,H);")||!html.includes("days since the hard part opened")||!html.includes('id="hard-give"')||!html.includes('Sources: WHO and UNICEF 2025'))throw Error('Pass 166: sales line, give slider and sources in the hard part');
 for(const src of ['Hutton and Varughese 2016','Financing Electricity Access in Africa','givewell.org','WHO/UNICEF JMP','Tracking SDG 7'])if(!html.includes(src))throw Error('Pass 166: ledger source missing in a comment: '+src);
 count++;console.log('PASS Pass 166 hard part additions in the page');
 check('Pass 168: leaving Earth opens with the hard part and enough science, ends Earth, points buy the ship',`
@@ -840,5 +840,13 @@ count++;console.log('PASS Pass 179 one clock, one tank, slower mess');}
 if(home.includes("sfxLoop('wind')")||home.includes('outdoorAmb')||!home.includes("localStorage.getItem('shrimp-music')==='0'")||!home.includes("if(d.type==='vis')landVis(!!d.on);"))throw Error('Pass 181: land has no wind and shares the mute');
 if(!html.includes("k==='win'||k==='gameover'||LAND.seen[k]")||!html.includes("landPost({type:'vis',on:0});musicResume();")||!html.includes("landPost({type:'mute',off:off?1:0})"))throw Error('Pass 181: banner and audio');
 count++;console.log('PASS Pass 181 land banner, no wind, one mute');}
+check('Pass 183: the hard part is things you watch: weekly orders history, one-line groups, short Nour cards',`
+var g=readyGame();g.humans=4.1e9;g.day=3000;var H=hardOf(g);hardDay(g);if(!H.open)throw Error('opens at 4B');
+for(var i=0;i<30;i++){g.day++;hardDay(g);}if(!H.oh||H.oh.length!==5||H.oh[0][0]!==0||H.oh[1][0]!==7)throw Error('one orders point a week: '+JSON.stringify(H.oh));
+HARD.forEach(function(x){if(x.body.split('. ').length>1||x.body.length>95)throw Error('one sentence per group: '+x.name);});
+var n=readyGame();n.story.miraDay=1;n.emp.hard={open:1,goal:'home',picks:{},day:0};n.day=2000;
+['nour1','nour2','nour3','nour4','nour5','nour6'].forEach(function(k){var m=MILESTONES[k],t=m.bodyFn?m.bodyFn(n):m.body;if(t.length>230||/\\n/.test(t))throw Error(k+' is longer than two lines: '+t.length);});
+`);
+if(!html.includes("var HG_COLS=120")||!html.includes('id="hg-cv"')||!html.includes('id="nour-cv"')||html.includes("showAfter(ho.t,ho.news"))throw Error('Pass 183: people grid, Nour jar, no popup after a hard-part option');count++;
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
