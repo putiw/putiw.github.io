@@ -486,7 +486,7 @@ Planned and agreed with Puti, not built yet:
 - After that a standing button, any time, also after Earth is finished. Confirm screen: Earth ends, everything you have carries over.
 - After the start only two tabs: Grandma's land and Space.
 - Carried-over resources become points the player puts into fuel, scan instruments, robots and the like.
-- Decide in chat 4 how this sits with the current Space (search program, gene edit or terraform, seed ship, shrimp let go free), the seed ship launch needs, the Space bot and the professor ending line. Ask Puti before removing any of it.
+- The new space chapter replaces the current Space (search program, gene edit or terraform, seed ship, shrimp let go free). Puti, 31 Oct: it felt like pressing buttons for no meaning. Remove it as rows 4 to 6 land; until then keep it working. Update the Space bot, the endings that mention Space and the Pacing targets with it.
 
 *5, Space part 1, the planet search* (optimal stopping).
 - Grandma always wanted to be an astronaut. She is in frozen sleep; the ship's AI (the player) makes every call. Before she sleeps she says what she wants from a planet (a river, birds, warmth, quiet); "best" is scored against that.
