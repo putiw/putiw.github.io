@@ -679,10 +679,11 @@ if(!html.includes("gb[bandOf(k.g)]+=k.n;if(k.age>=75)"))throw Error('Puti: colon
 if(!html.includes("Math.round(kitCap(G)/Math.max(1,popOpen(G))*100)+'% of them want a tank"))throw Error('Regions percent matches the people figure');
 count++;console.log('PASS 30 Oct requests');
 // Pass 161: Tank 1's own clock, one shared tank with the land, monthly jobs, leaving after Space
-const OWN_SETUP=`function ownGame(){var g=readyGame(),T=g.tanks[0];T.had=1;T.cycledAt=0;T.feeder=1;T.autoWC=1;T.pop=[{n:30,age:120,g:60},{n:10,age:20,g:40}];g.me=g.me||newMe();g.me.on=1;g.me.keep='self';g.emp.farms.rack=1;g.money=1e6;g.tday=g.day;return g;}
+const OWN_SETUP=`function ownGame(){var g=readyGame(),T=g.tanks[0];T.had=1;T.cycledAt=0;T.feeder=1;T.autoWC=1;T.pop=[{n:30,age:120,g:60},{n:10,age:20,g:40}];g.me=g.me||newMe();g.me.on=1;g.me.keep='self';g.emp.farms.rack=1;g.money=1e6;g.me.gplace={balcony:1,house:1,land:1};g.tday=g.day;return g;}
 function run(g,n,k){for(var i=0;i<n;i++){g.progress.queue=[];g.emp.ended=null;stepGame(g,k);}}`;
 check('Pass 161: tank clock, 40x elsewhere moves Tank 1 a day per 40, the land and old saves',OWN_SETUP+`
-var g=readyGame();delete g.tday;run(g,8);if(g.tday!==g.day)throw Error('Before the farm the tank day is the company day');
+var g=readyGame();delete g.tday;run(g,8);if(g.tday!==g.day)throw Error('Before the land the tank day is the company day');
+var f=ownGame();delete f.me.gplace;f.tday=f.day;var fd=f.day;run(f,4*40,1/40);if(f.tday-fd!==40)throw Error('Pass 163: with the farm but no land, Tank 1 moves with the company: '+(f.tday-fd));
 var h=ownGame();h.tday=h.day;var d0=h.day,t0=h.tday;run(h,4*40,1/40);if(h.day-d0!==40||Math.round(h.tday-t0)!==1)throw Error('At 40x the company moves 40 days, the tank one: '+(h.day-d0)+' '+(h.tday-t0));
 d0=h.day;t0=h.tday;run(h,4*3);if(h.day-d0!==3||h.tday-t0!==3)throw Error('On the land (real time) and at 1x both move together');
 var o=ownGame();o.day=900;delete o.tday;migrate(o);if(o.tday!==900)throw Error('Old saves start the tank clock at the company day');
@@ -718,5 +719,23 @@ if(!home161.includes('function applyOwn(T,d)')||!home161.includes("post({type:LE
 count++;console.log('PASS Pass 161 requests');
 ['shrimp-playthrough','shrimp-average-playthrough','shrimp-space-playthrough'].forEach(function(f){if(!fs.readFileSync(path.join(__dirname,f+'.cjs'),'utf8').includes("require('./shrimp-bot-cards.cjs')"))throw Error('Bots answer every card, they never close one without a pick (Puti, 30 Oct): '+f);});
 count++;console.log('PASS bots pick on every card');
+// Pass 163 (Puti, 31 Oct): the third-floor buyer, health check size, land clock card
+check('Pass 163: a month after the first babies a neighbour buys 5, never breeders, AED 3 each',OWN_SETUP+`
+var g=readyGame(),T=g.tanks[0];T.had=1;T.cycledAt=0;g.me=g.me||newMe();
+T.pop=[{n:10,age:120,g:60,b:1},{n:4,age:3,g:40}];g.stats.bornDay=1;g.day=40;
+if(milestoneConditions(g).jar)throw Error('Only 4 that are not breeders, no card yet');
+T.pop.push({n:6,age:50,g:50});if(!milestoneConditions(g).jar)throw Error('Card once 5 spare shrimp a month after the babies');
+var spare=jarSpare(g),bought=T.pop[0].n,m0=g.money;if(!storyChoose(g,'jar',0))throw Error('Sell him 5 fails');
+if(T.pop[0].n!==bought)throw Error('Bought breeders were sold');if(Math.round(g.money-m0)!==15||g.stats.sold!==5)throw Error('Pays 15 for 5: '+(g.money-m0));
+if(jarSpare(g)!==spare-5)throw Error('Takes exactly 5');
+var k=readyGame();k.stats.bornDay=1;k.day=40;k.kits.sold=1;k.tanks[0].pop=[{n:20,age:50,g:50}];if(milestoneConditions(k).jar)throw Error('Not after kits');
+var o=readyGame();o.stats.born=9;delete o.stats.bornDay;o.day=200;migrate(o);if(o.stats.bornDay!==200)throw Error('Old saves before kits get it a month from now');`);
+check('Pass 163: the land starts the tank clock and brings Two clocks',`
+if(CARD_NOW.indexOf('health')<0)throw Error('health card is urgent');
+var g=readyGame();g.me=g.me||newMe();g.me.keep='self';g.emp.farms.rack=1;if(tankClock(g))throw Error('farm alone does not split the clocks');
+g.me.gplace={land:1};if(!tankClock(g)||!milestoneConditions(g).landtime)throw Error('land splits the clocks and brings Two clocks');`);
+[[/si=hcWait\?-1:/,'the sick guide waits for the health card'],[/var n=Math\.max\(1,Math\.min\(16,Math\.floor\(totalN\(T\)\)\)\)/,'health check shows the colony when under 16'],[/function tankPace\(\)\{return false;\}/,'the Tank tab does not slow the company']].forEach(function(r){if(!r[0].test(html))throw Error('Pass 163: '+r[1]);});
+if(/Tap the tank, then Check shrimp to find the sick ones/.test(html))throw Error('Pass 163: no extra Check shrimp spotlight after the health card');
+count++;console.log('PASS Pass 163 requests');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
