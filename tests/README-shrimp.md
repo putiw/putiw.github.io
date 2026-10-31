@@ -1553,3 +1553,16 @@ Tests: space search 6, balance 120, academy 9, me 46, Space bot lands on TOI-700
 ## Deploy (31 Oct, Pass 171 to 177, BUILD 2026-10-31-real-sky)
 
 Before deploy: balance 120, academy 9, me 46, space search 6. Bots, seed 7: strong cold 2,215, strong kind 3,213, average Earth 6,805 (door day 5,882), all the same as the last deploy. Space bot passes (lands on TOI-700 d). Spotlight sweep 116 all good, layout scan only the known 2 px win World chart label, monkey 60 random taps on six stages (start, first hatch, farm license, a million, win, landed ship) at 360 and 390 px with no page errors, NaN or sideways scroll. home.html matches a fresh `build.py --game` of shrimp-proto (c32ac30), space.html parses. Not seen on a real phone.
+
+## Pass 178: opening fixes (31 Oct)
+
+Puti, from a phone playthrough:
+1. The 4× spotlight after the first ammonia waits 5 s of play instead of 15 s (`spotlight(...,gap)`, `introOK(gap)`).
+2. The third-floor jar: his daughter names them Jimmy, Jack, Jimbo, Jojo and Jaja.
+3. "Your first shrimp sale" waited for the jar sale and came before her own first sale. It now fires on a sale beyond the jar (`G.stats.jarSold`).
+4. Supplies card only shows while a second tank still isn't cycled (`supNeed`). Seeded tanks made it empty, and its Bulk supplies line was stale.
+5. Another tank shows and costs AED 150. The ready sheet still asks for the auto feeder and water changer before Got it, with "I'll buy them later" as the other way out (gear stays due, buy it in Gear).
+From the bot review of the opening:
+6. The "Your tank is cycled, buy your first shrimp" card is dropped if shrimp already went in while it waited its turn.
+7. A tab the player already opened gets no "Trade is open" spotlight later.
+Tests: balance 122, academy 9, me 46. Not deployed.

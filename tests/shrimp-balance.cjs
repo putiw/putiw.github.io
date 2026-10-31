@@ -252,7 +252,7 @@ var m1=kitMaterials(g);setQCStrict(g,2);if(!(kitMaterials(g)>m1))throw Error('St
 `);
 if(html.includes("needs '+big(nextLine.sold)")||html.includes('show up once your first three tanks')||html.includes('Bacteria starter unlocks when'))throw Error('Unlock rules should not be shown');
 if(!html.includes("bar.hidden=true;\n  if(!g)return;")||!html.includes("$('ideas-now').hidden=!soft"))throw Error('Guide lines belong in the ? popup, never a bar over the game (Puti, 28 Oct)');
-if(!html.includes("if(SPOT||SPOTQ.length||!introOK())return;")||!html.includes("if(!s.now&&!introOK())"))throw Error('One spotlight at a time');
+if(!html.includes("if(SPOT||SPOTQ.length||!introOK())return;")||!html.includes("if(!s.now&&!introOK(s.gap))"))throw Error('One spotlight at a time');
 check('player decides: room-based gates, any mix of tanks',`
 var g=readyGame();g.stats.sold=KIT_UNLOCK;var t=g.tanks[0];t.had=1;t.vol=80;t.volTier=2;t.pop=[{age:100,n:20,g:60}];if(!kitsOpen(g))throw Error('One 80 L tank should be enough room for kits');
 t.vol=40;t.volTier=1;if(kitsOpen(g))throw Error('Kits still need some room');
@@ -637,7 +637,9 @@ if(!html.includes("&&!(hasSales(G)&&G.tanks.every(function(t){return t.set.autoS
 check('Breeders are per litre, the same value keeps more in a bigger tank (Pass 151, Puti)',`var G=newGame();G.tanks.push(newTank(1));G.tanks[0].vol=320;G.tanks[1].vol=20;G.tanks.forEach(function(t){t.set.keepL=1;});if(keepN(G.tanks[0])!==320||keepN(G.tanks[1])!==20)throw Error('1 per L: '+keepN(G.tanks[0])+' '+keepN(G.tanks[1]));if(packAbove(G,G.tanks[1])!==keepN(G.tanks[1])*PACK_YOUNG)throw Error('Packing leaves the young');
 var O=newGame();O.tanks[0].vol=20;O.tanks[0].set.keep=16;delete O.tanks[0].set.keepL;migrate(O);if(O.tanks[0].set.keepL!==0.8)throw Error('old 16 in 20 L is 0.8 per L: '+O.tanks[0].set.keepL);if(SHARED_SET.indexOf('keepL')<0)throw Error('shared');`);
 if(!/function renderTankSheet[\s\S]{0,900}it\('feeder','Auto feeder'[\s\S]{0,200}it\('autoWC'/.test(html))throw Error('Puti: the new-tank sheet offers the auto feeder and auto water changer');
-if(!html.includes("else if(G.tanks.length<2||T.cycledAt!=null)sup='';"))throw Error('Puti: no seed bacteria rows for a cycled tank');
+if(!html.includes("if(!supNeed(G)||T.cycledAt!=null)sup='';"))throw Error('Puti: no seed bacteria rows for a cycled tank');
+check('Supplies card only while a tank still needs bacteria, new tank costs AED 150 and can skip its gear (Puti, 31 Oct)',`var G=newGame();G.tanks[0].cycledAt=0;G.money=150+capitalReserve(G);if(supNeed(G))throw Error('one tank');if(!addTank(G))throw Error('AED 150 should buy a tank');if(supNeed(G))throw Error('seeded tank needs no supplies');if(gearDone(G.tanks[1]))throw Error('gear still due');`);
+if(!html.includes("data-act=\"ts-later\""))throw Error('Puti: a buy-later way out of the new-tank sheet');
 count++;console.log('PASS new-tank sheet offers auto gear, no seed rows for cycled tanks');
 check('the farm takes the extra tanks as soon as the first farm is built, before its card',`var G=newGame();G.tanks.push(newTank(1));G.tanks.push(newTank(2));G.tanks.forEach(function(t){t.pop=[{age:90,n:300,g:50}];});G.emp.farms.rack=1;if(!farmBuilt(G))throw Error('no farm');detectMilestones(G);if(G.tanks.length!==1)throw Error('tanks '+G.tanks.length);if(totalN(G.tanks[0])>20.5)throw Error('tank 1 keeps 20, has '+totalN(G.tanks[0]));var G2=newGame();G2.tanks.push(newTank(1));G2.emp.farms.rack=1;G2.progress.seen.owntank=true;detectMilestones(G2);if(G2.tanks.length!==1)throw Error('saves with the card waiting');`);
 check('Pass 151: Tank 1 on the land breeds by the land rules, moved-in shrimp join it',`var G=newGame();G.me=newMe();G.me.on=1;var T=G.tanks[0];T.vol=20;T.set.keepL=0.2;T.pop=[{age:100,n:80,g:60}];if(landCrowd(G,T)!==0)throw Error('no land, no rule');G.me.gplace={land:1};if(!(Math.abs(landCrowd(G,T)-0.6)<1e-9))throw Error('80 in 20 L is 0.6 over: '+landCrowd(G,T));T.pop=[{age:100,n:40,g:60}];if(landCrowd(G,T)!==0)throw Error('40 in 20 L is fine');if(landGive(G,[{age:90,g:50},{age:10,g:20},{age:'x',g:1}])!==2||totalN(T)!==42)throw Error('give adds two');`);
@@ -657,11 +659,11 @@ var L=readyGame();L.me.on=1;L.me.gplace={land:1};L.emp.hard={open:1,picks:{},goa
 var P=readyGame();P.emp.regions.push('sa');P.emp.regDay={sa:0};P.day=100;P.humans=2e9;if(!cards3Cond(P).c_permit)throw Error('permit card');var pop0=popOpen(P);card3Choose(P,'c_permit',0);if(!(popOpen(P)<pop0))throw Error('waiting closes the region');
 var V=readyGame();V.me.on=1;V.me.hrs={videos:400};V.humans=1e6;var mv=V.money;videoDay(V);if(!(V.money>mv))throw Error('videos pay');`);
 // Puti, 30 Oct: tanks 2 and 3 need the auto feeder and water changer to finish, ration and water care move once automated, the You page
-check('30 Oct: a seeded tank needs the money for its auto gear, and the gear clears the flag',`
-var g=newGame();g.tanks[0].cycledAt=0;g.money=300;if(addTank(g))throw Error('150 for the tank is not enough, the gear is 310 more');g.money=460;if(!addTank(g))throw Error('460 buys tank and gear');var T=g.tanks[1];if(!T.gearDue)throw Error('flag');
+check('31 Oct: a seeded tank costs AED 150, its auto gear is bought on the sheet or later, and the gear clears the flag',`
+var g=newGame();g.tanks[0].cycledAt=0;g.money=100;if(addTank(g))throw Error('100 is not enough');g.money=460;if(!addTank(g))throw Error('buys the tank');if(g.money!==310)throw Error('tank only, '+g.money);var T=g.tanks[1];if(!T.gearDue)throw Error('flag');
 if(!buyUpgrade(g,T,'feeder')||!buyUpgrade(g,T,'autoWC'))throw Error('gear');if(T.gearDue)throw Error('flag cleared');
 var m=newGame();m.me=newMe();m.me.hrs={exercise:200};hoursDay(m);if(!(m.me.dlog&&m.me.dlog.length===1))throw Error('your day log');`);
-if(!html.includes("if(a==='ts-close'){if(TS&&gearDone(G.tanks[TS.i]))closeTankSheet();return;}"))throw Error('Puti: the new-tank sheet only closes once both are bought');
+if(!html.includes("if(a==='ts-close'){if(TS&&gearDone(G.tanks[TS.i]))closeTankSheet();return;}"))throw Error('Puti: Got it waits for both, I will buy them later is the other way out');
 if(!html.includes("lite||(!!T.feeder&&(id==='f-ration'||id==='h-ration'))"))throw Error('Puti: no Ration slider once the tank has an auto feeder');
 if(!html.includes("if(a&&c.parentNode!==$('p-up'))$('autocard').after(c);"))throw Error('Puti: Water care moves under Automation once the tank changes its own water');
 if(!html.includes('<section class="panel" id="p-me" hidden><div class="card" id="me-gplace" hidden></div>'))throw Error('Puti: Grandma\'s place first on the You page');
