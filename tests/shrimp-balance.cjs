@@ -348,7 +348,7 @@ g.emp.q=1.11;if(effectiveQuality(g)!==0.98)throw Error('Survival stays capped at
 `);
 if(!html.includes('id="battery-kit-upgrade"')||!html.includes('data-act="battery-kit"'))throw Error('Optional battery needs a control in Starter kits');
 if(/;\s[a-z]/.test(JSON.stringify(eval('('+fs.readFileSync(path.join(__dirname,'../shrimp/ending-playtest-data.js'),'utf8').replace(/^window\.ENDING_TEST_DATA = /,'').replace(/;\s*$/,'')+')').cards)))throw Error('No semicolons in late-game card text');
-if(!html.includes('function endingVerdict(G)')||!html.includes('What the world looks like'))throw Error('Ending shows what the world became');
+if(html.includes('endingVerdict')||!html.includes('What the world looks like'))throw Error('Ending shows what the world became');
 const storyData={window:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../shrimp/ending-playtest-data.js'),'utf8'),storyData);
 {const D=storyData.window.ENDING_TEST_DATA,cash=D.cards.find(x=>x.id==='c_cash'),war=D.cards.find(x=>x.id==='c_war');if(!cash||/shrimp as cash|legal tender/.test(cash.body)||war)throw Error('Ending preview should match the game text (the war is a hard-part group now)');}
 if(!storyData.window.ENDING_TEST_DATA.forks.find(x=>x.id==='kids').options[1].label.includes('no ads to kids'))throw Error('Kids sponsorship choice should make its distinction clear');

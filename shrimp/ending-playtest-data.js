@@ -77,7 +77,7 @@ window.ENDING_TEST_DATA = {
             "drive": -0.3
           },
           "heart": 2,
-          "endingLine": "An honest study on shrimp and stress."
+          "endingLine": "A published study on shrimp and stress."
         },
         {
           "id": "studybuy",
@@ -885,8 +885,7 @@ window.ENDING_TEST_DATA = {
           "description": "You clean the glass and restock it from the farm.",
           "traits": {
             "kin": 1
-          },
-          "endingLine": "You kept your first tank going, mostly."
+          }
         },
         {
           "label": "Leave it a while",
@@ -895,8 +894,7 @@ window.ENDING_TEST_DATA = {
             "kin": -0.5,
             "drive": -0.5,
             "control": -0.5
-          },
-          "endingLine": "The first tank went green around year eight and stayed that way for a long time."
+          }
         }
       ]
     }
@@ -908,18 +906,18 @@ window.ENDING_TEST_DATA = {
       "name": "The Empire, the good emperor",
       "who": "You wanted to be the best, and you were. You built the biggest shrimp company in history and you mostly played fair. People respected you, a lot of them liked you, a few were scared of how much you owned. You still answer emails on Sundays.",
       "mira": "Your head of operations. She runs the company better than you do and you both know it.",
-      "gp": "They put you on the cover of a magazine at the airport. I bought three. You did everything you said you would, and you did it decently, people tell me that when they find out I'm your grandmother. [visit] One thing, take a day off. Come fishing.",
+      "gp": "They put you on the cover of a magazine at the airport. I bought three. You did everything you said you would. [visit] One thing, take a day off. Come fishing.",
       "tank": "Everything was good. The water was good, the food was good, there was a lot of us and we were all fine. Every tank was the same tank."
     },
     "empire_dictator": {
       "id": "empire_dictator",
       "end": "empire",
       "name": "The Empire, the dictator",
-      "who": "You wanted it done, and you got it done faster than anyone thought possible. You bought what you couldn't build, you said what needed saying, and the people in the way didn't keep you up at night. Most rules turned out to be someone who hadn't been paid yet.",
+      "who": "You wanted it done, and you got it done faster than anyone thought possible. You bought what you couldn't build and you said what needed saying. Most rules turned out to be someone who hadn't been paid yet.",
       "mira": "She started her own company. It does things the slow way and it does fine. She doesn't call.",
-      "gp": "I saw your statue on the news. It doesn't look like you, it looks taller. You did it, every home has a tank, faster than I ever thought. I keep a little jar in the bedroom. It's the only tank in the building without your logo on it. [visit]",
+      "gp": "I saw your statue on the news. It doesn't look like you, it looks taller. You did it, faster than I ever thought. I keep a little jar in the bedroom. It's the only tank in the building without your logo on it. [visit]",
       "tank": "The water was always perfect. The machine fed us, the machine cleaned us, the machine counted us. We were counted many times a day. Nobody came close to the glass.",
-      "last": "Everyone has a tank, most of them have your name on it, and nobody says no to you anymore."
+      "last": "Most of the tanks have your name on them, and nobody says no to you anymore."
     },
     "empire_cartel": {
       "id": "empire_cartel",
@@ -952,16 +950,16 @@ window.ENDING_TEST_DATA = {
       "id": "question_prof",
       "end": "question",
       "name": "The Question, the professor",
-      "who": "Somewhere around the first research grant the shrimp stopped being a business and became a question. Why do they molt when they do. How a jar of water stays alive for years. Whether another planet could hold them. You didn't get rich. You trained a lot of people who went further than you did.",
+      "who": "Somewhere around the first research grant the shrimp stopped being a business and became a question. Why do they molt when they do. How a jar of water stays alive for years. You didn't get rich. You trained a lot of people who went further than you did.",
       "mira": "A marine biologist. She was one of your first scholarship students. She calls you her old professor even though you never taught her a class.",
-      "gp": "I don't understand half of what you write to me now. I read it anyway, out loud, to the shrimp. You were always like this, you took the radio apart when you were six. [visit] Find out what the water is like out there, then come tell me.",
-      "tank": "People watched us very carefully. They wrote things down. Some of us went up, very far, in a small dark box, and then there was a lake with no one in it, and then there was a lake with us in it."
+      "gp": "I don't understand half of what you write to me now. I read it anyway, out loud, to the shrimp. You were always like this, you took the radio apart when you were six. [visit] Find out why they molt, then come tell me.",
+      "tank": "People watched us very carefully. They wrote things down. Sometimes they changed the water a little and waited to see what we did."
     },
     "question_lucky": {
       "id": "question_lucky",
       "end": "question",
       "name": "The Question, the lucky one",
-      "who": "You funded people for years for no good reason. Nobody could tell you what the research was for and you paid anyway. Most of it went nowhere. One of them found the gene for heat tolerance, and that's why there are shrimp on a hot world now. You never claimed it, you just kept paying.",
+      "who": "You funded people for years for no good reason. Nobody could tell you what the research was for and you paid anyway. Most of it went nowhere. One of them found the gene for heat tolerance, and that's why shrimp in hot countries don't need a cooler now. You never claimed it, you just kept paying.",
       "mira": "She runs the lab that found it. She sends you the papers with your name crossed out of the thank-yous, because you asked her to.",
       "gp": "People keep asking me what you do and I say I don't know, something with science. They think I'm being modest for you. I'm not, I really don't know. [visit] The shrimp club says it's something with shrimp and the weather. That's what I tell people now.",
       "tank": "For a long time nothing happened and people kept watching. Then one day the water was warm, very warm, and we were fine."
@@ -997,7 +995,7 @@ window.ENDING_TEST_DATA = {
       "id": "drift_shop",
       "end": "drift",
       "name": "The Drift, the happy shop",
-      "who": "You had one shop and it was enough. Some years you meant to open a second one and then it was summer. You let the big things happen around you, other people built the farms and the networks, and you sold shrimp to the same forty families for twenty years. You knew which kid named which shrimp.",
+      "who": "You had one shop and it was enough. Some years you meant to open a second one and then it was summer. You kept the first shop while other people built the farms and the networks. You knew which kid named which shrimp.",
       "mira": "She paints shrimp. Nobody buys the paintings. Three of them hang in your shop and you won't sell them either.",
       "gp": "Everyone keeps asking me if I'm disappointed you didn't do the big thing. I tell them I sit in your shop on Sundays and drink tea and look at the shrimp, why would I be disappointed. [visit]",
       "tank": "Nothing much happened, for a long time, in a good way. The cat watched us. We watched the cat."

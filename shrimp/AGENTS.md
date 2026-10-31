@@ -237,6 +237,7 @@ These come from Puti's feedback. Treat them as requirements.
 - The player picks a path, nobody pushes it. Choices come as a question with a kind answer and a cold one (PROJ items with fk, question in FORK_Q). Cold answers are cheaper or faster. A hidden heart score (E.heart) adds up kind (+) and cold (−) picks, campaigns and film stories. It is never shown as a number. It slows or speeds the good Shrimp Times stories (heartMult), and the win card shows what the world became and Grandma's verdict. The monopoly/dictator path is allowed and valid.
 - Space was once only after everyone on Earth had a tank. 31 Oct: Puti changed this herself for the new space chapter. Since Pass 168 Leaving Earth opens during the hard part with enough science; the old Space chapter was removed in Pass 170. Never at year ten.
 - Don't paint good and evil (不要脸谱化善恶). Every cold answer has a real logistical reason in its text, and every kind answer says what it costs. The ending says what each path cost, it doesn't judge.
+- The ending only says what the code measured, in plain numbers a player would recognise (Pass 182). No verdicts, no claims about things that weren't built or bought (`endText` drops the house and lifeline lines when they didn't happen), nothing said twice (goal lines live in the world list, mangrove counts in the Earth paragraph only). After the win, say "Goal reached", never "everyone has a tank": the goal may be smaller. Grandma's log entries keep their event kind (`e`), count by that, not by matching text.
 - World is split into University, Media, Politics and Nature, one thing per track at a time.
 - Films: the player picks what each film is really about. Effects are hidden, the Shrimp Times reviews it.
 
@@ -485,6 +486,8 @@ Do not report a feature as finished just because its new path works once. Check 
 ## Open work
 
 Planned and agreed with Puti, not built yet:
+
+**Fix list from Puti's 31 Oct playtest** (project doc `claude/shrimp-fix-prompt.md`): Parts 1 to 4 done (Pass 179 to 182). Part 5, the hard part as things you watch, is next.
 
 **Stable screen, left over from Pass 180** (`tests/shrimp-stable.cjs` lists them): buying something that then leaves its list (equipment and treat rows once bought, projects, owner perks, coin buy) slides the next row into the button's place; the second tank adds the tank chips row to the header; the first gala adds the earth line to the header; opening the first store and the kit price − change their card's height; the first rack farm reshapes Farms. Decide with Puti whether bought rows should stay in place as Done.
 

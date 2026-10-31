@@ -48,14 +48,14 @@ if(!T.called&&!T.q.some(function(x){return x.k==='call';}))throw Error('She call
 var b=newGame();b.me.on=1;b.ps.t=1;var B=gtOf(b);B.q.push({key:'boat',k:'boat',due:9,d0:0,r0:0});var mb=b.money;gtAnswer(b,'boat',1);if(b.money!==mb+30000||B.boat!=='sold')throw Error('Sold the boat');
 var k=newGame();k.me.on=1;var K=gtOf(k);K.q.push({key:'boat',k:'boat',due:9,d0:0,r0:0});gtAnswer(k,'boat',0);if(K.boat!=='keep')throw Error('Kept');k.day=gtDayOf(2027,3,21);gtDay(k);if(!K.q.some(function(x){return x.k==='sail';}))throw Error('Kept boat means sailing');
 K.q.push({key:'gobekli',k:'gobekli',due:9,d0:0,r0:0});gtAnswer(k,'gobekli',0);if(workMult(k)!==0.5)throw Error('Two weeks away, half the orders');k.day+=15;if(workMult(k)===0.5)throw Error('Back');
-var e=newGame();e.me.on=1;e.me.letters=3;gtOf(e).there=3;if(gpLines(e).join().indexOf('Stories she never told you: how she met Grandpa')<0||gpLines(e).join().indexOf('You were there for 3')<0)throw Error('Ending '+gpLines(e).join('|'));
+var e=newGame();e.me.on=1;e.me.letters=3;gtOf(e).there=3;if(gtUntold(e)[0][2]!=='how she met Grandpa'||gpLines(e).join().indexOf('You were there for')>=0||gpLines(e).join().indexOf('Stories she never')>=0)throw Error('Ending '+gpLines(e).join('|'));
 `);
 check('keeping your own tank makes treats hand-given, happy treats count',`
 var g=newGame();var T=g.tanks[0];T.had=1;T.pop=[{age:60,n:30,g:40,b:1}];g.money=5000;g.treatsOwned={spinach:1};T.set.treats={spinach:true};
 dayRollover(g);if(!treatOn(T,'spinach'))throw Error('Weekly treat before');T.treats.spinach=0;g.emp.farms.hatch=1;if(!milestoneConditions(g).owntank)throw Error('Card');
 storyChoose(g,'owntank',0);if(!ownTank(g)||tankGone(g))throw Error('Kept');dayRollover(g);if(treatOn(T,'spinach'))throw Error('No auto renew once it is yours');
 if(!giveTreat(g,0,'spinach')||!giveHappy(g,'pea')||giveHappy(g,'pea')||g.me.happy!==1)throw Error('By hand');
-var h=newGame();h.emp.farms.hatch=1;storyChoose(h,'owntank',0);if(tankGone(h)||!ownTank(h)||storyChoices(h,'owntank').length!==1)throw Error('No choice, the tank is always there');h.ps.look+=15;if(ownLevel(h)!==2||gpLines(h).join().indexOf('never stopped')<0)throw Error('Tended ending');
+var h=newGame();h.emp.farms.hatch=1;storyChoose(h,'owntank',0);if(tankGone(h)||!ownTank(h)||storyChoices(h,'owntank').length!==1)throw Error('No choice, the tank is always there');h.ps.look+=15;if(ownLevel(h)!==2||/first tank/.test(gpLines(h).join()))throw Error('Tended level, no first-tank ending line (Pass 182)');
 `);
 check('packers, salespeople, managers and Noor each get a goodbye card',`
 var g=newGame();var E=g.emp;E.staff.pack=10;E.staff.lines=1;g.money=1e6;if(!milestoneConditions(g).bye_pack)throw Error('Kiki');
@@ -203,7 +203,7 @@ var m=g.emp.mat;buyProj(g,'sciind');if(g.emp.mat!==m*0.95||treesFor(g).indexOf('
 var h=newGame();h.kits.sold=ACADEMY_AT;h.academy.level=1;h.money=1e7;rlHire(h,'auto','pd');rlHire(h,'water','pd');h.academy.papers=4;buyProj(h,'sciacad');if(!h.emp.acad||!((h.tr.control||0)<0))throw Error('Academia');
 var q=newGame();q.tanks[0].feeder=1;q.tanks[0].autoWC=1;q.kits.sold=Math.max(1,q.kits.sold);personalDay(q);for(var d=0;d<6;d++){gtThere(q,1);}if(q.me.letters<3||!q.me.hist.some(function(x){return /fishing boat/.test(x);}))throw Error('His story in letters');
 var w=newGame();w.humans=4e9;hardDay(w);w.money=1e12;w.fin=[{kits:1e9}];hardBuy(w,'fled','camps');if(!rip(w).log.some(function(x){return /camp school/.test(x.tx);}))throw Error('A hard-part choice makes the news');
-var o=newGame();o.emp.farms.hatch=1;storyChoose(o,'owntank',0);if(gpLines(o).join().indexOf('never looked')<0)throw Error('Kept and never looked');o.ps.look+=5;if(gpLines(o).join().indexOf('never looked')>=0)throw Error('Looked after');
+var o=newGame();o.emp.farms.hatch=1;storyChoose(o,'owntank',0);
 `);
 check('Mira shows up at more moments, and each one follows something you did',`
 var g=newGame();g.day=1200;var c=milestoneConditions(g);if(c.mira_teen||c.mira_house||c.mira_net||c.mira_grown||c.mira_bye)throw Error('Not before you met her');
@@ -338,4 +338,14 @@ h.tanks[0].feeder=1;h.tanks[0].autoWC=1;h.kits.sold=Math.max(1,h.kits.sold);h.da
 var k=newGame();k.stats.sold=10;k.money=0;sharkLend(k,300);k.money=1000;if(!sharkPay(k)||k.emp.shark)throw Error('Pay back any time');
 var bf=newGame(),BT=bf.tanks[0];BT.cycledAt=0;BT.had=1;BT.pop=[{n:20,age:90,sex:'m'}];BT.chem.food=0;bf.progress.queue=[];for(var i=0;i<160;i++){bf.progress.queue=[];stepGame(bf);}if(totalN(BT)<14)throw Error('They live on biofilm '+totalN(BT));if(BT.chem.nutr>0.2||BT.chem.nutr<0.09)throw Error('Nutrition sinks to about 10% '+BT.chem.nutr);if(BT.chem.fed<0.45)throw Error('Biofilm keeps them half full');
 `);
+check('ending lines say only what happened (Pass 182)',`
+var g=newGame();g.me.on=1;gtLog(g,'Grandma turned 81. You forgot. She didn’t mention it.','missed','gbday');gtLog(g,'Grandma gave you AED 100 for your birthday.','there','pbday');var L=gtOf(g).log;if(L[L.length-2].e!=='gbday'||L[L.length-1].e!=='pbday')throw Error('Log keeps the event kind');
+g.emp.hard={goal:'p90',open:1,picks:{}};if(hardWinBody(g)!=='You picked a number and you reached it.')throw Error('p90 body '+hardWinBody(g));g.emp.hard.goal='none';if(hardWinBody(g)!=='')throw Error('Goal line only in the world list');
+['want','home'].forEach(function(k){g.emp.hard.goal=k;if(/Time is paused/.test(hardWinBody(g)))throw Error('No time is paused');});
+var f=newGame();f.emp.ended={kind:'fall_fast',day:900};f.sty={safe:20,bold:0,k:{tank:[9,0]}};var st=styleTop(f);if(st&&st.k==='steady'&&st.pos)throw Error('Never bet the company on a bankruptcy');
+var c=newGame();c.emp.coin={on:1,trees:2e6,otrees:5e6,honest:1};if(coinLines(c).join().indexOf('mangrove')>=0)throw Error('Mangrove counts only in the Earth paragraph');
+`);
+if(!/function endText\(G,id,X\)/.test(html)||/endingVerdict|Time is paused\. This|forty families|until she was eighty|studies the sea now|long runs of the same kind|messy and it worked|keep you up at night|did it decently|every home has a tank, faster/.test(html))throw Error('Ending lines from the 31 Oct review');
+if(html.indexOf("data-act=\"review\">Look back</button><button class=\"btn\" data-act=\"reset\">")<0||/Every human owns a shrimp tank/.test(html))throw Error('Empire win card: short line and Look back, no second copy of the ending');
+console.log('PASS ending text review (static)');count++;
 console.log(count+' free time, Grandma and ending checks passed');
