@@ -348,4 +348,14 @@ var c=newGame();c.emp.coin={on:1,trees:2e6,otrees:5e6,honest:1};if(coinLines(c).
 if(!/function endText\(G,id,X\)/.test(html)||/endingVerdict|Time is paused\. This|forty families|until she was eighty|studies the sea now|long runs of the same kind|messy and it worked|keep you up at night|did it decently|every home has a tank, faster/.test(html))throw Error('Ending lines from the 31 Oct review');
 if(html.indexOf("data-act=\"review\">Look back</button><button class=\"btn\" data-act=\"reset\">")<0||/Every human owns a shrimp tank/.test(html))throw Error('Empire win card: short line and Look back, no second copy of the ending');
 console.log('PASS ending text review (static)');count++;
+check('Pass 184: first-tank ending spans are company days, from the farm, with or without the land',html.slice(html.indexOf('function endSpan('),html.indexOf('// Mangrove counts live'))+`
+function own(){var g=newGame();acknowledgeMilestone(g);var T=g.tanks[0];T.had=1;T.cycledAt=0;T.pop=[{n:30,age:120,g:60}];g.me=g.me||newMe();g.me.on=1;return g;}
+var g=own(),T=g.tanks[0];g.day=900;ownTankNow(g);if(g.stats.ownFrom!==900)throw Error('ownFrom is the farm day: '+g.stats.ownFrom);
+T.glass=T.glass||[];for(var i=0;i<20;i++)T.glass[i]=0.9;g.stats.careN=60;
+while(g.day<6600){g.day++;if(g.day===1900)g.me.gplace={balcony:1,house:1,land:1};endStatsTank(g);}
+var L=endTankLines(g).join(' ');if(!/of the 15 years and (7|8) months since the farm/.test(L))throw Error('span since the farm: '+L);
+var h=own();h.day=50;ownTankNow(h);h.stats.careN=3;var d0=h.day;for(var k=0;k<4*400;k++){h.progress.queue=[];h.emp.ended=null;stepGame(h);}
+if(h.stats.ownD<395||!endTankLines(h).length)throw Error('no land still counts and gets lines: '+h.stats.ownD+' '+endTankLines(h));
+var o=own();o.me.keep='self';o.stats.ownD=200;o.stats.ownFrom=1900;delete o.stats.ownCo;migrate(o);if(!o.stats.ownPart||endTankLines(o).length)throw Error('old saves: unsure spans give no lines');
+`);
 console.log(count+' free time, Grandma and ending checks passed');

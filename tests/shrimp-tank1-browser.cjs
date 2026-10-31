@@ -21,8 +21,9 @@ module.exports=async function(ok){
  const boot=async()=>{await p.reload();await p.waitForFunction(()=>window.G&&G.tanks&&G.me&&G.me.gplace);await p.evaluate(()=>{window.spotlight=function(){};G.progress.queue=[];});};
  await boot();
  // 1. 40x company speed leaves Tank 1 at 2.4 s a tank day
- const r=await p.evaluate(async()=>{G.progress.queue=[];window.maxSpeed=function(){return 40;};setSpeed(40);G.tAt=Date.now();var t0=G.tday+((G.tstep||0)+(G.tq||0))/4,d0=G.day;await new Promise(r=>setTimeout(r,6000));return {t:G.tday+((G.tstep||0)+(G.tq||0))/4-t0,d:G.day-d0,sp:speed};});
+ const r=await p.evaluate(async()=>{G.progress.queue=[];window.maxSpeed=function(){return 40;};setSpeed(40);G.tAt=Date.now();var t0=G.tday+((G.tstep||0)+(G.tq||0))/4,d0=G.day,o0=G.stats.ownD||0;await new Promise(r=>setTimeout(r,6000));return {t:G.tday+((G.tstep||0)+(G.tq||0))/4-t0,d:G.day-d0,o:(G.stats.ownD||0)-o0,sp:speed};});
  ok(Math.abs(r.t-6000/2400)<0.6&&r.d>20,'at 40x company speed Tank 1 moved '+r.t.toFixed(2)+' tank days in 6 s (2.5 expected; company moved '+r.d.toFixed(1)+')');
+ ok(Math.abs(r.o-Math.floor(r.d))<=1,'Pass 184: first-tank ending days follow company days at 40x ('+r.o+' for '+r.d.toFixed(1)+')');
  await p.evaluate(()=>setSpeed(0));
  // 2. the land draws the game's columns, pests and glass
  const frame=async()=>{for(let i=0;i<100;i++){const f=p.frames().find(f=>f.url().includes('home.html'));if(f)return f;await wait(100);}throw Error('no land frame');};

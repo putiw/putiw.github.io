@@ -37,6 +37,13 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
  // Nour's jar
  const jar=await p.evaluate(()=>({hid:document.getElementById('nour-jar').hidden,cap:document.getElementById('nour-cap').textContent,h:document.getElementById('nour-cv').getBoundingClientRect().height}));
  if(jar.hid||!/Nour’s jar · \d+ shrimp/.test(jar.cap)||jar.h<100)throw Error('jar '+JSON.stringify(jar));ok('Nour’s jar: '+jar.cap);
+ // Pass 184: a one-option group leaves no big gap, and every legend name is readable at 360 px
+ for(const w of [360,390]){const q=await b.newPage({viewport:{width:w,height:844}});await q.setContent('<body>'+html+'</body>');await q.waitForTimeout(300);
+  const r=await q.evaluate(s=>{G=s;migrate(G);G.progress.queue=[];window.spotlight=function(){};speed=0;var H=hardOf(G);H.goalOk=1;H.at=HARD.length-1;HARD_SEL='never';ensureProgress(G).seen.nour1=1;nourOf(G);selectTab('world');render();
+   var c=document.getElementById('hard-card');if(c.classList.contains('shut'))c.querySelector('.hd').click();render();
+   var st=document.querySelector('.hard-step'),rows=st.querySelectorAll('.item');return {gap:st.getBoundingClientRect().bottom-rows[rows.length-1].getBoundingClientRect().bottom,
+    cut:[...document.querySelectorAll('.hg-k span')].filter(x=>x.scrollHeight>x.clientHeight+1||x.scrollWidth>x.clientWidth+1).map(x=>x.textContent)};},snaps[key]);
+  if(r.gap>160||r.cut.length)throw Error(w+' px: gap under a one-option group '+Math.round(r.gap)+', cut legend names '+r.cut);ok(w+' px: gap under a one-option group '+Math.round(r.gap)+' px, legend names readable');await q.close();}
  // after the win: grid and ledger stay, read-only
  const won=await p.evaluate(()=>{G.emp.won=Math.floor(G.day);render();return {hid:document.getElementById('hard-card').hidden,grid:document.getElementById('hg-cv').offsetHeight,dis:document.getElementById('hard-give').disabled,body:document.getElementById('hard-body').textContent.length,jar:document.getElementById('nour-jar').hidden};});
  if(won.hid||won.grid<100||!won.dis||won.body||!won.jar)throw Error('after the win '+JSON.stringify(won));ok('after the win the grid and a read-only ledger stay');

@@ -690,7 +690,7 @@ d0=h.day;t0=h.tday;run(h,4*3);if(h.day-d0!==3||h.tday-t0!==3)throw Error('On the
 var o=ownGame();o.day=900;delete o.tday;migrate(o);if(o.tday!==900)throw Error('Old saves start the tank clock at the company day');
 var T=h.tanks[0];waterChange(h,T,10);if(T.lastWC!==h.tday)throw Error('Tank stamps use tank days');
 if(td(h,T)!==h.tday||td(g,g.tanks[0])!==g.day)throw Error('td reads the right clock');
-var S=h.stats,n0=S.ownD||0;run(h,4*40,1/40);if((S.ownD||0)-n0!==1)throw Error('First tank stats count tank days: '+((S.ownD||0)-n0));`);
+var S=h.stats,n0=S.ownD||0,m0=S.ownTD||0;run(h,4*40,1/40);if((S.ownD||0)-n0!==40||(S.ownTD||0)-m0!==1)throw Error('Pass 184: first tank spans count company days, the care rate tank days: '+((S.ownD||0)-n0)+' '+((S.ownTD||0)-m0));`);
 check('Pass 161: one tank, the land draws the game state and its jobs come back',OWN_SETUP+`
 var g=ownGame(),T=g.tanks[0],C=careOf(T);C.mulm=0.6;C.sponge=0.55;C.grow=0.7;C.pests=[{k:'snail'},{k:'snail'},{k:'flat'}];
 var o=landOwn(g);if(o.ga.reduce(function(a,b){return a+b;},0)!==o.adults||o.gy.reduce(function(a,b){return a+b;},0)!==o.young)throw Error('Grade counts add up to the shrimp');
@@ -847,6 +847,16 @@ HARD.forEach(function(x){if(x.body.split('. ').length>1||x.body.length>95)throw 
 var n=readyGame();n.story.miraDay=1;n.emp.hard={open:1,goal:'home',picks:{},day:0};n.day=2000;
 ['nour1','nour2','nour3','nour4','nour5','nour6'].forEach(function(k){var m=MILESTONES[k],t=m.bodyFn?m.bodyFn(n):m.body;if(t.length>230||/\\n/.test(t))throw Error(k+' is longer than two lines: '+t.length);});
 `);
+check('Pass 184: one-off personal spending is not a daily loss',`
+var g=readyGame();g.money=300000;g.fin=[];for(var i=0;i<7;i++)g.fin.push({shrimp:20000,staff:-6000,family:-500});
+var before=operatingNet(g);g.fin[6].personal=-294000;g.money-=294000;
+if(Math.abs(operatingNet(g)-before)>1e-6||operatingNet(g)<=0)throw Error('personal counted in operatingNet: '+operatingNet(g));
+if(cashRunway(g)!==Infinity)throw Error('runway after a personal buy');
+g.fin[6].family=-500000;if(operatingNet(g)>=before)throw Error('money to Grandma must still count');
+var h=readyGame();h.fin=[];h.mh=[];for(var i=0;i<5;i++){h.fin.push({shrimp:100});h.mh.push(1000+100*i);}h.money=1500;h.fin[4].personal=-4000;h.money-=4000;
+if(Math.abs(netPerDay(h)-100)>1e-6)throw Error('netPerDay counts a personal buy: '+netPerDay(h));
+`);
+if(!html.includes("if(!G.ob.sp4c&&speed>=4)G.ob.sp4c=1;")||!html.includes("top:calc(24px + env(safe-area-inset-top,0px))"))throw Error('Pass 184: no 4x spotlight at 4x or more, story card near the top');count++;
 if(!html.includes("var HG_COLS=120")||!html.includes('id="hg-cv"')||!html.includes('id="nour-cv"')||html.includes("showAfter(ho.t,ho.news"))throw Error('Pass 183: people grid, Nour jar, no popup after a hard-part option');count++;
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
