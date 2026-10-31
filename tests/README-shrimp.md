@@ -1498,3 +1498,15 @@ Puti, from the test save.
 
 Tests: balance 116 (new Pass 171 checks), academy 9, me 46, space search 5, Space bot passes. Browser at 390 px: launch, ship Home opens the land, land ‹ Space opens the ship, no page errors. Not deployed.
 Open question for Puti: the planet list has 7 of the 45 worlds in Bohl et al. 2026 (plus K2-18 b, which isn't in it), and TOI-715 b, one of the paper's two best targets, is missing. Grandma still sits in her armchair on the land while she sleeps on the ship.
+
+## Pass 172: a real sky, more instruments, Grandma off the land, color sliders, Make icons (31 Oct)
+
+Puti, from the two test artifacts.
+1. The sky is real: `REAL` in `space.html` holds 220 planets from the NASA Exoplanet Archive (via the Open Exoplanet Catalogue's import, built by `tests/build-space-planets.py`): all 45 in Bohl et al. 2026 (MNRAS) plus K2-18 b and the nearest planets with a known year. Earth's numbers are copied only when measured (error bars, a transit for widths); a radial-velocity mass with no width is shown as at least. Stars in distance order, a star's planets together, 2 to 4 a cone, 69 cones. Same sky every trip. What the ship finds on the ground stays the game's guess (`truth`), seeded by name; the famous eight keep their Pass 169 values. Each planet's From Earth line is its catalogue facts.
+2. Three new instruments (ship card and scans): Orbit tracker (year, AU, eccentricity, 10 points), Star quake listener (asteroseismology, star age, 10), Radio aurora watch (magnetic field, 15). Stretched orbits, young stars and no field cost fit. Landing lists orbit, age and field too.
+3. Grandma is not on the land after Leave Earth (`GM_AWAY` from the voyage flag): her chair is empty and has no bubble.
+4. Land text says color. Colors is a panel docked at the bottom of the map, the thing moved into view above it: tap one of its colors, then Hue, Strength and Light sliders. Reset this color and Reset all replace As drawn and All as drawn; Other is gone (the sliders do it).
+5. Make: every tool button shows what it does (pen, eraser, fill, pick, pan, line, a square for Box, a circle, a triangle), plus Back and Forward arrows (undo, redo), Mirror, Flip, zoom.
+6. Millie's eye: checked, her sprites are the same pixels as before the blink update in every non-blink frame. Her eyes look different at different spots because she's drawn at 1.5x and the pixels land unevenly. Not changed; asked Puti.
+
+Tests: balance 117, academy 9, me 46, space search 5 (rewritten for the real sky), Space bot passes (lands on Gl 725 B c, fit 53). Land headless at 390 px: color panel, a slider recolors the armchair, Make icons, no page errors. Not deployed.

@@ -809,5 +809,11 @@ for(var i=0;i<400;i++){g.day+=1;personalDay(g);}if(g.me.cur||g.me.call||JSON.str
 if(/planets you passed|were better|Best of all/.test(sp)||!sp.includes('⌂ Home'))throw Error('Pass 171: no rank against other planets on landing, Home button on the ship');
 if(!html.includes("else if(d.type==='back'){spaceHide();if(landOpen(G))landShow();}")||!html.includes("if(G.voyage&&G.voyage.sealed)spaceShow();"))throw Error('Pass 171: ship Home goes to the land, the land goes back to the ship');}
 count++;console.log('PASS Pass 171 ship goes home to the land, landing has no rank');
+// Pass 172 (Puti, 31 Oct): real sky, more instruments, Grandma off the land after leaving, color panel with sliders, Make icons
+{const sp=fs.readFileSync(path.join(__dirname,'../shrimp/space.html'),'utf8'),home=fs.readFileSync(path.join(__dirname,'../shrimp/home.html'),'utf8');
+if(!/var REAL=\[/.test(sp)||!sp.includes("{id:'orbit',name:'Orbit tracker'")||!html.includes("{id:'mag',name:'Radio aurora watch'"))throw Error('Pass 172: real planets and the new instruments');
+if(!home.includes('window.GM_AWAY=!!VOY')||!home.includes('function gmAway')||!home.includes('class="cp-row"')||!home.includes('Reset this color')||!home.includes("mkI('undo','Back')"))throw Error('Pass 172: land changes');
+if(/>Colours<|As drawn|All as drawn/.test(home))throw Error('Pass 172: color, and no As drawn buttons');}
+count++;console.log('PASS Pass 172 real sky and land changes');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

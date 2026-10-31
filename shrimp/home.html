@@ -312,6 +312,20 @@ body.in-game #tb-back i{font-style:normal}
 .lbub .pcus input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
 .lbub .pcus{display:inline-flex;align-items:center}
 
+/* the color panel (Pass 172): docked at the bottom of the map so the thing stays in sight */
+.cpan{position:absolute;left:8px;right:8px;bottom:12px;z-index:30;background:var(--surface,#fffdf6);border:1px solid var(--line);border-radius:14px;padding:10px 12px 12px;box-shadow:0 6px 20px rgba(0,0,0,.18);max-height:52%;overflow:auto}
+.cpan .cp-hd{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cpan .cp-hint{font-size:12.5px;color:var(--ink-2);margin:2px 0 8px}
+.cpan .cp-cols{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.cpan .cp-cols button{width:26px;height:26px;border:1px solid var(--line);border-radius:6px;padding:0;cursor:pointer}
+.cpan .cp-cols button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+.cpan .cp-cols button.pch{border-color:var(--ink);border-width:2px}
+.cpan .cp-row{display:grid;grid-template-columns:62px 1fr;align-items:center;gap:8px;margin:4px 0;font-size:13px}
+.cpan input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;border-radius:9px;border:1px solid var(--line);margin:0}
+.cpan input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.cpan input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid var(--ink)}
+.cpan .cp-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+
 /* ---- Make: the player's own things (make.js) ---- */
 .mk{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);font-family:var(--font-body);color:var(--ink)}
 .mkhd{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--surface)}
@@ -341,6 +355,11 @@ body.in-game #tb-back i{font-style:normal}
 .mkdel{margin-left:auto;color:var(--shrimp)}
 .mkinfo{font-size:11px;color:var(--ink-3)}
 .mkhint{font-size:11.5px;color:var(--ink-2);line-height:1.3}
+
+/* tool buttons show what they do (Pass 172) */
+.mk .mkib{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-width:44px;padding:4px 6px}
+.mk .mki{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mk .mkl{font-size:10px;line-height:1.1}
 
 </style>
 <header class="top" id="top">
@@ -515,7 +534,7 @@ function boot(data){S=(data&&data.S)||load()||newState();var fresh=!S.tanks.leng
   document.querySelectorAll('.tabs [data-tab]').forEach(function(b){b.onclick=function(){sfx('click');setTab(b.dataset.tab);};});
   $('sheet').addEventListener('click',function(e){if(e.target===this&&SHEET&&!SHEET.o.noClose&&performance.now()-SHEET.at>450)closeSheet();});
   $('pop-dim').onclick=function(){if(performance.now()-POP_AT>450)closePop();};
-  $('tb-info').onclick=function(){openPop('<div class="sheet-hd"><h2>What this is</h2><button class="btn sm" onclick="closePop()">Close</button></div><p>A test bench for ideas, separate from the game. Nothing here touches your real save.</p><p><b>Home</b> is the place that grows with you: Grandma’s flat, a balcony, a house with a garden, then land with a stream.</p><p><b>Tank</b> has the hands-on jobs (vacuum, sponge, trim, pests, aquascape), the net and colour breeding. Tap a shrimp to net it, hold one to look closer.</p><p><b>Book</b> collects every colour, bird, fish and stream find.</p><p><b>Try</b> lists each idea with Keep, Maybe or Drop and a note. Dev controls are at the bottom (jump ahead, add money, switch designs).</p><p>One game day is 20 seconds at 1×.</p>');};
+  $('tb-info').onclick=function(){openPop('<div class="sheet-hd"><h2>What this is</h2><button class="btn sm" onclick="closePop()">Close</button></div><p>A test bench for ideas, separate from the game. Nothing here touches your real save.</p><p><b>Home</b> is the place that grows with you: Grandma’s flat, a balcony, a house with a garden, then land with a stream.</p><p><b>Tank</b> has the hands-on jobs (vacuum, sponge, trim, pests, aquascape), the net and color breeding. Tap a shrimp to net it, hold one to look closer.</p><p><b>Book</b> collects every color, bird, fish and stream find.</p><p><b>Try</b> lists each idea with Keep, Maybe or Drop and a note. Dev controls are at the bottom (jump ahead, add money, switch designs).</p><p>One game day is 20 seconds at 1×.</p>');};
   $('tb-mute').onclick=function(){S.opt.sound=!S.opt.sound;sfxUnlock();sfxMute(!S.opt.sound);save();};
   $('tb-mute').classList.toggle('muted',!S.opt.sound);
   setSpeed(S.speed);setTab(S.tab||'try');updateHeader();if(topped)toast('Added AED 1M of test money. More under Try › Dev.',3800);if(!S.seen.hello){S.seen.hello=1;toast('Every idea is listed here with a Try it button. Your notes save as you go.',4200);}
@@ -629,7 +648,7 @@ var IMG={},ART_READY=false,ART_WAIT=[];
 (function(){var ks=Object.keys(SPR),left=ks.length;ks.forEach(function(k){var im=new Image();im.onload=im.onerror=function(){if(--left===0){ART_READY=true;ART_WAIT.splice(0).forEach(function(f){try{f();}catch(e){console.error(e);}});}};im.src=SPR[k];IMG[k]=im;});})();
 function whenArt(f){if(ART_READY)f();else ART_WAIT.push(f);}
 var SW=114,SH=58;
-// Colours of the lines, for labels and the book. The shrimp themselves are drawn from their own
+// Colors of the lines, for labels and the book. The shrimp themselves are drawn from their own
 // genome: hue, saturation, lightness and grade (Puti's Shrimp Tanks lines and names).
 var COLOURS={
  red:{name:'Red',h:0,s:0.84,l:0.56},orange:{name:'Orange',h:28,s:0.84,l:0.56},yellow:{name:'Yellow',h:58,s:0.84,l:0.56},green:{name:'Green',h:120,s:0.84,l:0.56},
@@ -641,8 +660,8 @@ var VG_BODY=[0,0.4,0.5,0.6,0.7,0.8,0.9,1],VG_DITHER=[0,0.2,0.25,0.3,0.4,0.5,0.6,
 function hslRGB(h,s,l){h=((h%360)+360)%360;var c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs((h/60)%2-1)),m=l-c/2,r=0,g=0,b=0;if(h<60){r=c;g=x;}else if(h<120){r=x;g=c;}else if(h<180){g=c;b=x;}else if(h<240){g=x;b=c;}else if(h<300){r=x;b=c;}else{r=c;b=x;}return [Math.round((r+m)*255),Math.round((g+m)*255),Math.round((b+m)*255)];}
 function toVG(g){return clamp(Math.floor(clamp(g,0,100)/12.5),0,7);}
 var BODY={},BODY_N=0;
-// spec: {male, h, s, l (0-100), vg (grade 0-7), mat (colour maturity 0-1), juv, rili, legend, sick}
-// Older callers pass col only; that falls back to the line's colour.
+// spec: {male, h, s, l (0-100), vg (grade 0-7), mat (color maturity 0-1), juv, rili, legend, sick}
+// Older callers pass col only; that falls back to the line's color.
 function bodyCanvas(sp){var C=COLOURS[sp.col]||COLOURS.red,h=sp.h!=null?sp.h:C.h,s=sp.s!=null?sp.s:C.s*100,l=sp.l!=null?sp.l:C.l*100,vg=clamp(sp.vg|0,0,7),
    mat=sp.mat!=null?sp.mat:(sp.juv===2?0.3:sp.juv===1?0.7:1),hq=Math.round(h/3)*3,sq=Math.round(s/4)*4,lq=Math.round(l/3)*3,mq=Math.round(mat*10);
   if(sp.legend){vg=7;}
@@ -693,12 +712,12 @@ function decorImg(k){return k==='leaf'?IMG.tleaf:IMG['d_'+k];}
 /* ---- genetics.js ---- */
 // ===== Genetics: Puti's Shrimp Tanks DNA model (shrimp-tanks-phaser/src/game/genetics.ts, model v7) =====
 // A plain JS port, without the old-save migrations. Every shrimp carries an 80-base genome:
-//   Pigment 0-36  eight hue codons, two saturation, two lightness. The colour is the circular mean.
-//   Shell  36-52  the number of G/C bases sets how solid the colour is: the grade, G1 to G8.
+//   Pigment 0-36  eight hue codons, two saturation, two lightness. The color is the circular mean.
+//   Shell  36-52  the number of G/C bases sets how solid the color is: the grade, G1 to G8.
 //   Pattern 52-56 three or more C bases shows rili.
 //   Vigor  56-64  fertility, brood size, egg survival, stability (how little the babies drift).
 //   Body   64-80  catch resistance, speed, escape, size, lifespan, activity, food focus.
-// Close colours blend, far ones mostly follow one parent and carry a few of the other's hue
+// Close colors blend, far ones mostly follow one parent and carry a few of the other's hue
 // genes, which pulls the grade down. Babies drift a little in hue, so a line can walk.
 var GEN=(function(){
  var R=Math.random;
@@ -737,7 +756,7 @@ var GEN=(function(){
  function pairSpread(hs){var t=0,p=0;for(var a=0;a<hs.length;a++)for(var b=a+1;b<hs.length;b++){t+=hueDist(hs[a],hs[b]);p++;}return p?t/p:0;}
  function clean(g){g=String(g||'').toUpperCase().replace(/[^ATGC]/g,'');while(g.length<LEN)g+='G';return g.slice(0,LEN);}
  function replaceSeg(g,s,l,v){v=v.slice(0,l);while(v.length<l)v+='G';return (g.slice(0,s)+v+g.slice(s+l)).slice(0,LEN);}
- // ---- colour ----
+ // ---- color ----
  function hslRgb(h,s,l){s=cl(s,0,100)/100;l=cl(l,0,100)/100;var c=(1-Math.abs(2*l-1))*s,hs=hueC(h)/60,x=c*(1-Math.abs(hs%2-1)),R1=0,G1=0,B1=0;
   if(hs<1){R1=c;G1=x;}else if(hs<2){R1=x;G1=c;}else if(hs<3){G1=c;B1=x;}else if(hs<4){G1=x;B1=c;}else if(hs<5){R1=x;B1=c;}else{R1=c;B1=x;}var m=l-c/2;
   return [Math.round(cl((R1+m)*255,0,255)),Math.round(cl((G1+m)*255,0,255)),Math.round(cl((B1+m)*255,0,255))];}
@@ -819,7 +838,7 @@ var GEN=(function(){
   for(var i=SH_S;i<SH_S+SH_L;i++){if(arr[i]==='G'||arr[i]==='C')solid.push(i);else clr.push(i);}
   if(solid.length<want)shuffle(clr).slice(0,want-solid.length).forEach(function(i){arr[i]=item(['G','C']);});
   else if(solid.length>want)shuffle(solid).slice(0,solid.length-want).forEach(function(i){arr[i]=item(['A','T']);});}
- // A legendary parent resets it: the child is a fresh high-grade shrimp of any colour.
+ // A legendary parent resets it: the child is a fresh high-grade shrimp of any color.
  function legendChild(){var g=Math.floor(rng(5,8));return forStrain('custom',g,randAny(),OPACITY[g]);}
  function inherit(a,b,mc,ga,gb){a=clean(a);b=clean(b);if(hasLeg(a)||hasLeg(b))return legendChild();
   var arr=new Array(LEN),pig=inheritPig(a,b,mc),i;for(i=0;i<PIG_L;i++)arr[i]=pig[i];for(i=PIG_L;i<LEN;i++)arr[i]=(r()<0.5?a:b)[i];
@@ -835,12 +854,12 @@ var GEN=(function(){
 })();
 
 /* ---- breed.js ---- */
-// ===== Colour breeding, on Puti's Shrimp Tanks genetics (genetics.js) =====
-// Every shrimp carries an 80-base genome. Colour is continuous: eight hue genes plus saturation and
-// lightness. Grade G1-G8 is how solid the colour is: the shell genes set it, and hue genes that
+// ===== Color breeding, on Puti's Shrimp Tanks genetics (genetics.js) =====
+// Every shrimp carries an 80-base genome. Color is continuous: eight hue genes plus saturation and
+// lightness. Grade G1-G8 is how solid the color is: the shell genes set it, and hue genes that
 // disagree pull it down. Rili shows when 3 of the 4 pattern genes are C. Without picking, grade
 // sinks a little each generation; keep the best and move the rest on and a line climbs. Babies
-// drift a little in hue, so a line can slowly walk to a new colour.
+// drift a little in hue, so a line can slowly walk to a new color.
 var GRADE_NAMES=['G1','G2','G3','G4','G5','G6','G7','G8'];
 var LINE_NAMES={red:'Red',orange:'Orange',yellow:'Yellow',green:'Green',cyan:'Cyan',blue:'Blue',purple:'Purple',magenta:'Magenta',wild:'Wild',legendary:'Legendary'};
 var LINE_ORDER=['red','orange','yellow','green','cyan','blue','purple','magenta'];
@@ -859,7 +878,7 @@ function riliOf(i){return phOf(i).rili;}
 function colOf(i){return lineOf(i);}
 function juvOf(i){return i.age<JUV_DAYS?2:i.age<ADULT_DAYS?1:0;}
 function lineRank(l){var k=LINE_ORDER.indexOf(l);return k<0?(l==='wild'?20:30):k;}
-// What the art needs. Babies are nearly clear and colour up as they grow, like the game.
+// What the art needs. Babies are nearly clear and color up as they grow, like the game.
 function specOf(i){var p=phOf(i),j=juvOf(i);return {male:i.sex==='m',col:p.line,vg:p.grade,h:p.h,s:p.s,l:p.l,juv:j,mat:j===2?0.3:j===1?0.7:1,rili:p.rili,legend:p.legend,berried:!!i.eggs,size:p.body.size};}
 function shrimpRGB(i){var p=phOf(i);return 'rgb('+GEN.hslRgb(p.h,p.s,p.l).join(',')+')';}
 function colourName(i,full){if(i.age<JUV_DAYS)return 'Baby';var p=phOf(i),n=(LINE_NAMES[p.line]||'Wild')+(p.rili?' rili':'');return full?n+' · '+GRADE_NAMES[p.grade]:n;}
@@ -869,7 +888,7 @@ function geneStr(i){var q=GEN.inspect(i.dna),g=q.genome;
   var dna='<div class="genome">'+GEN.SEGS.map(function(s){return '<span class="gs gs'+s[1]+'" title="'+s[0]+'">'+g.substr(s[1],s[2])+'</span>';}).join('')+'</div>';
   return dna+'Hue '+Math.round(q.pig.h)+'° · sat '+Math.round(q.pig.s)+' · light '+Math.round(q.pig.l)+' · hue spread '+Math.round(q.pig.spread)+'°<br>Shell '+q.shell+'/16 · pattern '+q.patC+'/4 C · shows at '+Math.round(q.ge.expr*100)+'%<br>Fertility '+pct(q.vig.fert)+' · brood '+pct(q.vig.fec)+' · egg survival '+pct(q.vig.emb)+' · stability '+stabPct(q.vig.stab)+(q.legend?'<br>Legendary marker':'');}
 function newInd(o){var i={id:uid(),sex:Math.random()<0.5?'f':'m',age:0,dna:null,from:'bred',born:Math.floor(S.day),eggs:null,rest:0,name:''};for(var k in o||{})i[k]=o[k];return i;}
-// The stream: mostly clear wild shrimp. Now and then one has a faint colour, usually too faint
+// The stream: mostly clear wild shrimp. Now and then one has a faint color, usually too faint
 // to see at G1, and once in a blue moon a legendary one.
 var STREAM_TINTS=[58,220,120,28,180,0,272,315];
 function breedWild(){var x=Math.random(),dna;
@@ -913,8 +932,8 @@ function breedDay(T,d){var cap=tankCap(T),n=T.shrimp.length,crowd=n>cap?(n-cap)/
     if(i.age===JUV_DAYS)reveal(T,i);});
   if(dead.length){T.shrimp=T.shrimp.filter(function(i){return dead.indexOf(i)<0;});T.dayDead=(T.dayDead||0)+dead.length;if(typeof tankEvent==='function')tankEvent(T,'dead',dead);}
   T.shrimp.slice().forEach(function(i){if(i.eggs&&d>=i.eggs.due)hatch(T,i,d);});}
-// A baby shows its colour at 25 days.
-// It only counts as a new colour (and lights up Sort) when no grown shrimp in the tank has it.
+// A baby shows its color at 25 days.
+// It only counts as a new color (and lights up Sort) when no grown shrimp in the tank has it.
 function reveal(T,i){var first=bookShrimpSeen(i,{tank:T.name}),p=phOf(i),have=T.shrimp.some(function(o){return o!==i&&o.age>=ADULT_DAYS&&lineOf(o)===p.line&&riliOf(o)===p.rili;});
   if(!have){T.newCol=(T.newCol||0)+1;if(first&&p.line!=='wild'){var nm=colourName(i).toLowerCase();tankLog(T,(/^[aeiou]/.test(nm)?'An ':'A ')+nm+' baby showed up');}}}
 function tankMainColour(T){var cnt={};T.shrimp.forEach(function(i){if(i.age>=ADULT_DAYS){var c=lineOf(i);cnt[c]=(cnt[c]||0)+1;}});var best='red',bn=-1;for(var c in cnt)if(cnt[c]>bn){bn=cnt[c];best=c;}return best;}
@@ -926,7 +945,7 @@ function addToTank(T,list,from){list.forEach(function(i){if(from)i.from=from;T.s
 function takeHome(list,from){if(!list||!list.length)return;
   openSheet({title:'Take them home',mount:function(el,api){
     var row=document.createElement('div');row.className='chips';row.style.margin='0 0 10px';list.forEach(function(i){var c=document.createElement('span');c.className='chip';c.appendChild(shrimpIconCanvas(specOf(i),34,18));var t=document.createElement('span');t.textContent=colourName(i,true);c.appendChild(t);row.appendChild(c);});el.appendChild(row);
-    var p=document.createElement('p');p.className='hint';p.textContent='Wild shrimp are mostly clear. Some carry a colour too faint to see at G1. Breed them and keep the most coloured babies.';el.appendChild(p);
+    var p=document.createElement('p');p.className='hint';p.textContent='Wild shrimp are mostly clear. Some carry a color too faint to see at G1. Breed them and keep the most colored babies.';el.appendChild(p);
     var b=document.createElement('div');b.className='btns';S.tanks.forEach(function(T,ti){var bt=document.createElement('button');bt.className='btn';bt.innerHTML=esc(T.name)+'<small>'+(T.shrimp.length?plural(T.shrimp.length,'shrimp','shrimp'):'empty')+'</small>';bt.onclick=function(){addToTank(T,list,from||'stream');api.close();toast(plural(list.length,'shrimp','shrimp')+' in '+T.name);sfx('plop');modCall('render');};b.appendChild(bt);});
     if(S.tanks.length<STAGES[S.stage].tanks&&typeof setupTank==='function'){var nt=document.createElement('button');nt.className='btn';nt.innerHTML='+ A new tank<small>'+fmtA(300)+', keeps them apart</small>';nt.onclick=function(){var T=setupTank('Stream tank');if(!T)return;addToTank(T,list,from||'stream');api.close();toast(plural(list.length,'shrimp','shrimp')+' in '+T.name);sfx('plop');modCall('render');};b.appendChild(nt);}
     var no=document.createElement('button');no.className='btn';no.textContent='Let them go';no.onclick=function(){api.close();toast('Back in the stream');};b.appendChild(no);el.appendChild(b);}});}
@@ -941,7 +960,7 @@ function bookShrimpSeen(i,info,silent){if(i.age<JUV_DAYS)return false;var p=phOf
   else if((e.best==null?-1:e.best)<p.grade){Object.assign(e,rec);if(!silent){if(p.grade===7)toast('First '+(LINE_NAMES[p.line]||'')+(p.rili?' rili':'')+' at G8',3200);modCall('bookChanged','shrimp',key);}}
   if(p.line!=='wild'&&!p.legend){var arr=p.rili?(S.book.hueR||(S.book.hueR=[])):(S.book.hue||(S.book.hue=[])),slot=Math.min(119,Math.floor(p.h/3));if(arr[slot]==null||arr[slot]<p.grade)arr[slot]=p.grade;}
   return first;}
-// round 1 book keys were colour:tier
+// round 1 book keys were color:tier
 function migrateBook(){var B=S.book.shrimp;if(!B||S.book.v2)return;S.book.v2=1;var map={violet:'purple'},out={};
   Object.keys(B).forEach(function(k){var a=k.split(':'),c=map[a[0]]||a[0],t=a[1];if(c==='black')return;var nk=t==='rili'?c+':rili':c,best=t==='rili'?4:c==='wild'?2:[1,3,5,7][+t]||1;var e=out[nk]||(out[nk]={day:B[k].day,tank:B[k].tank,from:B[k].from});e.best=Math.max(e.best==null?-1:e.best,best);});
   S.book.shrimp=out;}
@@ -950,18 +969,18 @@ var LINE_SHOW={};LINE_ORDER.forEach(function(c,k){LINE_SHOW[c]={h:GEN.LINES[k][1
 // A found line shows your best one; a missing one is drawn solid so its silhouette reads.
 function bookShrimpDraw(c,ri){return function(x,w,h,got){var L=LINE_SHOW[c];var sp={male:false,col:c,h:got&&got.h!=null?got.h:L.h,s:got&&got.s!=null?got.s:L.s,l:got&&got.l!=null?got.l:L.l,vg:got?(got.best!=null?Math.max(1,got.best):3):7,juv:0,mat:1,rili:ri};
   shrimpStill(x,sp,w/2,h/2,Math.min(w*0.9,h*2),1);};}
-bookCat('shrimp',{title:'Shrimp colours',order:0,note:'Best grade so far for each line',head:function(el){shrimpBookHead(el);},entries:(function(){var e=[];
+bookCat('shrimp',{title:'Shrimp colors',order:0,note:'Best grade so far for each line',head:function(el){shrimpBookHead(el);},entries:(function(){var e=[];
   LINE_ORDER.concat(['wild']).forEach(function(c){[false,true].forEach(function(ri){e.push({id:c+(ri?':rili':''),name:LINE_NAMES[c]+(ri?' rili':''),col:c,rili:ri,grades:true,draw:bookShrimpDraw(c,ri)});});});
   e.push({id:'legendary',name:'Legendary',hint:'Once in a blue moon, from the stream',draw:function(x,w,h){shrimpStill(x,{male:false,col:'legendary',legend:true,vg:7,juv:0,mat:1,h:0,s:80,l:55},w/2,h/2,Math.min(w*0.9,h*2),1);}});
   return e;})()});
 var LINE_HINTS={red:'Grandma’s line',orange:'Reds drift toward it',magenta:'Reds drift toward it',yellow:'Faint ones in the stream',green:'Faint ones in the stream',cyan:'Faint ones in the stream',blue:'Faint ones in the stream',purple:'Red and blue, or the stream',wild:'From the stream'};
 var RILI_HINTS={red:'Grandma has a few',orange:'From rili reds that drift',magenta:'From rili reds that drift',wild:'Rare in the stream'};
-function shrimpHint(e){if(e.rili)return RILI_HINTS[e.col]||'Breed a rili into this colour';return LINE_HINTS[e.col]||'';}
+function shrimpHint(e){if(e.rili)return RILI_HINTS[e.col]||'Breed a rili into this color';return LINE_HINTS[e.col]||'';}
 // The wheel: 120 slots of 3° each, solid outside and rili inside, brighter for a higher grade.
 function shrimpBookHead(el){var hs=S.book.hue||[],hr=S.book.hueR||[],n=0,n8=0,r8=0,rn=0;for(var k=0;k<120;k++){if(hs[k]!=null){n++;if(hs[k]===7)n8++;}if(hr[k]!=null){rn++;if(hr[k]===7)r8++;}}
-  el.innerHTML='<div class="hd"><h2>Colour wheel</h2><small>'+n+' of 120 hues · '+n8+' at G8'+(rn?' · rili '+rn+(r8?' ('+r8+' at G8)':''):'')+'</small></div><div class="wheelrow"><canvas id="bk-wheel" width="220" height="220"></canvas><div class="wheeltxt">'+
+  el.innerHTML='<div class="hd"><h2>Color wheel</h2><small>'+n+' of 120 hues · '+n8+' at G8'+(rn?' · rili '+rn+(r8?' ('+r8+' at G8)':''):'')+'</small></div><div class="wheelrow"><canvas id="bk-wheel" width="220" height="220"></canvas><div class="wheeltxt">'+
    '<p>One slot for each shade you’ve kept: solid outside, rili inside. Brighter means a higher grade.</p>'+
-   '<details><summary>How colour works</summary><p>Each shrimp has eight colour genes. Babies take after their parents: two close colours blend, far apart ones mostly follow one parent and carry a few of the other’s genes, which lowers the grade.</p><p>Grade, G1 to G8, is how solid the colour is. G1 is see-through. Without picking it sinks a little each generation. Keep the best, move the rest on, and it climbs.</p><p>Rili needs 3 of the 4 pattern genes. Babies drift a little in hue, so a line can slowly walk to a new colour. A shrimp’s stability gene sets how much.</p></details></div></div>';
+   '<details><summary>How color works</summary><p>Each shrimp has eight color genes. Babies take after their parents: two close colors blend, far apart ones mostly follow one parent and carry a few of the other’s genes, which lowers the grade.</p><p>Grade, G1 to G8, is how solid the color is. G1 is see-through. Without picking it sinks a little each generation. Keep the best, move the rest on, and it climbs.</p><p>Rili needs 3 of the 4 pattern genes. Babies drift a little in hue, so a line can slowly walk to a new color. A shrimp’s stability gene sets how much.</p></details></div></div>';
   var cv=$('bk-wheel'),W=110,x=fitCanvas(cv,W,W);cv.style.width=W+'px';cv.style.height=W+'px';var c=W/2;
   for(var s=0;s<120;s++){var a0=(s*3-90-1.4)*Math.PI/180,a1=((s+1)*3-90-1.6)*Math.PI/180;[[hs,c-2,c-17],[hr,c-20,c-31]].forEach(function(ring){var g=ring[0][s];x.beginPath();x.arc(c,c,ring[1],a0,a1);x.arc(c,c,ring[2],a1,a0,true);x.closePath();
     if(g==null){x.fillStyle='rgba(120,110,90,.13)';}else{var rgb=GEN.hslRgb(s*3+1.5,30+g*9,82-g*4.5);x.fillStyle='rgb('+rgb.join(',')+')';}x.fill();});}
@@ -1302,7 +1321,7 @@ var tankMod={name:'tank',
   var groups=Object.keys(c.by).map(function(k){return c.by[k];}).sort(function(a,b){return b.n-a.n||lineRank(a.col)-lineRank(b.col);});
   if(groups.length){cb+='<div class="colony">';groups.forEach(function(g){cb+='<div class="cl"><canvas data-cl="'+g.ex.id+'" width="88" height="44"></canvas><div><b>'+esc((LINE_NAMES[g.col]||'Wild')+(g.rili?' rili':''))+' · '+g.n+'</b><small>Best '+GRADE_NAMES[Math.max(0,g.best)]+(g.col==='wild'?' · wild type':'')+'</small></div></div>';});cb+='</div>';}
   else cb+='<p class="hint">'+(T.scape.length?(T.role==='cull'?'Empty. Net shrimp in another tank and move them here.':'No shrimp yet. Net some in another tank and move them here, or take wild ones home from the stream.'):'Set up the tank with Aquascape first.')+'</p>';
-  if(c.babies)cb+='<p class="hint">'+plural(c.babies,'baby','babies')+' still too small to show a colour.</p>';
+  if(c.babies)cb+='<p class="hint">'+plural(c.babies,'baby','babies')+' still too small to show a color.</p>';
   if(T.role==='cull')cb+='<p class="hint">The cull tank. Now and then a hobbyist comes by and takes some, free'+(S.stats.given?' ('+S.stats.given+' so far)':'')+'.</p>';
   else if(T.shrimp.length>SHOW_N)cb+='<p class="hint">Only '+SHOW_N+' are out at a time. The rest hide in the moss and wood, and different ones come out each time you look. Culling a big tank takes many looks, so start early.</p>';
   cb+='<div class="btns"><button class="btn sm" data-rename>Rename</button>'+(T.role==='cull'?'<button class="btn sm" data-cullrole="off">Not a cull tank</button>':!cullTank(false)&&S.tanks.length>1?'<button class="btn sm" data-cullrole="on">Make this the cull tank</button>':'')+'</div>';
@@ -1345,7 +1364,7 @@ function tvTap(p){if(TV.bubbleFor){closeBubble();return;}
   var fb=filterBox();if(p[0]>fb.x-8&&p[1]>fb.y-10)toast('That’s the sponge filter. Clean it under Needs doing when the flow drops.');}
 function closeBubble(){TV.bubbleFor=null;var b=document.querySelector('.bub');if(b)b.remove();}
 function openBubble(a){closeBubble();var i=a.ind,T=TV.T;TV.bubbleFor=i.id;var el=document.createElement('div');el.className='bub';
-  var age=i.age,ageT=age<JUV_DAYS?age+' days, colour shows at '+JUV_DAYS:age<ADULT_DAYS?age+' days, grown at '+ADULT_DAYS:age+' days';
+  var age=i.age,ageT=age<JUV_DAYS?age+' days, color shows at '+JUV_DAYS:age<ADULT_DAYS?age+' days, grown at '+ADULT_DAYS:age+' days';
   var from={grandma:'Grandma’s line',stream:'From the stream',bred:'Born here',shop:'From the shop'}[i.from]||'';
   var par=i.mum?'<br><small>Mum '+esc((LINE_NAMES[i.mum.l]||'')+(i.mum.r?' rili':'')+' '+GRADE_NAMES[i.mum.g])+(i.dad?' · dad '+esc((LINE_NAMES[i.dad.l]||'')+(i.dad.r?' rili':'')+' '+GRADE_NAMES[i.dad.g]):'')+'</small>':'';
   var h='<b>'+esc(i.name?i.name+' · ':'')+esc(colourName(i,true))+'</b><br>'+(i.sex==='f'?'Female':'Male')+' · '+ageT+(i.eggs?'<br>Carrying '+i.eggs.n+' eggs, hatching in '+Math.max(0,i.eggs.due-Math.floor(S.day))+' days':'')+(from?' · <small>'+from+'</small>':'')+par;
@@ -1603,7 +1622,7 @@ function scapeThumb(x,k,w,h){if(k==='stems'){var g={s:0.12};x.save();for(var i=0
 var T=64;
 var LAND_V=2;                 // S.land layout version. 2 is the pixel home; older saves get their map rebuilt
 
-// ----- colours -----
+// ----- colors -----
 // Outdoors follows her tiles (they use the DawnBringer 32 palette). Rooms follow her apartment drawings.
 var PAL={K:'#21181b',INK:'#090609',CREAM:'#f1ebdb',PALE:'#d4e6f3',CORAL:'#dc8b79',CAB:'#446b7d',PLANT:'#4aa63e',
   g1:'#99e550',g2:'#6abe30',g3:'#37946e',g4:'#4b692f',g5:'#323c39',dirt:'#d9a066',dirt2:'#c18e5b',brown:'#8f563b',dbrown:'#663931',
@@ -1641,7 +1660,7 @@ PB.prototype.outline=function(c,diag){c=cu(c);var w=this.w,h=this.h,d=this.d,o=n
     var hit=(x>0&&(d[i-1]>>>24)>200)||(x<w-1&&(d[i+1]>>>24)>200)||(y>0&&(d[i-w]>>>24)>200)||(y<h-1&&(d[i+w]>>>24)>200);
     if(!hit&&diag)hit=(x>0&&y>0&&(d[i-w-1]>>>24)>200)||(x<w-1&&y>0&&(d[i-w+1]>>>24)>200)||(x>0&&y<h-1&&(d[i+w-1]>>>24)>200)||(x<w-1&&y<h-1&&(d[i+w+1]>>>24)>200);
     if(hit)o[i]=c;}this.d=o;return this;};
-// light on the top-left edge of a colour region, dark on the bottom-right (do it before the outline)
+// light on the top-left edge of a color region, dark on the bottom-right (do it before the outline)
 // emptyOnly: only empty pixels count as the edge (inner details don't get a rim)
 PB.prototype.shade=function(base,light,dark,k,emptyOnly){var B=cu(base),Lc=light?cu(light):0,Dc=dark?cu(dark):0,w=this.w,h=this.h,d=this.d,o=new Uint32Array(d);k=k||1;
   function out(x,y){if(x<0||y<0||x>=w||y>=h)return true;var c=d[y*w+x];return emptyOnly?(c>>>24)===0:c!==B;}
@@ -1818,7 +1837,7 @@ function composeTile(m,tx,ty){var g=mget(m,tx,ty),o=CT_O,X=tx*T,Y=ty*T,i,lx,ly,c
   if(nat){for(k=0;k<9;k++){CT_WB[k]=(Wv[k]&&CT_NK[k]!==1)?1:0;CT_GM[k]=(Gv[k]||CT_NK[k])?1:0;}
     for(lx=0;lx<64;lx++){var xc=(X+lx+0.5)/T;CT_SC[lx]=NS.stream?streamCy(xc):0;CT_SW[lx]=NS.stream?streamW(xc):0;}
     if(!eT&&cls!==2&&NS.stream&&TX.sand.length)eT=TX.sand[Math.floor(hash2(tx,ty,32)*TX.sand.length)].d;}
-  // mask codes for a grass tile: 0 fixed colour, 1 its own grass, 2-4 its own grass darkened
+  // mask codes for a grass tile: 0 fixed color, 1 its own grass, 2-4 its own grass darkened
   var MK=CT_M,own=cls===1,FW=CT_FW;
   // the water field once per pixel, from 12 rows above the tile (the bank face looks up to 11 px up)
   var w5=wn&&water5(m,tx,ty,cls,nat);
@@ -1944,7 +1963,7 @@ function paintFlats(x,cx,cy){var ob=LS().objs||[];for(var i=0;i<ob.length;i++){v
 function bucketKey(m,i){return isGrass(m.g[i])?bucketOf(m.gh[i]):-1;}
 // calmer lawn (Puti, 28 Oct: the grass read as noise at full screen). Her three greens are pulled closer together, the teal
 // strokes most, and a slow tint drifts over the land (about 3 tiles across, a little yellower or deeper), so a field reads
-// as one lawn with soft patches instead of the same tile over and over. Only her exact grass colours change.
+// as one lawn with soft patches instead of the same tile over and over. Only her exact grass colors change.
 var CG_D=cu('#4f9f4c'),CG_L=cu('#87cf48'),CG_O=cu('#94a24c'),CG_Y=cu('#9cc23e'),CG_N=cu('#3f8f43');
 function mixU(c,t,k){var r=c&255,g=(c>>>8)&255,b=(c>>>16)&255,r2=t&255,g2=(t>>>8)&255,b2=(t>>>16)&255;
   return ((255<<24)|(Math.round(b+(b2-b)*k)<<16)|(Math.round(g+(g2-g)*k)<<8)|Math.round(r+(r2-r)*k))>>>0;}
@@ -2009,7 +2028,7 @@ function objVer(o){return o.k==='tank'?(S.tanks[o.i]?1:0):o.k==='feeder'?Math.ro
 function objSprite(o){var d=OBJ[o.k];if(!d||!d.spr)return null;var c=OC[o.id],v=objVer(o);if(c&&c.g===SPR_GEN&&c.v===v)return c.s;
   var key=o.k+'|'+(d.keyOf?d.keyOf(o):((o.v==null?'':o.v)+'|'+o.fw+'x'+o.fh+'|'+(o.seed%7))),sp=spr(key,function(){return palSpr(palKey(o),d.spr(o));});OC[o.id]={s:sp,v:v,g:SPR_GEN};return sp;}
 
-// ----- recolour (palette swap). Her sprites use few colours, so any thing or ground can have its colours swapped one for one.
+// ----- recolour (palette swap). Her sprites use few colors, so any thing or ground can have its colors swapped one for one.
 // LS().pal = {kind: {'rrggbb':'rrggbb'}}. kind: an object's k (walls 'wall-p', 'wall-s'), or 'g'+ground for a ground.
 // Every thing or tile of that kind changes, the ones that came with the place too. Saved as hex pairs, so it stays small.
 var PALM={},PAL_GEN=1,PALTX=new WeakMap();
@@ -2022,7 +2041,7 @@ function sprPix(s){var x=document.createElement('canvas').getContext('2d');x.can
 function palSpr(k,s){var m=PALM[k];if(!m||!s||!s.c)return s;var q=sprPix(s),d=q.d;
   for(var i=0;i<d.length;i++){var u=d[i];if(!(u>>>24))continue;var v=m.get((u|0xff000000)>>>0);if(v!==undefined)d[i]=((v&0xffffff)|(u&0xff000000))>>>0;}
   q.x.putImageData(q.im,0,0);var r={};for(var p in s)r[p]=s[p];r.c=q.x.canvas;return r;}
-// the colours to offer: the most used solid colours, most first, up to 16
+// the colors to offer: the most used solid colors, most first, up to 16
 function topCols(cnt,n){var tot=0,ks=Object.keys(cnt);ks.forEach(function(k){tot+=cnt[k];});ks.sort(function(a,b){return cnt[b]-cnt[a];});
   return ks.filter(function(k,i){return i<4||cnt[k]>=tot*0.004;}).slice(0,n||16).map(Number);}
 function objCols(o){var d=OBJ[o.k],s=null;try{s=d.spr(o);}catch(e){}if(!s||!s.c)return [];var px=sprPix(s).d,cnt={};
@@ -2365,7 +2384,7 @@ defObj('palm',{base:58,solid:false,name:'Palm',spr:function(o){var pb=new PB(110
 defObj('trap',{solid:false,name:'Shrimp trap',spr:null,hit:function(o){return [o.tx*T+6,o.ty*T-10,T-12,T+10];},use:{side:'bank'}});
 
 // ----- creatures: pixel sprites with dark outlines, facing right (mirrored for left) -----
-// -- birds. Each has its real colour patches. Poses: 0 perched, 1 pecking, 2 wings up, 3 wings down
+// -- birds. Each has its real color patches. Poses: 0 perched, 1 pecking, 2 wings up, 3 wings down
 var BIRDS=[
  {id:'bulbul',cm:18,name:'White-eared bulbul',len:16,where:['feeder','tree','window'],hint:'Comes to any feeder',w:8,stage:0},
  {id:'myna',cm:23,name:'Common myna',len:17,where:['ground','lawn','feeder'],hint:'Walks about on the lawn',w:5,stage:0},
@@ -2456,7 +2475,7 @@ var FISH=[
  {id:'serpae-tetra',name:'Serpae tetra',len:[3,4.5],where:'both',hint:'Red with a black shoulder spot',w:6},
  {id:'black-phantom-tetra',name:'Black phantom tetra',len:[3,4.5],where:'lake',hint:'Grey with a black patch',w:5},
  {id:'rosy-tetra',name:'Rosy tetra',len:[3,4.5],where:'lake',hint:'Pink with a tall fin',w:5},
- {id:'tricolor-swordtail',name:'Tricolour swordtail',len:[5,8],where:'both',hint:'Rare. Orange, black and white, with a sword',w:1.5},
+ {id:'tricolor-swordtail',name:'Tricolor swordtail',len:[5,8],where:'both',hint:'Rare. Orange, black and white, with a sword',w:1.5},
  {id:'siamese-algae-eater',name:'Siamese algae eater',len:[8,15],where:'stream',hint:'Long, with a black stripe nose to tail',w:3},
  {id:'clown-killifish',name:'Clown killifish',len:[2.5,3.5],where:'lake',hint:'Banded, with a red and blue tail',w:2},
  {id:'glowlight-rasbora',name:'Glowlight rasbora',len:[2.5,3.5],where:'stream',hint:'Orange, with a dark wedge',w:5},
@@ -3100,7 +3119,7 @@ function useObj(o){
   if(o.k==='tank'){goUse(o,function(){if(S.tanks[o.i]){sfx('click');zoomToTank(o);return;}var s=objSprite(o);bubAt(oX(o),oBase(o)-(s?s.ay:60),'<b>An empty stand</b><div class="btns"><button class="btn primary" data-setup>Set up a tank here · '+fmtA(300)+'</button></div>',function(el){var b=el.querySelector('[data-setup]');if(b)b.onclick=function(){var T=setupTank();if(!T)return;closeBub();sfx('plop');toast(T.name+' is set up. A few stones to start.');goTank(S.tanks.length-1);};});});return true;}
   if(o.k==='feeder'||o.k==='wfeeder'){goUse(o,fillFeeder);return true;}
   if(o.k==='coop'){goUse(o,function(){collectEggs(o);});return true;}
-  if(o.gm){goUse(o,function(){grandmaSays(o);});return true;}
+  if(o.gm&&!gmAway()){goUse(o,function(){grandmaSays(o);});return true;}
   if(o.k==='trap'){goUse(o,trapTap);return true;}
   if(o.k==='bench'||(OBJ[o.k]&&OBJ[o.k].sit)){var me=L.me;if(me.sit&&me.sit.o===o)return true;goUse(o,sitOn);return true;}
   return false;}
@@ -3340,7 +3359,7 @@ function removeThing(o,e){var l=LS(),m=M();if(o&&o.gm)gmTo(gmSeats()[0]);
   else if(e){var j=0;for(var y2=e.ty;y2<e.ty+e.fh;y2++)for(var x2=e.tx;x2<e.tx+e.fw;x2++){var p=e.prev[j++];mset(m,x2,y2,p[0],p[1]);skinSet(x2,y2,p[3]);if(m.wb)m.wb[mi(m,x2,y2)]=p[2]||0;}l.edits=l.edits.filter(function(q){return q!==e;});L.pmask=null;earn(Math.floor(e.price/2),'refund');
     repaintAround(e.tx,e.ty,e.fw,e.fh);if(e.k==='pond'||e.k==='g-water'||e.prev.some(function(p){return p[0]===G_WATER;}))syncAgents();}
   sfx('pop');computePass();computeSpots();L.hints=null;L.dirty=true;save();}
-// ----- Colours: tap a thing or a ground, swap any of its colours. Every one of that kind changes, free.
+// ----- Colors: tap a thing or a ground, swap any of its colors. Every one of that kind changes, free.
 var DB32=['000000','222034','45283c','663931','8f563b','df7126','d9a066','eec39a','fbf236','99e550','6abe30','37946e','4b692f','524b24','323c39','3f3f74','306082','5b6ee1','639bff','5fcde4','cbdbfc','ffffff','9badb7','847e87','696a6a','595652','76428a','ac3232','d95763','d77bba','8f974a','8a6f30'];
 var G_NAME={};G_NAME[G_FLOOR]='Floor';G_NAME[G_HALL]='Hall floor';G_NAME[G_STEP]='Stepping stones';
 function colourTarget(t){var ob=LS().objs||[],best=null;for(var i=ob.length-1;i>=0;i--){var q=ob[i];if(!OBJ[q.k]||!OBJ[q.k].spr)continue;
@@ -3349,24 +3368,37 @@ function colourTarget(t){var ob=LS().objs||[],best=null;for(var i=ob.length-1;i>
   var sk=skinAt(t[0],t[1]);if(sk&&MADE_BY[sk])return {k:'c:'+sk,name:MADE_BY[sk].n,cols:function(){return madeCols(sk);}};
   var g=mget(M(),t[0],t[1]);if(g==null||g===G_VOID||g===G_WALL||g===G_STEP)return null;if(inAnyRoom(t[0],t[1])&&gClass(g)!==0)return null;
   var gb=BUILD.filter(function(b){return b.ground&&b.edit===g;})[0];return {k:'g'+g,name:gb?gb.name:G_NAME[g]||'Ground',cols:function(){return groundCols(g);}};}
-function tapColour(t,cx,cy){var c=colourTarget(t);if(!c){toast('Nothing to colour there.');sfx('nope');return;}var cols=c.cols();if(!cols.length){toast('Nothing to colour there.');sfx('nope');return;}
-  sfx('click');var sel=-1,cur=function(u){return palU(c.k,u);};
-  var html='<b>'+esc(c.name)+'</b><div class="hint">Tap a colour to swap it. '+(c.k.charAt(0)==='g'&&!OBJ[c.k]?'All of it changes.':'All of them change.')+'</div><div class="pcols">'+
-    cols.map(function(u,i){return '<button data-c="'+i+'" aria-label="Colour '+(i+1)+'"></button>';}).join('')+'</div>'+
-    '<div class="pchoose" hidden><div class="pcols">'+DB32.map(function(h){return '<button data-to="'+h+'" style="background:#'+h+'" aria-label="#'+h+'"></button>';}).join('')+'</div>'+
-    '<div class="btns"><label class="btn pcus">Other<input type="color"></label><button class="btn" data-orig>As drawn</button></div></div>'+
-    '<div class="btns"><button class="btn" data-all>All as drawn</button></div>';
-  showBub(cx,cy,html,function(el){var sw=el.querySelectorAll('[data-c]'),ch=el.querySelector('.pchoose'),inp=el.querySelector('input[type=color]');
-    function paint(){sw.forEach(function(b,i){var u=cols[i];b.style.background=hexOf(cur(u));b.setAttribute('aria-pressed',String(i===sel));b.classList.toggle('pch',cur(u)!==u);});}
-    function to(u){if(sel<0)return;palSet(c.k,cols[sel],u);paint();sfx('click');}
-    function fit(){var host=$('lwrap');if(!host)return;var W=host.clientWidth,H=host.clientHeight,w=el.offsetWidth,h=el.offsetHeight,x0=(parseFloat(el.style.left)||0)-(el._dx||0),y0=(parseFloat(el.style.top)||0)-(el._dy||0);
-      el.style.transform='';el._dx=el._dy=0;L.bubCam=[L.cam.x,L.cam.y];el.style.left=clamp(x0,6,Math.max(6,W-w-6))+'px';el.style.top=clamp(y0,6,Math.max(6,H-h-6))+'px';}
-    sw.forEach(function(b){b.onclick=function(){var i=+b.dataset.c;sel=sel===i?-1:i;ch.hidden=sel<0;if(sel>=0)inp.value=hexOf(cur(cols[sel]));paint();fit();};});
-    el.querySelectorAll('[data-to]').forEach(function(b){b.onclick=function(){to(U32(b.dataset.to));};});
-    inp.oninput=function(){to(U32(inp.value));};
-    el.querySelector('[data-orig]').onclick=function(){if(sel>=0)to(cols[sel]);};
-    el.querySelector('[data-all]').onclick=function(){palClear(c.k);sel=-1;ch.hidden=true;paint();sfx('pop');};
-    paint();});}
+// Pass 172 (Puti, 31 Oct): a panel docked at the bottom, so the thing stays in sight above it, and sliders instead of a fixed set:
+// hue, strength (saturation) and lightness. Reset puts one color back as she drew it, Reset all the whole thing.
+function rgb2hsl(u){var r=(u&255)/255,g=((u>>>8)&255)/255,b=((u>>>16)&255)/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,h=0,s=0,d=mx-mn;
+  if(d){s=l>.5?d/(2-mx-mn):d/(mx+mn);h=mx===r?(g-b)/d+(g<b?6:0):mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;}return [h,s,l];}
+function hsl2u(h,s,l){function f(n){var k=(n+h/30)%12,a=s*Math.min(l,1-l);return Math.round(255*(l-a*Math.max(-1,Math.min(k-3,9-k,1))));}return ((255<<24)|(f(4)<<16)|(f(8)<<8)|f(0))>>>0;}
+function closeCol(){if(L.cpan){L.cpan.remove();L.cpan=null;}}
+function tapColour(t,cx,cy){var c=colourTarget(t);if(!c){toast('Nothing to color there.');sfx('nope');return;}var cols=c.cols();if(!cols.length){toast('Nothing to color there.');sfx('nope');return;}
+  sfx('click');closeBub();closeCol();var host=$('lwrap');if(!host)return;var sel=0,cur=function(u){return palU(c.k,u);};
+  // keep the thing in the top part of the map, above the panel
+  var wy=(t[1]+0.5)*T,wx=(t[0]+0.5)*T;L.cam.x=wx-L.VW/2;L.cam.y=wy-L.VH*0.28;clampCam();L.dirty=true;
+  var el=document.createElement('div');el.className='cpan';el.setAttribute('role','dialog');el.setAttribute('aria-label','Color '+c.name);
+  el.innerHTML='<div class="cp-hd"><b>'+esc(c.name)+'</b><button class="btn sm" data-done>Done</button></div>'+
+    '<div class="cp-hint">'+(c.k.charAt(0)==='g'&&!OBJ[c.k]?'All of this ground changes.':'Every one of these changes.')+' Pick one of its colors, then slide.</div>'+
+    '<div class="cp-cols">'+cols.map(function(u,i){return '<button data-c="'+i+'" aria-label="Color '+(i+1)+'"></button>';}).join('')+'</div>'+
+    '<label class="cp-row"><span>Hue</span><input type="range" id="cp-h" min="0" max="359" step="1"></label>'+
+    '<label class="cp-row"><span>Strength</span><input type="range" id="cp-s" min="0" max="100" step="1"></label>'+
+    '<label class="cp-row"><span>Light</span><input type="range" id="cp-l" min="0" max="100" step="1"></label>'+
+    '<div class="cp-btns"><button class="btn" data-orig>Reset this color</button><button class="btn" data-all>Reset all</button></div>';
+  host.appendChild(el);L.cpan=el;
+  var sw=el.querySelectorAll('[data-c]'),H=el.querySelector('#cp-h'),Sx=el.querySelector('#cp-s'),Lx=el.querySelector('#cp-l');
+  function paint(){sw.forEach(function(b,i){var u=cols[i];b.style.background=hexOf(cur(u));b.setAttribute('aria-pressed',String(i===sel));b.classList.toggle('pch',cur(u)!==u);});}
+  function load(){var q=rgb2hsl(cur(cols[sel]));H.value=Math.round(q[0]);Sx.value=Math.round(q[1]*100);Lx.value=Math.round(q[2]*100);bars();}
+  function bars(){var h=+H.value,sv=+Sx.value,lv=+Lx.value;H.style.background='linear-gradient(90deg,'+[0,60,120,180,240,300,360].map(function(x){return 'hsl('+x+','+Math.max(40,sv)+'%,'+Math.min(70,Math.max(30,lv))+'%)';}).join(',')+')';
+    Sx.style.background='linear-gradient(90deg,hsl('+h+',0%,'+lv+'%),hsl('+h+',100%,'+lv+'%))';Lx.style.background='linear-gradient(90deg,#000,hsl('+h+','+sv+'%,50%),#fff)';}
+  function slide(){palSet(c.k,cols[sel],hsl2u(+H.value,+Sx.value/100,+Lx.value/100));bars();paint();}
+  sw.forEach(function(b){b.onclick=function(){sel=+b.dataset.c;sfx('click');paint();load();};});
+  [H,Sx,Lx].forEach(function(r){r.oninput=slide;});
+  el.querySelector('[data-orig]').onclick=function(){palSet(c.k,cols[sel],cols[sel]);paint();load();sfx('pop');};
+  el.querySelector('[data-all]').onclick=function(){palClear(c.k);paint();load();sfx('pop');};
+  el.querySelector('[data-done]').onclick=function(){closeCol();sfx('click');};
+  paint();load();}
 function tapBuild(wx,wy,t,cx,cy){if(L.making){toast('Pick one below, or New.');return;}if(L.colouring){tapColour(t,cx,cy);return;}if(L.moving){tapMove(t);return;}if(L.removing){var ob0=LS().objs,o0=null;for(var i0=ob0.length-1;i0>=0;i0--){var q0=ob0[i0];if(q0.built&&t[0]>=q0.tx&&t[0]<q0.tx+q0.fw&&t[1]>=q0.ty&&t[1]<q0.ty+q0.fh){o0=q0;break;}}
     var e0=o0?null:groundEdit(t[0],t[1]);if(o0||e0){removeThing(o0,e0);return;}toast(objAtTile(t[0],t[1],true)?'That came with the place.':'Nothing you built here.');sfx('nope');return;}
   var b=L.buildSel&&BUILDI[L.buildSel];
@@ -3406,11 +3438,11 @@ function renderBuildPal(pal){var list=buildList(),cats=BCAT.filter(function(c){r
   if(!L.buildCat||!cats.some(function(c){return c.id===L.buildCat;}))L.buildCat=cats.length?cats[0].id:null;
   var items=list.filter(function(b){return b.cat===L.buildCat;});
   pal.innerHTML='<div class="bcats" role="tablist">'+cats.map(function(c){return '<button class="bcat" role="tab" data-cat="'+c.id+'" aria-pressed="'+(!L.removing&&!L.moving&&!L.colouring&&!L.making&&L.buildCat===c.id)+'">'+esc(c.name)+'</button>';}).join('')+
-    '<button class="bcat bmk" data-kmode aria-pressed="'+!!L.making+'">Make</button><button class="bcat bmv" data-mmode aria-pressed="'+!!L.moving+'">Move</button><button class="bcat bcl" data-cmode aria-pressed="'+!!L.colouring+'">Colours</button><button class="bcat brm" data-rmode aria-pressed="'+!!L.removing+'">Remove</button></div>'+
+    '<button class="bcat bmk" data-kmode aria-pressed="'+!!L.making+'">Make</button><button class="bcat bmv" data-mmode aria-pressed="'+!!L.moving+'">Move</button><button class="bcat bcl" data-cmode aria-pressed="'+!!L.colouring+'">Colors</button><button class="bcat brm" data-rmode aria-pressed="'+!!L.removing+'">Remove</button></div>'+
     (L.making?mkPanelHtml():L.colouring?'<div class="bnote">One of a kind changes them all, the ones that came with the place too. Free.</div>':L.moving?'<div class="bnote">Tap a thing to pick it up, then tap where it goes. Moving is free.</div>':L.removing?'<div class="bnote">Tap something you built or painted to take it away. You get half back.</div>':
     '<div class="bgrid" style="grid-template-columns:repeat('+gridCols(items.length)+',minmax(0,1fr))">'+items.map(function(b){return '<button data-item="'+b.id+'" aria-pressed="'+(L.buildSel===b.id)+'"><span class="pi"></span><b>'+esc(b.name)+'</b><small>'+fmtA(b.price)+(b.ground?' a tile':'')+'</small></button>';}).join('')+'</div>');
   pal.querySelectorAll('[data-cat]').forEach(function(bt){bt.onclick=function(){L.buildCat=bt.dataset.cat;L.removing=false;L.moving=false;L.colouring=false;L.making=false;L.moveObj=null;L.buildSel=null;sfx('click');renderBuildPal(pal);updateStat(true);L.hints=null;L.dirty=true;};});
-  pal.querySelector('[data-cmode]').onclick=function(){L.colouring=!L.colouring;L.making=false;L.moving=false;L.removing=false;L.moveObj=null;L.buildSel=null;L.hints=null;closeBub();sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
+  pal.querySelector('[data-cmode]').onclick=function(){closeCol();L.colouring=!L.colouring;L.making=false;L.moving=false;L.removing=false;L.moveObj=null;L.buildSel=null;L.hints=null;closeBub();sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
   pal.querySelector('[data-mmode]').onclick=function(){L.moving=!L.moving;L.removing=false;L.colouring=false;L.making=false;L.moveObj=null;L.buildSel=null;L.hints=null;sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
   pal.querySelector('[data-kmode]').onclick=function(){L.making=!L.making;L.colouring=false;L.moving=false;L.removing=false;L.moveObj=null;L.buildSel=null;L.hints=null;closeBub();sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
   if(L.making)mkPanelBind(pal);
@@ -3475,7 +3507,7 @@ function mountHome(){var p=$('p-home');ensureLand();
 function setTool(id,quiet){id=mapTool(id);if(L.cv&&!toolsHere().some(function(t){return t.id===id;})){if(!quiet)toast(id==='rod'?'No fish here yet. Wait for the land with the stream.':'Not here yet.');id='walk';}
   L.tool=id;LS().tool=id;closeBub();L.hints=null;L.dirty=true;if(id!=='rod'&&L.fishing)L.fishing=null;if(id!=='build')L.camFree=false;if(id==='mow'&&L.me)L.me.speed=MOW_SPEED;else if(L.me)L.me.speed=ME_SPEED;
   document.querySelectorAll('#ltools [data-tool]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.tool===id));});
-  var pal=$('lpal');if(pal){if(id==='build'){renderBuildPal(pal);pal.hidden=false;}else{pal.hidden=true;L.buildSel=null;L.removing=false;L.moving=false;L.colouring=false;L.making=false;L.moveObj=null;}}
+  var pal=$('lpal');if(pal){if(id==='build'){renderBuildPal(pal);pal.hidden=false;}else{pal.hidden=true;closeCol();L.buildSel=null;L.removing=false;L.moving=false;L.colouring=false;L.making=false;L.moveObj=null;}}
   if(!quiet)sizeCanvas();updateStat(true);}
 // one canvas pixel per art pixel, scaled up by CSS: a whole number of screen pixels per art pixel where the screen allows
 // (2 on 3x phones), 1.5 on 2x phones, about 44 CSS px per tile either way
@@ -3502,7 +3534,7 @@ function updateStat(force){var el=$('lstat');if(!el)return;var l=LS(),html='',eg
   else if(f&&f.st==='bite')html='<b>Now!</b> Tap.';
   else if(L.tool==='build'&&L.moving)html=L.moveObj?'Tap where the '+esc(((OBJ[L.moveObj.k]||{}).name||'thing').toLowerCase())+' goes. Tap it again to put it down.':'Tap anything to pick it up.';
   else if(L.tool==='build'&&L.making)html='Draw your own things.';
-  else if(L.tool==='build'&&L.colouring)html='Tap a thing or the ground to change its colours.';
+  else if(L.tool==='build'&&L.colouring)html='Tap a thing or the ground to change its colors.';
   else if(L.tool==='build'&&L.removing)html='Tap or drag over things you built to take them away.';
   else if(b)html=b.ground?esc(b.name)+': tap a tile, or drag to paint. '+fmtA(b.price)+' a tile.':'Tap where the '+esc(b.name.toLowerCase())+' goes. '+fmtA(b.price)+'.';
   else if(L.tool==='build')html='Pick something to build. Drag the map to look around.';
@@ -3626,7 +3658,9 @@ function drawLight(x){var Lt=lightNow(),c=Lt.c;if(c[0]>=254&&c[1]>=254&&c[2]>=25
 OBJ.coop.live=function(x,o){var s=objSprite(o),eg=LS().eggs;if(!s||!s.nest||!eg.length)return;var n=Math.min(eg.length,8),w=s.nest.w||30,bx=oX(o)+s.nest.x+Math.round(w/2),by=oBase(o)+s.nest.y+2,front=Math.min(4,n),back=n-front;
   function row(k0,cnt,dy,sh){for(var k=0;k<cnt;k++)drawSpr(x,eggSpr(eg[k0+k]),bx+Math.round((k-(cnt-1)/2)*8)+sh-4,by-dy);}
   row(front,back,3,4);row(0,front,0,0);};
-OBJ.armchair.live=function(x,o){if(!o.gm)return;drawSprK(x,grandmaSpr(Math.floor(L.rt*2.2)%2),oX(o)-2*CHK,oBase(o)-2*CHK,CHK);};
+// after Leave Earth Grandma is asleep on the ship (Pass 172): her chair stays empty
+function gmAway(){return !!window.GM_AWAY;}
+OBJ.armchair.live=function(x,o){if(!o.gm||gmAway())return;drawSprK(x,grandmaSpr(Math.floor(L.rt*2.2)%2),oX(o)-2*CHK,oBase(o)-2*CHK,CHK);};
 // draw at full rate while things move, 30 fps for small animals, 8 fps when only water and Grandma's needles move
 function busy(){var me=L.me,dg=L.dog,c=L.cat;return L.dirty||L.camMoving||(me&&me.moving)||(dg&&(dg.run||dg.hop>0))||(c&&(c.st==='walk'||c.hop>0||c.reach>0))||L.parts.length>0||(L.fishing&&L.fishing.st!=='idle')||!!L.watch||!!L.marker||!!(L.ptr&&L.ptr.down);}
 function lively(){var i,b;for(i=0;i<L.birds.length;i++){b=L.birds[i];if(b.st!=='stay'||b.spot.hover)return true;}if(L.bfl&&L.bfl.length)return true;for(var id in L.henA){var c=L.henA[id];if(c.st==='walk'||c.st==='run'||c.st==='flap')return true;}for(var id2 in L.wildA){var c2=L.wildA[id2];if((c2.st==='walk'||c2.st==='run')&&inView(c2.x,c2.y,40))return true;}return false;}
@@ -3750,7 +3784,7 @@ function mkPrice(it){var t=MKT[it.t];return t.fixed?t.price:t.price+10*(it.fw*it
 function mkOk(it){return it&&typeof it.id==='string'&&MKT[it.t]&&it.w>0&&it.h>0&&it.w<=256&&it.h<=512&&Array.isArray(it.p)&&typeof it.d==='string';}
 function madeGround(k){var it=k&&k.indexOf('c:')===0&&MADE_BY[k.slice(2)];return !!(it&&it.t==='floor');}
 
-// ----- pixels: run-length over palette indices. "B" one pixel of colour 1, "B.1k." 56 of them.
+// ----- pixels: run-length over palette indices. "B" one pixel of color 1, "B.1k." 56 of them.
 function mkEnc(px){var o='',i=0,n=px.length;while(i<n){var c=px[i],j=i+1;while(j<n&&px[j]===c)j++;var r=j-i;o+=MK_ALPH.charAt(c);if(r===2)o+=MK_ALPH.charAt(c);else if(r>2)o+='.'+r.toString(36)+'.';i=j;}return o;}
 function mkDec(s,n){var px=new Uint8Array(n),i=0,k=0,last=0;while(k<s.length&&i<n){var ch=s.charAt(k);
     if(ch==='.'){var e=s.indexOf('.',k+1);if(e<0)break;var r=parseInt(s.slice(k+1,e),36)||1;for(var q=1;q<r&&i<n;q++)px[i++]=last;k=e+1;continue;}
@@ -3774,7 +3808,7 @@ function mkRegister(){var l=S&&S.land;if(!l)return;if(!Array.isArray(l.made))l.m
     if(it.t==='floor')b={k:'c:'+it.id,name:it.n,ground:1,edit:G_FLOOR,skin:it.id,price:t.price,where:GROUND_ON,stage:0};
     else if(it.t==='wall')b={k:'wall',name:it.n,price:t.price,where:GROUND_ON.filter(function(g){return g!==G_WATER;}),stage:0,o:{v:'c:'+it.id},k2:'wall-c:'+it.id};
     else if(it.t==='fence')b={k:'fence',name:it.n,price:t.price,where:(BUILDI.fence?BUILDI.fence.where:GROUND_ON.filter(function(g){return g!==G_WATER;})),stage:0,o:{v:'c:'+it.id},k2:'fence-c:'+it.id};
-    else{defObj('c:'+it.id,{fw:it.fw,fh:it.fh,base:63,name:it.n,flat:!!t.flat,sit:!!t.sit,nap:!!t.nap,keyOf:function(){return 'm';},spr:function(){return madeSpr(it.id);},live:t.sit?function(x,o){if(o.gm)drawSprK(x,grandmaSpr(Math.floor(L.rt*2.2)%2),oX(o)-2*CHK,oBase(o)-2*CHK-6,CHK);}:null});
+    else{defObj('c:'+it.id,{fw:it.fw,fh:it.fh,base:63,name:it.n,flat:!!t.flat,sit:!!t.sit,nap:!!t.nap,keyOf:function(){return 'm';},spr:function(){return madeSpr(it.id);},live:t.sit?function(x,o){if(o.gm&&!gmAway())drawSprK(x,grandmaSpr(Math.floor(L.rt*2.2)%2),oX(o)-2*CHK,oBase(o)-2*CHK-6,CHK);}:null});
       b={k:'c:'+it.id,name:it.n,price:mkPrice(it),where:mkWhere(),stage:0,o:{fw:it.fw,fh:it.fh}};}
     b.cat=t.cat;b.made=it.id;b.id=b.k2||b.k;BUILD.push(b);BUILDI[b.id]=b;});
   // a thing whose drawing is gone can't stay on the map
@@ -3810,6 +3844,14 @@ function mkIcon(id){var it=MADE_BY[id],b=BUILD.filter(function(q){return q.made=
 // ----- the editor -----
 var MK=null;
 var MK_TOOLS=[['pen','Pen'],['erase','Eraser'],['fill','Fill'],['pick','Pick'],['pan','Pan'],['line','Line'],['rect','Box'],['oval','Circle'],['tri','Triangle']];
+// each button shows what it does (Puti, 31 Oct): a square for Box, a circle for Circle, arrows for back and forward
+var MK_ICO={pen:'<path d="M4 20l1-5L15 5l4 4L9 19z"/><path d="M13 7l4 4"/>',erase:'<path d="M8 20h12"/><path d="M4 15l9-9 6 6-7 7H8z"/><path d="M9 10l6 6"/>',
+ fill:'<path d="M6 11l7-7 7 7-7 7z"/><path d="M20 15c0 2 1 3 1 4a1 1 0 01-2 0c0-1 1-2 1-4z" fill="currentColor"/>',pick:'<path d="M14 4l6 6-3 3-6-6z"/><path d="M11 7L4 14v4h4l7-7"/>',
+ pan:'<path d="M12 3v18M3 12h18"/><path d="M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/>',line:'<path d="M5 19L19 5"/>',rect:'<rect x="5" y="5" width="14" height="14"/>',
+ oval:'<circle cx="12" cy="12" r="7.5"/>',tri:'<path d="M12 4l8.5 15h-17z"/>',undo:'<path d="M9 7L4 12l5 5"/><path d="M4 12h11a5 5 0 010 10h-3"/>',
+ redo:'<path d="M15 7l5 5-5 5"/><path d="M20 12H9a5 5 0 000 10h3"/>',mir:'<path d="M12 3v18" stroke-dasharray="2 2"/><path d="M9 7L4 12l5 5zM15 7l5 5-5 5z"/>',
+ flip:'<path d="M4 9h14l-3-3M20 15H6l3 3"/>',zin:'<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5M8 11h6M11 8v6"/>',zout:'<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5M8 11h6"/>'};
+function mkI(k,label){return '<svg class="mki" viewBox="0 0 24 24" aria-hidden="true">'+MK_ICO[k]+'</svg><span class="mkl">'+label+'</span>';}
 function mkOpen(id){var it=id&&MADE_BY[id];closeBub();
   MK={id:id,it:it,from:0,undo:[],redo:[],tool:'pen',slot:0,col:[h2u('222034ff'),h2u('d9a066ff')],face:true,z:0,del:0};
   if(it){var q=madePx(id);MK.t=it.t;MK.n=it.n;MK.fw=it.fw;MK.fh=it.fh;MK.w=it.w;MK.h=it.h;MK.px=new Uint8Array(q.px);MK.pal=q.pal.slice();MK.step='draw';}
@@ -3823,7 +3865,7 @@ function mkBlank(){var t=MKT[MK.t];MK.fw=t.fw;MK.fh=t.fh;MK.w=t.w||t.fw*T;MK.h=t
     for(var y=0;y<MK.h;y++)for(var x=0;x<MK.w;x++)MK.px[y*MK.w+x]=y<MK_CAP-2?C:y<MK_CAP?CD:y>=MK.h-2?FD:y>=MK.h-10?(y===MK.h-10?FD:F2):F;}}
 function mkIdx(u){var p=MK.pal;for(var i=1;i<p.length;i++)if(p[i]===u)return i;if(p.length<64){p.push(u);return p.length-1;}
   var best=1,bd=1e9;for(var j=1;j<p.length;j++){var v=p[j],d=0;for(var s=0;s<32;s+=8){var a=((u>>>s)&255)-((v>>>s)&255);d+=a*a;}if(d<bd){bd=d;best=j;}}
-  if(!MK.full){MK.full=1;toast('63 colours is the most. Using the closest.');}return best;}
+  if(!MK.full){MK.full=1;toast('63 colors is the most. Using the closest.');}return best;}
 function mkName(){return MK.n||MKT[MK.t].name;}
 
 function mkRender(){var el=MK.el,t=MKT[MK.t];
@@ -3863,13 +3905,13 @@ function mkTake(u,w,h,dx,dy){var cnt={},k;for(k=0;k<u.length;k++)if(u[k]>>>24)cn
   var keep=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];}).map(Number);keep.forEach(function(v){mkIdx(v>>>0);});
   for(var y=0;y<h;y++)for(var x=0;x<w;x++){var v=u[y*w+x];if(!(v>>>24))continue;var X=x+dx,Y=y+dy;if(X<0||Y<0||X>=MK.w||Y>=MK.h)continue;MK.px[Y*MK.w+X]=mkIdx(v>>>0);}}
 
-function mkDrawView(el,hd){var t=MKT[MK.t],tools=MK_TOOLS.map(function(q){return '<button class="mkt" data-tool="'+q[0]+'" aria-pressed="'+(MK.tool===q[0])+'">'+q[1]+'</button>';}).join('');
+function mkDrawView(el,hd){var t=MKT[MK.t],tools=MK_TOOLS.map(function(q){return '<button class="mkt mkib" data-tool="'+q[0]+'" aria-label="'+q[1]+'" title="'+q[1]+'" aria-pressed="'+(MK.tool===q[0])+'">'+mkI(q[0],q[1])+'</button>';}).join('');
   var sizes=t.fixed?'':MK_SIZES.map(function(z){var on=z[0]===MK.fw&&z[1]===MK.fh;return '<button class="mkt" data-fp="'+z[0]+'x'+z[1]+'" aria-pressed="'+on+'">'+z[0]+'×'+z[1]+'</button>';}).join('')+
     '<button class="mkt" data-hh="-8" aria-label="Shorter">Shorter</button><button class="mkt" data-hh="8" aria-label="Taller">Taller</button>';
   var extra=[],seen={};DB32.forEach(function(h){seen[h2u(h+'ff')]=1;});for(var i=1;i<MK.pal.length;i++){var u=MK.pal[i];if(!seen[u]&&(u>>>24)===255){seen[u]=1;extra.push(u);}}
   el.innerHTML=hd+'<div class="mkview"><div class="mkpad"><canvas class="mkc"></canvas><canvas class="mkg"></canvas></div></div>'+
-    '<div class="mkbar"><div class="mkrow">'+tools+'<button class="mkt" data-undo>Undo</button><button class="mkt" data-redo>Redo</button><button class="mkt" data-mir aria-pressed="'+!!MK.mir+'">Mirror</button><button class="mkt" data-flip>Flip</button><button class="mkt" data-zm="-1" aria-label="Zoom out">−</button><button class="mkt" data-zm="1" aria-label="Zoom in">+</button></div>'+
-    '<div class="mkrow mkcolrow"><button class="mkslot" data-slot="0" aria-pressed="'+(MK.slot===0)+'"><i></i>Colour</button><button class="mkslot" data-slot="1" aria-pressed="'+(MK.slot===1)+'"><i></i>Face</button>'+
+    '<div class="mkbar"><div class="mkrow">'+tools+'<button class="mkt mkib" data-undo aria-label="Back" title="Back">'+mkI('undo','Back')+'</button><button class="mkt mkib" data-redo aria-label="Forward" title="Forward">'+mkI('redo','Forward')+'</button><button class="mkt mkib" data-mir aria-label="Mirror" title="Mirror" aria-pressed="'+!!MK.mir+'">'+mkI('mir','Mirror')+'</button><button class="mkt mkib" data-flip aria-label="Flip" title="Flip">'+mkI('flip','Flip')+'</button><button class="mkt mkib" data-zm="-1" aria-label="Zoom out" title="Zoom out">'+mkI('zout','Out')+'</button><button class="mkt mkib" data-zm="1" aria-label="Zoom in" title="Zoom in">'+mkI('zin','In')+'</button></div>'+
+    '<div class="mkrow mkcolrow"><button class="mkslot" data-slot="0" aria-pressed="'+(MK.slot===0)+'"><i></i>Color</button><button class="mkslot" data-slot="1" aria-pressed="'+(MK.slot===1)+'"><i></i>Face</button>'+
     '<button class="mkt" data-noface aria-pressed="'+!MK.face+'">No face</button></div>'+
     '<div class="mkpal"><label class="mkt mkother">Other<input type="color"></label>'+DB32.map(function(h){return '<button data-u="'+h2u(h+'ff')+'" style="background:#'+h+'" aria-label="#'+h+'"></button>';}).join('')+
     extra.map(function(u){return '<button data-u="'+u+'" style="background:'+hexOf(u)+'" aria-label="'+hexOf(u)+'"></button>';}).join('')+'</div>'+
@@ -3922,7 +3964,7 @@ function mkPaint(prev){var c=MK.c,g=MK.g,W=MK.w,H=MK.h,z=MK.z;if(!c)return;
   y.strokeStyle='rgba(0,0,0,0.22)';y.beginPath();for(var tx=T;tx<W;tx+=T){y.moveTo(tx*z+0.5,0);y.lineTo(tx*z+0.5,H*z);}for(var ty=H-T;ty>0;ty-=T){y.moveTo(0,ty*z+0.5);y.lineTo(W*z,ty*z+0.5);}y.stroke();
   var info=MK.el.querySelector('.mkinfo');if(info)info.textContent=W+'×'+H+' px';}
 
-// shapes stamp into the pixels: the edge in Colour, the inside in Face (or nothing)
+// shapes stamp into the pixels: the edge in Color, the inside in Face (or nothing)
 function mkShape(kind,x0,y0,x1,y1){var out=[],W=MK.w,H=MK.h;
   if(kind==='line'){var dx=Math.abs(x1-x0),sx=x0<x1?1:-1,dy=-Math.abs(y1-y0),sy=y0<y1?1:-1,e=dx+dy,x=x0,y=y0;for(var g=0;g<2000;g++){out.push([x,y,0]);if(x===x1&&y===y1)break;var e2=2*e;if(e2>=dy){e+=dy;x+=sx;}if(e2<=dx){e+=dx;y+=sy;}}return out;}
   var ax=Math.min(x0,x1),bx=Math.max(x0,x1),ay=Math.min(y0,y1),by=Math.max(y0,y1),w=bx-ax+1,h=by-ay+1;
@@ -3955,7 +3997,7 @@ function mkPointer(g){var down=null,view=MK.view;
     if(e.type==='pointerup'&&(tl==='line'||tl==='rect'||tl==='oval'||tl==='tri')){mkStamp(mkShape(tl,down.p0[0],down.p0[1],p[0],p[1]));}
     down=null;mkPaint();};}
 
-// ----- save: drop colours nobody uses, keep it small
+// ----- save: drop colors nobody uses, keep it small
 function mkSave(){var l=LS(),used={},map=[0],pal=[];for(var i=0;i<MK.px.length;i++)used[MK.px[i]]=1;
   for(var j=1;j<MK.pal.length;j++){if(used[j]){pal.push(u2h(MK.pal[j]));map[j]=pal.length;}}
   var px=new Uint8Array(MK.px.length);for(var k=0;k<px.length;k++)px[k]=map[MK.px[k]]||0;
@@ -4004,7 +4046,7 @@ earn=function(n,what){if(n<=0)return;S.cash+=n;post({type:'earn',n:n,what:what})
 var OWN=null;
 function gradeOf(g){return clamp(1+Math.round((g||0)/100*7),1,8);}
 function ownT(){return S.tanks[0]||null;}
-// Your tank is the game's Tank 1. The game decides births and deaths, the land keeps each shrimp it knows (colour,
+// Your tank is the game's Tank 1. The game decides births and deaths, the land keeps each shrimp it knows (color,
 // name, age) and only adds or removes the difference, so nothing gets reset. Moves and sales here go to the game.
 function gOf(i){return Math.round(clamp(phOf(i).grade,0,7)/7*100);}
 function syncOwn(d){if((d.seq||0)<SEQ)return;var T=ownT();if(!T||typeof newInd!=='function'||typeof GEN!=='object')return;T.name='Your tank';T.own=1;
@@ -4084,7 +4126,7 @@ function leftBack(){var b=$('tb-back');if(!b)return;b.innerHTML=LEFT?'<span aria
 // a card waiting at the company, or frozen accounts
 function needBar(){var b=$('lneed');if(!NEED){if(b)b.remove();return;}if(!b){b=document.createElement('button');b.type='button';b.id='lneed';b.className='lneed';b.onclick=function(){try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};document.body.appendChild(b);}b.textContent=NEED+' Tap to go back.';}
 window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||!S)return;
-  if(d.type==='cash'){S.cash=d.cash;FROZEN=d.frozen||'';if(!!d.left!==!!LEFT||!!d.voy!==!!VOY){LEFT=d.left?1:0;VOY=d.voy?1:0;leftBack();}var nd=d.need||'';if(nd!==NEED){NEED=nd;needBar();}gameTime(d.day);updateHeader();}
+  if(d.type==='cash'){S.cash=d.cash;FROZEN=d.frozen||'';if(!!d.left!==!!LEFT||!!d.voy!==!!VOY){LEFT=d.left?1:0;VOY=d.voy?1:0;window.GM_AWAY=!!VOY;leftBack();}var nd=d.need||'';if(nd!==NEED){NEED=nd;needBar();}gameTime(d.day);updateHeader();}
   if(d.type==='own')syncOwn(d);});
 // shrimp that leave your tank here leave it in the game too
 var _move=netMoveTo;netMoveTo=function(T2){var T=ownT(),N=netList(),a=0,y=0,giv=[];if(T&&T2)N.forEach(function(e){if(T2!==T&&e.from===T.id){if(e.ind.age>=ADULT_DAYS)a++;else y++;}if(T2===T&&e.from!==T.id)giv.push({age:e.ind.age,g:gOf(e.ind)});});_move(T2);if(a+y)post({type:'take',adults:a,young:y,seq:++SEQ});if(giv.length)post({type:'give',list:giv,seq:++SEQ});};
