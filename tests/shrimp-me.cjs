@@ -129,7 +129,7 @@ var g=newGame();g.humans=6e7;g.day=900;g.tr={drive:10,means:-6};treeDay(g);if(!t
 g.money=1e8;if(!buyTreeStep(g,'isl_buy')||buyTreeStep(g,'isl_pass'))throw Error('Steps in order');g.emp.inf=1e5;buyTreeStep(g,'isl_nation');if(taxRate(g)!==0.045)throw Error('Island tax');
 if(gpLines(g).join(' ').indexOf('Shrimp Island')<0)throw Error('Ending line');
 var h=newGame();h.humans=6e7;h.day=900;h.tr={drive:-10,care:-4};treeDay(h);if(!treeHas(h,'shop')||treeHas(h,'island'))throw Error('Shop for floaters');
-var q=newGame();q.tr={know:8,care:6};q.emp.won=4000;if(!spaceOpen(q))throw Error('Space for the curious');q.tr={drive:10,means:-6};q.emp.trees={};if(spaceOpen(q))throw Error('Not for climbers');
+var q=newGame();q.tr={know:8,care:6};q.emp.won=4000;if(typeof spaceOpen!=='undefined'||treesFor(q).indexOf('space')<0)throw Error('The curious path is still marked, the old Space door is gone');
 var l=newGame();l.humans=6e7;l.day=900;l.tr={know:8,kin:-8,drive:6};treeDay(l);if(!treeHas(l,'lab'))throw Error('Designer lab for use and tool');
 `);
 check('Grandma’s place: three paid steps, the last opens the land; the old house chain is gone',`
@@ -179,7 +179,7 @@ g.humans=0;addOwners(g,10);if(g.humans!==25)throw Error('Ten kits, 25 people');g
 check('the world moves on in headlines, food and big builds keep paying after Earth',`
 var g=newGame();g.emp.kitsOpened=1;g.humans=6e8;headlineDay(g);var R=rip(g);if(R.log.length!==5)throw Error('Gary, mayor, divorce and two about the founder '+R.log.length);headlineDay(g);if(rip(g).log.length!==5)throw Error('Once each');
 var f0=foodIncome(g);g.emp.proj.foodfactory=1;if(Math.abs(foodIncome(g)/f0-2)>1e-9)throw Error('Factory');g.emp.proj.foodopen=1;if(foodIncome(g)>=f0*4)throw Error('Recipe means less food sold');
-g.humans=8.2e9;g.emp.won=5000;g.space.started=true;g.emp.c3={c_water:0};var m=g.money;dayRollover(g);if(g.money-m<2e7)throw Error('After Earth it still earns '+(g.money-m));
+g.humans=8.2e9;g.emp.won=5000;g.emp.c3={c_water:0};var m=g.money;dayRollover(g);if(g.money-m<2e7)throw Error('After Earth it still earns '+(g.money-m));
 if(sideIncome(g)<3e6||!rip(g).log.some(function(x){return /desalination/.test(x.tx);}))throw Error('Water sales');
 `);
 check('story cards wait their turn, one to two and a half minutes of play apart',`
@@ -206,19 +206,19 @@ var w=newGame();w.humans=4e9;hardDay(w);w.money=1e12;w.fin=[{kits:1e9}];hardBuy(
 var o=newGame();o.emp.farms.hatch=1;storyChoose(o,'owntank',0);if(gpLines(o).join().indexOf('never looked')<0)throw Error('Kept and never looked');o.ps.look+=5;if(gpLines(o).join().indexOf('never looked')>=0)throw Error('Looked after');
 `);
 check('Mira shows up at more moments, and each one follows something you did',`
-var g=newGame();g.day=1200;var c=milestoneConditions(g);if(c.mira_teen||c.mira_house||c.mira_net||c.mira_grown||c.mira_space||c.mira_bye)throw Error('Not before you met her');
-g.story.choices={ev_mira:1};c=milestoneConditions(g);if(!c.mira_teen||c.mira_house||c.mira_net||c.mira_grown||c.mira_space||c.mira_bye)throw Error('Only the age one at first');
+var g=newGame();g.day=1200;var c=milestoneConditions(g);if(c.mira_teen||c.mira_house||c.mira_net||c.mira_grown||c.mira_bye)throw Error('Not before you met her');
+g.story.choices={ev_mira:1};c=milestoneConditions(g);if(!c.mira_teen||c.mira_house||c.mira_net||c.mira_grown||c.mira_bye)throw Error('Only the age one at first');
 if(MILESTONES.mira_teen.more(g).indexOf('Sunday')<0)throw Error('Her answer shows');g.story.choices.ev_mira=0;if(MILESTONES.mira_teen.more(g).indexOf('jar')<0)throw Error('The jar');
-g.me={on:1,house:{complete:5},cnt:{},gp:{}};g.emp.network=1;g.humans=2e8;g.space.started=true;g.story.choices.bye_pack=0;c=milestoneConditions(g);if(c.mira_grown)throw Error('Mira is not eighteen yet');g.day=3700;c=milestoneConditions(g);
-['mira_house','mira_net','mira_grown','mira_space','mira_bye'].forEach(function(k){if(!c[k]||!MILESTONES[k]||!MILESTONES[k].body)throw Error(k);});
+g.me={on:1,house:{complete:5},cnt:{},gp:{}};g.emp.network=1;g.humans=2e8;g.story.choices.bye_pack=0;c=milestoneConditions(g);if(c.mira_grown)throw Error('Mira is not eighteen yet');g.day=3700;c=milestoneConditions(g);
+['mira_house','mira_net','mira_grown','mira_bye'].forEach(function(k){if(!c[k]||!MILESTONES[k]||!MILESTONES[k].body)throw Error(k);});
 var n=Object.keys(MILESTONES).filter(function(k){return /^mira_/.test(k);}).length;if(n<10)throw Error('Mira moments '+n);
 `);
 check('paths without Space get a last chapter before the ending',`
 var g=newGame();g.tr={drive:10,means:-2};g.emp.won=2000;g.humans=WORLD;g.emp.trees={island:1};g.emp.tree={isl_buy:1,isl_nation:1};g.progress.seen={};g.progress.queue=['win'];
-if(spaceOpen(g)||lastChapter(g)!=='island')throw Error('Island chapter '+lastChapter(g));detectMilestones(g);
+if(lastChapter(g)!=='island')throw Error('Island chapter '+lastChapter(g));detectMilestones(g);
 if(g.progress.queue[0]!=='lastchap'||g.progress.queue.indexOf('win')<1)throw Error('Order '+g.progress.queue);var t=MILESTONES.lastchap.more(g);
 if(t.indexOf('Shrimp Island')<0||t.indexOf('calls itself a country')<0||t.indexOf('jetty')<0)throw Error('Text '+t);
-var q=newGame();q.emp.won=2000;q.emp.trees={space:1};q.tr={know:6,care:2};if(!spaceOpen(q)||lastChapter(q))throw Error('Space players keep their own last chapter');
+var q=newGame();q.emp.won=2000;q.emp.trees={space:1};q.tr={know:6,care:2};if(lastChapter(q)!=='lab')throw Error('Curious players get the lab as their last chapter: '+lastChapter(q));
 var r=newGame();r.tr={drive:-10,care:-2};r.emp.won=2000;r.emp.trees={shop:1};r.progress.seen={};r.progress.queue=['win'];detectMilestones(r);if(r.progress.queue[0]!=='lastchap'||MILESTONES.lastchap.more(r).indexOf('cat')<0)throw Error('Shop chapter');
 var o=newGame();o.tr={drive:-10};o.emp.won=1;o.progress={seen:{},queue:[],wait:[]};o.emp.trees={shop:1};detectMilestones(o);
 `);

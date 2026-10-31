@@ -36,6 +36,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:15px/1
 .wl li{margin:4px 0}
 #rank{width:100%;height:180px;display:block;margin:6px 0}
 .ttl{font-weight:600;margin:10px 0 0}
+.prep{font-weight:600;margin:12px 0 0;color:var(--dim)}
 </style>
 </head>
 <body>
@@ -217,7 +218,7 @@ function landHTML(){var p=here(T,V),R=rankOf(T,V),h='',nP=R.pass.length+1,nA=R.a
  
  var ttl=(R.place===1?'Best of the '+nP+' planets you passed.':'Number '+R.place+' of the '+nP+' planets you passed.')+' '+(nA?(R.betterAfter?R.betterAfter+' of the '+nA+' after it, with the fuel left, were better.':'None of the '+nA+' after it was better.'):'No fuel left to go further.');
  h+='<p class="ttl">'+ttl+'</p><canvas id="rank" aria-label="Fit of every planet passed and after"></canvas><p class="sub">Every planet in every star cone, up to where you stopped (grey) and as far as the fuel left would have gone (rings). '+(R.best?'Best of all: '+esc(R.best.name)+', '+R.best.f+', flyby '+R.best.s+'.':'')+'</p>';
- h+='<p>'+(!p.rocky?'No ground. '+(V.robots?V.robots+(V.robots===1?' robot waits':' robots wait')+' in orbit. ':''):(V.robots?V.robots+(V.robots===1?' robot starts':' robots start')+' on the ground. ':'No robots. ')+'Shrimp and moss go in first. ')+'Settling comes in the next update.</p>';
+ h+='<p>'+(!p.rocky?'No ground. '+(V.robots?V.robots+(V.robots===1?' robot waits':' robots wait')+' in orbit. ':''):(V.robots?V.robots+(V.robots===1?' robot starts':' robots start')+' on the ground. ':'No robots. ')+'Shrimp and moss go in first. ')+'</p><p class="prep">Preparing for settlement…</p>';
  return h;}
 function drawRank(c){var R=rankOf(T,V),w=c.clientWidth,h=c.clientHeight,d=DPR;c.width=w*d;c.height=h*d;var g=c.getContext('2d');g.setTransform(d,0,0,d,0,0);
  var L=40,B=30,top=8,right=8,all=R.pass.concat(R.after),maxS=Math.max(T.done.s+1,all.reduce(function(a,x){return Math.max(a,x.s);},1));

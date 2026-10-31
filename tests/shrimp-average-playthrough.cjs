@@ -7,7 +7,7 @@ let seed=Number(process.env.REVIEW_SEED||7);const initialSeed=seed,M=Object.crea
 const c=vm.createContext({Math:M,console});vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);
 vm.runInContext(require('./shrimp-bot-cards.cjs')(process.env.BOT_HEART!=='cold'),c);
 vm.runInContext('var cache={},lastChips="",lastColSig="",lastChartKey="",lastAlerts="";function toast(){};function big(n){return String(Math.round(n));};function anyHad(){return G.tanks.some(t=>t.had||totalN(t)>=1);}function updateReveal(){'+html.split('function updateReveal(){')[1].split('function applyReveal(){')[0],c);
-vm.runInContext(html.slice(html.indexOf('var PROJ_SHOW='),html.indexOf('var seenNew='))+html.slice(html.indexOf('function projectRank('),html.indexOf('MILESTONES.spaceDream=')),c);
+vm.runInContext(html.slice(html.indexOf('var PROJ_SHOW='),html.indexOf('var seenNew='))+html.slice(html.indexOf('function projectRank('),html.indexOf('var storySure=null;')),c);
 vm.runInContext('var NOSTORES='+(process.env.NOSTORES==='1')+';',c);
 vm.runInContext(`
 var trace=[],G=newGame(),events=[],snapshots={},actions=[],seen={},minCash=G.money,waitingSeconds=0,visits=0;
@@ -26,9 +26,9 @@ function care(){extraTanks(false);var T=G.tanks[0],P=ppm(T);if(kitsOpen(G)&&G.ki
  if(!G.ob.bottle){pay(G,40,'supplies');G.ob.bottle=1;G.ob.doses=10;}
  if(!T.had){if(T.cycledAt==null&&P.nh<.1){if(G.ob.doses<=0&&G.money>=40){pay(G,40,'supplies');G.ob.doses+=10;}addAmmonia(G,T);}if(T.chem.kh<2||P.no3>20)waterChange(G,T,50);if(safeToStock(G,T)&&buyPack(G,T,0))note('first shrimp');}
  else if(!earthArchived(G)){if(!T.feeder)feed(G,T,.8);if(P.nh>.1||P.no2>.1||P.no3>25||T.chem.kh<2||T.chem.gh<5||!T.autoWC&&G.day%7===0)waterChange(G,T,30);}
- checkGoals(G);if(G.stats.born)note('first hatch');if(kitsOpen(G))note('kits unlocked');if(G.kits.sold)note('first kit');if(farmCap(G))note('first farm');if(G.academy.level)note('first grant');if(G.academy.phds)note('PhDs');if(G.academy.professors)note('professor');if(G.story.anniversary)note('anniversary');if(G.emp.won)note('Earth complete');if(G.space.won)note('space complete');if(rip(G).n===RIPPLE.length)note('all newspaper headlines');
+ checkGoals(G);if(G.stats.born)note('first hatch');if(kitsOpen(G))note('kits unlocked');if(G.kits.sold)note('first kit');if(farmCap(G))note('first farm');if(G.academy.level)note('first grant');if(G.academy.phds)note('PhDs');if(G.academy.professors)note('professor');if(G.story.anniversary)note('anniversary');if(G.emp.won)note('Earth complete');if(voyageOpen(G))note('Leave Earth opens');if(rip(G).n===RIPPLE.length)note('all newspaper headlines');
 }
-function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,S=G.space,budget=2;function spend(name,fn){if(budget<1)return false;if(act(name,fn)){budget--;return true;}return false;}
+function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,budget=2;function spend(name,fn){if(budget<1)return false;if(act(name,fn)){budget--;return true;}return false;}
  if(G.stats.sold>=1&&G.tanks.length<MAX_TANKS&&!G.tanks.some(t=>!t.had)&&G.money>NEW_TANK_COST[G.tanks.length]+250)spend('another tank',()=>addTank(G));
  if(G.order){if(!G.order.taken)takeOrder(G);if(orderStock(G,G.order)>=G.order.n)act('deliver pet shop order',()=>deliverOrder(G));}
  if(T.had&&!earthArchived(G)){var stock=sellableStock(G);if(stock&&!(G.order&&G.order.taken)){G.price=suggestedPrice(G,stock);act('sell surplus shrimp',()=>sellAll(G,false));}}
@@ -74,21 +74,14 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,S=G.space,budget=
    var research=STUDIES.filter(r=>r.id!=='observe'&&!rd(G,r.id)&&r.req(G)).slice(0,3)[0];if(research&&A.active&&A.active.id==='observe')pauseStudy(G);if(!A.active)startStudy(G,research?research.id:'observe');
   }
  }
- if(spaceOpen(G)&&!S.started){if(requestSpaceDream(G)&&beginSpace(G))note('space started');}
- if(S.started&&!S.won){
-  var w=WORLDS.find(w=>!S.colonies[w.id]||!S.colonies[w.id].settled);if(w){var col=S.colonies[w.id];if(!col){if(canSurvey(G,w.id))spend('survey '+w.id,()=>surveyWorld(G,w.id));if(canLaunch(G,w.id)){if(A.crew<w.crew&&canSpend(10000000))spend('mission crew',()=>buyMissionCrew(G));if(A.crew>=w.crew)spend('launch '+w.id,()=>launchColony(G,w.id));}}
-   else{var m=habitatMetrics(G,w.id);if(m.temp>m.max&&!col.up.cooler)spend('cooling '+w.id,()=>buyHabitatUpgrade(G,w.id,'cooler'));if(m.capacityPower<0)spend('solar '+w.id,()=>buyHabitatUpgrade(G,w.id,'solar'));if(m.water<0){var u=!col.up.recycler?'recycler':'conditioner';spend(u+' '+w.id,()=>buyHabitatUpgrade(G,w.id,u));}if(m.capacityFood<0)spend('algae '+w.id,()=>buyHabitatUpgrade(G,w.id,'algaefarm'));if(w.id==='pelagia'&&!col.up.biosphere)spend('restore biosphere',()=>buyHabitatUpgrade(G,w.id,'biosphere'));if(col.water<60||col.food<20)spend('recovery supplies '+w.id,()=>resupplyColony(G,w.id));}
-  }
-  for(var world of WORLDS)if(S.colonies[world.id]&&S.colonies[world.id].settled)note('settled '+world.id);
- }
 }
 for(var day=0;day<8760;day++){
- care();if(G.day%(kitsOpen(G)?28:7)===0||G.day<35)visit();if(G.emp.won&&(G.space.won||!spaceOpen(G)))break;
- waitingSeconds+=2.4/maxSpeed(G);for(var q=0;q<4;q++){while(G.progress.queue.length){note('milestone '+G.progress.queue[0]);acknowledgeMilestone(G);}if(G.me&&G.me.on&&!G.me.send&&G.money>2e5)G.me.send=1;if(G.me&&G.me.on&&!G.me.botDay){G.me.botDay=1;setPick(G,'papers');setPick(G,'club');}if(G.me&&G.me.on&&Math.floor(G.day)%20===0){gtCheck(G);gtOf(G).mail.slice().forEach(function(){gtCollect(G,0);});gtOf(G).q.slice().forEach(function(it){gtAnswer(G,it.key,0);});if(G.me.cur)momentAnswer(G,true);}if(G.emp.won&&!spaceOpen(G))break;if(G.emp.won&&!G.space.started&&requestSpaceDream(G)&&beginSpace(G))note('space started');if(!stepGame(G))throw Error('Clock blocked at '+G.day);}
+ care();if(G.day%(kitsOpen(G)?28:7)===0||G.day<35)visit();if(G.emp.won)break;
+ waitingSeconds+=2.4/maxSpeed(G);for(var q=0;q<4;q++){while(G.progress.queue.length){note('milestone '+G.progress.queue[0]);acknowledgeMilestone(G);}if(G.me&&G.me.on&&!G.me.send&&G.money>2e5)G.me.send=1;if(G.me&&G.me.on&&!G.me.botDay){G.me.botDay=1;setPick(G,'papers');setPick(G,'club');}if(G.me&&G.me.on&&Math.floor(G.day)%20===0){gtCheck(G);gtOf(G).mail.slice().forEach(function(){gtCollect(G,0);});gtOf(G).q.slice().forEach(function(it){gtAnswer(G,it.key,0);});if(G.me.cur)momentAnswer(G,true);}if(G.emp.won)break;if(!stepGame(G))throw Error('Clock blocked at '+G.day);}
  minCash=Math.min(minCash,G.money);if(!Number.isFinite(G.money)||G.money<0)throw Error('Insolvent at '+G.day+' '+JSON.stringify(G.fin.slice(-3)));if(day%1000===0)console.log('progress',G.day,Math.round(G.money),Math.round(G.humans),farmCap(G),packCap(G));
  if(G.day%15===0){var fr=(G.fin||[]).slice(-7),inc=0;fr.forEach(function(r){for(var k in r)if(typeof r[k]==='number'&&r[k]>0)inc+=r[k];});trace.push([G.day,Math.round(G.money),Math.round(inc/Math.max(1,fr.length)),Math.round(operatingNet(G)||0),Math.round(G.humans),Math.round(G.kits.sold)]);}
  if(G.day%365===0){snapshots['year '+Math.floor(G.day/365)]=JSON.parse(JSON.stringify(G));}
 }
-care();var result={trace:trace,events:events,snapshots:snapshots,actions:actions,day:G.day,earth:G.emp.won,space:G.space.won,ending:endingPick(G),trees:Object.keys(G.emp.trees||{}),minCash:minCash,waitingMinutes:waitingSeconds/60,visits:visits,final:G};
+care();var result={trace:trace,events:events,snapshots:snapshots,actions:actions,day:G.day,earth:G.emp.won,sci:sciScore(G),ending:endingPick(G),trees:Object.keys(G.emp.trees||{}),minCash:minCash,waitingMinutes:waitingSeconds/60,visits:visits,final:G};
 `,c,{timeout:180000});
-const out=process.env.REVIEW_OUTPUT||require('os').tmpdir()+'/shrimp-average';fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'run-'+initialSeed+'.json'),JSON.stringify(c.result));console.log(JSON.stringify(c.events,null,2));console.log('RESULT',JSON.stringify({...c.result,snapshots:undefined,actions:undefined,final:undefined}));if(!c.G.emp.won||c.spaceOpen(c.G)&&!c.G.space.won)throw Error('Average-player scenario did not complete both chapters within 24 game years');if(c.minCash<=0)throw Error('Average-player scenario exhausted its working cash');
+const out=process.env.REVIEW_OUTPUT||require('os').tmpdir()+'/shrimp-average';fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'run-'+initialSeed+'.json'),JSON.stringify(c.result));console.log(JSON.stringify(c.events,null,2));console.log('RESULT',JSON.stringify({...c.result,snapshots:undefined,actions:undefined,final:undefined}));if(!c.G.emp.won)throw Error('Average-player scenario did not finish Earth within 24 game years');if(c.minCash<=0)throw Error('Average-player scenario exhausted its working cash');

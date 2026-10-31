@@ -211,7 +211,7 @@ g.emp.wel=0.3;var h=g.humans;welfareDay(g);if(!(g.humans<h&&g.emp.lapsed>0))thro
 g.emp.wel=0.9;if(!(welfareMult(g)>1.1))throw Error('Thriving owners should refer more');
 var f=fairShrimpPrice(g);g.priceAED=f*1.5;g.market.m=1.2;g.price=clamp(g.priceAED/fairShrimpPrice(g),0.5,3);if(Math.abs(g.price*fairShrimpPrice(g)-f*1.5)>1e-9)throw Error('An AED shrimp price must hold as mood moves');
 g.emp.won=1;g.emp.farms={rack:3};var raw=g.emp.rawShrimp;empireDay(g);if(g.emp.rawShrimp>raw)throw Error('Farms stop breeding kit stock after the win');
-var w=WORLDS[0];if(!w.wild||!/let into|let them go|live free|released/.test(w.why))throw Error('Space worlds should end with free-living shrimp');
+if(typeof WORLDS!=='undefined'||typeof spaceOpen!=='undefined'||typeof spaceDay!=='undefined')throw Error('The old Space chapter is gone');
 `);
 check('hand packing, packing tools, health checks, treats and story choices',`
 var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=10000;var t=g.tanks[0];t.had=1;t.pop=[{age:60,n:80,g:80},{age:120,n:30,g:80}];t.set.keepL=10/t.vol;
@@ -394,7 +394,8 @@ check('one tree a tap, others plant slowly for the coin, research opens Space',`
 var g=readyGame();g.humans=4e9;var C=coinOf(g);C.on=1;C.honest=1;C.price=30;g.money=1e12;
 if(coinPlantBatch(g)!==COIN_TREE)throw Error('One tree a tap');
 for(var d=0;d<30;d++){g.day+=1;coinDay(g);}if((C.otrees||0)>0.0002*3*g.humans*30*1.2+1)throw Error('Others plant at most 0.06% of people a day');
-var s=readyGame();s.emp.won=1;s.academy=s.academy||{};s.academy.papers=45;if(!spaceOpen(s))throw Error('Years of research should open Space after Earth');s.academy.papers=3;s.academy.level=1;treesFor=function(){return [];};if(spaceOpen(s))throw Error('Without research or the curious path, no Space');
+var s=readyGame();s.emp.won=1;s.space={v:1,started:true,colonies:{orbit:{n:80}},surveys:{orbit:1},won:0};s.progress.queue=['spaceDream'];s.progress.reviewing=true;s.academy.active={id:'terraform',progress:20};s=migrate(s);
+if(s.space||s.progress.queue.indexOf('spaceDream')>=0||s.progress.reviewing||s.academy.active||earthArchived(s)||!canLeave(s))throw Error('An old Space save goes back to its won company');
 `);
 if(!html.includes('id="after"')||!html.includes("showAfter(slab,stx,aft)")||!html.includes("if(pp&&pp.fk){showAfter(pp.name,pp.d,kindNote());}"))throw Error('Decisions show what happened afterwards, in a popup');
 if(!html.includes("var renderInner=render;render=function(){var a=anchorGet();renderInner.apply(this,arguments);anchorFix(a);settleScan();};")||!html.includes('SETTLE_MS=500'))throw Error('The screen holds still under the finger and fresh decisions ignore taps for half a second');
@@ -479,8 +480,6 @@ if(o.tr.drive!==2.5||o.trAbs.drive!==5.5||'ego' in o.tr||'reach' in o.tr||'ego' 
 var n=newGame();delete n.trAbs;n.tr={ego:2,reach:1};migrate(n);if(n.tr.drive!==3||n.trAbs.drive!==3||'ego' in n.tr)throw Error('Fold without sizes '+JSON.stringify([n.tr,n.trAbs]));
 var v=traitVals(o);if(Object.keys(v).length!==7||Object.keys(v).some(function(k){return !isFinite(v[k]);}))throw Error('Values '+JSON.stringify(v));
 var w=newGame();w.emp.won=2000;w.progress.reviewing=true;w.progress.queue=[];migrate(w);if(w.progress.reviewing)throw Error('Stuck review should be released so the win card offers Keep playing');
-if(!MILESTONES.spaceDream)MILESTONES.spaceDream={chapter:'Chapter 6',title:'Next stop, space',body:''};// the card itself lives outside the sim
-var s=newGame();s.tr={know:8,care:6};acknowledgeMilestone(s);s.emp.won=3000;s.day=3000;if(!requestSpaceDream(s))throw Error('Dream');var s2=migrate(JSON.parse(JSON.stringify(s)));if(!s2.progress.reviewing||s2.progress.queue[0]!=='spaceDream'||!beginSpace(s2)||progressionBlocked(s2))throw Error('Space hand-off has to survive a reload');
 `);
 if(html.includes('review-empire')||html.includes('Review your empire'))throw Error('The win card has no review button, it froze the game');
 {const w0=html.indexOf("key==='win'?'<button"),w=html.slice(w0,html.indexOf("</button>':'",w0)+9);if(!w.includes('data-act="sandbox">Keep playing<')||!w.includes('data-act="reset">New game<')||(w.split('<button').length-1)!==2)throw Error('Win card offers Keep playing and New game only: '+w);}
@@ -704,8 +703,8 @@ var g=ownGame(),T=g.tanks[0],C=careOf(T);T.glass=null;C.mulm=C.sponge=C.grow=0;C
 var gm=glassMean(T);if(gm<0.35||gm>0.75)throw Error('Glass about half green after a tank month: '+gm);
 if(ownWell(g).total<50)throw Error('A month of mess still reads Fine: '+ownWell(g).total);
 for(d=0;d<90;d++){g.tday++;glassGrow(g,T);careDay(g);}if(ownWell(g).total>=60)throw Error('Months of nothing shows: '+ownWell(g).total);`);
-check('Pass 161: leaving after Space and after the win, without the land too',OWN_SETUP+`
-var g=ownGame();g.emp.won=1;g.space=g.space||{};g.space.started=1;if(!canLeave(g))throw Error('Leaving is offered after Space');
+check('Pass 161: leaving after the win, without the land too',OWN_SETUP+`
+var g=ownGame();g.emp.won=1;if(!canLeave(g))throw Error('Leaving is offered after the win');
 if(!leaveCompany(g)||!g.left||!landOpen(g))throw Error('Leaving works and brings the land');
 var h=ownGame();h.emp.won=1;if(!canLeave(h))throw Error('Leaving is offered after the win');
 var k=ownGame();k.emp.hard={open:1};if(!canLeave(k))throw Error('Leaving is offered from the hard part');
@@ -771,9 +770,8 @@ g.emp.hard={open:1,goal:'home',picks:{},day:0};if(!voyageOpen(g))throw Error('Ha
 g.academy.papers=0;g.academy.done={observe:40};rlines(g).genes.found=3;rlines(g).food.dud=2;if(sciScore(g)!==65)throw Error('Score: studies 1, finds and null results 5: '+sciScore(g));if(voyageOpen(g))throw Error('65 is not enough');
 g.academy.papers=435;if(sciScore(g)!==500||!voyageOpen(g))throw Error('500 opens it');
 var rich=voyagePtsOf(g),half=g.money;g.money=half/2;var poor=voyagePtsOf(g);g.money=half;if(!(rich.cash-poor.cash<=13&&rich.cash>poor.cash))throw Error('Giving half away costs a few points: '+rich.cash+' '+poor.cash);
-g.space.started=true;if(voyageOpen(g))throw Error('Old Space started: the new door stays shut');g.space.started=false;
 var m0=g.money;if(!startVoyage(g))throw Error('Start');var V=g.voyage;
-if(!earthArchived(g)||spaceOpen(g)||canLeave(g)||voyageOpen(g))throw Error('Earth ends, other doors shut');
+if(!earthArchived(g)||canLeave(g)||voyageOpen(g))throw Error('Earth ends, other doors shut');
 if(!landOpen(g)||!ownTank(g))throw Error('The land and Tank 1 come along');if(m0-g.money>3e5)throw Error('Cash stays: '+(m0-g.money));
 if(V.fuel!==100||voyageSpent(V)!==100||voyageTotal(V)!==V.pts.cash+V.pts.sci+V.pts.kits)throw Error('Starts with 100 flybys');
 var k0=g.kits.sold,h0=g.humans,d0=g.day;g.progress.queue=[];for(var i=0;i<400;i++){g.progress.queue=[];stepGame(g);}if(g.day-d0<99)throw Error('Days still pass: '+(g.day-d0));if(g.kits.sold!==k0||g.humans!==h0)throw Error('The company stops');
@@ -795,5 +793,13 @@ var s2=migrate(JSON.parse(JSON.stringify(g)));if(!s2.voyage.landed||s2.voyage.tr
 if(!html.includes('id="space-if"')||!html.includes("data-act=\"voy-launch\""))throw Error('Pass 169: launch button and ship overlay in the page');count++;console.log('PASS Pass 169 ship overlay in the page');
 if(!html.includes('id="tab-land"')||!html.includes('id="voyage-door"')||!html.includes('id="voyage-card"')||!html.includes("if(b.dataset.tab==='land')"))throw Error('Pass 168: land tab, door and ship card in the page');
 count++;console.log('PASS Pass 168 leaving Earth in the page');
+// Pass 170 (Puti, 31 Oct): the old Space chapter is gone, the header goal hides after leaving Earth, the land knows it's a voyage, settling stops at Preparing for settlement
+{const sp=fs.readFileSync(path.join(__dirname,'../shrimp/space.html'),'utf8'),home=fs.readFileSync(path.join(__dirname,'../shrimp/home.html'),'utf8');
+if(/MILESTONES\.spaceDream|id="space-card"|function spaceOpen|WORLDS=\[/.test(html))throw Error('Pass 170: old Space chapter left in the page');
+if(!html.includes("&&!G.emp.won&&!G.voyage;var el0=G.voyage?'':earthLine(G,!tg);"))throw Error('Pass 170: header goal bar hides after leaving Earth');
+if(!html.includes('voy:G.voyage?1:0')||!home.includes("VOY?'Space':'Company'"))throw Error('Pass 170: the land gets a voyage flag for its back button');
+if(!html.includes('Preparing for settlement…')||!sp.includes('Preparing for settlement…'))throw Error('Pass 170: landing stops at Preparing for settlement');
+if(!home.includes('data-mir')||!home.includes("{id:'fence',name:'Fence'")||!home.includes('function gmSeats'))throw Error('Pass 170: land mirror tool, made fences, Grandma on made chairs');}
+count++;console.log('PASS Pass 170 cleanup after the planet search');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
