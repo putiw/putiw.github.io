@@ -1405,3 +1405,7 @@ From a UX review: a player who only follows what the screen shows, in Chrome at 
 
 Tests: balance 107 (new: the buyer card, breeders kept, pay, not after kits, old saves; land starts the clock; health card, guide wait, check size, no Tank tab slowdown), academy 11, me 46. Bots seed 7, Pass 162 → 163: strong cold 2,218 → 2,215, strong kind 3,221 → 3,226, average Earth 6,553 → 6,777, Space 7,964 → 8,188. Seeds 11/23/31/43 old against new: 6,833/6,721/6,749/6,581 against 6,637/6,777/6,637/6,665, mean 6,721 against 6,679, so seed noise. Space bot passes.
 Not done: 6 (thin late tabs) and 7 (small Sell buttons) wait for Puti. Old saves with the farm but no land: Tank 1's day jumps to the company day on load, so any due jobs show at once.
+
+## Deploy (31 Oct, Pass 162 + 163, BUILD 2026-10-31-two-clocks)
+
+Before deploy: balance 107, academy 11, me 46, bots as in Pass 163, Space bot passes, spotlight sweep 116 all good, layout scan only the known 2 px win World chart label, monkey 60 random taps on six stages at 360 and 390 px with no page errors, NaN or sideways scroll.
