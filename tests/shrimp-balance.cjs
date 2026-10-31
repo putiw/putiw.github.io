@@ -835,5 +835,10 @@ count++;console.log('PASS Pass 175 test costs and fixed panel');
 if(!html.includes('var TANK_DAY_MS=2400,TANK_CATCH=30;')||!html.includes('var OWN_DUE=1/3,OWN_FULL=90;')||!html.includes('stepGame(G,0)||progressionBlocked(G))break;}')||!html.includes("var LAND_JOBS={glass:'glass',vac:'vac',sponge:'sponge',trim:'trim',pest:'pests'};"))throw Error('Pass 179: Tank 1 runs 2.4 s a tank day at any speed, 90 days to full, jobs on the land');
 if(!home.includes("TOYS.push({id:'glass'")||!home.includes("var busy=jobOpen();")||!home.includes("name==='wipe'"))throw Error('Pass 179: the land has the glass wipe and leaves a job alone');
 count++;console.log('PASS Pass 179 one clock, one tank, slower mess');}
+// Pass 181 (Puti, 1 Nov): no wind on the land, one mute, the land banner never for the win. Full checks: tests/shrimp-land-audio.cjs
+{const home=require('fs').readFileSync(__dirname+'/../shrimp/home.html','utf8');
+if(home.includes("sfxLoop('wind')")||home.includes('outdoorAmb')||!home.includes("localStorage.getItem('shrimp-music')==='0'")||!home.includes("if(d.type==='vis')landVis(!!d.on);"))throw Error('Pass 181: land has no wind and shares the mute');
+if(!html.includes("k==='win'||k==='gameover'||LAND.seen[k]")||!html.includes("landPost({type:'vis',on:0});musicResume();")||!html.includes("landPost({type:'mute',off:off?1:0})"))throw Error('Pass 181: banner and audio');
+count++;console.log('PASS Pass 181 land banner, no wind, one mute');}
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

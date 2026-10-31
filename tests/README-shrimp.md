@@ -1595,3 +1595,12 @@ Puti: pressing a button must not shift the screen, every box keeps its size, but
 7. Header numbers in fixed-width tabular slots. Free time rows have a fixed button column and two-line text, the money-for-Grandma hint keeps two lines. The space panel scrolls inside its fixed height.
 Test: new `tests/shrimp-stable.cjs` (390x844, every visible button on every tab at 13 stages, a fresh page per click, ~1900 clicks, about 15 min with `STABLE_N=10`; plus home.html and space.html buttons). Collapsible headers and show/hide toggles may change their own card but not scroll or the header; one-off chapter starts (starting the lab, the first hard-part goal, answering a question card) are listed as allowed.
 Result: 1,836 clicks at 13 stages, from 210 buttons that moved something (28 page jumps, up to 580 px) to 23, none of which scroll the page. What's left is listed under Open work in AGENTS.md. `shrimp-layout` overflow is back to the one known 2 px chart label.
+
+## Pass 181: Grandma's land, banner, wind, one mute (1 Nov)
+
+Puti's playtest, Part 3 of the fix list.
+1. "Something needs you at the company" showed on every land visit: `landNeed` fired whenever `#milestone-card` was up, and after the win the win card stays up. Now only for a new card in the queue (`G.progress.queue[0]`), never `win` or `gameover`, never a card already shown on the company page (`renderMilestone` marks `LAND.seen` when the land isn't open), and once per card (marked on `landHide`).
+2. The outdoor wind loop is gone from the land (`outdoorAmb`, `sfxLoop('wind')`).
+3. One mute: the land's sound button now reads and writes the game's `shrimp-music` key and posts `mute`; the company's `setMute` posts `mute` to the land; the land also follows `storage` events. Only one page plays music: opening the land suspends the company's music and keeps it off while the land is open, the game tells the land `vis` on/off, hidden the land suspends its `AudioContext`. Back at the company the music resumes (on the next tap on an iPhone). space.html has no sound, nothing to do there.
+4. Land source: Pass 180 had edited `shrimp/home.html` by hand; those edits were ported back into `shrimp-home-proto/src` (style.css, land.css, tank.js, toys.js, land.js) on `shrimp-proto`, a fresh `build.py --game` matched the game's copy byte for byte, then this pass was built from the source.
+Test: new `tests/shrimp-land-audio.cjs` (14 checks, 390 px, real http, autoplay allowed), a Pass 181 check in `shrimp-balance`. Balance 123, academy 9, me 46, tank1 all pass. Not heard on a real phone.
