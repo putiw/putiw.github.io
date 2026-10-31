@@ -1642,3 +1642,5 @@ Project doc `claude/shrimp-fix-prompt-1nov.md`, all five parts, plus one ask fro
 6. Puti: story cards (`#milestone-card`, the opening card too) sit 24 px from the top instead of above the tab bar.
 Test: balance 127, me 49 (spans from the farm, no-land lines, old saves), tank1 all (decor at purchase, 40x ending days in the browser), hard 10 (gap and legend at 360/390), academy 9, space search 6, land-audio. `shrimp-stable` on the World tab: same 3 movers as the Pass 183 build (`#ow-body` world-bank rows), none new.
 Before deploy: bots seed 7: strong cold 2,210 (was 2,215), strong kind 3,197 (3,201), average Earth 6,777 garden_hermit (6,609), no INSOLVENT. Space bot passes. Spotlight sweep 116 all good. Layout scan only the known 2 px win World chart label. Monkey 60 taps at six stages, 360 and 390, clean.
+
+Deployed 1 Nov (Pass 184, main at 0fd958d, BUILD 2026-11-01-playtest-1nov).
