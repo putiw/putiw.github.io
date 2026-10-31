@@ -1460,3 +1460,16 @@ Row 4 of the three big updates. Built on Pass 166.
 Tests: balance 111 (new Pass 168 check: gate, score, old Space shuts it, start, Earth stops while days pass, points, ranges, save), academy 11, me 46. Average bot seeds 7, 31 and cold probed for the threshold (numbers in AGENTS.md). Browser at 360 and 390 px over http from the year 17 snapshot: door, sheet, leave, ship edits, land tab and back; tabs Space and land only, no sideways scroll, no page errors.
 Not done: launch (row 5, `V.sealed`), the company goal bar still shows in the header after leaving, "The ship leaves in the next update" placeholder line, land source has no proper voyage flag.
 
+## Pass 169: the planet search (31 Oct)
+
+Row 5 of the three big updates. Built on Pass 168.
+- Launch at the bottom of the ship card, two taps. The ship is sealed and `shrimp/space.html` opens full screen.
+- Grandma says three things she wants, out of six, and sleeps. Fuel for N flybys, braking 10, scans 1 or 2, said on that screen.
+- Black map, pixel stars, a cone of 2 to 4 stars ahead. Flyby 1, scans only with the instruments packed, Brake here 10 and you stay. Fuel never drops under what braking needs.
+- Named stops at their real distances: Proxima b (first cone), TRAPPIST-1 e, f, g (one cone), LHS 1140 b, TOI-700 e, K2-18 b (no ground, disputed DMS), Kepler-442 b (out of reach at 100 fuel). Facts checked and sourced in comments; the landing truth is the game's guess.
+- Landing: heat, air, water, ground, star, days, life, her wishes yes/partly/no, how she wakes, then where it ranked: every planet in every cone passed and every one the fuel left could reach, chart with the rank in the title.
+- The trip saves in the game (`G.voyage.trip`, `V.landed`). Ship card: To the ship while flying, Look after landing.
+
+Tests: balance 113 (new Pass 169 check: launch once, sealed ship fixed, bad trips refused, landing kept and name cleaned, save), new `tests/shrimp-space-search.cjs` 5 (same seed same sky, named stops, fuel rules, rank counts, spread of planets), academy 11, me 46. Browser at 390 and 360 px over http: ship card, launch, wishes, map, flybys, a scan, brake, landing and chart, back to the ship card; no sideways scroll, no page errors (Google Fonts blocked in the sandbox only). Bots not run (no sim change on Earth; they don't take the voyage).
+Not done: settling (row 6), the old Space chapter still there, land source voyage flag, header goal bar after leaving. Not seen on a real phone.
+

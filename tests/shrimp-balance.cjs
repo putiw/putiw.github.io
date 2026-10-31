@@ -782,6 +782,17 @@ while(voyageSet(g,'robots','',g.voyage.robots+1));if(voyageLeft(g)<0)throw Error
 if(!voyageSet(g,'robots','',0)||!voyageSet(g,'seeds','soil',true))throw Error('Taking back frees points');
 var s2=JSON.parse(JSON.stringify(g));if(!s2.voyage||s2.voyage.fuel!==g.voyage.fuel)throw Error('Saves');
 `);
+check('Pass 169: launch seals the ship, the trip comes back from space.html and saves',`
+var g=readyGame();g.money=2e10;g.kits.sold=3e9;g.humans=4e9;g.emp.hard={open:1,goal:'home',picks:{},day:0};g.academy.papers=600;
+if(!startVoyage(g))throw Error('Start');if(voyageTrip(g,{s:0,used:0,path:[]}))throw Error('No trip before launch');
+if(!voyageLaunch(g)||!g.voyage.sealed||!(g.voyage.seed>0))throw Error('Launch');if(voyageLaunch(g))throw Error('Once');
+if(voyageSet(g,'robots','',1))throw Error('Sealed ship does not change');
+if(voyageTrip(g,{s:-1,used:0,path:[]})||voyageTrip(g,'x'))throw Error('Bad trips refused');
+if(!voyageTrip(g,{w:['river','warm','green'],s:3,used:4,path:[0,1,0],scans:{},done:null,woke:1})||g.voyage.trip.s!==3||g.voyage.landed)throw Error('Trip kept');
+if(!voyageTrip(g,{w:['river'],s:3,used:14,path:[0,1,0],scans:{},done:{s:3,id:'3.0',name:'SC <b>30 b',fit:71},woke:1})||!g.voyage.landed||g.voyage.landed.fit!==71||/</.test(g.voyage.landed.name))throw Error('Landing kept, name cleaned');
+var s2=migrate(JSON.parse(JSON.stringify(g)));if(!s2.voyage.landed||s2.voyage.trip.used!==14)throw Error('Saves');
+`);
+if(!html.includes('id="space-if"')||!html.includes("data-act=\"voy-launch\""))throw Error('Pass 169: launch button and ship overlay in the page');count++;console.log('PASS Pass 169 ship overlay in the page');
 if(!html.includes('id="tab-land"')||!html.includes('id="voyage-door"')||!html.includes('id="voyage-card"')||!html.includes("if(b.dataset.tab==='land')"))throw Error('Pass 168: land tab, door and ship card in the page');
 count++;console.log('PASS Pass 168 leaving Earth in the page');
 console.log(count+' focused balance and migration checks passed');

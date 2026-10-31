@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The ship</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{--bg:#04050a;--ink:#e8e6df;--dim:#8a8c99;--line:#262a38;--card:#0d0f18;--acc:#ff6b4a;--ok:#9fe0a8}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:15px/1.4 Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;overflow:hidden;-webkit-text-size-adjust:100%}
+#sky{position:fixed;inset:0;width:100%;height:100%;image-rendering:pixelated;touch-action:manipulation}
+#top{position:fixed;left:0;right:0;top:0;display:flex;align-items:center;gap:8px;padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top));background:linear-gradient(#04050aee,#04050a00);z-index:3}
+#top button{font:inherit}
+.back{background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:5px 10px;cursor:pointer}
+#fuel{font-variant-numeric:tabular-nums;white-space:nowrap}
+#wish{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto;justify-content:flex-end}
+.chip{font-size:12px;border:1px solid var(--line);border-radius:10px;padding:1px 7px;color:var(--dim);white-space:nowrap}
+#panel{position:fixed;left:0;right:0;bottom:0;max-height:52vh;overflow:auto;background:var(--card);border-top:1px solid var(--line);padding:12px 14px;padding-bottom:max(14px,env(safe-area-inset-bottom));z-index:2}
+#panel.tall{max-height:100%;top:0;padding-top:calc(56px + env(safe-area-inset-top));border-top:0}#top.solid{background:#0d0f18}
+#panel h2{font-size:17px;margin:0}
+#panel h3{font-size:13px;margin:12px 0 4px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+#panel p{margin:6px 0}
+.sub{color:var(--dim);font-size:13px}
+.hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.facts{margin:6px 0;padding:0;list-style:none}
+.facts li{margin:2px 0;display:grid;grid-template-columns:70px 1fr;gap:4px}
+.facts b{color:var(--dim);font-weight:500}
+.known{border-left:2px solid var(--line);padding-left:8px;color:#c9c7bf;font-size:14px}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.btn{font:inherit;background:#1a1e2c;color:var(--ink);border:1px solid #343a50;border-radius:8px;padding:7px 11px;cursor:pointer}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.go{background:var(--acc);border-color:var(--acc);color:#140804;font-weight:600}
+.btn.sure{background:#ffd34a;border-color:#ffd34a;color:#140804}
+.wl{margin:8px 0 4px;padding-left:20px}
+.wl li{margin:4px 0}
+#rank{width:100%;height:180px;display:block;margin:6px 0}
+.ttl{font-weight:600;margin:10px 0 0}
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas>
+<div id="top"><button class="back" id="back" aria-label="Back to Space">‹ Space</button><span id="fuel"></span><span id="wish"></span></div>
+<div id="panel"></div>
+<script>
+// ==SPACE-SIM-START==
+// The planet search (row 5). Pure: no DOM between these markers, tests load this slice.
+// Fuel counts flybys. Each flyby costs 1, a scan 1 or 2, braking BRAKE. Braking means staying: the ship can't speed up again.
+var BRAKE=10;
+var CONES=[2,3,3,3,4];
+function hash(a,b,c){var h=Math.imul((a|0)^0x9e3779b9,0x85ebca6b);h^=h>>>13;h=Math.imul(h^(b|0),0xc2b2ae35);h^=h>>>16;h=Math.imul(h^(c|0),0x27d4eb2f);h^=h>>>15;return h>>>0;}
+function rng(s){s=s|0;return function(){s=(s+0x6D2B79F5)|0;var t=Math.imul(s^(s>>>15),1|s);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+// light years from the Sun at flyby s. Proxima at 1, about 40 ly at 41, about 1,200 ly at 101.
+function lyAt(s){return 4.2*Math.pow(1.058,s-1);}
+function stepFor(ly){return 1+Math.round(Math.log(ly/4.2)/Math.log(1.058));}
+var STAR={M:'Red dwarf',K:'Orange star',G:'Yellow star'};
+var WISH=[
+ {id:'river',name:'River',say:'Water I can hear. A river, a sea. Not a puddle.'},
+ {id:'birds',name:'Birds',say:'Air thick enough for birds.'},
+ {id:'warm',name:'Warm',say:'Warm. Not Abu Dhabi in August.'},
+ {id:'quiet',name:'Quiet sun',say:'A quiet sun. No storms coming off it.'},
+ {id:'morning',name:'Mornings',say:'Mornings. A sun that comes up and goes down.'},
+ {id:'green',name:'Green',say:'Something already growing.'}];
+var WISH_W=[22,12,6];
+// Named stops. "known" is what Earth knew, checked 31 Oct 2026:
+// Proxima b: Anglada-Escudé et al. 2016 (Nature); min mass 1.07, P 11.2 d, 4.2 ly, flare star (Wikipedia, Proxima Centauri b).
+// TRAPPIST-1 e/f/g: Agol et al. 2021 (PSJ) via NASA Exoplanet Archive; 40 ly; JWST 2025 on e (Espinoza, Glidden et al., ApJL; MIT news 8 Sep 2025): no H2 sky, CO2-rich unlikely, N2 sky or ocean still possible.
+// LHS 1140 b: Cadieux et al. 2024 (ApJL), Université de Montréal release 10 Jul 2024: 48 ly, 1.7 R, 5.6 M, 10-20% water by mass, tentative N2 sky. P 24.7 d (Dittmann et al. 2017).
+// TOI-700 e: Gilbert et al. 2023 (ApJL), NASA SVS 14264: 95% Earth radius, P 28 d, ~100 ly, optimistic HZ; d (P 37 d) in the conservative HZ.
+// K2-18 b: Benneke et al. 2019; Madhusudhan et al. 2023 and 2025 (ApJL); 124 ly, P 33 d, CH4 detected, DMS claim at 3 sigma not confirmed by independent reanalyses (Taylor 2025; Live Science 2025).
+// Kepler-442 b: Torres et al. 2015 (ApJ); 1,206 ly, 1.34 R, mass ~2.3 (+5.9/-1.3), P 112.3 d, K star, Teq ~233 K.
+// The list these come from: Bohl, Lawrence, Lowry and Kaltenegger, MNRAS, 19 Mar 2026 (45 rocky habitable-zone worlds, 24 on the strict cut). The game doesn't claim which are on it.
+// What the ship finds on landing (t, air, water, life...) is the game's guess, not a fact.
+var NAMED=[
+ {id:'proxb',name:'Proxima Centauri b',ly:4.2,star:'M',t:-10,mass:1.1,rocky:1,air:1,water:2,flare:1,lock:1,life:1,
+  known:'The nearest star to the Sun. At least 1.07 Earths of mass, a year of 11.2 days. Its red dwarf flares, and flares can strip the air off a planet. Nobody on Earth knew if it had any.'},
+ {id:'t1e',trio:1,name:'TRAPPIST-1 e',ly:40,star:'M',t:2,mass:.69,rocky:1,air:2,water:4,flare:1,lock:1,life:2,
+  known:'Seven planets round one very small red star. This one is 0.92 Earths wide and 0.69 the mass, a year of 6.1 days. In 2025 Webb ruled out a hydrogen sky and a thick Mars or Venus one. Nitrogen air or an ocean was still possible.'},
+ {id:'t1f',trio:1,name:'TRAPPIST-1 f',ly:40,star:'M',t:-45,mass:1.04,rocky:1,air:2,water:1,flare:1,lock:1,life:0,
+  known:'Seven planets round one very small red star. This one is 1.05 Earths wide and 1.04 the mass, a year of 9.2 days. Further out than e, colder.'},
+ {id:'t1g',trio:1,name:'TRAPPIST-1 g',ly:40,star:'M',t:-70,mass:1.32,rocky:1,air:2,water:1,flare:1,lock:1,life:0,
+  known:'Seven planets round one very small red star. This one is 1.13 Earths wide and 1.32 the mass, a year of 12.4 days. The coldest of the three in the warm zone.'},
+ {id:'lhs1140b',name:'LHS 1140 b',ly:48,star:'M',t:4,mass:5.6,rocky:1,air:2,water:3,flare:0,lock:1,life:2,
+  known:'1.7 Earths wide, 5.6 the mass. Too light for rock alone, maybe a tenth to a fifth water. Webb in 2024: probably ice, maybe a round sea on the side facing its star, a hint of nitrogen air. Not confirmed.'},
+ {id:'toi700e',name:'TOI-700 e',ly:101.4,star:'M',t:12,mass:.8,rocky:1,air:2,water:3,flare:0,lock:1,life:3,
+  known:'95% of Earth’s width, likely rocky, a year of 28 days, round a small cool star. On the warm edge of its habitable zone. Its neighbour d, a little further out, is inside it.'},
+ {id:'k218b',name:'K2-18 b',ly:124,star:'M',t:15,mass:8.9,rocky:0,air:4,water:4,flare:0,lock:1,life:1,
+  known:'About 2.5 Earths wide and 9 the mass, a year of 33 days. Methane in its air. A 2025 claim of dimethyl sulfide, which on Earth only life makes, did not hold up when other teams checked.'},
+ {id:'kep442b',name:'Kepler-442 b',ly:1206,star:'K',t:14,mass:2.3,rocky:1,air:2,water:3,flare:0,lock:0,life:4,
+  known:'1.34 Earths wide, maybe 2.3 the mass (very unsure), a year of 112 days, round an orange star. By its starlight alone about −40 °C. Air would warm it.'}];
+NAMED.forEach(function(p){p.s=stepFor(p.ly);p.named=1;});
+function gen(seed,s,i){var r=rng(hash(seed,s,i+1)),u=r(),star=u<.68?'M':u<.9?'K':'G';
+ var t=Math.round((r()+r()+r()-1.5)*120+5),rocky=r()<.66?1:0,mass=rocky?Math.round((.3+r()*2.4)*10)/10:Math.round((3+r()*12)*10)/10;
+ var flare=r()<(star==='M'?.6:star==='K'?.2:.08)?1:0,lock=r()<(star==='M'?.9:star==='K'?.4:.08)?1:0,air,water,life=0;
+ if(!rocky)air=4;else{air=mass<.6?(r()<.6?0:1):[0,1,2,2,2,3,3,4][Math.floor(r()*8)];if(flare&&air>0&&r()<.6)air--;if(t>80&&air>0&&air<3)air=3;}
+ if(!rocky)water=r()<.5?4:0;else if(air===0)water=t<0&&r()<.6?1:0;else if(t<-20)water=r()<.7?1:0;else if(t>90)water=0;else water=[0,2,2,3,3,4][Math.floor(r()*6)];
+ if(rocky&&water>=2&&air>=1&&air<=3){var q=t>=0&&t<=35?1:.5;life=Math.min(4,Math.floor(r()*q*4.6)+(air===2&&water>=3&&r()<.4?1:0));}else if(rocky&&water===1&&air>=1)life=r()<.2?1:0;
+ return {id:s+'.'+i,s:s,i:i,name:'SC '+(s*10+i)+' '+'bcd'[Math.floor(r()*3)],star:star,ly:Math.round(lyAt(s)*(.96+r()*.08)*10)/10,t:t,mass:mass,rocky:rocky,air:air,water:water,flare:flare,lock:lock,life:life,dx:r()*2-1,dy:r()*2-1};}
+var CONE_CACHE={};
+function coneAt(seed,s){if(s<1)return [];var k=seed+':'+s;if(CONE_CACHE[k])return CONE_CACHE[k];
+ var trio=NAMED.filter(function(p){return p.trio&&p.s===s;}),c;
+ if(trio.length)c=trio.map(function(p,i){return Object.assign({},p,{s:s,i:i,dx:(i-1)*.15,dy:i===1?-.3:.2});});
+ else{var n=CONES[hash(seed,s,0)%CONES.length];c=[];for(var i=0;i<n;i++)c.push(gen(seed,s,i));
+  NAMED.forEach(function(p){if(p.s===s&&!p.trio){var j=hash(seed,s,77)%n;c[j]=Object.assign({},p,{s:s,i:j,dx:c[j].dx,dy:c[j].dy});}});}
+ c.forEach(function(p){if(p.named)p.id=p.id;});
+ var ks=Object.keys(CONE_CACHE);if(ks.length>600)CONE_CACHE={};CONE_CACHE[k]=c;return c;}
+function band(t){return t<-60?'frozen':t<-15?'cold':t<35?'mild':t<80?'hot':'burning';}
+// fit for Grandma, 0 to 100: 60 for a place shrimp and moss can live, 40 for what she asked.
+function wishFit(p,id){if(id==='river')return [0,.2,.5,1,1][p.water];if(id==='birds')return [0,.3,1,.6,0][p.air];
+ if(id==='warm')return p.t>=18&&p.t<=32?1:p.t>=8&&p.t<=40?.6:p.t>=-5&&p.t<=50?.25:0;if(id==='quiet')return p.flare?0:1;if(id==='morning')return p.lock?.15:1;if(id==='green')return p.life/4;return 0;}
+function baseFit(p){if(!p.rocky)return 0;var t=p.t,b=10;b+=t>=0&&t<=30?15:t>=-20&&t<=45?9:t>=-50&&t<=70?3:0;b+=[0,7,15,7,0][p.air];b+=[0,3,6,9,10][p.water];b+=p.life*2.5;return b;}
+function fitOf(p,w){var f=baseFit(p);(w||[]).forEach(function(id,k){f+=(WISH_W[k]||0)*wishFit(p,id)*(p.rocky?1:.5);});return Math.round(f);}
+function tripNew(seed){var r=rng(hash(seed,0,7)),ids=WISH.map(function(x){return x.id;});for(var i=ids.length-1;i>0;i--){var j=Math.floor(r()*(i+1)),x=ids[i];ids[i]=ids[j];ids[j]=x;}
+ return {w:ids.slice(0,3),s:0,used:0,path:[],scans:{},done:null,woke:0};}
+function fuelLeft(t,v){return v.fuel-t.used;}
+function here(t,v){return t.s<1?null:coneAt(v.seed,t.s)[t.path[t.s-1]]||null;}
+function canFly(t,v){return !!t.woke&&!t.done&&fuelLeft(t,v)-1>=BRAKE;}
+function fly(t,v,i){var c=coneAt(v.seed,t.s+1);if(!canFly(t,v)||!(i>=0&&i<c.length))return false;t.s++;t.path.push(i);t.used++;return true;}
+var SCAN=[{id:'transit',name:'Transit spectroscopy',cost:2,what:'air and water'},{id:'rv',name:'Radial velocity',cost:1,what:'mass'},{id:'flare',name:'Flare watch',cost:1,what:'flares'},{id:'tide',name:'Tidal lock check',cost:1,what:'days and nights'}];
+function scanned(t,k){return (t.scans[String(t.s)]||'').split(',').indexOf(k)>=0;}
+function canScan(t,v,k){var c=SCAN.filter(function(x){return x.id===k;})[0];return !!(c&&here(t,v)&&!t.done&&v.inst&&v.inst[k]&&!scanned(t,k)&&fuelLeft(t,v)-c.cost>=BRAKE);}
+function scan(t,v,k){if(!canScan(t,v,k))return false;var c=SCAN.filter(function(x){return x.id===k;})[0],key=String(t.s),sc=t.scans[key]||'';t.scans[key]=sc+(sc?',':'')+k;t.used+=c.cost;return true;}
+function canBrake(t,v){return !t.done&&t.s>=1&&fuelLeft(t,v)>=BRAKE;}
+function brake(t,v){if(!canBrake(t,v))return false;var p=here(t,v);t.used+=BRAKE;t.done={s:t.s,id:p.id,name:p.name,fit:fitOf(p,t.w)};return true;}
+// where the stop ranks: every planet in every cone up to the stop, and every one the fuel left could have reached after it
+function rankOf(t,v){var d=t.done;if(!d)return null;var left=fuelLeft(t,v),pass=[],after=[],k;
+ for(k=1;k<=d.s;k++)coneAt(v.seed,k).forEach(function(p){if(p.id!==d.id)pass.push({s:k,f:fitOf(p,t.w),name:p.name});});
+ for(k=d.s+1;k<=d.s+left;k++)coneAt(v.seed,k).forEach(function(p){after.push({s:k,f:fitOf(p,t.w),name:p.name});});
+ var bp=pass.filter(function(x){return x.f>d.fit;}).length,ba=after.filter(function(x){return x.f>d.fit;}),best=after.concat(pass).reduce(function(a,x){return !a||x.f>a.f?x:a;},null);
+ return {fit:d.fit,pass:pass,after:after,place:bp+1,betterAfter:ba.length,best:best};}
+// text for what a scan or a landing shows
+function airText(a){return ['None.','Thin. Shrimp would need a dome.','Breathable, more or less.','Thick and warm.','Crushing, mostly hydrogen.'][a];}
+function waterText(p){return ['None.','Ice only.','Ponds and wet ground.','Seas.','One ocean, no shore.'][p.water];}
+function massText(p){return p.rocky?'Rocky, '+p.mass+' Earths.':'Not rock. '+p.mass+' Earths, gas and deep water.';}
+function lifeText(l){return ['Bare rock.','Slime in the wet places.','Brown-green mats along the shores.','Moss and low green things. Small swimmers.','Green to the horizon. Things that fly.'][l];}
+function tempText(t){return (t>0?'+':t<0?'−':'')+Math.abs(t)+' °C on average.';}
+// ==SPACE-SIM-END==
+
+(function(){
+var $=function(id){return document.getElementById(id);},cv=$('sky'),cx=cv.getContext('2d'),panel=$('panel');
+var parentOK=window.parent&&window.parent!==window,dev=!parentOK||/[?&]dev/.test(location.search);
+var V=null,T=null,sel=-1,sure='',sureT=0,anim=null,DPR=1,W=0,H=0;
+function post(m){m.space=1;if(parentOK)try{window.parent.postMessage(m,'*');}catch(e){}}
+function devV(){var s=null;try{s=JSON.parse(localStorage.getItem('shrimp-space-dev'));}catch(e){}return s||{seed:7,fuel:100,inst:{transit:1,rv:1,flare:1,tide:1},robots:6,seeds:{},trip:null};}
+function saveTrip(){if(dev&&!parentOK){V.trip=T;try{localStorage.setItem('shrimp-space-dev',JSON.stringify(V));}catch(e){}}else post({type:'trip',trip:T});}
+window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||d.type!=='voy'||e.source!==window.parent)return;var first=!V;V=d.v;if(first||!T)T=V.trip?JSON.parse(JSON.stringify(V.trip)):tripNew(V.seed);if(first){sel=-1;}draw();show();});
+$('back').onclick=function(){if(dev&&!parentOK){if(confirm('Dev: start a new trip?')){V=devV();V.seed=1+Math.floor(Math.random()*1e9);T=tripNew(V.seed);saveTrip();sel=-1;show();}return;}post({type:'back'});};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function cnt(n){return Math.round(n).toLocaleString('en-US');}
+function lyS(n){return (n<10?n.toFixed(1):cnt(n))+' ly';}
+function ask(k){if(sure===k&&Date.now()<sureT)return true;sure=k;sureT=Date.now()+4000;setTimeout(function(){if(sure===k&&Date.now()>=sureT){sure='';show();}},4100);show();return false;}
+// --- map ---
+var SW=88,SH=170;
+function stepX(seed,path,s){var x=0;for(var k=1;k<=s;k++){var c=coneAt(seed,k),i=path[k-1],n=c.length;x+=((i-(n-1)/2)*SW+c[i].dx*14);}return x;}
+function optPos(s,i,baseX){var c=coneAt(V.seed,s),n=c.length,p=c[i];return {x:baseX+(i-(n-1)/2)*SW+p.dx*14,y:-s*SH+p.dy*22};}
+var COL={M:'#ff7a5c',K:'#ffb35c',G:'#fff1a8'};
+var BG=[];(function(){var r=rng(99);for(var i=0;i<180;i++)BG.push({x:r(),y:r(),b:r(),z:.15+r()*.35});})();
+function resize(){DPR=Math.max(1,Math.min(3,window.devicePixelRatio||1));W=innerWidth;H=innerHeight;cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);draw();}
+addEventListener('resize',resize);
+function mapBox(){var top=$('top').getBoundingClientRect().bottom,bot=panel.classList.contains('tall')?H:H-panel.getBoundingClientRect().height;return {top:top,bot:Math.max(top+120,bot)};}
+function cam(){var bx=stepX(V.seed,T.path,T.s),by=-T.s*SH,a=anim;if(a){var k=Math.min(1,(performance.now()-a.t0)/650),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;bx=a.x0+(bx-a.x0)*e;by=a.y0+(by-a.y0)*e;if(k>=1)anim=null;}return {x:bx,y:by};}
+function px(x,y,s,c){cx.fillStyle=c;cx.fillRect(Math.round(x-s/2),Math.round(y-s/2),s,s);}
+function draw(){if(!V||!T)return;cx.setTransform(DPR,0,0,DPR,0,0);cx.fillStyle='#04050a';cx.fillRect(0,0,W,H);var m=mapBox(),c=cam(),ox=W/2-c.x,oy=m.bot-56-c.y,now=performance.now();
+ BG.forEach(function(s){var y=((s.y*H-c.y*s.z*.4)%H+H)%H,x=((s.x*W-c.x*s.z*.3)%W+W)%W;px(x,y,s.b>.93?2:1,'rgba(220,225,255,'+(.25+s.b*.5)+')');});
+ // trail
+ cx.strokeStyle='rgba(255,255,255,.12)';cx.lineWidth=1;cx.beginPath();var x=0;cx.moveTo(ox,oy);for(var k=1;k<=T.s;k++){var cc=coneAt(V.seed,k),i=T.path[k-1];x+=((i-(cc.length-1)/2)*SW+cc[i].dx*14);var y=-k*SH;cx.lineTo(ox+x,oy+y);}cx.stroke();
+ x=0;for(k=1;k<=T.s;k++){cc=coneAt(V.seed,k);var bx=x;cc.forEach(function(p,j){var q=optPos(k,j,bx);var on=j===T.path[k-1];px(ox+q.x,oy+q.y,on?4:2,on?COL[p.star]:'rgba(160,160,180,.35)');});x+=((T.path[k-1]-(cc.length-1)/2)*SW+cc[T.path[k-1]].dx*14);}
+ var hx=stepX(V.seed,T.path,T.s),hy=-T.s*SH;
+ if(T.s===0){px(ox,oy+8,10,'#fff1a8');px(ox,oy+8,14,'rgba(255,241,168,.18)');}
+ else{var p=here(T,V);px(ox+hx,oy+hy,8,COL[p.star]);px(ox+hx,oy+hy,14,'rgba(255,255,255,.07)');var a=now/1400;px(ox+hx+Math.cos(a)*16,oy+hy+Math.sin(a)*7,3,'#9fc8ff');}
+ // cone ahead
+ if(!T.done){var nc=coneAt(V.seed,T.s+1),fly=canFly(T,V);cx.strokeStyle='rgba(255,255,255,'+(fly?.10:.04)+')';cx.beginPath();cx.moveTo(ox+hx,oy+hy);cx.lineTo(ox+hx-SW*2.4,oy+hy-SH*1.2);cx.moveTo(ox+hx,oy+hy);cx.lineTo(ox+hx+SW*2.4,oy+hy-SH*1.2);cx.stroke();
+  cx.font='12px Inter,system-ui,sans-serif';cx.textAlign='center';
+  nc.forEach(function(p,j){var q=optPos(T.s+1,j,hx),X=ox+q.x,Y=oy+q.y;var tw=.6+.4*Math.sin(now/500+j*2);px(X,Y,p.star==='G'?6:p.star==='K'?5:4,COL[p.star]);if(p.named){cx.strokeStyle='rgba(255,255,255,.6)';cx.strokeRect(Math.round(X-6)+.5,Math.round(Y-6)+.5,12,12);}
+   if(j===sel){cx.strokeStyle='rgba(255,255,255,'+tw+')';cx.strokeRect(Math.round(X-10)+.5,Math.round(Y-10)+.5,20,20);}
+   cx.fillStyle=fly?'rgba(232,230,223,.85)':'rgba(232,230,223,.35)';cx.fillText(p.named?p.name:STAR[p.star],X,Y-14);});}
+ // ship
+ var sx=ox+c.x,sy=oy+c.y+(T.s===0?30:22);if(!T.done){var sh=['..#..','.###.','.###.','##.##','#...#'];sh.forEach(function(r,yy){for(var xx=0;xx<5;xx++)if(r[xx]==='#')px(sx-4+xx*2,sy-4+yy*2,2,'#e8e6df');});if(anim)px(sx,sy+8,2,'#ff6b4a');}
+}
+function loop(){draw();requestAnimationFrame(loop);}
+cv.addEventListener('pointerdown',function(e){if(!V||!T||T.done||!T.woke)return;var m=mapBox(),c=cam(),ox=W/2-c.x,oy=m.bot-56-c.y,hx=stepX(V.seed,T.path,T.s),best=-1,bd=34*34;
+ coneAt(V.seed,T.s+1).forEach(function(p,j){var q=optPos(T.s+1,j,hx),dx=ox+q.x-e.clientX,dy=oy+q.y-e.clientY,d=dx*dx+dy*dy;if(d<bd){bd=d;best=j;}});if(best>=0){sel=best;show();}});
+// --- panel ---
+function chips(){$('fuel').textContent=V&&T?'Fuel '+cnt(fuelLeft(T,V)):'';$('wish').innerHTML=T?T.w.map(function(id){var w=WISH.filter(function(x){return x.id===id;})[0];return '<span class="chip">'+w.name+'</span>';}).join(''):'';}
+function factsHTML(p){var L=[],sc=function(k){return scanned(T,k);};
+ L.push('<li><b>Looks</b> '+band(p.t)+' from here.</li>');
+ if(sc('transit'))L.push('<li><b>Air</b> '+airText(p.air)+'</li><li><b>Water</b> '+waterText(p)+'</li>');
+ if(sc('rv'))L.push('<li><b>Mass</b> '+massText(p)+'</li>');
+ if(sc('flare'))L.push('<li><b>Star</b> '+(p.flare?'Flares often.':'Quiet.')+'</li>');
+ if(sc('tide'))L.push('<li><b>Days</b> '+(p.lock?'One side always faces the star.':'It turns. Days and nights.')+'</li>');
+ return '<ul class="facts">'+L.join('')+'</ul>';}
+function nextHTML(){var h='',c=coneAt(V.seed,T.s+1);if(!canFly(T,V))return '<p class="sub">Fuel is down to braking. The ship stops here or nowhere.</p>';
+ if(sel<0||!c[sel])return '<p class="sub">Tap a star ahead to look at it. A flyby costs 1.</p>';var p=c[sel];
+ h+='<h3>Ahead</h3><div class="hd"><h2>'+esc(p.named?p.name:STAR[p.star])+'</h2><small class="sub">'+(p.named?STAR[p.star]+', ':'')+lyS(p.ly)+'</small></div><p>Looks '+band(p.t)+' from here.</p>';
+ h+='<div class="row"><button class="btn go" data-a="fly">Fly by, 1</button></div>';return h;}
+function show(){chips();if(!V||!T){panel.innerHTML='<p class="sub">Waiting for the ship.</p>';return;}panel.classList.toggle('tall',!T.woke||!!T.done);$('top').classList.toggle('solid',!T.woke||!!T.done);var h='';
+ if(!T.woke){var instN=SCAN.filter(function(x){return V.inst&&V.inst[x.id];}).map(function(x){return x.name.toLowerCase();});
+  h+='<h2>Before she sleeps</h2><p>Grandma always wanted to be an astronaut. She tells the ship what she wants from a planet.</p><ol class="wl">'+T.w.map(function(id,k){var w=WISH.filter(function(x){return x.id===id;})[0];return '<li>'+(k===0?'Most of all: ':k===1?'Then: ':'If you can: ')+'“'+w.say+'”</li>';}).join('')+'</ol>';
+  h+='<p>Fuel for '+cnt(V.fuel)+' flybys. Braking at a star takes '+BRAKE+', and after that the ship stays. Scans cost 1 or 2.</p>';
+  h+='<p>'+(instN.length?'On board: '+instN.join(', ')+'.':'No instruments on board. You fly by what a star looks like.')+'</p>';
+  h+='<p>She goes to sleep. Every call is yours now.</p><div class="row"><button class="btn go" data-a="wake">Leave the Sun</button></div>';
+  panel.innerHTML=h;draw();return;}
+ if(T.done){panel.innerHTML=landHTML();var rc=$('rank');if(rc)drawRank(rc);return;}
+ if(T.s===0)h+='<h2>The Sun</h2><p class="sub">Behind you now.</p>';
+ else{var p=here(T,V);h+='<div class="hd"><h2>'+esc(p.name)+'</h2><small class="sub">'+STAR[p.star]+', '+lyS(p.ly)+', flyby '+T.s+'</small></div>';
+  if(p.known)h+='<p class="known">From Earth: '+esc(p.known)+'</p>';
+  h+=factsHTML(p);var own=SCAN.filter(function(x){return V.inst&&V.inst[x.id]&&!scanned(T,x.id);});
+  if(own.length)h+='<div class="row">'+own.map(function(x){return '<button class="btn" data-a="scan" data-k="'+x.id+'"'+(canScan(T,V,x.id)?'':' disabled')+'>'+x.name+', '+x.cost+'</button>';}).join('')+'</div>';
+  h+='<div class="row"><button class="btn'+(sure==='brake'?' sure':'')+'" data-a="brake"'+(canBrake(T,V)?'':' disabled')+'>'+(sure==='brake'?'Tap again. The ship stays here.':'Brake here, '+BRAKE)+'</button></div>';}
+ h+=nextHTML();panel.innerHTML=h;draw();}
+function wishLine(p){return T.w.map(function(id){var w=WISH.filter(function(x){return x.id===id;})[0],f=wishFit(p,id);return w.name+', '+(f>=.8?'yes':f>=.3?'partly':'no');}).join('. ')+'.';}
+function wake(f){return f>=80?'Grandma wakes up, looks out for a long time and says it will do.':f>=60?'Grandma wakes up. She says it’s not what she pictured, then asks where the robots should start.':f>=40?'Grandma wakes up and asks if this is really it. Then she asks for her hat.':'Grandma wakes up, looks out and says nothing for a while. She asks for tea.';}
+function landHTML(){var p=here(T,V),R=rankOf(T,V),h='',nP=R.pass.length+1,nA=R.after.length;
+ h+='<div class="hd"><h2>'+esc(p.name)+'</h2><small class="sub">'+STAR[p.star]+', '+lyS(p.ly)+'</small></div>';
+ h+='<p>Fit for Grandma: <b>'+R.fit+'</b> of 100.</p><ul class="facts"><li><b>Heat</b> '+tempText(p.t)+'</li><li><b>Air</b> '+airText(p.air)+'</li><li><b>Water</b> '+waterText(p)+'</li><li><b>Ground</b> '+massText(p)+'</li><li><b>Star</b> '+(p.flare?'Flares often.':'Quiet.')+'</li><li><b>Days</b> '+(p.lock?'One side always faces the star.':'Days and nights.')+'</li><li><b>Life</b> '+(p.rocky||p.life?lifeText(p.life):'Nothing the ship can see.')+'</li></ul>';
+ h+='<p>She asked for: '+wishLine(p)+'</p><p>'+wake(R.fit)+'</p>';
+ 
+ var ttl=(R.place===1?'Best of the '+nP+' planets you passed.':'Number '+R.place+' of the '+nP+' planets you passed.')+' '+(nA?(R.betterAfter?R.betterAfter+' of the '+nA+' after it, with the fuel left, were better.':'None of the '+nA+' after it was better.'):'No fuel left to go further.');
+ h+='<p class="ttl">'+ttl+'</p><canvas id="rank" aria-label="Fit of every planet passed and after"></canvas><p class="sub">Every planet in every star cone, up to where you stopped (grey) and as far as the fuel left would have gone (rings). '+(R.best?'Best of all: '+esc(R.best.name)+', '+R.best.f+', flyby '+R.best.s+'.':'')+'</p>';
+ h+='<p>'+(!p.rocky?'No ground. '+(V.robots?V.robots+(V.robots===1?' robot waits':' robots wait')+' in orbit. ':''):(V.robots?V.robots+(V.robots===1?' robot starts':' robots start')+' on the ground. ':'No robots. ')+'Shrimp and moss go in first. ')+'Settling comes in the next update.</p>';
+ return h;}
+function drawRank(c){var R=rankOf(T,V),w=c.clientWidth,h=c.clientHeight,d=DPR;c.width=w*d;c.height=h*d;var g=c.getContext('2d');g.setTransform(d,0,0,d,0,0);
+ var L=40,B=30,top=8,right=8,all=R.pass.concat(R.after),maxS=Math.max(T.done.s+1,all.reduce(function(a,x){return Math.max(a,x.s);},1));
+ var X=function(s){return L+(s-.5)/maxS*(w-L-right);},Y=function(f){return top+(1-f/100)*(h-top-B);};
+ g.strokeStyle='#343a50';g.lineWidth=1;g.beginPath();g.moveTo(L,top);g.lineTo(L,h-B);g.lineTo(w-right,h-B);g.stroke();
+ g.fillStyle='#8a8c99';g.font='11px Inter,system-ui,sans-serif';g.textAlign='right';[0,50,100].forEach(function(f){g.fillText(f,L-4,Y(f)+4);});
+ g.textAlign='center';[1,Math.round(maxS/2),maxS].forEach(function(s){g.fillText(s,X(s),h-B+13);});g.fillText('Flyby (star number)',L+(w-L)/2,h-3);
+ g.save();g.translate(10,top+(h-top-B)/2);g.rotate(-Math.PI/2);g.fillText('Fit (0 to 100)',0,0);g.restore();
+ g.strokeStyle='rgba(255,107,74,.35)';g.setLineDash([3,3]);g.beginPath();g.moveTo(X(T.done.s+.5),top);g.lineTo(X(T.done.s+.5),h-B);g.stroke();g.setLineDash([]);
+ R.pass.forEach(function(x){g.fillStyle='rgba(170,172,190,.7)';g.fillRect(X(x.s)-1.5,Y(x.f)-1.5,3,3);});
+ R.after.forEach(function(x){g.strokeStyle='rgba(170,172,190,.8)';g.strokeRect(X(x.s)-2,Y(x.f)-2,4,4);});
+ g.fillStyle='#ff6b4a';g.fillRect(X(T.done.s)-3.5,Y(R.fit)-3.5,7,7);}
+panel.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||b.disabled||!T)return;var a=b.dataset.a;
+ if(a==='wake'){T.woke=1;saveTrip();show();return;}
+ if(a==='fly'){var c0=cam();if(fly(T,V,sel)){anim={t0:performance.now(),x0:c0.x,y0:c0.y};sel=-1;sure='';saveTrip();show();}return;}
+ if(a==='scan'){if(scan(T,V,b.dataset.k)){saveTrip();show();}return;}
+ if(a==='brake'){if(!ask('brake'))return;sure='';if(brake(T,V)){saveTrip();show();panel.scrollTop=0;}return;}});
+if(dev&&!parentOK){V=devV();T=V.trip||tripNew(V.seed);}
+resize();show();requestAnimationFrame(loop);post({type:'ready'});
+})();
+</script>
+</body>
+</html>
