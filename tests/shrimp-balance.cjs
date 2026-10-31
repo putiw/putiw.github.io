@@ -815,5 +815,8 @@ if(!/var REAL=\[/.test(sp)||!sp.includes("{id:'orbit',name:'Orbit tracker'")||!h
 if(!home.includes('window.GM_AWAY=!!VOY')||!home.includes('function gmAway')||!home.includes('class="cp-row"')||!home.includes('Reset this color')||!home.includes("mkI('undo','Back')"))throw Error('Pass 172: land changes');
 if(/>Colours<|As drawn|All as drawn/.test(home))throw Error('Pass 172: color, and no As drawn buttons');}
 count++;console.log('PASS Pass 172 real sky and land changes');
+// Pass 173 (Puti, 31 Oct): stream shrimp put in Your tank reach Tank 1; whole-pixel zoom so Millie's eyes keep their shape
+{const home=fs.readFileSync(path.join(__dirname,'../shrimp/home.html'),'utf8');if(!home.includes("if(T&&o&&T===o&&list&&list.length)post({type:'give'")||!home.includes('var ZOOMS=[1,2,4,6],ZDEF=1;'))throw Error('Pass 173: trap give and whole-pixel zoom');}
+count++;console.log('PASS Pass 173 trap catches reach the game, whole-pixel zoom');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

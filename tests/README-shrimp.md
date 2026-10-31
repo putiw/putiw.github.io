@@ -1510,3 +1510,10 @@ Puti, from the two test artifacts.
 6. Millie's eye: checked, her sprites are the same pixels as before the blink update in every non-blink frame. Her eyes look different at different spots because she's drawn at 1.5x and the pixels land unevenly. Not changed; asked Puti.
 
 Tests: balance 117, academy 9, me 46, space search 5 (rewritten for the real sky), Space bot passes (lands on Gl 725 B c, fit 53). Land headless at 390 px: color panel, a slider recolors the armchair, Make icons, no page errors. Not deployed.
+
+## Pass 173: Millie's eyes, the stream trap (31 Oct)
+
+1. Millie's eyes changed shape depending on where she stood: art was drawn at 0.7 of a screen step and people at 1.5x on top, so pixels landed unevenly. Zoom now goes in whole screen pixels (`ZOOMS=[1,2,4,6]` screen pixels per art pixel, default 2). At 2, 4 and 6 everyone, people at 1.5x included, lands on whole pixels, same proportions as before. 1 is the far view. On Puti's phone the default shows about 9 tiles across instead of 13. Checked at 390 px, 3x: the same eyes at six spots.
+2. Stream trap checked on the live build (main, 507d1c2): set, wait, pull up, 4 shrimp, Take home into Your tank. The land added them but never told the game, so the game's Tank 1 stayed at 0 and the next sync took them back out. Now `addToTank` into Your tank posts `give` (game.js). Checked: Tank 1 goes 0 to 4. The trap itself was fine.
+
+Tests: balance 118, academy 9, me 46, space search 5. Not deployed.
