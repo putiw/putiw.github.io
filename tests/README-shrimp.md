@@ -1517,3 +1517,14 @@ Tests: balance 117, academy 9, me 46, space search 5 (rewritten for the real sky
 2. Stream trap checked on the live build (main, 507d1c2): set, wait, pull up, 4 shrimp, Take home into Your tank. The land added them but never told the game, so the game's Tank 1 stayed at 0 and the next sync took them back out. Now `addToTank` into Your tank posts `give` (game.js). Checked: Tank 1 goes 0 to 4. The trap itself was fine.
 
 Tests: balance 118, academy 9, me 46, space search 5. Not deployed.
+
+## Pass 174: Millie's eyes for real, the ship's layout (31 Oct)
+
+1. Millie's eyes still changed as she moved: the land canvas had one pixel per art pixel, so 1.5x people came out 1 or 2 canvas pixels per art pixel. The canvas now holds 2 pixels per art pixel (`L.R`, the drawing is scaled by 2), and `drawSprK` snaps to those pixels: every art pixel of Millie is 3 canvas pixels, 3 screen pixels on Puti's phone at the default zoom. Checked at 390 px, 3x, five spots: both eyes white, pupil, white, same as her Aseprite file. Land source on `shrimp-proto`.
+2. The ship (space.html), keeping the layout:
+   - The panel has one height. Under the planet, Looks and one row per instrument in a fixed order (air and water, mass, star, days, orbit, star age, field). Before a scan the row is the instrument as a button with its cost; tapping it fills the row with the answer. Instruments not packed say Not on board.
+   - Tapping a star ahead puts a small box next to it on the map with its name, distance, how it looks and Fly by, 1. The Ahead section is gone from the panel.
+   - Brake is on the map, bottom right above the panel, the same place every flyby: Brake and settle here, 10, then Tap again.
+   - Several planets of one star in a cone: the letters on the map, the star's name once above them.
+
+Tests: balance 119, academy 9, me 46, space search 5, Space bot passes. Not deployed.

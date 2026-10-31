@@ -37,10 +37,21 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:15px/1
 #rank{width:100%;height:180px;display:block;margin:6px 0}
 .ttl{font-weight:600;margin:10px 0 0}
 .prep{font-weight:600;margin:12px 0 0;color:var(--dim)}
+/* Pass 174: the panel keeps one height, every instrument has its own row, Fly by sits next to the star, Brake on the map */
+#panel:not(.tall){height:min(48vh,420px);max-height:none}
+.known{max-height:4.4em;overflow:auto}
+.facts li{min-height:30px;align-items:center;grid-template-columns:84px 1fr}
+.facts .scan{font:inherit;font-size:13px;background:#1a1e2c;color:var(--ink);border:1px solid #343a50;border-radius:7px;padding:4px 9px;cursor:pointer;justify-self:start}
+.facts .scan:disabled{opacity:.4;cursor:default}
+.facts .off{color:#5b5e6c;font-size:13px}
+#ahead{position:fixed;z-index:3;background:#0d0f18ee;border:1px solid var(--line);border-radius:10px;padding:7px 9px;font-size:12.5px;line-height:1.3;width:max-content;max-width:210px;transform:translate(-50%,calc(-100% - 16px))}
+#ahead b{display:block;font-size:13.5px}#ahead .btn{margin-top:6px;padding:5px 10px;font-size:13px}
+#brakeb{position:fixed;right:12px;z-index:3;font-size:13px;padding:6px 10px}
 </style>
 </head>
 <body>
 <canvas id="sky"></canvas>
+<div id="ahead" hidden><div id="ah-t"></div><button class="btn go" id="flyb">Fly by, 1</button></div><button class="btn" id="brakeb" hidden></button>
 <div id="top"><button class="back" id="back" aria-label="Grandma’s land">⌂ Home</button><span id="fuel"></span><span id="wish"></span></div>
 <div id="panel"></div>
 <script>
@@ -198,29 +209,31 @@ function draw(){if(!V||!T)return;cx.setTransform(DPR,0,0,DPR,0,0);cx.fillStyle='
   cx.font='12px Inter,system-ui,sans-serif';cx.textAlign='center';
   nc.forEach(function(p,j){var q=optPos(T.s+1,j,hx),X=ox+q.x,Y=oy+q.y;var tw=.6+.4*Math.sin(now/500+j*2);px(X,Y,p.star==='G'?6:p.star==='K'?5:4,COL[p.star]);if(p.named){cx.strokeStyle='rgba(255,255,255,.6)';cx.strokeRect(Math.round(X-6)+.5,Math.round(Y-6)+.5,12,12);}
    if(j===sel){cx.strokeStyle='rgba(255,255,255,'+tw+')';cx.strokeRect(Math.round(X-10)+.5,Math.round(Y-10)+.5,20,20);}
-   cx.fillStyle=fly?'rgba(232,230,223,.85)':'rgba(232,230,223,.35)';cx.fillText(p.named?p.name:STAR[p.star],X,j%2?Y+22:Y-14);});}
+   cx.fillStyle=fly?'rgba(232,230,223,.85)':'rgba(232,230,223,.35)';if(j!==sel)cx.fillText(shortName(p,nc),X,j%2?Y+22:Y-14);
+   if(j===sel)aheadAt(p,X,Y,fly);});
+  // a star with several planets ahead: its name once, above them
+  var grp={};nc.forEach(function(p,j){var q=optPos(T.s+1,j,hx);(grp[p.st]=grp[p.st]||[]).push([ox+q.x,oy+q.y]);});Object.keys(grp).forEach(function(st){var g=grp[st];if(g.length<2)return;var gx=g.reduce(function(a,v){return a+v[0];},0)/g.length,gy=Math.min.apply(null,g.map(function(v){return v[1];}))-34;cx.fillStyle=fly?'rgba(232,230,223,.9)':'rgba(232,230,223,.4)';cx.fillText(st,gx,gy);});if(sel<0||!nc[sel])aheadAt(null);}else aheadAt(null);
  // ship
  var sx=ox+c.x,sy=oy+c.y+(T.s===0?30:22);if(!T.done){var sh=['..#..','.###.','.###.','##.##','#...#'];sh.forEach(function(r,yy){for(var xx=0;xx<5;xx++)if(r[xx]==='#')px(sx-4+xx*2,sy-4+yy*2,2,'#e8e6df');});if(anim)px(sx,sy+8,2,'#ff6b4a');}
 }
+function aheadAt(p,X,Y,fly){var a=$('ahead');if(!p){if(!a.hidden)a.hidden=true;return;}if(a.hidden||a._p!==p.name){a._p=p.name;$('ah-t').innerHTML='<b>'+esc(p.name)+'</b>'+STAR[p.star]+', '+lyS(p.ly)+'. Looks '+band(p.t)+'.';}
+ $('flyb').hidden=!fly;if(!fly)$('ah-t').innerHTML='<b>'+esc(p.name)+'</b>Fuel is down to braking.';a.hidden=false;var w=a.offsetWidth||180;a.style.left=Math.max(w/2+8,Math.min(W-w/2-8,X))+'px';a.style.top=Math.max(mapBox().top+a.offsetHeight+20,Y)+'px';}
+// planets of one star in a cone: the letter on the map, the full name on tap
+function shortName(p,c){var same=c.filter(function(q){return q.st===p.st;}).length>1;if(!same)return p.name;var k=p.name.lastIndexOf(' ');return k>0?p.name.slice(k+1):p.name;}
 function loop(){draw();requestAnimationFrame(loop);}
 cv.addEventListener('pointerdown',function(e){if(!V||!T||T.done||!T.woke)return;var m=mapBox(),c=cam(),ox=W/2-c.x,oy=m.bot-56-c.y,hx=stepX(V.seed,T.path,T.s),best=-1,bd=34*34;
  coneAt(V.seed,T.s+1).forEach(function(p,j){var q=optPos(T.s+1,j,hx),dx=ox+q.x-e.clientX,dy=oy+q.y-e.clientY,d=dx*dx+dy*dy;if(d<bd){bd=d;best=j;}});if(best>=0){sel=best;show();}});
 // --- panel ---
 function chips(){$('fuel').textContent=V&&T?'Fuel '+cnt(fuelLeft(T,V)):'';$('wish').innerHTML=T?T.w.map(function(id){var w=WISH.filter(function(x){return x.id===id;})[0];return '<span class="chip">'+w.name+'</span>';}).join(''):'';}
-function factsHTML(p){var L=[],sc=function(k){return scanned(T,k);};
- L.push('<li><b>Looks</b> '+band(p.t)+' from here.</li>');
- if(sc('transit'))L.push('<li><b>Air</b> '+airText(p.air)+'</li><li><b>Water</b> '+waterText(p)+'</li>');
- if(sc('rv'))L.push('<li><b>Mass</b> '+massText(p)+'</li>');
- if(sc('flare'))L.push('<li><b>Star</b> '+(p.flare?'Flares often.':'Quiet.')+'</li>');
- if(sc('tide'))L.push('<li><b>Days</b> '+(p.lock?'One side always faces the star.':'It turns. Days and nights.')+'</li>');
- if(sc('orbit'))L.push('<li><b>Orbit</b> '+orbitText(p)+'</li>');
- if(sc('age'))L.push('<li><b>Star age</b> '+ageText(p)+'</li>');
- if(sc('mag'))L.push('<li><b>Field</b> '+magText(p)+'</li>');
+// one fixed row per instrument: the answer once scanned, the instrument as a button before, dim when it isn't on board
+var ROWS=[['transit','Air, water',function(p){return airText(p.air)+' '+waterText(p);}],['rv','Mass',massText],['flare','Star',function(p){return p.flare?'Flares often.':'Quiet.';}],
+ ['tide','Days',function(p){return p.lock?'One side always faces the star.':'It turns. Days and nights.';}],['orbit','Orbit',orbitText],['age','Star age',ageText],['mag','Field',magText]];
+function factsHTML(p){var L=['<li><b>Looks</b> '+(p?band(p.t)+' from here.':'')+'</li>'];
+ ROWS.forEach(function(r){var k=r[0],sc=SCAN.filter(function(x){return x.id===k;})[0],on=V.inst&&V.inst[k],cell;
+  if(p&&scanned(T,k))cell=r[2](p);else if(!on)cell='<span class="off">Not on board</span>';
+  else cell='<button class="scan" data-a="scan" data-k="'+k+'"'+(p&&canScan(T,V,k)?'':' disabled')+'>'+sc.name+' · '+sc.cost+'</button>';
+  L.push('<li><b>'+r[1]+'</b> '+cell+'</li>');});
  return '<ul class="facts">'+L.join('')+'</ul>';}
-function nextHTML(){var h='',c=coneAt(V.seed,T.s+1);if(!canFly(T,V))return '<p class="sub">Fuel is down to braking. The ship stops here or nowhere.</p>';
- if(sel<0||!c[sel])return '<p class="sub">Tap a star ahead to look at it. A flyby costs 1.</p>';var p=c[sel];
- h+='<h3>Ahead</h3><div class="hd"><h2>'+esc(p.named?p.name:STAR[p.star])+'</h2><small class="sub">'+(p.named?STAR[p.star]+', ':'')+lyS(p.ly)+'</small></div><p>Looks '+band(p.t)+' from here.</p>';
- h+='<div class="row"><button class="btn go" data-a="fly">Fly by, 1</button></div>';return h;}
 function show(){chips();if(!V||!T){panel.innerHTML='<p class="sub">Waiting for the ship.</p>';return;}panel.classList.toggle('tall',!T.woke||!!T.done);$('top').classList.toggle('solid',!T.woke||!!T.done);var h='';
  if(!T.woke){var instN=SCAN.filter(function(x){return V.inst&&V.inst[x.id];}).map(function(x){return x.name.toLowerCase();});
   h+='<h2>Before she sleeps</h2><p>Grandma always wanted to be an astronaut. She tells the ship what she wants from a planet.</p><ol class="wl">'+T.w.map(function(id,k){var w=WISH.filter(function(x){return x.id===id;})[0];return '<li>'+(k===0?'Most of all: ':k===1?'Then: ':'If you can: ')+'“'+w.say+'”</li>';}).join('')+'</ol>';
@@ -229,13 +242,17 @@ function show(){chips();if(!V||!T){panel.innerHTML='<p class="sub">Waiting for t
   h+='<p>She goes to sleep. Every call is yours now.</p><div class="row"><button class="btn go" data-a="wake">Leave the Sun</button></div>';
   panel.innerHTML=h;draw();return;}
  if(T.done){panel.innerHTML=landHTML();var rc=$('rank');if(rc)drawRank(rc);return;}
- if(T.s===0)h+='<h2>The Sun</h2><p class="sub">Behind you now.</p>';
+ if(T.s===0)h+='<div class="hd"><h2>The Sun</h2><small class="sub">Behind you now</small></div><p class="sub">Tap a star ahead to look at it.</p>';
  else{var p=here(T,V);h+='<div class="hd"><h2>'+esc(p.name)+'</h2><small class="sub">'+STAR[p.star]+', '+lyS(p.ly)+', flyby '+T.s+'</small></div>';
   if(p.known)h+='<p class="known">From Earth: '+esc(p.known)+'</p>';
-  h+=factsHTML(p);var own=SCAN.filter(function(x){return V.inst&&V.inst[x.id]&&!scanned(T,x.id);});
-  if(own.length)h+='<div class="row">'+own.map(function(x){return '<button class="btn" data-a="scan" data-k="'+x.id+'"'+(canScan(T,V,x.id)?'':' disabled')+'>'+x.name+', '+x.cost+'</button>';}).join('')+'</div>';
-  h+='<div class="row"><button class="btn'+(sure==='brake'?' sure':'')+'" data-a="brake"'+(canBrake(T,V)?'':' disabled')+'>'+(sure==='brake'?'Tap again. The ship stays here.':'Brake here, '+BRAKE)+'</button></div>';}
- h+=nextHTML();panel.innerHTML=h;draw();}
+  h+=factsHTML(p);}
+ if(T.s===0)h+=factsHTML(null);
+ panel.innerHTML=h;brakeUI();draw();}
+// Brake sits on the map, bottom right above the panel, in the same place every flyby
+function brakeUI(){var b=$('brakeb');if(!V||!T||!T.woke||T.done||T.s<1){b.hidden=true;return;}b.hidden=false;b.disabled=!canBrake(T,V);
+ b.className='btn'+(sure==='brake'?' sure':'');b.textContent=sure==='brake'?'Tap again. The ship stays here.':'Brake and settle here, '+BRAKE;b.style.bottom=(panel.getBoundingClientRect().height+10)+'px';}
+$('brakeb').onclick=function(){if(!T||!ask('brake')){brakeUI();return;}sure='';if(brake(T,V)){$('ahead').hidden=true;saveTrip();show();panel.scrollTop=0;}};
+$('flyb').onclick=function(){if(!T)return;var c0=cam();if(fly(T,V,sel)){anim={t0:performance.now(),x0:c0.x,y0:c0.y};sel=-1;sure='';saveTrip();show();}};
 function wishLine(p){return T.w.map(function(id){var w=WISH.filter(function(x){return x.id===id;})[0],f=wishFit(p,id);return w.name+', '+(f>=.8?'yes':f>=.3?'partly':'no');}).join('. ')+'.';}
 function wake(f){return f>=80?'Grandma wakes up, looks out for a long time and says it will do.':f>=60?'Grandma wakes up. She says it’s not what she pictured, then asks where the robots should start.':f>=40?'Grandma wakes up and asks if this is really it. Then she asks for her hat.':'Grandma wakes up, looks out and says nothing for a while. She asks for tea.';}
 function landHTML(){var p=here(T,V),R=rankOf(T,V),h='';
@@ -260,9 +277,8 @@ function drawRank(c){var R=rankOf(T,V),w=c.clientWidth,h=c.clientHeight,d=DPR;c.
  g.fillStyle='#ff6b4a';g.fillRect(X(T.done.s)-3.5,Y(R.fit)-3.5,7,7);}
 panel.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||b.disabled||!T)return;var a=b.dataset.a;
  if(a==='wake'){T.woke=1;saveTrip();show();return;}
- if(a==='fly'){var c0=cam();if(fly(T,V,sel)){anim={t0:performance.now(),x0:c0.x,y0:c0.y};sel=-1;sure='';saveTrip();show();}return;}
  if(a==='scan'){if(scan(T,V,b.dataset.k)){saveTrip();show();}return;}
- if(a==='brake'){if(!ask('brake'))return;sure='';if(brake(T,V)){saveTrip();show();panel.scrollTop=0;}return;}});
+ });
 if(dev&&!parentOK){V=devV();T=V.trip||tripNew(V.seed);}
 resize();show();requestAnimationFrame(loop);post({type:'ready'});
 })();

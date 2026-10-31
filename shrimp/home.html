@@ -3523,7 +3523,8 @@ function pickCpa(dpr){var d=dpr*0.6875;if(d>=1.75)return Math.round(d)/dpr;if(d>
 function sizeCanvas(){var wrap=$('lwrap');if(!wrap||!L.cv)return;var W=wrap.clientWidth,top=wrap.getBoundingClientRect().top,pal=$('lpal'),palH=pal&&!pal.hidden?78:0;
   var tb=document.querySelector('.tabs'),tabsH=tb?tb.getBoundingClientRect().height:62,tl=$('ltools'),toolsH=tl&&tl.parentNode&&tl.parentNode.id==='lwrap'?4:(tl?tl.offsetHeight:50)+14;var H=Math.round(clamp(window.innerHeight-top-toolsH-34-palH-tabsH-10,250,660));
   var dpr=window.devicePixelRatio||1,cpa=zoomK()/dpr;if(Math.abs(H-L.cssH)<3&&W===L.cssW&&L.x&&L.sizedCv===L.cv&&cpa===L.cpa)return;L.sizedCv=L.cv;
-  var mid=L.VW?[L.cam.x+L.VW/2,L.cam.y+L.VH/2]:null;L.cssW=W;L.cssH=H;L.dpr=dpr;L.cpa=cpa;L.s=1;L.cv.width=Math.max(1,Math.round(W/cpa));L.cv.height=Math.max(1,Math.round(H/cpa));L.cv.style.width=(L.cv.width*cpa)+'px';L.cv.style.height=(L.cv.height*cpa)+'px';L.VW=L.cv.width;L.VH=L.cv.height;
+  var mid=L.VW?[L.cam.x+L.VW/2,L.cam.y+L.VH/2]:null;L.cssW=W;L.cssH=H;L.dpr=dpr;L.cpa=cpa;L.s=1;// the canvas holds 2 pixels per art pixel (Pass 174), so people at 1.5x land on whole canvas pixels (3 per art pixel): Millie's eyes keep their shape
+  var vw=Math.max(1,Math.round(W/cpa)),vh=Math.max(1,Math.round(H/cpa));L.R=2;L.cv.width=vw*L.R;L.cv.height=vh*L.R;L.cv.style.width=(vw*cpa)+'px';L.cv.style.height=(vh*cpa)+'px';L.VW=vw;L.VH=vh;
   if(mid){L.cam.x=mid[0]-L.VW/2;L.cam.y=mid[1]-L.VH/2;}L.x=L.cv.getContext('2d',{alpha:false});L.x.imageSmoothingEnabled=false;clampCam();L.dirty=true;}
 function homeSub(){var l=LS(),n=Math.min(S.tanks.length,STAGES[S.stage].tanks),bits=[plural(n,'tank')+' of '+STAGES[S.stage].tanks];if(l.hens.length&&S.stage>=2)bits.push(plural(l.hens.length,'hen'));if(l.pond.length)bits.push(plural(l.pond.length,'fish','fish')+' in the pond');var birds=Object.keys(S.book.birds||{}).length;if(birds)bits.push(plural(birds,'bird')+' seen');return bits.join(' · ');}
 function renderCard(){var nm=$('h-name');if(!nm)return;nm.textContent=STAGES[S.stage].name;$('h-sub').textContent=homeSub();var mv=$('h-move'),nx=STAGES[S.stage+1];
@@ -3557,7 +3558,8 @@ function updateStat(force){var el=$('lstat');if(!el)return;var l=LS(),html='',eg
 // ----- drawing (one canvas pixel per art pixel; nothing here allocates per frame) -----
 // people and pets are drawn half again as big as her art (Puti, 28 Oct), nearest pixel, standing on the same feet
 var CHK=1.5;
-function drawSprK(x,s,wx,wy,k){if(!s)return;x.drawImage(s.c,Math.round(wx-s.ax*k)-L.cdx,Math.round(wy-s.ay*k)-L.cdy,Math.round(s.w*k),Math.round(s.h*k));}
+// snap to whole canvas pixels (L.R a world pixel) and keep the exact 1.5x size, so every art pixel is 3 canvas pixels
+function drawSprK(x,s,wx,wy,k){if(!s)return;var R=L.R||1;x.drawImage(s.c,Math.round((wx-s.ax*k)*R)/R-L.cdx,Math.round((wy-s.ay*k)*R)/R-L.cdy,Math.round(s.w*k*R)/R,Math.round(s.h*k*R)/R);}
 function drawSpr(x,s,wx,wy){if(!s)return;x.drawImage(s.c,Math.round(wx-s.ax)-L.cdx,Math.round(wy-s.ay)-L.cdy);}
 var DOGL=null;
 function dogCanvas(left){var im=IMG.dog;if(!im||!im.naturalWidth)return null;if(!left)return im;if(DOGL)return DOGL;var n=Math.floor(im.naturalWidth/128),c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;var x=c.getContext('2d');
@@ -3619,10 +3621,10 @@ function drawIt(x,it){var t=it.t,o,c;
   else if(t===I_HEN||t===I_WILD){c=it.a;drawSpr(x,shadowSpr(12,3),c.x,c.y);drawSpr(x,henSpr(c.kind||'wild',chickPose(c),c.face),c.x,c.y);}
   else if(t===I_BIRD)drawBird(x,it.a);}
 function draw(){var x=L.x,m=M(),cv=L.cv,i;L.cdx=Math.round(L.cam.x);L.cdy=Math.round(L.cam.y);
-  x.setTransform(1,0,0,1,0,0);x.imageSmoothingEnabled=false;
+  x.setTransform(L.R||1,0,0,L.R||1,0,0);x.imageSmoothingEnabled=false;
   if(!L.groundOK&&ART.ready)renderGround();
-  var W=m.w*T,H=m.h*T;if(L.cdx<0||L.cdy<0||L.cdx+cv.width>W||L.cdy+cv.height>H||!L.groundOK){x.fillStyle=PAL.VOID;x.fillRect(0,0,cv.width,cv.height);}
-  if(L.groundOK){var sx0=Math.max(0,L.cdx),sy0=Math.max(0,L.cdy),sx1=Math.min(W,L.cdx+cv.width),sy1=Math.min(H,L.cdy+cv.height);if(sx1>sx0&&sy1>sy0)x.drawImage(L.gcv,sx0,sy0,sx1-sx0,sy1-sy0,sx0-L.cdx,sy0-L.cdy,sx1-sx0,sy1-sy0);}
+  var VW=L.VW,VH=L.VH,W=m.w*T,H=m.h*T;if(L.cdx<0||L.cdy<0||L.cdx+VW>W||L.cdy+VH>H||!L.groundOK){x.fillStyle=PAL.VOID;x.fillRect(0,0,VW,VH);}
+  if(L.groundOK){var sx0=Math.max(0,L.cdx),sy0=Math.max(0,L.cdy),sx1=Math.min(W,L.cdx+VW),sy1=Math.min(H,L.cdy+VH);if(sx1>sx0&&sy1>sy0)x.drawImage(L.gcv,sx0,sy0,sx1-sx0,sy1-sy0,sx0-L.cdx,sy0-L.cdy,sx1-sx0,sy1-sy0);}
   if(!ART.ready)return;
   drawWater(x);drawPondFish(x);drawWindowFeeders(x);
   // thrown grain: each bit is a few small kernels, not one blob (Puti, 28 Oct: they read as burgers)

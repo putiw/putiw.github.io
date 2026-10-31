@@ -818,5 +818,10 @@ count++;console.log('PASS Pass 172 real sky and land changes');
 // Pass 173 (Puti, 31 Oct): stream shrimp put in Your tank reach Tank 1; whole-pixel zoom so Millie's eyes keep their shape
 {const home=fs.readFileSync(path.join(__dirname,'../shrimp/home.html'),'utf8');if(!home.includes("if(T&&o&&T===o&&list&&list.length)post({type:'give'")||!home.includes('var ZOOMS=[1,2,4,6],ZDEF=1;'))throw Error('Pass 173: trap give and whole-pixel zoom');}
 count++;console.log('PASS Pass 173 trap catches reach the game, whole-pixel zoom');
+// Pass 174 (Puti, 31 Oct): Millie on whole canvas pixels; the ship's panel keeps one height, instruments are buttons in their rows, Fly by by the star, Brake on the map
+{const home=fs.readFileSync(path.join(__dirname,'../shrimp/home.html'),'utf8'),sp=fs.readFileSync(path.join(__dirname,'../shrimp/space.html'),'utf8');
+if(!home.includes('L.R=2;L.cv.width=vw*L.R'))throw Error('Pass 174: land canvas at 2 pixels per art pixel');
+if(!sp.includes('id="flyb"')||!sp.includes('id="brakeb"')||!sp.includes("Not on board")||!sp.includes('#panel:not(.tall){height:'))throw Error('Pass 174: ship layout');}
+count++;console.log('PASS Pass 174 Millie pixels, fixed ship layout');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
