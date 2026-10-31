@@ -17,7 +17,7 @@ document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length
 document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea')))e.preventDefault();});
 
 // ----- money: the company's cash -----
-var FROZEN='',NEED='',SEQ=0,LEFT=0;   // SEQ: our last take/give; an 'own' from before the game handled it is stale
+var FROZEN='',NEED='',SEQ=0,LEFT=0,VOY=0;   // SEQ: our last take/give; an 'own' from before the game handled it is stale
 spend=function(n,what){if(n<=0)return true;if(FROZEN){toast(FROZEN,4200);sfx('nope');return false;}if(S.cash<n){toast('Not enough cash for '+what+'.');sfx('nope');return false;}
   S.cash-=n;post({type:'spend',n:n,what:what});updateHeader();save();return true;};
 earn=function(n,what){if(n<=0)return;S.cash+=n;post({type:'earn',n:n,what:what});updateHeader();save();};
@@ -101,11 +101,12 @@ if(typeof breedDay==='function'){var _bd=breedDay;breedDay=function(T,d){if(!T.o
 // the land's day is the game's day
 function gameTime(day){if(day==null||!isFinite(day))return;window.GDAY=day;if(S.gday==null||S.gday>day){S.gday=day;return;}var n=Math.floor(day)-Math.floor(S.gday);if(n>=1){S.gday=day;advance(Math.min(n,365));}}
 // after the company is sold the land is all there is: the back button opens your years and settings instead (Pass 161)
-function leftBack(){var b=$('tb-back');if(!b)return;b.innerHTML=LEFT?'<span aria-hidden="true">≡</span><i> Your years</i>':'<span aria-hidden="true">‹</span><i> Company</i>';b.setAttribute('aria-label',LEFT?'Your years at the company, settings':'Back to the company');}
+// after leaving Earth (the game sends voy) the back button goes to Space (Pass 170)
+function leftBack(){var b=$('tb-back');if(!b)return;b.innerHTML=LEFT?'<span aria-hidden="true">≡</span><i> Your years</i>':'<span aria-hidden="true">‹</span><i> '+(VOY?'Space':'Company')+'</i>';b.setAttribute('aria-label',LEFT?'Your years at the company, settings':VOY?'Back to Space':'Back to the company');}
 // a card waiting at the company, or frozen accounts
 function needBar(){var b=$('lneed');if(!NEED){if(b)b.remove();return;}if(!b){b=document.createElement('button');b.type='button';b.id='lneed';b.className='lneed';b.onclick=function(){try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};document.body.appendChild(b);}b.textContent=NEED+' Tap to go back.';}
 window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||!S)return;
-  if(d.type==='cash'){S.cash=d.cash;FROZEN=d.frozen||'';if(!!d.left!==!!LEFT){LEFT=d.left?1:0;leftBack();}var nd=d.need||'';if(nd!==NEED){NEED=nd;needBar();}gameTime(d.day);updateHeader();}
+  if(d.type==='cash'){S.cash=d.cash;FROZEN=d.frozen||'';if(!!d.left!==!!LEFT||!!d.voy!==!!VOY){LEFT=d.left?1:0;VOY=d.voy?1:0;leftBack();}var nd=d.need||'';if(nd!==NEED){NEED=nd;needBar();}gameTime(d.day);updateHeader();}
   if(d.type==='own')syncOwn(d);});
 // shrimp that leave your tank here leave it in the game too
 var _move=netMoveTo;netMoveTo=function(T2){var T=ownT(),N=netList(),a=0,y=0,giv=[];if(T&&T2)N.forEach(function(e){if(T2!==T&&e.from===T.id){if(e.ind.age>=ADULT_DAYS)a++;else y++;}if(T2===T&&e.from!==T.id)giv.push({age:e.ind.age,g:gOf(e.ind)});});_move(T2);if(a+y)post({type:'take',adults:a,young:y,seq:++SEQ});if(giv.length)post({type:'give',list:giv,seq:++SEQ});};
