@@ -1541,3 +1541,11 @@ With tests this cheap the Space bot scans everything and lands on TOI-700 d, fit
 
 Puti: the ship gets at least 300 fuel. `VOY_FUEL` is now min 300, start 300, max 500. The first 300 are free (`free`), and each step of 10 past that costs 10 points as before (`voyageSpent` counts fuel above 300). A ship in an old save that hasn't landed is topped up to 300. With 69 cones in the sky, 300 is enough to fly past every star and test most of them.
 Tests: balance 120 (fuel checks: starts at 300 for 0 points, 290 refused, 310 costs 10), Space bot passes. Not deployed.
+
+## Pass 177: 300 stops, a few good places for any wishes (31 Oct)
+
+Puti: the sky had 69 stops, she wanted 300, and more than one good planet to choose from.
+1. `tests/build-space-planets.py` now takes 960: 959 planets, still every one of the 45 in Bohl et al. 2026, then the nearest with a known year. They make 302 stops of 2 to 4. White (A) stars allowed; a last stop of one planet borrows one from the stop before. `space.html` is about 200 KB now.
+2. Real nearby planets are mostly too hot, so few are good. To make sure there are several for any wishes: more life on warm wet rocky planets, a bit more warming from air, some close-in planets turning slowly instead of locked (like Mercury), fewer red dwarfs flaring. Over all 120 orders of her three wishes, at least 3 planets score 80 or more and at least 5 score 75 or more (new test). TOI-700 d can reach 100.
+3. Space bot: settles at its best seen minus 5.
+Tests: space search 6, balance 120, academy 9, me 46, Space bot lands on TOI-700 d. Not deployed.

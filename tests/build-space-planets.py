@@ -12,7 +12,7 @@ Only Earth's measurements are copied. What a ship finds on the ground is decided
 import gzip, json, math, os, re, sys
 import xml.etree.ElementTree as ET
 
-TARGET = 220
+TARGET = 960
 PAPER = ["GJ 1002 b","GJ 1002 c","GJ 1061 c","GJ 1061 d","GJ 251 c","GJ 273 b","GJ 3323 b","GJ 667 C c","GJ 667 C e",
  "GJ 667 C f","GJ 682 b","K2-239 d","K2-288 B b","K2-3 d","K2-72 e","Kepler-1229 b","Kepler-1410 b","Kepler-1544 b",
  "Kepler-1606 b","Kepler-1649 c","Kepler-1652 b","Kepler-186 f","Kepler-296 e","Kepler-296 f","Kepler-441 b",
@@ -104,7 +104,7 @@ def main(src):
     for r in rows:
         for n in PAPER:
             if find(n) == r['n']: r['n'] = n; r['hz'] = 1  # the paper's spelling
-    rows = [r for r in rows if r['ly'] and r['sp']]
+    rows = [r for r in rows if r['ly'] and r['sp'] in ('A', 'F', 'G', 'K', 'M')]
     rows.sort(key=lambda r: r['ly'])
     js = json.dumps(rows, separators=(',', ':'), ensure_ascii=False)
     page = os.path.join(os.path.dirname(__file__), '..', 'shrimp', 'space.html')

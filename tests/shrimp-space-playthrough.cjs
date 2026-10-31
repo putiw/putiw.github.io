@@ -40,7 +40,7 @@ while(!t.done){const next=sky.coneAt(v.seed,t.s+1);let pick=0,pf=-1;next.forEach
  if(!sky.fly(t,v,pick)){sky.brake(t,v);break;}
  for(const k of ['transit','rv'])if(sky.scan(t,v,k))scans++;
  const f=sky.fitOf(sky.here(t,v),t.w);if(t.s<=look){best=Math.max(best,f);continue;}
- if(f>best&&sky.canBrake(t,v))sky.brake(t,v);}
+ if(f>=best-5&&sky.canBrake(t,v))sky.brake(t,v);}
 if(!t.done)throw Error('Never stopped');
 const R=sky.rankOf(t,v);
 if(!c.voyageTrip(c.G,JSON.parse(JSON.stringify(t)))||!c.G.voyage.landed||c.G.voyage.landed.name!==t.done.name)throw Error('Landing not kept');
