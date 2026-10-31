@@ -823,5 +823,9 @@ count++;console.log('PASS Pass 173 trap catches reach the game, whole-pixel zoom
 if(!home.includes('L.R=2;L.cv.width=vw*L.R'))throw Error('Pass 174: land canvas at 2 pixels per art pixel');
 if(!sp.includes('id="flyb"')||!sp.includes('id="brakeb"')||!sp.includes("Not on board")||!sp.includes('#panel:not(.tall){height:'))throw Error('Pass 174: ship layout');}
 count++;console.log('PASS Pass 174 Millie pixels, fixed ship layout');
+// Pass 175 (Puti, 31 Oct): tests cost 0.1 (transit 0.2), the panel never scrolls, Orbit is the last row
+{const sp=fs.readFileSync(path.join(__dirname,'../shrimp/space.html'),'utf8');
+if(!sp.includes("name:'Transit spectroscopy',cost:.2,")||!sp.includes("name:'Orbit tracker',cost:.1,")||!sp.includes("['orbit','Orbit',orbitText]];")||!sp.includes('#panel:not(.tall){height:404px;max-height:none;overflow:hidden'))throw Error('Pass 175: tenth test costs, fixed panel');}
+count++;console.log('PASS Pass 175 test costs and fixed panel');
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

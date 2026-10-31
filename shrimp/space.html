@@ -38,9 +38,13 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:15px/1
 .ttl{font-weight:600;margin:10px 0 0}
 .prep{font-weight:600;margin:12px 0 0;color:var(--dim)}
 /* Pass 174: the panel keeps one height, every instrument has its own row, Fly by sits next to the star, Brake on the map */
-#panel:not(.tall){height:min(48vh,420px);max-height:none}
-.known{max-height:4.4em;overflow:auto}
-.facts li{min-height:30px;align-items:center;grid-template-columns:84px 1fr}
+#panel:not(.tall){height:404px;max-height:none;overflow:hidden;padding-top:10px}
+#panel:not(.tall) .hd{height:24px;overflow:hidden}
+.known{height:3.9em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;font-size:13px;line-height:1.3;margin:6px 0;cursor:pointer}
+#panel:not(.tall) .facts{margin:4px 0 0}
+.facts li{height:35px;margin:0;align-items:center;grid-template-columns:84px 1fr;font-size:13px;line-height:1.25;overflow:hidden}
+.facts li>span.v{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#kfull{position:fixed;left:12px;right:12px;z-index:4;background:#0d0f18f2;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px;color:#c9c7bf}
 .facts .scan{font:inherit;font-size:13px;background:#1a1e2c;color:var(--ink);border:1px solid #343a50;border-radius:7px;padding:4px 9px;cursor:pointer;justify-self:start}
 .facts .scan:disabled{opacity:.4;cursor:default}
 .facts .off{color:#5b5e6c;font-size:13px}
@@ -144,15 +148,16 @@ function baseFit(p){if(!p.rocky)return 0;var t=p.t,b=10;b+=t>=0&&t<=30?15:t>=-20
 function fitOf(p,w){var f=baseFit(p);(w||[]).forEach(function(id,k){f+=(WISH_W[k]||0)*wishFit(p,id)*(p.rocky?1:.5);});return Math.round(f);}
 function tripNew(seed){var r=rng(hash(seed,0,7)),ids=WISH.map(function(x){return x.id;});for(var i=ids.length-1;i>0;i--){var j=Math.floor(r()*(i+1)),x=ids[i];ids[i]=ids[j];ids[j]=x;}
  return {w:ids.slice(0,3),s:0,used:0,path:[],scans:{},done:null,woke:0};}
-function fuelLeft(t,v){return v.fuel-t.used;}
+// scans cost tenths (Pass 175), so fuel is kept to one decimal
+function fuelLeft(t,v){return Math.round((v.fuel-t.used)*10)/10;}
 function here(t,v){return t.s<1?null:coneAt(v.seed,t.s)[t.path[t.s-1]]||null;}
 function canFly(t,v){return !!t.woke&&!t.done&&fuelLeft(t,v)-1>=BRAKE;}
 function fly(t,v,i){var c=coneAt(v.seed,t.s+1);if(!canFly(t,v)||!(i>=0&&i<c.length))return false;t.s++;t.path.push(i);t.used++;return true;}
-var SCAN=[{id:'transit',name:'Transit spectroscopy',cost:2,what:'air and water'},{id:'rv',name:'Radial velocity',cost:1,what:'mass'},{id:'flare',name:'Flare watch',cost:1,what:'flares'},{id:'tide',name:'Tidal lock check',cost:1,what:'days and nights'},
- {id:'orbit',name:'Orbit tracker',cost:1,what:'year and orbit shape'},{id:'age',name:'Star quake listener',cost:1,what:'star age'},{id:'mag',name:'Radio aurora watch',cost:1,what:'magnetic field'}];
+var SCAN=[{id:'transit',name:'Transit spectroscopy',cost:.2,what:'air and water'},{id:'rv',name:'Radial velocity',cost:.1,what:'mass'},{id:'flare',name:'Flare watch',cost:.1,what:'flares'},{id:'tide',name:'Tidal lock check',cost:.1,what:'days and nights'},
+ {id:'orbit',name:'Orbit tracker',cost:.1,what:'year and orbit shape'},{id:'age',name:'Star quake listener',cost:.1,what:'star age'},{id:'mag',name:'Radio aurora watch',cost:.1,what:'magnetic field'}];
 function scanned(t,k){return (t.scans[String(t.s)]||'').split(',').indexOf(k)>=0;}
-function canScan(t,v,k){var c=SCAN.filter(function(x){return x.id===k;})[0];return !!(c&&here(t,v)&&!t.done&&v.inst&&v.inst[k]&&!scanned(t,k)&&fuelLeft(t,v)-c.cost>=BRAKE);}
-function scan(t,v,k){if(!canScan(t,v,k))return false;var c=SCAN.filter(function(x){return x.id===k;})[0],key=String(t.s),sc=t.scans[key]||'';t.scans[key]=sc+(sc?',':'')+k;t.used+=c.cost;return true;}
+function canScan(t,v,k){var c=SCAN.filter(function(x){return x.id===k;})[0];return !!(c&&here(t,v)&&!t.done&&v.inst&&v.inst[k]&&!scanned(t,k)&&Math.round((fuelLeft(t,v)-c.cost)*10)/10>=BRAKE);}
+function scan(t,v,k){if(!canScan(t,v,k))return false;var c=SCAN.filter(function(x){return x.id===k;})[0],key=String(t.s),sc=t.scans[key]||'';t.scans[key]=sc+(sc?',':'')+k;t.used=Math.round((t.used+c.cost)*10)/10;return true;}
 function canBrake(t,v){return !t.done&&t.s>=1&&fuelLeft(t,v)>=BRAKE;}
 function brake(t,v){if(!canBrake(t,v))return false;var p=here(t,v);t.used+=BRAKE;t.done={s:t.s,id:p.id,name:p.name,fit:fitOf(p,t.w)};return true;}
 // where the stop ranks: every planet in every cone up to the stop, and every one the fuel left could have reached after it
@@ -177,7 +182,7 @@ var $=function(id){return document.getElementById(id);},cv=$('sky'),cx=cv.getCon
 var parentOK=window.parent&&window.parent!==window,dev=!parentOK||/[?&]dev/.test(location.search);
 var V=null,T=null,sel=-1,sure='',sureT=0,anim=null,DPR=1,W=0,H=0;
 function post(m){m.space=1;if(parentOK)try{window.parent.postMessage(m,'*');}catch(e){}}
-function devV(){var s=null;try{s=JSON.parse(localStorage.getItem('shrimp-space-dev'));}catch(e){}return s||{seed:7,fuel:100,inst:{transit:1,rv:1,flare:1,tide:1},robots:6,seeds:{},trip:null};}
+function devV(){var s=null;try{s=JSON.parse(localStorage.getItem('shrimp-space-dev'));}catch(e){}return s||{seed:7,fuel:100,inst:{transit:1,rv:1,flare:1,tide:1,orbit:1,age:1,mag:1},robots:6,seeds:{},trip:null};}
 function saveTrip(){if(dev&&!parentOK){V.trip=T;try{localStorage.setItem('shrimp-space-dev',JSON.stringify(V));}catch(e){}}else post({type:'trip',trip:T});}
 window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||d.type!=='voy'||e.source!==window.parent)return;var first=!V;V=d.v;if(first||!T)T=V.trip?JSON.parse(JSON.stringify(V.trip)):tripNew(V.seed);if(first){sel=-1;}draw();show();});
 $('back').onclick=function(){if(dev&&!parentOK){if(confirm('Dev: start a new trip?')){V=devV();V.seed=1+Math.floor(Math.random()*1e9);T=tripNew(V.seed);saveTrip();sel=-1;show();}return;}post({type:'back'});};
@@ -224,27 +229,27 @@ function loop(){draw();requestAnimationFrame(loop);}
 cv.addEventListener('pointerdown',function(e){if(!V||!T||T.done||!T.woke)return;var m=mapBox(),c=cam(),ox=W/2-c.x,oy=m.bot-56-c.y,hx=stepX(V.seed,T.path,T.s),best=-1,bd=34*34;
  coneAt(V.seed,T.s+1).forEach(function(p,j){var q=optPos(T.s+1,j,hx),dx=ox+q.x-e.clientX,dy=oy+q.y-e.clientY,d=dx*dx+dy*dy;if(d<bd){bd=d;best=j;}});if(best>=0){sel=best;show();}});
 // --- panel ---
-function chips(){$('fuel').textContent=V&&T?'Fuel '+cnt(fuelLeft(T,V)):'';$('wish').innerHTML=T?T.w.map(function(id){var w=WISH.filter(function(x){return x.id===id;})[0];return '<span class="chip">'+w.name+'</span>';}).join(''):'';}
+function chips(){$('fuel').textContent=V&&T?'Fuel '+fuelLeft(T,V).toFixed(1):'';$('wish').innerHTML=T?T.w.map(function(id){var w=WISH.filter(function(x){return x.id===id;})[0];return '<span class="chip">'+w.name+'</span>';}).join(''):'';}
 // one fixed row per instrument: the answer once scanned, the instrument as a button before, dim when it isn't on board
 var ROWS=[['transit','Air, water',function(p){return airText(p.air)+' '+waterText(p);}],['rv','Mass',massText],['flare','Star',function(p){return p.flare?'Flares often.':'Quiet.';}],
- ['tide','Days',function(p){return p.lock?'One side always faces the star.':'It turns. Days and nights.';}],['orbit','Orbit',orbitText],['age','Star age',ageText],['mag','Field',magText]];
-function factsHTML(p){var L=['<li><b>Looks</b> '+(p?band(p.t)+' from here.':'')+'</li>'];
+ ['tide','Days',function(p){return p.lock?'One side always faces the star.':'It turns. Days and nights.';}],['age','Star age',ageText],['mag','Field',magText],['orbit','Orbit',orbitText]];
+function factsHTML(p){var L=['<li><b>Looks</b> <span class="v">'+(p?band(p.t)+' from here.':'')+'</span></li>'];
  ROWS.forEach(function(r){var k=r[0],sc=SCAN.filter(function(x){return x.id===k;})[0],on=V.inst&&V.inst[k],cell;
-  if(p&&scanned(T,k))cell=r[2](p);else if(!on)cell='<span class="off">Not on board</span>';
+  if(p&&scanned(T,k))cell='<span class="v">'+r[2](p)+'</span>';else if(!on)cell='<span class="off">Not on board</span>';
   else cell='<button class="scan" data-a="scan" data-k="'+k+'"'+(p&&canScan(T,V,k)?'':' disabled')+'>'+sc.name+' · '+sc.cost+'</button>';
   L.push('<li><b>'+r[1]+'</b> '+cell+'</li>');});
  return '<ul class="facts">'+L.join('')+'</ul>';}
-function show(){chips();if(!V||!T){panel.innerHTML='<p class="sub">Waiting for the ship.</p>';return;}panel.classList.toggle('tall',!T.woke||!!T.done);$('top').classList.toggle('solid',!T.woke||!!T.done);var h='';
+function show(){chips();var kf=$('kfull');if(kf)kf.remove();if(!V||!T){panel.innerHTML='<p class="sub">Waiting for the ship.</p>';return;}panel.classList.toggle('tall',!T.woke||!!T.done);$('top').classList.toggle('solid',!T.woke||!!T.done);var h='';
  if(!T.woke){var instN=SCAN.filter(function(x){return V.inst&&V.inst[x.id];}).map(function(x){return x.name.toLowerCase();});
   h+='<h2>Before she sleeps</h2><p>Grandma always wanted to be an astronaut. She tells the ship what she wants from a planet.</p><ol class="wl">'+T.w.map(function(id,k){var w=WISH.filter(function(x){return x.id===id;})[0];return '<li>'+(k===0?'Most of all: ':k===1?'Then: ':'If you can: ')+'“'+w.say+'”</li>';}).join('')+'</ol>';
-  h+='<p>Fuel for '+cnt(V.fuel)+' flybys. Braking at a star takes '+BRAKE+', and after that the ship stays. Scans cost 1 or 2.</p>';
+  h+='<p>Fuel for '+cnt(V.fuel)+' flybys. Braking at a star takes '+BRAKE+', and after that the ship stays. Scans cost 0.1 or 0.2.</p>';
   h+='<p>'+(instN.length?'On board: '+instN.join(', ')+'.':'No instruments on board. You fly by what a star looks like.')+'</p>';
   h+='<p>She goes to sleep. Every call is yours now.</p><div class="row"><button class="btn go" data-a="wake">Leave the Sun</button></div>';
   panel.innerHTML=h;draw();return;}
  if(T.done){panel.innerHTML=landHTML();var rc=$('rank');if(rc)drawRank(rc);return;}
- if(T.s===0)h+='<div class="hd"><h2>The Sun</h2><small class="sub">Behind you now</small></div><p class="sub">Tap a star ahead to look at it.</p>';
+ if(T.s===0)h+='<div class="hd"><h2>The Sun</h2><small class="sub">Behind you now</small></div><p class="known" style="border:0;padding:0">Tap a star ahead to look at it. A flyby costs 1, a test 0.1 or 0.2.</p>';
  else{var p=here(T,V);h+='<div class="hd"><h2>'+esc(p.name)+'</h2><small class="sub">'+STAR[p.star]+', '+lyS(p.ly)+', flyby '+T.s+'</small></div>';
-  if(p.known)h+='<p class="known">From Earth: '+esc(p.known)+'</p>';
+  h+='<p class="known" data-k="1">From Earth: '+esc(p.known||'nothing.')+'</p>';
   h+=factsHTML(p);}
  if(T.s===0)h+=factsHTML(null);
  panel.innerHTML=h;brakeUI();draw();}
@@ -275,6 +280,7 @@ function drawRank(c){var R=rankOf(T,V),w=c.clientWidth,h=c.clientHeight,d=DPR;c.
  R.pass.forEach(function(x){g.fillStyle='rgba(170,172,190,.7)';g.fillRect(X(x.s)-1.5,Y(x.f)-1.5,3,3);});
  R.after.forEach(function(x){g.strokeStyle='rgba(170,172,190,.8)';g.strokeRect(X(x.s)-2,Y(x.f)-2,4,4);});
  g.fillStyle='#ff6b4a';g.fillRect(X(T.done.s)-3.5,Y(R.fit)-3.5,7,7);}
+panel.addEventListener('click',function(e){var k=e.target.closest('[data-k]');if(k){var f=$('kfull');if(!f){f=document.createElement('div');f.id='kfull';f.onclick=function(){f.remove();};document.body.appendChild(f);}f.textContent=k.textContent;f.style.bottom=(panel.getBoundingClientRect().height+10)+'px';return;}});
 panel.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||b.disabled||!T)return;var a=b.dataset.a;
  if(a==='wake'){T.woke=1;saveTrip();show();return;}
  if(a==='scan'){if(scan(T,V,b.dataset.k)){saveTrip();show();}return;}

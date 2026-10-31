@@ -1528,3 +1528,11 @@ Tests: balance 118, academy 9, me 46, space search 5. Not deployed.
    - Several planets of one star in a cone: the letters on the map, the star's name once above them.
 
 Tests: balance 119, academy 9, me 46, space search 5, Space bot passes. Not deployed.
+
+## Pass 175: tests cost a tenth, the ship's panel never scrolls (31 Oct)
+
+1. Every test costs 0.1 fuel, transit spectroscopy 0.2 (were 1 and 2). Fuel shows one decimal; tests still never touch the braking 10.
+2. The panel is 404 px with no scrolling: header, From Earth in three lines (tap it for the whole text in a box over the map), Looks, then one 35 px row per test with Orbit last. Answers take at most two lines. Checked at 390 px: running all seven tests, every row stays where it was and the panel never scrolls.
+3. Dev trips pack all seven instruments.
+
+With tests this cheap the Space bot scans everything and lands on TOI-700 d, fit 95, best of 199 passed. Balance 120, academy 9, me 46, space search 5 (fuel numbers updated). Not deployed.

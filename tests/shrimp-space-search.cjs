@@ -25,14 +25,14 @@ check('Earth’s line only says what was measured',c=>{
   ok(!/—/.test(p.known),'no dash '+r.n);});
  const px=c.truth(c.REAL.find(r=>r.n==='Proxima Centauri b'));ok(px.flare===1&&px.rocky===1,'Proxima flares, rocky');
 });
-check('fuel: a flyby 1, scans 1 or 2, braking 10 kept back, new instruments only when packed',c=>{
+check('fuel: a flyby 1, tests 0.1 or 0.2, braking 10 kept back, new instruments only when packed',c=>{
  const v={seed:5,fuel:20,inst:{transit:1,rv:1,orbit:1},robots:0,seeds:{}};const t=c.tripNew(v.seed);
  ok(t.w.length===3&&new Set(t.w).size===3,'three wishes');ok(!c.fly(t,v,0),'no flying asleep');t.woke=1;
  ok(!c.canBrake(t,v),'nothing to brake at by the Sun');ok(c.fly(t,v,0)&&t.used===1&&t.s===1,'flyby');
- ok(c.scan(t,v,'transit')&&t.used===3,'transit costs 2');ok(!c.scan(t,v,'transit'),'once per planet');ok(!c.scan(t,v,'flare'),'not packed');
- ok(c.scan(t,v,'orbit')&&t.used===4,'orbit tracker costs 1');ok(!c.scan(t,v,'mag'),'radio watch not packed');
- while(c.fly(t,v,0));ok(c.fuelLeft(t,v)===10,'stops flying with braking fuel left: '+c.fuelLeft(t,v));
- ok(!c.canScan(t,v,'rv'),'scans never eat the braking fuel');ok(c.brake(t,v)&&c.fuelLeft(t,v)===0&&t.done,'brake');ok(!c.fly(t,v,0)&&!c.brake(t,v),'stays');
+ ok(c.scan(t,v,'transit')&&t.used===1.2,'transit costs 0.2');ok(!c.scan(t,v,'transit'),'once per planet');ok(!c.scan(t,v,'flare'),'not packed');
+ ok(c.scan(t,v,'orbit')&&t.used===1.3,'orbit tracker costs 0.1');ok(!c.scan(t,v,'mag'),'radio watch not packed');
+ while(c.fly(t,v,0));const fl=c.fuelLeft(t,v);ok(fl>=10&&fl<11,'stops flying with braking fuel left: '+fl);
+ for(let i=0;i<20;i++){c.scan(t,v,'rv');c.scan(t,v,'transit');}ok(c.fuelLeft(t,v)>=10,'tests never eat the braking fuel');ok(c.brake(t,v)&&c.fuelLeft(t,v)<1&&t.done,'brake');ok(!c.fly(t,v,0)&&!c.brake(t,v),'stays');
 });
 check('rank counts are kept for the bots, not shown',c=>{
  const v={seed:9,fuel:100,inst:{},robots:0,seeds:{}};const t=c.tripNew(v.seed);t.woke=1;for(let i=0;i<10;i++)c.fly(t,v,0);c.brake(t,v);
