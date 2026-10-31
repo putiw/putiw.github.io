@@ -1566,3 +1566,7 @@ From the bot review of the opening:
 6. The "Your tank is cycled, buy your first shrimp" card is dropped if shrimp already went in while it waited its turn.
 7. A tab the player already opened gets no "Trade is open" spotlight later.
 Tests: balance 122, academy 9, me 46. Not deployed.
+
+## Deploy (31 Oct, Pass 178, BUILD 2026-10-31-opening)
+
+Before deploy: balance 122, academy 9, me 46. Bots, seed 7: strong cold 2,215 (same), strong kind 3,201 (was 3,213), average Earth door day 6,267. No INSOLVENT. Spotlight sweep 115 all good (one fewer: the Supplies card no longer shows). Layout scan only the known 2 px World chart label at 360. Monkey 60 random taps on six stages at 360 and 390, no errors.
