@@ -109,3 +109,12 @@ body.in-game #tb-back i{font-style:normal}
 @media (max-width:370px){.landwrap .tslot{width:40px;height:40px}.landwrap .tslot .ticon{width:28px;height:28px}.landwrap .ltools{gap:5px}}
 /* a card waiting at the company (Pass 151) */
 .lneed{position:fixed;left:0;right:0;margin:0 auto;width:max-content;top:calc(env(safe-area-inset-top) + 104px);z-index:60;max-width:calc(100% - 32px);padding:8px 14px;border:2px solid #21181b;border-radius:10px;background:#fff6d6;color:#21181b;font:600 13px/1.3 system-ui,sans-serif;box-shadow:0 2px 0 #21181b;text-align:center}
+
+/* Colours (palette swap): her colours as swatches, the choices as DawnBringer 32 */
+.lbub .pcols{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:6px}
+.lbub .pcols button{width:auto!important;min-width:0;aspect-ratio:1;border:1px solid var(--line);border-radius:4px;padding:0;cursor:pointer}
+.lbub .pcols button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+.lbub .pcols button.pch{border-color:var(--ink);border-width:2px}
+.lbub .pcus{position:relative;overflow:hidden}
+.lbub .pcus input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.lbub .pcus{display:inline-flex;align-items:center}

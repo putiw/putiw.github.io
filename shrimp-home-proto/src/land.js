@@ -163,7 +163,8 @@ function darkU(c,k){var r=c&255,g=(c>>>8)&255,b=(c>>>16)&255;k=k||0.86;return ((
 // ----- one tile, pixel by pixel. Outdoors, water and grass edges follow smooth fields made from the tile grid, so banks
 // run on the diagonal instead of in steps. Her ragged dark fringe on the grass, foam and a bank face on the far side of water.
 var K30=cu('#303030');
-function texOf(m,g,tx,ty){if(isGrass(g))return grassTexFor(g,tx,ty,bucketOf(m.gh[mi(m,clamp(tx,0,m.w-1),clamp(ty,0,m.h-1))])).d;
+function texOf(m,g,tx,ty){return palTex('g'+g,texOf0(m,g,tx,ty));}
+function texOf0(m,g,tx,ty){if(isGrass(g))return grassTexFor(g,tx,ty,bucketOf(m.gh[mi(m,clamp(tx,0,m.w-1),clamp(ty,0,m.h-1))])).d;
   if(g===G_DIRT)return TX.dirt[Math.floor(hash2(tx,ty,31)*TX.dirt.length)].d;if(g===G_SAND)return TX.sand[Math.floor(hash2(tx,ty,32)*TX.sand.length)].d;
   if(g===G_WATER)return (m.backdrop==='sea'&&ty>=m.seaRow?TX.sea:TX.water)[((tx+ty*3)&1)].d;return null;}
 function grassTexFor(g,tx,ty,b){return ((g===G_MEADOW?TX.meadow:TX.grass)[grassVar(tx,ty)]||TX.grass[0])[b];}
@@ -204,7 +205,7 @@ var CT_O=new Uint32Array(4096),CT_W=new Float32Array(9),CT_G=new Float32Array(9)
 function composeTile(m,tx,ty){var g=mget(m,tx,ty),o=CT_O,X=tx*T,Y=ty*T,i,lx,ly,cls=gClass(g);
   if(!ART.ready||!TX.grass.length){o.fill(VOID_U);return o;}
   if(cls===0||g===G_STONE){var f=g===G_FLOOR?floorPx:g===G_TILE?balconyPx:g===G_HALL?hallPx:g===G_STONE?stonePx:null;
-    for(ly=0;ly<64;ly++)for(lx=0;lx<64;lx++)o[ly*64+lx]=f?f(X+lx,Y+ly):VOID_U;
+    var gk='g'+g;for(ly=0;ly<64;ly++)for(lx=0;lx<64;lx++)o[ly*64+lx]=f?palU(gk,f(X+lx,Y+ly)):VOID_U;
     if((g===G_FLOOR||g===G_HALL||g===G_TILE)&&mget(m,tx,ty-1)===G_WALL)for(ly=0;ly<6;ly++)for(lx=0;lx<64;lx++)o[ly*64+lx]=darkU(o[ly*64+lx],0.72+ly*0.045);
     if(cls===0)return o;}
   else{o.set(texOf(m,g,tx,ty));
@@ -216,7 +217,7 @@ function composeTile(m,tx,ty){var g=mget(m,tx,ty),o=CT_O,X=tx*T,Y=ty*T,i,lx,ly,c
   for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++,k++){var g2=mgetE(m,tx+dx,ty+dy),c2=gClass(g2);if(c2===0){c2=cls;g2=g;}if(c2!==cls)mixed=true;
     Wv[k]=c2===3?1:0;Gv[k]=c2===1?1:0;if(c2===3&&!wn){wn=true;wx=tx+dx;wy=ty+dy;}if(c2===1&&!gn){gn=true;gg=g2;gx=tx+dx;gy=ty+dy;}if(c2===2&&!en){en=true;eg=g2;ex=tx+dx;ey=ty+dy;}}
   if(!mixed)return o;
-  var wT=wn?texOf(m,G_WATER,wx,wy):null,gT=cls===1?null:gn?grassTexFor(gg,gx,gy,2).d:null,eT=cls===2?null:en&&eg!==G_STONE?texOf(m,eg,ex,ey):null,eStone=en&&eg===G_STONE;
+  var wT=wn?texOf(m,G_WATER,wx,wy):null,gT=cls===1?null:gn?palTex('g'+gg,grassTexFor(gg,gx,gy,2).d):null,eT=cls===2?null:en&&eg!==G_STONE?texOf(m,eg,ex,ey):null,eStone=en&&eg===G_STONE;
   // near the stream, the lake or the garden pond the banks come from their shapes
   var nat=false,NS=L.nat;if(NS&&(NS.stream||NS.lake||NS.pond)){k=0;for(dy=-1;dy<=1;dy++)for(dx=-1;dx<=1;dx++,k++){var nk=natKind(m,clamp(tx+dx,0,m.w-1),clamp(ty+dy,0,m.h-1));CT_NK[k]=nk;if(nk)nat=true;}if(nat&&painted(m,mi(m,tx,ty)))nat=false;}
   if(nat){for(k=0;k<9;k++){CT_WB[k]=(Wv[k]&&CT_NK[k]!==1)?1:0;CT_GM[k]=(Gv[k]||CT_NK[k])?1:0;}
@@ -241,7 +242,7 @@ function composeTile(m,tx,ty){var g=mget(m,tx,ty),o=CT_O,X=tx*T,Y=ty*T,i,lx,ly,c
     if(fg>0.5){var cg=cls===1?o[i]:(gT?gT[i]:o[i]),mk=own?1:0;
       if(fg<0.555||(wn&&fw>0.44)){var r=hash2(px,py,63);if(r<0.42){cg=K30;mk=0;}else if(r<0.78){cg=GD_;mk=0;}}
       o[i]=cg;MK[i]=mk;}
-    else{var fromOwn=own&&!eStone&&!eT,ce=cls===2?o[i]:eStone?stonePx(px,py):(eT?eT[i]:dryW&&gT?gT[i]:o[i]),d1=fg>0.43,d2=wn&&fw>0.42;
+    else{var fromOwn=own&&!eStone&&!eT,ce=cls===2?o[i]:eStone?palU('g'+G_STONE,stonePx(px,py)):(eT?eT[i]:dryW&&gT?gT[i]:o[i]),d1=fg>0.43,d2=wn&&fw>0.42;
       if(d1)ce=darkU(ce,0.88);if(d2)ce=darkU(ce,0.9);o[i]=ce;MK[i]=fromOwn?1+(d1?1:0)+(d2?2:0):0;}}
   if(own&&L.tmk){var ti=mi(m,tx,ty);L.tmk[ti]={c:o.slice(),m:MK.slice()};}
   return o;}
@@ -252,7 +253,7 @@ function maskedTile(m,tx,ty,mk){var o=CT_O,b=texOf(m,mget(m,tx,ty),tx,ty),sv=mk.
 var TUFT_C=['#2b7a5a','#4fa83a','#99e550'].map(cu),SEED_C=[cu('#d9a066'),cu('#eec39a')],WFL=['#fbf236','#ffffff','#d77bba','#639bff'].map(cu);
 function tuftsInto(o,m,tx,ty){var g=mget(m,tx,ty);if(!isGrass(g))return;var b=bucketOf(m.gh[mi(m,tx,ty)]);if(!b)return;var mead=g===G_MEADOW;
   var n=mead?[0,2,5,7][b]:[0,2,4,6][b],H=mead?[0,7,12,16][b]:[0,5,9,13][b];
-  function put(x,y,c){if(x<0||y<0||x>63||y>63)return;o[y*64+x]=c;}
+  var gk='g'+g;function put(x,y,c){if(x<0||y<0||x>63||y>63)return;o[y*64+x]=palU(gk,c);}
   for(var k=0;k<n;k++){var bx=6+Math.floor(hash2(tx*7+k,ty,101)*52),by=H+4+Math.floor(hash2(tx,ty*5+k,103)*(60-H-4));
     if(g===G_STEP&&Math.abs(bx-32)<20&&Math.abs(by-34)<14)continue;
     var nb=4+Math.floor(hash2(tx+k,ty,105)*3);
@@ -411,7 +412,37 @@ function LS(){return S.land;}
 function mkObj(k,tx,ty,o){var d=OBJ[k]||{},l=LS(),r={id:'o'+(l.oid=(l.oid||0)+1),k:k,tx:tx,ty:ty,fw:d.fw||1,fh:d.fh||1,seed:Math.floor(hash2(tx,ty,k.length*31)*1e6)};for(var p in o||{})r[p]=o[p];return r;}
 function objVer(o){return o.k==='tank'?(S.tanks[o.i]?1:0):o.k==='feeder'?Math.round((o.s||0)*5):0;}
 function objSprite(o){var d=OBJ[o.k];if(!d||!d.spr)return null;var c=OC[o.id],v=objVer(o);if(c&&c.g===SPR_GEN&&c.v===v)return c.s;
-  var key=o.k+'|'+(d.keyOf?d.keyOf(o):((o.v==null?'':o.v)+'|'+o.fw+'x'+o.fh+'|'+(o.seed%7))),sp=spr(key,function(){return d.spr(o);});OC[o.id]={s:sp,v:v,g:SPR_GEN};return sp;}
+  var key=o.k+'|'+(d.keyOf?d.keyOf(o):((o.v==null?'':o.v)+'|'+o.fw+'x'+o.fh+'|'+(o.seed%7))),sp=spr(key,function(){return palSpr(palKey(o),d.spr(o));});OC[o.id]={s:sp,v:v,g:SPR_GEN};return sp;}
+
+// ----- recolour (palette swap). Her sprites use few colours, so any thing or ground can have its colours swapped one for one.
+// LS().pal = {kind: {'rrggbb':'rrggbb'}}. kind: an object's k (walls 'wall-p', 'wall-s'), or 'g'+ground for a ground.
+// Every thing or tile of that kind changes, the ones that came with the place too. Saved as hex pairs, so it stays small.
+var PALM={},PAL_GEN=1,PALTX=new WeakMap();
+function palKey(o){return o.k==='wall'?'wall-'+(o.v||'p'):o.k;}
+function palBuild(){PALM={};PAL_GEN++;var p=(S.land&&S.land.pal)||{};Object.keys(p).forEach(function(k){var m=new Map(),q=p[k]||{};Object.keys(q).forEach(function(a){if(/^[0-9a-f]{6}$/.test(a)&&/^[0-9a-f]{6}$/.test(q[a]||''))m.set(U32(a),U32(q[a]));});if(m.size)PALM[k]=m;});}
+function palU(k,u){var m=PALM[k];if(!m)return u;var v=m.get(u);return v===undefined?u:v;}
+function palTex(k,P){var m=PALM[k];if(!m||!P)return P;var c=PALTX.get(P);if(c&&c.g===PAL_GEN&&c.k===k)return c.o;
+  var o=new Uint32Array(P.length);for(var i=0;i<P.length;i++){var v=m.get(P[i]);o[i]=v===undefined?P[i]:v;}PALTX.set(P,{g:PAL_GEN,k:k,o:o});return o;}
+function sprPix(s){var x=document.createElement('canvas').getContext('2d');x.canvas.width=s.c.width;x.canvas.height=s.c.height;x.drawImage(s.c,0,0);var im=x.getImageData(0,0,s.c.width,s.c.height);return {x:x,im:im,d:new Uint32Array(im.data.buffer)};}
+function palSpr(k,s){var m=PALM[k];if(!m||!s||!s.c)return s;var q=sprPix(s),d=q.d;
+  for(var i=0;i<d.length;i++){var u=d[i];if(!(u>>>24))continue;var v=m.get((u|0xff000000)>>>0);if(v!==undefined)d[i]=((v&0xffffff)|(u&0xff000000))>>>0;}
+  q.x.putImageData(q.im,0,0);var r={};for(var p in s)r[p]=s[p];r.c=q.x.canvas;return r;}
+// the colours to offer: the most used solid colours, most first, up to 16
+function topCols(cnt,n){var tot=0,ks=Object.keys(cnt);ks.forEach(function(k){tot+=cnt[k];});ks.sort(function(a,b){return cnt[b]-cnt[a];});
+  return ks.filter(function(k,i){return i<4||cnt[k]>=tot*0.004;}).slice(0,n||16).map(Number);}
+function objCols(o){var d=OBJ[o.k],s=null;try{s=d.spr(o);}catch(e){}if(!s||!s.c)return [];var px=sprPix(s).d,cnt={};
+  for(var i=0;i<px.length;i++){var u=px[i];if((u>>>24)!==255)continue;cnt[u]=(cnt[u]||0)+1;}return topCols(cnt);}
+var G_PX={};G_PX[G_FLOOR]=floorPx;G_PX[G_TILE]=balconyPx;G_PX[G_HALL]=hallPx;G_PX[G_STONE]=stonePx;
+function groundCols(g){var cnt={},add=function(P){for(var i=0;i<P.length;i++){var u=P[i];if((u>>>24)===255)cnt[u]=(cnt[u]||0)+1;}};
+  if(G_PX[g]){var f=G_PX[g],P=new Uint32Array(256*256);for(var y=0;y<256;y++)for(var x=0;x<256;x++)P[y*256+x]=f(x,y);add(P);}
+  else{var L2=g===G_GRASS?TX.grass:g===G_MEADOW?TX.meadow:null;
+    if(L2)L2.forEach(function(v){(v||[]).forEach(function(t){add(t.d);});});
+    else (g===G_DIRT?TX.dirt:g===G_SAND?TX.sand:g===G_WATER?TX.water:[]).forEach(function(t){add(t.d);});}
+  var out=topCols(cnt,isGrass(g)?13:16);if(isGrass(g))TUFT_C.forEach(function(u){if(out.indexOf(u)<0)out.push(u);});return out;}
+function palSet(k,src,dst){var l=LS();if(!l.pal)l.pal={};var a=hexOf(src).slice(1),b=dst==null?a:hexOf(dst).slice(1),q=l.pal[k]||(l.pal[k]={});
+  if(a===b)delete q[a];else q[a]=b;if(!Object.keys(q).length)delete l.pal[k];palRedraw(k);}
+function palClear(k){var l=LS();if(l.pal)delete l.pal[k];palRedraw(k);}
+function palRedraw(k){palBuild();resetSprites();var d=OBJ[k];if(!d&&k.charAt(0)==='g'||d&&d.flat||k==='bridge')L.groundOK=false;L.dirty=true;save();}
 
 // ----- the four homes, in tiles -----
 // water bodies are remembered per tile: 1 pond (yours), 2 stream, 3 lake, 4 sea
@@ -1004,7 +1035,7 @@ function mainRoom(){return M().rooms[0];}
 function inRoom(r,tx,ty){return r&&tx>=r.x&&tx<r.x+r.w&&ty>=r.y&&ty<r.y+r.h;}
 
 // ----- state setup and old saves -----
-function ensureLand(){var l=S.land;if(!l||typeof l!=='object')l=S.land={};if(l.objs)l.objs=l.objs.filter(function(o){return o.k!=='vegbed';});
+function ensureLand(){var l=S.land;if(!l||typeof l!=='object')l=S.land={};if(l.pal&&typeof l.pal!=='object')delete l.pal;palBuild();if(l.objs)l.objs=l.objs.filter(function(o){return o.k!=='vegbed';});
   if(!l.basket)l.basket={};if(!l.eggs)l.eggs=[];if(!l.hens)l.hens=[];if(!l.wild)l.wild=[];if(!l.pond)l.pond=[];if(!l.bucket)l.bucket=[];
   if(!l.stats)l.stats={mowed:0,eggs:0,fish:0,birds:0,traps:0};if(!l.seen)l.seen={};
   if(l.v!==LAND_V){
@@ -1699,7 +1730,33 @@ function removeThing(o,e){var l=LS(),m=M();
   else if(e){var j=0;for(var y2=e.ty;y2<e.ty+e.fh;y2++)for(var x2=e.tx;x2<e.tx+e.fw;x2++){var p=e.prev[j++];mset(m,x2,y2,p[0],p[1]);if(m.wb)m.wb[mi(m,x2,y2)]=p[2]||0;}l.edits=l.edits.filter(function(q){return q!==e;});L.pmask=null;earn(Math.floor(e.price/2),'refund');
     repaintAround(e.tx,e.ty,e.fw,e.fh);if(e.k==='pond'||e.k==='g-water'||e.prev.some(function(p){return p[0]===G_WATER;}))syncAgents();}
   sfx('pop');computePass();computeSpots();L.hints=null;L.dirty=true;save();}
-function tapBuild(wx,wy,t,cx,cy){if(L.moving){tapMove(t);return;}if(L.removing){var ob0=LS().objs,o0=null;for(var i0=ob0.length-1;i0>=0;i0--){var q0=ob0[i0];if(q0.built&&t[0]>=q0.tx&&t[0]<q0.tx+q0.fw&&t[1]>=q0.ty&&t[1]<q0.ty+q0.fh){o0=q0;break;}}
+// ----- Colours: tap a thing or a ground, swap any of its colours. Every one of that kind changes, free.
+var DB32=['000000','222034','45283c','663931','8f563b','df7126','d9a066','eec39a','fbf236','99e550','6abe30','37946e','4b692f','524b24','323c39','3f3f74','306082','5b6ee1','639bff','5fcde4','cbdbfc','ffffff','9badb7','847e87','696a6a','595652','76428a','ac3232','d95763','d77bba','8f974a','8a6f30'];
+var G_NAME={};G_NAME[G_FLOOR]='Floor';G_NAME[G_HALL]='Hall floor';G_NAME[G_STEP]='Stepping stones';
+function colourTarget(t){var ob=LS().objs||[],best=null;for(var i=ob.length-1;i>=0;i--){var q=ob[i];if(!OBJ[q.k]||!OBJ[q.k].spr)continue;
+    if(t[0]>=q.tx&&t[0]<q.tx+q.fw&&t[1]>=q.ty&&t[1]<q.ty+q.fh){if(!best||(OBJ[best.k].flat&&!OBJ[q.k].flat))best=q;}}
+  if(best){var bi=BUILDI[best.k==='wall'?'wall-'+(best.v||'p'):best.k];return {k:palKey(best),name:bi?bi.name:OBJ[best.k].name||best.k,cols:function(){return objCols(best);}};}
+  var g=mget(M(),t[0],t[1]);if(g==null||g===G_VOID||g===G_WALL||g===G_STEP)return null;if(inAnyRoom(t[0],t[1])&&gClass(g)!==0)return null;
+  var gb=BUILD.filter(function(b){return b.ground&&b.edit===g;})[0];return {k:'g'+g,name:gb?gb.name:G_NAME[g]||'Ground',cols:function(){return groundCols(g);}};}
+function tapColour(t,cx,cy){var c=colourTarget(t);if(!c){toast('Nothing to colour there.');sfx('nope');return;}var cols=c.cols();if(!cols.length){toast('Nothing to colour there.');sfx('nope');return;}
+  sfx('click');var sel=-1,cur=function(u){return palU(c.k,u);};
+  var html='<b>'+esc(c.name)+'</b><div class="hint">Tap a colour to swap it. '+(c.k.charAt(0)==='g'&&!OBJ[c.k]?'All of it changes.':'All of them change.')+'</div><div class="pcols">'+
+    cols.map(function(u,i){return '<button data-c="'+i+'" aria-label="Colour '+(i+1)+'"></button>';}).join('')+'</div>'+
+    '<div class="pchoose" hidden><div class="pcols">'+DB32.map(function(h){return '<button data-to="'+h+'" style="background:#'+h+'" aria-label="#'+h+'"></button>';}).join('')+'</div>'+
+    '<div class="btns"><label class="btn pcus">Other<input type="color"></label><button class="btn" data-orig>As drawn</button></div></div>'+
+    '<div class="btns"><button class="btn" data-all>All as drawn</button></div>';
+  showBub(cx,cy,html,function(el){var sw=el.querySelectorAll('[data-c]'),ch=el.querySelector('.pchoose'),inp=el.querySelector('input[type=color]');
+    function paint(){sw.forEach(function(b,i){var u=cols[i];b.style.background=hexOf(cur(u));b.setAttribute('aria-pressed',String(i===sel));b.classList.toggle('pch',cur(u)!==u);});}
+    function to(u){if(sel<0)return;palSet(c.k,cols[sel],u);paint();sfx('click');}
+    function fit(){var host=$('lwrap');if(!host)return;var W=host.clientWidth,H=host.clientHeight,w=el.offsetWidth,h=el.offsetHeight,x0=(parseFloat(el.style.left)||0)-(el._dx||0),y0=(parseFloat(el.style.top)||0)-(el._dy||0);
+      el.style.transform='';el._dx=el._dy=0;L.bubCam=[L.cam.x,L.cam.y];el.style.left=clamp(x0,6,Math.max(6,W-w-6))+'px';el.style.top=clamp(y0,6,Math.max(6,H-h-6))+'px';}
+    sw.forEach(function(b){b.onclick=function(){var i=+b.dataset.c;sel=sel===i?-1:i;ch.hidden=sel<0;if(sel>=0)inp.value=hexOf(cur(cols[sel]));paint();fit();};});
+    el.querySelectorAll('[data-to]').forEach(function(b){b.onclick=function(){to(U32(b.dataset.to));};});
+    inp.oninput=function(){to(U32(inp.value));};
+    el.querySelector('[data-orig]').onclick=function(){if(sel>=0)to(cols[sel]);};
+    el.querySelector('[data-all]').onclick=function(){palClear(c.k);sel=-1;ch.hidden=true;paint();sfx('pop');};
+    paint();});}
+function tapBuild(wx,wy,t,cx,cy){if(L.colouring){tapColour(t,cx,cy);return;}if(L.moving){tapMove(t);return;}if(L.removing){var ob0=LS().objs,o0=null;for(var i0=ob0.length-1;i0>=0;i0--){var q0=ob0[i0];if(q0.built&&t[0]>=q0.tx&&t[0]<q0.tx+q0.fw&&t[1]>=q0.ty&&t[1]<q0.ty+q0.fh){o0=q0;break;}}
     var e0=o0?null:groundEdit(t[0],t[1]);if(o0||e0){removeThing(o0,e0);return;}toast(objAtTile(t[0],t[1],true)?'That came with the place.':'Nothing you built here.');sfx('nope');return;}
   var b=L.buildSel&&BUILDI[L.buildSel];
   if(b){var a=b.ground?t:anchorFor(b,t[0],t[1]);if(!canPlace(b,a[0],a[1])){if(!(b.ground&&mget(M(),t[0],t[1])===b.edit))toast(b.ground&&inAnyRoom(t[0],t[1])?'Not inside the house.':'It doesn’t fit there.');sfx('nope');return;}placeAt(b,a[0],a[1]);return;}
@@ -1737,20 +1794,21 @@ function gridCols(n){if(n<=4)return Math.max(1,n);var best=4,bw=9;[3,4,5].forEac
 function renderBuildPal(pal){var list=buildList(),cats=BCAT.filter(function(c){return list.some(function(b){return b.cat===c.id;});});
   if(!L.buildCat||!cats.some(function(c){return c.id===L.buildCat;}))L.buildCat=cats.length?cats[0].id:null;
   var items=list.filter(function(b){return b.cat===L.buildCat;});
-  pal.innerHTML='<div class="bcats" role="tablist">'+cats.map(function(c){return '<button class="bcat" role="tab" data-cat="'+c.id+'" aria-pressed="'+(!L.removing&&!L.moving&&L.buildCat===c.id)+'">'+esc(c.name)+'</button>';}).join('')+
-    '<button class="bcat bmv" data-mmode aria-pressed="'+!!L.moving+'">Move</button><button class="bcat brm" data-rmode aria-pressed="'+!!L.removing+'">Remove</button></div>'+
-    (L.moving?'<div class="bnote">Tap a thing to pick it up, then tap where it goes. Moving is free.</div>':L.removing?'<div class="bnote">Tap something you built or painted to take it away. You get half back.</div>':
+  pal.innerHTML='<div class="bcats" role="tablist">'+cats.map(function(c){return '<button class="bcat" role="tab" data-cat="'+c.id+'" aria-pressed="'+(!L.removing&&!L.moving&&!L.colouring&&L.buildCat===c.id)+'">'+esc(c.name)+'</button>';}).join('')+
+    '<button class="bcat bmv" data-mmode aria-pressed="'+!!L.moving+'">Move</button><button class="bcat bcl" data-cmode aria-pressed="'+!!L.colouring+'">Colours</button><button class="bcat brm" data-rmode aria-pressed="'+!!L.removing+'">Remove</button></div>'+
+    (L.colouring?'<div class="bnote">One of a kind changes them all, the ones that came with the place too. Free.</div>':L.moving?'<div class="bnote">Tap a thing to pick it up, then tap where it goes. Moving is free.</div>':L.removing?'<div class="bnote">Tap something you built or painted to take it away. You get half back.</div>':
     '<div class="bgrid" style="grid-template-columns:repeat('+gridCols(items.length)+',minmax(0,1fr))">'+items.map(function(b){return '<button data-item="'+b.id+'" aria-pressed="'+(L.buildSel===b.id)+'"><span class="pi"></span><b>'+esc(b.name)+'</b><small>'+fmtA(b.price)+(b.ground?' a tile':'')+'</small></button>';}).join('')+'</div>');
-  pal.querySelectorAll('[data-cat]').forEach(function(bt){bt.onclick=function(){L.buildCat=bt.dataset.cat;L.removing=false;L.moving=false;L.moveObj=null;L.buildSel=null;sfx('click');renderBuildPal(pal);updateStat(true);L.hints=null;L.dirty=true;};});
-  pal.querySelector('[data-mmode]').onclick=function(){L.moving=!L.moving;L.removing=false;L.moveObj=null;L.buildSel=null;L.hints=null;sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
-  var rm=pal.querySelector('[data-rmode]');rm.onclick=function(){L.removing=!L.removing;L.moving=false;L.moveObj=null;L.buildSel=null;sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
+  pal.querySelectorAll('[data-cat]').forEach(function(bt){bt.onclick=function(){L.buildCat=bt.dataset.cat;L.removing=false;L.moving=false;L.colouring=false;L.moveObj=null;L.buildSel=null;sfx('click');renderBuildPal(pal);updateStat(true);L.hints=null;L.dirty=true;};});
+  pal.querySelector('[data-cmode]').onclick=function(){L.colouring=!L.colouring;L.moving=false;L.removing=false;L.moveObj=null;L.buildSel=null;L.hints=null;closeBub();sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
+  pal.querySelector('[data-mmode]').onclick=function(){L.moving=!L.moving;L.removing=false;L.colouring=false;L.moveObj=null;L.buildSel=null;L.hints=null;sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
+  var rm=pal.querySelector('[data-rmode]');rm.onclick=function(){L.removing=!L.removing;L.moving=false;L.colouring=false;L.moveObj=null;L.buildSel=null;sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
   pal.querySelectorAll('[data-item]').forEach(function(bt){var ic=bt.querySelector('.pi');try{ic.appendChild(itemIcon(BUILDI[bt.dataset.item]));}catch(e){}
     bt.onclick=function(){L.buildSel=L.buildSel===bt.dataset.item?null:bt.dataset.item;L.hints=null;L.dirty=true;pal.querySelectorAll('[data-item]').forEach(function(q){q.setAttribute('aria-pressed',String(q.dataset.item===L.buildSel));});sfx('click');updateStat(true);};});}
 function itemIcon(b){var c=document.createElement('canvas'),d=Math.min(2,window.devicePixelRatio||1);c.width=56*d;c.height=36*d;c.style.width='56px';c.style.height='36px';var x=c.getContext('2d');x.imageSmoothingEnabled=false;
   var s;if(b.ground){var gi=groundIcon(b);if(gi){x.drawImage(gi,0,0,c.width,c.height);return c;}}
   if(b.edit===G_STEP){var pb=new PB(28,18);pb.rect(0,0,28,18,'#6abe30');pb.ell(9,9,6,4,'#9badb7');pb.ell(20,10,5,3.5,'#9badb7');pb.set(7,7,'#cbdbfc');s=mk(pb,14,18);}
   else if(b.edit===G_WATER){var pw=new PB(28,18);pw.rect(0,0,28,18,'#6abe30');pw.ell(14,9,11,6,'#5fcde4');pw.rect(9,6,6,1,'#cbdbfc');s=mk(pw,14,18);}
-  else{var sz=itemSize(b),o={k:b.k,tx:0,ty:0,fw:sz[0],fh:sz[1],seed:17,v:(b.o&&b.o.v!=null)?b.o.v:0,s:0.6,i:-1};try{s=OBJ[b.k].spr(o);}catch(e){}}
+  else{var sz=itemSize(b),o={k:b.k,tx:0,ty:0,fw:sz[0],fh:sz[1],seed:17,v:(b.o&&b.o.v!=null)?b.o.v:0,s:0.6,i:-1};try{s=palSpr(palKey(o),OBJ[b.k].spr(o));}catch(e){}}
   if(s){var sc=Math.min(56*d/s.w,36*d/s.h),k=sc>=1?Math.floor(sc):sc;x.drawImage(s.c,Math.round((c.width-s.w*k)/2),Math.round((c.height-s.h*k)/2),Math.round(s.w*k),Math.round(s.h*k));}return c;}
 
 // ----- the bubble over the map -----
@@ -1804,7 +1862,7 @@ function mountHome(){var p=$('p-home');ensureLand();
 function setTool(id,quiet){id=mapTool(id);if(L.cv&&!toolsHere().some(function(t){return t.id===id;})){if(!quiet)toast(id==='rod'?'No fish here yet. Wait for the land with the stream.':'Not here yet.');id='walk';}
   L.tool=id;LS().tool=id;closeBub();L.hints=null;L.dirty=true;if(id!=='rod'&&L.fishing)L.fishing=null;if(id!=='build')L.camFree=false;if(id==='mow'&&L.me)L.me.speed=MOW_SPEED;else if(L.me)L.me.speed=ME_SPEED;
   document.querySelectorAll('#ltools [data-tool]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.tool===id));});
-  var pal=$('lpal');if(pal){if(id==='build'){renderBuildPal(pal);pal.hidden=false;}else{pal.hidden=true;L.buildSel=null;L.removing=false;L.moving=false;L.moveObj=null;}}
+  var pal=$('lpal');if(pal){if(id==='build'){renderBuildPal(pal);pal.hidden=false;}else{pal.hidden=true;L.buildSel=null;L.removing=false;L.moving=false;L.colouring=false;L.moveObj=null;}}
   if(!quiet)sizeCanvas();updateStat(true);}
 // one canvas pixel per art pixel, scaled up by CSS: a whole number of screen pixels per art pixel where the screen allows
 // (2 on 3x phones), 1.5 on 2x phones, about 44 CSS px per tile either way
@@ -1830,6 +1888,7 @@ function updateStat(force){var el=$('lstat');if(!el)return;var l=LS(),html='',eg
   else if(f&&(f.st==='wait'||f.st==='fly'))html='Wait for the float to go under, then tap.';
   else if(f&&f.st==='bite')html='<b>Now!</b> Tap.';
   else if(L.tool==='build'&&L.moving)html=L.moveObj?'Tap where the '+esc(((OBJ[L.moveObj.k]||{}).name||'thing').toLowerCase())+' goes. Tap it again to put it down.':'Tap anything to pick it up.';
+  else if(L.tool==='build'&&L.colouring)html='Tap a thing or the ground to change its colours.';
   else if(L.tool==='build'&&L.removing)html='Tap or drag over things you built to take them away.';
   else if(b)html=b.ground?esc(b.name)+': tap a tile, or drag to paint. '+fmtA(b.price)+' a tile.':'Tap where the '+esc(b.name.toLowerCase())+' goes. '+fmtA(b.price)+'.';
   else if(L.tool==='build')html='Pick something to build. Drag the map to look around.';
@@ -2030,6 +2089,7 @@ window.LAND={settle:function(){mowSettle();},
   me:function(){return L.me;},dog:function(){return L.dog;},cat:function(){return L.cat;},map:function(){return M();},passable:passable,ready:function(){return ART.ready&&L.groundOK;},
   screenOf:function(wx,wy){return toCss(wx,wy);},tapWorld:function(wx,wy){var c=toCss(wx,wy);onTap(wx,wy,c[0],c[1]);},walkTile:function(tx,ty){return walkTo([tx,ty],null,null,null);},
   waterKind:waterKind,tileOf:tileOf,objSprite:objSprite,oX:oX,oBase:oBase,
+  objs:function(){return LS().objs;},pal:function(){return {saved:LS().pal||null,live:Object.keys(PALM)};},look:function(tx,ty){L.cam.x=Math.max(0,(tx+0.5)*T-L.VW/2);L.cam.y=Math.max(0,(ty+0.5)*T-L.VH/2);L.dirty=true;},
   _dbg:{dogFrame:dogFrame,dogNew:dogNew,meIdx:function(){meFrame();return L.mfIdx;},flood:flood,pathFor:pathFor,smoothPath:smoothPath,losClear:losClear,nearestReachable:nearestReachable,tilesTo:tilesTo,repaintTile:repaintTile,renderGround:function(){var t=performance.now();renderGround();return performance.now()-t;},flushGround:function(){var t=performance.now();drainRepaint(1e9);return performance.now()-t;},catDecide:catDecide,catRoom:catRoom,composeTile:function(tx,ty){return composeTile(M(),tx,ty);}},
   _spr:{cat:catSpr,hen:henSpr,bird:birdSpr,grandma:grandmaSpr,fish:fishSpr,find:findSpr,egg:eggSpr,mower:mowerSpr,obj:function(k,o){var d=OBJ[k];o=o||{};var q={k:k,tx:0,ty:0,fw:o.fw||d.fw,fh:o.fh||d.fh,seed:o.seed||5,v:o.v,s:o.s,i:o.i==null?-1:o.i,gm:o.gm};return d.spr(q);}}};
 // ----- #full: open straight on the land, fully upgraded, with every hen and her fish (for previews) -----
