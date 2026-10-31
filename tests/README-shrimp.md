@@ -1435,3 +1435,16 @@ Row 3 of the three big updates. Added, nothing in the ten groups changed.
 
 Tests: balance 109 (new Pass 166 check: giving maths, reserve, late batches, Nour order and counts, sources in comments, no em-dashes), academy 11, me 46. Average bot seed 7: Earth 6,777 to 6,805 (six more story cards), all six Nour cards fire. Browser at 360 px from the hard part snapshot: no sideways scroll, no page errors, slider updates the share.
 Not done: the ? popup for the hard part doesn't mention the ledger. Not checked by Puti: Nour's wording, the ledger's lines.
+
+## Pass 167: Make on Grandma's land (31 Oct)
+
+Row 2 of the three big updates. Land source on `shrimp-proto` (`shrimp-home-proto/src/land.js` "Make" at the end of the land closure, new `make.css`), `shrimp/home.html` rebuilt with `build.py --game` (checked the old build matched the game's copy first).
+- Build has a Make chip: New, then your things. New asks the type (Chair, Sofa, Bed, Table, Rug, Thing, Floor, Wall), then Blank or a copy of anything of that sort. The type line says what it does.
+- Draw view: pen, eraser, fill, pick, pan, line, box, circle, triangle, undo, redo, zoom. Colour and Face swatches, No face for outlines. DawnBringer 32 plus the drawing's own colours plus Other. Footprint chips 1x1 to 3x2, Shorter/Taller in 8 px steps. The floor the thing stands on is shaded. Delete needs a second tap and is blocked while any are placed.
+- Saved things show up in their group (Indoors, Ground, Walls) with a price: chair 30, sofa 60, bed 80, table 40, rug 30, thing 25, +10 a tile past the first; floor 10 a tile, wall 20. Making is free. Remove gives half back.
+- Millie sits on made chairs and sofas, Pierre naps on made sofas and beds, rugs can be walked over, the rest is solid. Floors sit over a wood deck tile (acts as deck, no edges); Remove puts the old ground back. Made walls join other walls; see-through pixels show through.
+- Colours work on made things, floors and walls.
+- Sizes: chair 64x96 0.9 KB, bed 128x160 1.3 KB, rug 1.5 KB, a copied lawn floor 1.9 KB, wall 0.3 KB. Land save with five made things and nine placed: 52 KB.
+- Checked headless at 390 px in the prototype (make all eight types, place them, sit, rug passable, chair not, undo/redo, reload keeps all, Colours on a floor, Remove a floor tile, delete blocked then allowed) and in the game's overlay (make a table, place it, AED 50 taken from the company). No page errors. Fast suites pass (109, 11, 46).
+- Not done: fences, Grandma sitting on made chairs, a mirror tool.
+
