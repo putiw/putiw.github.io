@@ -700,9 +700,9 @@ var c0=g.stats.care||0;landTank(g,{mulm:0.05,sponge:0,grow:0.2,snail:1,flat:0,jo
 if(C.mulm!==0.05||C.sponge!==0||C.grow!==0.2||C.pests.length!==1||(g.stats.care||0)!==c0+1)throw Error('A job on the land is done in the game too');
 if(!T.wood||T.plants||!T.ldec||!landOwn(g).decor.wood)throw Error('The land decides the decor once, then the game sends it back');
 if(ownDue(g).length)throw Error('Nothing due after the jobs: '+ownDue(g));`);
-check('Pass 161: own-tank jobs about once a tank month, the tank stays fine between',OWN_SETUP+`
+check('Pass 161/179: own-tank jobs about once a tank month, the tank stays fine between',OWN_SETUP+`
 var g=ownGame(),T=g.tanks[0],C=careOf(T);T.glass=null;C.mulm=C.sponge=C.grow=0;C.pests=[];for(var d=0;d<30;d++){g.tday++;glassGrow(g,T);careDay(g);}
-var gm=glassMean(T);if(gm<0.35||gm>0.75)throw Error('Glass about half green after a tank month: '+gm);
+var gm=glassMean(T);if(gm<0.25||gm>0.45)throw Error('Pass 179: glass about a third green after a tank month: '+gm);
 if(ownWell(g).total<50)throw Error('A month of mess still reads Fine: '+ownWell(g).total);
 for(d=0;d<90;d++){g.tday++;glassGrow(g,T);careDay(g);}if(ownWell(g).total>=60)throw Error('Months of nothing shows: '+ownWell(g).total);`);
 check('Pass 161: leaving after the win, without the land too',OWN_SETUP+`
@@ -716,7 +716,7 @@ if(!html.includes("body.left-on .tabs,body.left-on #speed{display:none!important
 if(!html.includes("#review-box .sheet-in{max-height:88vh"))throw Error('The recap scrolls');
 if(!html.includes("var PACE_T='Your tank runs at 1× on this tab'")||!html.includes("if(tankPace()&&v>1){SPEED_WANT=v;v=1;}"))throw Error('The Tank tab runs at 1x once the tank has its own clock');
 const home161=fs.readFileSync(path.join(__dirname,'../shrimp/home.html'),'utf8');
-if(!home161.includes('function applyOwn(T,d)')||!home161.includes("post({type:LEFT?'menu':'back'})")||!home161.includes("if(T.own&&OWN)return;"))throw Error('The land follows the game tank and has no way back after leaving');
+if(!home161.includes('function applyOwn(T,d)')||!home161.includes("post({type:LEFT?'menu':'back'})")||!home161.includes("if(T.own||T===ownT())return;"))throw Error('The land follows the game tank and has no way back after leaving');
 count++;console.log('PASS Pass 161 requests');
 ['shrimp-playthrough','shrimp-average-playthrough','shrimp-space-playthrough'].forEach(function(f){if(!fs.readFileSync(path.join(__dirname,f+'.cjs'),'utf8').includes("require('./shrimp-bot-cards.cjs')"))throw Error('Bots answer every card, they never close one without a pick (Puti, 30 Oct): '+f);});
 count++;console.log('PASS bots pick on every card');
@@ -810,7 +810,7 @@ for(var i=0;i<400;i++){g.day+=1;personalDay(g);}if(g.me.cur||g.me.call||JSON.str
 `);
 {const sp=fs.readFileSync(path.join(__dirname,'../shrimp/space.html'),'utf8');
 if(/planets you passed|were better|Best of all/.test(sp)||!sp.includes('⌂ Home'))throw Error('Pass 171: no rank against other planets on landing, Home button on the ship');
-if(!html.includes("else if(d.type==='back'){spaceHide();if(landOpen(G))landShow();}")||!html.includes("if(G.voyage&&G.voyage.sealed)spaceShow();"))throw Error('Pass 171: ship Home goes to the land, the land goes back to the ship');}
+if(!html.includes("else if(d.type==='back'){spaceHide();if(landOpen(G))landShow();}")||!html.includes("if(!fj&&G.voyage&&G.voyage.sealed)spaceShow();"))throw Error('Pass 171: ship Home goes to the land, the land goes back to the ship');}
 count++;console.log('PASS Pass 171 ship goes home to the land, landing has no rank');
 // Pass 172 (Puti, 31 Oct): real sky, more instruments, Grandma off the land after leaving, color panel with sliders, Make icons
 {const sp=fs.readFileSync(path.join(__dirname,'../shrimp/space.html'),'utf8'),home=fs.readFileSync(path.join(__dirname,'../shrimp/home.html'),'utf8');
@@ -830,5 +830,10 @@ count++;console.log('PASS Pass 174 Millie pixels, fixed ship layout');
 {const sp=fs.readFileSync(path.join(__dirname,'../shrimp/space.html'),'utf8');
 if(!sp.includes("name:'Transit spectroscopy',cost:.2,")||!sp.includes("name:'Orbit tracker',cost:.1,")||!sp.includes("['orbit','Orbit',orbitText]];")||!sp.includes('#panel:not(.tall){height:404px;max-height:none;overflow:hidden'))throw Error('Pass 175: tenth test costs, fixed panel');}
 count++;console.log('PASS Pass 175 test costs and fixed panel');
+// Pass 179 (Puti, 31 Oct): Tank 1 on one real-time clock, 3 months from clean to covered, its jobs are the land's. Full checks: tests/shrimp-tank1.cjs
+{const home=require('fs').readFileSync(__dirname+'/../shrimp/home.html','utf8');
+if(!html.includes('var TANK_DAY_MS=2400,TANK_CATCH=30;')||!html.includes('var OWN_DUE=1/3,OWN_FULL=90;')||!html.includes('stepGame(G,0)||progressionBlocked(G))break;}')||!html.includes("var LAND_JOBS={glass:'glass',vac:'vac',sponge:'sponge',trim:'trim',pest:'pests'};"))throw Error('Pass 179: Tank 1 runs 2.4 s a tank day at any speed, 90 days to full, jobs on the land');
+if(!home.includes("TOYS.push({id:'glass'")||!home.includes("var busy=jobOpen();")||!home.includes("name==='wipe'"))throw Error('Pass 179: the land has the glass wipe and leaves a job alone');
+count++;console.log('PASS Pass 179 one clock, one tank, slower mess');}
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};

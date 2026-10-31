@@ -1570,3 +1570,15 @@ Tests: balance 122, academy 9, me 46. Not deployed.
 ## Deploy (31 Oct, Pass 178, BUILD 2026-10-31-opening)
 
 Before deploy: balance 122, academy 9, me 46. Bots, seed 7: strong cold 2,215 (same), strong kind 3,201 (was 3,213), average Earth door day 6,267. No INSOLVENT. Spotlight sweep 115 all good (one fewer: the Supplies card no longer shows). Layout scan only the known 2 px World chart label at 360. Monkey 60 random taps on six stages at 360 and 390, no errors.
+
+## Pass 179: Tank 1, one clock, one tank, slower mess (31 Oct)
+
+Puti: Tank 1 on the company Tank tab and on the land didn't match (algae, poop, pests), it got dirty very fast and pests came constantly.
+1. One clock. From the land on, Tank 1 moves by real time only, 2.4 s a tank day (`TANK_DAY_MS`), 72 s a tank month, on the company page and on the land, at any company speed (`ownClock`, `G.tAt`). The page steps the company with `stepGame(G,0)`; the 1/speed share and `LAND.acc` no longer move Tank 1. It holds while a cleaning job is open. Reload or a hidden page catches up at most 30 tank days.
+2. 3 tank months from clean to fully covered (`OWN_FULL` 90), due at a third (about day 30) for gravel, sponge, trim and glass (`GLASS_K` 1.1, nitrate no longer speeds Tank 1's glass). Wellbeing starts to drop at due.
+3. Pests: none for a tank month after a pest clean (`C.pestAt`), then (0.05 + mulm)/50 a day, flatworms only once the gravel is due. A monthly cleaner sees pests in about 9% of months.
+4. index.html is the only simulator. The land never runs its own `tankDay` on Your tank (it used to for up to 365 days on every load), applies no mess while a job is open, and sends a job's result against the values from when it started. The game now sends mulm per gravel column and every pest with kind and place; the land draws them as given, so both pages put poop and pests in the same places and a visit doesn't move them. A clean column stays clean.
+5. Company care buttons for Tank 1 open the land on that job (its vacuum, sponge, scissors, tweezers and sounds) and come back when it's done. The glass wipe is on the land too, with a wipe sound. The Two clocks card says the new rule.
+6. The land's pest drawing guards against missing sizes and non-finite places (the gradient error).
+Tests: new `tests/shrimp-tank1.cjs` (sim: due 27-33, covered 81-99, pests; browser at 390 px: 40x leaves Tank 1 at 2.5 days in 6 s, land and company match on columns and pests on first visit, after a land clean, 10 s later and after a reload, the land clean isn't undone, Vacuum on the company opens the land and comes back, no gradient errors). Balance 122, academy 9, me 46. Not deployed.
+Not done: the company still draws Tank 1 in its own ink style; positions and amounts now match, plants and the scape are drawn by each page in its own art (the scape is the land's call, the game only keeps the decor flags).

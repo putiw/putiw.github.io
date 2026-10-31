@@ -634,10 +634,11 @@ function sfxLoop(name){if(!AC||!S||!S.opt.sound)return {set:function(){},stop:fu
  try{if(name==='siphon'){var s=noiseSrc(),f=AC.createBiquadFilter();f.type='bandpass';f.frequency.value=700;f.Q.value=1.4;s.connect(f);f.connect(g);s.start();nodes.push(s);
    var lfo=AC.createOscillator(),lg=AC.createGain();lfo.frequency.value=7;lg.gain.value=260;lfo.connect(lg);lg.connect(f.frequency);lfo.start();nodes.push(lfo);}
   else if(name==='mower'){var o=AC.createOscillator(),f2=AC.createBiquadFilter();o.type='sawtooth';o.frequency.value=72;f2.type='lowpass';f2.frequency.value=420;o.connect(f2);f2.connect(g);o.start();nodes.push(o);var s2=noiseSrc(),f3=AC.createBiquadFilter();f3.type='bandpass';f3.frequency.value=2400;f3.Q.value=0.6;var g3=AC.createGain();g3.gain.value=0.25;s2.connect(f3);f3.connect(g3);g3.connect(g);s2.start();nodes.push(s2);}
+  else if(name==='wipe'){var s6=noiseSrc(),f6=AC.createBiquadFilter();f6.type='bandpass';f6.frequency.value=1900;f6.Q.value=0.8;s6.connect(f6);f6.connect(g);s6.start();nodes.push(s6);}
   else if(name==='bubbles'){var s3=noiseSrc(),f4=AC.createBiquadFilter();f4.type='lowpass';f4.frequency.value=380;f4.Q.value=6;s3.connect(f4);f4.connect(g);s3.start();nodes.push(s3);}
   else if(name==='wind'){var s4=noiseSrc(),f5=AC.createBiquadFilter();f5.type='lowpass';f5.frequency.value=500;s4.connect(f5);f5.connect(g);s4.start();nodes.push(s4);var l2=AC.createOscillator(),lg2=AC.createGain();l2.frequency.value=0.08;lg2.gain.value=250;l2.connect(lg2);lg2.connect(f5.frequency);l2.start();nodes.push(l2);}
  }catch(e){}
- var peak={siphon:0.22,mower:0.12,bubbles:0.16,wind:0.05}[name]||0.1;
+ var peak={siphon:0.22,mower:0.12,bubbles:0.16,wind:0.05,wipe:0.09}[name]||0.1;
  return {set:function(l){if(AC)g.gain.setTargetAtTime(peak*clamp(l,0,1),AC.currentTime,0.06);},stop:function(){if(!AC)return;g.gain.setTargetAtTime(0,AC.currentTime,0.08);setTimeout(function(){nodes.forEach(function(n){try{n.stop();}catch(e){}});g.disconnect();},500);}};}
 var OUTDOOR=null;
 function outdoorAmb(on){if(!AC)return;if(on&&!OUTDOOR){OUTDOOR=sfxLoop('wind');OUTDOOR.set(1);}else if(!on&&OUTDOOR){OUTDOOR.stop();OUTDOOR=null;}}
@@ -1178,7 +1179,7 @@ function tvDraw(){var x=TV.cv.getContext('2d'),W=TV.W,H=TV.H,T=TV.T,t=TV.t,g=tvG
   if(T.level<0.999){var wy=H*WATER_TOP+(1-T.level)*H*(SAND_TOP-WATER_TOP);var gr=x.createLinearGradient(0,0,0,wy);gr.addColorStop(0,'#e8f4f4');gr.addColorStop(1,'#d5ebee');x.fillStyle=gr;x.fillRect(0,0,W,wy);
     x.strokeStyle='rgba(90,150,170,.8)';x.lineWidth=1.4;x.beginPath();for(var px=0;px<=W;px+=6)x.lineTo(px,wy+Math.sin(px*0.08+t*2)*1.2);x.stroke();}
   if(TOY&&TOY.drawTop)TOY.drawTop(x,g,t);}
-function drawPests(x,T,t){var W=TV.W,H=TV.H;T.pests.forEach(function(p){var px=p.x*W,py=p.y*H;if(p.k==='snail'){var r=6*p.sz*Math.max(1,W/420);
+function drawPests(x,T,t){var W=TV.W,H=TV.H;T.pests.forEach(function(p){if(!(p.sz>0))p.sz=1;if(!isFinite(p.a))p.a=0;var px=p.x*W,py=p.y*H;if(!isFinite(px)||!isFinite(py))return;if(p.k==='snail'){var r=6*p.sz*Math.max(1,W/420);
    if(p.kind==='ramshorn')drawRamshorn(x,px,py,r*0.85,p.a);else drawBladder(x,px,py,r,p.a,t+p.id);}
   else{var len=11*p.sz*Math.max(1,W/420),ang=p.a;x.save();x.translate(px,py);x.rotate(ang);x.fillStyle='rgba(245,240,232,.92)';x.beginPath();x.moveTo(len/2,0);x.lineTo(len/2-2.6,-1.6);x.quadraticCurveTo(-len/3,-1.6,-len/2,0);x.quadraticCurveTo(-len/3,1.6,len/2-2.6,1.6);x.closePath();x.fill();x.strokeStyle='rgba(120,110,96,.9)';x.lineWidth=0.6;x.stroke();
    x.fillStyle=INK;x.beginPath();x.arc(len/2-2.4,-0.6,0.45,0,6.283);x.arc(len/2-2.4,0.6,0.45,0,6.283);x.fill();x.restore();}});}
@@ -1304,7 +1305,7 @@ var tankMod={name:'tank',
   // jobs: only the most pressing one glows
   var nd=needs(T),ids=nd.map(function(n){return n.id;}),tray=S.opt.toys==='tray';var show=tray?TOYS.map(function(t){return t.id;}):ids;
   if(!TOY){var jb='';
-   if(show.length){jb+='<div class="toys">';TOYS.forEach(function(t){if(show.indexOf(t.id)<0)return;var n=nd.find(function(z){return z.id===t.id;});jb+='<button class="btn'+(n?' need':'')+(n&&n===nd[0]&&!T.own?' glow':'')+'" data-toy="'+t.id+'"><canvas data-icon="'+t.id+'" width="56" height="44"></canvas>'+t.name+'<small>'+(n?n.t:t.idle(T))+'</small></button>';});jb+='</div>';}
+   if(show.length){jb+='<div class="toys">';TOYS.forEach(function(t){if(show.indexOf(t.id)<0||t.own&&!T.own)return;var n=nd.find(function(z){return z.id===t.id;});jb+='<button class="btn'+(n?' need':'')+(n&&n===nd[0]&&!T.own?' glow':'')+'" data-toy="'+t.id+'"><canvas data-icon="'+t.id+'" width="56" height="44"></canvas>'+t.name+'<small>'+(n?n.t:t.idle(T))+'</small></button>';});jb+='</div>';}
    else jb+='<p class="hint">Nothing needs doing. The tank is fine for now.</p>';
    side+=card('jobs',tray?'Jobs':'Needs doing',nd.length?plural(nd.length,'job'):'all good',jb);}
   // wellbeing: one bar and a word; the parts are behind ?
@@ -4055,7 +4056,8 @@ function ownT(){return S.tanks[0]||null;}
 // name, age) and only adds or removes the difference, so nothing gets reset. Moves and sales here go to the game.
 function gOf(i){return Math.round(clamp(phOf(i).grade,0,7)/7*100);}
 function syncOwn(d){if((d.seq||0)<SEQ)return;var T=ownT();if(!T||typeof newInd!=='function'||typeof GEN!=='object')return;T.name='Your tank';T.own=1;
-  if(report())return;OWN=d;try{ownAge(T,d);}catch(e){}
+  var busy=jobOpen();   // Pass 179: while a job is open the game's mess doesn't land on the tank, or the job is undone under you; shrimp still sync
+  if(!busy&&report())return;OWN=d;try{ownAge(T,d);}catch(e){}
   var A=Math.min(600,d.adults|0),Y=Math.min(600,d.young|0),N=netList(),
     mine=function(){return T.shrimp.concat(N.filter(function(e){return e.from===T.id;}).map(function(e){return e.ind;}));},ad=function(){return mine().filter(function(i){return i.age>=ADULT_DAYS;});},yo=function(){return mine().filter(function(i){return i.age<ADULT_DAYS;});};
   // shrimp in the net from Your tank still count as in it until they're moved or sold
@@ -4072,7 +4074,7 @@ function syncOwn(d){if((d.seq||0)<SEQ)return;var T=ownT();if(!T||typeof newInd!=
   var a1=ad(),y1=yo();
   if(a1.length<A)add(A-a1.length,true);else if(a1.length>A)cut(a1,a1.length-A);
   if(y1.length<Y)add(Y-y1.length,false);else if(y1.length>Y)cut(y1,y1.length-Y);
-  try{ownGrades(T,d);applyOwn(T,d);}catch(e){console.error(e);}
+  try{ownGrades(T,d);if(!busy)applyOwn(T,d);}catch(e){console.error(e);}
   if(activeTab==='tank'&&typeof tvSync==='function')try{tvSync();}catch(e){}}
 // ----- one tank (Pass 161): the game's Tank 1 is the only truth for Your tank -----
 // The game sends ages (tank days), grades, the mess (mulm, sponge, growth, pests), glass, water, decor and wellbeing.
@@ -4092,21 +4094,28 @@ function decorSet(T,f){var D={wood:['wood'],plants:['sword','lotus'],moss:['moss
     if(f[k]){var kk=D[k][0],ds=DECOR_SIZE[kk],it={id:uid(),k:kk,x:rnd(250,ART_W-250),y:kk==='leaf'?ART_H*0.9:ds.y+ds.h,s:kk==='leaf'?1:0.85,f:Math.random()<0.5?1:-1,r:kk==='leaf'?rnd(-0.5,0.5):0};T.scape.push(it);scapeResort(T,it);if(DECOR[kk].moss)seedMoss(T,it,6,true);if(k==='plants')defaultStems(T,it.x,4);}
     else{T.scape=T.scape.filter(function(i){if(D[k].indexOf(i.k)<0)return true;delete T.moss[i.id];return false;});if(k==='plants')T.stems=[];if(k==='moss')T.moss={};}});
   if(ch&&typeof TV==='object')TV.L={};}
+// a pest from the game: its kind and place are the game's, its look comes from its seed, so it looks the same every visit
+function gamePest(g,was){var s=g.s>>>0,sn=g.k==='snail',glass=g.y<0.72;if(was&&was.k===(sn?'snail':'planaria')){was.x=g.x;was.y=g.y;was.glass=glass;return was;}
+  return {id:'g'+g.s,k:sn?'snail':'planaria',kind:sn?(s%5?'bladder':'ramshorn'):'',x:g.x,y:g.y,glass:glass,a:(s%628)/100,sz:0.8+(s%41)/100};}
+function jobOpen(){return !!(TOY||$('sheet')&&!$('sheet').hidden);}
 function ownVals(T){var sn=0,pl=0;T.pests.forEach(function(p){if(p.k==='snail')sn++;else pl++;});return {mulm:mulmMean(T),flow:T.flow,og:overgrowth(T),sn:sn,pl:pl,no3:T.no3,wc:T.lastWC,dec:JSON.stringify(decorFlags(T))};}
-function applyOwn(T,d){var c=d.care;if(!c)return;
-  var tg=clamp(c.mulm*MM_K,0,1),mm=mulmMean(T),i;if(Math.abs(mm-tg)>0.002){if(mm<0.002){var w=0;for(i=0;i<MULM_N;i++)w+=mulmWeight(T,i);for(i=0;i<MULM_N;i++)T.mulm[i]=clamp(tg*mulmWeight(T,i)*MULM_N/w,0,1);}else for(i=0;i<MULM_N;i++)T.mulm[i]=clamp(T.mulm[i]*tg/mm,0,1);}
+function applyOwn(T,d){var c=d.care;if(!c)return;var i;
+  if(Array.isArray(d.mc)&&d.mc.length===MULM_N){for(i=0;i<MULM_N;i++)T.mulm[i]=clamp((+d.mc[i]||0)*MM_K,0,1);}
+  else{var tg=clamp(c.mulm*MM_K,0,1),mm=mulmMean(T);if(Math.abs(mm-tg)>0.002){if(mm<0.002){var w=0;for(i=0;i<MULM_N;i++)w+=mulmWeight(T,i);for(i=0;i<MULM_N;i++)T.mulm[i]=clamp(tg*mulmWeight(T,i)*MULM_N/w,0,1);}else for(i=0;i<MULM_N;i++)T.mulm[i]=clamp(T.mulm[i]*tg/mm,0,1);}}
   T.flow=clamp(1-0.9*c.sponge,0.05,1);
   var og=overgrowth(T),to=clamp(c.grow,0,1)*OG_K;if(og>0.01&&Math.abs(og-to)>0.004){var f=to/og;for(var k in T.moss)T.moss[k].forEach(function(m){m.len=Math.max(6,m.len*f);});T.stems.forEach(function(st){st.h=Math.max(20,st.h*f);});TV.L={};}
-  [['snail',c.snail|0],['planaria',c.flat|0]].forEach(function(q){var have=T.pests.filter(function(p){return p.k===q[0];});if(have.length<q[1])addPests(T,q[0],Math.min(40,q[1]-have.length));else if(have.length>q[1]){var gone=have.slice(q[1]);T.pests=T.pests.filter(function(p){return gone.indexOf(p)<0;});}});
+  if(Array.isArray(d.pests)){var old={};T.pests.forEach(function(p){old[p.id]=p;});T.pests=d.pests.map(function(g){return gamePest(g,old['g'+g.s]);});}
+  else [['snail',c.snail|0],['planaria',c.flat|0]].forEach(function(q){var have=T.pests.filter(function(p){return p.k===q[0];});if(have.length<q[1])addPests(T,q[0],Math.min(40,q[1]-have.length));else if(have.length>q[1]){var gone=have.slice(q[1]);T.pests=T.pests.filter(function(p){return gone.indexOf(p)<0;});}});
   if(d.no3!=null)T.no3=d.no3;if(d.nh!=null)T.nh=d.nh;
   if(d.decor)decorSet(T,d.decor);
   LAST=ownVals(T);if(!d.decor)report(1);}
 // what a job on the land changed, back to the game; first=1 also sends the land's decor once, it wins for old saves
 function report(first){var T=ownT();if(!T||!LAST||TOY||$('sheet')&&!$('sheet').hidden)return false;var v=ownVals(T),m={type:'tank'},any=0;
-  if(v.mulm<LAST.mulm-0.004){m.mulm=v.mulm/MM_K;any=1;}
+  if(v.mulm<LAST.mulm-0.004){m.mulm=v.mulm/MM_K;m.mc=T.mulm.map(function(x){return Math.round(x/MM_K*100)/100;});any=1;}
   if(v.flow>LAST.flow+0.004){m.sponge=clamp((1-v.flow)/0.9,0,1);any=1;}
   if(v.og<LAST.og-0.004){m.grow=v.og/OG_K;any=1;}
-  if(v.sn<LAST.sn||v.pl<LAST.pl){m.snail=v.sn;m.flat=v.pl;any=1;}
+  if(v.sn<LAST.sn||v.pl<LAST.pl){m.snail=v.sn;m.flat=v.pl;m.ps=T.pests.filter(function(p){return /^g\d+$/.test(p.id);}).map(function(p){return +p.id.slice(1);});any=1;}
+  if(GLD){m.gl=GLD;if(OWN)OWN.glass=GLD;GLD=null;any=1;}
   if(v.wc!==LAST.wc&&LAST.no3>0){m.wc=Math.round(clamp(1-v.no3/LAST.no3,0,0.9)*100);any=1;}
   if(any)m.job=1;
   if(first||v.dec!==LAST.dec){m.decor=JSON.parse(v.dec);any=1;}
@@ -4117,9 +4126,9 @@ function glassLayer(W,H,dpr,g){var k=g+'|'+W+'|'+H;if(GLC&&GLK===k)return GLC;va
   var GW=32,GH=16,cw=W/GW,ch=(H*0.78)/GH;for(var i=0;i<g.length&&i<GW*GH;i++){var a=(+g[i])/9;if(a<0.06)continue;var cx=(i%GW)*cw,cy=H*0.22+Math.floor(i/GW)*ch;x.fillStyle='rgba(96,150,70,'+(a*0.07).toFixed(3)+')';x.fillRect(cx,cy,cw+0.5,ch+0.5);
     var n=Math.ceil(a*4);for(var q=0;q<n;q++){var h=((i+1)*2654435761^(q+1)*40503)>>>0;var px=cx+(h%997)/997*cw,py=cy+((h>>>10)%991)/991*ch,sz=1.2+((h>>>20)%4)*0.6;x.fillStyle='rgba('+(58+(h%30))+','+(120+(h>>>7)%40)+',52,'+(0.3+0.3*a).toFixed(2)+')';x.fillRect(px,py,sz,sz);}}
   GLC=c;GLK=k;return c;}
-if(typeof tvDraw==='function'){var _tvd=tvDraw;tvDraw=function(){_tvd.apply(this,arguments);try{if(OWN&&OWN.glass&&TV.T&&TV.T===ownT()){var x=TV.cv.getContext('2d');x.setTransform(1,0,0,1,0,0);x.drawImage(glassLayer(TV.W,TV.H,TV.dpr,OWN.glass),0,0);}}catch(e){}};}
+if(typeof tvDraw==='function'){var _tvd=tvDraw;tvDraw=function(){_tvd.apply(this,arguments);try{var gs=GLS?GLS.join(''):OWN&&OWN.glass;if(gs&&TV.T&&TV.T===ownT()){var x=TV.cv.getContext('2d');x.setTransform(1,0,0,1,0,0);x.drawImage(glassLayer(TV.W,TV.H,TV.dpr,gs),0,0);}}catch(e){}};}
 // Your tank's mess, water and wellbeing come from the game; the land's own day does nothing to it
-if(typeof tankDay==='function'){var _td=tankDay;tankDay=function(T,d){if(T.own&&OWN)return;return _td(T,d);};}
+if(typeof tankDay==='function'){var _td=tankDay;tankDay=function(T,d){if(T.own||T===ownT())return;return _td(T,d);};}   // Pass 179: not even before the first sync
 if(typeof wellbeing==='function'){var _wb=wellbeing;wellbeing=function(T){if(T&&T.own&&OWN&&OWN.well)return {total:OWN.well.total,parts:OWN.well.parts.map(function(q){return q.slice();})};return _wb(T);};}
 // births and deaths in Your tank come from the game; here they only grow older
 if(typeof breedDay==='function'){var _bd=breedDay;breedDay=function(T,d){if(!T.own)return _bd(T,d);T.shrimp.forEach(function(i){i.eggs=null;});};}
@@ -4132,14 +4141,45 @@ function leftBack(){var b=$('tb-back');if(!b)return;b.innerHTML=LEFT?'<span aria
 function needBar(){var b=$('lneed');if(!NEED){if(b)b.remove();return;}if(!b){b=document.createElement('button');b.type='button';b.id='lneed';b.className='lneed';b.onclick=function(){try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};document.body.appendChild(b);}b.textContent=NEED+' Tap to go back.';}
 window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||!S)return;
   if(d.type==='cash'){S.cash=d.cash;FROZEN=d.frozen||'';if(!!d.left!==!!LEFT||!!d.voy!==!!VOY){LEFT=d.left?1:0;VOY=d.voy?1:0;window.GM_AWAY=!!VOY;leftBack();}var nd=d.need||'';if(nd!==NEED){NEED=nd;needBar();}gameTime(d.day);updateHeader();}
-  if(d.type==='own')syncOwn(d);});
+  if(d.type==='own')syncOwn(d);
+  if(d.type==='job')jobFromGame(d.id);});
 // shrimp that leave your tank here leave it in the game too
 var _move=netMoveTo;netMoveTo=function(T2){var T=ownT(),N=netList(),a=0,y=0,giv=[];if(T&&T2)N.forEach(function(e){if(T2!==T&&e.from===T.id){if(e.ind.age>=ADULT_DAYS)a++;else y++;}if(T2===T&&e.from!==T.id)giv.push({age:e.ind.age,g:gOf(e.ind)});});_move(T2);if(a+y)post({type:'take',adults:a,young:y,seq:++SEQ});if(giv.length)post({type:'give',list:giv,seq:++SEQ});};
 // shrimp from the stream trap put in Your tank go to the game's Tank 1 too (Pass 172: they were dropped at the next sync)
 if(typeof addToTank==='function'){var _add=addToTank;addToTank=function(T,list,from){_add(T,list,from);var o=ownT();if(T&&o&&T===o&&list&&list.length)post({type:'give',list:list.map(function(i){return {age:i.age||0,g:gOf(i)};}),seq:++SEQ});};}
 var _sell=sellShrimp;sellShrimp=function(T,i){var own=T===ownT(),ad=i.age>=ADULT_DAYS;var p=_sell(T,i);if(own)post({type:'take',adults:ad?1:0,young:ad?0:1,seq:++SEQ});return p;};
 // care jobs count as caring for your tank in the game
-if(typeof toyEnd==='function'){var _end=toyEnd;toyEnd=function(){var r=_end.apply(this,arguments);try{report();}catch(e){}return r;};}
+if(typeof toyEnd==='function'){var _end=toyEnd;toyEnd=function(){var was=!!TOY;var r=_end.apply(this,arguments);if(was)jobDone();return r;};}
+
+// ----- jobs on Your tank (Pass 179) -----
+// While a job is open the game's clock for Tank 1 holds (busy), and the result goes back against the values from when it started.
+// A job the company sent (a care button on its Tank tab) goes back to the company when it's done.
+var FROM_GAME=0,SPONGE_ON=0;
+function jobBegin(T){if(T!==ownT())return;try{LAST=ownVals(T);}catch(e){}post({type:'busy',on:1});}
+function jobDone(){try{report();}catch(e){}post({type:'busy',on:0});GLS=null;if(FROM_GAME){FROM_GAME=0;setTimeout(function(){try{LAND.settle();}catch(e){}save(true);post({type:'back'});},350);}}
+var _ts=toyStart;toyStart=function(id){var T=S.tanks[S.sel];if(id==='glass'){if(TOY)toyEnd();if(T!==ownT()||!OWN||!OWN.glass)return;closeBubble();jobBegin(T);TOY=glassToy(T);TOY.id=id;TOY.T=T;hold();lockOn();TOY.start();tankMod.renderSide();return;}
+  if(id==='sponge'){jobBegin(T);SPONGE_ON=T===ownT()?1:0;return _ts.apply(this,arguments);}
+  var r=_ts.apply(this,arguments);if(TOY)jobBegin(T);return r;};
+var _cs=closeSheet;closeSheet=function(){var r=_cs.apply(this,arguments);if(SPONGE_ON&&!SHEET){SPONGE_ON=0;jobDone();}return r;};
+function jobFromGame(id,n){var T=ownT();if(!T||!S)return;if(!LAST&&(n||0)<40){setTimeout(function(){jobFromGame(id,(n||0)+1);},100);return;}   // the tank is drawn from the game first
+  FROM_GAME=1;closeSheet(true);if(TOY)toyEnd();S.sel=0;setTab('tank');setTimeout(function(){toyStart(id);if(!TOY&&!SPONGE_ON){FROM_GAME=0;post({type:'back'});}},60);}
+// the game's due list decides what the side buttons call due for Your tank, so both pages agree
+if(typeof needs==='function'){var _nd=needs;needs=function(T){if(!T||!T.own||!OWN||!OWN.due)return _nd(T);var o=[],map={gravel:['vac','Gravel due'],sponge:['sponge','Filter due'],trim:['trim','Trim due'],pests:['pests','Pests'],glass:['glass','Glass due']};
+  if(!T.scape.length)o.push({id:'scape',t:'Empty tank'});OWN.due.forEach(function(k){if(map[k])o.push({id:map[k][0],t:map[k][1]});});return o;};}
+// The glass wipe: the game's glass grid (32 by 16, 0 to 9), wiped with a finger. Before Pass 179 only the company had it.
+var GLS=null,GLD=null;
+TOYS.push({id:'glass',name:'Glass',own:1,idle:function(T){if(!OWN||!OWN.glass)return 'clear';var s=0;for(var i=0;i<OWN.glass.length;i++)s+=+OWN.glass[i];return Math.round(s/(9*OWN.glass.length)*100)+'% green';},
+  icon:function(x,w,h){x.strokeStyle=INK;x.lineWidth=1.3;x.strokeRect(w*0.18,h*0.14,w*0.64,h*0.72);x.fillStyle='rgba(96,150,70,.45)';x.fillRect(w*0.2,h*0.16,w*0.6,h*0.68);x.fillStyle='#f6f1e6';x.beginPath();x.ellipse(w*0.46,h*0.5,w*0.16,h*0.22,-0.5,0,6.283);x.fill();}});
+function glassToy(T){var P={last:null,loop:null,did:0};GLS=(OWN.glass||'').split('').map(function(c){return +c||0;});
+  function wipe(p){var W=TV.W,H=TV.H,GW=32,GH=16,cw=W/GW,ch=H*0.78/GH,cx=p[0]/cw,cy=(p[1]-H*0.22)/ch,hit=0;
+    for(var gy=Math.floor(cy-1.5);gy<=cy+1.5;gy++)for(var gx=Math.floor(cx-1.5);gx<=cx+1.5;gx++){if(gx<0||gy<0||gx>=GW||gy>=GH)continue;var d=Math.hypot(gx+0.5-cx,gy+0.5-cy),i=gy*GW+gx;if(d>1.6||!GLS[i])continue;GLS[i]=Math.max(0,GLS[i]-(d<0.9?3:1));hit=1;}
+    if(hit)P.did=1;return hit;}
+  P.start=function(){toyBar(barHtml('Drag on the glass to wipe the algae off.'));};
+  P.down=function(p){P.last=p;if(!P.loop)P.loop=sfxLoop('wipe');wipe(p);};
+  P.move=function(p){if(!P.last)return;var d=Math.hypot(p[0]-P.last[0],p[1]-P.last[1]),n=Math.max(1,Math.ceil(d/6)),hit=0;for(var k=1;k<=n;k++)hit|=wipe([P.last[0]+(p[0]-P.last[0])*k/n,P.last[1]+(p[1]-P.last[1])*k/n]);if(P.loop)P.loop.set(hit?Math.min(1,d/10):0);P.last=p;};
+  P.up=function(){P.last=null;if(P.loop){P.loop.stop();P.loop=null;}};
+  P.end=function(){P.up();if(P.did)GLD=GLS.join('');};
+  return P;}
 
 // ----- the header: back to the company, today's real time -----
 function clock(){var d=new Date();return d.toLocaleDateString('en-GB',{weekday:'short'})+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
