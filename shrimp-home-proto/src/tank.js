@@ -276,11 +276,11 @@ function hobbyists(T){var n=T.shrimp.length;if(T.role!=='cull'||n<3||Math.random
   take.forEach(function(i){liftOut(T,i);});T.shrimp=T.shrimp.filter(function(i){return take.indexOf(i)<0;});S.stats.given=(S.stats.given||0)+k;tankLog(T,'A hobbyist took '+plural(k,'shrimp','shrimp')+', free');
   if(activeTab==='tank')toast('A hobbyist came by the '+(T.name==='Cull tank'?'cull tank':T.name)+' for '+plural(k,'shrimp','shrimp')+'. Free, for their own tank.',3200);if(T===TV.T)tvSync(true);}
 // the bar under the tank while there's something in the net
-function netBar(){var el=$('netbar');if(!el)return;var N=netList();if(!N.length||TOY){el.hidden=true;el.innerHTML='';el._h='';return;}
+function netBar(){var el=$('netbar');if(!el)return;var N=netList();if(!N.length||TOY){el.hidden=true;el.innerHTML='';el._h='';var js0=$('jobslot');if(js0)js0.classList.remove('net');return;}
   var T=S.tanks[S.sel],h='<span class="nb-n"><b>'+N.length+'</b> in the net</span><span class="nb-b">';
   if(!T||T.role!=='cull')h+='<button class="btn sm primary" data-net="cull">Move to cull tank</button>';
   S.tanks.forEach(function(t,ti){if(t.role==='cull'&&t!==T||t===T&&N.every(function(e){return e.from===t.id;}))return;h+='<button class="btn sm" data-net="'+ti+'">Move to '+esc(t.name)+'</button>';});
-  h+='<button class="btn sm" data-net="back">Put back</button></span>';if(el._h!==h){el.innerHTML=h;el._h=h;}el.hidden=false;}
+  h+='<button class="btn sm" data-net="back">Put back</button></span>';if(el._h!==h){el.innerHTML=h;el._h=h;}el.hidden=false;var js1=$('jobslot');if(js1)js1.classList.add('net');}
 function netStep(dt){var b=netBox();netList().forEach(function(e,k){var q=TV.netAg[e.ind.id];if(!q)return;q.ph+=dt;q.left-=dt;if(q.left<=0){var sp=netSpot(k);q.tx=sp[0];q.ty=sp[1];q.left=1.4+Math.random()*3.4;}
     q.x=clamp(q.x,b.x0,b.x1);q.y=clamp(q.y,b.y0,b.y1);var dx=q.tx-q.x,dy=q.ty-q.y,d=Math.hypot(dx,dy);if(d>1){var m=Math.min(d,dt*tvBase()*0.22);q.x+=dx/d*m;q.y+=dy/d*m;if(Math.abs(dx)>2)q.face=dx>0?-1:1;q.sp=1;}else q.sp=0;});
   TV.fly.forEach(function(f){f.t+=dt;if(f.t>=f.dur&&!f.over){f.over=1;if(f.done)f.done();}});TV.fly=TV.fly.filter(function(f){return !f.over;});}
@@ -302,7 +302,7 @@ var tankMod={name:'tank',
  day:function(d){S.tanks.forEach(function(T){tankDay(T,d);});netDay();if(activeTab==='tank'){tvSync();tankMod.renderSide();}var dot=$('tankdot');if(dot)dot.hidden=!(S.opt.toys==='need'&&anyNeeds());},
  show:function(){newLook();TV.capUntil=0;tankMod.render();tvStart();if(S.fromHome){S.fromHome=0;var tv=$('tv');if(tv){tv.classList.remove('fadein');void tv.offsetWidth;tv.classList.add('fadein');}}},
  hide:function(){tvStop();closeBubble();TV.hold=null;if(TOY)toyEnd();},
- render:function(){if(activeTab!=='tank')return;var el=$('p-tank');if(!el.querySelector('#tv-canvas')){el.innerHTML='<div class="tchips" id="tchips"></div><div class="lockzone" id="lockzone"><div class="lockbar" id="lockbar" hidden></div><div class="tv" id="tv"><canvas id="tv-canvas"></canvas><span class="tv-cap" id="tv-cap"></span></div><div class="netbar" id="netbar" hidden></div><div id="toypanel"></div></div><div id="tankside"></div>';
+ render:function(){if(activeTab!=='tank')return;var el=$('p-tank');if(!el.querySelector('#tv-canvas')){el.innerHTML='<div class="tchips" id="tchips"></div><div class="lockzone" id="lockzone"><div class="tv" id="tv"><canvas id="tv-canvas"></canvas><span class="tv-cap" id="tv-cap"></span></div><div class="jobslot" id="jobslot"><div class="toys" id="toybtns"></div><p class="hint jobnone" id="jobnone" hidden>Nothing needs doing. The tank is fine for now.</p><div class="netbar" id="netbar" hidden></div><div class="lockbar" id="lockbar"></div></div><div id="toypanel"></div></div><div id="tankside"></div>';
    TV.cv=$('tv-canvas');TV.L={};bindTv();}
   if(!S.tanks[S.sel])S.sel=0;tvSize();tvSync(true);tankMod.renderSide();netBar();tvStart();},
  renderSide:function(){if(activeTab!=='tank'||!$('tankside'))return;var T=S.tanks[S.sel];
@@ -314,10 +314,10 @@ var tankMod={name:'tank',
   var card=function(k,title,small,body,extra){return '<div class="card coll'+(shut[k]?' shut':'')+'" data-k="'+k+'"><div class="hd"><h2>'+title+'</h2><small>'+small+'</small>'+(extra||'')+'</div>'+body+'</div>';};
   // jobs: only the most pressing one glows
   var nd=needs(T),ids=nd.map(function(n){return n.id;}),tray=S.opt.toys==='tray';var show=tray?TOYS.map(function(t){return t.id;}):ids;
-  if(!TOY){var jb='';
-   if(show.length){jb+='<div class="toys">';TOYS.forEach(function(t){if(show.indexOf(t.id)<0||t.own&&!T.own)return;var n=nd.find(function(z){return z.id===t.id;});jb+='<button class="btn'+(n?' need':'')+(n&&n===nd[0]&&!T.own?' glow':'')+'" data-toy="'+t.id+'"><canvas data-icon="'+t.id+'" width="56" height="44"></canvas>'+t.name+'<small>'+(n?n.t:t.idle(T))+'</small></button>';});jb+='</div>';}
-   else jb+='<p class="hint">Nothing needs doing. The tank is fine for now.</p>';
-   side+=card('jobs',tray?'Jobs':'Needs doing',nd.length?plural(nd.length,'job'):'all good',jb);}
+  // Pass 180: the job buttons sit in a fixed slot under the tank. Every job this tank can have keeps its place, ones not needed now are invisible, and the job bar takes the same slot.
+  var jb='',any=false;TOYS.forEach(function(t){if(t.own&&!T.own)return;var on=show.indexOf(t.id)>=0,n=nd.find(function(z){return z.id===t.id;});if(on)any=true;jb+='<button class="btn'+(n?' need':'')+(n&&n===nd[0]&&!T.own?' glow':'')+'" data-toy="'+t.id+'"'+(on?'':' data-idle="1"')+'><canvas data-icon="'+t.id+'" width="56" height="44"></canvas>'+t.name+'<small>'+(n?n.t:t.idle(T))+'</small></button>';});
+  var tbx=$('toybtns');if(tbx&&tbx._h!==jb){tbx.innerHTML=jb;tbx._h=jb;tbx.querySelectorAll('canvas[data-icon]').forEach(function(cv){var t=TOYS.find(function(z){return z.id===cv.dataset.icon;});var x=fitCanvas(cv,28,22);cv.style.width='28px';cv.style.height='22px';t.icon(x,28,22);});}
+  if($('jobnone'))$('jobnone').hidden=true;
   // wellbeing: one bar and a word; the parts are behind ?
   if(scoreMode()){var wb=wellbeing(T),wt=wb.total,low=wt<50,open=!!TV.wbHelp;
    var bar='<div class="wbar"><i style="width:'+wt+'%;background:'+(wt>=75?'#2f7a45':wt>=50?'#7d9b53':'#b23a2e')+'"></i><b style="left:50%"></b></div>';
@@ -367,7 +367,7 @@ function bindTv(){var cv=TV.cv,down=null;
     else if(b.dataset.toy){sfx('click');toyStart(b.dataset.toy);}
     else if(b.dataset.dev==='wild'){var T2=S.tanks[S.sel];var list=[];for(var k=0;k<6;k++)list.push(breedWild());addToTank(T2,list,'stream');toast('6 wild shrimp added to '+T2.name);tvSync(true);tankMod.renderSide();}
     else if(b.dataset.rename!=null)renameTank();});}
-function renameTank(){var T=S.tanks[S.sel];openSheet({title:'Rename',keepTime:true,html:'<input id="rn-in" maxlength="24" style="width:100%;font:15px var(--font-body);padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2)"><div class="btns"><button class="btn primary" id="rn-ok">Save</button></div>',mount:function(el,api){var i=$('rn-in');i.value=T.name;i.focus();$('rn-ok').onclick=function(){var v=i.value.replace(/[<>]/g,'').trim();if(v)T.name=v.slice(0,24);api.close();};}});}
+function renameTank(){var T=S.tanks[S.sel];openSheet({title:'Rename',keepTime:true,html:'<input id="rn-in" maxlength="24" style="width:100%;font:15px var(--font-body);padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2)"><div class="btns"><button class="btn primary" id="rn-ok">Save</button></div>',mount:function(el,api){var i=$('rn-in');i.value=T.name;i.focus({preventScroll:true});$('rn-ok').onclick=function(){var v=i.value.replace(/[<>]/g,'').trim();if(v)T.name=v.slice(0,24);api.close();};}});}
 // Tap a shrimp to net it, tap one in the net to put it back. With a card open, a tap just closes it.
 function tvTap(p){if(TV.bubbleFor){closeBubble();return;}
   if(netList().length&&inNet(p)){var k=netAt(p);if(k>=0)netReturn(k);return;}
@@ -388,7 +388,7 @@ function openBubble(a){closeBubble();var i=a.ind,T=TV.T;TV.bubbleFor=i.id;var el
     if(k==='sell'&&!b.dataset.sure){b.dataset.sure='1';b.textContent='Tap again to sell · '+fmtA(shopPrice(i));setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent='Pet shop · '+fmtA(shopPrice(i));}},3000);return;}
     if(k==='sell'){liftOut(T,i);var pr=sellShrimp(T,i);sfx('coin');toast('Sold to the pet shop for '+fmtA(pr));closeBubble();tvSync(true);tankMod.renderSide();}
     else if(k==='move'){ex.innerHTML='<div class="btns">'+S.tanks.map(function(t,ti){return t===T?'':'<button class="btn" data-mv="'+ti+'">'+esc(t.name)+'</button>';}).join('')+'</div>';}
-    else if(k==='name'){ex.innerHTML='<div class="btns"><input maxlength="14" style="flex:1;min-width:0;font:14px var(--font-body);padding:6px 8px;border:1px solid var(--line);border-radius:8px" value="'+esc(i.name||'')+'"><button class="btn" data-nm>Save</button></div>';ex.querySelector('input').focus();}
+    else if(k==='name'){ex.innerHTML='<div class="btns"><input maxlength="14" style="flex:1;min-width:0;font:14px var(--font-body);padding:6px 8px;border:1px solid var(--line);border-radius:8px" value="'+esc(i.name||'')+'"><button class="btn" data-nm>Save</button></div>';ex.querySelector('input').focus({preventScroll:true});}
     else if(b.dataset.mv!=null){}});
   el.addEventListener('click',function(e){var mv=e.target.closest('[data-mv]');if(mv){var to=S.tanks[+mv.dataset.mv];liftOut(T,i);moveShrimp(i,T,to);toast('Moved to '+to.name);sfx('plop');closeBubble();tvSync(true);tankMod.renderSide();}
     var nm=e.target.closest('[data-nm]');if(nm){var v=el.querySelector('input').value.replace(/[^A-Za-z0-9 .'-]/g,'').trim().slice(0,14);i.name=v;closeBubble();toast(v?'Named '+v:'Name cleared');save();}});}

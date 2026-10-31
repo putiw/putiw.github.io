@@ -1870,7 +1870,7 @@ function toolsHere(){var m=M(),has={},wild=false;m.g.forEach(function(g){has[g]=
   return TOOLS.filter(function(t){if(t.id==='mow')return has[G_GRASS]||has[G_MEADOW];if(t.id==='grain')return S.stage>=2;if(t.id==='rod')return wild;return true;});}
 function mountHome(){var p=$('p-home');ensureLand();
   p.innerHTML='<div class="card hcard"><div class="hd"><h2 id="h-name"></h2><small id="h-sub"></small><button class="qh" id="h-help" aria-label="How the home works">?</button></div><div class="hmove" id="h-move"></div></div>'+
-   '<div class="landwrap pixland" id="lwrap"><canvas id="land-cv"></canvas><div class="lzoom"><button class="lzb" id="lz-in" aria-label="Zoom in">+</button><button class="lzb" id="lz-out" aria-label="Zoom out">−</button></div><button class="lzb lhelp" id="lz-help" aria-label="How the land works">?</button><div class="lclock" id="lclock" hidden></div><div class="ltools" id="ltools" role="toolbar" aria-label="Tools"></div></div><div class="palette lpal" id="lpal" hidden></div><div class="lstat" id="lstat"></div>';
+   '<div class="landwrap pixland" id="lwrap"><canvas id="land-cv"></canvas><div class="lzoom"><button class="lzb" id="lz-in" aria-label="Zoom in">+</button><button class="lzb" id="lz-out" aria-label="Zoom out">−</button></div><button class="lzb lhelp" id="lz-help" aria-label="How the land works">?</button><div class="lclock" id="lclock" hidden></div><div class="ltools" id="ltools" role="toolbar" aria-label="Tools"></div><div class="palette lpal" id="lpal" hidden></div></div><div class="lstat" id="lstat"></div>';
   L.cv=$('land-cv');L.sizedCv=null;L.cv.addEventListener('pointerdown',onDown);L.cv.addEventListener('pointermove',onMove);L.cv.addEventListener('pointerup',onUp);L.cv.addEventListener('pointercancel',onUp);
   L.cv.addEventListener('contextmenu',function(e){e.preventDefault();});
   $('lz-in').onclick=function(){setZoom(1);};$('lz-out').onclick=function(){setZoom(-1);};$('lz-help').onclick=function(){$('h-help').onclick();};
@@ -1906,7 +1906,7 @@ function zoomK(){return ZOOMS[zoomI()];}
 function setZoom(d){var l=LS(),z0=zoomI(),z=clamp(z0+d,0,ZOOMS.length-1);if(z===z0)return;l.zoom=z;sfx('click');sizeCanvas();zoomBtns();save();}
 function zoomBtns(){var a=$('lz-in'),b=$('lz-out'),z=zoomI();if(a)a.disabled=z>=ZOOMS.length-1;if(b)b.disabled=z<=0;}
 function pickCpa(dpr){var d=dpr*0.6875;if(d>=1.75)return Math.round(d)/dpr;if(d>=1.2)return 1.5/dpr;return 1/dpr;}
-function sizeCanvas(){var wrap=$('lwrap');if(!wrap||!L.cv)return;var W=wrap.clientWidth,top=wrap.getBoundingClientRect().top,pal=$('lpal'),palH=pal&&!pal.hidden?78:0;
+function sizeCanvas(){var wrap=$('lwrap');if(!wrap||!L.cv)return;var W=wrap.clientWidth,top=wrap.getBoundingClientRect().top,pal=$('lpal'),palH=0;// Pass 180: the build palette floats over the map, the map keeps its size
   var tb=document.querySelector('.tabs'),tabsH=tb?tb.getBoundingClientRect().height:62,tl=$('ltools'),toolsH=tl&&tl.parentNode&&tl.parentNode.id==='lwrap'?4:(tl?tl.offsetHeight:50)+14;var H=Math.round(clamp(window.innerHeight-top-toolsH-34-palH-tabsH-10,250,660));
   var dpr=window.devicePixelRatio||1,cpa=zoomK()/dpr;if(Math.abs(H-L.cssH)<3&&W===L.cssW&&L.x&&L.sizedCv===L.cv&&cpa===L.cpa)return;L.sizedCv=L.cv;
   var mid=L.VW?[L.cam.x+L.VW/2,L.cam.y+L.VH/2]:null;L.cssW=W;L.cssH=H;L.dpr=dpr;L.cpa=cpa;L.s=1;// the canvas holds 2 pixels per art pixel (Pass 174), so people at 1.5x land on whole canvas pixels (3 per art pixel): Millie's eyes keep their shape

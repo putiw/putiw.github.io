@@ -101,6 +101,7 @@ body.in-game #b-money{min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:cl
 body.in-game #tb-back i{font-style:normal}
 @media (max-width:410px){body.in-game #tb-back i{display:none}body.in-game #tb-back{width:36px;padding:6px 0;justify-content:center}body.in-game #b-money{font-size:16px}}
 /* tools sit on the map, bottom left, like the zoom buttons (28 Oct): small square slots, no labels, the line under the map says what the picked tool does */
+.landwrap .lpal{position:absolute;left:6px;right:6px;bottom:58px;z-index:6;margin:0;padding:6px!important;background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid var(--line);border-radius:10px;max-height:46%;overflow:auto!important;box-shadow:0 4px 14px rgba(0,0,0,.14)}.landwrap .lpal[hidden]{display:none}
 .landwrap .ltools{position:absolute;left:8px;bottom:8px;z-index:5;margin:0;gap:6px;justify-content:flex-start}
 .landwrap .tslot{flex:0 0 auto;width:44px;height:44px;padding:0;border-radius:9px;box-shadow:0 2px 0 #21181b}
 .landwrap .tslot .ticon{width:30px;height:30px}
