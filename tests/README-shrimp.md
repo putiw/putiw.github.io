@@ -1536,3 +1536,8 @@ Tests: balance 119, academy 9, me 46, space search 5, Space bot passes. Not depl
 3. Dev trips pack all seven instruments.
 
 With tests this cheap the Space bot scans everything and lands on TOI-700 d, fit 95, best of 199 passed. Balance 120, academy 9, me 46, space search 5 (fuel numbers updated). Not deployed.
+
+## Pass 176: 300 flybys at least (31 Oct)
+
+Puti: the ship gets at least 300 fuel. `VOY_FUEL` is now min 300, start 300, max 500. The first 300 are free (`free`), and each step of 10 past that costs 10 points as before (`voyageSpent` counts fuel above 300). A ship in an old save that hasn't landed is topped up to 300. With 69 cones in the sky, 300 is enough to fly past every star and test most of them.
+Tests: balance 120 (fuel checks: starts at 300 for 0 points, 290 refused, 310 costs 10), Space bot passes. Not deployed.

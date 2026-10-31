@@ -2265,12 +2265,13 @@ function voyageOpen(G){var E=G.emp;return !!(!G.voyage&&!G.left&&!E.ended&&(hard
 // What carries over, as points. Logs, so a fortune ten times bigger is a few more points, and giving half away costs little.
 function voyagePtsOf(G){var c=Math.max(0,G.money);return {cash:Math.round(40*Math.log10(1+c/1e6)),sci:Math.round(sciScore(G)/5),kits:Math.round(12*Math.log10(1+(G.kits.sold||0)))};}
 function voyageTotal(V){var p=V.pts;return p.cash+p.sci+p.kits;}
-var VOY_FUEL={min:20,max:200,step:10,start:100};
+// Pass 176 (Puti, 31 Oct): 300 flybys come free, more cost a point each
+var VOY_FUEL={min:300,max:500,step:10,start:300,free:300};
 var VOY_INST=[{id:'transit',name:'Transit spectroscopy',d:'Reads a planet’s air as it passes its star.',pts:40},{id:'rv',name:'Radial velocity',d:'Weighs a planet by how it pulls its star. Rocky or not.',pts:25},{id:'flare',name:'Flare watch',d:'Watches a star for flares that strip air off its planets.',pts:15},{id:'tide',name:'Tidal lock check',d:'Tells if one side always faces the star.',pts:15},
  {id:'orbit',name:'Orbit tracker',d:'Times a planet’s year and how stretched its orbit is. Stretched means wild seasons.',pts:10},{id:'age',name:'Star quake listener',d:'Hears a star ring to tell its age. Young stars are restless.',pts:10},{id:'mag',name:'Radio aurora watch',d:'Listens for auroras to tell if a planet has a magnetic field to keep its air.',pts:15}];
 var VOY_ROBOT={pts:5,max:30};
 var VOY_SEED=[{id:'soil',name:'Plants and soil life',d:'Grass, moss, worms, the things that make dirt into soil.',pts:20},{id:'birds',name:'Hens, fish and bird eggs',d:'From the land. Frozen.',pts:30}];
-function voyageSpent(V){var t=V.fuel;VOY_INST.forEach(function(x){if(V.inst[x.id])t+=x.pts;});t+=V.robots*VOY_ROBOT.pts;VOY_SEED.forEach(function(x){if(V.seeds[x.id])t+=x.pts;});return t;}
+function voyageSpent(V){var t=Math.max(0,V.fuel-VOY_FUEL.free);VOY_INST.forEach(function(x){if(V.inst[x.id])t+=x.pts;});t+=V.robots*VOY_ROBOT.pts;VOY_SEED.forEach(function(x){if(V.seeds[x.id])t+=x.pts;});return t;}
 function voyageLeft(G){var V=G.voyage;return V?voyageTotal(V)-voyageSpent(V):0;}
 // One change to the ship. Refused if it goes over the points or out of range.
 function voyageSet(G,what,id,val){var V=G.voyage;if(!V||V.sealed)return false;var o=JSON.parse(JSON.stringify(V));
@@ -2289,7 +2290,7 @@ function voyageTrip(G,t){var V=G.voyage;if(!V||!V.sealed||!t||typeof t!=='object
 function startVoyage(G){if(!voyageOpen(G))return false;var E=G.emp;
  if(!G.me)G.me=newMe();if(!landOpen(G)){var gm=G.me;gm.gplace=gm.gplace||{};GPLACE.forEach(function(x){if(!gm.gplace[x.id]){pay(G,x.m,'personal');gm.gplace[x.id]=Math.floor(G.day)+1;}});}if(!ownTank(G))ownTankNow(G);
  G.voyage={day:Math.floor(G.day),cash:Math.round(G.money),sci:sciScore(G),kits:Math.round(G.kits.sold||0),owners:Math.round(G.humans),won:!!E.won,end:endingPick(G),pts:voyagePtsOf(G),fuel:0,inst:{},robots:0,seeds:{}};
- var V=G.voyage;V.fuel=Math.max(VOY_FUEL.min,Math.min(VOY_FUEL.start,Math.floor(voyageTotal(V)/VOY_FUEL.step)*VOY_FUEL.step));
+ var V=G.voyage;V.fuel=VOY_FUEL.start;
  E.dues=[];E.slow=[];log(G,'Left Earth. Everything went into the ship.');return true;}
 function voyageDay(G){var E=G.emp;if(!E.voyNote&&voyageOpen(G)){E.voyNote=Math.floor(G.day);log(G,'Your researchers say a ship could leave now. Leave Earth is in World.');}}
 function earthArchived(G){return !!G.voyage;}
@@ -2397,6 +2398,7 @@ function rlM(G,id,per){return Math.max(0.5,1-per*rlFound(G,id));}
 // The old Space chapter is gone (after Pass 169). Old saves in it go back to their won company; the new voyage door opens with enough science.
 function migrateChapters(G){if(!G.academy)G.academy=newAcademy();var A=G.academy,d=newAcademy();Object.keys(d).forEach(function(k){if(A[k]===undefined)A[k]=d[k];});
  if(A.active&&!studyById(A.active.id))A.active=null;Object.keys(A.work||{}).forEach(function(k){if(!studyById(k))delete A.work[k];});
+ if(G.voyage&&!G.voyage.landed&&!(G.voyage.fuel>=VOY_FUEL.min))G.voyage.fuel=VOY_FUEL.min;
  if(G.space){if(G.space.started&&!G.voyage)log(G,'The old space program closed. Leave Earth is in World once your science is enough.');delete G.space;}
  var p=G.progress;if(p&&p.queue)p.queue=p.queue.filter(function(k){return k!=='spaceDream'&&k!=='mira_space';});}
 
@@ -5760,7 +5762,7 @@ function renderVoyage(){var door=$('voyage-door'),vc=$('voyage-card');if(!door||
   if(vc._h!==h){vc._h=h;vc.innerHTML=h;}return;}
  h='<div class="hd"><h2>The ship</h2><small>'+cnt(left)+' of '+cnt(voyageTotal(V))+' points left</small></div>';
  h+='<p class="hint">Left Earth on day '+cnt(V.day)+'. '+cnt(V.owners)+' people had a tank. Change these until the ship leaves.</p>';
- h+='<h3 class="track">Fuel</h3>'+itemHTML('Fuel for '+V.fuel+' flybys','Flying past a star is cheap. Slowing down at one costs as much fuel as speeding up, so stopping means staying. 1 point a flyby.','<span class="voy-step">'+voyStep('fuel',-VOY_FUEL.step,V.fuel>VOY_FUEL.min,'−'+VOY_FUEL.step)+' '+voyStep('fuel',VOY_FUEL.step,V.fuel<VOY_FUEL.max&&left>=VOY_FUEL.step,'+'+VOY_FUEL.step)+'</span>');
+ h+='<h3 class="track">Fuel</h3>'+itemHTML('Fuel for '+V.fuel+' flybys','Flying past a star is cheap. Slowing down at one costs as much fuel as speeding up, so stopping means staying. The first '+VOY_FUEL.free+' come free, more cost 1 point a flyby.','<span class="voy-step">'+voyStep('fuel',-VOY_FUEL.step,V.fuel>VOY_FUEL.min,'−'+VOY_FUEL.step)+' '+voyStep('fuel',VOY_FUEL.step,V.fuel<VOY_FUEL.max&&left>=VOY_FUEL.step,'+'+VOY_FUEL.step)+'</span>');
  h+='<h3 class="track">Instruments</h3>'+VOY_INST.map(function(x){var on=!!V.inst[x.id];return itemHTML(x.name,x.d+' '+x.pts+' points.','<button class="btn sm" data-act="voy-set" data-w="inst" data-id="'+x.id+'"'+(on||left>=x.pts?'':' disabled')+'>'+(on?'Remove':'Add')+'</button>');}).join('');
  h+='<h3 class="track">After landing</h3>'+itemHTML(V.robots+(V.robots===1?' robot':' robots'),'They turn rock into soil, slowly. '+VOY_ROBOT.pts+' points each.','<span class="voy-step">'+voyStep('robots',-1,V.robots>0,'−1')+' '+voyStep('robots',1,V.robots<VOY_ROBOT.max&&left>=VOY_ROBOT.pts,'+1')+'</span>');
  h+=itemHTML('Shrimp and moss','From Tank 1. Always on board.','<button class="btn sm" disabled>Packed</button>');

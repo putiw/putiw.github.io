@@ -773,9 +773,10 @@ var rich=voyagePtsOf(g),half=g.money;g.money=half/2;var poor=voyagePtsOf(g);g.mo
 var m0=g.money;if(!startVoyage(g))throw Error('Start');var V=g.voyage;
 if(!earthArchived(g)||canLeave(g)||voyageOpen(g))throw Error('Earth ends, other doors shut');
 if(!landOpen(g)||!ownTank(g))throw Error('The land and Tank 1 come along');if(m0-g.money>3e5)throw Error('Cash stays: '+(m0-g.money));
-if(V.fuel!==100||voyageSpent(V)!==100||voyageTotal(V)!==V.pts.cash+V.pts.sci+V.pts.kits)throw Error('Starts with 100 flybys');
+if(V.fuel!==300||voyageSpent(V)!==0||voyageTotal(V)!==V.pts.cash+V.pts.sci+V.pts.kits)throw Error('Starts with 300 free flybys');
+if(voyageSet(g,'fuel','',290)||!voyageSet(g,'fuel','',310)||voyageSpent(g.voyage)!==10||!voyageSet(g,'fuel','',300))throw Error('300 is the least, more costs a point each');
 var k0=g.kits.sold,h0=g.humans,d0=g.day;g.progress.queue=[];for(var i=0;i<400;i++){g.progress.queue=[];stepGame(g);}if(g.day-d0<99)throw Error('Days still pass: '+(g.day-d0));if(g.kits.sold!==k0||g.humans!==h0)throw Error('The company stops');
-if(!voyageSet(g,'inst','transit',true)||!g.voyage.inst.transit)throw Error('Instrument');if(voyageSet(g,'fuel','',500)||voyageSet(g,'robots','',-1)||voyageSet(g,'inst','laser',true))throw Error('Out of range refused');
+if(!voyageSet(g,'inst','transit',true)||!g.voyage.inst.transit)throw Error('Instrument');if(voyageSet(g,'fuel','',600)||voyageSet(g,'robots','',-1)||voyageSet(g,'inst','laser',true))throw Error('Out of range refused');
 while(voyageSet(g,'robots','',g.voyage.robots+1));if(voyageLeft(g)<0)throw Error('Never over the points');if(voyageSet(g,'seeds','birds',true)&&voyageLeft(g)<0)throw Error('Seeds over the points');
 if(!voyageSet(g,'robots','',0)||!voyageSet(g,'seeds','soil',true))throw Error('Taking back frees points');
 var s2=JSON.parse(JSON.stringify(g));if(!s2.voyage||s2.voyage.fuel!==g.voyage.fuel)throw Error('Saves');
