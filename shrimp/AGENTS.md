@@ -139,6 +139,15 @@ The sim lives between `// ==SIM-START==` and `// ==SIM-END==`. The tests load on
 - **Food and tank care** (Pass 126, `foodRate`, `careGoods`, `topupShrimp`, `spareFarmShrimp`, `CARE_*`): the Finance line `foodsales`. Only homes with a living tank buy (homes × welfare): food from the first kit (×2 with the factory, pods on top), moss and plants once you have a shop or store, water test refills with the care app. Struggling tanks buy 10-shrimp top-ups twice a year at AED 40, only from farm output the kits don't use. 40% of the goods part is paid back as supplies. Income moves shrimp → kits → care: about 1–3% of kit income early, 10–15% at half of Earth, more than kits once reach is full.
 - **Care plan** (Pass 127, fork `careplan`: `careplanfree` / `careplanpaid`, `planShare`, `planHomes`, `planDay`, `planFee`, `setPlanFee`, `PLAN_*`): opens with the care app at 1M owners, in the Kits tab with the other forks. Free: every living tank, you pay AED 0.10 a tank a month in calls (Distribution and customer support), welfare +5. Paid: the player sets the fee AED 5–60 a month with − and + in Owners' tanks; the share of living tanks that pay is mood × 1.4 (0.2–1) × e^(−fee/15), welfare +5 × that share, fees go to Food and tank care, calls still cost 0.10.
 
+### Leaving Earth (Pass 168, row 4)
+
+- Gate `voyageOpen`: hard part open (or won), `sciScore(G)` >= `VOYAGE_SCI` (500), not left, not ended, old Space not started. `sciScore` = research-line papers + finished academy studies (observe repeats count) + 5 per find or null result. Average bot seeds 7 and 31 cross 500 on days 5,882 and 6,071 (hard part opened 5,291 and 5,147, Earth done 6,805 and 6,665); cold heart only after its win; the strong bot never (no science).
+- Door: `#voyage-door` card at the top of World, "Leave Earth…" opens `#voy-sheet` (what carries over, points, Stay / Leave Earth). Lab shows one line with the score until then (`voyageLabLine`). A log line when it first opens (`voyageDay`, `E.voyNote`).
+- `startVoyage`: buys Grandma's place up to the land if missing, own tank on, `G.voyage` = {day, cash, sci, kits, owners, won, end, pts, fuel, inst, robots, seeds}. Cash stays (the land spends it); points are counted from it. Earth stops like `G.left`: `dayRollover` takes the left branch, `earthArchived` true, giving and Nour stop, `canLeave` and `spaceOpen` false.
+- Points (`voyagePtsOf`, logs): cash 40·log10(1+AED/1M), science score/5, kits 12·log10(1+sold). About 380 for the average bot. Ship (`voyageSet`, never over the points): fuel 20 to 200 flybys at 1 point (starts at 100), instruments `VOY_INST` (transit spectroscopy 40, radial velocity 25, flare watch 15, tidal lock 15), robots 5 each up to 30, seeds `VOY_SEED` (plants and soil 20, hens, fish and bird eggs 30; shrimp and moss always). Row 5 reads these; `V.sealed` is reserved for launch.
+- Tabs after: Space (`#voyage-card` in `p-space`, old `#space-card` hidden) and Grandma's land (`#tab-land` opens the land, not a panel). The land's back button is relabelled "‹ Space" from `landSend` through the iframe's DOM; the land source still says Company; give it a proper voyage flag there.
+- The old Space chapter stays reachable as its own door after the win until rows 5 and 6 replace it; taking either closes the other. Bots don't take the new door, so the pacing table is unchanged.
+
 ### Grandma's land (27 Oct)
 
 - **Steps** (`GPLACE`, `gplaceNext`, `gplaceOffer`, `buyGplace`, `landOpen`, `renderGplace`, card `#me-gplace` in the You tab): A flat with a balcony AED 4k, A house with a garden AED 40k, Land with a stream AED 250k. The first two are paid steps with no map. Land opens the map. The Go button sits on Tank 1 in the Tank tab (`renderLandRow`, card `#landcard`, shown only with Tank 1 selected and no recipe), since the land's tank is Tank 1; the You tab card then just says Tank 1 lives there (Pass 128). Kept in `G.me.gplace`. "A place of your own" (`HOUSE`) was removed in Pass 151; old saves keep `G.me.house` only for `houseLines` in the ending.
@@ -220,7 +229,7 @@ These come from Puti's feedback. Treat them as requirements.
 - There is one public mood (E.op.m), no audiences. Water and Fire were removed at Puti's request, don't bring them back.
 - Late game (from about a million owners, Pass 154): a fixed AED price is no choice. Late costs are days of income (`needDays`, `incRef`), days of ✦ income (`needIDays`), your time (`needAway`), kits a day for a while (`slowKits`), or a share of income for years (`duesAdd`). The fast answer pays now (more want one, cheaper kits) and the bill comes later in the Times or the hard part (`later`, `hardMul`). Some cards are kind against kind (the rivers, the fisher). No backstop, no ending verdict.
 - The player picks a path, nobody pushes it. Choices come as a question with a kind answer and a cold one (PROJ items with fk, question in FORK_Q). Cold answers are cheaper or faster. A hidden heart score (E.heart) adds up kind (+) and cold (−) picks, campaigns and film stories. It is never shown as a number. It slows or speeds the good Shrimp Times stories (heartMult), and the win card shows what the world became and Grandma's verdict. The monopoly/dictator path is allowed and valid.
-- Space opens only after everyone on Earth has a tank, never at year ten. Puti has asked for this twice, don't change it back. (31 Oct: Puti changed this herself for the new space chapter, see Open work. It holds until chat 4 there ships.)
+- Space opens only after everyone on Earth has a tank, never at year ten. Puti has asked for this twice, don't change it back. (31 Oct: Puti changed this herself for the new space chapter. Since Pass 168 Leaving Earth opens during the hard part with enough science; the old Space chapter keeps its after-everyone gate until it is removed.)
 - Don't paint good and evil (不要脸谱化善恶). Every cold answer has a real logistical reason in its text, and every kind answer says what it costs. The ending says what each path cost, it doesn't judge.
 - World is split into University, Media, Politics and Nature, one thing per track at a time.
 - Films: the player picks what each film is really about. Effects are hidden, the Shrimp Times reviews it.
@@ -467,7 +476,7 @@ Planned and agreed with Puti, not built yet:
 | 1 | ~~Recolour existing land items (palette swap)~~ done, Pass 165 | land source (`shrimp-proto`, `shrimp-home-proto/`) | with 3 |
 | 2 | ~~Furniture and tile editor~~ done, Pass 167 | land source | with 3 |
 | 3 | Hard part additions, done (Pass 166) | index.html | with 1 or 2 |
-| 4 | Research unlock and the space start | index.html | after 3 |
+| 4 | Research unlock and the space start, done (Pass 168) | index.html | after 3 |
 | 5 | Space part 1, the planet search | new `shrimp/space.html` | after 4 |
 | 6 | Space part 2, settlement | space.html, reusing the land engine | last |
 
@@ -484,7 +493,7 @@ Planned and agreed with Puti, not built yet:
 - Make the sales drop plain: the half that can buy is saturated, the other half can't. Not a punishment, the market ends. Fully optional: making enough before, finding other income, going slowly, or leaving it are all fine.
 - The point to land, by numbers not words: life isn't equal (half the world can't keep a basic tank), and a fortune this size could change a lot without changing your own life.
 
-*4, the space unlock.* Replaces the current gate (`spaceOpen` after a finished goal, `spaceResearch` 40+ papers or a group).
+*4, the space unlock.* Done in Pass 168, see Leaving Earth under Systems added recently. Was: replaces the current gate (`spaceOpen` after a finished goal, `spaceResearch` 40+ papers or a group).
 - Opens once the hard part is open and the player has sponsored enough science (research lines, papers, the academy). Not cash, not hard part progress. Exact threshold to set with the bots.
 - After that a standing button, any time, also after Earth is finished. Confirm screen: Earth ends, everything you have carries over.
 - After the start only two tabs: Grandma's land and Space.

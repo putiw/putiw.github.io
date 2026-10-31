@@ -1448,3 +1448,15 @@ Row 2 of the three big updates. Land source on `shrimp-proto` (`shrimp-home-prot
 - Checked headless at 390 px in the prototype (make all eight types, place them, sit, rug passable, chair not, undo/redo, reload keeps all, Colours on a floor, Remove a floor tile, delete blocked then allowed) and in the game's overlay (make a table, place it, AED 50 taken from the company). No page errors. Fast suites pass (109, 11, 46).
 - Not done: fences, Grandma sitting on made chairs, a mirror tool.
 
+## Pass 168: Leaving Earth (31 Oct)
+
+Row 4 of the three big updates. Built on Pass 166.
+- Opens during the hard part (or after the win) once the player paid for 500 science: papers from funded people, finished studies, 5 per find or null result. Not cash, not hard part progress. The Lab shows the count until then.
+- Leave Earth card at the top of World, a confirm sheet: Earth ends, what carries over as points (cash, science, kits sold; logs, so giving half away costs about 12 points), then two tabs.
+- After: Space and Grandma's land only. Earth stops like selling the company. The land comes along (bought if missing), cash stays for it. The land's back button reads Space.
+- Space tab: the ship. Fuel in flybys (starts at 100), four instruments, robots, seeds. Change freely, never over the points.
+- Old Space stays as a separate door after the win until rows 5 and 6; taking one shuts the other. Bots don't change.
+
+Tests: balance 111 (new Pass 168 check: gate, score, old Space shuts it, start, Earth stops while days pass, points, ranges, save), academy 11, me 46. Average bot seeds 7, 31 and cold probed for the threshold (numbers in AGENTS.md). Browser at 360 and 390 px over http from the year 17 snapshot: door, sheet, leave, ship edits, land tab and back; tabs Space and land only, no sideways scroll, no page errors.
+Not done: launch (row 5, `V.sealed`), the company goal bar still shows in the header after leaving, "The ship leaves in the next update" placeholder line, land source has no proper voyage flag.
+

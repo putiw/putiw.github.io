@@ -389,7 +389,7 @@ main details:not(.card):not(.dream-tracker):not(#next-card)[open]>summary::befor
 :root{--c1:#2a78d6;--c2:#eb6834;--c3:#1baf7a;--c4:#c98500;--c5:#d55181;--c6:#6250d6;--c7:#1a93b0;--c8:#8a6440;--c9:#6f8f1f;--mid:#8f887a}
 .me-lane{font-size:13px;margin:10px 0 6px;color:var(--ink-2)}.me-lane small{font-weight:400;color:var(--ink-3)}#me-picks>.me-lane:first-child{margin-top:0}.me-picks{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px}.me-picks .btn{justify-content:flex-start;text-align:left;min-height:38px;padding:6px 10px;font-size:13px;white-space:normal}.me-picks .btn[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
 #me-hint{margin:8px 0 0}.me-mom p{margin:0 0 10px;font-size:13.5px;line-height:1.45}.me-mbtn{display:grid;gap:6px}
-#land-ov{position:fixed;inset:0;z-index:9000;background:#efe9dc}body.left-on .tabs,body.left-on #speed{display:none!important}body.left-on #settings,body.left-on #review-box{z-index:9500}#review-box .sheet-in{max-height:88vh;max-height:88dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}#land-ov iframe{border:0;width:100%;height:100%;display:block}body.land-on{overflow:hidden}.me-mbtn .btn{white-space:normal;text-align:left;justify-content:flex-start}
+#land-ov{position:fixed;inset:0;z-index:9000;background:#efe9dc}.voy-pts{margin:4px 0 8px;padding-left:18px}.voy-pts li{margin:3px 0}.voy-step{display:flex;gap:6px;white-space:nowrap}.voy-go{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}body.left-on .tabs,body.left-on #speed{display:none!important}body.left-on #settings,body.left-on #review-box{z-index:9500}#review-box .sheet-in{max-height:88vh;max-height:88dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}#land-ov iframe{border:0;width:100%;height:100%;display:block}body.land-on{overflow:hidden}.me-mbtn .btn{white-space:normal;text-align:left;justify-content:flex-start}
 .me-letters{margin-top:14px}.me-letters>summary{font:600 13.5px var(--font-body);cursor:pointer}.me-letters details{margin:0;border-top:1px solid var(--line);padding:8px 0}.me-letters details>summary{font-size:13px;color:var(--ink-2);cursor:pointer}.me-letters details p{margin:6px 0 0}.me-letters p{font-size:13.5px;line-height:1.5}.me-hist{margin:10px 0 0;padding:0;list-style:none;font-size:13px;line-height:1.45;color:var(--ink-2)}.me-hist li{padding:7px 0 7px 10px;border-left:2px solid var(--line)}.me-hist:empty{display:none}
 .gt-top{margin-bottom:10px}#me-moment .me-mom+.me-mom{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}.gt-last{margin:0 0 10px;font-size:13.5px;line-height:1.45}.me-hist li.gt-miss{color:var(--ink-3)}.gt-years{margin-top:10px}.gt-years summary{font-size:13px;color:var(--ink-2);cursor:pointer}.me-act .ma-n .btn.pick{width:auto;min-width:76px;padding:0 12px;font-size:14px}.me-act .btn.pick.on{background:var(--accent);border-color:transparent;color:var(--accent-ink)}.me-hist li+li{margin-top:2px}
 .apop-foot{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);display:flex;justify-content:flex-end}
@@ -638,7 +638,7 @@ h1,h2,h3,h4,summary,button,.btn,label,th,.scope-label{text-wrap:balance}p,li,sma
     <div id="e-regions"></div></div>
   <div class="card coll" data-k="sellco" id="sellco" style="order:99" hidden><div class="hd"><h2>Fishfood Holdings</h2><small id="sellco-sum"></small></div><p class="sub">They still want to buy the company. Their card is on your desk.</p><div class="btns"><button class="btn" data-act="sell-co" id="sellco-btn">Sell, the game ends here</button></div></div>
 </section>
-<section class="panel" id="p-world" hidden><div class="card coll" data-k="hard" id="hard-card" style="order:-5" hidden><div class="hd"><h2>The hard part</h2><small id="hard-sum"></small></div><div id="hard-body"></div></div><div class="card coll" data-k="coin" id="coin-card" style="order:-4" hidden><div class="hd"><h2 id="coin-h">Shrimpcoin</h2><small id="coin-sum"></small></div><div id="coin-body"></div><div id="coin-island"></div></div><div id="treecard" style="display:contents" hidden></div><div class="card coll" data-k="ripple" id="ripplecard" hidden><div class="hd"><h2>The Shrimp Times</h2><small id="rp-sum"></small></div><p class="rp-head" id="rp-latest"></p><p class="hint" id="rp-fx" hidden></p><details><summary id="rp-archsum">Earlier stories</summary><ol class="rp-arch" id="rp-archive"></ol></details><div id="rp-sci" hidden><h3 class="track">Science</h3><p class="rp-head" id="rp-scilatest"></p><details><summary id="rp-sciarch">Earlier</summary><ol class="rp-arch" id="rp-sciarchive"></ol></details></div></div></section><section class="panel" id="p-space" hidden><div class="card coll" data-k="space" id="space-card"></div></section><section class="panel" id="p-research" hidden><div class="card coll" data-k="academy" id="academy-card" style="order:5"><div class="hd"><h2>Research</h2><small id="academy-sum"></small></div><div id="academy-body"></div></div><div class="card coll" data-k="rlines" id="rl-card" style="order:5" hidden><div class="hd"><h2>Research lines</h2><small id="rl-sum"></small></div><div id="rl-body"></div></div></section><section class="panel" id="p-me" hidden><div class="card" id="me-gplace" hidden></div><div class="card coll" data-k="megp" id="me-gp"><div class="hd"><h2>Grandma</h2><small id="me-gsum"></small></div><div id="me-moment"></div><div id="me-hist"></div><details class="me-letters" id="me-letters" hidden><summary>Her letters</summary><div id="me-ltext"></div></details></div><div class="card coll" data-k="mefree" id="me-free"><div class="hd"><h2>Your day</h2><small id="me-when"></small></div><p class="me-note" id="me-note"></p><div id="me-picks"></div><p class="hint" id="me-hint"></p></div><div class="card coll" data-k="melog" id="me-log"><div class="hd"><h2>What happened</h2><small id="me-logsum"></small></div><ul class="me-hist" id="me-logl"></ul></div></section>
+<section class="panel" id="p-world" hidden><div class="card" id="voyage-door" style="order:-6" hidden></div><div class="card coll" data-k="hard" id="hard-card" style="order:-5" hidden><div class="hd"><h2>The hard part</h2><small id="hard-sum"></small></div><div id="hard-body"></div></div><div class="card coll" data-k="coin" id="coin-card" style="order:-4" hidden><div class="hd"><h2 id="coin-h">Shrimpcoin</h2><small id="coin-sum"></small></div><div id="coin-body"></div><div id="coin-island"></div></div><div id="treecard" style="display:contents" hidden></div><div class="card coll" data-k="ripple" id="ripplecard" hidden><div class="hd"><h2>The Shrimp Times</h2><small id="rp-sum"></small></div><p class="rp-head" id="rp-latest"></p><p class="hint" id="rp-fx" hidden></p><details><summary id="rp-archsum">Earlier stories</summary><ol class="rp-arch" id="rp-archive"></ol></details><div id="rp-sci" hidden><h3 class="track">Science</h3><p class="rp-head" id="rp-scilatest"></p><details><summary id="rp-sciarch">Earlier</summary><ol class="rp-arch" id="rp-sciarchive"></ol></details></div></div></section><section class="panel" id="p-space" hidden><div class="card" id="voyage-card" hidden></div><div class="card coll" data-k="space" id="space-card"></div></section><section class="panel" id="p-research" hidden><div class="card coll" data-k="academy" id="academy-card" style="order:5"><div class="hd"><h2>Research</h2><small id="academy-sum"></small></div><div id="academy-body"></div></div><div class="card coll" data-k="rlines" id="rl-card" style="order:5" hidden><div class="hd"><h2>Research lines</h2><small id="rl-sum"></small></div><div id="rl-body"></div></div></section><section class="panel" id="p-me" hidden><div class="card" id="me-gplace" hidden></div><div class="card coll" data-k="megp" id="me-gp"><div class="hd"><h2>Grandma</h2><small id="me-gsum"></small></div><div id="me-moment"></div><div id="me-hist"></div><details class="me-letters" id="me-letters" hidden><summary>Her letters</summary><div id="me-ltext"></div></details></div><div class="card coll" data-k="mefree" id="me-free"><div class="hd"><h2>Your day</h2><small id="me-when"></small></div><p class="me-note" id="me-note"></p><div id="me-picks"></div><p class="hint" id="me-hint"></p></div><div class="card coll" data-k="melog" id="me-log"><div class="hd"><h2>What happened</h2><small id="me-logsum"></small></div><ul class="me-hist" id="me-logl"></ul></div></section>
 <div id="land-ov" hidden><iframe id="land-if" title="Grandma’s land" allow="autoplay"></iframe></div>
 <section class="panel" id="p-up" hidden>
   <div class="card" id="equipcard"><div class="hd"><h2>Equipment</h2><small id="u-for"></small></div><div id="upgrades"></div></div>
@@ -678,7 +678,7 @@ h1,h2,h3,h4,summary,button,.btn,label,th,.scope-label{text-wrap:balance}p,li,sma
   <button role="tab" data-tab="market" id="tab-market" aria-selected="false" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 7h11l-3-3M16 13H5l3 3"/></svg><span class="tl">Trade</span></button>
   <button role="tab" data-tab="promote" id="tab-promote" aria-selected="false" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 8.5v3h3l6.5 4v-11l-6.5 4z"/><path d="M15.5 8.2a3 3 0 0 1 0 3.6"/></svg><span class="tl"><span class="tl-l">Ads</span><span class="tl-s">Ads</span></span></button>
   <button role="tab" data-tab="emp" id="tab-emp" aria-selected="false" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6.8 10 4l7 2.8v6.6L10 16l-7-2.6z"/><path d="M3 6.8 10 9.6l7-2.8M10 9.6V16"/></svg><span class="tl">Kits</span><span class="dot" id="empdot" hidden></span></button>
-<button role="tab" data-tab="world" id="tab-world" aria-selected="false" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M3 10h14M10 3c2.4 2.6 2.4 11.4 0 14M10 3c-2.4 2.6-2.4 11.4 0 14"/></svg><span class="tl">World</span></button><button role="tab" data-tab="research" id="tab-research" aria-selected="false" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3h4M8.8 3v5L4.5 15a1.3 1.3 0 0 0 1.1 2h8.8a1.3 1.3 0 0 0 1.1-2L11.2 8V3"/><path d="M6.3 12h7.4"/></svg><span class="tl"><span class="tl-l">Lab</span><span class="tl-s">Lab</span></span></button><button role="tab" data-tab="space" id="tab-space" aria-selected="false" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="4.3"/><path d="M3.2 13.6c-1-1.8 3.3-4.6 7.3-6s7.6-1.4 6.3.8"/></svg><span class="tl">Space</span></button></div></nav>
+<button role="tab" data-tab="world" id="tab-world" aria-selected="false" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M3 10h14M10 3c2.4 2.6 2.4 11.4 0 14M10 3c-2.4 2.6-2.4 11.4 0 14"/></svg><span class="tl">World</span></button><button role="tab" data-tab="research" id="tab-research" aria-selected="false" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3h4M8.8 3v5L4.5 15a1.3 1.3 0 0 0 1.1 2h8.8a1.3 1.3 0 0 0 1.1-2L11.2 8V3"/><path d="M6.3 12h7.4"/></svg><span class="tl"><span class="tl-l">Lab</span><span class="tl-s">Lab</span></span></button><button role="tab" data-tab="space" id="tab-space" aria-selected="false" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="4.3"/><path d="M3.2 13.6c-1-1.8 3.3-4.6 7.3-6s7.6-1.4 6.3.8"/></svg><span class="tl">Space</span></button><button role="tab" data-tab="land" id="tab-land" aria-selected="false" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 15c3-2 5-2 8 0s5 2 8 0"/><path d="M5 12V8l3-3 3 3v4"/></svg><span class="tl">Grandma’s land</span></button></div></nav>
 
 <script>
 // ==SIM-START==
@@ -1633,7 +1633,7 @@ function stepGame(G,k){
 // Once Grandma's land is bought (Pass 163, was: once the farm took the other tanks), Tank 1 lives on its own days (G.tday, G.tstep).
 // It moves at 1x whatever speed the company runs at, and in real time on the land. Before the land it is just G.day.
 // Pass 163 (Puti, 31 Oct): Tank 1 gets its own clock once Grandma's land is bought. Before that it moves with the company.
-function tankClock(G){return !!(G&&(landOpen(G)||G.left));}
+function tankClock(G){return !!(G&&(landOpen(G)||G.left||G.voyage));}
 function td(G,T){return T&&G.tday!=null&&T===G.tanks[0]&&tankClock(G)?G.tday:G.day;}
 function ownStep(G){var T=G.tanks[0];if(!T)return;stepTank(G,T);G.tstep=(G.tstep||0)+1;if(G.tstep>=4){G.tstep=0;G.tday++;tankRoll(G,T,0);careDay(G);endStatsTank(G);}}
 
@@ -1781,8 +1781,8 @@ consolidate(T);illDay(G,T,i);glassGrow(G,T);if(T.treats)for(var tk in T.treats)i
 }
 function dayRollover(G){
   if(G.emp&&!G.emp.kitsOpened&&kitsOpen(G))G.emp.kitsOpened=1;
-  if(G.left){endStatsDay(G);personalDay(G);G.fin=G.fin||[];var tl=G.today||{};tl.d=G.day-1;tl.cash=Math.round(G.money);G.fin.push(tl);if(G.fin.length>500)G.fin.shift();G.today={};return;}
-  academyDay(G);rlDay(G);endStatsDay(G);duesDay(G);hardDay(G);coinDay(G);spaceDay(G);checkGoals(G);orderDay(G);kitOrderDay(G);personalDay(G);roundTwoDay(G);quietDay(G);prepDay(G);
+  if(G.left||G.voyage){endStatsDay(G);personalDay(G);G.fin=G.fin||[];var tl=G.today||{};tl.d=G.day-1;tl.cash=Math.round(G.money);G.fin.push(tl);if(G.fin.length>500)G.fin.shift();G.today={};return;}
+  academyDay(G);rlDay(G);voyageDay(G);endStatsDay(G);duesDay(G);hardDay(G);coinDay(G);spaceDay(G);checkGoals(G);orderDay(G);kitOrderDay(G);personalDay(G);roundTwoDay(G);quietDay(G);prepDay(G);
   if(G.ps&&G.day>30){var sp=dailySpend(G);if(sp>0){if(G.money<10*sp)G.ps.thin++;else if(G.money>120*sp)G.ps.fat++;}}
   if(G.recipe)syncRecipe(G);
   G.fin=G.fin||[];var td=G.today||{};td.d=G.day-1;td.cash=Math.round(G.money);G.fin.push(td);if(G.fin.length>500)G.fin.shift();G.today={};chartDay(G,td);
@@ -2070,7 +2070,7 @@ var MILESTONES={
 };
 function milestoneConditions(G){var t=G.tanks[0],p=ppm(t);return Object.assign({
   cycle:t.cycledAt!=null&&p.nh<0.05&&p.no2<0.05&&p.no3<=20&&t.chem.kh>=2,
-  hatch:G.stats.born>=3,sale:G.stats.sold>0,landtime:landOpen(G)&&!G.left,jar:!!G.stats.bornDay&&G.day>=G.stats.bornDay+30&&!(G.kits.sold>0)&&jarSpare(G)>=JAR_N,kits:kitsOpen(G),kit:G.kits.sold>0,
+  hatch:G.stats.born>=3,sale:G.stats.sold>0,landtime:landOpen(G)&&!G.left&&!G.voyage,jar:!!G.stats.bornDay&&G.day>=G.stats.bornDay+30&&!(G.kits.sold>0)&&jarSpare(G)>=JAR_N,kits:kitsOpen(G),kit:G.kits.sold>0,
   farm:Object.keys(G.emp.farms).some(function(k){return G.emp.farms[k]>0;}),
   ministry:pd(G,'ministry'),million:G.humans>=1e6,tenyears:G.day>=DREAM_DAYS&&!G.emp.won,win:!!G.emp.won,
   tanks2:false,health:G.tanks.some(function(x){return !!x.ill;}),tools:(G.emp.handPacked||0)>=3&&!stationDone(G),qc:G.kits.sold>=QC_FROM,station:stationDone(G)&&(G.emp.handPacked||0)>0,
@@ -2138,7 +2138,7 @@ if(p.nextStory!=null&&p.nextStory-now>300000)p.nextStory=now;
   if(p.queue.indexOf('win')>=0&&!p.seen.lastchap&&lastChapter(G)){p.seen.lastchap=true;p.queue.splice(p.queue.indexOf('win'),0,'lastchap');}
   newsTick(G);
 }
-function progressionBlocked(G){var p=ensureProgress(G);return p.queue.length>0||(!!G.emp.ended&&!G.left)||!!G.emp.won&&!p.sandbox&&!(G.space&&G.space.started);}
+function progressionBlocked(G){var p=ensureProgress(G);return p.queue.length>0||(!!G.emp.ended&&!G.left)||!!G.emp.won&&!p.sandbox&&!(G.space&&G.space.started)&&!G.voyage;}
 function acknowledgeMilestone(G){var p=ensureProgress(G),key=p.queue.shift();if(!key)return null;p.lastAck=storyClock(G);if(key==='ev_mira')G.emp.infOn=1;return key;}
 function activeFarms(G,id){return Math.max(0,(G.emp.farms[id]||0)-((G.emp.pausedFarms||{})[id]||0));}
 function farmOverhead(G){var c=0;FARMS.forEach(function(f){c+=activeFarms(G,f.id)*f.up;});return c*(rippleHas(G,'upkeep')?0.95:1)*(pd(G,'lawbribe')?0.85:1)*(pd(G,'solar')?0.9:1)*(pd(G,'wastedump')?0.78:1)*rlM(G,'energy',0.05);}
@@ -2259,8 +2259,40 @@ var ACADEMY_AT=3000;function academyOpen(G){return G.kits.sold>=ACADEMY_AT||!!G.
 // Space opens once everyone on Earth has a tank, not at the ten-year mark.
 // Space is the curious player's chapter: the question type, or anyone who put real years into research.
 function spaceResearch(G){var A=G.academy;return !!(A&&((A.papers||0)>=40||(A.level||0)>=3));}
-function spaceOpen(G){return !!(G.emp&&G.emp.won)&&(treeHas(G,'space')||treesFor(G).indexOf('space')>=0||spaceResearch(G));}
-function earthArchived(G){return !!(G.emp.won&&G.space&&G.space.started);}
+function spaceOpen(G){return !G.voyage&&!!(G.emp&&G.emp.won)&&(treeHas(G,'space')||treesFor(G).indexOf('space')>=0||spaceResearch(G));}
+// ----- Leaving Earth (row 4 of the three big updates, Pass 168) -----
+// The new space start. Opens during the hard part (or after the win) once the player has paid for enough science:
+// papers from the people they fund, finished academy studies, and finds or null results (5 each). Not cash, not hard part progress.
+// The old Space chapter (spaceOpen) stays as its own door until rows 5 and 6 replace it; taking one closes the other.
+var VOYAGE_SCI=500;
+function sciScore(G){var A=G.academy;if(!A)return 0;var f=0,d=0,k;if(A.rl)for(k in A.rl)f+=(A.rl[k].found||0)+(A.rl[k].dud||0);for(k in (A.done||{}))d+=A.done[k]||0;return Math.floor((A.papers||0)+d+5*f);}
+function voyageOpen(G){var E=G.emp;return !!(!G.voyage&&!G.left&&!E.ended&&!(G.space&&G.space.started)&&(hardOpen(G)||E.won)&&sciScore(G)>=VOYAGE_SCI);}
+// What carries over, as points. Logs, so a fortune ten times bigger is a few more points, and giving half away costs little.
+function voyagePtsOf(G){var c=Math.max(0,G.money);return {cash:Math.round(40*Math.log10(1+c/1e6)),sci:Math.round(sciScore(G)/5),kits:Math.round(12*Math.log10(1+(G.kits.sold||0)))};}
+function voyageTotal(V){var p=V.pts;return p.cash+p.sci+p.kits;}
+var VOY_FUEL={min:20,max:200,step:10,start:100};
+var VOY_INST=[{id:'transit',name:'Transit spectroscopy',d:'Reads a planet’s air as it passes its star.',pts:40},{id:'rv',name:'Radial velocity',d:'Weighs a planet by how it pulls its star. Rocky or not.',pts:25},{id:'flare',name:'Flare watch',d:'Watches a star for flares that strip air off its planets.',pts:15},{id:'tide',name:'Tidal lock check',d:'Tells if one side always faces the star.',pts:15}];
+var VOY_ROBOT={pts:5,max:30};
+var VOY_SEED=[{id:'soil',name:'Plants and soil life',d:'Grass, moss, worms, the things that make dirt into soil.',pts:20},{id:'birds',name:'Hens, fish and bird eggs',d:'From the land. Frozen.',pts:30}];
+function voyageSpent(V){var t=V.fuel;VOY_INST.forEach(function(x){if(V.inst[x.id])t+=x.pts;});t+=V.robots*VOY_ROBOT.pts;VOY_SEED.forEach(function(x){if(V.seeds[x.id])t+=x.pts;});return t;}
+function voyageLeft(G){var V=G.voyage;return V?voyageTotal(V)-voyageSpent(V):0;}
+// One change to the ship. Refused if it goes over the points or out of range.
+function voyageSet(G,what,id,val){var V=G.voyage;if(!V||V.sealed)return false;var o=JSON.parse(JSON.stringify(V));
+ if(what==='fuel'){val=Math.round(val);if(val<VOY_FUEL.min||val>VOY_FUEL.max)return false;o.fuel=val;}
+ else if(what==='inst'){if(!VOY_INST.some(function(x){return x.id===id;}))return false;o.inst[id]=!!val;}
+ else if(what==='robots'){val=Math.round(val);if(val<0||val>VOY_ROBOT.max)return false;o.robots=val;}
+ else if(what==='seeds'){if(!VOY_SEED.some(function(x){return x.id===id;}))return false;o.seeds[id]=!!val;}
+ else return false;
+ if(voyageSpent(o)>voyageTotal(o)&&voyageSpent(o)>voyageSpent(V))return false;
+ V.fuel=o.fuel;V.inst=o.inst;V.robots=o.robots;V.seeds=o.seeds;return true;}
+// Earth ends here. Cash stays the player's (the land runs on it); the points are counted from it, not taken from it.
+function startVoyage(G){if(!voyageOpen(G))return false;var E=G.emp;
+ if(!G.me)G.me=newMe();if(!landOpen(G)){var gm=G.me;gm.gplace=gm.gplace||{};GPLACE.forEach(function(x){if(!gm.gplace[x.id]){pay(G,x.m,'personal');gm.gplace[x.id]=Math.floor(G.day)+1;}});}if(!ownTank(G))ownTankNow(G);
+ G.voyage={day:Math.floor(G.day),cash:Math.round(G.money),sci:sciScore(G),kits:Math.round(G.kits.sold||0),owners:Math.round(G.humans),won:!!E.won,end:endingPick(G),pts:voyagePtsOf(G),fuel:0,inst:{},robots:0,seeds:{}};
+ var V=G.voyage;V.fuel=Math.max(VOY_FUEL.min,Math.min(VOY_FUEL.start,Math.floor(voyageTotal(V)/VOY_FUEL.step)*VOY_FUEL.step));
+ E.dues=[];E.slow=[];log(G,'Left Earth. Everything went into the ship.');return true;}
+function voyageDay(G){var E=G.emp;if(!E.voyNote&&voyageOpen(G)){E.voyNote=Math.floor(G.day);log(G,'Your researchers say a ship could leave now. Leave Earth is in World.');}}
+function earthArchived(G){return !!((G.emp.won&&G.space&&G.space.started)||G.voyage);}
 // People funded in the six fields (a PI lab counts as three).
 // The Lab header: what the rows show, position by position (a PI lab is 3 people in rlStaff).
 function rlSum(G){var A=G.academy;if(!A||!A.rl)return '';return RPOS.map(function(p){var n=0;for(var k in A.rl)n+=A.rl[k][p.id]||0;return n?n+' '+(n===1?p.few:p.many):'';}).filter(Boolean).join(', ');}
@@ -2895,7 +2927,7 @@ function takeFarm(G){for(var i=FARMS.length-1;i>=0;i--){var f=FARMS[i];if((G.emp
 // then only the Tank and You pages stay, the land keeps its own years, the world stays where you left it.
 // On the land: Tank 1 still lives (feeding, water, illness, glass), nothing else at the company moves.
 function leftDay(G){var T=G.tanks[0];if(!T)return;consolidate(T);illDay(G,T,0);glassGrow(G,T);if(T.treats)for(var tk in T.treats)if(T.treats[tk]>0)T.treats[tk]--;if(T.happy)for(var hk in T.happy)if(T.happy[hk]>0)T.happy[hk]--;var P=ppm(T),N=totalN(T);T.hist.push({d:G.day,nh:+P.nh.toFixed(3),no2:+P.no2.toFixed(3),no3:+P.no3.toFixed(2),n:Math.round(N),t:+T.chem.temp.toFixed(1)});if(T.hist.length>200)T.hist.shift();pay(G,dailyCost(G,T),'running');if(T.feeder)feed(G,T,T.set.autoRation/100,true);if(T.autoWC&&G.day%T.set.autoWCDays===0&&wcWeek(G,T)+T.set.autoWCPct<=WC_AUTO_MAX)waterChange(G,T,T.set.autoWCPct,true);}
-function canLeave(G){var E=G.emp;return !!(!E.ended&&!G.left&&(hardOpen(G)||E.won||(G.space&&G.space.started))&&!frozen(G));}
+function canLeave(G){var E=G.emp;return !!(!E.ended&&!G.left&&!G.voyage&&(hardOpen(G)||E.won||(G.space&&G.space.started))&&!frozen(G));}
 function leaveCompany(G){if(!canLeave(G))return false;var E=G.emp,sale=E.offerOpen?buyoutPrice(G):Math.max(2e7,Math.round(incRef(G)*730/1e5)*1e5);
  var unfixed=hardOpen(G)&&!E.won?HARD.filter(function(g){return hardReach(G,g)<0.999&&g.id!=='never';}).length:0;
  G.left={day:Math.floor(G.day),sale:sale,inc:incRef(G),owners:Math.round(G.humans),end:endingPick(G)};G.money=sale;E.dues=[];E.slow=[];
@@ -3367,7 +3399,7 @@ var LEDGER={
 // What you give is a share of the company's daily profit, never below the cash it needs to run. It goes out in batches of about three months.
 // Each batch lands a year or two later, and not all of it arrives. A third each to water, power and health. You fund, you don't fix.
 var GIVE_LOSS=['A pipe contract stalls when the builder goes bust. The pipes sit in a yard.','Pumps break in the first dry season. Nobody nearby has the part.','A grant waits at a border for eight months.','An official takes a cut. The audit finds it a year later.','Solar kits arrive without the cables.'];
-function giveDay(G,H,now){var E=G.emp;if(E.won||E.ended||G.left)return;var q=H.gq||(H.gq=[]);
+function giveDay(G,H,now){var E=G.emp;if(E.won||E.ended||G.left||G.voyage)return;var q=H.gq||(H.gq=[]);
  for(var i=q.length-1;i>=0;i--)if(now>=q[i].due)giveLand(G,H,q.splice(i,1)[0]);
  if(H.give>0&&!frozen(G)){var a=Math.min(Math.max(0,operatingNet(G)||0)*H.give,Math.max(0,G.money-capitalReserve(G)));if(a>=1){pay(G,a,'projects');H.gv=(H.gv||0)+a;H.bt=(H.bt||0)+a;}}
  if(H.bs==null)H.bs=now;
@@ -3385,7 +3417,7 @@ function giveLines(G){var H=G.emp.hard;if(!H||!(H.gv>=1))return [];var w=(H.gq||
 // ----- Nour, Mira's cousin (Pass 166): one household trying to keep a jar, back in the country Mira's family left. -----
 // Six cards over the hard part. What you fund helps her at her scale, or it doesn't.
 function nourOf(G){return G.emp.nour||(G.emp.nour={n:14});}
-function nourDue(G,d){var E=G.emp,H=E.hard;return !!(H&&H.open&&!E.won&&!E.ended&&!G.left&&G.story&&G.story.miraDay!=null&&!(H.picks.never&&H.picks.never.deliver)&&Math.floor(G.day)-(H.day||0)>=d);}
+function nourDue(G,d){var E=G.emp,H=E.hard;return !!(H&&H.open&&!E.won&&!E.ended&&!G.left&&!G.voyage&&G.story&&G.story.miraDay!=null&&!(H.picks.never&&H.picks.never.deliver)&&Math.floor(G.day)-(H.day||0)>=d);}
 function nourStarted(G,g,o){var p=(hardOf(G).picks[g]||{})[o];return !!(p&&p.start!=null);}
 MILESTONES.nour1={story:1,title:'Mira’s cousin',tab:'world',body:'Mira holds her phone up to your tank. On the screen is her cousin Nour, twelve, back in the country Mira’s family left. Nour has a jar with fourteen red shrimp in it, from a pet shop that buys your kits second hand.\n\nThe power there is on about six hours a day. When it goes off, so does the air pump. Nour wants to know what to do at night.',
  opts:function(G){return [['Send her a battery air pump','It takes seven weeks and a customs fee her dad pays. Batteries cost money there too.','pump'],['Tell her to fill the jar with plants and feed less','Nour fills the jar with moss from a ditch and feeds every other day. She sends a photo every morning.','plants'],['Tell her shrimp can take a night without a pump','Mostly true. She stops asking.','fine']];},
@@ -5741,6 +5773,33 @@ function coldText(G){var c=REGIONS.filter(function(r){return regOpen(G,r.id)&&r.
 // Go and live on the land (Pass 161): one row, on the You tab under Grandma's place and in the hard part, from the hard part on
 var LEAVE_SURE=0;
 function leaveSale(G){return G.emp.offerOpen?buyoutPrice(G):Math.max(2e7,Math.round(incRef(G)*730/1e5)*1e5);}
+// ----- Leaving Earth, the screens (Pass 168) -----
+function voyagePtsRows(p){return [['Cash, '+aed(Math.max(0,G.money))+'. It stays yours on the land.',p.cash],['Science you paid for, '+cnt(sciScore(G))+'.',p.sci],[cnt(Math.round(G.kits.sold||0))+' kits sold. The lines and farms, taken apart.',p.kits]];}
+function voyageLabLine(){if(G.voyage||(G.space&&G.space.started)||!(hardOpen(G)||G.emp.won))return '';var sc=sciScore(G);
+ return '<p class="hint">'+(sc>=VOYAGE_SCI?'Enough science for a ship. Leave Earth is in World.':'A ship needs '+VOYAGE_SCI+' science. You have '+cnt(sc)+'. A paper or a finished study counts 1, a find or a null result 5.')+'</p>';}
+function voyageSheet(on){var sh=$('voy-sheet');if(!on){if(sh)sh.hidden=true;return;}
+ if(!sh){sh=document.createElement('div');sh.id='voy-sheet';sh.className='sheet';sh.setAttribute('role','dialog');sh.setAttribute('aria-modal','true');document.body.appendChild(sh);}
+ var p=voyagePtsOf(G),t=p.cash+p.sci+p.kits,rows=voyagePtsRows(p).map(function(r){return '<li>'+r[0]+' <b>'+cnt(r[1])+' points</b></li>';}).join('');
+ sh.innerHTML='<div class="sheet-in"><div class="sheet-hd"><h2>Leave Earth</h2><button type="button" class="rst" data-act="voy-close">Close</button></div>'
+  +'<p>Earth ends here. The company stops. The hard part stays where it is today'+(G.emp.won?'':', with the groups you haven’t reached')+'. There’s no coming back to it.</p>'
+  +'<p>Everything you have goes into a ship:</p><ul class="voy-pts">'+rows+'</ul><p><b>'+cnt(t)+' points</b> for fuel, instruments, robots and seeds.</p>'
+  +'<p>After this there are two tabs: Grandma’s land and Space.</p>'
+  +'<div class="voy-go"><button class="btn" data-act="voy-close">Stay</button><button class="btn primary" data-act="voy-go">Leave Earth</button></div></div>';
+ sh.hidden=false;}
+function voyStep(w,d,ok,label){return '<button class="btn sm" data-act="voy-set" data-w="'+w+'" data-d="'+d+'"'+(ok?'':' disabled')+'>'+label+'</button>';}
+function renderVoyage(){var door=$('voyage-door'),vc=$('voyage-card'),sc=$('space-card');if(!door||!vc)return;
+ var open=voyageOpen(G);door.hidden=!open;
+ if(open){var dh='<div class="hd"><h2>Leave Earth</h2></div><p>Your science says a ship could go. Earth ends, everything you have goes into the ship.</p><p><button class="btn" data-act="voy-ask">Leave Earth…</button></p>';if(door._h!==dh){door._h=dh;door.innerHTML=dh;}}
+ vc.hidden=!G.voyage;if(sc)sc.hidden=!!G.voyage;if(!G.voyage)return;
+ var V=G.voyage,left=voyageLeft(G),h='<div class="hd"><h2>The ship</h2><small>'+cnt(left)+' of '+cnt(voyageTotal(V))+' points left</small></div>';
+ h+='<p class="hint">Left Earth on day '+cnt(V.day)+'. '+cnt(V.owners)+' people had a tank. Change these until the ship leaves.</p>';
+ h+='<h3 class="track">Fuel</h3>'+itemHTML('Fuel for '+V.fuel+' flybys','Flying past a star is cheap. Slowing down at one costs as much fuel as speeding up, so stopping means staying. 1 point a flyby.','<span class="voy-step">'+voyStep('fuel',-VOY_FUEL.step,V.fuel>VOY_FUEL.min,'−'+VOY_FUEL.step)+' '+voyStep('fuel',VOY_FUEL.step,V.fuel<VOY_FUEL.max&&left>=VOY_FUEL.step,'+'+VOY_FUEL.step)+'</span>');
+ h+='<h3 class="track">Instruments</h3>'+VOY_INST.map(function(x){var on=!!V.inst[x.id];return itemHTML(x.name,x.d+' '+x.pts+' points.','<button class="btn sm" data-act="voy-set" data-w="inst" data-id="'+x.id+'"'+(on||left>=x.pts?'':' disabled')+'>'+(on?'Remove':'Add')+'</button>');}).join('');
+ h+='<h3 class="track">After landing</h3>'+itemHTML(V.robots+(V.robots===1?' robot':' robots'),'They turn rock into soil, slowly. '+VOY_ROBOT.pts+' points each.','<span class="voy-step">'+voyStep('robots',-1,V.robots>0,'−1')+' '+voyStep('robots',1,V.robots<VOY_ROBOT.max&&left>=VOY_ROBOT.pts,'+1')+'</span>');
+ h+=itemHTML('Shrimp and moss','From Tank 1. Always on board.','<button class="btn sm" disabled>Packed</button>');
+ h+=VOY_SEED.map(function(x){var on=!!V.seeds[x.id];return itemHTML(x.name,x.d+' '+x.pts+' points.','<button class="btn sm" data-act="voy-set" data-w="seeds" data-id="'+x.id+'"'+(on||left>=x.pts?'':' disabled')+'>'+(on?'Remove':'Add')+'</button>');}).join('');
+ h+='<p class="hint">The ship leaves in the next update.</p>';
+ if(vc._h!==h){vc._h=h;vc.innerHTML=h;}}
 function leaveHTML(){if(!canLeave(G))return '';var sure=Date.now()<LEAVE_SURE;return '<div class="leave-box">'+chapterRow('Go and live on the land',sure?'You keep '+aed(leaveSale(G))+', the first tank and the land. The world stays where it is. Your years at the company come first.':'Sell the company. Keep the land and your first tank.','<button class="btn" data-act="leave-ask">'+(sure?'Tap again to sell':'Sell')+'</button>')+'</div>';}
 function chapterRow(title,body,button){return '<div class="item"><div><h3>'+title+'</h3><p>'+body+'</p></div><div>'+button+'</div></div>';}
 
@@ -5768,7 +5827,7 @@ function landPost(m){var f=$('land-if');if(!f||!f.contentWindow)return;m.game=1;
 // a card waiting under the land, and frozen accounts, show on the land too (Pass 151)
 function landNeed(){var c=$('milestone-card');return c&&!c.hidden?'Something needs you at the company.':'';}
 function landFrozen(G){if(!frozen(G))return '';var w=G.emp.frozenWhy,d=Math.ceil(G.emp.frozen-G.day);return (w==='land'?'You’re out looking at land with Grandma':w==='police'?'The police froze your accounts':'The bank froze your accounts')+', '+d+' day'+(d===1?'':'s')+' left. Nothing can be bought here either.';}
-function landSend(){var o0=landOwn(G);o0.seq=LAND.seq||0;landPost({type:'cash',cash:Math.floor(G.money),day:G.day,frozen:landFrozen(G),need:G.left?'':landNeed(),left:G.left?1:0});o0.type='own';landPost(o0);}
+function landSend(){if(G&&G.voyage)try{var vb=$('land-if').contentDocument.getElementById('tb-back');if(vb&&vb.dataset.voy!=='1'){vb.dataset.voy='1';vb.innerHTML='<span aria-hidden="true">‹</span><i> Space</i>';vb.setAttribute('aria-label','Back to Space');}}catch(err){}var o0=landOwn(G);o0.seq=LAND.seq||0;landPost({type:'cash',cash:Math.floor(G.money),day:G.day,frozen:landFrozen(G),need:G.left?'':landNeed(),left:G.left?1:0});o0.type='own';landPost(o0);}
 function landShow(){var ov=$('land-ov'),f=$('land-if');if(!ov)return;if(!f.src)f.src='home.html?v='+BUILD;ov.hidden=false;document.body.classList.add('land-on');LAND.on=true;landSend();clearInterval(LAND.t);LAND.t=setInterval(function(){if(LAND.on)landSend();},1000);}
 function landHide(){if(G&&G.left)return;var ov=$('land-ov');if(ov)ov.hidden=true;document.body.classList.remove('land-on');LAND.on=false;clearInterval(LAND.t);save(true);render();}
 window.addEventListener('message',function(e){var d=e.data,f=$('land-if');if(!d||!d.land||typeof G==='undefined'||!G||!f||e.source!==f.contentWindow)return;
@@ -5786,7 +5845,7 @@ var meBack='tank';
 function meWhen(G){return '';}
 var GT_OPEN=0,GT_LAST='',GT_FINE=['Grandma is fine. She says the shrimp look good.','Grandma is fine. She’s watching a cooking show and says it’s wrong.','Grandma is fine. The neighbour’s cat is in her kitchen again.','Grandma is fine. She wants to know if you’re eating.'];
 function renderMe(){var M=G.me,b=$('tb-me');if(!M)return;b.hidden=!M.on;b.classList.toggle('fresh',!!M.on&&!G.opt.meSeen);b.classList.toggle('ring',!!(M.on&&M.call)&&activeTab!=='me');
- $('tab-tank').hidden=tankGone(G);if(tankGone(G)&&activeTab==='tank')selectTab('emp');
+ $('tab-tank').hidden=tankGone(G)||!!G.voyage;if(tankGone(G)&&!G.voyage&&activeTab==='tank')selectTab('emp');
  if(ownTank(G)){G.sel=0;$('tankchips').hidden=true;$('ovcard').hidden=true;$('charts').hidden=true;}
  renderTrees();
  var dc=$('dyecard');dc.hidden=!(G.dye&&G.dye.on);if(!dc.hidden)setT('dye-sum','since day '+G.dye.day);
@@ -5903,12 +5962,12 @@ function renderCoin(){var c=$('coin-card');if(!c)return;var C=G.emp.coin,on=!!(C
  h+='<div class="item"><div><h3>Sell coins</h3><p>'+(C.treasury>=1?'Your company holds '+cnt(Math.floor(C.treasury))+'. Big sales push the price down.':nextMint?'Nothing to sell yet. Your first coins come in '+nextMint+' days, one for each tree still alive. Or buy some.':'Nothing to sell yet. Plant trees or buy coins first.')+'</p></div><div class="coin-sell">'+[['10%',.1],['Half',.5],['All',1]].map(function(x){return '<button class="btn" data-act="coin-sell" data-f="'+x[1]+'"'+(C.treasury>=1?'':' disabled')+'>'+x[0]+'</button>';}).join('')+'</div></div>';
  if(!C.honest)h+=itemHTML('Count only trees that live','From now on a coin waits a year for its tree. The seedling coins you already made stay out there.',bbtn('coin-honest','','Switch',true));
  $('coin-body').mhtml=h;}
-function renderChapters(){renderRL();renderHard();renderCoin();
+function renderChapters(){renderRL();renderHard();renderCoin();renderVoyage();
  var A=G.academy,S=G.space,open=academyOpen(G),a=$('academy-card');a.hidden=!open;a.style.order='0';if(open&&!rlStaff(G)&&!G.opt.labOpened){G.opt.labOpened=1;a.classList.remove('shut','queued');(G.opt.shut||(G.opt.shut={})).academy=false;}
  if(open){
  if(!A.level&&activeTab!=='world'&&$('business-roadmap'))$('business-roadmap').textContent+=' Research grants open in Lab.';
  }
- $('tab-space').hidden=!spaceOpen(G);
+ $('tab-space').hidden=!spaceOpen(G)&&!G.voyage;
  if(activeTab==='space'){document.body.classList.add('business-context');['business-strip','astrip','vitals','vwater','acts','tankchips','fold'].forEach(function(id){$(id).hidden=true;});}
  if(open){
  var ppl=rlStaff(G),yr=rlYearAll(G),np=A.papers||0,nd=uniqueStudies(G);
@@ -5938,6 +5997,7 @@ function renderChapters(){renderRL();renderHard();renderCoin();
   if(A.professors){h+='<h3 class="track">Courses</h3><p class="hint">Each course costs 60 knowledge and trains 5 graduates a day. Graduates can join space missions.</p>';COURSES.filter(function(c){return rd(G,c.req);}).forEach(function(c){h+=chapterRow(c.name,A.courses[c.id]?'Running.':'Ready to open.',chapterButton('course',A.courses[c.id]?'Running':'Open · 60 knowledge',!A.courses[c.id]&&A.knowledge>=60,c.id));});}
  }
  if(nd)h+='<details><summary>Discoveries ('+nd+')</summary>'+STUDIES.filter(function(r){return rd(G,r.id)&&!r.repeat;}).map(function(r){return '<p><b>'+r.name+'</b> · '+r.why+'</p>';}).join('')+'</details>';
+ h+=voyageLabLine();
  chapterHTML($("academy-body"),h);
  }
  var target=$('space-card'),s='<div class="hd"><h2>Space</h2></div>';
@@ -5959,7 +6019,7 @@ function renderChapters(){renderRL();renderHard();renderCoin();
  }
  chapterHTML(target,s);
  // Keep a compact tab bar: the original laboratory stays accessible in Operations.
- $('tab-tank').hidden=false;
+ $('tab-tank').hidden=!!G.voyage;
  if((G.progress.queue[0]==='tenyears'||G.progress.queue[0]==='win')&&!S.started&&spaceOpen(G)&&!$('chapter-milestone')){var b=document.createElement('button');b.id='chapter-milestone';b.className='btn';b.dataset.chapter='space-dream';b.textContent=spaceOpen(G)?'Hear Grandma’s new dream':'Reunite at ten years';$('milestone-actions').appendChild(b);}
 }
 document.addEventListener('click',function(e){var b=e.target.closest('[data-chapter]');if(!b||b.disabled)return;var a=b.dataset.chapter,id=b.dataset.id,ok=false;
@@ -6079,7 +6139,7 @@ function renderProgression(){
  selectTab(activeTab);renderMilestone();renderDream();var E=G.emp,open=kitsOpen(G),hasFarm=Object.keys(E.farms).some(function(k){return E.farms[k]>0;}),inBiz=open&&['emp','up','promote','world','research'].indexOf(activeTab)>=0,business=inBiz&&(topAway(G)||labMode()),phase=phaseInfo(G);
  var idl=ideas(G),idh=idl.map(function(x){return '<button type="button" class="idea" data-itab="'+x.tab+'" data-idea="'+x.k+'"><span>'+x.t+'</span><small>'+(x.tab==='fin'?'Money':tabWords(TAB_NAME[x.tab]||''))+' ›</small></button>';}).join('');$('ideas-k').hidden=!idl.length;$('ideas').hidden=!idl.length&&$('ideas-now').hidden;$('ideas-list').mhtml=idh;
  document.body.classList.toggle('business-context',business);var intro=G.progress.queue[0]==='intro';document.body.classList.toggle('story-intro',intro);if(intro){['tank','up','market','promote','emp','world','research'].forEach(function(tab){$('p-'+tab).hidden=true;});}
- var lateTrade=labMode()&&!G.opt.all;$('tab-market').hidden=!rv('market')||lateTrade;$('tab-research').hidden=!academyOpen(G);if(lateTrade&&activeTab==='market')selectTab('emp');$('tab-promote').hidden=!rv('sell');$('tab-world').hidden=!paperOpen(G)&&!(G.emp.ripple&&G.emp.ripple.n);if(G.left){['up','market','promote','emp','world','research','space'].forEach(function(k){var t=$('tab-'+k);if(t)t.hidden=true;});if(activeTab!=='tank'&&activeTab!=='me')selectTab('tank');}
+ var lateTrade=labMode()&&!G.opt.all;$('tab-market').hidden=!rv('market')||lateTrade;$('tab-research').hidden=!academyOpen(G);if(lateTrade&&activeTab==='market')selectTab('emp');$('tab-promote').hidden=!rv('sell');$('tab-world').hidden=!paperOpen(G)&&!(G.emp.ripple&&G.emp.ripple.n);if(G.left){['up','market','promote','emp','world','research','space'].forEach(function(k){var t=$('tab-'+k);if(t)t.hidden=true;});if(activeTab!=='tank'&&activeTab!=='me')selectTab('tank');}$('tab-land').hidden=!G.voyage;if(G.voyage){['tank','up','market','promote','emp','world','research'].forEach(function(k){var t=$('tab-'+k);if(t)t.hidden=true;});$('tab-space').hidden=false;if(activeTab!=='space'&&activeTab!=='me')selectTab('space');}
 
  var tabs=document.querySelector('.tabs-in');tabs.insertBefore($('tab-emp'),$('tab-promote'));
  document.querySelector('.biznav').hidden=true;
@@ -6241,6 +6301,7 @@ function initControls(){
   });
   document.querySelector('.tabs').addEventListener('click',function(e){
     var b=e.target.closest('button');if(!b)return;
+    if(b.dataset.tab==='land'){if(landOpen(G))landShow();return;}
     if(TVLOCK&&b.dataset.tab!=='tank')tvLockOff();
     if(G.opt.activeCard){delete G.opt.fresh[G.opt.activeCard.k];G.opt.activeCard=null;}
     activeTab=b.dataset.tab;if(activeTab==='world'&&G.ps)G.ps.news++;if(activeTab==='up'&&!G.opt.visitedUp){G.opt.visitedUp=true;save();}
@@ -6377,6 +6438,10 @@ function initControls(){
     if(a==='region'){var nr0=nextRegion(G);if(buyRegion(G)){toast('Expanded into '+nr0.name);cache.ereg=null;cache.eshop=null;cache.eproj=null;}}
     if(a==='addtank'){if(addTank(G)){var nt2=G.tanks[G.tanks.length-1];cache.upsig=null;lastChips='';if(nt2.seeded)openTankSheet(G.tanks.length-1);else toast('New tank ready. It needs cycling.');}}
     if(a==='ad'){if(addAd(G,b.dataset.id))toast('Campaign started');cache.adsig=null;}
+    if(a==='voy-ask'){if(voyageOpen(G))voyageSheet(true);return;}
+    if(a==='voy-close'){voyageSheet(false);return;}
+    if(a==='voy-go'){voyageSheet(false);if(startVoyage(G)){$('settings').hidden=true;cache.voy=null;selectTab('space');save();render();try{window.scrollTo(0,0);}catch(err){}}return;}
+    if(a==='voy-set'){var vv=G.voyage,vw=b.dataset.w,vid=b.dataset.id||'',vd=+b.dataset.d;if(!vv)return;var ok=vw==='fuel'?voyageSet(G,'fuel','',vv.fuel+vd):vw==='robots'?voyageSet(G,'robots','',vv.robots+vd):vw==='inst'?voyageSet(G,'inst',vid,!vv.inst[vid]):voyageSet(G,'seeds',vid,!vv.seeds[vid]);if(!ok)toast('Not enough points');cache.voy=null;save();render();return;}
     if(a==='leave-ask'){if(!canLeave(G))return;if(Date.now()>=LEAVE_SURE){LEAVE_SURE=Date.now()+6000;render();setTimeout(render,6100);return;}
       LEAVE_SURE=0;if(leaveCompany(G)){$('settings').hidden=true;detectMilestones(G);save();render();}return;}
     if(a==='review'){if(!G.left&&!G.emp.won)return;$('settings').hidden=true;$('apop').hidden=true;var rb=$('review-box');if(!rb){rb=document.createElement('div');rb.id='review-box';rb.className='sheet';rb.innerHTML='<div class="sheet-in"><div class="sheet-hd"><h2>Your years at the company</h2><button type="button" class="rst" data-act="review-close">Close</button></div><div class="ending-box" id="review-in"></div></div>';document.body.appendChild(rb);}$('review-in').innerHTML=endingHTML(G);rb.hidden=false;return;}
