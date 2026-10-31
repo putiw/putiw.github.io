@@ -1,9 +1,9 @@
-// ===== Colour breeding, on Puti's Shrimp Tanks genetics (genetics.js) =====
-// Every shrimp carries an 80-base genome. Colour is continuous: eight hue genes plus saturation and
-// lightness. Grade G1-G8 is how solid the colour is: the shell genes set it, and hue genes that
+// ===== Color breeding, on Puti's Shrimp Tanks genetics (genetics.js) =====
+// Every shrimp carries an 80-base genome. Color is continuous: eight hue genes plus saturation and
+// lightness. Grade G1-G8 is how solid the color is: the shell genes set it, and hue genes that
 // disagree pull it down. Rili shows when 3 of the 4 pattern genes are C. Without picking, grade
 // sinks a little each generation; keep the best and move the rest on and a line climbs. Babies
-// drift a little in hue, so a line can slowly walk to a new colour.
+// drift a little in hue, so a line can slowly walk to a new color.
 var GRADE_NAMES=['G1','G2','G3','G4','G5','G6','G7','G8'];
 var LINE_NAMES={red:'Red',orange:'Orange',yellow:'Yellow',green:'Green',cyan:'Cyan',blue:'Blue',purple:'Purple',magenta:'Magenta',wild:'Wild',legendary:'Legendary'};
 var LINE_ORDER=['red','orange','yellow','green','cyan','blue','purple','magenta'];
@@ -22,7 +22,7 @@ function riliOf(i){return phOf(i).rili;}
 function colOf(i){return lineOf(i);}
 function juvOf(i){return i.age<JUV_DAYS?2:i.age<ADULT_DAYS?1:0;}
 function lineRank(l){var k=LINE_ORDER.indexOf(l);return k<0?(l==='wild'?20:30):k;}
-// What the art needs. Babies are nearly clear and colour up as they grow, like the game.
+// What the art needs. Babies are nearly clear and color up as they grow, like the game.
 function specOf(i){var p=phOf(i),j=juvOf(i);return {male:i.sex==='m',col:p.line,vg:p.grade,h:p.h,s:p.s,l:p.l,juv:j,mat:j===2?0.3:j===1?0.7:1,rili:p.rili,legend:p.legend,berried:!!i.eggs,size:p.body.size};}
 function shrimpRGB(i){var p=phOf(i);return 'rgb('+GEN.hslRgb(p.h,p.s,p.l).join(',')+')';}
 function colourName(i,full){if(i.age<JUV_DAYS)return 'Baby';var p=phOf(i),n=(LINE_NAMES[p.line]||'Wild')+(p.rili?' rili':'');return full?n+' · '+GRADE_NAMES[p.grade]:n;}
@@ -32,7 +32,7 @@ function geneStr(i){var q=GEN.inspect(i.dna),g=q.genome;
   var dna='<div class="genome">'+GEN.SEGS.map(function(s){return '<span class="gs gs'+s[1]+'" title="'+s[0]+'">'+g.substr(s[1],s[2])+'</span>';}).join('')+'</div>';
   return dna+'Hue '+Math.round(q.pig.h)+'° · sat '+Math.round(q.pig.s)+' · light '+Math.round(q.pig.l)+' · hue spread '+Math.round(q.pig.spread)+'°<br>Shell '+q.shell+'/16 · pattern '+q.patC+'/4 C · shows at '+Math.round(q.ge.expr*100)+'%<br>Fertility '+pct(q.vig.fert)+' · brood '+pct(q.vig.fec)+' · egg survival '+pct(q.vig.emb)+' · stability '+stabPct(q.vig.stab)+(q.legend?'<br>Legendary marker':'');}
 function newInd(o){var i={id:uid(),sex:Math.random()<0.5?'f':'m',age:0,dna:null,from:'bred',born:Math.floor(S.day),eggs:null,rest:0,name:''};for(var k in o||{})i[k]=o[k];return i;}
-// The stream: mostly clear wild shrimp. Now and then one has a faint colour, usually too faint
+// The stream: mostly clear wild shrimp. Now and then one has a faint color, usually too faint
 // to see at G1, and once in a blue moon a legendary one.
 var STREAM_TINTS=[58,220,120,28,180,0,272,315];
 function breedWild(){var x=Math.random(),dna;
@@ -76,8 +76,8 @@ function breedDay(T,d){var cap=tankCap(T),n=T.shrimp.length,crowd=n>cap?(n-cap)/
     if(i.age===JUV_DAYS)reveal(T,i);});
   if(dead.length){T.shrimp=T.shrimp.filter(function(i){return dead.indexOf(i)<0;});T.dayDead=(T.dayDead||0)+dead.length;if(typeof tankEvent==='function')tankEvent(T,'dead',dead);}
   T.shrimp.slice().forEach(function(i){if(i.eggs&&d>=i.eggs.due)hatch(T,i,d);});}
-// A baby shows its colour at 25 days.
-// It only counts as a new colour (and lights up Sort) when no grown shrimp in the tank has it.
+// A baby shows its color at 25 days.
+// It only counts as a new color (and lights up Sort) when no grown shrimp in the tank has it.
 function reveal(T,i){var first=bookShrimpSeen(i,{tank:T.name}),p=phOf(i),have=T.shrimp.some(function(o){return o!==i&&o.age>=ADULT_DAYS&&lineOf(o)===p.line&&riliOf(o)===p.rili;});
   if(!have){T.newCol=(T.newCol||0)+1;if(first&&p.line!=='wild'){var nm=colourName(i).toLowerCase();tankLog(T,(/^[aeiou]/.test(nm)?'An ':'A ')+nm+' baby showed up');}}}
 function tankMainColour(T){var cnt={};T.shrimp.forEach(function(i){if(i.age>=ADULT_DAYS){var c=lineOf(i);cnt[c]=(cnt[c]||0)+1;}});var best='red',bn=-1;for(var c in cnt)if(cnt[c]>bn){bn=cnt[c];best=c;}return best;}
@@ -89,7 +89,7 @@ function addToTank(T,list,from){list.forEach(function(i){if(from)i.from=from;T.s
 function takeHome(list,from){if(!list||!list.length)return;
   openSheet({title:'Take them home',mount:function(el,api){
     var row=document.createElement('div');row.className='chips';row.style.margin='0 0 10px';list.forEach(function(i){var c=document.createElement('span');c.className='chip';c.appendChild(shrimpIconCanvas(specOf(i),34,18));var t=document.createElement('span');t.textContent=colourName(i,true);c.appendChild(t);row.appendChild(c);});el.appendChild(row);
-    var p=document.createElement('p');p.className='hint';p.textContent='Wild shrimp are mostly clear. Some carry a colour too faint to see at G1. Breed them and keep the most coloured babies.';el.appendChild(p);
+    var p=document.createElement('p');p.className='hint';p.textContent='Wild shrimp are mostly clear. Some carry a color too faint to see at G1. Breed them and keep the most colored babies.';el.appendChild(p);
     var b=document.createElement('div');b.className='btns';S.tanks.forEach(function(T,ti){var bt=document.createElement('button');bt.className='btn';bt.innerHTML=esc(T.name)+'<small>'+(T.shrimp.length?plural(T.shrimp.length,'shrimp','shrimp'):'empty')+'</small>';bt.onclick=function(){addToTank(T,list,from||'stream');api.close();toast(plural(list.length,'shrimp','shrimp')+' in '+T.name);sfx('plop');modCall('render');};b.appendChild(bt);});
     if(S.tanks.length<STAGES[S.stage].tanks&&typeof setupTank==='function'){var nt=document.createElement('button');nt.className='btn';nt.innerHTML='+ A new tank<small>'+fmtA(300)+', keeps them apart</small>';nt.onclick=function(){var T=setupTank('Stream tank');if(!T)return;addToTank(T,list,from||'stream');api.close();toast(plural(list.length,'shrimp','shrimp')+' in '+T.name);sfx('plop');modCall('render');};b.appendChild(nt);}
     var no=document.createElement('button');no.className='btn';no.textContent='Let them go';no.onclick=function(){api.close();toast('Back in the stream');};b.appendChild(no);el.appendChild(b);}});}
@@ -104,7 +104,7 @@ function bookShrimpSeen(i,info,silent){if(i.age<JUV_DAYS)return false;var p=phOf
   else if((e.best==null?-1:e.best)<p.grade){Object.assign(e,rec);if(!silent){if(p.grade===7)toast('First '+(LINE_NAMES[p.line]||'')+(p.rili?' rili':'')+' at G8',3200);modCall('bookChanged','shrimp',key);}}
   if(p.line!=='wild'&&!p.legend){var arr=p.rili?(S.book.hueR||(S.book.hueR=[])):(S.book.hue||(S.book.hue=[])),slot=Math.min(119,Math.floor(p.h/3));if(arr[slot]==null||arr[slot]<p.grade)arr[slot]=p.grade;}
   return first;}
-// round 1 book keys were colour:tier
+// round 1 book keys were color:tier
 function migrateBook(){var B=S.book.shrimp;if(!B||S.book.v2)return;S.book.v2=1;var map={violet:'purple'},out={};
   Object.keys(B).forEach(function(k){var a=k.split(':'),c=map[a[0]]||a[0],t=a[1];if(c==='black')return;var nk=t==='rili'?c+':rili':c,best=t==='rili'?4:c==='wild'?2:[1,3,5,7][+t]||1;var e=out[nk]||(out[nk]={day:B[k].day,tank:B[k].tank,from:B[k].from});e.best=Math.max(e.best==null?-1:e.best,best);});
   S.book.shrimp=out;}
@@ -113,18 +113,18 @@ var LINE_SHOW={};LINE_ORDER.forEach(function(c,k){LINE_SHOW[c]={h:GEN.LINES[k][1
 // A found line shows your best one; a missing one is drawn solid so its silhouette reads.
 function bookShrimpDraw(c,ri){return function(x,w,h,got){var L=LINE_SHOW[c];var sp={male:false,col:c,h:got&&got.h!=null?got.h:L.h,s:got&&got.s!=null?got.s:L.s,l:got&&got.l!=null?got.l:L.l,vg:got?(got.best!=null?Math.max(1,got.best):3):7,juv:0,mat:1,rili:ri};
   shrimpStill(x,sp,w/2,h/2,Math.min(w*0.9,h*2),1);};}
-bookCat('shrimp',{title:'Shrimp colours',order:0,note:'Best grade so far for each line',head:function(el){shrimpBookHead(el);},entries:(function(){var e=[];
+bookCat('shrimp',{title:'Shrimp colors',order:0,note:'Best grade so far for each line',head:function(el){shrimpBookHead(el);},entries:(function(){var e=[];
   LINE_ORDER.concat(['wild']).forEach(function(c){[false,true].forEach(function(ri){e.push({id:c+(ri?':rili':''),name:LINE_NAMES[c]+(ri?' rili':''),col:c,rili:ri,grades:true,draw:bookShrimpDraw(c,ri)});});});
   e.push({id:'legendary',name:'Legendary',hint:'Once in a blue moon, from the stream',draw:function(x,w,h){shrimpStill(x,{male:false,col:'legendary',legend:true,vg:7,juv:0,mat:1,h:0,s:80,l:55},w/2,h/2,Math.min(w*0.9,h*2),1);}});
   return e;})()});
 var LINE_HINTS={red:'Grandma’s line',orange:'Reds drift toward it',magenta:'Reds drift toward it',yellow:'Faint ones in the stream',green:'Faint ones in the stream',cyan:'Faint ones in the stream',blue:'Faint ones in the stream',purple:'Red and blue, or the stream',wild:'From the stream'};
 var RILI_HINTS={red:'Grandma has a few',orange:'From rili reds that drift',magenta:'From rili reds that drift',wild:'Rare in the stream'};
-function shrimpHint(e){if(e.rili)return RILI_HINTS[e.col]||'Breed a rili into this colour';return LINE_HINTS[e.col]||'';}
+function shrimpHint(e){if(e.rili)return RILI_HINTS[e.col]||'Breed a rili into this color';return LINE_HINTS[e.col]||'';}
 // The wheel: 120 slots of 3° each, solid outside and rili inside, brighter for a higher grade.
 function shrimpBookHead(el){var hs=S.book.hue||[],hr=S.book.hueR||[],n=0,n8=0,r8=0,rn=0;for(var k=0;k<120;k++){if(hs[k]!=null){n++;if(hs[k]===7)n8++;}if(hr[k]!=null){rn++;if(hr[k]===7)r8++;}}
-  el.innerHTML='<div class="hd"><h2>Colour wheel</h2><small>'+n+' of 120 hues · '+n8+' at G8'+(rn?' · rili '+rn+(r8?' ('+r8+' at G8)':''):'')+'</small></div><div class="wheelrow"><canvas id="bk-wheel" width="220" height="220"></canvas><div class="wheeltxt">'+
+  el.innerHTML='<div class="hd"><h2>Color wheel</h2><small>'+n+' of 120 hues · '+n8+' at G8'+(rn?' · rili '+rn+(r8?' ('+r8+' at G8)':''):'')+'</small></div><div class="wheelrow"><canvas id="bk-wheel" width="220" height="220"></canvas><div class="wheeltxt">'+
    '<p>One slot for each shade you’ve kept: solid outside, rili inside. Brighter means a higher grade.</p>'+
-   '<details><summary>How colour works</summary><p>Each shrimp has eight colour genes. Babies take after their parents: two close colours blend, far apart ones mostly follow one parent and carry a few of the other’s genes, which lowers the grade.</p><p>Grade, G1 to G8, is how solid the colour is. G1 is see-through. Without picking it sinks a little each generation. Keep the best, move the rest on, and it climbs.</p><p>Rili needs 3 of the 4 pattern genes. Babies drift a little in hue, so a line can slowly walk to a new colour. A shrimp’s stability gene sets how much.</p></details></div></div>';
+   '<details><summary>How color works</summary><p>Each shrimp has eight color genes. Babies take after their parents: two close colors blend, far apart ones mostly follow one parent and carry a few of the other’s genes, which lowers the grade.</p><p>Grade, G1 to G8, is how solid the color is. G1 is see-through. Without picking it sinks a little each generation. Keep the best, move the rest on, and it climbs.</p><p>Rili needs 3 of the 4 pattern genes. Babies drift a little in hue, so a line can slowly walk to a new color. A shrimp’s stability gene sets how much.</p></details></div></div>';
   var cv=$('bk-wheel'),W=110,x=fitCanvas(cv,W,W);cv.style.width=W+'px';cv.style.height=W+'px';var c=W/2;
   for(var s=0;s<120;s++){var a0=(s*3-90-1.4)*Math.PI/180,a1=((s+1)*3-90-1.6)*Math.PI/180;[[hs,c-2,c-17],[hr,c-20,c-31]].forEach(function(ring){var g=ring[0][s];x.beginPath();x.arc(c,c,ring[1],a0,a1);x.arc(c,c,ring[2],a1,a0,true);x.closePath();
     if(g==null){x.fillStyle='rgba(120,110,90,.13)';}else{var rgb=GEN.hslRgb(s*3+1.5,30+g*9,82-g*4.5);x.fillStyle='rgb('+rgb.join(',')+')';}x.fill();});}

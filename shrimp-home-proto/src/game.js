@@ -26,7 +26,7 @@ earn=function(n,what){if(n<=0)return;S.cash+=n;post({type:'earn',n:n,what:what})
 var OWN=null;
 function gradeOf(g){return clamp(1+Math.round((g||0)/100*7),1,8);}
 function ownT(){return S.tanks[0]||null;}
-// Your tank is the game's Tank 1. The game decides births and deaths, the land keeps each shrimp it knows (colour,
+// Your tank is the game's Tank 1. The game decides births and deaths, the land keeps each shrimp it knows (color,
 // name, age) and only adds or removes the difference, so nothing gets reset. Moves and sales here go to the game.
 function gOf(i){return Math.round(clamp(phOf(i).grade,0,7)/7*100);}
 function syncOwn(d){if((d.seq||0)<SEQ)return;var T=ownT();if(!T||typeof newInd!=='function'||typeof GEN!=='object')return;T.name='Your tank';T.own=1;
@@ -106,7 +106,7 @@ function leftBack(){var b=$('tb-back');if(!b)return;b.innerHTML=LEFT?'<span aria
 // a card waiting at the company, or frozen accounts
 function needBar(){var b=$('lneed');if(!NEED){if(b)b.remove();return;}if(!b){b=document.createElement('button');b.type='button';b.id='lneed';b.className='lneed';b.onclick=function(){try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};document.body.appendChild(b);}b.textContent=NEED+' Tap to go back.';}
 window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||!S)return;
-  if(d.type==='cash'){S.cash=d.cash;FROZEN=d.frozen||'';if(!!d.left!==!!LEFT||!!d.voy!==!!VOY){LEFT=d.left?1:0;VOY=d.voy?1:0;leftBack();}var nd=d.need||'';if(nd!==NEED){NEED=nd;needBar();}gameTime(d.day);updateHeader();}
+  if(d.type==='cash'){S.cash=d.cash;FROZEN=d.frozen||'';if(!!d.left!==!!LEFT||!!d.voy!==!!VOY){LEFT=d.left?1:0;VOY=d.voy?1:0;window.GM_AWAY=!!VOY;leftBack();}var nd=d.need||'';if(nd!==NEED){NEED=nd;needBar();}gameTime(d.day);updateHeader();}
   if(d.type==='own')syncOwn(d);});
 // shrimp that leave your tank here leave it in the game too
 var _move=netMoveTo;netMoveTo=function(T2){var T=ownT(),N=netList(),a=0,y=0,giv=[];if(T&&T2)N.forEach(function(e){if(T2!==T&&e.from===T.id){if(e.ind.age>=ADULT_DAYS)a++;else y++;}if(T2===T&&e.from!==T.id)giv.push({age:e.ind.age,g:gOf(e.ind)});});_move(T2);if(a+y)post({type:'take',adults:a,young:y,seq:++SEQ});if(giv.length)post({type:'give',list:giv,seq:++SEQ});};

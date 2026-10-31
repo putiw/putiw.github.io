@@ -1,11 +1,11 @@
 // ===== Genetics: Puti's Shrimp Tanks DNA model (shrimp-tanks-phaser/src/game/genetics.ts, model v7) =====
 // A plain JS port, without the old-save migrations. Every shrimp carries an 80-base genome:
-//   Pigment 0-36  eight hue codons, two saturation, two lightness. The colour is the circular mean.
-//   Shell  36-52  the number of G/C bases sets how solid the colour is: the grade, G1 to G8.
+//   Pigment 0-36  eight hue codons, two saturation, two lightness. The color is the circular mean.
+//   Shell  36-52  the number of G/C bases sets how solid the color is: the grade, G1 to G8.
 //   Pattern 52-56 three or more C bases shows rili.
 //   Vigor  56-64  fertility, brood size, egg survival, stability (how little the babies drift).
 //   Body   64-80  catch resistance, speed, escape, size, lifespan, activity, food focus.
-// Close colours blend, far ones mostly follow one parent and carry a few of the other's hue
+// Close colors blend, far ones mostly follow one parent and carry a few of the other's hue
 // genes, which pulls the grade down. Babies drift a little in hue, so a line can walk.
 var GEN=(function(){
  var R=Math.random;
@@ -44,7 +44,7 @@ var GEN=(function(){
  function pairSpread(hs){var t=0,p=0;for(var a=0;a<hs.length;a++)for(var b=a+1;b<hs.length;b++){t+=hueDist(hs[a],hs[b]);p++;}return p?t/p:0;}
  function clean(g){g=String(g||'').toUpperCase().replace(/[^ATGC]/g,'');while(g.length<LEN)g+='G';return g.slice(0,LEN);}
  function replaceSeg(g,s,l,v){v=v.slice(0,l);while(v.length<l)v+='G';return (g.slice(0,s)+v+g.slice(s+l)).slice(0,LEN);}
- // ---- colour ----
+ // ---- color ----
  function hslRgb(h,s,l){s=cl(s,0,100)/100;l=cl(l,0,100)/100;var c=(1-Math.abs(2*l-1))*s,hs=hueC(h)/60,x=c*(1-Math.abs(hs%2-1)),R1=0,G1=0,B1=0;
   if(hs<1){R1=c;G1=x;}else if(hs<2){R1=x;G1=c;}else if(hs<3){G1=c;B1=x;}else if(hs<4){G1=x;B1=c;}else if(hs<5){R1=x;B1=c;}else{R1=c;B1=x;}var m=l-c/2;
   return [Math.round(cl((R1+m)*255,0,255)),Math.round(cl((G1+m)*255,0,255)),Math.round(cl((B1+m)*255,0,255))];}
@@ -126,7 +126,7 @@ var GEN=(function(){
   for(var i=SH_S;i<SH_S+SH_L;i++){if(arr[i]==='G'||arr[i]==='C')solid.push(i);else clr.push(i);}
   if(solid.length<want)shuffle(clr).slice(0,want-solid.length).forEach(function(i){arr[i]=item(['G','C']);});
   else if(solid.length>want)shuffle(solid).slice(0,solid.length-want).forEach(function(i){arr[i]=item(['A','T']);});}
- // A legendary parent resets it: the child is a fresh high-grade shrimp of any colour.
+ // A legendary parent resets it: the child is a fresh high-grade shrimp of any color.
  function legendChild(){var g=Math.floor(rng(5,8));return forStrain('custom',g,randAny(),OPACITY[g]);}
  function inherit(a,b,mc,ga,gb){a=clean(a);b=clean(b);if(hasLeg(a)||hasLeg(b))return legendChild();
   var arr=new Array(LEN),pig=inheritPig(a,b,mc),i;for(i=0;i<PIG_L;i++)arr[i]=pig[i];for(i=PIG_L;i<LEN;i++)arr[i]=(r()<0.5?a:b)[i];

@@ -3,7 +3,7 @@ var IMG={},ART_READY=false,ART_WAIT=[];
 (function(){var ks=Object.keys(SPR),left=ks.length;ks.forEach(function(k){var im=new Image();im.onload=im.onerror=function(){if(--left===0){ART_READY=true;ART_WAIT.splice(0).forEach(function(f){try{f();}catch(e){console.error(e);}});}};im.src=SPR[k];IMG[k]=im;});})();
 function whenArt(f){if(ART_READY)f();else ART_WAIT.push(f);}
 var SW=114,SH=58;
-// Colours of the lines, for labels and the book. The shrimp themselves are drawn from their own
+// Colors of the lines, for labels and the book. The shrimp themselves are drawn from their own
 // genome: hue, saturation, lightness and grade (Puti's Shrimp Tanks lines and names).
 var COLOURS={
  red:{name:'Red',h:0,s:0.84,l:0.56},orange:{name:'Orange',h:28,s:0.84,l:0.56},yellow:{name:'Yellow',h:58,s:0.84,l:0.56},green:{name:'Green',h:120,s:0.84,l:0.56},
@@ -15,8 +15,8 @@ var VG_BODY=[0,0.4,0.5,0.6,0.7,0.8,0.9,1],VG_DITHER=[0,0.2,0.25,0.3,0.4,0.5,0.6,
 function hslRGB(h,s,l){h=((h%360)+360)%360;var c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs((h/60)%2-1)),m=l-c/2,r=0,g=0,b=0;if(h<60){r=c;g=x;}else if(h<120){r=x;g=c;}else if(h<180){g=c;b=x;}else if(h<240){g=x;b=c;}else if(h<300){r=x;b=c;}else{r=c;b=x;}return [Math.round((r+m)*255),Math.round((g+m)*255),Math.round((b+m)*255)];}
 function toVG(g){return clamp(Math.floor(clamp(g,0,100)/12.5),0,7);}
 var BODY={},BODY_N=0;
-// spec: {male, h, s, l (0-100), vg (grade 0-7), mat (colour maturity 0-1), juv, rili, legend, sick}
-// Older callers pass col only; that falls back to the line's colour.
+// spec: {male, h, s, l (0-100), vg (grade 0-7), mat (color maturity 0-1), juv, rili, legend, sick}
+// Older callers pass col only; that falls back to the line's color.
 function bodyCanvas(sp){var C=COLOURS[sp.col]||COLOURS.red,h=sp.h!=null?sp.h:C.h,s=sp.s!=null?sp.s:C.s*100,l=sp.l!=null?sp.l:C.l*100,vg=clamp(sp.vg|0,0,7),
    mat=sp.mat!=null?sp.mat:(sp.juv===2?0.3:sp.juv===1?0.7:1),hq=Math.round(h/3)*3,sq=Math.round(s/4)*4,lq=Math.round(l/3)*3,mq=Math.round(mat*10);
   if(sp.legend){vg=7;}

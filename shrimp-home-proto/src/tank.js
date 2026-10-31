@@ -332,7 +332,7 @@ var tankMod={name:'tank',
   var groups=Object.keys(c.by).map(function(k){return c.by[k];}).sort(function(a,b){return b.n-a.n||lineRank(a.col)-lineRank(b.col);});
   if(groups.length){cb+='<div class="colony">';groups.forEach(function(g){cb+='<div class="cl"><canvas data-cl="'+g.ex.id+'" width="88" height="44"></canvas><div><b>'+esc((LINE_NAMES[g.col]||'Wild')+(g.rili?' rili':''))+' · '+g.n+'</b><small>Best '+GRADE_NAMES[Math.max(0,g.best)]+(g.col==='wild'?' · wild type':'')+'</small></div></div>';});cb+='</div>';}
   else cb+='<p class="hint">'+(T.scape.length?(T.role==='cull'?'Empty. Net shrimp in another tank and move them here.':'No shrimp yet. Net some in another tank and move them here, or take wild ones home from the stream.'):'Set up the tank with Aquascape first.')+'</p>';
-  if(c.babies)cb+='<p class="hint">'+plural(c.babies,'baby','babies')+' still too small to show a colour.</p>';
+  if(c.babies)cb+='<p class="hint">'+plural(c.babies,'baby','babies')+' still too small to show a color.</p>';
   if(T.role==='cull')cb+='<p class="hint">The cull tank. Now and then a hobbyist comes by and takes some, free'+(S.stats.given?' ('+S.stats.given+' so far)':'')+'.</p>';
   else if(T.shrimp.length>SHOW_N)cb+='<p class="hint">Only '+SHOW_N+' are out at a time. The rest hide in the moss and wood, and different ones come out each time you look. Culling a big tank takes many looks, so start early.</p>';
   cb+='<div class="btns"><button class="btn sm" data-rename>Rename</button>'+(T.role==='cull'?'<button class="btn sm" data-cullrole="off">Not a cull tank</button>':!cullTank(false)&&S.tanks.length>1?'<button class="btn sm" data-cullrole="on">Make this the cull tank</button>':'')+'</div>';
@@ -375,7 +375,7 @@ function tvTap(p){if(TV.bubbleFor){closeBubble();return;}
   var fb=filterBox();if(p[0]>fb.x-8&&p[1]>fb.y-10)toast('That’s the sponge filter. Clean it under Needs doing when the flow drops.');}
 function closeBubble(){TV.bubbleFor=null;var b=document.querySelector('.bub');if(b)b.remove();}
 function openBubble(a){closeBubble();var i=a.ind,T=TV.T;TV.bubbleFor=i.id;var el=document.createElement('div');el.className='bub';
-  var age=i.age,ageT=age<JUV_DAYS?age+' days, colour shows at '+JUV_DAYS:age<ADULT_DAYS?age+' days, grown at '+ADULT_DAYS:age+' days';
+  var age=i.age,ageT=age<JUV_DAYS?age+' days, color shows at '+JUV_DAYS:age<ADULT_DAYS?age+' days, grown at '+ADULT_DAYS:age+' days';
   var from={grandma:'Grandma’s line',stream:'From the stream',bred:'Born here',shop:'From the shop'}[i.from]||'';
   var par=i.mum?'<br><small>Mum '+esc((LINE_NAMES[i.mum.l]||'')+(i.mum.r?' rili':'')+' '+GRADE_NAMES[i.mum.g])+(i.dad?' · dad '+esc((LINE_NAMES[i.dad.l]||'')+(i.dad.r?' rili':'')+' '+GRADE_NAMES[i.dad.g]):'')+'</small>':'';
   var h='<b>'+esc(i.name?i.name+' · ':'')+esc(colourName(i,true))+'</b><br>'+(i.sex==='f'?'Female':'Male')+' · '+ageT+(i.eggs?'<br>Carrying '+i.eggs.n+' eggs, hatching in '+Math.max(0,i.eggs.due-Math.floor(S.day))+' days':'')+(from?' · <small>'+from+'</small>':'')+par;

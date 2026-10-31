@@ -118,3 +118,17 @@ body.in-game #tb-back i{font-style:normal}
 .lbub .pcus{position:relative;overflow:hidden}
 .lbub .pcus input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
 .lbub .pcus{display:inline-flex;align-items:center}
+
+/* the color panel (Pass 172): docked at the bottom of the map so the thing stays in sight */
+.cpan{position:absolute;left:8px;right:8px;bottom:12px;z-index:30;background:var(--surface,#fffdf6);border:1px solid var(--line);border-radius:14px;padding:10px 12px 12px;box-shadow:0 6px 20px rgba(0,0,0,.18);max-height:52%;overflow:auto}
+.cpan .cp-hd{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cpan .cp-hint{font-size:12.5px;color:var(--ink-2);margin:2px 0 8px}
+.cpan .cp-cols{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.cpan .cp-cols button{width:26px;height:26px;border:1px solid var(--line);border-radius:6px;padding:0;cursor:pointer}
+.cpan .cp-cols button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+.cpan .cp-cols button.pch{border-color:var(--ink);border-width:2px}
+.cpan .cp-row{display:grid;grid-template-columns:62px 1fr;align-items:center;gap:8px;margin:4px 0;font-size:13px}
+.cpan input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;border-radius:9px;border:1px solid var(--line);margin:0}
+.cpan input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.cpan input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid var(--ink)}
+.cpan .cp-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}

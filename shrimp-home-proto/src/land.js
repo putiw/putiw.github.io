@@ -8,7 +8,7 @@
 var T=64;
 var LAND_V=2;                 // S.land layout version. 2 is the pixel home; older saves get their map rebuilt
 
-// ----- colours -----
+// ----- colors -----
 // Outdoors follows her tiles (they use the DawnBringer 32 palette). Rooms follow her apartment drawings.
 var PAL={K:'#21181b',INK:'#090609',CREAM:'#f1ebdb',PALE:'#d4e6f3',CORAL:'#dc8b79',CAB:'#446b7d',PLANT:'#4aa63e',
   g1:'#99e550',g2:'#6abe30',g3:'#37946e',g4:'#4b692f',g5:'#323c39',dirt:'#d9a066',dirt2:'#c18e5b',brown:'#8f563b',dbrown:'#663931',
@@ -46,7 +46,7 @@ PB.prototype.outline=function(c,diag){c=cu(c);var w=this.w,h=this.h,d=this.d,o=n
     var hit=(x>0&&(d[i-1]>>>24)>200)||(x<w-1&&(d[i+1]>>>24)>200)||(y>0&&(d[i-w]>>>24)>200)||(y<h-1&&(d[i+w]>>>24)>200);
     if(!hit&&diag)hit=(x>0&&y>0&&(d[i-w-1]>>>24)>200)||(x<w-1&&y>0&&(d[i-w+1]>>>24)>200)||(x>0&&y<h-1&&(d[i+w-1]>>>24)>200)||(x<w-1&&y<h-1&&(d[i+w+1]>>>24)>200);
     if(hit)o[i]=c;}this.d=o;return this;};
-// light on the top-left edge of a colour region, dark on the bottom-right (do it before the outline)
+// light on the top-left edge of a color region, dark on the bottom-right (do it before the outline)
 // emptyOnly: only empty pixels count as the edge (inner details don't get a rim)
 PB.prototype.shade=function(base,light,dark,k,emptyOnly){var B=cu(base),Lc=light?cu(light):0,Dc=dark?cu(dark):0,w=this.w,h=this.h,d=this.d,o=new Uint32Array(d);k=k||1;
   function out(x,y){if(x<0||y<0||x>=w||y>=h)return true;var c=d[y*w+x];return emptyOnly?(c>>>24)===0:c!==B;}
@@ -223,7 +223,7 @@ function composeTile(m,tx,ty){var g=mget(m,tx,ty),o=CT_O,X=tx*T,Y=ty*T,i,lx,ly,c
   if(nat){for(k=0;k<9;k++){CT_WB[k]=(Wv[k]&&CT_NK[k]!==1)?1:0;CT_GM[k]=(Gv[k]||CT_NK[k])?1:0;}
     for(lx=0;lx<64;lx++){var xc=(X+lx+0.5)/T;CT_SC[lx]=NS.stream?streamCy(xc):0;CT_SW[lx]=NS.stream?streamW(xc):0;}
     if(!eT&&cls!==2&&NS.stream&&TX.sand.length)eT=TX.sand[Math.floor(hash2(tx,ty,32)*TX.sand.length)].d;}
-  // mask codes for a grass tile: 0 fixed colour, 1 its own grass, 2-4 its own grass darkened
+  // mask codes for a grass tile: 0 fixed color, 1 its own grass, 2-4 its own grass darkened
   var MK=CT_M,own=cls===1,FW=CT_FW;
   // the water field once per pixel, from 12 rows above the tile (the bank face looks up to 11 px up)
   var w5=wn&&water5(m,tx,ty,cls,nat);
@@ -349,7 +349,7 @@ function paintFlats(x,cx,cy){var ob=LS().objs||[];for(var i=0;i<ob.length;i++){v
 function bucketKey(m,i){return isGrass(m.g[i])?bucketOf(m.gh[i]):-1;}
 // calmer lawn (Puti, 28 Oct: the grass read as noise at full screen). Her three greens are pulled closer together, the teal
 // strokes most, and a slow tint drifts over the land (about 3 tiles across, a little yellower or deeper), so a field reads
-// as one lawn with soft patches instead of the same tile over and over. Only her exact grass colours change.
+// as one lawn with soft patches instead of the same tile over and over. Only her exact grass colors change.
 var CG_D=cu('#4f9f4c'),CG_L=cu('#87cf48'),CG_O=cu('#94a24c'),CG_Y=cu('#9cc23e'),CG_N=cu('#3f8f43');
 function mixU(c,t,k){var r=c&255,g=(c>>>8)&255,b=(c>>>16)&255,r2=t&255,g2=(t>>>8)&255,b2=(t>>>16)&255;
   return ((255<<24)|(Math.round(b+(b2-b)*k)<<16)|(Math.round(g+(g2-g)*k)<<8)|Math.round(r+(r2-r)*k))>>>0;}
@@ -414,7 +414,7 @@ function objVer(o){return o.k==='tank'?(S.tanks[o.i]?1:0):o.k==='feeder'?Math.ro
 function objSprite(o){var d=OBJ[o.k];if(!d||!d.spr)return null;var c=OC[o.id],v=objVer(o);if(c&&c.g===SPR_GEN&&c.v===v)return c.s;
   var key=o.k+'|'+(d.keyOf?d.keyOf(o):((o.v==null?'':o.v)+'|'+o.fw+'x'+o.fh+'|'+(o.seed%7))),sp=spr(key,function(){return palSpr(palKey(o),d.spr(o));});OC[o.id]={s:sp,v:v,g:SPR_GEN};return sp;}
 
-// ----- recolour (palette swap). Her sprites use few colours, so any thing or ground can have its colours swapped one for one.
+// ----- recolour (palette swap). Her sprites use few colors, so any thing or ground can have its colors swapped one for one.
 // LS().pal = {kind: {'rrggbb':'rrggbb'}}. kind: an object's k (walls 'wall-p', 'wall-s'), or 'g'+ground for a ground.
 // Every thing or tile of that kind changes, the ones that came with the place too. Saved as hex pairs, so it stays small.
 var PALM={},PAL_GEN=1,PALTX=new WeakMap();
@@ -427,7 +427,7 @@ function sprPix(s){var x=document.createElement('canvas').getContext('2d');x.can
 function palSpr(k,s){var m=PALM[k];if(!m||!s||!s.c)return s;var q=sprPix(s),d=q.d;
   for(var i=0;i<d.length;i++){var u=d[i];if(!(u>>>24))continue;var v=m.get((u|0xff000000)>>>0);if(v!==undefined)d[i]=((v&0xffffff)|(u&0xff000000))>>>0;}
   q.x.putImageData(q.im,0,0);var r={};for(var p in s)r[p]=s[p];r.c=q.x.canvas;return r;}
-// the colours to offer: the most used solid colours, most first, up to 16
+// the colors to offer: the most used solid colors, most first, up to 16
 function topCols(cnt,n){var tot=0,ks=Object.keys(cnt);ks.forEach(function(k){tot+=cnt[k];});ks.sort(function(a,b){return cnt[b]-cnt[a];});
   return ks.filter(function(k,i){return i<4||cnt[k]>=tot*0.004;}).slice(0,n||16).map(Number);}
 function objCols(o){var d=OBJ[o.k],s=null;try{s=d.spr(o);}catch(e){}if(!s||!s.c)return [];var px=sprPix(s).d,cnt={};
@@ -770,7 +770,7 @@ defObj('palm',{base:58,solid:false,name:'Palm',spr:function(o){var pb=new PB(110
 defObj('trap',{solid:false,name:'Shrimp trap',spr:null,hit:function(o){return [o.tx*T+6,o.ty*T-10,T-12,T+10];},use:{side:'bank'}});
 
 // ----- creatures: pixel sprites with dark outlines, facing right (mirrored for left) -----
-// -- birds. Each has its real colour patches. Poses: 0 perched, 1 pecking, 2 wings up, 3 wings down
+// -- birds. Each has its real color patches. Poses: 0 perched, 1 pecking, 2 wings up, 3 wings down
 var BIRDS=[
  {id:'bulbul',cm:18,name:'White-eared bulbul',len:16,where:['feeder','tree','window'],hint:'Comes to any feeder',w:8,stage:0},
  {id:'myna',cm:23,name:'Common myna',len:17,where:['ground','lawn','feeder'],hint:'Walks about on the lawn',w:5,stage:0},
@@ -861,7 +861,7 @@ var FISH=[
  {id:'serpae-tetra',name:'Serpae tetra',len:[3,4.5],where:'both',hint:'Red with a black shoulder spot',w:6},
  {id:'black-phantom-tetra',name:'Black phantom tetra',len:[3,4.5],where:'lake',hint:'Grey with a black patch',w:5},
  {id:'rosy-tetra',name:'Rosy tetra',len:[3,4.5],where:'lake',hint:'Pink with a tall fin',w:5},
- {id:'tricolor-swordtail',name:'Tricolour swordtail',len:[5,8],where:'both',hint:'Rare. Orange, black and white, with a sword',w:1.5},
+ {id:'tricolor-swordtail',name:'Tricolor swordtail',len:[5,8],where:'both',hint:'Rare. Orange, black and white, with a sword',w:1.5},
  {id:'siamese-algae-eater',name:'Siamese algae eater',len:[8,15],where:'stream',hint:'Long, with a black stripe nose to tail',w:3},
  {id:'clown-killifish',name:'Clown killifish',len:[2.5,3.5],where:'lake',hint:'Banded, with a red and blue tail',w:2},
  {id:'glowlight-rasbora',name:'Glowlight rasbora',len:[2.5,3.5],where:'stream',hint:'Orange, with a dark wedge',w:5},
@@ -1505,7 +1505,7 @@ function useObj(o){
   if(o.k==='tank'){goUse(o,function(){if(S.tanks[o.i]){sfx('click');zoomToTank(o);return;}var s=objSprite(o);bubAt(oX(o),oBase(o)-(s?s.ay:60),'<b>An empty stand</b><div class="btns"><button class="btn primary" data-setup>Set up a tank here · '+fmtA(300)+'</button></div>',function(el){var b=el.querySelector('[data-setup]');if(b)b.onclick=function(){var T=setupTank();if(!T)return;closeBub();sfx('plop');toast(T.name+' is set up. A few stones to start.');goTank(S.tanks.length-1);};});});return true;}
   if(o.k==='feeder'||o.k==='wfeeder'){goUse(o,fillFeeder);return true;}
   if(o.k==='coop'){goUse(o,function(){collectEggs(o);});return true;}
-  if(o.gm){goUse(o,function(){grandmaSays(o);});return true;}
+  if(o.gm&&!gmAway()){goUse(o,function(){grandmaSays(o);});return true;}
   if(o.k==='trap'){goUse(o,trapTap);return true;}
   if(o.k==='bench'||(OBJ[o.k]&&OBJ[o.k].sit)){var me=L.me;if(me.sit&&me.sit.o===o)return true;goUse(o,sitOn);return true;}
   return false;}
@@ -1745,7 +1745,7 @@ function removeThing(o,e){var l=LS(),m=M();if(o&&o.gm)gmTo(gmSeats()[0]);
   else if(e){var j=0;for(var y2=e.ty;y2<e.ty+e.fh;y2++)for(var x2=e.tx;x2<e.tx+e.fw;x2++){var p=e.prev[j++];mset(m,x2,y2,p[0],p[1]);skinSet(x2,y2,p[3]);if(m.wb)m.wb[mi(m,x2,y2)]=p[2]||0;}l.edits=l.edits.filter(function(q){return q!==e;});L.pmask=null;earn(Math.floor(e.price/2),'refund');
     repaintAround(e.tx,e.ty,e.fw,e.fh);if(e.k==='pond'||e.k==='g-water'||e.prev.some(function(p){return p[0]===G_WATER;}))syncAgents();}
   sfx('pop');computePass();computeSpots();L.hints=null;L.dirty=true;save();}
-// ----- Colours: tap a thing or a ground, swap any of its colours. Every one of that kind changes, free.
+// ----- Colors: tap a thing or a ground, swap any of its colors. Every one of that kind changes, free.
 var DB32=['000000','222034','45283c','663931','8f563b','df7126','d9a066','eec39a','fbf236','99e550','6abe30','37946e','4b692f','524b24','323c39','3f3f74','306082','5b6ee1','639bff','5fcde4','cbdbfc','ffffff','9badb7','847e87','696a6a','595652','76428a','ac3232','d95763','d77bba','8f974a','8a6f30'];
 var G_NAME={};G_NAME[G_FLOOR]='Floor';G_NAME[G_HALL]='Hall floor';G_NAME[G_STEP]='Stepping stones';
 function colourTarget(t){var ob=LS().objs||[],best=null;for(var i=ob.length-1;i>=0;i--){var q=ob[i];if(!OBJ[q.k]||!OBJ[q.k].spr)continue;
@@ -1754,24 +1754,37 @@ function colourTarget(t){var ob=LS().objs||[],best=null;for(var i=ob.length-1;i>
   var sk=skinAt(t[0],t[1]);if(sk&&MADE_BY[sk])return {k:'c:'+sk,name:MADE_BY[sk].n,cols:function(){return madeCols(sk);}};
   var g=mget(M(),t[0],t[1]);if(g==null||g===G_VOID||g===G_WALL||g===G_STEP)return null;if(inAnyRoom(t[0],t[1])&&gClass(g)!==0)return null;
   var gb=BUILD.filter(function(b){return b.ground&&b.edit===g;})[0];return {k:'g'+g,name:gb?gb.name:G_NAME[g]||'Ground',cols:function(){return groundCols(g);}};}
-function tapColour(t,cx,cy){var c=colourTarget(t);if(!c){toast('Nothing to colour there.');sfx('nope');return;}var cols=c.cols();if(!cols.length){toast('Nothing to colour there.');sfx('nope');return;}
-  sfx('click');var sel=-1,cur=function(u){return palU(c.k,u);};
-  var html='<b>'+esc(c.name)+'</b><div class="hint">Tap a colour to swap it. '+(c.k.charAt(0)==='g'&&!OBJ[c.k]?'All of it changes.':'All of them change.')+'</div><div class="pcols">'+
-    cols.map(function(u,i){return '<button data-c="'+i+'" aria-label="Colour '+(i+1)+'"></button>';}).join('')+'</div>'+
-    '<div class="pchoose" hidden><div class="pcols">'+DB32.map(function(h){return '<button data-to="'+h+'" style="background:#'+h+'" aria-label="#'+h+'"></button>';}).join('')+'</div>'+
-    '<div class="btns"><label class="btn pcus">Other<input type="color"></label><button class="btn" data-orig>As drawn</button></div></div>'+
-    '<div class="btns"><button class="btn" data-all>All as drawn</button></div>';
-  showBub(cx,cy,html,function(el){var sw=el.querySelectorAll('[data-c]'),ch=el.querySelector('.pchoose'),inp=el.querySelector('input[type=color]');
-    function paint(){sw.forEach(function(b,i){var u=cols[i];b.style.background=hexOf(cur(u));b.setAttribute('aria-pressed',String(i===sel));b.classList.toggle('pch',cur(u)!==u);});}
-    function to(u){if(sel<0)return;palSet(c.k,cols[sel],u);paint();sfx('click');}
-    function fit(){var host=$('lwrap');if(!host)return;var W=host.clientWidth,H=host.clientHeight,w=el.offsetWidth,h=el.offsetHeight,x0=(parseFloat(el.style.left)||0)-(el._dx||0),y0=(parseFloat(el.style.top)||0)-(el._dy||0);
-      el.style.transform='';el._dx=el._dy=0;L.bubCam=[L.cam.x,L.cam.y];el.style.left=clamp(x0,6,Math.max(6,W-w-6))+'px';el.style.top=clamp(y0,6,Math.max(6,H-h-6))+'px';}
-    sw.forEach(function(b){b.onclick=function(){var i=+b.dataset.c;sel=sel===i?-1:i;ch.hidden=sel<0;if(sel>=0)inp.value=hexOf(cur(cols[sel]));paint();fit();};});
-    el.querySelectorAll('[data-to]').forEach(function(b){b.onclick=function(){to(U32(b.dataset.to));};});
-    inp.oninput=function(){to(U32(inp.value));};
-    el.querySelector('[data-orig]').onclick=function(){if(sel>=0)to(cols[sel]);};
-    el.querySelector('[data-all]').onclick=function(){palClear(c.k);sel=-1;ch.hidden=true;paint();sfx('pop');};
-    paint();});}
+// Pass 172 (Puti, 31 Oct): a panel docked at the bottom, so the thing stays in sight above it, and sliders instead of a fixed set:
+// hue, strength (saturation) and lightness. Reset puts one color back as she drew it, Reset all the whole thing.
+function rgb2hsl(u){var r=(u&255)/255,g=((u>>>8)&255)/255,b=((u>>>16)&255)/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,h=0,s=0,d=mx-mn;
+  if(d){s=l>.5?d/(2-mx-mn):d/(mx+mn);h=mx===r?(g-b)/d+(g<b?6:0):mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;}return [h,s,l];}
+function hsl2u(h,s,l){function f(n){var k=(n+h/30)%12,a=s*Math.min(l,1-l);return Math.round(255*(l-a*Math.max(-1,Math.min(k-3,9-k,1))));}return ((255<<24)|(f(4)<<16)|(f(8)<<8)|f(0))>>>0;}
+function closeCol(){if(L.cpan){L.cpan.remove();L.cpan=null;}}
+function tapColour(t,cx,cy){var c=colourTarget(t);if(!c){toast('Nothing to color there.');sfx('nope');return;}var cols=c.cols();if(!cols.length){toast('Nothing to color there.');sfx('nope');return;}
+  sfx('click');closeBub();closeCol();var host=$('lwrap');if(!host)return;var sel=0,cur=function(u){return palU(c.k,u);};
+  // keep the thing in the top part of the map, above the panel
+  var wy=(t[1]+0.5)*T,wx=(t[0]+0.5)*T;L.cam.x=wx-L.VW/2;L.cam.y=wy-L.VH*0.28;clampCam();L.dirty=true;
+  var el=document.createElement('div');el.className='cpan';el.setAttribute('role','dialog');el.setAttribute('aria-label','Color '+c.name);
+  el.innerHTML='<div class="cp-hd"><b>'+esc(c.name)+'</b><button class="btn sm" data-done>Done</button></div>'+
+    '<div class="cp-hint">'+(c.k.charAt(0)==='g'&&!OBJ[c.k]?'All of this ground changes.':'Every one of these changes.')+' Pick one of its colors, then slide.</div>'+
+    '<div class="cp-cols">'+cols.map(function(u,i){return '<button data-c="'+i+'" aria-label="Color '+(i+1)+'"></button>';}).join('')+'</div>'+
+    '<label class="cp-row"><span>Hue</span><input type="range" id="cp-h" min="0" max="359" step="1"></label>'+
+    '<label class="cp-row"><span>Strength</span><input type="range" id="cp-s" min="0" max="100" step="1"></label>'+
+    '<label class="cp-row"><span>Light</span><input type="range" id="cp-l" min="0" max="100" step="1"></label>'+
+    '<div class="cp-btns"><button class="btn" data-orig>Reset this color</button><button class="btn" data-all>Reset all</button></div>';
+  host.appendChild(el);L.cpan=el;
+  var sw=el.querySelectorAll('[data-c]'),H=el.querySelector('#cp-h'),Sx=el.querySelector('#cp-s'),Lx=el.querySelector('#cp-l');
+  function paint(){sw.forEach(function(b,i){var u=cols[i];b.style.background=hexOf(cur(u));b.setAttribute('aria-pressed',String(i===sel));b.classList.toggle('pch',cur(u)!==u);});}
+  function load(){var q=rgb2hsl(cur(cols[sel]));H.value=Math.round(q[0]);Sx.value=Math.round(q[1]*100);Lx.value=Math.round(q[2]*100);bars();}
+  function bars(){var h=+H.value,sv=+Sx.value,lv=+Lx.value;H.style.background='linear-gradient(90deg,'+[0,60,120,180,240,300,360].map(function(x){return 'hsl('+x+','+Math.max(40,sv)+'%,'+Math.min(70,Math.max(30,lv))+'%)';}).join(',')+')';
+    Sx.style.background='linear-gradient(90deg,hsl('+h+',0%,'+lv+'%),hsl('+h+',100%,'+lv+'%))';Lx.style.background='linear-gradient(90deg,#000,hsl('+h+','+sv+'%,50%),#fff)';}
+  function slide(){palSet(c.k,cols[sel],hsl2u(+H.value,+Sx.value/100,+Lx.value/100));bars();paint();}
+  sw.forEach(function(b){b.onclick=function(){sel=+b.dataset.c;sfx('click');paint();load();};});
+  [H,Sx,Lx].forEach(function(r){r.oninput=slide;});
+  el.querySelector('[data-orig]').onclick=function(){palSet(c.k,cols[sel],cols[sel]);paint();load();sfx('pop');};
+  el.querySelector('[data-all]').onclick=function(){palClear(c.k);paint();load();sfx('pop');};
+  el.querySelector('[data-done]').onclick=function(){closeCol();sfx('click');};
+  paint();load();}
 function tapBuild(wx,wy,t,cx,cy){if(L.making){toast('Pick one below, or New.');return;}if(L.colouring){tapColour(t,cx,cy);return;}if(L.moving){tapMove(t);return;}if(L.removing){var ob0=LS().objs,o0=null;for(var i0=ob0.length-1;i0>=0;i0--){var q0=ob0[i0];if(q0.built&&t[0]>=q0.tx&&t[0]<q0.tx+q0.fw&&t[1]>=q0.ty&&t[1]<q0.ty+q0.fh){o0=q0;break;}}
     var e0=o0?null:groundEdit(t[0],t[1]);if(o0||e0){removeThing(o0,e0);return;}toast(objAtTile(t[0],t[1],true)?'That came with the place.':'Nothing you built here.');sfx('nope');return;}
   var b=L.buildSel&&BUILDI[L.buildSel];
@@ -1811,11 +1824,11 @@ function renderBuildPal(pal){var list=buildList(),cats=BCAT.filter(function(c){r
   if(!L.buildCat||!cats.some(function(c){return c.id===L.buildCat;}))L.buildCat=cats.length?cats[0].id:null;
   var items=list.filter(function(b){return b.cat===L.buildCat;});
   pal.innerHTML='<div class="bcats" role="tablist">'+cats.map(function(c){return '<button class="bcat" role="tab" data-cat="'+c.id+'" aria-pressed="'+(!L.removing&&!L.moving&&!L.colouring&&!L.making&&L.buildCat===c.id)+'">'+esc(c.name)+'</button>';}).join('')+
-    '<button class="bcat bmk" data-kmode aria-pressed="'+!!L.making+'">Make</button><button class="bcat bmv" data-mmode aria-pressed="'+!!L.moving+'">Move</button><button class="bcat bcl" data-cmode aria-pressed="'+!!L.colouring+'">Colours</button><button class="bcat brm" data-rmode aria-pressed="'+!!L.removing+'">Remove</button></div>'+
+    '<button class="bcat bmk" data-kmode aria-pressed="'+!!L.making+'">Make</button><button class="bcat bmv" data-mmode aria-pressed="'+!!L.moving+'">Move</button><button class="bcat bcl" data-cmode aria-pressed="'+!!L.colouring+'">Colors</button><button class="bcat brm" data-rmode aria-pressed="'+!!L.removing+'">Remove</button></div>'+
     (L.making?mkPanelHtml():L.colouring?'<div class="bnote">One of a kind changes them all, the ones that came with the place too. Free.</div>':L.moving?'<div class="bnote">Tap a thing to pick it up, then tap where it goes. Moving is free.</div>':L.removing?'<div class="bnote">Tap something you built or painted to take it away. You get half back.</div>':
     '<div class="bgrid" style="grid-template-columns:repeat('+gridCols(items.length)+',minmax(0,1fr))">'+items.map(function(b){return '<button data-item="'+b.id+'" aria-pressed="'+(L.buildSel===b.id)+'"><span class="pi"></span><b>'+esc(b.name)+'</b><small>'+fmtA(b.price)+(b.ground?' a tile':'')+'</small></button>';}).join('')+'</div>');
   pal.querySelectorAll('[data-cat]').forEach(function(bt){bt.onclick=function(){L.buildCat=bt.dataset.cat;L.removing=false;L.moving=false;L.colouring=false;L.making=false;L.moveObj=null;L.buildSel=null;sfx('click');renderBuildPal(pal);updateStat(true);L.hints=null;L.dirty=true;};});
-  pal.querySelector('[data-cmode]').onclick=function(){L.colouring=!L.colouring;L.making=false;L.moving=false;L.removing=false;L.moveObj=null;L.buildSel=null;L.hints=null;closeBub();sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
+  pal.querySelector('[data-cmode]').onclick=function(){closeCol();L.colouring=!L.colouring;L.making=false;L.moving=false;L.removing=false;L.moveObj=null;L.buildSel=null;L.hints=null;closeBub();sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
   pal.querySelector('[data-mmode]').onclick=function(){L.moving=!L.moving;L.removing=false;L.colouring=false;L.making=false;L.moveObj=null;L.buildSel=null;L.hints=null;sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
   pal.querySelector('[data-kmode]').onclick=function(){L.making=!L.making;L.colouring=false;L.moving=false;L.removing=false;L.moveObj=null;L.buildSel=null;L.hints=null;closeBub();sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
   if(L.making)mkPanelBind(pal);
@@ -1880,7 +1893,7 @@ function mountHome(){var p=$('p-home');ensureLand();
 function setTool(id,quiet){id=mapTool(id);if(L.cv&&!toolsHere().some(function(t){return t.id===id;})){if(!quiet)toast(id==='rod'?'No fish here yet. Wait for the land with the stream.':'Not here yet.');id='walk';}
   L.tool=id;LS().tool=id;closeBub();L.hints=null;L.dirty=true;if(id!=='rod'&&L.fishing)L.fishing=null;if(id!=='build')L.camFree=false;if(id==='mow'&&L.me)L.me.speed=MOW_SPEED;else if(L.me)L.me.speed=ME_SPEED;
   document.querySelectorAll('#ltools [data-tool]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.tool===id));});
-  var pal=$('lpal');if(pal){if(id==='build'){renderBuildPal(pal);pal.hidden=false;}else{pal.hidden=true;L.buildSel=null;L.removing=false;L.moving=false;L.colouring=false;L.making=false;L.moveObj=null;}}
+  var pal=$('lpal');if(pal){if(id==='build'){renderBuildPal(pal);pal.hidden=false;}else{pal.hidden=true;closeCol();L.buildSel=null;L.removing=false;L.moving=false;L.colouring=false;L.making=false;L.moveObj=null;}}
   if(!quiet)sizeCanvas();updateStat(true);}
 // one canvas pixel per art pixel, scaled up by CSS: a whole number of screen pixels per art pixel where the screen allows
 // (2 on 3x phones), 1.5 on 2x phones, about 44 CSS px per tile either way
@@ -1907,7 +1920,7 @@ function updateStat(force){var el=$('lstat');if(!el)return;var l=LS(),html='',eg
   else if(f&&f.st==='bite')html='<b>Now!</b> Tap.';
   else if(L.tool==='build'&&L.moving)html=L.moveObj?'Tap where the '+esc(((OBJ[L.moveObj.k]||{}).name||'thing').toLowerCase())+' goes. Tap it again to put it down.':'Tap anything to pick it up.';
   else if(L.tool==='build'&&L.making)html='Draw your own things.';
-  else if(L.tool==='build'&&L.colouring)html='Tap a thing or the ground to change its colours.';
+  else if(L.tool==='build'&&L.colouring)html='Tap a thing or the ground to change its colors.';
   else if(L.tool==='build'&&L.removing)html='Tap or drag over things you built to take them away.';
   else if(b)html=b.ground?esc(b.name)+': tap a tile, or drag to paint. '+fmtA(b.price)+' a tile.':'Tap where the '+esc(b.name.toLowerCase())+' goes. '+fmtA(b.price)+'.';
   else if(L.tool==='build')html='Pick something to build. Drag the map to look around.';
@@ -2031,7 +2044,9 @@ function drawLight(x){var Lt=lightNow(),c=Lt.c;if(c[0]>=254&&c[1]>=254&&c[2]>=25
 OBJ.coop.live=function(x,o){var s=objSprite(o),eg=LS().eggs;if(!s||!s.nest||!eg.length)return;var n=Math.min(eg.length,8),w=s.nest.w||30,bx=oX(o)+s.nest.x+Math.round(w/2),by=oBase(o)+s.nest.y+2,front=Math.min(4,n),back=n-front;
   function row(k0,cnt,dy,sh){for(var k=0;k<cnt;k++)drawSpr(x,eggSpr(eg[k0+k]),bx+Math.round((k-(cnt-1)/2)*8)+sh-4,by-dy);}
   row(front,back,3,4);row(0,front,0,0);};
-OBJ.armchair.live=function(x,o){if(!o.gm)return;drawSprK(x,grandmaSpr(Math.floor(L.rt*2.2)%2),oX(o)-2*CHK,oBase(o)-2*CHK,CHK);};
+// after Leave Earth Grandma is asleep on the ship (Pass 172): her chair stays empty
+function gmAway(){return !!window.GM_AWAY;}
+OBJ.armchair.live=function(x,o){if(!o.gm||gmAway())return;drawSprK(x,grandmaSpr(Math.floor(L.rt*2.2)%2),oX(o)-2*CHK,oBase(o)-2*CHK,CHK);};
 // draw at full rate while things move, 30 fps for small animals, 8 fps when only water and Grandma's needles move
 function busy(){var me=L.me,dg=L.dog,c=L.cat;return L.dirty||L.camMoving||(me&&me.moving)||(dg&&(dg.run||dg.hop>0))||(c&&(c.st==='walk'||c.hop>0||c.reach>0))||L.parts.length>0||(L.fishing&&L.fishing.st!=='idle')||!!L.watch||!!L.marker||!!(L.ptr&&L.ptr.down);}
 function lively(){var i,b;for(i=0;i<L.birds.length;i++){b=L.birds[i];if(b.st!=='stay'||b.spot.hover)return true;}if(L.bfl&&L.bfl.length)return true;for(var id in L.henA){var c=L.henA[id];if(c.st==='walk'||c.st==='run'||c.st==='flap')return true;}for(var id2 in L.wildA){var c2=L.wildA[id2];if((c2.st==='walk'||c2.st==='run')&&inView(c2.x,c2.y,40))return true;}return false;}
@@ -2155,7 +2170,7 @@ function mkPrice(it){var t=MKT[it.t];return t.fixed?t.price:t.price+10*(it.fw*it
 function mkOk(it){return it&&typeof it.id==='string'&&MKT[it.t]&&it.w>0&&it.h>0&&it.w<=256&&it.h<=512&&Array.isArray(it.p)&&typeof it.d==='string';}
 function madeGround(k){var it=k&&k.indexOf('c:')===0&&MADE_BY[k.slice(2)];return !!(it&&it.t==='floor');}
 
-// ----- pixels: run-length over palette indices. "B" one pixel of colour 1, "B.1k." 56 of them.
+// ----- pixels: run-length over palette indices. "B" one pixel of color 1, "B.1k." 56 of them.
 function mkEnc(px){var o='',i=0,n=px.length;while(i<n){var c=px[i],j=i+1;while(j<n&&px[j]===c)j++;var r=j-i;o+=MK_ALPH.charAt(c);if(r===2)o+=MK_ALPH.charAt(c);else if(r>2)o+='.'+r.toString(36)+'.';i=j;}return o;}
 function mkDec(s,n){var px=new Uint8Array(n),i=0,k=0,last=0;while(k<s.length&&i<n){var ch=s.charAt(k);
     if(ch==='.'){var e=s.indexOf('.',k+1);if(e<0)break;var r=parseInt(s.slice(k+1,e),36)||1;for(var q=1;q<r&&i<n;q++)px[i++]=last;k=e+1;continue;}
@@ -2179,7 +2194,7 @@ function mkRegister(){var l=S&&S.land;if(!l)return;if(!Array.isArray(l.made))l.m
     if(it.t==='floor')b={k:'c:'+it.id,name:it.n,ground:1,edit:G_FLOOR,skin:it.id,price:t.price,where:GROUND_ON,stage:0};
     else if(it.t==='wall')b={k:'wall',name:it.n,price:t.price,where:GROUND_ON.filter(function(g){return g!==G_WATER;}),stage:0,o:{v:'c:'+it.id},k2:'wall-c:'+it.id};
     else if(it.t==='fence')b={k:'fence',name:it.n,price:t.price,where:(BUILDI.fence?BUILDI.fence.where:GROUND_ON.filter(function(g){return g!==G_WATER;})),stage:0,o:{v:'c:'+it.id},k2:'fence-c:'+it.id};
-    else{defObj('c:'+it.id,{fw:it.fw,fh:it.fh,base:63,name:it.n,flat:!!t.flat,sit:!!t.sit,nap:!!t.nap,keyOf:function(){return 'm';},spr:function(){return madeSpr(it.id);},live:t.sit?function(x,o){if(o.gm)drawSprK(x,grandmaSpr(Math.floor(L.rt*2.2)%2),oX(o)-2*CHK,oBase(o)-2*CHK-6,CHK);}:null});
+    else{defObj('c:'+it.id,{fw:it.fw,fh:it.fh,base:63,name:it.n,flat:!!t.flat,sit:!!t.sit,nap:!!t.nap,keyOf:function(){return 'm';},spr:function(){return madeSpr(it.id);},live:t.sit?function(x,o){if(o.gm&&!gmAway())drawSprK(x,grandmaSpr(Math.floor(L.rt*2.2)%2),oX(o)-2*CHK,oBase(o)-2*CHK-6,CHK);}:null});
       b={k:'c:'+it.id,name:it.n,price:mkPrice(it),where:mkWhere(),stage:0,o:{fw:it.fw,fh:it.fh}};}
     b.cat=t.cat;b.made=it.id;b.id=b.k2||b.k;BUILD.push(b);BUILDI[b.id]=b;});
   // a thing whose drawing is gone can't stay on the map
@@ -2215,6 +2230,14 @@ function mkIcon(id){var it=MADE_BY[id],b=BUILD.filter(function(q){return q.made=
 // ----- the editor -----
 var MK=null;
 var MK_TOOLS=[['pen','Pen'],['erase','Eraser'],['fill','Fill'],['pick','Pick'],['pan','Pan'],['line','Line'],['rect','Box'],['oval','Circle'],['tri','Triangle']];
+// each button shows what it does (Puti, 31 Oct): a square for Box, a circle for Circle, arrows for back and forward
+var MK_ICO={pen:'<path d="M4 20l1-5L15 5l4 4L9 19z"/><path d="M13 7l4 4"/>',erase:'<path d="M8 20h12"/><path d="M4 15l9-9 6 6-7 7H8z"/><path d="M9 10l6 6"/>',
+ fill:'<path d="M6 11l7-7 7 7-7 7z"/><path d="M20 15c0 2 1 3 1 4a1 1 0 01-2 0c0-1 1-2 1-4z" fill="currentColor"/>',pick:'<path d="M14 4l6 6-3 3-6-6z"/><path d="M11 7L4 14v4h4l7-7"/>',
+ pan:'<path d="M12 3v18M3 12h18"/><path d="M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/>',line:'<path d="M5 19L19 5"/>',rect:'<rect x="5" y="5" width="14" height="14"/>',
+ oval:'<circle cx="12" cy="12" r="7.5"/>',tri:'<path d="M12 4l8.5 15h-17z"/>',undo:'<path d="M9 7L4 12l5 5"/><path d="M4 12h11a5 5 0 010 10h-3"/>',
+ redo:'<path d="M15 7l5 5-5 5"/><path d="M20 12H9a5 5 0 000 10h3"/>',mir:'<path d="M12 3v18" stroke-dasharray="2 2"/><path d="M9 7L4 12l5 5zM15 7l5 5-5 5z"/>',
+ flip:'<path d="M4 9h14l-3-3M20 15H6l3 3"/>',zin:'<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5M8 11h6M11 8v6"/>',zout:'<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5M8 11h6"/>'};
+function mkI(k,label){return '<svg class="mki" viewBox="0 0 24 24" aria-hidden="true">'+MK_ICO[k]+'</svg><span class="mkl">'+label+'</span>';}
 function mkOpen(id){var it=id&&MADE_BY[id];closeBub();
   MK={id:id,it:it,from:0,undo:[],redo:[],tool:'pen',slot:0,col:[h2u('222034ff'),h2u('d9a066ff')],face:true,z:0,del:0};
   if(it){var q=madePx(id);MK.t=it.t;MK.n=it.n;MK.fw=it.fw;MK.fh=it.fh;MK.w=it.w;MK.h=it.h;MK.px=new Uint8Array(q.px);MK.pal=q.pal.slice();MK.step='draw';}
@@ -2228,7 +2251,7 @@ function mkBlank(){var t=MKT[MK.t];MK.fw=t.fw;MK.fh=t.fh;MK.w=t.w||t.fw*T;MK.h=t
     for(var y=0;y<MK.h;y++)for(var x=0;x<MK.w;x++)MK.px[y*MK.w+x]=y<MK_CAP-2?C:y<MK_CAP?CD:y>=MK.h-2?FD:y>=MK.h-10?(y===MK.h-10?FD:F2):F;}}
 function mkIdx(u){var p=MK.pal;for(var i=1;i<p.length;i++)if(p[i]===u)return i;if(p.length<64){p.push(u);return p.length-1;}
   var best=1,bd=1e9;for(var j=1;j<p.length;j++){var v=p[j],d=0;for(var s=0;s<32;s+=8){var a=((u>>>s)&255)-((v>>>s)&255);d+=a*a;}if(d<bd){bd=d;best=j;}}
-  if(!MK.full){MK.full=1;toast('63 colours is the most. Using the closest.');}return best;}
+  if(!MK.full){MK.full=1;toast('63 colors is the most. Using the closest.');}return best;}
 function mkName(){return MK.n||MKT[MK.t].name;}
 
 function mkRender(){var el=MK.el,t=MKT[MK.t];
@@ -2268,13 +2291,13 @@ function mkTake(u,w,h,dx,dy){var cnt={},k;for(k=0;k<u.length;k++)if(u[k]>>>24)cn
   var keep=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];}).map(Number);keep.forEach(function(v){mkIdx(v>>>0);});
   for(var y=0;y<h;y++)for(var x=0;x<w;x++){var v=u[y*w+x];if(!(v>>>24))continue;var X=x+dx,Y=y+dy;if(X<0||Y<0||X>=MK.w||Y>=MK.h)continue;MK.px[Y*MK.w+X]=mkIdx(v>>>0);}}
 
-function mkDrawView(el,hd){var t=MKT[MK.t],tools=MK_TOOLS.map(function(q){return '<button class="mkt" data-tool="'+q[0]+'" aria-pressed="'+(MK.tool===q[0])+'">'+q[1]+'</button>';}).join('');
+function mkDrawView(el,hd){var t=MKT[MK.t],tools=MK_TOOLS.map(function(q){return '<button class="mkt mkib" data-tool="'+q[0]+'" aria-label="'+q[1]+'" title="'+q[1]+'" aria-pressed="'+(MK.tool===q[0])+'">'+mkI(q[0],q[1])+'</button>';}).join('');
   var sizes=t.fixed?'':MK_SIZES.map(function(z){var on=z[0]===MK.fw&&z[1]===MK.fh;return '<button class="mkt" data-fp="'+z[0]+'x'+z[1]+'" aria-pressed="'+on+'">'+z[0]+'×'+z[1]+'</button>';}).join('')+
     '<button class="mkt" data-hh="-8" aria-label="Shorter">Shorter</button><button class="mkt" data-hh="8" aria-label="Taller">Taller</button>';
   var extra=[],seen={};DB32.forEach(function(h){seen[h2u(h+'ff')]=1;});for(var i=1;i<MK.pal.length;i++){var u=MK.pal[i];if(!seen[u]&&(u>>>24)===255){seen[u]=1;extra.push(u);}}
   el.innerHTML=hd+'<div class="mkview"><div class="mkpad"><canvas class="mkc"></canvas><canvas class="mkg"></canvas></div></div>'+
-    '<div class="mkbar"><div class="mkrow">'+tools+'<button class="mkt" data-undo>Undo</button><button class="mkt" data-redo>Redo</button><button class="mkt" data-mir aria-pressed="'+!!MK.mir+'">Mirror</button><button class="mkt" data-flip>Flip</button><button class="mkt" data-zm="-1" aria-label="Zoom out">−</button><button class="mkt" data-zm="1" aria-label="Zoom in">+</button></div>'+
-    '<div class="mkrow mkcolrow"><button class="mkslot" data-slot="0" aria-pressed="'+(MK.slot===0)+'"><i></i>Colour</button><button class="mkslot" data-slot="1" aria-pressed="'+(MK.slot===1)+'"><i></i>Face</button>'+
+    '<div class="mkbar"><div class="mkrow">'+tools+'<button class="mkt mkib" data-undo aria-label="Back" title="Back">'+mkI('undo','Back')+'</button><button class="mkt mkib" data-redo aria-label="Forward" title="Forward">'+mkI('redo','Forward')+'</button><button class="mkt mkib" data-mir aria-label="Mirror" title="Mirror" aria-pressed="'+!!MK.mir+'">'+mkI('mir','Mirror')+'</button><button class="mkt mkib" data-flip aria-label="Flip" title="Flip">'+mkI('flip','Flip')+'</button><button class="mkt mkib" data-zm="-1" aria-label="Zoom out" title="Zoom out">'+mkI('zout','Out')+'</button><button class="mkt mkib" data-zm="1" aria-label="Zoom in" title="Zoom in">'+mkI('zin','In')+'</button></div>'+
+    '<div class="mkrow mkcolrow"><button class="mkslot" data-slot="0" aria-pressed="'+(MK.slot===0)+'"><i></i>Color</button><button class="mkslot" data-slot="1" aria-pressed="'+(MK.slot===1)+'"><i></i>Face</button>'+
     '<button class="mkt" data-noface aria-pressed="'+!MK.face+'">No face</button></div>'+
     '<div class="mkpal"><label class="mkt mkother">Other<input type="color"></label>'+DB32.map(function(h){return '<button data-u="'+h2u(h+'ff')+'" style="background:#'+h+'" aria-label="#'+h+'"></button>';}).join('')+
     extra.map(function(u){return '<button data-u="'+u+'" style="background:'+hexOf(u)+'" aria-label="'+hexOf(u)+'"></button>';}).join('')+'</div>'+
@@ -2327,7 +2350,7 @@ function mkPaint(prev){var c=MK.c,g=MK.g,W=MK.w,H=MK.h,z=MK.z;if(!c)return;
   y.strokeStyle='rgba(0,0,0,0.22)';y.beginPath();for(var tx=T;tx<W;tx+=T){y.moveTo(tx*z+0.5,0);y.lineTo(tx*z+0.5,H*z);}for(var ty=H-T;ty>0;ty-=T){y.moveTo(0,ty*z+0.5);y.lineTo(W*z,ty*z+0.5);}y.stroke();
   var info=MK.el.querySelector('.mkinfo');if(info)info.textContent=W+'×'+H+' px';}
 
-// shapes stamp into the pixels: the edge in Colour, the inside in Face (or nothing)
+// shapes stamp into the pixels: the edge in Color, the inside in Face (or nothing)
 function mkShape(kind,x0,y0,x1,y1){var out=[],W=MK.w,H=MK.h;
   if(kind==='line'){var dx=Math.abs(x1-x0),sx=x0<x1?1:-1,dy=-Math.abs(y1-y0),sy=y0<y1?1:-1,e=dx+dy,x=x0,y=y0;for(var g=0;g<2000;g++){out.push([x,y,0]);if(x===x1&&y===y1)break;var e2=2*e;if(e2>=dy){e+=dy;x+=sx;}if(e2<=dx){e+=dx;y+=sy;}}return out;}
   var ax=Math.min(x0,x1),bx=Math.max(x0,x1),ay=Math.min(y0,y1),by=Math.max(y0,y1),w=bx-ax+1,h=by-ay+1;
@@ -2360,7 +2383,7 @@ function mkPointer(g){var down=null,view=MK.view;
     if(e.type==='pointerup'&&(tl==='line'||tl==='rect'||tl==='oval'||tl==='tri')){mkStamp(mkShape(tl,down.p0[0],down.p0[1],p[0],p[1]));}
     down=null;mkPaint();};}
 
-// ----- save: drop colours nobody uses, keep it small
+// ----- save: drop colors nobody uses, keep it small
 function mkSave(){var l=LS(),used={},map=[0],pal=[];for(var i=0;i<MK.px.length;i++)used[MK.px[i]]=1;
   for(var j=1;j<MK.pal.length;j++){if(used[j]){pal.push(u2h(MK.pal[j]));map[j]=pal.length;}}
   var px=new Uint8Array(MK.px.length);for(var k=0;k<px.length;k++)px[k]=map[MK.px[k]]||0;
