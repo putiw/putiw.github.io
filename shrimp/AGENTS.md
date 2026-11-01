@@ -497,6 +497,8 @@ Planned and agreed with Puti, not built yet:
 
 **Fix list from Claude's 1 Nov playtest** (project doc `claude/shrimp-fix-prompt-1nov.md`): all five parts done (Pass 184). World tab world-bank rows fixed in Pass 185. Average bot Earth day moved 6,609 to 6,777.
 
+**Fix list from Puti's 1 Nov afternoon playtest** (project doc `claude/shrimp-fix-prompt-1nov-pm.md`): Part A done (Pass 190): kits after tank 2's first baby, care guide after 10 kits, story cards tied to a moment go first and narrative ones drop after 60 days (`STORY_PROMPT`, `STORY_DROP`, `progress.at`), Mira 8 on day 0.
+
 **World tab rows** (Pass 185): on `#ow-body` the buy rows come first and a row bought there stays as Done (disabled) until you leave the tab (`OW_KEEP`). The same pattern could fix the other bought-row movers below if Puti agrees.
 
 **Stable screen, left over from Pass 180** (`tests/shrimp-stable.cjs` lists them): buying something that then leaves its list (equipment and treat rows once bought, projects, owner perks, coin buy) slides the next row into the button's place; the second tank adds the tank chips row to the header; the first gala adds the earth line to the header; opening the first store and the kit price − change their card's height; the first rack farm reshapes Farms. Decide with Puti whether bought rows should stay in place as Done.

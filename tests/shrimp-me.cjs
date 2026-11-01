@@ -102,12 +102,12 @@ k.emp.bank={left:12000,pay:600,miss:0,next:k.day};k.emp.farms.barn=1;k.emp.farmP
 check('dyed shrimp sell for more until someone finds out',`
 var g=newGame();var T=g.tanks[0];T.had=1;T.set.sellAge=50;T.pop=[{age:90,n:40,g:40,b:0}];g.stats.sold=40;if(!milestoneConditions(g).dye_offer)throw Error('Offer');
 var a=doSell(g,T,true,10).revenue;storyChoose(g,'dye_offer',0);var b=doSell(g,T,true,10).revenue;if(Math.abs(b/a-1.9)>0.01)throw Error('90% more '+a+' '+b);
-g.day=30;var r=Math.random;Math.random=function(){return 0;};dyeDay(g);Math.random=r;if(g.dye.on||!milestoneConditions(g).mira_dye||g.orderNext<100)throw Error('Found out');
+g.day=30;g.story.choices=g.story.choices||{};g.story.choices.ev_mira=0;var r=Math.random;Math.random=function(){return 0;};dyeDay(g);Math.random=r;if(g.dye.on||!milestoneConditions(g).mira_dye||g.orderNext<100)throw Error('Found out');
 `);
 check('fight nights pay, cost shrimp, can be raided, and lead to the investor',`
 Math.random=function(){return 0.9;};var g=newGame();var T=g.tanks[0];T.had=1;T.pop=[{age:90,n:60,g:40,b:0}];T.feeder=1;T.autoWC=1;g.kits.sold=1;personalDay(g);g.emp.fight=1;setPick(g,'fight');g.fin=[{shrimp:100}];
 var m=g.money,n=totalN(T);for(var d=0;d<29;d++){g.day++;personalDay(g);}if(g.money<=m||totalN(T)>=n||!g.emp.fightDead)throw Error('Fight nights');
-if(!milestoneConditions(g).mira_fight)throw Error('Mira');g.emp.kitsOpened=1;if(!milestoneConditions(g).wash_offer)throw Error('Investor after four nights');
+g.story.choices=g.story.choices||{};g.story.choices.ev_mira=0;if(!milestoneConditions(g).mira_fight)throw Error('Mira');g.emp.kitsOpened=1;if(!milestoneConditions(g).wash_offer)throw Error('Investor after four nights');
 `);
 check('washing money pays every day, asks favours, and the way back costs almost everything',`
 var g=newGame();g.emp.kitsOpened=1;g.money=100000;g.day=500;storyChoose(g,'wash_offer',0);if(!dirtyOn(g))throw Error('On');var m=g.money;washDay(g);if(g.money<=m)throw Error('Cash');
@@ -117,7 +117,7 @@ var p=JSON.parse(JSON.stringify(g));storyChoose(g,'fav_2',0);if(!g.emp.network||
 g.tr={drive:6,know:-4,care:6};if(endingPick(g)!=='network_dark')throw Error('Dark '+endingPick(g));
 var q=Object.assign(engineCopy(p));function engineCopy(x){var y=newGame();for(var k in x)y[k]=x[k];return y;}
 q.money=1000000;q.emp.farms.barn=4;storyChoose(q,'fav_2',1);if(q.money>100000||!frozen(q)||farmCap(q)!==20||!q.emp.turned||dirtyOn(q))throw Error('Police '+q.money+' '+farmCap(q));
-q.tr={drive:6,know:-4,care:6};if(endingPick(q)!=='network_back')throw Error('Back');q.day+=366;turnedDay(q);if(!milestoneConditions(q).mira_back)throw Error('Mira comes back');
+q.tr={drive:6,know:-4,care:6};if(endingPick(q)!=='network_back')throw Error('Back');q.day+=366;turnedDay(q);q.story.choices=q.story.choices||{};q.story.choices.ev_mira=0;if(!milestoneConditions(q).mira_back)throw Error('Mira comes back');
 var r=engineCopy(JSON.parse(JSON.stringify(p)));r.money=1e6;storyChoose(r,'fav_2',2);if(dirtyOn(r)||!r.emp.paidOut||gpLines(r).join().indexOf('route')<0)throw Error('Paid out');
 `);
 check('the buyout offer ends the game with its own ending',`
@@ -209,8 +209,8 @@ check('Mira shows up at more moments, and each one follows something you did',`
 var g=newGame();g.day=1200;var c=milestoneConditions(g);if(c.mira_teen||c.mira_house||c.mira_net||c.mira_grown||c.mira_bye)throw Error('Not before you met her');
 g.story.choices={ev_mira:1};c=milestoneConditions(g);if(!c.mira_teen||c.mira_house||c.mira_net||c.mira_grown||c.mira_bye)throw Error('Only the age one at first');
 if(MILESTONES.mira_teen.more(g).indexOf('Sunday')<0)throw Error('Her answer shows');g.story.choices.ev_mira=0;if(MILESTONES.mira_teen.more(g).indexOf('jar')<0)throw Error('The jar');
-g.me={on:1,house:{complete:5},cnt:{},gp:{}};g.emp.network=1;g.humans=2e8;g.story.choices.bye_pack=0;c=milestoneConditions(g);if(c.mira_grown)throw Error('Mira is not eighteen yet');g.day=3700;c=milestoneConditions(g);
-['mira_house','mira_net','mira_grown','mira_bye'].forEach(function(k){if(!c[k]||!MILESTONES[k]||!MILESTONES[k].body)throw Error(k);});
+g.me={on:1,house:{complete:5},cnt:{},gp:{}};g.emp.network=1;g.humans=2e8;g.story.choices.bye_pack=0;c=milestoneConditions(g);if(c.mira_grown)throw Error('Mira is not eighteen yet');['mira_house','mira_net','mira_bye'].forEach(function(k){if(!c[k]||!MILESTONES[k].body)throw Error(k);});g.day=3700;c=milestoneConditions(g);
+if(!c.mira_grown||c.mira_house||c.mira_net||c.mira_bye)throw Error('At eighteen only the grown-up card (Pass 190)');
 var n=Object.keys(MILESTONES).filter(function(k){return /^mira_/.test(k);}).length;if(n<10)throw Error('Mira moments '+n);
 `);
 check('paths without Space get a last chapter before the ending',`

@@ -1692,3 +1692,86 @@ Puti: when you go to the police and can't sell kits for a year, Trade and the Se
 Test: balance 129 (new police-year check), me 49, academy 9, tank1, hard 10, land-audio. Headless 390: Trade back, strip button "Sell 32 · AED 83", click sells 32 for AED 83, Trade gone after the ban.
 
 Before deploy (Passes 187 to 189): bots seed 7: strong cold 2,140 empire_dictator (was 2,210), strong kind 3,206 question_prof (3,197), average Earth 6,777 garden_hermit (6,777), no INSOLVENT, no STUCK. Spotlight sweep 108 all good. Layout scan: the one known 2 px. Stable full run: 1,778 clicks, 19 buttons moved something (was 23), the same Gear buy rows and story picks as before. Not run: space playthrough, monkey.
+
+## Pass 190: unlocks and story timing (1 Nov, afternoon fixes Part A)
+
+Project doc `claude/shrimp-fix-prompt-1nov-pm.md`, Part A.
+1. Kits also wait for tank 2's first baby (`G.stats.t2Born`, set at the first hatch in any tank after Tank 1; `kitsOpen`). The 200 sold and 60 L from Pass 187 still apply. Saves already past keep Kits (`kitsOpened`). Lock line, idea and tanks2 card say "babies in a second tank". Average bot opens Kits on day 329 (was 309).
+2. The care item in Kit development is the Shrimp care guide leaflet (there is no separate care video in the code): it shows once 10 kits are sold. Bought ones stay. The first-kit card no longer points at it.
+3. The tank-at-home card (`owntank`) goes first in the story line and skips the story gap, so it shows right after the farm chapter, when the farm takes the tanks (`ownTankNow` already ran then).
+4. Story timing. Cards waited in one line, one about every 1 to 2.5 minutes of play, so at 12x a card came hundreds of days after its cause. Now each waiting card keeps the day it became due (`progress.at`). Cards about a moment go first and skip the gap (only the 15 s rest): `STORY_PROMPT` (choices or a change already made: owntank, the four staff goodbyes, burnout, research trees) are never dropped; `STORY_DROP` (no choices: every Mira card, gp_net, me_doctor) are dropped if more than 60 days old when their turn comes (`progress.dropped`). At 4x the 15 s rest is 25 days, at 12x 75 days, so at 12x and 40x some Mira cards will be dropped rather than shown late.
+5. Mira: one birthday, 8 on day 0 (`miraAge` = 8 + day/365; ev_mira says she's eight and fires around day 160). Eleven on day 1095, eighteen on day 3650. Changes: mira_bye, mira_house, mira_net, mira_dirty only while she's under 15 (childish lines); mira_fight under 18; mira_dye, mira_fight, mira_back need her met. mira_bye was set off by any staff goodbye (the sales one at day 1484 in the old run), now only by the packers' (it's about the packing line). Not changed: the ending's Mira paragraph gives her an adult job even when the strong bot wins on day 2,140 (she's 14). Puti to decide.
+Test: balance 130 (new: freshness and Mira age), me 49 (Mira tests set her met), academy 9. Average bot seed 7: Earth 6,749 (was 6,777), no INSOLVENT.
+
+Story cards, average bot seed 7 (bot play clock 4 s a game day, so lags here are far shorter than at 12x). Day due is when the card joined the line, Pass 190 build. "-" for cards that don't wait in the story line (chapters, intros) or didn't come up.
+
+| Card | Trigger | Fired, Pass 189 build | Due, Pass 190 | Fired, Pass 190 |
+|---|---|---|---|---|
+| intro | `?` | 0 | - | 0 |
+| cycle | `t.cycledAt!=null&&p.nh<0.05&&p.no2<0.05&&p.no3<=20&&t.chem.kh>=2` | 28 | - | 28 |
+| hatch | `G.stats.born>=3` | 53 | - | 53 |
+| jar | `!!G.stats.bornDay&&G.day>=G.stats.bornDay+30&&!(G.kits.sold>0)&&jarSpare(G)>=JAR_N` | 81 | - | 81 |
+| sale | `G.stats.sold>(G.stats.jarSold\|\|0)` | 119 | - | 119 |
+| ev_mira | `G.stats.sold>=30` | 161 | 161 | 161 |
+| dye_offer | `G.stats.sold>=40&&!kitsOpen(G)` | 191 | 168 | 191 |
+| mira_dye | `!!(G.dye&&G.dye.found)&&miraMet(G)` | 221 | 204 | 204 |
+| health | `G.tanks.some(function(x){return !!x.ill;})` | 249 | - | 249 |
+| kits | `kitsOpen(G)` | 309 | - | 329 |
+| kit | `G.kits.sold>0` | 368 | - | 365 |
+| me_intro | `!!(G.me&&G.me.on)` | 372 | - | 369 |
+| fight_invite | `G.stats.sold>=150&&G.day>=250&&!G.emp.won&&!!(G.me&&G.me.on)` | 376 | 366 | 373 |
+| party1 | `qHad, 500 shrimp / EU` | 447 | 435 | 435 |
+| ev_paper | `G.kits.sold>=5` | 506 | 477 | 477 |
+| qc | `G.kits.sold>=QC_FROM` | 645 | - | 618 |
+| ripple | `!!(G.emp.ripple&&G.emp.ripple.n>=1)` | 742 | - | 689 |
+| station | `stationDone(G)&&(G.emp.handPacked\|\|0)>0` | 812 | - | 756 |
+| bulk | `!!(G.korder&&!G.korder.taken)` | 847 | - | 793 |
+| worldtab | `!!(G.ob&&G.ob.ereg)` | 870 | - | 814 |
+| farm | `Object.keys(G.emp.farms).some(function(k){return G.emp.farms[k]>0;})` | 896 | - | 840 |
+| ev_rival | `G.kits.sold>=40&&farmBuilt(G)` | 900 | 840 | 863 |
+| owntank | `farmBuilt(G)&&!G.emp.won` | 926 | 840 | 844 |
+| pain_heat | `owners past the pain level, kits open` | 1200 | 1101 | 1125 |
+| mira_teen | `miraMet(G)&&miraAge(G)>=11` | 1256 | 1095 | 1095 |
+| pain_pack | `owners past the pain level, kits open` | 1358 | 1236 | 1237 |
+| ev_ai | `G.humans>=2e4` | 1389 | 1264 | 1264 |
+| pain_inbox | `owners past the pain level, kits open` | 1454 | 1401 | 1401 |
+| bye_sales | `byeReady(G,'sales')` | 1484 | 1204 | 1204 |
+| mira_bye | `miraMet(G)&&miraBye(G)&&miraAge(G)<15` | 1510 | - | - |
+| ministry | `pd(G,'ministry')` | 1514 | - | 1596 |
+| bye_pack | `byeReady(G,'pack')` | 1652 | 5320 | 5320 |
+| pain_moss | `owners past the pain level, kits open` | 1712 | 1599 | 1600 |
+| pain_crash | `owners past the pain level, kits open` | 1855 | 1694 | 1694 |
+| gp_land | `5e5 sent to Grandma` | 1953 | 1861 | 1861 |
+| landtime | `landOpen(G)&&!G.left&&!G.voyage` | 1983 | - | 1891 |
+| pain_permit | `owners past the pain level, kits open` | 2010 | 1944 | 1944 |
+| million | `G.humans>=1e6` | 2089 | - | 2014 |
+| buyout | `(G.humans>=1e6\|\|G.humans>=2e5&&((G.me&&G.me.cnt.dinners)\|\|0)>=6)&&!G.emp.won&&!G.em...` | 2093 | 2014 | 2018 |
+| pain_payout | `owners past the pain level, kits open` | 2240 | 2111 | 2111 |
+| pain_copy | `owners past the pain level, kits open` | 2453 | 2365 | 2365 |
+| party2 | `qHad, 500 shrimp / EU` | 2716 | 2660 | 2660 |
+| c_fisher | `CARDS3: owners or cond` | 2743 | 2612 | 2612 |
+| c_mytank | `CARDS3: owners or cond` | 2920 | 2920 | 2920 |
+| ev_marine | `G.humans>=5e7` | 3027 | 2874 | 2874 |
+| tree_rewild | `research tree opened` | 3051 | 2880 | 2880 |
+| coin_offer | `1e8 owners` | 3245 | 3086 | 3086 |
+| c_permit | `CARDS3: owners or cond` | 3642 | 3446 | 3446 |
+| tenyears | `G.day>=DREAM_DAYS&&!G.emp.won` | 3650 | - | 3650 |
+| mira_scholar | `pd(G,'scholar')&&miraMet(G)&&miraAge(G)>=18` | 3811 | 3650 | 3654 |
+| mira_grown | `miraMet(G)&&miraAge(G)>=18` | 3846 | 3650 | 3658 |
+| c_cash | `CARDS3: owners or cond` | 4495 | 4307 | 4307 |
+| c_inspect | `CARDS3: owners or cond` | 5228 | 5013 | 5013 |
+| hardpart | `hardOpen` | 5448 | - | 5229 |
+| nour1 | `hard part days, previous Nour card seen` | 5493 | 5274 | 5274 |
+| nour2 | `hard part days, previous Nour card seen` | 5648 | 5429 | 5429 |
+| c_power | `CARDS3: owners or cond` | 5723 | 5379 | 5379 |
+| nour3 | `hard part days, previous Nour card seen` | 5828 | 5609 | 5623 |
+| c_rivers | `CARDS3: owners or cond` | 5851 | 5444 | 5457 |
+| c_many | `CARDS3: owners or cond` | 5943 | 5504 | 5504 |
+| nour4 | `hard part days, previous Nour card seen` | 6008 | 5789 | 5789 |
+| c_blackout | `CARDS3: owners or cond` | 6043 | 5553 | 5553 |
+| c_prison | `CARDS3: owners or cond` | 6144 | 5865 | 5865 |
+| ev_school | `G.humans>=2e5&&G.kits.stock>=20&&!G.emp.won` | 6180 | 5597 | 5597 |
+| nour5 | `hard part days, previous Nour card seen` | 6208 | 5989 | 5989 |
+| nour6 | `hard part days, previous Nour card seen` | 6448 | 6229 | 6229 |
+| lastchap | `?` | 6777 | - | 6749 |
+| win | `!!G.emp.won` | 6777 | - | 6749 |

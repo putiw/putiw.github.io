@@ -253,6 +253,13 @@ var m1=kitMaterials(g);setQCStrict(g,2);if(!(kitMaterials(g)>m1))throw Error('St
 if(html.includes("needs '+big(nextLine.sold)")||html.includes('show up once your first three tanks')||html.includes('Bacteria starter unlocks when'))throw Error('Unlock rules should not be shown');
 if(!html.includes("bar.hidden=true;\n  if(!g)return;")||!html.includes("$('ideas-now').hidden=!soft"))throw Error('Guide lines belong in the ? popup, never a bar over the game (Puti, 28 Oct)');
 if(!html.includes("if(SPOT||SPOTQ.length||!introOK())return;")||!html.includes("if(!s.now&&!introOK(s.gap))"))throw Error('One spotlight at a time');
+check('story cards about a moment go first, narrative ones go stale after 60 days (Pass 190)',`
+var g=readyGame();var p=ensureProgress(g);p.seen.ev_mira=true;g.story.choices={ev_mira:0};g.day=1200;p.wait=['ev_paper','ev_rival'];p.at={ev_paper:1100,ev_rival:1100};p.queue=[];p.soon=[];
+detectMilestones(g);var w=p.wait.concat(p.queue);if(w.indexOf('mira_teen')<0||p.queue.indexOf('mira_teen')<0&&p.wait[0]!=='mira_teen')throw Error('Mira at eleven goes first '+JSON.stringify(w));
+var g2=readyGame(),p2=ensureProgress(g2);g2.day=500;p2.wait=['ev_paper','mira_teen'];p2.at={ev_paper:400,mira_teen:400};p2.queue=[];p2.soon=[];p2.seen.mira_teen=true;detectMilestones(g2);if(p2.wait.concat(p2.queue).indexOf('mira_teen')>=0||(p2.dropped||[]).indexOf('mira_teen')<0)throw Error('Stale Mira card dropped');
+if(miraAge(newGame())!==8||Math.round(miraAge({day:365*3}))!==11)throw Error('Mira is 8 on day 0');
+var g3=readyGame();g3.story.choices={ev_mira:0,bye_sales:0};if(milestoneConditions(g3).mira_bye)throw Error('Mira asks about the packing line only after the packers go');
+`);
 check('a tank seeded from Tank 1 stays cycled for 30 days with shrimp (1 Nov)',`
 var g=readyGame();var t=g.tanks[0];t.had=1;t.cycledAt=0;t.pop=[{age:100,n:40,g:60}];g.money=1e5;if(!addTank(g))throw Error('addTank');var T=g.tanks[1];T.vol=640;T.volTier=VOLS.length-1;T.pop=[{age:100,n:600,g:60}];T.had=1;
 for(var d=0;d<5;d++)tankRoll(g,T,1);if(T.chem.bacA<Math.min(capA(T),bacTarget(T))*0.99||T.chem.bacB<Math.min(capA(T),bacTarget(T))*0.99)throw Error('Seeded tank fell behind');
@@ -261,9 +268,9 @@ check('police year: loose farm shrimp sell by hand, inside weekly buyers (Pass 1
 var g=readyGame();g.emp.farms.hatch=1;g.emp.rawShrimp=500;g.emp.nosale=g.day+100;if(!banSale(g))throw Error('ban sale on');var d=demandLeft(g),r=sellAll(g,true);if(r.count<1||r.count>d)throw Error('within buyers '+r.count+' '+d);
 var m=g.money;sellAll(g,false);var q=banSell(g,false,demandLeft(g));if(g.emp.rawShrimp>=500)throw Error('raw shrimp sold');g.emp.nosale=g.day-1;if(banSale(g))throw Error('ends with the ban');
 `);
-check('kits need a second tank and room (1 Nov)',`
+check('kits need babies in tank 2 and room (1 Nov, Pass 190)',`
 var g=readyGame();g.stats.sold=KIT_UNLOCK;var t=g.tanks[0];t.had=1;t.vol=80;t.volTier=2;t.pop=[{age:100,n:20,g:60}];if(kitsOpen(g))throw Error('One 80 L tank should not open kits');
-var t2=newTank(1);t2.had=1;t2.pop=[{age:100,n:20,g:60}];g.tanks.push(t2);if(!kitsOpen(g))throw Error('A second tank with 80 L stocked should open kits');
+var t2=newTank(1);t2.had=1;t2.pop=[{age:100,n:20,g:60}];g.tanks.push(t2);if(kitsOpen(g))throw Error('Kits wait for tank 2 babies');t2.clutches=[{due:0,f:1,g:60}];stepGame(g);if(!g.stats.t2Born)throw Error('tank 2 birth not marked');if(!kitsOpen(g))throw Error('A second tank with babies and 80 L stocked should open kits');
 t.vol=20;t.volTier=0;t2.vol=20;if(kitsOpen(g))throw Error('Kits still need some room');
 `);
 check('hired salespeople sell surplus without an extra toggle',`
