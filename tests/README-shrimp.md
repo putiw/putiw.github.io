@@ -1996,3 +1996,9 @@ The Rewilding card has Plant trees on the coast hills (`plSheet`): a fixed 48×3
 The stream ending now also needs 100 of your planted trees living (`PL_OWN`, `streamReady`). Whether the stream gets a hint stays Puti's call.
 Browser 360 and 390: canvas and sheet keep their place and size on six taps and a bag, no errors.
 Test: balance 135 (bag, no planting in water, one per spot, rock dies, water helps, neighbors choke, patches spread and aren't yours, bay greys mud, stream gate).
+
+### Pass 209: Space still opens (plan Part 7)
+
+Grant papers and finds count in `sciScore` through their fields. Seed 7, Leave Earth opens: average 5,921 and Scientist profile (`PROFILE=scientist`) 6,139, against the baseline 5,996 (both within 3%). The Scientist ends question_prof. The strong bot never reaches it on Earth; the Space bot passes.
+
+Left in the plan, waiting for Puti: the card table (Part 2 rewrites and Part 3 new cards, `tests/shrimp-card-table.md`, artifact "Card table"), the land-life pick (Part 8), then the final check (Part 9).
