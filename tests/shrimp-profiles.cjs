@@ -44,7 +44,7 @@ function player(p,rich){
  g.me.hrs={work:pl.hrs[0]*(0.85+0.3*rnd()),house:pl.hrs[1]*(0.85+0.3*rnd())};
  // Measures the rework reads (Part 1): real hours on the land, grant directions, giving, farm wellbeing, research centres.
  const ls=val(pl.land,'land')*(0.5+rnd());P.landMs=ls<0.95?P.t*ls/(1-ls):P.t*20;const gr=val(pl.grants,'grants');if(gr!=null){P.grN=6;P.grB=Math.round(6*gr);}
- P.giveD=4;P.giveY=val(pl.give,'give')*4*(0.6+0.8*rnd());P.fw=[val(pl.farmWell,'farmWell')*yrs,yrs];g.stats.earned=1e11;g.stats.rsp=1e11*val(pl.centre,'centre')*(0.6+0.8*rnd());
+ P.giveD=4;P.giveY=val(pl.give,'give')*4*(0.6+0.8*rnd());P.fw=[Math.max(0,val(pl.farmWell,"farmWell"))*400,400];g.stats.earned=1e11;g.stats.rsp=1e11*val(pl.centre,'centre')*(0.6+0.8*rnd());
  if(p.evil){g.emp.network=1;g.emp.evil={bribe:2,dirty:1,mangrove:1,force:2};}
  return c.endingPick(g);}
 function run(p,rich){const out={};for(let i=0;i<N;i++){const e=player(p,rich),f=e.split('_')[0];out[f]=(out[f]||0)+1;out[e]=(out[e]||0)+1;}return out;}

@@ -1959,3 +1959,10 @@ Test: balance 132 (the know check replaced: settings don't move curiosity, resea
 ### Pass 204: card table for Puti (plan Part 2, waiting for her yes)
 
 The table of all 77 decisions with proposed changes is in `tests/shrimp-card-table.md` (also the project doc `claude/shrimp-card-table.md`). Nothing rewritten yet. While waiting: Part 3b (farm wellbeing) and Part 4 (research grants), which don't depend on it.
+
+### Pass 205: farm wellbeing, many or happy (plan Part 3b)
+
+A standing choice on the Farms card, not a card (Puti). Top of Farms once a farm is built (`#fwell`, `renderFarmWell`): Shrimp wellbeing bar with its number (the title opens what it changes), a Shrimp a rack slider 50% to 100% (`E.fw.s`, default 100% = as now), Farm feed Plain / Good +10% upkeep / Fancy +25% upkeep (`FW_FEED`, a share of farm upkeep so it stays a choice late). The header keeps upkeep and shrimp a day.
+Sim: `farmCap` × stocking, `farmOverhead` × (1 + feed share), `farmWell` = 45 + 80 × (1 − stocking) + feed (8 or 15), 0 to 100. The default reads 45 (`FW_MID`) and changes nothing. `sickKitRate` × `farmWellMult` (1 + (45 − wellbeing)/100, 0.5 to 1.5). Kin: each farm day adds the setting, weighted by log of what the farms made, to `G.ps.fw`; `playVal('kin')` averages it with the own tank part once 30 weights are in. The default is neutral, so only a held setting counts.
+Spotlight line for the block. Browser 360 and 390: the block is 169 px whatever is picked, a feed tap and the slider don't move the page, no horizontal scroll, no errors.
+Test: balance 133 (new: default neutral, fewer a rack means less output and more wellbeing, fancy costs and raises it, fewer sick kits, kin reads the held setting, farm days add to it). Bots not run (default is unchanged, so the win day can't move).

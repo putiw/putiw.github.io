@@ -876,6 +876,15 @@ if(Math.abs(netPerDay(h)-100)>1e-6)throw Error('netPerDay counts a personal buy:
 `);
 if(!html.includes("if(!G.ob.sp4c&&speed>=4)G.ob.sp4c=1;")||!html.includes("top:calc(24px + env(safe-area-inset-top,0px))"))throw Error('Pass 184: no 4x spotlight at 4x or more, story card near the top');count++;
 if(!html.includes("var HG_COLS=120")||!html.includes('id="hg-cv"')||!html.includes('id="nour-cv"')||html.includes("showAfter(ho.t,ho.news"))throw Error('Pass 183: people grid, Nour jar, no popup after a hard-part option');count++;
+check('Pass 205: farm wellbeing, many or happy',`
+var g=readyGame();g.emp.farms={barn:4};g.money=1e9;var c0=farmCap(g),o0=farmOverhead(g),w0=farmWell(g),k0=sickKitRate(g);
+if(w0!==FW_MID||farmWellMult(g)!==1)throw Error('The default farm changes nothing '+w0);
+fwOf(g).s=0.5;if(!(farmCap(g)<c0*0.51&&farmWell(g)>w0+30))throw Error('Fewer a rack: less output, more wellbeing '+farmCap(g)+' '+farmWell(g));
+fwOf(g).s=1;fwOf(g).f=2;if(!(farmOverhead(g)>o0*1.2&&farmWell(g)>w0))throw Error('Fancy feed costs upkeep and raises wellbeing');
+fwOf(g).s=0.5;if(!(sickKitRate(g)<k0))throw Error('Happy farms send out fewer sick kits');
+var h=newGame();h.ps.fw=[60,60];if(!(playVal(h,'kin')>0.9))throw Error('Kin reads the farm setting held '+playVal(h,'kin'));h.ps.fw=[0,60];if(playVal(h,'kin')!==0)throw Error('Default farm is neutral kin');
+var q=readyGame();q.emp.farms={barn:1};q.money=1e9;q.ps=q.ps||{};fwOf(q).s=0.5;fwOf(q).f=2;for(var i=0;i<40;i++){q.progress.queue=[];stepGame(q);}if(!(q.ps.fw&&q.ps.fw[1]>0&&q.ps.fw[0]>0)&&q.emp.prod>0)throw Error('Farm days add to the held setting '+JSON.stringify(q.ps.fw));
+`);
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
 // Pass 196 (Puti, 1 Nov): after Start over, a built land from the old game can be bought back for AED 300k plus AED 100 a built thing.
