@@ -2002,3 +2002,17 @@ Test: balance 135 (bag, no planting in water, one per spot, rock dies, water hel
 Grant papers and finds count in `sciScore` through their fields. Seed 7, Leave Earth opens: average 5,921 and Scientist profile (`PROFILE=scientist`) 6,139, against the baseline 5,996 (both within 3%). The Scientist ends question_prof. The strong bot never reaches it on Earth; the Space bot passes.
 
 Left in the plan, waiting for Puti: the card table (Part 2 rewrites and Part 3 new cards, `tests/shrimp-card-table.md`, artifact "Card table"), the land-life pick (Part 8), then the final check (Part 9).
+
+### Pass 210: one push table, skipped options count, no head start (card review A1 to A7)
+
+Spec: Puti's approved review `shrimp-card-review-1nov.md` (other agent, 1 Nov evening).
+1. `PUSH` (story cards, pains, late cards, goodbyes) and `FORK_PUSH` (fork projects) are now the only source of what a decision pushes. `storyChoose` and `buyProj` are wrapped: the tags inside them still run for heart (`E.heart`, the news) but the traits are replaced by the table. Fair/cold cards push means and risk or control only (kin or care at most .3 where the card is about it). Goodbyes are means ±.4 each. Tags follow the review's A7 (Mira's jar is own people, the bank sale is own people, letting postdocs go is strangers far away, care guide is kin).
+2. Skipped options count (`PUSH_SKIP`, `pushSkip`): for know, care and kin, when the chosen side leaves a trait at 0, the largest size a skipped side had goes into `trAbs`. A trait reads how often, not only which way.
+3. `endingScores`: no +0.2 for Empire, style terms capped at ±0.15. Tie-breaks in `endingPick`: network needs care above 0.1, else empire; garden against drift within 0.1 goes garden if kin > −care.
+4. Care from play: giving reads only when you give (nothing given reads nothing), and real time on the land reads own people (a quarter of play there is −1, plan Part 8). Hard part options move fairness at most 1 each; a slow fix picked while the workaround is open adds care .5 (was .7).
+5. Story choices and fork options show in an order fixed per game (`optOrder`, `G.oseed`), so the top button isn't always the same kind of answer.
+6. Drive kept even: kind fork sides that stay small carry dr−.3 (co-op, retrain, share the gene, let postdocs go, publish the study, sponge filter, recipe, free care plan, insulated boxes), cold ones dr+.5.
+
+Profiles (family %, normal run): Empire builder empire 93, Dictator cartel 89, Grandma's kid drift 94, Do-gooder network 80, Scientist question 100, Shrimp nerd garden 100, Casual 3/33/0/25/40, Returning 19/27/16/24/15, fair chooser 1/32/32/34/1, cold chooser 22/4/28/43/4, random 12/19/29/35/5. All plan targets met, and `shrimp-profiles` now asserts them (`PROFILE_TARGETS_ON`).
+Before this pass: Grandma's kid drift 28, Casual garden 81, fair chooser garden 100, cold chooser empire 100.
+Test: balance 135 (random chooser within ±0.05 with skips counted, drive even), me 50 (c_cash buy is company first, letting postdocs go is care, the stream needs planted trees), profiles. Ending preview formula updated and rebuilt.

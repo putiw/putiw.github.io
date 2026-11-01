@@ -517,7 +517,7 @@ var g=richGame();g.tr={};g.trAbs={};storyChoose(g,'buyout',1);if(Object.keys(pus
 check('null test: a random chooser lands in the middle on every trait',`
 `+DECS+`
 var D=decisions(),s=11,rnd=function(){s=(s*1664525+1013904223)>>>0;return s/4294967296;},R={};TRAITS.forEach(function(k){R[k]=[];});
-for(var it=0;it<3000;it++){var t={},a={};D.forEach(function(d){var o=d.opts[Math.floor(rnd()*d.opts.length)].push;for(var k in o){t[k]=(t[k]||0)+o[k];a[k]=(a[k]||0)+Math.abs(o[k]);}});TRAITS.forEach(function(k){R[k].push((t[k]||0)/((a[k]||0)+TRAIT_K));});}
+for(var it=0;it<3000;it++){var t={},a={};D.forEach(function(d){var oo=d.opts[Math.floor(rnd()*d.opts.length)],o=oo.push,ab=oo.abs||{};for(var k in o)t[k]=(t[k]||0)+o[k];var ks={};for(var k1 in o)ks[k1]=1;for(var k2 in ab)ks[k2]=1;for(var k3 in ks)a[k3]=(a[k3]||0)+Math.max(Math.abs(o[k3]||0),ab[k3]||0);});TRAITS.forEach(function(k){R[k].push((t[k]||0)/((a[k]||0)+TRAIT_K));});}
 var off=TRAITS.map(function(k){var v=R[k].sort(function(x,y){return x-y;});return [k,v[1500]];}).filter(function(x){return Math.abs(x[1])>0.05;});
 if(D.length<60)throw Error('Only '+D.length+' decisions found');if(off.length)throw Error('Random chooser median off centre: '+JSON.stringify(off));
 `);
@@ -533,7 +533,7 @@ check('Pass 203: curiosity is research spend and grant picks, never settings or 
 var g=newGame();g.day=730;g.ps.t=4e6;g.stats.earned=1e7;var lo=playVal(g,'know');g.ps.tw=600;g.ps.help=200;g.ps.chart=100;if(playVal(g,'know')!==lo)throw Error('Settings still move curiosity');
 g.stats.rsp=2e5;var hi=playVal(g,'know');if(Math.abs(lo+0.6)>0.01||!(hi>0.45&&hi<=0.8))throw Error('Know from play '+lo+' '+hi);
 g.ps.grN=4;g.ps.grB=4;if(!(playVal(g,'know')>hi))throw Error('Basic science grants add curiosity');
-var c=newGame();if(playVal(c,'care')!=null)throw Error('No care from play before the hard part');c.ps.giveD=3;c.ps.giveY=0;var c0=playVal(c,'care');c.ps.giveY=0.3;if(!(c0<0&&playVal(c,'care')>0.6))throw Error('Giving '+c0+' '+playVal(c,'care'));
+var c=newGame();if(playVal(c,'care')!=null)throw Error('No care from play before the hard part');c.ps.giveD=3;c.ps.giveY=0;var c0=playVal(c,'care');c.ps.giveY=0.3;if(!(c0==null&&playVal(c,'care')>0.6))throw Error('Giving '+c0+' '+playVal(c,'care'));
 var d=newGame();d.day=3000;d.ps.t=3.6e6;d.ps.landMs=1.2e6;if(!(playVal(d,'drive')<-0.9))throw Error('A quarter of play on the land is life first '+playVal(d,'drive'));
 var c=newGame();c.day=730;c.ps.t=4e6;c.ps.prep=[0.2,4];var lc=playVal(c,'control');c.ps.prep=[4,4];if(!(lc<-0.5&&playVal(c,'control')>0.5))throw Error('Control reads how ready you were at each big step');
 var d=newGame();d.day=730;d.ps.t=4e6;if(playVal(d,'drive')!=null)throw Error('A player who never opened the You page says nothing about drive');
