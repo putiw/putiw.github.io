@@ -1955,3 +1955,7 @@ New ending text for Puti to approve (empire_hard, "The Empire, the hard bargain"
 - Tank: The water was fine and the food was the cheapest food. There were a lot of us. When some died, more came the next day.
 
 Test: balance 132 (the know check replaced: settings don't move curiosity, research share and grants do, giving held over years, land quarter reads −1), me 50 (cold empire without acts is empire_hard, dictator needs the acts, cold garden stays garden, fair empire stays empire), endcards 50, academy 9, profiles. Ending preview rebuilt and its formula updated. Pass 202 and 203 went into one commit (a stuck shell step held the first one).
+
+### Pass 204: card table for Puti (plan Part 2, waiting for her yes)
+
+The table of all 77 decisions with proposed changes is in `tests/shrimp-card-table.md` (also the project doc `claude/shrimp-card-table.md`). Nothing rewritten yet. While waiting: Part 3b (farm wellbeing) and Part 4 (research grants), which don't depend on it.
