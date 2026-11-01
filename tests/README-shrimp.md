@@ -2071,3 +2071,8 @@ Browser: spotlights 103 all good, layout one 2 px text on the win World tab (kno
 Suites: balance 135, me 50, academy 10, hard 12, frozen, endcards 50, cardtap, tank1, yourtank, land-audio, land-life, profiles.
 
 Deployed 1 Nov night (Passes 201 to 214, BUILD 2026-11-01-p214). Tests before deploy are those in Pass 214: balance 135, me 50, academy 10, hard 12, frozen, endcards 50, cardtap, tank1, yourtank, land-audio, land-life, profiles, spotlights 103, layout (one known 2 px), stable 13 known movers, bots and Space bot as in the Pass 214 table.
+
+### Pass 215: hardier line costs 90% of breeding
+
+Puti: the hardier line's settling cost is 90% less breeding, not 10%. `farmCap` multiplies by 0.1 while `G.emp.strain` is unsettled (3 to 9 months, hidden); card body and Switch button say 90%. Not deployed (main at Pass 214).
+Test: balance 135.
