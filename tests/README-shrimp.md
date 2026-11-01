@@ -1655,3 +1655,5 @@ Test: `shrimp-stable` STABLE_TABS=world 158 clicks, 0 movers (was 3). balance 12
 ## Pass 186: stream trap in 10 minutes (1 Nov)
 
 Puti: the trap fills after 10 real minutes, was 6 hours (`TRAP_MS`, land source `shrimp-proto`). Real time, not game days, so speeding up the company doesn't fill it faster; time with the app closed counts. Early tap says the minutes left; texts in the toast, ? and Try say about 10 minutes. Old traps set without a timestamp are capped at 10 minutes. Checked headless (early: about 10 minutes, after 10: 3 wild shrimp and a snail), land-audio passes.
+
+Deployed 1 Nov (Passes 185 and 186, BUILD 2026-11-01-world-rows). Before deploy: balance 127, academy 9, me 49, tank1, land-audio. Bots seed 7: strong cold 2,210, strong kind 3,197, average Earth 6,777 garden_hermit, all the same as Pass 184, no INSOLVENT. Space bot passes. Spotlight sweep 116 all good. Layout scan only the known 2 px win World chart label. Monkey 60 taps at six stages, 360 and 390, clean. Not seen on a real phone.
