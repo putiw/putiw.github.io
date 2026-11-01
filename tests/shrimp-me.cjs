@@ -202,9 +202,9 @@ g.ps.t+=121000;newsTick(g);if(R.log.length!==3)throw Error('Then the rest, space
 var b=newGame();b.kits.sold=100;newsLine(b,'bots');if(rip(b).log.length!==1)throw Error('No play clock, straight to print');
 `);
 check('academia or industry, letters to Grandma, and choices that make the news',`
-var g=newGame();g.kits.sold=ACADEMY_AT;g.academy.level=1;g.money=1e7;rlHire(g,'auto','pd');if(forkOpts('science').some(function(p){return p.req(g);}))throw Error('Not right after the first postdoc');rlHire(g,'water','pd');g.academy.papers=4;if(!forkOpts('science').every(function(p){return p.req(g);}))throw Error('Science question once postdocs have a track record');
+var g=newGame();g.kits.sold=ACADEMY_AT;g.academy.level=1;g.money=1e7;grOf(g).ctr={auto:1,water:1};rlHire(g,'auto','pd');if(forkOpts('science').some(function(p){return p.req(g);}))throw Error('Not right after the first postdoc');rlHire(g,'water','pd');g.academy.papers=4;if(!forkOpts('science').every(function(p){return p.req(g);}))throw Error('Science question once postdocs have a track record');
 var m=g.emp.mat;buyProj(g,'sciind');if(g.emp.mat!==m*0.95||treesFor(g).indexOf('lab')<0||forkOpts('science').some(function(p){return p.id==='sciacad'&&g.emp.proj[p.id];}))throw Error('Industry');
-var h=newGame();h.kits.sold=ACADEMY_AT;h.academy.level=1;h.money=1e7;rlHire(h,'auto','pd');rlHire(h,'water','pd');h.academy.papers=4;buyProj(h,'sciacad');if(!h.emp.acad||!((h.tr.control||0)<0))throw Error('Academia');
+var h=newGame();h.kits.sold=ACADEMY_AT;h.academy.level=1;h.money=1e7;grOf(h).ctr={auto:1,water:1};rlHire(h,'auto','pd');rlHire(h,'water','pd');h.academy.papers=4;buyProj(h,'sciacad');if(!h.emp.acad||!((h.tr.control||0)<0))throw Error('Academia');
 var q=newGame();q.tanks[0].feeder=1;q.tanks[0].autoWC=1;q.kits.sold=Math.max(1,q.kits.sold);personalDay(q);for(var d=0;d<6;d++){gtThere(q,1);}if(q.me.letters<3||!q.me.hist.some(function(x){return /fishing boat/.test(x);}))throw Error('His story in letters');
 var w=newGame();w.humans=4e9;hardDay(w);w.money=1e12;w.fin=[{kits:1e9}];hardBuy(w,'fled','camps');if(!rip(w).log.some(function(x){return /camp school/.test(x.tx);}))throw Error('A hard-part choice makes the news');
 var o=newGame();o.emp.farms.hatch=1;storyChoose(o,'owntank',0);
@@ -247,11 +247,11 @@ var g=newGame();g.money=1e8;if(aiCost(g)!==2e7||rivalCost(g)!==1e6)throw Error('
 storyChoose(g,'ev_ai',0);if(g.money!==8e7||g.emp.aiCut!==0.02)throw Error('Paid share');var h=newGame();h.money=1000;if(aiCost(h)!==50000||storyChoose(h,'ev_ai',0))throw Error('Small company still pays the base price');
 `);
 check('research lines: many people in many fields at once, finds are luck',`
-var g=newGame();g.kits.sold=ACADEMY_AT;g.money=1e8;['energy','water','auto'].forEach(function(id){rlHire(g,id,'phd');rlHire(g,id,'pi');});if(rlines(g).water.pi!==1||rlines(g).energy.phd!==1)throw Error('Hired in parallel');
+var g=newGame();g.kits.sold=ACADEMY_AT;g.money=1e8;grOf(g).ctr={energy:1,water:1,auto:1};['energy','water','auto'].forEach(function(id){rlHire(g,id,'phd');rlHire(g,id,'pi');});if(rlines(g).water.pi!==1||rlines(g).energy.phd!==1)throw Error('Hired in parallel');
 var y=rlYearAll(g);if(Math.abs(y-3*(40000+1500000)*USD)>1)throw Error('Yearly cost '+y);var m0=g.money;rlDay(g);if(Math.abs(m0-g.money-y/365)>1)throw Error('Paid daily');
 var f0=distributionCost(g);g.emp.farms.hatch=2;var u0=farmOverhead(g);var r=Math.random,sd=11;Math.random=function(){sd=(sd*16807)%2147483647;return sd/2147483647;};for(var d=0;d<4*365;d++)rlDay(g);Math.random=r;
 if(!(rlFound(g,'water')>=1&&rlFound(g,'energy')>=1))throw Error('Something found in four years '+rlFound(g,'water'));if(!(distributionCost(g)<f0)||!(farmOverhead(g)<u0))throw Error('Finds help');
-var h=newGame();h.kits.sold=ACADEMY_AT;h.money=10;if(rlHire(h,'genes','pi'))throw Error('Needs cash');for(var i=0;i<20;i++){h.money=1e9;rlHire(h,'genes','phd');}if(rlines(h).genes.phd!==12)throw Error('Cap per field');
+var h=newGame();h.kits.sold=ACADEMY_AT;h.money=10;grOf(h).ctr.genes=1;if(rlHire(h,'genes','pi'))throw Error('Needs cash');for(var i=0;i<20;i++){h.money=1e9;rlHire(h,'genes','phd');}if(rlines(h).genes.phd!==12)throw Error('Cap per field');
 `);
 check('the game keeps a history for the ending charts',`
 var g=newGame();g.money=1000;for(var d=0;d<60;d++){g.day++;dayRollover(g);}var C=g.chart;if(!C||C.s.length<6||!(Object.keys(C.sp).length>=0))throw Error('History '+(C&&C.s.length));
@@ -263,7 +263,7 @@ while(addHour(g,'work',1));var h=dayHours(g);if(h.work!==14||h.sleep!==7||h.noth
 if(!addHour(g,'work',-1)||dayHours(g).sleep!==5)throw Error('Minus');var n=0;g.me.day.forEach(function(x){n++;});if(n!==24)throw Error('24 hours');
 `);
 check('postdocs cost USD 50k, extra pay is not faster, papers come out steadily',`
-var g=newGame();g.money=1e9;g.kits.sold=5000;g.academy.level=1;var o=null;academyOpen=function(){return true;};if(!rlHire(g,'genes','pd')||!rlHire(g,'genes','phd'))throw Error('Hire');if(Math.round(rlYear(g,'genes')/USD)!==90000)throw Error('Cost '+rlYear(g,'genes')/USD);
+var g=newGame();g.money=1e9;g.kits.sold=5000;g.academy.level=1;grOf(g).ctr.genes=1;var o=null;academyOpen=function(){return true;};if(!rlHire(g,'genes','pd')||!rlHire(g,'genes','phd'))throw Error('Hire');if(Math.round(rlYear(g,'genes')/USD)!==90000)throw Error('Cost '+rlYear(g,'genes')/USD);
 var o1=rlOdds(g,'genes');setPdPay(g,2);if(Math.round(rlYear(g,'genes')/USD)!==115000)throw Error('Extra pay '+rlYear(g,'genes')/USD);if(rlOdds(g,'genes')!==o1)throw Error('Odds must not change');
 var r=Math.random;Math.random=function(){return 0.99;};for(var d=0;d<365*5;d++)rlDay(g);Math.random=r;var p=g.academy.rl.genes.papers;if(p<7||p>9)throw Error('Papers in 5 years '+p);
 `);
@@ -312,7 +312,7 @@ var w=newGame();w.emp.kitsOpened=1;w.kits.sold=60;w.money=1e6;if(storesOn(w))thr
 if(HEAT_COST[2]!==450)throw Error('Thermostat chiller costs 450');
 `);
 check('one research system: people in the fields run lab projects, a chiller keeps water changes cool',`
-var g=newGame();g.kits.sold=ACADEMY_AT;g.money=1e8;if(!rlHire(g,'auto','pd')||g.academy.level!==1)throw Error('First person starts the lab');if(!startStudy(g,'automation'))throw Error('Start a project');for(var i=0;i<80;i++)academyDay(g);if(!rd(g,'automation'))throw Error('Project finishes without a grant');if(g.academy.funded!==0)throw Error('No grant days used');
+var g=newGame();g.kits.sold=ACADEMY_AT;g.money=1e8;g.day=400;grantDay(g);if(rlHire(g,'auto','pd')||!grPick(g,0,150)||g.academy.level!==1)throw Error('The first grant starts the lab (Pass 206)');if(!startStudy(g,'automation'))throw Error('Start a project');for(var i=0;i<80;i++)academyDay(g);if(!rd(g,'automation'))throw Error('Project finishes without a grant');if(g.academy.funded!==0)throw Error('No grant days used');
 var h=newGame(),T=h.tanks[0];T.heater=2;T.chem.temp=24;T.set.heat=24;h.day=285;waterChange(h,T,50);if(Math.abs(T.chem.temp-24)>0.01)throw Error('Chiller-matched water '+T.chem.temp);
 `);
 check('farms and shops climb one kind at a time',`

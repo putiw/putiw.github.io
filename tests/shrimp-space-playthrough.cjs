@@ -18,8 +18,9 @@ function clear(){while(G.progress.queue.length)acknowledgeMilestone(G);}
 clear();if(!G.emp.won)throw Error('Fixture is not a won game');if(typeof spaceOpen!=='undefined')throw Error('Old Space is back');
 record('after the win');
 // Fund research until the door opens. Strong players fund nothing on Earth, so this is the slow road in.
-RLINES.forEach(function(l){for(var k=0;k<3;k++)rlHire(G,l.id,'pd');rlHire(G,l.id,'pi');});
-var d0=G.day;for(var i=0;i<4*365*20&&!voyageOpen(G);i++){clear();stepGame(G);if(G.money<0)throw Error('Insolvent');}
+// Pass 206: a grant a year, a centre every 5 grants, staff the centres.
+function fund(){var g=grOf(G);if(g.c.length&&!g.c.some(function(c){return c.x;}))grPick(G,0,GR_MIN);if(grCanCentre(G)){var f=RLINES.filter(function(l){return !g.ctr[l.id];})[0];if(f)grOpenCentre(G,f.id);}RLINES.forEach(function(l){if(!g.ctr[l.id])return;for(var k=0;k<3;k++)rlHire(G,l.id,'pd');rlHire(G,l.id,'pi');});}
+var d0=G.day;for(var i=0;i<4*365*20&&!voyageOpen(G);i++){if(i%120===0)fund();clear();stepGame(G);if(G.money<0)throw Error('Insolvent');}
 if(!voyageOpen(G))throw Error('Leave Earth never opened: science '+sciScore(G));
 record('Leave Earth opens',{years:+((G.day-d0)/365).toFixed(1)});
 var owners=G.humans,kits=G.kits.sold;if(!startVoyage(G))throw Error('Could not leave');var V=G.voyage;

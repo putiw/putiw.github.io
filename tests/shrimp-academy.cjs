@@ -41,4 +41,19 @@ var g=newGame();g.day=3650;g.emp.won=3650;acknowledgeMilestone(g);g.money=1e10;g
 startStudy(g,'observe');for(var i=0;i<80;i++)academyDay(g);if(!g.academy.active||g.academy.active.id!=='observe')throw Error('Observe should repeat');
 if(STUDIES.some(function(r){return /Space:/.test(r.why);}))throw Error('Space-only study left');
 `);
+check('Pass 206: research grants, two applicants a year, the amount moves only fairness, centres every 5 grants',`
+var g=newGame();g.kits.sold=ACADEMY_AT;g.money=1e9;g.day=500;grantDay(g);var R=grOf(g);if(R.c.length!==2||R.c[0].d===R.c[1].d)throw Error('Two applicants in two directions '+JSON.stringify(R.c));
+if(rlHire(g,'auto','pd'))throw Error('No lines before a centre');
+var t0=JSON.stringify(g.tr||{});if(!grPick(g,0,240))throw Error('Pick');if(!(g.tr.means>0.39))throw Error('The top amount is fair '+JSON.stringify(g.tr));if(grPick(g,1,150))throw Error('One a year');
+if(!g.academy.level||rlStaff(g)!==1)throw Error('A grant starts the lab and counts as a person');
+var a=newGame(),b=newGame();[a,b].forEach(function(x){x.kits.sold=ACADEMY_AT;x.money=1e9;x.day=500;});var oa=[],ob=[];
+for(var k=0;k<400;k++){var x=JSON.parse(JSON.stringify(a)),y=JSON.parse(JSON.stringify(b));Math.random=(function(s){return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296;};})(k+1);grantDay(x);grPick(x,0,150);var M=Math.random;Math.random=(function(s){return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296;};})(k+1);grantDay(y);grPick(y,0,240);
+ Math.random=(function(s){return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296;};})(k+999);x.day+=1095;grantDay(x);Math.random=(function(s){return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296;};})(k+999);y.day+=1095;grantDay(y);oa.push(grOf(x).done[0].res);ob.push(grOf(y).done[0].res);}
+if(oa.join()!==ob.join())throw Error('The amount changed the results');if(oa.indexOf('find')<0||oa.indexOf('papers')<0)throw Error('Finds and plain papers both happen');
+var s=newGame();s.kits.sold=ACADEMY_AT;s.money=1e9;s.day=500;grantDay(s);if(!grSkip(s)||grPick(s,0,150))throw Error('Skip the year');
+var c=newGame();c.kits.sold=ACADEMY_AT;c.money=1e12;c.day=500;for(var yr=0;yr<5;yr++){c.day+=365;grantDay(c);if(!grPick(c,0,150)){grOf(c).run=[];grPick(c,0,150);}if(yr<4&&grCanCentre(c))throw Error('Centre too early '+yr);}
+if(!grCanCentre(c)||!grOpenCentre(c,'basic')||grOpenCentre(c,'eco')||!rlHire(c,'basic','pd'))throw Error('A centre after 5 grants, one per 5');
+var o=newGame();o.academy.rl={water:{phd:2,pd:1,pi:0,found:1,dud:0}};delete o.academy.gr;o.kits.sold=ACADEMY_AT;o.money=1e9;if(!grOf(o).ctr.water||!rlHire(o,'water','pd')||grCanCentre(o))throw Error('Old saves keep their lines as centres');
+var p=newGame();p.ps.grN=0;p.kits.sold=ACADEMY_AT;p.money=1e9;p.day=500;grantDay(p);var bi=grOf(p).c.findIndex(function(x){return x.d==='basic'||x.d==='eco';});if(bi<0){grOf(p).c[0].d='basic';bi=0;}grPick(p,bi,150);if(p.ps.grN!==1||p.ps.grB!==1)throw Error('Curiosity counts the grant');
+`);
 console.log(count+' academy and parallel chapter checks passed');
