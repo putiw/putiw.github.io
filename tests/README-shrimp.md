@@ -1657,3 +1657,18 @@ Test: `shrimp-stable` STABLE_TABS=world 158 clicks, 0 movers (was 3). balance 12
 Puti: the trap fills after 10 real minutes, was 6 hours (`TRAP_MS`, land source `shrimp-proto`). Real time, not game days, so speeding up the company doesn't fill it faster; time with the app closed counts. Early tap says the minutes left; texts in the toast, ? and Try say about 10 minutes. Old traps set without a timestamp are capped at 10 minutes. Checked headless (early: about 10 minutes, after 10: 3 wild shrimp and a snail), land-audio passes.
 
 Deployed 1 Nov (Passes 185 and 186, BUILD 2026-11-01-world-rows). Before deploy: balance 127, academy 9, me 49, tank1, land-audio. Bots seed 7: strong cold 2,210, strong kind 3,197, average Earth 6,777 garden_hermit, all the same as Pass 184, no INSOLVENT. Space bot passes. Spotlight sweep 116 all good. Layout scan only the known 2 px win World chart label. Monkey 60 taps at six stages, 360 and 390, clean. Not seen on a real phone.
+
+## Pass 187: Puti's 1 Nov phone playtest, 11 notes (1 Nov)
+
+1. Cycled card (and any story card on the Tank tab) sits under the tank when it fits (`msPlace`), else at the top.
+2. pH tip says how: set KH under Water care, then change water. pH follows KH (`phEq` = 6.4 + 0.3 KH), KH 2 is about 7.0, KH 4 about 7.6.
+3. Ads tab opens after 10 shrimp sold (was the first sellable shrimp).
+4. Colour food: "Redder babies, about +2 grade. AED 6 a week." Short enough that no ? shows.
+5. Header gap: `floorKeep` held the header at its tallest after a tap, so buying the auto feeder (Fed and Nutrition row gone) left about 28 px empty until a tab change. The floor now lets go on the next scroll (`hFloorFree`). Fed/Nutrition stay hidden once every tank has a feeder (they came back whenever a tank went hungry, moving the header).
+6. Temperature gear (fan, heater) opens when a tank passes 25.5 °C or drops under 21.5 °C (was 26.5 / 21, after the Too warm label). The warm idea fires at 26 °C.
+7. Sell waiting ("Ready in ~2 d", "Buyers back in 3 d") is a grey disabled button in the Sell spot, not loose text.
+8. The You button appears with its intro card ("Your time"), not minutes before it.
+9. Kits need a second tank too (`kitsOpen`), plus 200 sold and 60 L stocked. Lock line, idea and tanks2 card say so.
+10. Help sheet opens right under its ?, or above when there's no room (`hsPlace`); a scroll closes it. Shrimp Times help no longer mentions people going shrimp-free until someone has (`ripple.free`).
+11. Packing at 1,440 with 240 breeders is the Pass 151 rule (packing waits for 6 shrimp per breeder, `PACK_YOUNG`). Not a bug, the line now says why: "Packing waits for 6 shrimp per breeder, 1,440, so the young grow up. You have 1,425."
+Test: balance 127 (kits test now needs a second tank), academy 9, me 49. Headless 390: header 167 → 138 px after feeder plus a scroll, help sheet top 6 px under its ?, cycle card 8 px under the tank. Not run: stable, layout scan, bots, spotlight sweep (the Ads reveal at 10 sold and the second-tank kit gate move pacing; check bots before deploy).

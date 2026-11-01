@@ -250,6 +250,8 @@ These come from Puti's feedback. Treat them as requirements.
 - Every box keeps its size whatever its text or state. Buttons stay in the same spot: on the right of their row in a fixed 112 px column (`itemHTML`), never dropped under the text. Labels don't wrap (ellipsis), descriptions are two lines, the full text is behind ? (`data-ht`). `.btns` rows don't wrap.
 - A button you can't use right now keeps its space (`visibility:hidden`) instead of vanishing. Grids keep their column count.
 - A card that changes state (offer, running, done) keeps one skeleton: same rows, same button places. The running film shows the three cuts with the picked one marked; a running campaign keeps the offer list with the days left on its button. If states can't share rows, reserve the tallest state's height (`slotMin`).
+- Help (`#helpsheet`) opens right under its ?, or right above it when there's no room, never at the screen bottom; scrolling closes it (`hsPlace`, Pass 187). On the Tank tab a story card sits under the tank when it fits (`msPlace`).
+- The header's tap floor (`HFLOOR`) lets go on the next scroll (`hFloorFree`), so a row that left for good leaves no gap. Fed and Nutrition stay hidden once every tank has a feeder.
 - Things that come and go float over the page instead of pushing it: the story card (`#milestone-card`, a fixed sheet), help (`#helpsheet`), the Aquascape panel, the land's build palette. The job bar and the care buttons share one slot under the tank on both pages (`#tv-slot`, `#jobslot`).
 - Header numbers sit in fixed-width tabular slots. A tap never lets the page get shorter under you (`floorKeep`, freed on tab change).
 - Check every UI change with `tests/shrimp-stable.cjs`.
@@ -567,6 +569,6 @@ Left from that review, not done:
 - The own tank's year-eight card (`c_mytank`) only checks the glass.
 
 **Known gaps**
-- Kits open after 200 home-bred sales and 60 L of tanks with shrimp in them (`KIT_UNLOCK`, `KIT_ROOM`). From 100 sold one loose idea in the ? popup says more tank room is needed; the guide no longer names the route.
+- Kits open after 200 home-bred sales, a second tank (Puti, 1 Nov, Pass 187) and 60 L of tanks with shrimp in them (`KIT_UNLOCK`, `KIT_ROOM`). From 100 sold one loose idea in the ? popup says more tank room is needed; the guide no longer names the route.
 - The opening is slow from the first sale (day ~120) to kits (day ~320) for a player who never buys ads. Worth a look with the bots.
 - The first babies trigger a few spotlights in a row (Colony, Recent events). They could be merged into one.
