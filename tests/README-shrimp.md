@@ -1651,3 +1651,7 @@ Deployed 1 Nov (Pass 184, main at 0fd958d, BUILD 2026-11-01-playtest-1nov).
 2. Stream trap checked headless: set (AED 20), early check says Nothing yet with the hours left, after 6 real hours it holds 2 to 7 wild shrimp plus a find, Take the shrimp home works. No bug; the wait is real time (`TRAP_MS` 6 h).
 3. Grandma's land starts with Your tank (Tank 1) on her floor beside the armchair (land source `shrimp-proto`, `landOwnTank` in land.js, game.js runs it for old fresh lands). Tapping it opens the Tank tab.
 Test: `shrimp-stable` STABLE_TABS=world 158 clicks, 0 movers (was 3). balance 127, tank1, tank1-browser, land-audio pass. Not run: bots, spotlight sweep, monkey, layout scan.
+
+## Pass 186: stream trap in 10 minutes (1 Nov)
+
+Puti: the trap fills after 10 real minutes, was 6 hours (`TRAP_MS`, land source `shrimp-proto`). Real time, not game days, so speeding up the company doesn't fill it faster; time with the app closed counts. Early tap says the minutes left; texts in the toast, ? and Try say about 10 minutes. Old traps set without a timestamp are capped at 10 minutes. Checked headless (early: about 10 minutes, after 10: 3 wild shrimp and a snail), land-audio passes.
