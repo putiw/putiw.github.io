@@ -1700,7 +1700,9 @@ function illById(id){return ILLS.filter(function(x){return x.id===id;})[0];}
 var ILL_R=0.12,ILL_STAGES=['','A few sick','Spreading','Outbreak','About to crash'];
 function illFrac(T){return T&&T.ill?(T.ill.frac==null?0.05:T.ill.frac):0;}
 function illStage(T){var f=illFrac(T);return !T||!T.ill?0:f<0.15?1:f<0.5?2:f<0.85?3:4;}
-function startIll(G,T,type,msg){markEvent(G);var N=totalN(T);T.ill={type:type,day:Math.floor(td(G,T)),days:0,frac:clamp(4/Math.max(N,1),0.02,0.1),st:1};if(msg)log(G,msg,T);}
+// Pass 197 (Puti): no illness for 2 real minutes after the gravel or the glass is cleaned
+function justCleaned(T){return !!(T&&T.cleanT&&Date.now()-T.cleanT<120000);}
+function startIll(G,T,type,msg){if(justCleaned(T))return;markEvent(G);var N=totalN(T);T.ill={type:type,day:Math.floor(td(G,T)),days:0,frac:clamp(4/Math.max(N,1),0.02,0.1),st:1};if(msg)log(G,msg,T);}
 // Random illness comes from the play-time schedule in the UI (every 3 to 6 minutes of play), poor water adds its own risk here.
 // Glass algae: a 32x16 grid of green on the front glass, grows every day, wiped by hand in the tank view.
 var GLASS_W=32,GLASS_H=16;
@@ -1711,7 +1713,7 @@ function glassGrow(G,T){if(T.cycledAt==null&&!T.had)return;var P=ppm(T),n=GLASS_
  var rate=T===G.tanks[0]&&careOn(G)?1/OWN_FULL/(0.35*1.4*1.6)*GLASS_K:0.007*(1+Math.min(2,P.no3/25))*(T.plants?0.6:1)*(T.moss?0.9:1);
  for(var j=0;j<n;j++){var v=T.glass[j];if(Math.random()<0.35)v=Math.min(1,v+rate*(0.4+2*Math.random())*(v>0.05?1.6:1));T.glass[j]=Math.round(v*100)/100;}T.glassV=(T.glassV||0)+1;}
 // How likely a tank is to get sick: water, crowding, dirty glass and new stock raise it, almond leaves and plants lower it.
-function illRisk(G,T){if(!T.had||totalN(T)<10||T.ill)return 0;var c=T.chem,P=ppm(T),N=totalN(T);
+function illRisk(G,T){if(!T.had||totalN(T)<10||T.ill||justCleaned(T))return 0;var c=T.chem,P=ppm(T),N=totalN(T);
  var r=1+(c.gh<5?1:0)+(P.no3>25?1:0)+(P.no3>40?1:0)+(N/T.vol>5?1:0)+glassMean(T)*1.5+(T.newStock!=null&&td(G,T)-T.newStock<20?1:0);
  return r*(T.leaves?0.7:1)*(T.plants?0.85:1);}
 function illRandom(G){if(G.tanks.some(function(t){return t.ill;}))return false;var w=G.tanks.map(function(t){return illRisk(G,t);}),tot=w.reduce(function(a,b){return a+b;},0);if(!tot)return false;
@@ -1763,7 +1765,7 @@ function qHad(G){return G.tanks.some(function(t){return t.had;});}
 function hotNow(G){return !!(G.hot&&G.hot.until>G.day);}
 function matHit(G){var h=G.emp&&G.emp.matHit;return h&&h.until>G.day?h.m:1;}
 var QUIET=[
- {id:'sick',w:3,ok:function(G){return !farmBuilt(G)&&G.tanks.some(function(t){return t.had&&totalN(t)>=10&&!t.ill;});},go:function(G){var ts=G.tanks.filter(function(t){return t.had&&totalN(t)>=10&&!t.ill;}),T=ts[Math.floor(Math.random()*ts.length)];startIll(G,T,Math.random()<0.5?'bact':'scut','A few shrimp in '+T.name+' look off. Tap the tank and check them');}},
+ {id:'sick',w:3,ok:function(G){return !farmBuilt(G)&&G.tanks.some(function(t){return t.had&&totalN(t)>=10&&!t.ill&&!justCleaned(t);});},go:function(G){var ts=G.tanks.filter(function(t){return t.had&&totalN(t)>=10&&!t.ill&&!justCleaned(t);}),T=ts[Math.floor(Math.random()*ts.length)];startIll(G,T,Math.random()<0.5?'bact':'scut','A few shrimp in '+T.name+' look off. Tap the tank and check them');}},
  {id:'hot',w:2,ok:function(G){return !farmBuilt(G)&&qHad(G)&&!hotNow(G)&&G.tanks.some(function(t){return t.had&&t.heater<2;});},go:function(G){G.hot={until:Math.floor(G.day)+6,add:3};log(G,'A hot spell. The room is about 3 °C warmer for the next few days');}},
  {id:'algae',w:2,ok:function(G){return !farmBuilt(G)&&G.tanks.some(function(t){return t.had&&t.glass;});},go:function(G){G.tanks.forEach(function(t){if(t.had&&t.glass)for(var i=0;i<t.glass.length;i++)t.glass[i]=Math.min(1,t.glass[i]+0.35+0.3*Math.random());});log(G,'Algae bloom. The glass went green overnight. Tap the tank to clean it');}},
  {id:'order',w:2,ok:function(G){return !kitsOpen(G)&&!G.order&&G.stats.born>0;},go:function(G){G.orderNext=0;orderDay(G);if(!G.order)return false;}},
@@ -3038,7 +3040,7 @@ function miraMet(G){return !!(G.story&&G.story.choices&&G.story.choices.ev_mira!
 function miraBye(G){var c=G.story&&G.story.choices||{};return c.bye_pack!=null;}/* the card is about the packing line */
 function miraAns(G){return (G.story&&G.story.choices&&G.story.choices.ev_mira)|0;}
 MILESTONES.mira_teen={story:1,title:'Mira',body:'Mira is eleven. She calls you {name|the shrimp person} now. She has a school project about shrimp and she has brought the whole class’s questions in a list.',tab:'tank',more:function(G){return ['Her jar is still on the windowsill. Three shrimp, no filter, perfectly fine.','She tests her own water every Sunday and writes it in a notebook.','She says she waved goodbye to the shrimp that day, and one waved back, mostly.'][miraAns(G)]||'';}};
-MILESTONES.mira_bye={story:1,title:'Mira',body:'Mira found out the packing line is quiet now. She asks who tapes the boxes. You say the machines. She says that is a sad answer for a box.',tab:'emp'};
+MILESTONES.mira_bye={story:1,title:'Mira',body:'Mira found out the packing line is all machines now. She asks if the machines check that the shrimp are happy. You don’t know.',tab:'emp'};
 MILESTONES.mira_house={story:1,title:'Mira',body:'Mira helps paint the shrimp room at your house. She gets more paint on her shoes than on the wall. She says it is the best room in the building.',tab:'me'};
 MILESTONES.mira_net={story:1,title:'Mira',body:'Mira counts your trucks from her window at night. There are more than there used to be. She doesn’t tell her mom.',tab:'emp'};
 MILESTONES.mira_grown={story:1,title:'Mira',body:'Mira turns eighteen. She asks what you would do in her place.',tab:'emp',more:function(G){return pd(G,'scholar')?'She is already studying the sea. She just wants to hear you say it is a good idea.':dirtyOn(G)?'She doesn’t ask about the investor.':'She hasn’t decided yet. She says the shrimp helped her think.';}};
@@ -3129,7 +3131,7 @@ function landOwn(G){var T=G.tanks[0],a=0,y=0,gs=0,ga=[0,0,0,0,0,0,0,0],gy=[0,0,0
   o.glass=(T.glass||[]).map(function(v){return Math.min(9,Math.round(v*9));}).join('');o.no3=+P.no3.toFixed(1);o.nh=+P.nh.toFixed(2);o.decor=T.ldec?{wood:T.wood?1:0,plants:T.plants?1:0,moss:T.moss?1:0,leaves:T.leaves?1:0}:null;o.well=ownWell(G);o.due=ownDue(G);}
  return o;}
 // what a job on the land changed (Pass 161)
-function landTank(G,d){var T=G.tanks[0];if(!T||!d)return;var C=careOf(T),n=function(v){return clamp(+v||0,0,1);};
+function landTank(G,d){var T=G.tanks[0];if(!T||!d)return;var C=careOf(T),n=function(v){return clamp(+v||0,0,1);};if(d.mulm!=null||typeof d.gl==='string')T.cleanT=Date.now();
  if(d.mulm!=null)C.mulm=n(d.mulm);if(d.sponge!=null)C.sponge=n(d.sponge);if(d.grow!=null)C.grow=n(d.grow);
  // Pass 179: the land sends the columns it cleaned and the pests still there, so what was cleaned stays clean
  if(Array.isArray(d.mc)&&d.mc.length===CK_MN){var w=0,s=0,i;C.mc=d.mc.map(n);for(i=0;i<CK_MN;i++){w+=ckMulmW(i);s+=C.mc[i];}C.mulm=n(s/w);C.mcg=C.mulm;}
@@ -3733,7 +3735,7 @@ function trim(n,d){return String(+Number(n).toFixed(d));}
 (function(){var vv=window.visualViewport,fix=function(){var a=document.activeElement,typing=!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!/^(range|checkbox|radio|button)$/.test(a.type||''));document.body.classList.toggle('kbd',typing&&!!vv&&vv.height<window.innerHeight*0.8);var t=document.querySelector('.tabs');if(t&&t.style.transform)t.style.transform='';};if(vv){vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);}document.addEventListener('focusin',function(){setTimeout(fix,300);});document.addEventListener('focusout',function(){setTimeout(fix,50);setTimeout(fix,400);});})();
 // No browser feel: no pinch or double-tap zoom, no long-press menu outside text fields.
 (function(){var stop=function(e){e.preventDefault();};['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,stop,{passive:false});});document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea,[contenteditable]')))e.preventDefault();});})();
-var toastT=null,NF=null,BUILD='2026-11-01-p196';
+var toastT=null,NF=null,BUILD='2026-11-01-p197';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
@@ -3751,6 +3753,34 @@ function musicStart(){if(!musicOn()||MUS.on||(typeof LAND!=='undefined'&&LAND.on
  MUS.on=true;var c2=MUS.ctx;if(c2.state==='suspended')c2.resume();
  (MUS.bufs?Promise.resolve(MUS.bufs):Promise.all([musLoad(c2,'water.mp3'),musLoad(c2,'music.mp3')]).then(function(b){MUS.bufs=b;return b;})).then(function(b){if(!MUS.on)return;MUS.loops.push(musLoop(c2,b[0],MUS.bus,{vol:0.4,fade:4.8,start:1.7,ahead:14}),musLoop(c2,b[1],MUS.bus,{vol:0.16,fade:2.2,start:0.6,ahead:7}));}).catch(function(){MUS.on=false;MUS.fail=Date.now();});}catch(e){MUS.on=false;MUS.fail=Date.now();}}
 function musicStop(){MUS.on=false;MUS.loops.forEach(function(l){l.stop();});MUS.loops=[];if(MUS.ctx){MUS.ctx.close();MUS.ctx=null;}}
+// Pass 197 (Puti): the tank jobs here make the land's sounds (same synth, same numbers) and give a small buzz.
+// They ride the music's context and bus, so the one mute turns them off too.
+var SFXN=null;
+function sfxOk(){return musicOn()&&MUS.ctx&&MUS.ctx.state==='running'&&!(typeof LAND!=='undefined'&&LAND.on);}
+function sfxNoise(){var c=MUS.ctx;if(!SFXN||SFXN.c!==c){var len=c.sampleRate*2,b=c.createBuffer(1,len,c.sampleRate),d=b.getChannelData(0);for(var i=0;i<len;i++)d[i]=Math.random()*2-1;SFXN={c:c,b:b};}var s=c.createBufferSource();s.buffer=SFXN.b;s.loop=true;s.playbackRate.value=0.8+Math.random()*0.4;return s;}
+function sfxEnv(g,t,a,peak,d){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+a+d);}
+function sfxTone(type,f0,f1,t,dur,vol){var c=MUS.ctx,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);if(f1)o.frequency.exponentialRampToValueAtTime(f1,t+dur);sfxEnv(g,t,0.006,vol,dur);o.connect(g);g.connect(MUS.bus);o.start(t);o.stop(t+dur+0.05);}
+function sfxBurst(t,dur,vol,ft,fq,q){var c=MUS.ctx,s=sfxNoise(),f=c.createBiquadFilter(),g=c.createGain();f.type=ft;f.frequency.value=fq;f.Q.value=q||1;sfxEnv(g,t,0.004,vol,dur);s.connect(f);f.connect(g);g.connect(MUS.bus);s.start(t,Math.random());s.stop(t+dur+0.05);}
+function sfx(name,o){if(!sfxOk())return;o=o||{};var t=MUS.ctx.currentTime,v=o.v||1;try{switch(name){
+ case 'snip':sfxBurst(t,0.025,0.25*v,'highpass',3500,0.8);sfxBurst(t+0.035,0.03,0.18*v,'highpass',4200,0.8);sfxTone('square',2600,1800,t,0.015,0.02*v);break;
+ case 'pop':sfxTone('sine',700,180,t,0.09,0.18*v);sfxBurst(t,0.03,0.06*v,'bandpass',1500,2);break;
+ case 'plop':sfxTone('sine',420,120,t,0.14,0.2*v);sfxBurst(t,0.06,0.05*v,'lowpass',700,1);break;
+ case 'squelch':sfxBurst(t,0.22,0.22*v,'lowpass',520,4);sfxTone('sine',140,70,t,0.2,0.08*v);for(var i=0;i<4;i++)sfxTone('sine',500+Math.random()*500,200,t+0.04*i+Math.random()*0.03,0.04,0.04*v);break;
+ case 'suck':sfxBurst(t,0.3,0.12*v,'bandpass',600,1.5);sfxTone('sine',180,420,t,0.25,0.04*v);break;
+ case 'scoop':sfxBurst(t,0.12,0.1*v,'bandpass',900,1);sfxTone('sine',600,900,t,0.08,0.05*v);break;
+ case 'pour':sfxBurst(t,0.9,0.12*v,'bandpass',700,0.8);break;
+ case 'nope':sfxTone('triangle',220,160,t,0.12,0.08*v);break;
+ }}catch(e){}}
+function sfxLoop(name){var none={set:function(){},stop:function(){}};if(!sfxOk())return none;var c=MUS.ctx,g=c.createGain(),nodes=[];g.gain.value=0;g.connect(MUS.bus);
+ try{var s=sfxNoise(),f=c.createBiquadFilter();f.type='bandpass';s.connect(f);f.connect(g);s.start();nodes.push(s);
+  if(name==='siphon'){f.frequency.value=700;f.Q.value=1.4;var lfo=c.createOscillator(),lg=c.createGain();lfo.frequency.value=7;lg.gain.value=260;lfo.connect(lg);lg.connect(f.frequency);lfo.start();nodes.push(lfo);}
+  else{f.frequency.value=1900;f.Q.value=0.8;}}catch(e){}
+ var peak=name==='siphon'?0.22:0.09;
+ return {set:function(l){try{g.gain.setTargetAtTime(peak*clamp(l,0,1),c.currentTime,0.06);}catch(e){}},stop:function(){try{g.gain.setTargetAtTime(0,c.currentTime,0.08);}catch(e){}setTimeout(function(){nodes.forEach(function(n){try{n.stop();}catch(e){}});try{g.disconnect();}catch(e){}},500);}};}
+// A short buzz. Android has navigator.vibrate; iPhone Safari has none, but tapping a switch checkbox gives a tick (iOS 18+).
+var HAPT=null,HAPT_AT=0;
+function hap(ms){var now=Date.now();if(now-HAPT_AT<60||!musicOn())return;HAPT_AT=now;try{if(navigator.vibrate){navigator.vibrate(ms||10);return;}}catch(e){}
+ try{if(!HAPT){var l=document.createElement('label'),i=document.createElement('input');i.type='checkbox';i.setAttribute('switch','');l.appendChild(i);l.setAttribute('aria-hidden','true');l.style.cssText='position:fixed;left:-99px;top:0;width:1px;height:1px;opacity:0;pointer-events:none';l.addEventListener('click',function(e){e.stopPropagation();},true);document.body.appendChild(l);HAPT=l;}HAPT.click();}catch(e){}}
 // iPhone Safari only unlocks audio when a finger lifts (touchend/click), not when it lands, and refuses resume() outside
 // a tap. So every tap checks: start the sound if it should be on, or wake a context the phone left suspended.
 function musicKick(){if(!musicOn()||(typeof LAND!=='undefined'&&LAND.on))return;if(!MUS.on){if(!MUS.fail||Date.now()-MUS.fail>60000)musicStart();return;}if(MUS.ctx&&MUS.ctx.state!=='running'&&!document.hidden){try{var r=MUS.ctx.resume();if(r&&r.catch)r.catch(function(){});}catch(e){}}}
@@ -4617,7 +4647,8 @@ function homeBuyMode(G,T){return !!T&&!!T.had&&T===G.tanks[0]&&G.sel===0&&totalN
 function careRow(){var el=$('tv-care');if(!el)return;var T=G.tanks[G.sel]||G.tanks[0],own=careOn(G)&&G.sel===0,N=T?totalN(T):0,busy=TVLOCK||HC||SB||QCR,glass=!!(T&&T.glass&&glassMean(T)>0.01);
  var vh=function(b,on){b.hidden=false;b.style.visibility=on?'':'hidden';b.disabled=!on;};var bm=homeBuyMode(G,T);vh($('tv-check'),N>=1||bm);if(bm&&G.money<PACKS[0].cost)$('tv-check').disabled=true;var tcl=$('tv-check-l');if(tcl&&tcl.textContent!==(bm?'Buy shrimp':'Check shrimp'))tcl.textContent=bm?'Buy shrimp':'Check shrimp';vh($('tv-clean'),N>=1||glass&&T.had);document.querySelectorAll('#tv-care [data-care]').forEach(function(b){b.hidden=!own;});
  // Pass 194 (Puti): the buttons that show share the full width. Pass 180's rule still holds for and the job bar takes the same slot, so nothing moves.
- var n=Array.from(el.children).filter(function(b){return !b.hidden&&b.style.visibility!=='hidden';}).length;Array.from(el.children).forEach(function(b){if(!b.hidden&&b.style.visibility==='hidden')b.hidden=true;});el.style.gridTemplateColumns='repeat('+Math.max(1,n)+',minmax(0,1fr))';el.hidden=n<1&&!busy&&!el.dataset.had;if(n>=1)el.dataset.had=1;
+ var n=Array.from(el.children).filter(function(b){return !b.hidden&&b.style.visibility!=='hidden';}).length;el.style.gridTemplateColumns='repeat(3,minmax(0,1fr))';   // Pass 197 (Puti): back to three a row, two rows; a button that isn't needed keeps its place
+ el.hidden=n<1&&!busy&&!el.dataset.had;if(n>=1)el.dataset.had=1;
  var sl=$('tv-slot');if(sl){sl.classList.toggle('busy',!!busy&&!!TVLOCK&&TVLOCK.mode!=='sponge');sl.classList.toggle('empty',el.hidden&&!busy);}}   // Pass 194: no empty band before the first care button
 var CARE_HINT={glass:'Drag on the glass to wipe the algae off.',vac:'Drag to move the tube over the gravel. Your finger can stay below it.',sponge:'Squeeze the sponge in old tank water.',trim:'Drag the scissors through the moss and stems that grew out.',pest:'Tap them to pick them off.'};
 function tvLockOn(mode){if(TVLOCK||(SPOT&&SPOT.on)||HC||SB||QCR||!TVM)return;tvActs(false);mode=typeof mode==='string'?mode:'glass';if(landJob(mode))return;
@@ -4645,7 +4676,7 @@ function tvLockInit(){var cv=$('tv-canvas'),st=null;
  document.addEventListener('touchmove',function(e){if(TVLOCK&&e.target.closest&&e.target.closest('#tankview'))e.preventDefault();},{passive:false});}
 function tvWipe(px,py){var T=TVM&&TVM.tank;if(!T||!T.glass)return;var cw=TVM.W/GLASS_W,ch=(TVM.H*0.78)/GLASS_H,py=py-TVM.H*0.22,R=Math.max(22,TVM.W*0.07),ch2=false;
  for(var gy=Math.max(0,Math.floor((py-R)/ch));gy<=Math.min(GLASS_H-1,Math.floor((py+R)/ch));gy++)for(var gx=Math.max(0,Math.floor((px-R)/cw));gx<=Math.min(GLASS_W-1,Math.floor((px+R)/cw));gx++){var cx=(gx+0.5)*cw,cy=(gy+0.5)*ch,d=Math.hypot(cx-px,cy-py);if(d>R)continue;var k=gy*GLASS_W+gx,v=T.glass[k];if(v>0){T.glass[k]=Math.max(0,Math.round(v*(d<R*0.6?0:0.4)*100)/100);ch2=true;}}
- if(ch2){T.glassV=(T.glassV||0)+1;G.stats.wiped=(G.stats.wiped||0)+1;careMark(G,T);}}
+ if(ch2){T.cleanT=Date.now();T.glassV=(T.glassV||0)+1;G.stats.wiped=(G.stats.wiped||0)+1;careMark(G,T);}}
 function updateTankView(){var card=$('tankview');if(!card)return;careRow();var T=G.tanks[G.sel]||G.tanks[0];if(labMode())T=G.tanks[0];
  if(!TVM)TVM=tvMake($('tv-canvas'),{n:24,gate:function(){return activeTab==='tank'&&!HC&&!SB&&!QCR;}});
  var N=totalN(T),sick=T.ill&&N>=1&&!G.opt.hcDone&&!(G.emp.healed>0)&&$('tv-acts').hidden;
@@ -4832,22 +4863,22 @@ function ckBar(text,btn,dis){setT('tv-lockhint',text);var b=$('tv-done');if(!b)r
 // Drag anywhere and the tube moves with your finger, by the same amount, so your thumb can stay below
 // the mouth. The brown fluff swirls up the tube into the bucket. Babies near the tube get pulled in,
 // so you check the bucket and tap them back before you pour it out.
-function ckVacJob(v,T,C){var V={on:false,water:0,dirt:0,babies:[],parts:[],grains:[],mode:'vac',bb:[],did:0};V.m0=ckMean(ckMulm(C));
+function ckVacJob(v,T,C){var V={on:false,water:0,dirt:0,babies:[],parts:[],grains:[],mode:'vac',bb:[],did:0};V.m0=ckMean(ckMulm(C));V.snd=sfxLoop('siphon');
  V.bar=function(){if(V.mode==='vac')ckBar(V.water>=0.999?'Bucket full. Check it for babies.':'Drag to move the tube over the gravel. Your finger can stay below it. Bucket '+Math.round(V.water*100)+'%'+(V.babies.length?' · '+ckN(V.babies.length,'baby','babies')+' in it':''),V.water>0.02?'Check for babies':'Done');
   else ckBar(V.babies.length?'Tap the babies to put them back.':'Nothing alive in the bucket.','Pour it out',V.babies.length>0);};
  V.tube=function(){var W=v.W,H=v.H,len=H*0.36,tw=Math.max(16,W*0.05);if(V.tx==null){V.tx=W*0.5;V.ty=H*0.5;}V.tx=clamp(V.tx,tw,W-tw);V.ty=clamp(V.ty,H*0.06,H*0.95-len);return {x:V.tx,y:V.ty+len,w:tw,top:V.ty};};
  V.down=function(p){if(V.mode==='bucket'){V.tap(p);return;}if(V.water>=0.999)return;var tb=V.tube();V.grab={x:p[0],y:p[1],tx:tb.x,ty:tb.top};V.on=true;};
  V.move=function(p){if(!V.on||!V.grab)return;V.tx=V.grab.tx+(p[0]-V.grab.x);V.ty=V.grab.ty+(p[1]-V.grab.y);V.p=1;};
  V.up=function(){V.on=false;V.grab=null;};
- V.finish=function(){if(V.mode==='vac'){if(V.water<0.02){tvLockOff();return;}V.on=false;V.mode='bucket';V.layout();V.bar();}else{if(V.babies.length){toast('Put the babies back first');return;}tvLockOff();}};
+ V.finish=function(){if(V.mode==='vac'){if(V.water<0.02){tvLockOff();return;}V.on=false;V.mode='bucket';V.snd.set(0);V.layout();V.bar();sfx('pour',{v:0.4});}else{if(V.babies.length){sfx('nope');toast('Put the babies back first');return;}sfx('pour');tvLockOff();}};
  V.back=function(a){a.hidden=false;a.x=ckRnd(v.W*0.2,v.W*0.8);a.y=v.H*0.35;a.surf='water';a.intent='swim';var sp=tvSpot(v,'sand');a.tx=sp.x;a.ty=sp.y;a.tsurf='sand';a.speed=tvBase(v)*a.sc*0.5;a.left=8;};
- V.end=function(){v.ag.forEach(function(a){if(a.hidden)V.back(a);});V.babies=[];var m1=ckMean(ckMulm(C));if(V.m0>0)C.mulm=clamp(C.mulm*m1/V.m0,0,1);C.mcg=C.mulm;V.did=V.dirt>0.005?1:0;};
- V.step=function(dt){var W=v.W,H=v.H,m=ckMulm(C);if(V.mode==='vac'){var tb=V.tube(),active=V.on&&V.water<0.999;
+ V.end=function(){V.snd.stop();v.ag.forEach(function(a){if(a.hidden)V.back(a);});V.babies=[];var m1=ckMean(ckMulm(C));if(V.m0>0)C.mulm=clamp(C.mulm*m1/V.m0,0,1);C.mcg=C.mulm;V.did=V.dirt>0.005?1:0;};
+ V.step=function(dt){var W=v.W,H=v.H,m=ckMulm(C);if(V.mode==='vac'){var tb=V.tube(),active=V.on&&V.water<0.999;V.snd.set(active?(tb.y>H*0.74?1:0.55):0);
    if(active){V.water=Math.min(1,V.water+dt/10);
     if(tb.y>H*0.77){var R=tb.w*1.2;for(var i=0;i<CK_MN;i++){var cx=(i+0.5)/CK_MN*W,d=Math.abs(cx-tb.x);if(d<R&&m[i]>0){var take=Math.min(m[i],dt*2.4*(1-d/R));m[i]-=take;V.dirt+=take;var n=Math.ceil(take*40);for(var q=0;q<n;q++)V.parts.push({x:cx+ckRnd(-3,3),y:H*ckRnd(0.82,0.93),t:0,c:Math.random()<0.7?'rgba(96,70,40,.85)':'rgba(140,110,70,.7)',r:ckRnd(1,2.2),sw:ckRnd(0,6.28)});}}
      if(Math.random()<dt*14)V.grains.push({x:tb.x+ckRnd(-tb.w*0.35,tb.w*0.35),y:tb.y-2,vy:-ckRnd(30,60),t:0});}
     // babies get pulled toward the tube
-    v.ag.forEach(function(a){if(a.sc>0.5||a.hidden)return;var dx=tb.x-a.x,dy=tb.y-a.y,d=Math.hypot(dx,dy);if(d<tb.w*1.8){if(d<tb.w*0.45){a.hidden=true;V.babies.push(a);V.parts.push({x:tb.x,y:tb.y,t:0,c:'#fff',r:2.4,sw:0});V.bar();}else{var sp=tvBase(v)*0.9*dt;a.x+=dx/d*sp;a.y+=dy/d*sp;}}});
+    v.ag.forEach(function(a){if(a.sc>0.5||a.hidden)return;var dx=tb.x-a.x,dy=tb.y-a.y,d=Math.hypot(dx,dy);if(d<tb.w*1.8){if(d<tb.w*0.45){a.hidden=true;V.babies.push(a);hap(15);V.parts.push({x:tb.x,y:tb.y,t:0,c:'#fff',r:2.4,sw:0});V.bar();}else{var sp=tvBase(v)*0.9*dt;a.x+=dx/d*sp;a.y+=dy/d*sp;}}});
     if(V.water>=0.999){V.on=false;V.bar();}else if((V.bt=(V.bt||0)+dt)>0.5){V.bt=0;V.bar();}}
    // the fluff rides up the tube and out the hose
    V.parts.forEach(function(p){p.t+=dt;var tx=tb.x+Math.sin(p.t*9+p.sw)*tb.w*0.3;p.x+=(tx-p.x)*Math.min(1,dt*8);p.y-=dt*(140+p.t*120);});V.parts=V.parts.filter(function(p){return p.y>tb.top+2&&p.t<3;});
@@ -4855,7 +4886,7 @@ function ckVacJob(v,T,C){var V={on:false,water:0,dirt:0,babies:[],parts:[],grain
   else V.bb.forEach(function(b){b.a+=(Math.random()-0.5)*dt*3;b.x+=Math.cos(b.a)*dt*10;b.y+=Math.sin(b.a)*dt*10;var dx=b.x-V.bk.cx,dy=(b.y-V.bk.cy)/0.62;if(Math.hypot(dx,dy)>V.bk.r*0.78){b.a+=Math.PI;b.x-=Math.cos(b.a)*2;}});};
  V.layout=function(){var W=v.W,H=v.H;V.bk={cx:W/2,cy:H*0.52,r:Math.min(W*0.3,H*0.62)};V.bb=V.babies.map(function(a){return {a0:a,x:V.bk.cx+ckRnd(-1,1)*V.bk.r*0.4,y:V.bk.cy+ckRnd(-1,1)*V.bk.r*0.25,a:ckRnd(0,6.28)};});
   V.specks=[];var n=Math.min(260,Math.round(20+V.dirt*260));for(var i=0;i<n;i++){var a=Math.random()*6.283,rr=Math.sqrt(Math.random())*V.bk.r*0.8;V.specks.push([V.bk.cx+Math.cos(a)*rr,V.bk.cy+Math.sin(a)*rr*0.62,ckRnd(0.8,2.2)]);}};
- V.tap=function(p){var hit=null,bd=1e9;V.bb.forEach(function(b){var d=Math.hypot(p[0]-b.x,p[1]-b.y);if(d<24&&d<bd){bd=d;hit=b;}});if(!hit)return;V.bb.splice(V.bb.indexOf(hit),1);V.babies.splice(V.babies.indexOf(hit.a0),1);V.back(hit.a0);V.bar();};
+ V.tap=function(p){var hit=null,bd=1e9;V.bb.forEach(function(b){var d=Math.hypot(p[0]-b.x,p[1]-b.y);if(d<24&&d<bd){bd=d;hit=b;}});if(!hit)return;V.bb.splice(V.bb.indexOf(hit),1);V.babies.splice(V.babies.indexOf(hit.a0),1);V.back(hit.a0);sfx('plop');hap(10);V.bar();};
  V.draw=function(x,t){if(V.mode!=='vac')return;var W=v.W,H=v.H,tb=V.tube();
   // the gravel vac: a clear tube with a hose out of the top
   x.save();x.fillStyle='rgba(255,255,255,.22)';x.fillRect(tb.x-tb.w/2,tb.top,tb.w,tb.y-tb.top);
@@ -4894,7 +4925,7 @@ function ckTrimJob(v,T,C){var Z={trail:[],last:null,fl:[],moss:0,tops:0,puffs:0,
   for(var j=0;j<L.ms.length;j++){var m=ckMossAt(v,C,j),pf=Z.puffsOf(j,m,s),ch=pf.filter(function(p){return !p.tw;});for(var i=Math.min(4,ch.length);i<ch.length;i++){var p0=ch[i-1],p1=ch[i],rr=p1.r+2;
     if(ckSeg(a,b,[p0.x-rr,p0.y],[p1.x+rr,p1.y])||ckSeg(a,b,[p0.x,p0.y-rr],[p1.x,p1.y+rr])){var cut=pf.filter(function(p){return p.i>=i;});L.ms[j]=Math.max(4,(i*CK_STEP)/s);Z.float(cut,'moss');did=true;break;}}}
   for(var k=0;k<CK_ST;k++){var pts=ckStemPts(v,C,k,L.st[k]);for(var q=Math.max(4,Math.floor(pts.length*0.25));q<pts.length;q++){if(ckSeg(a,b,pts[q-1],pts[q])){var cutLen=(q-1)*4/v.H,taken=L.st[k]-cutLen;if(taken<10/v.H)break;L.st[k]=cutLen;Z.float(pts.slice(q-1),'stem');did=true;break;}}}
-  if(did){Z.snapT=performance.now();Z.cuts++;Z.did=1;Z.bar();}};
+  if(did){var now=performance.now();if(now-(Z.snipT||0)>70){sfx('snip');hap(8);Z.snipT=now;}Z.snapT=now;Z.cuts++;Z.did=1;Z.bar();}};
  Z.float=function(pts,kind){if(kind==='moss'){var c0=pts[Math.floor(pts.length/2)],near=Z.fl.find(function(f){return f.kind==='moss'&&Math.hypot(f.x-c0.x,f.y-c0.y)<26&&f.pts.length<160;});
    if(near){pts.forEach(function(p){near.pts.push({x:p.x-near.x,y:p.y-near.y,r:p.r,c:p.c,al:p.al,rot:p.rot,ang:p.ang});});near.n+=pts.length;return;}}
   var cx=0,cy=0;pts.forEach(function(p){cx+=(p.x!=null?p.x:p[0]);cy+=(p.y!=null?p.y:p[1]);});cx/=pts.length;cy/=pts.length;
@@ -4904,7 +4935,7 @@ function ckTrimJob(v,T,C){var Z={trail:[],last:null,fl:[],moss:0,tops:0,puffs:0,
  Z.move=function(p){Z.cur=p;if(Z.drag){if(Math.hypot(p[0]-Z.drag.p0[0],p[1]-Z.drag.p0[1])>8)Z.drag.moved=true;Z.drag.f.x=p[0];Z.drag.f.y=p[1];Z.drag.f.vx=Z.drag.f.vy=0;return;}if(!Z.last)return;Z.cutSeg(Z.last,p);Z.last=p;Z.trail.push({x:p[0],y:p[1],t:0});};
  Z.up=function(){if(Z.drag){var d=Z.drag;Z.drag=null;if(!d.moved)Z.scoop(d.f);return;}Z.last=null;};
  Z.count=function(f){if(f.kind==='moss')Z.puffs+=f.n;else Z.tops++;Z.moss=Z.puffs>0?Math.max(1,Math.round(Z.puffs/16)):0;};
- Z.scoop=function(f){Z.fl.splice(Z.fl.indexOf(f),1);Z.count(f);Z.bar();};
+ Z.scoop=function(f){Z.fl.splice(Z.fl.indexOf(f),1);Z.count(f);sfx('scoop');hap(10);Z.bar();};
  Z.step=function(dt){var W=v.W,surf=v.H*0.22+6,now=performance.now();Z.fl.forEach(function(f){if(Z.drag&&Z.drag.f===f)return;f.vy=Math.max(-18,f.vy-dt*4);f.x+=f.vx*dt;f.y+=f.vy*dt;f.vx*=0.99;f.rot+=f.vr*dt;if(f.y<surf){f.y=surf;f.vy=0;f.vx+=Math.sin(now/900+f.x)*dt*3;}f.x=clamp(f.x,10,W-10);});
   Z.trail.forEach(function(t){t.t+=dt;});Z.trail=Z.trail.filter(function(t){return t.t<0.35;});};
  Z.draw=function(x,t){Z.fl.forEach(function(f){x.save();x.translate(f.x,f.y);x.rotate(f.rot);if(f.kind==='moss')ckDrawPuffs(x,f.pts);else{x.strokeStyle='#4f7f33';x.lineWidth=1.3;x.beginPath();f.pts.forEach(function(p,i){if(i)x.lineTo(p.x,p.y);else x.moveTo(p.x,p.y);});x.stroke();
@@ -4926,7 +4957,7 @@ function ckScissors(x,p,since){var open=since<90?0.06:since<200?0.06+(since-90)/
 function ckPestJob(v,T,C){var P={out:{snail:0,flat:0},anim:[],did:0};
  P.bar=function(){var sn=C.pests.filter(function(p){return p.k==='snail';}).length,fl=C.pests.length-sn;ckBar(C.pests.length?'Tap them to pick them off. '+(fl?ckN(fl,'flatworm','flatworms')+(sn?', ':''):'')+(sn?ckN(sn,'snail','snails'):'')+' left.':'All picked off.');};
  P.down=function(p){var t=TVLOCK&&TVLOCK.t||0,best=-1,bd=26,bq=null;C.pests.forEach(function(q,i){var s=ckPestPos(q,i,v,t),d=Math.hypot(p[0]-s[0],p[1]-s[1]);if(d<bd){bd=d;best=i;bq=s;}});
-  if(best<0){P.anim.push({x:p[0],y:p[1],t:0,miss:1});return;}var q=C.pests.splice(best,1)[0];P.out[q.k==='snail'?'snail':'flat']++;P.did=1;P.anim.push({x:bq[0],y:bq[1],a:bq[2],t:0,pest:q});P.bar();
+  if(best<0){P.anim.push({x:p[0],y:p[1],t:0,miss:1});return;}var q=C.pests.splice(best,1)[0];P.out[q.k==='snail'?'snail':'flat']++;P.did=1;sfx('pop');hap(12);P.anim.push({x:bq[0],y:bq[1],a:bq[2],t:0,pest:q});P.bar();
   if(q.k!=='snail'&&!C.pests.some(function(z){return z.k!=='snail';}))toast('No flatworms left. Keep the gravel clean so they don’t come back.');};
  P.step=function(dt){P.anim.forEach(function(a){a.t+=dt;});P.anim=P.anim.filter(function(a){return a.t<0.7;});};
  P.draw=function(x,t){P.anim.forEach(function(a){var k=a.t/0.7;x.save();if(a.pest){var lift=k*k*40;x.globalAlpha=1-k;x.translate(a.x,a.y-lift);ckPest(x,a.pest,0,0,a.a,v.W,t);
@@ -4963,20 +4994,20 @@ function ckSpongeJob(v,T,C){var P={stage:'squeeze',dirt:clamp(C.sponge,0.1,1),mu
   P.sq+=((P.press?1:0)-P.sq)*Math.min(1,dt*(P.press?14:6));sponge(bcx,bcy+bh*0.08,W*0.2,H*0.24);
   // flow meter
   var fl=flow();x.fillStyle=CK_INK;x.font='600 13px Inter,system-ui';x.textAlign='left';x.fillText('Flow '+Math.round(fl*100)+'%',12,20);x.fillStyle='#e4ddcf';x.fillRect(12,27,W*0.36,7);x.fillStyle=fl>0.85?'#2f7a45':fl>0.55?'#93560f':'#b23a2e';x.fillRect(12,27,W*0.36*fl,7);}
- P.downH=function(e){e.preventDefault();if(P.stage!=='squeeze')return;P.press=true;var take=P.dirt*0.2+0.01;P.dirt=Math.max(0,P.dirt-take);P.murk=Math.min(0.92,P.murk+take*1.05);P.did=1;
+ P.downH=function(e){e.preventDefault();if(P.stage!=='squeeze')return;P.press=true;var take=P.dirt*0.2+0.01;P.dirt=Math.max(0,P.dirt-take);P.murk=Math.min(0.92,P.murk+take*1.05);P.did=1;sfx('squelch');hap(15);
   var bcx=W*0.5,bcy=H*0.62+H*0.56*0.08;for(var i=0;i<Math.ceil(10+take*60);i++){var a=Math.random()*6.283,sp=ckRnd(30,110);P.parts.push({x:bcx+Math.cos(a)*W*0.06,y:bcy+Math.sin(a)*H*0.06,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp*0.7,r:ckRnd(3,7),t:0});}
   if(P.dirt<0.06){P.stage='clean';$('sp-btns').innerHTML='<button type="button" class="btn primary" id="sp-done">Put it back</button>';$('sp-done').onclick=function(){P.put=1;tvLockOff();};setT('sp-line','Clean. The bacteria are still in it, that’s what you want.');}};
- P.upH=function(){if(P.press){P.press=false;for(var i=0;i<6;i++)P.bub.push({x:W*0.5+ckRnd(-W*0.08,W*0.08),y:H*0.7,r:ckRnd(1.5,3.5)});}};
+ P.upH=function(){if(P.press){P.press=false;sfx('suck',{v:0.6});for(var i=0;i<6;i++)P.bub.push({x:W*0.5+ckRnd(-W*0.08,W*0.08),y:H*0.7,r:ckRnd(1.5,3.5)});}};
  cv.addEventListener('pointerdown',P.downH);window.addEventListener('pointerup',P.upH);window.addEventListener('pointercancel',P.upH);
  $('sp-x').onclick=function(){tvLockOff();};
  P.end=function(){P.dead=true;window.removeEventListener('pointerup',P.upH);window.removeEventListener('pointercancel',P.upH);$('spsheet').hidden=true;$('sp-in').innerHTML='';
   if(P.did){C.sponge=P.stage==='clean'?0:Math.min(C.sponge,P.dirt);}if(P.put)toast('The filter flows again. Bubbles are back.');};
  requestAnimationFrame(draw);return P;}
 var CK_JOBS={vac:ckVacJob,trim:ckTrimJob,pest:ckPestJob,sponge:ckSpongeJob};
-function careAt(px,py,down){var M=TVLOCK;if(!M)return;if(M.mode==='glass'){tvWipe(px,py);return;}if(!M.job)return;M.pt=[px,py];if(down){if(M.job.down)M.job.down([px,py]);}else if(M.job.move)M.job.move([px,py]);tvWake(TVM);}
-function careUp(){var M=TVLOCK;if(M&&M.job&&M.job.up)M.job.up(M.pt);}
+function careAt(px,py,down){var M=TVLOCK;if(!M)return;if(M.mode==='glass'){if(!M.wl)M.wl=sfxLoop('wipe');M.wl.set(1);tvWipe(px,py);return;}if(!M.job)return;M.pt=[px,py];if(down){if(M.job.down)M.job.down([px,py]);}else if(M.job.move)M.job.move([px,py]);tvWake(TVM);}
+function careUp(){var M=TVLOCK;if(M&&M.wl){M.wl.stop();M.wl=null;}if(M&&M.job&&M.job.up)M.job.up(M.pt);}
 function careDoneTap(){var M=TVLOCK;if(M&&M.job&&M.job.finish){M.job.finish();return;}tvLockOff();}
-function careFinish(M){if(!M||!M.job)return;var j=M.job;M.job=null;try{if(j.end)j.end();}catch(e){console.error(e);}if(j.did)careDone(G,M.mode);}
+function careFinish(M){if(M&&M.wl){M.wl.stop();M.wl=null;}if(!M||!M.job)return;var j=M.job;M.job=null;try{if(j.end)j.end();}catch(e){console.error(e);}if(j.did){careDone(G,M.mode);if(M.mode==='vac'&&G.tanks[0])G.tanks[0].cleanT=Date.now();}}
 // Look over a few shrimp and take out the ones you don't want. Uses the health-check sheet.
 function cullNote(T){var st=cullState(G,T),a=cullAdults(T);if(a<40)return '';
  return '<p class="hint cull-round">'+(st.monthly?'Monthly check: this one look covers all of '+T.name+'.':st.done?T.name+' has been gone through. A full check is due again in '+st.next+' day'+(st.next===1?'':'s')+', until then a look covers a fifth of it.':'Round '+st.round+' of '+CULL_ROUNDS+' to go through '+T.name+'.')+(cullEach(G,T,16)>=1.5?' Each shrimp here stands for about '+cnt(Math.round(cullEach(G,T,16)))+' like it in the tank.':'')+'</p>';}
@@ -5623,7 +5654,7 @@ function anchorCheck(){if(typeof document==='undefined'||!document.body||documen
 // Pass 180: a tap never lets the page get shorter under you. On every tap the page keeps at least its current height until the tab changes, so closing or shrinking something near the bottom can't pull the screen up.
 var FLOOR=0,TAP_AT=0,HFLOOR=0;function floorKeep(e){TAP_AT=Date.now();var m=document.querySelector('main');if(!m)return;var h=Math.max(m.getBoundingClientRect().height,parseFloat(getComputedStyle(m).minHeight)||0);if(h>FLOOR){FLOOR=h;m.style.minHeight=h+'px';}
  // the sticky header doesn't shrink under a tap either (a top button that stops mattering leaves its row until the tab changes), except when the tap is the fold button itself
- var t=document.querySelector('header.top');if(t&&!(e&&e.target&&e.target.closest&&e.target.closest('#fold'))){var th=Math.max(t.getBoundingClientRect().height,parseFloat(getComputedStyle(t).minHeight)||0);if(th>HFLOOR){HFLOOR=th;t.style.minHeight=th+'px';}}}
+ /* Pass 197 (Puti): no header floor, the sticky header always fits what it shows */}
 // 1 Nov: the header's tap floor lets go once the player scrolls, so a row that went away for good (Fed after the auto feeder) doesn't leave a gap until the next tab change.
 function hFloorFree(){if(!HFLOOR)return;HFLOOR=0;var t=document.querySelector('header.top');if(t)t.style.minHeight='';}
 ['wheel','touchmove'].forEach(function(ev){addEventListener(ev,function(){if(Date.now()-TAP_AT>600)hFloorFree();},{passive:true});});
@@ -6285,7 +6316,11 @@ function renderMilestone(){
   msPlace();
 }
 // Pass 194 (Puti, 1 Nov pm): story cards always sit at the top of the screen, on every tab.
-function msPlace(){var c=$('milestone-card');if(c&&c.style.top)c.style.top='';}
+// Pass 197: except "Your tank is cycled" on the Tank tab, which sits where the cycling card was, 8 px under the tank.
+function msPlace(){var c=$('milestone-card');if(!c)return;var key=G&&G.progress&&G.progress.queue[0],tv=$('tankview');
+ if(key==='cycle'&&activeTab==='tank'&&tv&&tv.getClientRects().length&&!c.hidden){var sl=$('tv-slot'),b=tv.getBoundingClientRect().bottom;if(sl&&sl.getClientRects().length)b=Math.max(b,sl.getBoundingClientRect().bottom);
+  var top=Math.round(Math.max(24,Math.min(b+8,window.innerHeight-260)))+'px';if(c.style.top!==top){c.style.top=top;c.style.maxHeight='calc(100vh - '+top+' - 90px)';}return;}
+ if(c.style.top){c.style.top='';c.style.maxHeight='';}}
 function renderDream(){
  var S=G.story,remaining=Math.max(0,DREAM_DAYS-Math.floor(G.day)),year=Math.floor(G.day/365)+1;
  setT('dream-year',G.day===DREAM_DAYS?'Ten years':'Year '+year);

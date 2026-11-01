@@ -1863,3 +1863,13 @@ Test: cardtap, tank1, me 49, a browser script (Excel opens the sheet with the ca
 
 Start over now keeps a land that has anything built (objects with `built`, ground edits) in `shrimp-land-old` (`{n: built things, S: the land save}`). In the new game the land step on Grandma's place shows two rows: Land with a stream, AED 250k, fresh (buying it drops the old land; colours and drawn things still come over), and Your old land, "From your old save: the land as you left it, N things built. AED 300k plus AED 100 each.", which puts the old land save back (`gday` cleared so it takes the new game's day) and logs it. `buyGplace(G,cost)` takes the price for the land step. Lands with nothing built get no offer.
 Test: balance 133 (two Pass 194 string checks updated, one new), me 49, a browser script: build a coop, Start over, offer shows AED 300,100, buy, the land opens with the coop and colours.
+
+### Pass 197: six fixes from Puti's phone (1 Nov, evening)
+
+1. "Your tank is cycled" sits on the Tank tab where the cycling card was, 8 px under the tank (`msPlace`); every other card stays at the top.
+2. Sticky header: no tap floor (`floorKeep` no longer sets `header.top` min-height), so a row that goes away (water readings after the auto tester) takes its space with it.
+3. Care buttons back to three a row, two rows; a button that isn't needed keeps its place (visibility hidden).
+4. Company-page tank jobs make the land's sounds (same synth on the music context and bus, one mute): siphon loop with level from the tube, pour, plop for a baby back, snip, scoop, pop, squelch and suck, glass wipe loop. Short buzz on each (`hap`: `navigator.vibrate`, or a hidden switch checkbox on iPhone, iOS 18+). No buzz when muted.
+5. Mira's packing card: "Mira found out the packing line is all machines now. She asks if the machines check that the shrimp are happy. You don't know."
+6. No illness for 2 real minutes after the gravel or the glass is cleaned, here or on the land (`T.cleanT`, `justCleaned`: `startIll`, `illRisk`, the random sick event).
+Test: balance 132, me 49, tank1 (with browser), cardtap, a browser script (two rows of three at 390, glass wipe then `startIll` does nothing, risk back after 121 s, four jobs open and close with no errors, header min-height empty after a tap, cycled card top 8 px under the tank).
