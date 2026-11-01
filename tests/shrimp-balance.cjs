@@ -41,8 +41,8 @@ if(!html.includes("f.hidden=!sh||!n.feed||emp;w.hidden=!kit||!n.wc||")&&html.inc
 if(!html.includes("activeTab==='up'&&!G.opt.visitedUp")||!html.includes("g.tab==='up'&&o.visitedUp"))throw Error('Equipment tab guidance dot should be remembered as seen after visiting');
 if(!html.includes("var CARD_GROUP={kits:'k',staff:'k',korder:'k'};"))throw Error('Sales rules and colony toggles should not be coupled by spotlight grouping');
 console.log('PASS Trade combines independent colony/sales toggles; actions persist and Equipment dot clears after visit');
-const goalRowStart=html.indexOf('<div class="goalrow">'),dreamSummary=html.indexOf('id="dream-tracker"'),infoPop=html.indexOf('<div class="apop" id="apop"');
-if(!(infoPop>=0&&infoPop<goalRowStart&&goalRowStart<dreamSummary&&html.includes('id="b-goal-short"')))throw Error('Grandma year tracker should share the owners row inside the info panel');
+const goalRowStart=html.indexOf('<div class="goalrow" style="display:none">'),dreamSummary=html.indexOf('id="dream-tracker"'),infoPop=html.indexOf('<div class="apop" id="apop"');
+if(!(infoPop>=0&&infoPop<goalRowStart&&goalRowStart<dreamSummary&&html.includes('id="b-goal-short"')))throw Error('Grandma year tracker should share the owners row inside the info panel'); // Pass 194: the row stays in the DOM, hidden (Puti took the owners bar and letters out of the ? popup)
 console.log('PASS Grandma year tracker shares the progress row with a compact mobile progress label');
 if(!html.includes('class="card coll" data-k="charts" id="charts"')||!html.includes('class="card coll" data-k="ads" id="adscard"'))throw Error('Delayed charts and advertising should fold when first revealed');
 console.log('PASS delayed charts and advertising can fold when first revealed');
@@ -393,7 +393,7 @@ var h=readyGame();h.money=-1;var ids=Object.keys(PAINS);ids.forEach(function(id)
 h.money=1e9;if(!painPick(JSON.parse(JSON.stringify(h)),ids[0],PAINS[ids[0]].ch.length-1))throw Error('Pain choices still work with money');
 var reset=migrate(newGame());if(!reset.progress.v8)throw Error('A fresh migrated game should carry the newest progress marks');
 `);
-if(!html.includes('G=migrate(newGame());seenNew=null;'))throw Error('Start over must build the game the same way a first load does');
+if(!(html.includes('G=migrate(newGame());var lf=')&&html.includes('location.reload();},60)')))throw Error('Start over must build the game the same way a first load does');
 if(!html.includes("['pointerup','touchend','click','keydown'].forEach(function(ev){document.addEventListener(ev,musicKick,true);});"))throw Error('Sound must unlock on finger-up taps and retry on every tap');
 if(!/function save\(force\)\{if\(document\.hidden&&!force\)return;/.test(html)||!html.includes('catchUp(G,(Date.now()-at)/1000,speed)'))throw Error('No saving while hidden, and coming back from the background catches up');
 if(!html.includes("else if(c.stop)setSpeed(0);")||!html.includes('if(cu.stop)G.savedSpeed=0;')||!html.includes('if(document.hidden)HIDDEN_AT=Date.now();')||!html.includes('Date.now()-MUS.fail>60000'))throw Error('A stopped catch-up pauses the game, a page loaded hidden still catches up, and failed sound loads back off');
@@ -888,3 +888,5 @@ if(!html.includes("if(!G.ob.sp4c&&speed>=4)G.ob.sp4c=1;")||!html.includes("top:c
 if(!html.includes("var HG_COLS=120")||!html.includes('id="hg-cv"')||!html.includes('id="nour-cv"')||html.includes("showAfter(ho.t,ho.news"))throw Error('Pass 183: people grid, Nour jar, no popup after a hard-part option');count++;
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
+// Pass 196 (Puti, 1 Nov): after Start over, a built land from the old game can be bought back for AED 300k plus AED 100 a built thing.
+if(!html.includes('data-act="gplace-old"')||!html.includes('return 300000+100*o.n;')||!html.includes("localStorage.setItem('shrimp-land-old'"))throw Error('Old built land should be offered back after Start over');

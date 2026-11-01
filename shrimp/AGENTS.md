@@ -506,6 +506,8 @@ Planned and agreed with Puti, not built yet:
 
 **Pass 195 (1 Nov pm):** American spelling across index, home and space; the social media manager is Nona (was Noor; old save text migrated once, `G.noorNona`; Nour, Mira's cousin, is a different person); the staff card is "Staff"; item titles replace the ? (above); Buy shrimp help has no salt-dip line; buying the Excel course opens the Money sheet (`finOpen` is now kits or Excel) with one "New:" line until it's closed.
 
+**Pass 196 (1 Nov pm):** Start over keeps a built land (any `built` object or ground edit) in localStorage `shrimp-land-old` as `{n,S}`. When the new game reaches the land step, Grandma's place offers Land with a stream (AED 250k, fresh, drops the old one) or Your old land (AED 300k + AED 100 per built thing, `landOldCost`, "From your old save..."), which copies the old land save back to `shrimp-land-v1`. Colours and drawn things still carry over to a fresh land (`shrimp-land-keep`).
+
 **World tab rows** (Pass 185): on `#ow-body` the buy rows come first and a row bought there stays as Done (disabled) until you leave the tab (`OW_KEEP`). The same pattern could fix the other bought-row movers below if Puti agrees.
 
 **Stable screen, left over from Pass 180** (`tests/shrimp-stable.cjs` lists them): buying something that then leaves its list (equipment and treat rows once bought, projects, owner perks, coin buy) slides the next row into the button's place; the second tank adds the tank chips row to the header; the first gala adds the earth line to the header; opening the first store and the kit price − change their card's height; the first rack farm reshapes Farms. Decide with Puti whether bought rows should stay in place as Done.

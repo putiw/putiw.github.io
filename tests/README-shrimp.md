@@ -1858,3 +1858,8 @@ Test: tank1 (with browser), cardtap, land-audio, a reset script (land save gone,
 5. Buy shrimp ?: the salt-dip sentence removed.
 6. Excel course: buying it opens the Money sheet (tap cash) with "Money over time" open and one line, "New: your books. Tap your cash at the top to come back here.", shown until the sheet is closed. `finOpen` = kits open or Excel bought, so the chart lives in the sheet from then on.
 Test: cardtap, tank1, me 49, a browser script (Excel opens the sheet with the card inside and the note; item title opens the help sheet). Not run: stable, endcards (needs bot runs), bots.
+
+### Pass 196: buy back your old land (Puti, 1 Nov pm)
+
+Start over now keeps a land that has anything built (objects with `built`, ground edits) in `shrimp-land-old` (`{n: built things, S: the land save}`). In the new game the land step on Grandma's place shows two rows: Land with a stream, AED 250k, fresh (buying it drops the old land; colours and drawn things still come over), and Your old land, "From your old save: the land as you left it, N things built. AED 300k plus AED 100 each.", which puts the old land save back (`gday` cleared so it takes the new game's day) and logs it. `buyGplace(G,cost)` takes the price for the land step. Lands with nothing built get no offer.
+Test: balance 133 (two Pass 194 string checks updated, one new), me 49, a browser script: build a coop, Start over, offer shows AED 300,100, buy, the land opens with the coop and colours.
