@@ -2050,3 +2050,22 @@ Land source on `shrimp-proto` (`src/land.js`, `land.css`, `game.js`, commit "Lan
 All three count through real time on the land (`G.ps.landMs`: life first and, since Pass 210, own people), never taps. The ending adds "You spent N hours on the land."
 The land posts through `window.LAND_POST` (set in `game.js`), since the land's code sits in a closure. Test hooks `LAND.life`.
 Test: new `tests/shrimp-land-life.cjs` at 360 and 390 (bed grows, ripens, dries, picks; the game hears it; the dinner takes it; a walk counts; the Log opens with no sideways scroll; no errors), land-audio, tank1, yourtank, me 50.
+
+### Pass 214: final check (plan Part 9)
+
+Bots, seed 7, before this plan (Pass 202 baseline) and now:
+
+| Bot | Before | Now |
+|---|---|---|
+| Strong cold | 2,216 empire_dictator | 2,194 empire_dictator |
+| Strong kind | 3,148 question_prof | 3,138 garden_hermit |
+| Average (kind) | Earth 6,357 garden_hermit, Leave Earth 5,996 | Earth 6,861 empire_good, Leave Earth 5,614 (sci 573) |
+| Average, `PROFILE=scientist` | | Earth 6,889 question_prof, Leave Earth 5,720 |
+| Average, `PROFILE=dogooder` | | Earth 6,609 network_life, Leave Earth 6,019 |
+| Average, `PROFILE=grandma` | | Earth 6,861 empire_good (bots pick cards by profile but never play the land, Your day or the You page, so life first and own people don't show) |
+| Space bot (from strong cold) | Leave Earth 4,582 | Leave Earth 6,996, lands, passes |
+
+The average bot is about 8% slower to Earth than the baseline (6,357 to 6,861); the kind bot now turns down the dark projects (posters, songs, the evil route), which were word of mouth and reach. Seed noise is about ±500 days (AGENTS Pacing).
+Profiles (`shrimp-profiles`, asserting): every target met, table in Pass 212.
+Browser: spotlights 103 all good, layout one 2 px text on the win World tab (known since Pass 200), stable 13 movers, all on the known list (bought rows leaving their list, now including the evil route's Turn it down, the first rack, header strips), land-life at 360 and 390.
+Suites: balance 135, me 50, academy 10, hard 12, frozen, endcards 50, cardtap, tank1, yourtank, land-audio, land-life, profiles.
