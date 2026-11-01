@@ -10,6 +10,7 @@ ADULT_DAYS=75;                      // the same as the game
 SAVE_KEY='shrimp-land-v1';
 var P=window.parent!==window?window.parent:(window.TEST_PARENT||null);   // the test page stands in for the company in the same page
 function post(m){if(!P)return;m.land=1;try{P.postMessage(m,'*');}catch(e){}}
+window.LAND_POST=post;// Pass 213: the land closure posts harvests and walks through this
 window.GAME_POST=post;
 // no browser feel inside the game: no pinch zoom, no long-press menu (Puti, 28 Oct)
 ['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,function(e){e.preventDefault();},{passive:false});});

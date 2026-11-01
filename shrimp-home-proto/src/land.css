@@ -72,6 +72,8 @@ body.in-game .top .brand .date{margin-left:auto}
 .lzb:active{transform:translateY(1px);box-shadow:0 1px 0 #21181b}
 .lzb:disabled{opacity:.4;box-shadow:none}
 .lzb.lhelp{position:absolute;right:8px;top:8px;z-index:5;font-size:16px}
+.lzb.llog{position:absolute;right:8px;top:48px;z-index:5;font-size:12px;width:auto;padding:0 8px}
+.lg-h{margin:10px 0 4px;font-size:13px}.lg{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 10px;font-size:13px}.lg li{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lg-no{color:#9a9184}.lg-n{color:#6b6456;font-variant-numeric:tabular-nums}
 /* in the game: no title card (the place name and tank count were dev info), Home and Tank are a small switch in the header */
 body.in-game .hcard{display:none}
 body.in-game .top .r1{display:none}
