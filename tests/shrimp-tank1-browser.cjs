@@ -30,9 +30,9 @@ module.exports=async function(ok){
  const land=async()=>{await p.evaluate(()=>landShow());const f=await frame();
   await f.waitForFunction(()=>window.S&&S.tanks&&S.tanks[0]&&S.tanks[0].own&&S.tanks[0].pests.some(q=>/^g/.test(q.id)),null,{timeout:20000});await wait(1200);return f;};
  const compare=async(f,what)=>{const c=await p.evaluate(()=>{var C=careOf(G.tanks[0]);return {mc:ckMulm(C),ps:C.pests.map(q=>q.s+':'+q.x.toFixed(2)+','+q.y.toFixed(2)).sort().join(' ')};});
-  const l=await f.evaluate(()=>{var T=S.tanks[0];return {mc:T.mulm.map(v=>v/0.8),ps:T.pests.map(q=>q.id.slice(1)+':'+q.x.toFixed(2)+','+q.y.toFixed(2)).sort().join(' ')};});
+  const l=await f.evaluate(()=>{var T=S.tanks[0];return {mc:T.mulm.map(v=>v/0.8),ps:T.pests.map(q=>q.id.slice(1)+':'+(q.bx!=null?q.bx:q.x).toFixed(2)+','+(q.by!=null?q.by:q.y).toFixed(2)).sort().join(' ')};});
   const dm=Math.max(...c.mc.map((v,i)=>Math.abs(v-l.mc[i])));
-  ok(dm<0.035,what+': mulm columns match within two tank days of new mulm (max diff '+dm.toFixed(3)+')');ok(c.ps===l.ps,what+': pests match ('+c.ps+' | '+l.ps+')');return c;};
+  ok(dm<0.035,what+': mulm columns match within two tank days of new mulm (max diff '+dm.toFixed(3)+')');ok(c.ps===l.ps,what+': pests match, spots the crawl goes round ('+c.ps+' | '+l.ps+')');return c;};
  let f=await land();await compare(f,'first visit');
  // 3. a clean on the land: half the gravel, one pest, a wipe of the top left glass
  await f.evaluate(async()=>{var T=S.tanks[0];S.sel=0;setTab('tank');await new Promise(r=>setTimeout(r,400));toyStart('vac');for(var i=0;i<24;i++)T.mulm[i]=0;toyEnd();await new Promise(r=>setTimeout(r,300));

@@ -345,7 +345,7 @@ body.gb-on main{padding-bottom:64px}body.gb-on .pause-pill{bottom:calc(132px + e
 input,select,textarea{max-width:100%;min-width:0;box-sizing:border-box}.name-row input[type=date]{-webkit-appearance:none;appearance:none;display:block;min-height:44px;text-align:left}.name-row input[type=date]::-webkit-date-and-time-value{text-align:left}.name-row{margin:12px 0}.name-row label{display:block;font-size:12px;color:var(--ink-3);margin-bottom:4px}.name-row input{width:100%;box-sizing:border-box;padding:10px 12px;font-size:16px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
 .grandma-letter{margin:10px 0;padding:10px 12px;background:var(--surface-2);border-left:3px solid var(--accent);font-size:13px;white-space:pre-line}
 #milestone-body{white-space:pre-line}body.story-intro .top,body.story-intro .tabs,body.onetab .tabs{display:none!important}.speed.pre button{display:none}.wp.wsum.calm{display:none!important}
-#milestone-card{border:2px solid var(--accent);scroll-margin-top:12px}#milestone-card h2:focus{outline:none}
+#hard-card.hpick #hg-t,#hard-card.hpick .hg-wrap,#hard-card.hpick #hg-key,#hard-card.hpick #nour-jar,#hard-card.hpick #hard-led{display:none!important}#milestone-card{border:2px solid var(--accent);scroll-margin-top:12px}#milestone-card h2:focus{outline:none}
 .pk{color:var(--ink-3);font-size:11px;white-space:nowrap}
 #milestone-letter{white-space:normal;padding:6px 12px}#milestone-letter>summary{color:var(--accent);font-weight:600;font-size:13px;min-height:24px}#milestone-ltext{white-space:pre-line;margin-top:6px}
 #milestone-card .scope-label{font-size:11px}#milestone-card .sub{margin:6px 0}#milestone-card .btns{margin-top:6px}
@@ -3735,7 +3735,7 @@ function trim(n,d){return String(+Number(n).toFixed(d));}
 (function(){var vv=window.visualViewport,fix=function(){var a=document.activeElement,typing=!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!/^(range|checkbox|radio|button)$/.test(a.type||''));document.body.classList.toggle('kbd',typing&&!!vv&&vv.height<window.innerHeight*0.8);var t=document.querySelector('.tabs');if(t&&t.style.transform)t.style.transform='';};if(vv){vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);}document.addEventListener('focusin',function(){setTimeout(fix,300);});document.addEventListener('focusout',function(){setTimeout(fix,50);setTimeout(fix,400);});})();
 // No browser feel: no pinch or double-tap zoom, no long-press menu outside text fields.
 (function(){var stop=function(e){e.preventDefault();};['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,stop,{passive:false});});document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea,[contenteditable]')))e.preventDefault();});})();
-var toastT=null,NF=null,BUILD='2026-11-01-p197';
+var toastT=null,NF=null,BUILD='2026-11-01-p198';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
@@ -4832,7 +4832,9 @@ function ckPlants(v,x,C){var L=ckTrim(C),W=v.W,H=v.H,s=ckS(v),k=W+'|'+H+'|'+v.dp
   v.ckPK=k;}
  x.drawImage(v.ckPC,0,0,W,H);}
 // Pests: bladder and ramshorn snails, small white flatworms. They creep a little where the sim put them.
-function ckPestPos(p,i,v,t){var sn=p.k==='snail',w=sn?0.08:0.3;return [p.x*v.W+Math.sin(t*w*0.5+i*1.7)*(sn?3:8),p.y*v.H+Math.cos(t*w*0.4+i)*(sn?1:2),careH(1,p.s)*6.283+Math.sin(t*w+i)*(sn?0.2:0.5)];}
+// Pass 198 (Puti): pests crawl slowly back and forth round their spot (same path on the land, `pestCrawl` there), not a wobble in place
+function pestCrawl(s,sn,t){s=s>>>0;var r1=(s%997)/997,r2=(s%613)/613,P=sn?140+r1*80:40+r1*30,w=6.283/P,ph=r2*6.283,A=sn?0.10:0.16,B=sn?0.03:0.05;return [A*Math.sin(w*t+ph),B*Math.sin(w*1.7*t+ph*2),Math.atan2(B*1.7*Math.cos(w*1.7*t+ph*2),A*Math.cos(w*t+ph))];}
+function ckPestPos(p,i,v,t){var c=pestCrawl(p.s!=null?p.s:i*7919,p.k==='snail',t);return [clamp(p.x+c[0],0.03,0.97)*v.W,clamp(p.y+c[1],0.25,0.97)*v.H,c[2]];}
 function ckBladder(x,px,py,r,ang,t){x.save();x.translate(px,py);x.rotate(ang);var w=Math.sin(t*2.2)*0.12;
  x.fillStyle='rgba(120,118,110,.55)';x.beginPath();x.ellipse(r*0.55,0,r*0.95,r*0.42,0,0,6.283);x.fill();
  x.strokeStyle='rgba(90,88,80,.8)';x.lineWidth=0.7;x.beginPath();x.moveTo(r*1.35,-r*0.15);x.quadraticCurveTo(r*1.75,-r*(0.45+w),r*2.0,-r*(0.55+w));x.moveTo(r*1.35,r*0.15);x.quadraticCurveTo(r*1.75,r*(0.45-w),r*2.0,r*(0.55-w));x.stroke();
@@ -6095,23 +6097,24 @@ function hardGroupHTML(g){var H=hardOf(G),r=hardReach(G,g),P=H.picks[g.id]||{},l
  var warTaken=g.war&&Object.keys(P).some(function(k){var x=hardOp(g,k);return x&&x.f;});
  g.ops.forEach(function(o){if(o.old&&!P[o.id])return;h+=hardOptRow(g,o,P,warTaken);});
  return '<div class="hard-now"><p class="scope-label"><i style="background:'+HG_COL[g.id]+'"></i>'+g.name+' · '+(r>=0.999?'all reached':big(left)+' people left')+'</p><p class="hard-one">'+g.body+'</p><div class="hard-ops">'+h+'</div></div>';}
+var HARD_RE=false;
 function hardGoalsHTML(first){var H=hardOf(G);return leaveHTML()+HARD_GOALS.map(function(x){var cur=x.id===H.goal,sure=HARD_SURE===x.id;
  var lab=cur?'\u2713 '+(first?'Keep this':'Current'):sure?'Tap again':'Choose';return itemHTML(x.t,x.d,'<button class="btn'+(sure?' primary':'')+'" data-act="'+(first&&cur?'hard-keep':'hard-goal')+'" data-id="'+x.id+'"'+(cur&&!first?' disabled':'')+'>'+lab+'</button>');}).join('');}
 function renderHard(){var c=$('hard-card');if(!c)return;var E=G.emp,won=!!E.won,open=hardOpen(G)&&(won||!E.ended);c.hidden=!open;if(!open||activeTab!=='world')return;var H=hardOf(G);
  setT('hard-sum',won?'Goal reached':big(Math.floor(G.humans))+' of '+big(hardTarget(G)));
  var gl=HARD_GOALS.filter(function(x){return x.id===H.goal;})[0]||HARD_GOALS[0],at=Math.min(H.at||0,HARD.length),cur=HARD[Math.min(at,HARD.length-1)];
- var sg=hardGroup(HARD_SEL),sel=won||!H.goalOk?null:sg&&hgSeen(G,HARD.indexOf(sg))?sg.id:null;
- $('hard-top').mhtml=won?'<p class="hard-goal1">Goal reached on day '+cnt(E.won)+'.</p>':H.goalOk?'<p class="hard-goal1">Goal: <b>'+gl.t+'</b>, '+big(hardTarget(G))+'</p><p class="hint hard-gp">'+(H.gline?'Grandma: '+H.gline:'')+'</p>':'';
- var B=hgBlocks(G),cvw=$('hg-cv').clientWidth||Math.max(100,c.clientWidth-HG_LW-30),L=hgLayout(B,cvw);setT('hg-t',big(Math.floor(G.humans))+' of '+big(WORLD)+' people have a tank, a square is a million');
- $('hg-lab').style.height=L.H+'px';$('hg-lab').mhtml=hgLabHTML(B,sel);$('hg-key').mhtml=hgKeyHTML();hgDraw(B,L,sel);
+ var pick=!won&&(!H.goalOk||HARD_RE);c.classList.toggle('hpick',pick);   // Pass 198 (Puti): pick the goal first, the grid comes after; Change goal goes back to the pick
+ var sg=hardGroup(HARD_SEL),sel=won||pick?null:sg&&hgSeen(G,HARD.indexOf(sg))?sg.id:null;
+ $('hard-top').mhtml=won?'<p class="hard-goal1">Goal reached on day '+cnt(E.won)+'.</p>':pick?'':itemHTML('Goal: '+gl.t,big(hardTarget(G))+' people'+(H.gline?'. Grandma: '+H.gline:''),'<button class="btn" data-act="hard-re">Change goal</button>');
+ if(!pick){var B=hgBlocks(G),cvw=$('hg-cv').clientWidth||Math.max(100,c.clientWidth-HG_LW-30),L=hgLayout(B,cvw);setT('hg-t',big(Math.floor(G.humans))+' of '+big(WORLD)+' people have a tank, a square is a million');
+ $('hg-lab').style.height=L.H+'px';$('hg-lab').mhtml=hgLabHTML(B,sel);$('hg-key').mhtml=hgKeyHTML();hgDraw(B,L,sel);}
  var hb=$('hard-body');
  if(won)hb.mhtml='';
- else if(!H.goalOk){var h0='<p class="hard-one">The groups open once you decide what “everyone” means. You can change it later.</p>'+hardGoalsHTML(true);hb.mhtml=h0;slotMin(hb,'hb',[h0]);}
+ else if(pick){var h0='<p class="hard-one">'+(H.goalOk?'What does “everyone” mean now?':'First decide what “everyone” means. You can change it later.')+'</p>'+hardGoalsHTML(true);hb.mhtml=h0;slotMin(hb,'hb',[h0]);}
  else{hb.style.minHeight='';var tapL='<p class="hard-one">Tap a group.</p>',sh='<div class="hard-step">'+(sel?hardGroupHTML(hardGroup(sel)):tapL)+'</div>';hb.mhtml=sh;
   var stp=hb.querySelector('.hard-step');if(stp)slotMin(stp,'hs',[tapL].concat(HARD.map(function(x){return hardGroupHTML(x);})));}// Pass 190: no Next, any group any time, the slot is the tallest group so a tap moves nothing below
- nourJar(won);
- $('hard-led').mhtml=hardLedgerHTML(G,H,won);
- $('hard-re').mhtml=won||!H.goalOk?'':'<details class="hard-re"><summary>Rethink the goal</summary>'+hardGoalsHTML(false)+'</details>';}
+ if(!pick){nourJar(won);$('hard-led').mhtml=hardLedgerHTML(G,H,won);}
+ $('hard-re').mhtml='';}
 // Pass 180: give a box the height of its tallest state, measured once per width, so moving between states never changes its size.
 var SLOTH={};function slotMin(el,key,list){if(!el||!el.getClientRects().length)return;var w=el.clientWidth,k=key+'|'+w+'|'+list.length;if(SLOTH[k]==null){var m=document.createElement('div');m.className=el.className;m.style.cssText='position:absolute;left:-9999px;top:0;visibility:hidden;width:'+w+'px';el.parentNode.appendChild(m);var mx=0;list.forEach(function(x){m.innerHTML=x;mx=Math.max(mx,m.offsetHeight);});m.remove();SLOTH[k]=mx;}el.style.minHeight=SLOTH[k]+'px';}
 // Pass 190: the orders-a-day chart was removed (Puti).
@@ -6543,8 +6546,9 @@ function initControls(){
     if(a==='coin-honest'){coinOf(G).honest=1;render();return;}
     if(a==='proj-no'){if(projDecline(G,b.dataset.id))render();return;}
     if(a==='hard-buy'){var hg=hardGroup(b.dataset.g),ho=hg&&hardOp(hg,b.dataset.o);if(hardBuy(G,b.dataset.g,b.dataset.o)){render();}else toast('Not enough spare cash, or not possible yet.');return;}
-    if(a==='hard-goal'){var gg=HARD_GOALS.filter(function(x){return x.id===b.dataset.id;})[0];if(gg&&gg.now&&HARD_SURE!==gg.id){HARD_SURE=gg.id;render();return;}HARD_SURE=null;if(hardSetGoal(G,b.dataset.id)){hardOf(G).goalOk=1;detectMilestones(G);render();}return;}
-    if(a==='hard-keep'){var Hk=hardOf(G);Hk.goalOk=1;Hk.gline=Hk.gline||(HARD_GOALS.filter(function(x){return x.id===Hk.goal;})[0]||{}).gp;render();return;}
+    if(a==='hard-goal'){var gg=HARD_GOALS.filter(function(x){return x.id===b.dataset.id;})[0];if(gg&&gg.now&&HARD_SURE!==gg.id){HARD_SURE=gg.id;render();return;}HARD_SURE=null;if(hardSetGoal(G,b.dataset.id)){hardOf(G).goalOk=1;HARD_RE=false;detectMilestones(G);render();}return;}
+    if(a==='hard-re'){HARD_RE=true;HARD_SURE=null;render();return;}
+    if(a==='hard-keep'){var Hk=hardOf(G);Hk.goalOk=1;HARD_RE=false;Hk.gline=Hk.gline||(HARD_GOALS.filter(function(x){return x.id===Hk.goal;})[0]||{}).gp;render();return;}
     if(a==='hard-next'){var Hn=hardOf(G);Hn.at=Math.min(HARD.length,(Hn.at||0)+1);HARD_SEL=null;render();return;}
     if(a==='hard-sel'){HARD_SEL=b.dataset.g;render();return;}
     if(a==='hg-tap'){var hid=hgHit(e);if(hid){HARD_SEL=hid;render();}return;}

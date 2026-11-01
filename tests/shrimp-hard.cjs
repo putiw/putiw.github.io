@@ -28,9 +28,15 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
  await p.mouse.click(pt.x,pt.y);await p.waitForTimeout(300);
  const lab2=await p.evaluate(()=>document.querySelector('#hard-body .hard-now .scope-label').textContent);if(!/No water/.test(lab2))throw Error('block tap did not select: '+lab2);ok('tapping a block selects it');
  // before a goal is picked the groups are grey and can't be picked; goal buttons: none filled, the current one has a check
- const pre=await p.evaluate(()=>{var H=hardOf(G);H.goalOk=0;HARD_SEL=null;HGK='';render();var q=HGR.find(r=>r.id==='no'),c=document.getElementById('hg-cv').getBoundingClientRect();
-  var r={hit:hgHit({clientX:c.left+q.x0+1,clientY:c.top+q.y0+1}),off:document.querySelectorAll('#hg-lab .hg-k.off').length,prim:document.querySelectorAll('#hard-body [data-act^="hard-"].primary').length,check:[...document.querySelectorAll('#hard-body button')].filter(b=>/\u2713/.test(b.textContent)).length};H.goalOk=1;HGK='';render();return r;});
- if(pre.hit!==null||pre.off<9||pre.prim||pre.check!==1)throw Error('before the goal '+JSON.stringify(pre));ok('before the goal: groups grey, no goal button filled, one check mark');
+ const pre=await p.evaluate(()=>{var H=hardOf(G);H.goalOk=0;HARD_SEL=null;HGK='';render();var cv=document.getElementById('hg-cv');
+  var r={grid:cv.getClientRects().length,prim:document.querySelectorAll('#hard-body [data-act^="hard-"].primary').length,check:[...document.querySelectorAll('#hard-body button')].filter(b=>/\u2713/.test(b.textContent)).length};H.goalOk=1;HGK='';render();return r;});
+ if(pre.grid||pre.prim||pre.check!==1)throw Error('before the goal '+JSON.stringify(pre));ok('before the goal: only the goal pick shows (Pass 198), no goal button filled, one check mark');
+ // Change goal goes back to the pick, Keep this returns to the grid
+ await p.click('#hard-top [data-act="hard-re"]');await p.waitForTimeout(700);
+ const reA=await p.evaluate(()=>document.getElementById('hg-cv').getClientRects().length);
+ await p.click('#hard-body [data-act="hard-keep"]');await p.waitForTimeout(300);
+ const reB=await p.evaluate(()=>document.getElementById('hg-cv').getClientRects().length);
+ if(reA||!reB)throw Error('change goal: '+JSON.stringify([reA,reB]));ok('Change goal opens the pick, Keep this goes back');
  // fund an option: its squares show as on the way, then fill as days pass
  const k0=await p.evaluate(()=>{G.money=1e15;HARD_SEL='war';var H=hardOf(G);delete H.picks.war;render();return HGK;});await p.waitForTimeout(800);
  await p.click('#hard-body [data-act="hard-buy"][data-o="out"]');await p.waitForTimeout(300);

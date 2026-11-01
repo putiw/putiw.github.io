@@ -1203,7 +1203,9 @@ function drawBladder(x,px,py,r,ang,t){x.save();x.translate(px,py);x.rotate(ang);
 function drawRamshorn(x,px,py,r,ang){x.save();x.translate(px,py);x.rotate(ang*0.2);x.fillStyle='#8a4a30';x.beginPath();x.arc(0,0,r,0,6.283);x.fill();x.strokeStyle=INK;x.lineWidth=0.9;x.stroke();
   x.strokeStyle='rgba(44,26,16,.7)';x.lineWidth=0.7;x.beginPath();for(var a=0;a<5*Math.PI;a+=0.25){var rr=r*(0.92-a/(5*Math.PI)*0.85);var X=Math.cos(a)*rr,Y=Math.sin(a)*rr;if(a===0)x.moveTo(X,Y);else x.lineTo(X,Y);}x.stroke();
   x.fillStyle='rgba(255,220,190,.35)';x.beginPath();x.arc(-r*0.35,-r*0.4,r*0.25,0,6.283);x.fill();x.restore();}
-function pestsStep(T,dt){var W=TV.W,H=TV.H;T.pests.forEach(function(p){if(p.held)return;var sp=p.k==='snail'?0.006:0.03;p.a+=(Math.random()-0.5)*dt*(p.k==='snail'?0.8:2.4);p.x+=Math.cos(p.a)*sp*dt*(p.glass?1:0.6);p.y+=Math.sin(p.a)*sp*dt*(p.glass?1:0.25)*(W/H);
+// Pass 198 (hand edit, port to shrimp-proto src/tank.js and game.js): the game's pests crawl round their spot on the same path as the company page
+function pestCrawl(s,sn,t){s=s>>>0;var r1=(s%997)/997,r2=(s%613)/613,P=sn?140+r1*80:40+r1*30,w=6.283/P,ph=r2*6.283,A=sn?0.10:0.16,B=sn?0.03:0.05;return [A*Math.sin(w*t+ph),B*Math.sin(w*1.7*t+ph*2),Math.atan2(B*1.7*Math.cos(w*1.7*t+ph*2),A*Math.cos(w*t+ph))];}
+function pestsStep(T,dt){var W=TV.W,H=TV.H;T.pests.forEach(function(p){if(p.held)return;if(p.bx!=null){var c=pestCrawl(p.gs,p.k==='snail',performance.now()/1000);p.x=clamp(p.bx+c[0],0.03,0.97);p.y=clamp(p.by+c[1],0.25,0.97);p.a=c[2];return;}var sp=p.k==='snail'?0.006:0.03;p.a+=(Math.random()-0.5)*dt*(p.k==='snail'?0.8:2.4);p.x+=Math.cos(p.a)*sp*dt*(p.glass?1:0.6);p.y+=Math.sin(p.a)*sp*dt*(p.glass?1:0.25)*(W/H);
   if(p.glass){if(p.y<0.26||p.y>0.72)p.a=-p.a;p.y=clamp(p.y,0.25,0.73);}else{p.y=clamp(p.y,0.77,0.92);}if(p.x<0.04||p.x>0.96)p.a=Math.PI-p.a;p.x=clamp(p.x,0.03,0.97);});}
 function tvLoop(){if(!TV.on)return;requestAnimationFrame(tvLoop);if(!tvSize())return;var now=performance.now(),dt=TV.last?Math.min(0.1,(now-TV.last)/1000):0.016;TV.last=now;
   var live=running()||TOY;if(live){TV.t+=dt;agentsStep(dt);if(TV.T)pestsStep(TV.T,dt);}netStep(dt);holdStep();if(TOY&&TOY.step)TOY.step(dt);tvDraw();}
@@ -4111,8 +4113,8 @@ function decorSet(T,f){var D={wood:['wood'],plants:['sword','lotus'],moss:['moss
     else{T.scape=T.scape.filter(function(i){if(D[k].indexOf(i.k)<0)return true;delete T.moss[i.id];return false;});if(k==='plants')T.stems=[];if(k==='moss')T.moss={};}});
   if(ch&&typeof TV==='object')TV.L={};}
 // a pest from the game: its kind and place are the game's, its look comes from its seed, so it looks the same every visit
-function gamePest(g,was){var s=g.s>>>0,sn=g.k==='snail',glass=g.y<0.72;if(was&&was.k===(sn?'snail':'planaria')){was.x=g.x;was.y=g.y;was.glass=glass;return was;}
-  return {id:'g'+g.s,k:sn?'snail':'planaria',kind:sn?(s%5?'bladder':'ramshorn'):'',x:g.x,y:g.y,glass:glass,a:(s%628)/100,sz:0.8+(s%41)/100};}
+function gamePest(g,was){var s=g.s>>>0,sn=g.k==='snail',glass=g.y<0.72;if(was&&was.k===(sn?'snail':'planaria')){was.bx=g.x;was.by=g.y;was.gs=s;was.glass=glass;return was;}
+  return {id:'g'+g.s,k:sn?'snail':'planaria',kind:sn?(s%5?'bladder':'ramshorn'):'',x:g.x,y:g.y,bx:g.x,by:g.y,gs:s,glass:glass,a:(s%628)/100,sz:0.8+(s%41)/100};}
 function jobOpen(){return !!(TOY||$('sheet')&&!$('sheet').hidden);}
 function ownVals(T){var sn=0,pl=0;T.pests.forEach(function(p){if(p.k==='snail')sn++;else pl++;});return {mulm:mulmMean(T),flow:T.flow,og:overgrowth(T),sn:sn,pl:pl,no3:T.no3,wc:T.lastWC,dec:JSON.stringify(decorFlags(T))};}
 function applyOwn(T,d){var c=d.care;if(!c)return;var i;

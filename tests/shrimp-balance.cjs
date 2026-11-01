@@ -416,7 +416,7 @@ if(STORY_FIRST.indexOf('coin_offer')<0)throw Error('The Shrimpcoin offer should 
 var o=readyGame();o.emp.hard={open:1,goal:'want',picks:{}};migrate(o);if(!o.emp.hard.goalOk||o.emp.hard.at!==HARD.length)throw Error('An old save already in the hard part skips the walk-through');
 var n=readyGame();n.emp.hard={open:1,goal:'home',picks:{}};migrate(n);if(n.emp.hard.goalOk)throw Error('A fresh hard part starts with the goal');
 `);
-if(html.includes("Group '+(at+1)")||!html.includes("The groups open once you decide what “everyone” means.")||!html.includes("move('lab-card','up',false);")||!html.includes("wrap.hidden=true;$('p-up').appendChild(wrap)")||!html.includes("salesOpen(G)&&!salesDone(G)"))throw Error('Hard part walk-through, no lab certification, no home-tank gear after hatcheries, no idle Sales card');
+if(html.includes("Group '+(at+1)")||!html.includes("First decide what “everyone” means.")||!html.includes("move('lab-card','up',false);")||!html.includes("wrap.hidden=true;$('p-up').appendChild(wrap)")||!html.includes("salesOpen(G)&&!salesDone(G)"))throw Error('Hard part walk-through, no lab certification, no home-tank gear after hatcheries, no idle Sales card');
 if(/' of '\+l\.finds\.length\+' found/.test(html))throw Error('Research has no total to find');
 check('one tree a tap, others plant slowly for the coin, research opens Space',`
 var g=readyGame();g.humans=4e9;var C=coinOf(g);C.on=1;C.honest=1;C.price=30;g.money=1e12;
