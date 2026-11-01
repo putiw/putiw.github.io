@@ -16,7 +16,7 @@ window.ENDING_TEST_DATA = {
         {
           "id": "sciacad",
           "label": "Let them go, wish them luck",
-          "description": "They take what they learned with you to other companies. The ones who stay ask the big questions, and once in a while one finds something nobody was looking for.",
+          "description": "They go back to the universities. The ones who stay ask the big questions, and once in a while one finds something nobody was looking for.",
           "traits": {
             "care": 0.5,
             "control": -0.5,
@@ -55,7 +55,7 @@ window.ENDING_TEST_DATA = {
         {
           "id": "labyou",
           "label": "Name it after you",
-          "description": "Donors recognize your name and back the lab. More influence ✦ every day than any other naming deal.",
+          "description": "Donors recognize your name and back the lab. More influence ✦ every day.",
           "traits": {
             "drive": 1
           },
@@ -98,7 +98,7 @@ window.ENDING_TEST_DATA = {
         {
           "id": "geneshare",
           "label": "Share it",
-          "description": "Every breeder gets better shrimp, your rivals too. Word of mouth up a little.",
+          "description": "Every breeder gets better shrimp, your rivals too. No license money. Word of mouth up a little.",
           "traits": {
             "care": 0.7,
             "drive": -0.3
@@ -182,7 +182,7 @@ window.ENDING_TEST_DATA = {
         {
           "id": "retrain",
           "label": "Retraining fund",
-          "description": "Crews learn kelp farming and reef tours. Slow and expensive, the towns forgive you.",
+          "description": "Crews learn kelp farming and reef tours. The towns stop blaming you.",
           "traits": {
             "care": -0.5,
             "drive": -0.3
@@ -437,7 +437,7 @@ window.ENDING_TEST_DATA = {
         {
           "id": "kidsfree",
           "label": "Kits for poor schools, no ads to kids",
-          "description": "AED 600,000 for class tanks that sell nothing. Slower, +2% want one.",
+          "description": "60 days of income for class tanks that sell nothing. Slower, +2% want one.",
           "traits": {
             "care": 0.7,
             "drive": -0.3
@@ -482,7 +482,7 @@ window.ENDING_TEST_DATA = {
         {
           "id": "wasteclean",
           "label": "Keep cleaning it, add plant filters",
-          "description": "AED 1.5M, the river below the farm stays clear.",
+          "description": "Farm upkeep 10% higher, the river below the farm stays clear.",
           "traits": {
             "kin": 0.5,
             "means": 0.3
@@ -706,7 +706,7 @@ window.ENDING_TEST_DATA = {
     {
       "id": "c_prison",
       "title": "Tiny jails",
-      "body": "A shrimp liberation group says every tank is a tiny jail. They’re not all wrong, a 20 L tank is small.",
+      "body": "A shrimp liberation group says every tank is a tiny jail. A 20 L tank is small.",
       "options": [
         {
           "label": "Argue with them",
@@ -765,7 +765,7 @@ window.ENDING_TEST_DATA = {
           "endingLine": "Mira’s other grandpa takes visitors out to the reef. Mira sends photos."
         },
         {
-          "label": "A fund for every crew that lost work",
+          "label": "A fund for every crew that lost work, 2% of income for two years",
           "description": "He gets the same as every other crew, no more.",
           "traits": {
             "care": 0.5,
@@ -843,7 +843,7 @@ window.ENDING_TEST_DATA = {
     {
       "id": "c_green",
       "title": "Green power where nobody needs it",
-      "body": "A year after the solar farms, the engineers ask: keep building, in places that have enough electricity but make it from coal and gas? Nothing to do with shrimp.\n\nA gigawatt of solar or wind costs about AED 4B and makes 2 TWh a year. The world uses 30,000 TWh, 60% of it from coal and gas. One percent of the world’s power is 150 GW, about AED 600B. Sold at grid price it pays back in 10 to 12 years. Given away, it never does.",
+      "body": "A year after the solar farms, the engineers ask: keep building, in places that have enough electricity but make it from coal and gas?\n\nA gigawatt of solar or wind costs about AED 4B and makes 2 TWh a year. The world uses 30,000 TWh, 60% of it from coal and gas. One percent of the world’s power is 150 GW, about AED 600B. Sold at grid price it pays back in 10 to 12 years. Given away, it never does.",
       "options": [
         {
           "label": "Build 150 GW and sell the power",
@@ -895,6 +895,192 @@ window.ENDING_TEST_DATA = {
             "drive": -0.5,
             "control": -0.5
           }
+        }
+      ]
+    },
+    {
+      "id": "c_knee",
+      "title": "The knee",
+      "body": "Grandma’s knee surgery is booked for the week of the Europe launch. She’ll need someone the first few days.",
+      "options": [
+        {
+          "label": "Go with her, Europe opens in six months",
+          "description": "You sit by her bed and read her the shrimp club newsletter. Europe waits.",
+          "traits": {},
+          "endingLine": "You put the Europe launch back six months for Grandma’s knee."
+        },
+        {
+          "label": "Launch, she goes with an aunt",
+          "description": "Europe opens on the date on the posters. Auntie Lan stays with Grandma for the week.",
+          "traits": {}
+        }
+      ]
+    },
+    {
+      "id": "c_strain",
+      "title": "A hardier line",
+      "body": "The farm can breed a hardier line. Fewer die in shipping, the color is a bit duller. While the line settles breeding is 10% lower, for three to nine months, nobody knows how long.",
+      "options": [
+        {
+          "label": "Switch, 10% less breeding for 3 to 9 months, 1% fewer want one",
+          "description": "The new line goes into every rack.",
+          "traits": {},
+          "endingLine": "Your farms switched to a hardier, duller red."
+        },
+        {
+          "label": "Keep the old line",
+          "description": "Nothing changes. The red stays red.",
+          "traits": {}
+        }
+      ]
+    },
+    {
+      "id": "c_heat",
+      "title": "Power cut",
+      "body": "50 °C and the power is out. The chiller on your first tank has a battery, it’ll last the night. The rack room runs on the room AC. One battery, one room.",
+      "options": [
+        {
+          "label": "Keep it home",
+          "description": "Tank 1 makes it through the night. The rack room doesn’t.",
+          "traits": {},
+          "endingLine": "The racks lost everything the night the power went out."
+        },
+        {
+          "label": "Move it to the farm",
+          "description": "The racks make it. You can’t net them in the dark, so Tank 1 stays where it is.",
+          "traits": {},
+          "endingLine": "You gave the farm the battery the night the power went out. Tank 1 was empty in the morning."
+        }
+      ]
+    },
+    {
+      "id": "c_jar2",
+      "title": "The third floor, again",
+      "body": "The man from the third floor is at your door. His daughter’s shrimp all died while she was at school. Jimmy, Jack, Jimbo, Jojo and Jaja. He asks for five more, she won’t know.",
+      "options": [
+        {
+          "label": "Sell him five, AED 15",
+          "description": "He pays at the door and takes them up in a cup.",
+          "traits": {}
+        },
+        {
+          "label": "Tell him to tell her, bring her over",
+          "description": "She comes down the next day with the empty jar. You give her a care guide and five shrimp. She names them the same names.",
+          "traits": {},
+          "endingLine": "A girl on the third floor learned to keep shrimp from you."
+        }
+      ]
+    },
+    {
+      "id": "c_lights",
+      "title": "The lights",
+      "body": "Half the grow lights in the rack room are the cheap kind now. One of the packers swapped them and sold the good ones. She’s short on rent, she looks after her little sister alone.",
+      "options": [
+        {
+          "label": "Fire her",
+          "description": "She clears her locker that afternoon.",
+          "traits": {}
+        },
+        {
+          "label": "Call the police",
+          "description": "They take a statement. It goes to court in the spring.",
+          "traits": {},
+          "endingLine": "A packer of yours went to court over the grow lights."
+        },
+        {
+          "label": "Raise her pay and keep her, AED 20 more a day",
+          "description": "She’s at work early the next day. Maybe it happens again, maybe it doesn’t.",
+          "traits": {},
+          "endingLine": "You kept the packer who sold the lights and paid her more."
+        }
+      ]
+    },
+    {
+      "id": "c_contam",
+      "title": "The cleaning bucket",
+      "body": "Someone rinsed a bucket of cleaning stuff into a breeding tank. Most of the shrimp lived. The ones that did will struggle to breathe and to molt, and they’ll get sick a lot.",
+      "options": [
+        {
+          "label": "Clove oil, they go to sleep",
+          "description": "It takes an afternoon. The tank is clean by evening.",
+          "traits": {}
+        },
+        {
+          "label": "Let them live out their lives",
+          "description": "They get their own tank in the corner. Someone feeds them.",
+          "traits": {},
+          "endingLine": "A tank in the corner of the farm for shrimp that couldn’t breathe well."
+        }
+      ]
+    },
+    {
+      "id": "c_cousin",
+      "title": "The cousin",
+      "body": "Your cousin is funny, everyone likes him, and he talks big. He’s never kept a job a year. He says he knows how to sell anything. Your aunt hopes you’ll help.",
+      "options": [
+        {
+          "label": "Hire him as a regional manager, sales up a little, until he makes a mistake",
+          "description": "He’s on the phone to every shop by Monday.",
+          "traits": {},
+          "endingLine": "Your cousin ran a region for a while."
+        },
+        {
+          "label": "Don’t",
+          "description": "Your aunt is quiet at the New Year dinner. Grandma tells you about it twice.",
+          "traits": {}
+        }
+      ]
+    },
+    {
+      "id": "c_letgo",
+      "title": "Let them go",
+      "body": "Mira wants to let her shrimp go in the stream behind the school. They’d be happier, she says. Cherry shrimp aren’t from here.",
+      "options": [
+        {
+          "label": "Yes",
+          "description": "She lets them go one at a time and waves at each.",
+          "traits": {},
+          "endingLine": "Mira let her shrimp go in the stream behind the school."
+        },
+        {
+          "label": "No, they aren’t from here",
+          "description": "She’s cross for a week. Then she asks what is from here.",
+          "traits": {},
+          "endingLine": "Mira knows which shrimp belong in the stream behind the school."
+        }
+      ]
+    },
+    {
+      "id": "c_lie",
+      "title": "How’s the company",
+      "body": "Grandma calls. How’s the company.",
+      "options": [
+        {
+          "label": "Tell her",
+          "description": "She listens to all of it. Then she asks if you’re eating.",
+          "traits": {}
+        },
+        {
+          "label": "Say it’s fine",
+          "description": "She says good, she knew it would be.",
+          "traits": {}
+        }
+      ]
+    },
+    {
+      "id": "c_pricewar",
+      "title": "Price war",
+      "body": "A rival cuts kit prices by a fifth. If you cut too you both earn less. If you hold and they keep cutting, they take some of your orders. They decide again every month.",
+      "options": [
+        {
+          "label": "Hold your price",
+          "description": "You keep your price. You find out each month what they did.",
+          "traits": {}
+        },
+        {
+          "label": "Cut it, 20% less on every kit for a year",
+          "description": "Your price drops with theirs.",
+          "traits": {}
         }
       ]
     }

@@ -2016,3 +2016,27 @@ Spec: Puti's approved review `shrimp-card-review-1nov.md` (other agent, 1 Nov ev
 Profiles (family %, normal run): Empire builder empire 93, Dictator cartel 89, Grandma's kid drift 94, Do-gooder network 80, Scientist question 100, Shrimp nerd garden 100, Casual 3/33/0/25/40, Returning 19/27/16/24/15, fair chooser 1/32/32/34/1, cold chooser 22/4/28/43/4, random 12/19/29/35/5. All plan targets met, and `shrimp-profiles` now asserts them (`PROFILE_TARGETS_ON`).
 Before this pass: Grandma's kid drift 28, Casual garden 81, fair chooser garden 100, cold chooser empire 100.
 Test: balance 135 (random chooser within ±0.05 with skips counted, drive even), me 50 (c_cash buy is company first, letting postdocs go is care, the stream needs planted trees), profiles. Ending preview formula updated and rebuilt.
+
+### Pass 211: costs and texts (card review A8, A9, B, A11)
+
+- Labels say their cost where the sim had one and the label didn't: Wait them out (fewer orders until they close), keep your drivers and what they cost, Send the survey (some customers unsubscribe), the crew fund is now 2% of income for two years (`duesAdd`, shown on the button), plastic plants in the kits next week, a second shift with payroll up a third, the audits with six months of inspections. Pain and late-card buttons already show their sim costs through `choiceFx`.
+- Cut: "proper", "properly", "the towns forgive you" (now "The towns stop blaming you."), "They're not all wrong," on Tiny jails, "Nothing to do with shrimp." on the 150 GW card, "than any other naming deal", "Each truck is a truck." (now "A truck a day per town."), "Each country keeps its own side." Ask nicely says "a word with the ministry". Share the gene says "No license money."
+- Fixed prices: Kits for poor schools is 60 days of income (`p.days` in `pm`); Keep cleaning the farm water is farm upkeep +10% (button "Upkeep +10%", `p.costL`). The buyout was already three years of income.
+- A11: Luca and Gema's AED 0 is only the test save (no staff counted there; real saves count them when the card fires). `{,name}` in Tired renders through `N()`. Moving (nour4) has its body in `bodyFn`. Nona's age now follows the year she was hired (`bodyFn`).
+
+### Pass 212: new cards (plan Part 3, review constraints)
+
+Ten cards in `CARDS3` (pushes in `PUSH`, `card3Map` maps them to story cards; `lab` and `bodyFn` supported):
+1. The knee (`c_knee`): fires within 10 days of opening Europe, if Grandma's knee hasn't happened. Go with her, Europe opens in six months (the region comes off and returns in 182 days, counts a visit) dr−.8 / Launch, she goes with an aunt (a line in Her years) dr+.5. The old knee event waits unless Europe is open or day 2,600 passes, so one knee a game.
+2. A hardier line (`c_strain`, farm and 20k kits): Switch, 10% less breeding for 3 to 9 months (hidden, a log line when it settles, `strainDay`), 1% fewer want one, kit survival +2 points ki+.3 ri+.3 / Keep the old line dr+.3.
+3. Power cut (`c_heat`): a heat wave, a rack or barn farm and no hatchery, a chiller on Tank 1. Buttons show the counts from the save: Keep it home, the farm's N die tonight dr−.5 / Move it to the farm, Tank 1's N die tonight ki−.5. No moss line.
+4. The third floor, again (`c_jar2`): 150 days after the jar sale. Sell him five, AED 15 dr+.3 / Tell him to tell her, bring her over (five shrimp free, a later note) ca−.3 me+.3. She is the man's daughter, not Mira.
+5. The lights (`c_lights`): Fire her dr+.3 / Call the police (a court line in the Times) co+.5 / Raise her pay and keep her, AED 20 more a day (1 in 4 it happens again, three days of income) ca−.3.
+6. The cleaning bucket (`c_contam`): Clove oil, they go to sleep (untagged) / Let them live out their lives co−.3. With two basic-science finds the body adds the lab's line on clove oil.
+7. The cousin (`c_cousin`): Hire him as a regional manager, sales up a little, until he makes a mistake (half the time 10 days of income later, Times line) ca−.3 ri+.3 / Don't (aunt quiet at New Year, in Her years) dr+.3.
+8. Let them go (`c_letgo`, Mira took the jar, 300 to 1,500 days after she met you, so 8 to 12): Yes ca−.3 / No, they aren't from here ki+.3. Later lines follow.
+9. How's the company (`c_lie`): once, cash under 10% of its all-time high (`G.stats.cashHi`, at least AED 1M). Tell her me+.4 / Say it's fine co+.3, both in Her years.
+10. Price war (`c_pricewar`): one card, then the rival decides each month for a year (`pwDay`). Hold your price ri−.3 (each month they cut, 8% fewer kits that month) / Cut it, 20% less on every kit for a year dr+.5. A Times line when it ends.
+Knee, power cut and the white lie go first (`STORY_PROMPT`).
+Balance: own-tank kin from play now centres at 10 looks and treats (was 20), so a player who barely looks reads mildly stock. Profiles after: Empire builder 96, Dictator cartel 94, Grandma's kid drift 92, Do-gooder network 79, Scientist question 100, Shrimp nerd garden 100, Casual 5/43/0/14/38, fair chooser 3/40/33/23/0, cold chooser 26/9/31/32/3. All targets met.
+Test: balance 135, me 50, academy 10, cardtap, endcards 50, profiles. Ending preview rebuilt (21 cards). Not run: the new cards in a browser.
