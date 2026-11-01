@@ -906,9 +906,20 @@ var s=readyGame();s.emp.trees={rewild:1};s.emp.pl={b:0,t:[]};for(var i=0;i<200;i
 var b=readyGame();b.emp.evil={bay:1};b.emp.trees={rewild:1};b.money=1e9;plBuy(b);var mud=null;for(var x2=0;x2<PL_W&&!mud;x2++)for(var y2=0;y2<PL_H;y2++)if(plGround(x2,y2)===1){mud=[x2,y2];break;}if(plPlant(b,mud[0],mud[1]))throw Error('The bay license greys the mud');
 if(streamReady.toString().indexOf('plLiving(G,true)>=PL_OWN')<0)throw Error('The stream needs 100 of your trees');
 `);
-console.log(count+' focused balance and migration checks passed');
+
 module.exports={engine,html};
 // Pass 196 (Puti, 1 Nov): after Start over, a built land from the old game can be bought back for AED 300k plus AED 100 a built thing.
 if(!html.includes('data-act="gplace-old"')||!html.includes('return 300000+100*o.n;')||!html.includes("localStorage.setItem('shrimp-land-old'"))throw Error('Old built land should be offered back after Start over');
 // Pass 200 (Puti, 1 Nov): Your tank reads the same on both pages: the land's tiles and lines, Wellbeing, Food and water. Browser check: tests/shrimp-yourtank.cjs
 if(!html.includes('function ownLines(G)')||!html.includes('id="owncare"')||!html.includes('id="wellcard"')||!html.includes("o0.lines=ownLines(G);o0.fw=ownFW(G);"))throw Error('Pass 200: Your tank the same on the company page and the land');
+check('Pass 217: later() survives a reload, the wedding holds the Gulf without a second purchase, the bonus needs the cash',`
+var g=newGame();g.day=500;g.emp.x217=0;later(g,10,null,function(h){h.emp.x217=1;});var r=JSON.parse(JSON.stringify(g));r.day=511;laterDay(r);if(r.emp.x217!==1)throw Error('later callback lost on reload');
+var w=newGame();w.day=900;w.emp.regions=['auh','dxb','uae','gcc'];w.emp.regDay={gcc:899};w.emp.staff.pack=2;w.me.on=1;
+if(!CARDS3.c_wedding.cond(w))throw Error('wedding should be open');if(!card3Choose(w,'c_wedding',1))throw Error('wedding go');
+if(w.emp.regions.indexOf('gcc')<0||!regHeld(w,'gcc'))throw Error('Gulf should stay bought and be held');if(nextRegion(w)&&nextRegion(w).id==='gcc')throw Error('Gulf offered again');
+w.day=915;if(regHeld(w,'gcc'))throw Error('Gulf still held after two weeks');
+var b=newGame();b.money=10;b.fin=[{kits:1e6}];if(card3Choose(b,'c_bonus',0)||card3Choose(b,'c_bonus',1))throw Error('bonus paid without the cash');
+var P=PUSH;['c_wedding','c_play','c_flood','c_bonus'].forEach(function(k){if(P[k].length!==CARDS3[k].ch.length)throw Error('PUSH length '+k);});
+if((P.c_wedding[1].drive||0)>=0||(P.c_play[1].drive||0)>=0||(P.c_flood[0].care||0)<=0||(P.c_bonus[1].care||0)>=0)throw Error('new card pushes out of order');
+`);
+console.log(count+' focused balance and migration checks passed');
