@@ -1682,3 +1682,13 @@ Test: balance 127 (kits test now needs a second tank), academy 9, me 49. Headles
 5. From the first farm the Gear tab is called Farm and Trade is hidden (was at 10 kits a day of farm output). The tank-at-home card says so.
 6. Header gap after automating: same cause as Pass 187 (`HFLOOR` held the tall header), the scroll release covers it. Headless: a fully automated 5-tank recipe header is 88 px with no floor.
 Test: balance 128 (new: seeded tank stays cycled; breeders test updated), me 49 (standard tank pays the recipe once), academy 9, tank1 all. Not run: stable, layout scan, bots, spotlight sweep.
+
+## Pass 189: police year sells loose farm shrimp (1 Nov)
+
+Puti: when you go to the police and can't sell kits for a year, Trade and the Sell button come back, then go when the ban lifts.
+- `banSale(G)`: `E.nosale` running, a farm built, not on the voyage. Trade shows again (`lateTrade`), the business strip shows the ban line plus a Sell button (`#ban-sell`).
+- `banSell`: sells the farms' loose shrimp (`E.rawShrimp`) at Tank 1's price (`priceAt(fleetGrade)` x market x price) inside the weekly buyers, from `sellAll` and the Sell handler. Farms keep about two weeks of buyers in loose shrimp during the ban.
+- Police option text adds "only loose shrimp to pet shops". When the ban ends a news line says kits are back; Trade hides again.
+Test: balance 129 (new police-year check), me 49, academy 9, tank1, hard 10, land-audio. Headless 390: Trade back, strip button "Sell 32 · AED 83", click sells 32 for AED 83, Trade gone after the ban.
+
+Before deploy (Passes 187 to 189): bots seed 7: strong cold 2,140 empire_dictator (was 2,210), strong kind 3,206 question_prof (3,197), average Earth 6,777 garden_hermit (6,777), no INSOLVENT, no STUCK. Spotlight sweep 108 all good. Layout scan: the one known 2 px. Stable full run: 1,778 clicks, 19 buttons moved something (was 23), the same Gear buy rows and story picks as before. Not run: space playthrough, monkey.
