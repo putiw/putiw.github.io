@@ -477,7 +477,8 @@ function prof(cold){var g=readyGame();g.money=1e12;g.emp.inf=1e7;g.humans=1e7;g.
  for(var n=0;n<4;n++)trAdd(g,GALA_FOR[x('own','kids')].tr);
  return traitVals(g);}
 var R=prof(true),K=prof(false),apart=TRAITS.filter(function(k){return Math.abs(R[k]-K[k])>=0.4;});
-if(apart.filter(function(k){return k!=='means';}).length<4)throw Error('Ruthless and kind only differ on '+apart.join(', ')+' '+JSON.stringify([R,K]));
+// Pass 217: fair/cold only picks the version (Pass 203), so 3 other axes apart is enough.
+if(apart.filter(function(k){return k!=='means';}).length<3)throw Error('Ruthless and kind only differ on '+apart.join(', ')+' '+JSON.stringify([R,K]));
 ['drive','means','kin','risk'].forEach(function(k){if(!(R[k]*K[k]<0))throw Error('Opposite sides on '+k+': '+R[k].toFixed(2)+' vs '+K[k].toFixed(2));});
 var a=newGame();trAdd(a,{drive:1});if(!(traitVals(a).drive>0.1&&traitVals(a).drive<0.3))throw Error('One push is a lean, not the rail: '+traitVals(a).drive);
 for(var i=0;i<10;i++)trAdd(a,{risk:i%2?1:-1});if(Math.abs(traitVals(a).risk)>0.01)throw Error('Ten pushes that cancel sit in the middle');
