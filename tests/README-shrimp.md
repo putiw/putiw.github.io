@@ -2069,3 +2069,5 @@ The average bot is about 8% slower to Earth than the baseline (6,357 to 6,861); 
 Profiles (`shrimp-profiles`, asserting): every target met, table in Pass 212.
 Browser: spotlights 103 all good, layout one 2 px text on the win World tab (known since Pass 200), stable 13 movers, all on the known list (bought rows leaving their list, now including the evil route's Turn it down, the first rack, header strips), land-life at 360 and 390.
 Suites: balance 135, me 50, academy 10, hard 12, frozen, endcards 50, cardtap, tank1, yourtank, land-audio, land-life, profiles.
+
+Deployed 1 Nov night (Passes 201 to 214, BUILD 2026-11-01-p214). Tests before deploy are those in Pass 214: balance 135, me 50, academy 10, hard 12, frozen, endcards 50, cardtap, tank1, yourtank, land-audio, land-life, profiles, spotlights 103, layout (one known 2 px), stable 13 known movers, bots and Space bot as in the Pass 214 table.
