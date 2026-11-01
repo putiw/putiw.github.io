@@ -2738,6 +2738,8 @@ function gtNow(G){return G.ps&&G.ps.t>0?G.ps.t:Math.floor(G.day)*3000;}
 function gtDayOf(y,m,d){return Math.round((Date.UTC(y,m-1,d)-GT_T0)/864e5);}
 function gtDate(day){return new Date(GT_T0+Math.floor(day||0)*864e5);}
 function gtFmt(day){var d=gtDate(day);return d.getUTCDate()+' '+GT_MON[d.getUTCMonth()];}
+// Pass 213: what the vegetable bed on the land gave since the last dinner (land 'harvest' messages), taken at the dinner.
+function harvestTake(G){var M=G.me,H=M&&M.harvest;if(!H)return '';var k=Object.keys(H).filter(function(x){return H[x]>0;});if(!k.length)return '';var t=k.map(function(x){return H[x]+' '+x;});M.harvest={};return t.length>1?t.slice(0,-1).join(', ')+' and '+t[t.length-1]:t[0];}
 function cnyEve(y){var s=CNY[y-2026];return s?gtDayOf(y,+s.slice(0,2),+s.slice(2))-1:null;}
 function gtOrd(n){var t=n%100,u=n%10;return n+(t>10&&t<14?'th':u===1?'st':u===2?'nd':u===3?'rd':'th');}
 // Pocket money: usually 100, sometimes 150, never more than 200.
@@ -2757,7 +2759,7 @@ var GT_YEAR={
   a:[['I’ll be there',0,function(G,it){return 'Grandma turned '+it.age+'. You brought the cake, she said it was too sweet and had two pieces.';},1],['Send a cake',150,function(G,it){return 'You sent Grandma a cake for her '+gtOrd(it.age)+'. She shared it with the neighbors.';}]],
   miss:function(G,it){return 'Grandma turned '+it.age+'. You forgot. She didn’t mention it.';}},
  cny:{t:function(G,it){return 'Grandma is cooking the big New Year’s Eve dinner on '+gtFmt(it.due)+'. Are you coming?';},
-  a:[['I’ll come',0,function(G){return 'You went to Grandma’s New Year’s Eve dinner. She cooked for twenty people, there were six of you. Red envelope: AED '+gtGiftNow(G)+'.';},1],['Can’t this year',0,function(G,it){gtMail(G,'A red envelope from Grandma, New Year '+(it.y+0));return 'Grandma cooked the New Year’s Eve dinner anyway and froze half of it. She mailed you a red envelope.';}]],
+  a:[['I’ll come',0,function(G){var h=harvestTake(G);return 'You went to Grandma’s New Year’s Eve dinner. She cooked for twenty people, there were six of you.'+(h?' You brought '+h+' from the land, she put them in everything.':'')+' Red envelope: AED '+gtGiftNow(G)+'.';},1],['Can’t this year',0,function(G,it){gtMail(G,'A red envelope from Grandma, New Year '+(it.y+0));return 'Grandma cooked the New Year’s Eve dinner anyway and froze half of it. She mailed you a red envelope.';}]],
   miss:function(G,it){gtMail(G,'A red envelope from Grandma, New Year '+it.y);return 'You didn’t come to Grandma’s New Year’s Eve dinner. She mailed you a red envelope.';}},
  pbday:{t:function(){return 'Happy birthday. Grandma has a red envelope for you.';},
   a:[['Thanks, Grandma',0,function(G){return 'Grandma gave you AED '+gtGiftNow(G)+' for your birthday. She said don’t spend it on shrimp.';},1]],
@@ -3943,7 +3945,7 @@ function trim(n,d){return String(+Number(n).toFixed(d));}
 (function(){var vv=window.visualViewport,fix=function(){var a=document.activeElement,typing=!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!/^(range|checkbox|radio|button)$/.test(a.type||''));document.body.classList.toggle('kbd',typing&&!!vv&&vv.height<window.innerHeight*0.8);var t=document.querySelector('.tabs');if(t&&t.style.transform)t.style.transform='';};if(vv){vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);}document.addEventListener('focusin',function(){setTimeout(fix,300);});document.addEventListener('focusout',function(){setTimeout(fix,50);setTimeout(fix,400);});})();
 // No browser feel: no pinch or double-tap zoom, no long-press menu outside text fields.
 (function(){var stop=function(e){e.preventDefault();};['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,stop,{passive:false});});document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea,[contenteditable]')))e.preventDefault();});})();
-var toastT=null,NF=null,BUILD='2026-11-01-p212';
+var toastT=null,NF=null,BUILD='2026-11-01-p213';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
@@ -5762,7 +5764,9 @@ function endGrandmaNums(G){var M=G.me||{},T=M.gt,o=[];if(!M.on||!T)return o;var 
  if(ch){var w=v?'You visited Grandma '+endTimes(v)+(c?' and called her '+endTimes(c):''):'You called Grandma '+endTimes(c),r=endRate(ch,dd);o.push(w+' in '+endSpan(dd)+(endRateFb(ch,dd)?'':', '+r)+'.');}
  var b=(T.log||[]).filter(function(x){return x.e?x.e==='gbday':/^(Grandma turned \d|You sent Grandma a cake for her)/.test(x.t||'');}),bt=b.filter(function(x){return x.k==='there';}).length;if(b.length>=2)o.push('You were there for '+bt+' of her '+b.length+' birthdays.');
  var told=Math.min(M.letters||0,GP_STORY.length),all=GP_STORY.length;if(told&&told<all){var un=M.on?gtUntold(G):[];o.push('She told you '+told+' of her '+all+' stories.'+(un.length?' You never heard about '+un.map(function(x){return x[2];}).join(', ')+'.':''));}else if(told>=all)o.push('She told you all '+all+' of her stories.');
- if(M.sent>=1000)o.push('You sent her '+aed(M.sent)+(M.gplace&&M.gplace.land?', she bought land with it.':'.'));return o;}
+ if(M.sent>=1000)o.push('You sent her '+aed(M.sent)+(M.gplace&&M.gplace.land?', she bought land with it.':'.'));
+ if(M.grown)o.push('You grew '+cntE(M.grown)+' vegetables on the land.');if(M.walks)o.push('You walked the dog '+endTimes(M.walks)+', '+cntE(M.walkMin||0)+' minutes in all.');
+ if(G.ps&&G.ps.landMs>=600000)o.push('You spent '+Math.round(G.ps.landMs/3600000*10)/10+' hours on the land.');return o;}
 function endWorkNums(G){var S=G.stats||{},W=S.wh||[],o=[],h=W.filter(function(x){return x&&x[1]>60;}).map(function(x){return x[0]/x[1];});if(h.length>=2){var a=h.slice(0,Math.ceil(h.length/2)),b=h.slice(Math.ceil(h.length/2)),m=function(v){return v.reduce(function(p,q){return p+q;},0)/v.length;},a1=Math.round(m(a)),b1=Math.round(m(b));o.push(a1===b1?'You worked about '+a1+'-hour days the whole way.':'You worked '+a1+'-hour days at first, then '+b1+'.');}
  if(G.ps&&(G.ps.tw||0)>=50)o.push('You changed a setting '+G.ps.tw+' times.');
  var R=S.rdL,X=S.rdX;if(R&&R[1]>=4){var avg=R[0]/R[1];var t='You spent about '+Math.round(avg)+' seconds on each decision after a million owners';if(X&&X[1]>=4)t+=', and picked the most expensive option '+X[0]+' times out of '+X[1];o.push(t+'.');}if(G.ps&&(G.ps.help||0)>=40)o.push('You opened the help '+cntE(G.ps.help)+' times.');return o;}
@@ -6254,6 +6258,8 @@ window.addEventListener('message',function(e){var d=e.data,f=$('land-if');if(!d|
  else if(d.type==='mute'){syncMute();if(d.off)musicStop();}
  else if(d.type==='spend'&&d.n>0&&!frozen(G)){pay(G,Math.min(d.n,Math.max(0,G.money)),'personal');landSend();}
  else if(d.type==='earn'&&d.n>0){earn(G,d.n,'personal');landSend();}
+ else if(d.type==='harvest'&&d.n>0&&G.me){var Hv=G.me.harvest||(G.me.harvest={});Hv[String(d.crop||'vegetables').slice(0,20)]=(Hv[String(d.crop||'vegetables').slice(0,20)]||0)+Math.min(100,d.n|0);G.me.grown=(G.me.grown||0)+Math.min(100,d.n|0);}
+ else if(d.type==='walk'&&d.min>0&&G.me){G.me.walks=(G.me.walks||0)+1;G.me.walkMin=(G.me.walkMin||0)+Math.min(120,d.min|0);}
  else if(d.type==='take'){landTake(G,d.adults,d.young);if(d.seq)LAND.seq=d.seq;landSend();}
  else if(d.type==='give'){landGive(G,d.list);if(d.seq)LAND.seq=d.seq;landSend();}
  else if(d.type==='care'){careDone(G,'land');}

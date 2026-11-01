@@ -271,6 +271,8 @@ body.in-game .top .brand .date{margin-left:auto}
 .lzb:active{transform:translateY(1px);box-shadow:0 1px 0 #21181b}
 .lzb:disabled{opacity:.4;box-shadow:none}
 .lzb.lhelp{position:absolute;right:8px;top:8px;z-index:5;font-size:16px}
+.lzb.llog{position:absolute;right:8px;top:48px;z-index:5;font-size:12px;width:auto;padding:0 8px}
+.lg-h{margin:10px 0 4px;font-size:13px}.lg{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 10px;font-size:13px}.lg li{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lg-no{color:#9a9184}.lg-n{color:#6b6456;font-variant-numeric:tabular-nums}
 /* in the game: no title card (the place name and tank count were dev info), Home and Tank are a small switch in the header */
 body.in-game .hcard{display:none}
 body.in-game .top .r1{display:none}
@@ -2037,7 +2039,7 @@ var OBJ={};   // kind -> {fw,fh,flat,solid,walk,spr(o),live(x,o,t),hit(o),use,na
 function defObj(k,d){OBJ[k]=d;d.fw=d.fw||1;d.fh=d.fh||1;if(d.solid==null)d.solid=!d.flat;}
 function LS(){return S.land;}
 function mkObj(k,tx,ty,o){var d=OBJ[k]||{},l=LS(),r={id:'o'+(l.oid=(l.oid||0)+1),k:k,tx:tx,ty:ty,fw:d.fw||1,fh:d.fh||1,seed:Math.floor(hash2(tx,ty,k.length*31)*1e6)};for(var p in o||{})r[p]=o[p];return r;}
-function objVer(o){return o.k==='tank'?(S.tanks[o.i]?1:0):o.k==='feeder'?Math.round((o.s||0)*5):0;}
+function objVer(o){return o.k==='tank'?(S.tanks[o.i]?1:0):o.k==='feeder'?Math.round((o.s||0)*5):o.k==='veg'?OBJ.veg.keyOf(o):0;}
 function objSprite(o){var d=OBJ[o.k];if(!d||!d.spr)return null;var c=OC[o.id],v=objVer(o);if(c&&c.g===SPR_GEN&&c.v===v)return c.s;
   var key=o.k+'|'+(d.keyOf?d.keyOf(o):((o.v==null?'':o.v)+'|'+o.fw+'x'+o.fh+'|'+(o.seed%7))),sp=spr(key,function(){return palSpr(palKey(o),d.spr(o));});OC[o.id]={s:sp,v:v,g:SPR_GEN};return sp;}
 
@@ -2322,6 +2324,10 @@ defObj('bench',{fw:2,base:50,name:'Bench',spr:function(o){var W=128,pb=new PB(W,
   for(var s=0;s<3;s++){pb.rect(10,4+s*7,W-20,5,'#c68450');pb.rect(10,4+s*7,W-20,1,'#d9a066');pb.rect(10,8+s*7,W-20,1,'#8e4f26');}
   pb.rect(6,28,W-12,6,'#c68450');pb.rect(6,28,W-12,1,'#d9a066');pb.rect(6,33,W-12,2,'#8e4f26');pb.rect(6,36,W-12,4,'#b0703f');
   [10,W-14].forEach(function(x){pb.rect(x,2,4,48,'#2a2a2e');pb.rect(x-2,24,8,3,'#2a2a2e');});ink(pb);var sp=mk(pb,64,50);sp.seat={x:0,y:-22};return sp;},use:{side:'s'}});
+defObj('veg',{fw:2,base:30,name:'Vegetable bed',keyOf:function(o){return (o.crop||'')+'|'+vegState(o)+'|'+Math.round(vegStage(o)*4);},spr:function(o){var W=128,H=48,pb=new PB(W,H),st=vegState(o),c=vegCrop(o.crop);
+  pb.rect(4,18,120,26,'#8f563b');pb.rect(4,18,120,3,'#b8794a');pb.rect(4,41,120,3,'#663931');pb.rect(10,22,108,18,'#5b3a24');for(var i=0;i<12;i++)pb.set(14+i*9,30+(i%3),'#45283c');
+  if(c){var g=vegStage(o),dry=st==='dead',col=dry?'#8a6f30':'#6abe30',hh=Math.round(3+g*14);for(var k=0;k<5;k++){var x=18+k*22;pb.rect(x,30-hh,2,hh,col);pb.rect(x-3,30-hh+2,3,2,col);pb.rect(x+2,30-hh+5,3,2,col);if(st==='ripe'){pb.ell(x-2,30-hh+7,2.5,2.5,c.c);pb.ell(x+4,30-hh+10,2.5,2.5,c.c);}}}
+  ink(pb);return mk(pb,W/2,H-6);}});
 defObj('birdbath',{base:56,name:'Bird bath',spr:function(o){var pb=new PB(48,48);shadowPB(pb,24,44,16,3,55);pb.rect(19,18,10,22,'#9badb7');pb.rect(19,18,3,22,'#cbdbfc');pb.rect(26,18,3,22,'#847e87');pb.rect(12,38,24,6,'#847e87');pb.rect(12,38,24,2,'#9badb7');
   pb.ell(24,14,20,7,'#847e87');pb.ell(24,12,20,6,'#9badb7');pb.ell(24,12,16,4,'#5fcde4');pb.rect(18,11,5,1,'#cbdbfc');ink(pb);var s=mk(pb,24,44);s.rim=[[-16,-32],[16,-32]];return s;}});
 defObj('lantern',{base:56,name:'Lantern',spr:function(o){var pb=new PB(24,76);pb.rect(10,22,4,52,'#2a2a2e');pb.rect(5,72,14,3,'#2a2a2e');pb.rect(4,6,16,18,'#2a2a2e');pb.rect(6,9,12,12,'#fbf236');pb.rect(7,10,4,4,'#fff9c8');pb.poly([[3,7],[12,0],[21,7]],'#2a2a2e');ink(pb);return mk(pb,12,74);}});
@@ -2818,6 +2824,7 @@ function stepDog(dt){var dg=L.dog,me=L.me;if(!dg||!me)return;dg.t+=dt;dg.run=fal
   if(dg.bound==null){dg.bound=true;dg.left=dogInterest();}
   var far=Math.hypot(dg.x-me.x,dg.y-me.y);
   // with you: count down the interest; walking together slowly grows his love
+  walkTick(dt);
   if(dg.bound){dg.left-=dt;if(me.moving&&dg.st==='follow')addLove(dt*0.02);
     if(far>T*14){var b=L.trail[Math.max(0,L.trail.length-12)]||[me.x-30,me.y];dg.x=b[0];dg.y=b[1];dg.q=[];L.trail=L.trail.slice(-6);}
     if(dg.left<=0&&dg.st!=='play'&&dg.st!=='come'){dg.bound=false;dogWander(true);return;}}
@@ -3118,7 +3125,7 @@ function onTap(wx,wy,cx,cy){var t=tileOf(wx,wy),m=M(),me=L.me;if(!me)return;
   if(g===G_WATER&&!objAtTile(t[0],t[1],true)){tapWater(wx,wy,t);return;}
   if(me.sit&&Math.hypot(wx-me.x,wy-me.y)<30){return;}
   if(walkTo(t,wx,wy,null)){L.marker={x:wx,y:wy,t:0};if(!LS().seen.walk){LS().seen.walk=1;updateStat(true);}}}
-var USE_KINDS={tank:1,feeder:1,wfeeder:1,coop:1,armchair:1,trap:1,bench:1};
+var USE_KINDS={tank:1,feeder:1,wfeeder:1,coop:1,armchair:1,trap:1,bench:1,veg:1};
 function interactAt(wx,wy){var ob=LS().objs.slice().sort(function(a,b){return oBase(b)-oBase(a);});
   for(var i=0;i<ob.length;i++){var o=ob[i],d=OBJ[o.k];if(!d||!(USE_KINDS[o.k]||d.sit))continue;if(o.k==='armchair'&&!o.gm)continue;var r;
     if(d.hit)r=d.hit(o);else{var s=objSprite(o);if(!s)continue;r=[oX(o)-s.ax,oBase(o)-s.ay,s.w,s.h];}
@@ -3132,10 +3139,38 @@ function useObj(o){
   if(o.k==='tank'){goUse(o,function(){if(S.tanks[o.i]){sfx('click');zoomToTank(o);return;}var s=objSprite(o);bubAt(oX(o),oBase(o)-(s?s.ay:60),'<b>An empty stand</b><div class="btns"><button class="btn primary" data-setup>Set up a tank here · '+fmtA(300)+'</button></div>',function(el){var b=el.querySelector('[data-setup]');if(b)b.onclick=function(){var T=setupTank();if(!T)return;closeBub();sfx('plop');toast(T.name+' is set up. A few stones to start.');goTank(S.tanks.length-1);};});});return true;}
   if(o.k==='feeder'||o.k==='wfeeder'){goUse(o,fillFeeder);return true;}
   if(o.k==='coop'){goUse(o,function(){collectEggs(o);});return true;}
+  if(o.k==='veg'){goUse(o,function(){vegTap(o);});return true;}
   if(o.gm&&!gmAway()){goUse(o,function(){grandmaSays(o);});return true;}
   if(o.k==='trap'){goUse(o,trapTap);return true;}
   if(o.k==='bench'||(OBJ[o.k]&&OBJ[o.k].sit)){var me=L.me;if(me.sit&&me.sit.o===o)return true;goUse(o,sitOn);return true;}
   return false;}
+
+// ----- Vegetable bed (Pass 213, plan Part 8). Plant, water, pick, on game days. What you grow goes to Grandma's New Year dinner
+// (the game hears it as a 'harvest' message). A crop needs water at least every VEG_DRY game days; past that it dries out.
+// Away at the company for months means a dead bed, so it rewards coming back. Season from the game calendar (day 0 is 20 Oct).
+var VEG_DRY=20,VEG_CROPS={cool:[{id:'tomato',n:'Tomatoes',d:75,y:12,c:'#d04648'},{id:'onion',n:'Spring onions',d:40,y:10,c:'#6abe30'},{id:'bokchoy',n:'Bok choy',d:45,y:6,c:'#37946e'}],hot:[{id:'okra',n:'Okra',d:60,y:14,c:'#4b692f'},{id:'chili',n:'Chilies',d:90,y:20,c:'#ac3232'}]};
+function vegDay(){return window.GDAY!=null?Math.floor(window.GDAY):Math.floor(S.day||0);}
+function vegSeason(){var m=new Date(Date.UTC(2026,9,20)+vegDay()*864e5).getUTCMonth();return m>=9||m<=2?'cool':'hot';}
+function vegCrop(id){var c=null;['cool','hot'].forEach(function(k){VEG_CROPS[k].forEach(function(x){if(x.id===id)c=x;});});return c;}
+function vegState(o){if(!o.crop)return 'empty';var c=vegCrop(o.crop),d=vegDay();if(d-(o.w||o.pl)>VEG_DRY)return 'dead';return d-o.pl>=c.d?'ripe':'growing';}
+function vegStage(o){var c=vegCrop(o.crop);if(!c)return 0;return clamp((Math.min(vegDay(),(o.w||o.pl)+VEG_DRY)-o.pl)/c.d,0,1);}
+function vegTap(o){var st=vegState(o),s=objSprite(o),bx=oX(o),by=oBase(o)-(s?s.ay:30);
+ if(st==='empty'||st==='dead'){var list=VEG_CROPS[vegSeason()];bubAt(bx,by,'<b>'+(st==='dead'?'It dried out':'The bed')+'</b><div class="hint">'+(vegSeason()==='cool'?'Cool months.':'Hot months.')+' Water it at least every '+VEG_DRY+' days.</div><div class="btns">'+list.map(function(c){return '<button class="btn" data-veg="'+c.id+'">'+c.n+' · '+c.d+' days</button>';}).join('')+'</div>',function(el){el.querySelectorAll('[data-veg]').forEach(function(b){b.onclick=function(){o.crop=b.dataset.veg;o.pl=vegDay();o.w=o.pl;closeBub();sfx('scoop',{v:0.5});puff('dust',bx,oBase(o)-8,6,{speed:30,life:0.5});L.dirty=true;save();};});});return;}
+ if(st==='growing'){o.w=vegDay();sfx('splash',{v:0.4});puff('drop',bx,oBase(o)-14,8,{col:'#5fcde4',speed:35,life:0.6});var c=vegCrop(o.crop),left=Math.max(0,c.d-(vegDay()-o.pl));toast('Watered. '+c.n+' in about '+left+' day'+(left===1?'':'s')+'.');L.dirty=true;save();return;}
+ var cr=vegCrop(o.crop),n=cr.y,l=LS();l.harvest=l.harvest||{};l.harvest[cr.id]=(l.harvest[cr.id]||0)+n;(l.stats||(l.stats={})).veg=(l.stats.veg||0)+n;o.crop=null;o.pl=null;o.w=null;
+ sfx('pop');puff('spark',bx,oBase(o)-16,8,{col:cr.c,speed:40,life:0.6});toast(n+' '+cr.n.toLowerCase()+', for the New Year dinner.');if(window.LAND_POST)window.LAND_POST({type:'harvest',crop:cr.n.toLowerCase(),n:n});bookAdd('garden',cr.id,{where:'the bed'});L.dirty=true;save();}
+// ----- Walks with the dog (Pass 213). Walking with him while he follows you counts as a walk once it lasts a minute; it ends when he
+// loses interest or you stop for long. The game hears 'walk' with the minutes.
+function walkTick(dt){var dg=L.dog,me=L.me;if(!dg||!me)return;var w=L.walk||(L.walk={t:0,idle:0});
+ if(dg.bound&&dg.st==='follow'){w.t+=dt;w.idle=me.moving?0:w.idle+dt;}
+ if(w.t>0&&(!dg.bound||w.idle>40)){if(w.t>=60){var mins=Math.round(w.t/60),l=LS();l.stats=l.stats||{};l.stats.walks=(l.stats.walks||0)+1;l.stats.walkMin=(l.stats.walkMin||0)+mins;toast('A walk with the dog, '+mins+' minute'+(mins===1?'':'s')+'.');if(window.LAND_POST)window.LAND_POST({type:'walk',min:mins});save();}w.t=0;w.idle=0;}}
+// ----- The log (Pass 213): birds seen, fish records, what the bed gave, walks. Read from the save, nothing to do.
+function openLog(){var l=LS(),b=(S.book&&S.book.birds)||{},seen=BIRDS.filter(function(x){return b[x.id];}),fb=l.fishBest||{},st=l.stats||{},hv=l.harvest||{};
+ var h='<h3 class="lg-h">Birds · '+seen.length+' of '+BIRDS.length+'</h3><ul class="lg">'+BIRDS.map(function(x){var e=b[x.id];return '<li'+(e?'':' class="lg-no"')+'>'+(e?esc(x.name)+(x.rare?' <i>rare</i>':''):'Not seen yet')+'</li>';}).join('')+'</ul>';
+ var fk=Object.keys(fb);h+='<h3 class="lg-h">Fish · '+(st.fish||0)+' caught</h3>'+(fk.length?'<ul class="lg">'+fk.map(function(id){var F=FISH.filter(function(x){return x.id===id;})[0];return '<li>'+esc(F?F.name:id)+' <span class="lg-n">best '+fb[id].toFixed(1)+' cm</span></li>';}).join('')+'</ul>':'<p class="hint">Nothing yet. The rod works at the stream.</p>');
+ var hk=Object.keys(hv);h+='<h3 class="lg-h">The bed</h3>'+(hk.length?'<ul class="lg">'+hk.map(function(k){var c=vegCrop(k);return '<li>'+esc(c?c.n:k)+' <span class="lg-n">'+hv[k]+'</span></li>';}).join('')+'</ul>':'<p class="hint">Nothing picked yet.</p>');
+ h+='<h3 class="lg-h">The dog</h3><p class="hint">'+(st.walks?st.walks+' walk'+(st.walks===1?'':'s')+', '+(st.walkMin||0)+' minutes in all.':'No walks yet. Pet him and he follows you.')+'</p>';
+ openSheet({title:'Log',html:h,keepTime:1});}
 function henFlap(hc){hc.st='flap';hc.t=0;sfx('cluck');puff('feather',hc.x,hc.y-16,3,{col:HEN[hc.kind].body,speed:30,life:1.1});}
 // walk to the bank next to some water, then do fn
 function goBank(wx,wy,t,fn){var me=L.me,m=M(),st=tileOf(me.x,me.y),F=flood(st[0],st[1]),best=null,bs=1e9;
@@ -3314,6 +3349,7 @@ var BUILD=[
  {k:'lantern',name:'Lantern',price:40,where:OUTS.concat([G_TILE]),stage:1},
  {k:'feeder',name:'Bird feeder',price:45,where:OUTS.concat([G_TILE]),stage:1,o:{s:0}},
  {k:'coop',name:'Coop',price:400,where:OUT,stage:2,max:1,o:{fw:3,fh:2}},
+ {k:'veg',name:'Vegetable bed',price:30,where:OUT,stage:1,max:4,o:{fw:2,fh:1}},
  {k:'pot',name:'Flower pot',price:20,where:[G_TILE,G_STONE,G_FLOOR],stage:1,o:{v:1}},
  {k:'herbs',name:'Herb pot',price:15,where:[G_TILE,G_STONE,G_FLOOR],stage:1},
  {k:'bchair',name:'Folding chair',price:35,where:[G_TILE,G_STONE,G_GRASS],stage:1},
@@ -3498,10 +3534,10 @@ function toolsHere(){var m=M(),has={},wild=false;m.g.forEach(function(g){has[g]=
   return TOOLS.filter(function(t){if(t.id==='mow')return has[G_GRASS]||has[G_MEADOW];if(t.id==='grain')return S.stage>=2;if(t.id==='rod')return wild;return true;});}
 function mountHome(){var p=$('p-home');ensureLand();
   p.innerHTML='<div class="card hcard"><div class="hd"><h2 id="h-name"></h2><small id="h-sub"></small><button class="qh" id="h-help" aria-label="How the home works">?</button></div><div class="hmove" id="h-move"></div></div>'+
-   '<div class="landwrap pixland" id="lwrap"><canvas id="land-cv"></canvas><div class="lzoom"><button class="lzb" id="lz-in" aria-label="Zoom in">+</button><button class="lzb" id="lz-out" aria-label="Zoom out">−</button></div><button class="lzb lhelp" id="lz-help" aria-label="How the land works">?</button><div class="lclock" id="lclock" hidden></div><div class="ltools" id="ltools" role="toolbar" aria-label="Tools"></div><div class="palette lpal" id="lpal" hidden></div></div><div class="lstat" id="lstat"></div>';
+   '<div class="landwrap pixland" id="lwrap"><canvas id="land-cv"></canvas><div class="lzoom"><button class="lzb" id="lz-in" aria-label="Zoom in">+</button><button class="lzb" id="lz-out" aria-label="Zoom out">−</button></div><button class="lzb lhelp" id="lz-help" aria-label="How the land works">?</button><button class="lzb llog" id="lz-log" aria-label="Log">Log</button><div class="lclock" id="lclock" hidden></div><div class="ltools" id="ltools" role="toolbar" aria-label="Tools"></div><div class="palette lpal" id="lpal" hidden></div></div><div class="lstat" id="lstat"></div>';
   L.cv=$('land-cv');L.sizedCv=null;L.cv.addEventListener('pointerdown',onDown);L.cv.addEventListener('pointermove',onMove);L.cv.addEventListener('pointerup',onUp);L.cv.addEventListener('pointercancel',onUp);
   L.cv.addEventListener('contextmenu',function(e){e.preventDefault();});
-  $('lz-in').onclick=function(){setZoom(1);};$('lz-out').onclick=function(){setZoom(-1);};$('lz-help').onclick=function(){$('h-help').onclick();};
+  $('lz-in').onclick=function(){setZoom(1);};$('lz-out').onclick=function(){setZoom(-1);};$('lz-help').onclick=function(){$('h-help').onclick();};$('lz-log').onclick=function(){sfx('click');openLog();};
   $('h-help').onclick=function(){openPop('<div class="sheet-hd"><h2>Home</h2><button class="btn sm" onclick="closePop()">Close</button></div>'+
     '<p><b>Walk:</b> tap where Millie should go, or hold and drag to steer her. Tap a thing and she walks over and uses it: a tank, the feeder, the coop, Grandma, the bench. The dog comes along. Tap him or Pierre to say hi.</p>'+
     '<p><b>Birds:</b> sit on the bench or keep still and they come closer. Tap one and stay still while the ring fills. It goes in the book.</p>'+
@@ -4039,6 +4075,7 @@ function mkSave(){var l=LS(),used={},map=[0],pal=[];for(var i=0;i<MK.px.length;i
 function mkDelete(id){var l=LS();l.made=(l.made||[]).filter(function(q){return q.id!==id;});mkRegister();if(l.pal){delete l.pal['c:'+id];delete l.pal['wall-c:'+id];delete l.pal['fence-c:'+id];}palBuild();resetSprites();save(true);mkClose();sfx('pop');
   var pal=$('lpal');if(pal&&!pal.hidden)renderBuildPal(pal);toast('Deleted.');}
 // test hooks
+window.LAND.life={L:function(){return L;},LS:LS,vegState:vegState,vegTap:vegTap,walkTick:walkTick,openLog:openLog,mkObj:mkObj,tileOf:tileOf,objSprite:objSprite};// Pass 213 test hooks
 window.LAND.mk={ed:function(){return MK;},made:function(){return LS().made;},skin:function(){return LS().skin;},open:mkOpen,
   place:function(id,near){var b=BUILD.filter(function(q){return q.made===id;})[0],me=L.me,t=near||tileOf(me.x,me.y);if(!b)return null;for(var r=0;r<6;r++)for(var dy=-r;dy<=r;dy++)for(var dx=-r;dx<=r;dx++){var a=b.ground?[t[0]+dx,t[1]+dy]:anchorFor(b,t[0]+dx,t[1]+dy);if(canPlace(b,a[0],a[1])&&placeAt(b,a[0],a[1]))return a;}return null;},
   objs:function(){return LS().objs;},use:useObj,me:function(){return L.me;},size:function(){return JSON.stringify(S).length;}};
@@ -4058,6 +4095,7 @@ ADULT_DAYS=75;                      // the same as the game
 SAVE_KEY='shrimp-land-v1';
 var P=window.parent!==window?window.parent:(window.TEST_PARENT||null);   // the test page stands in for the company in the same page
 function post(m){if(!P)return;m.land=1;try{P.postMessage(m,'*');}catch(e){}}
+window.LAND_POST=post;// Pass 213: the land closure posts harvests and walks through this
 window.GAME_POST=post;
 // no browser feel inside the game: no pinch zoom, no long-press menu (Puti, 28 Oct)
 ['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,function(e){e.preventDefault();},{passive:false});});

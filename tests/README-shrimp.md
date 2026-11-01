@@ -2040,3 +2040,13 @@ Ten cards in `CARDS3` (pushes in `PUSH`, `card3Map` maps them to story cards; `l
 Knee, power cut and the white lie go first (`STORY_PROMPT`).
 Balance: own-tank kin from play now centres at 10 looks and treats (was 20), so a player who barely looks reads mildly stock. Profiles after: Empire builder 96, Dictator cartel 94, Grandma's kid drift 92, Do-gooder network 79, Scientist question 100, Shrimp nerd garden 100, Casual 5/43/0/14/38, fair chooser 3/40/33/23/0, cold chooser 26/9/31/32/3. All targets met.
 Test: balance 135, me 50, academy 10, cardtap, endcards 50, profiles. Ending preview rebuilt (21 cards). Not run: the new cards in a browser.
+
+### Pass 213: life on the land (plan Part 8, Puti picked 1, 4 and 5)
+
+Land source on `shrimp-proto` (`src/land.js`, `land.css`, `game.js`, commit "Land: vegetable bed, walks with the dog, the Log"), rebuilt with `build.py --game`; `shrimp/home.html` is that build.
+1. **Vegetable bed** (`defObj('veg')`, Build, Yard, AED 30, up to 4): tap it to plant what grows this season (cool months Oct to Mar: tomatoes 75 days, spring onions 40, bok choy 45; hot months: okra 60, chilies 90), tap again to water, tap when ripe to pick. Game days (`GDAY`). A crop needs water at least every 20 game days (`VEG_DRY`), past that it dries out, so months at the company mean a dead bed. Picking posts `harvest`; the game keeps it in `G.me.harvest` and Grandma's New Year's Eve dinner says "You brought 12 tomatoes from the land, she put them in everything." (`harvestTake`). The ending has "You grew N vegetables on the land."
+2. **The Log** (a Log button under the map's ?): birds seen of the nine, fish caught with each species' best length, what the bed gave, walks with the dog. Read from the save, nothing to do there.
+3. **Walks with the dog** (`walkTick`): while he follows you, a walk counts once it lasts a minute; it ends when he loses interest or you stand still 40 s. A toast, the Log, and `walk` to the game (`G.me.walks`, minutes); the ending has the count and the minutes.
+All three count through real time on the land (`G.ps.landMs`: life first and, since Pass 210, own people), never taps. The ending adds "You spent N hours on the land."
+The land posts through `window.LAND_POST` (set in `game.js`), since the land's code sits in a closure. Test hooks `LAND.life`.
+Test: new `tests/shrimp-land-life.cjs` at 360 and 390 (bed grows, ripens, dries, picks; the game hears it; the dinner takes it; a walk counts; the Log opens with no sideways scroll; no errors), land-audio, tank1, yourtank, me 50.
