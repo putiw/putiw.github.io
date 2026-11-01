@@ -71,11 +71,11 @@ if(buyFarm(g,'rack'))throw Error('Spent working capital');g.money=10000;if(!buyF
 if(farmCap(g)!==1)throw Error('Wrong capacity');if(changeFarm(g,'rack','pause'))throw Error('No pausing farms');var cash=g.money;changeFarm(g,'rack','sell');
 if(g.money<=cash||farmCap(g)||g.emp.farms.rack)throw Error('Sale inconsistent');
 `);
-check('automatic inventory respects the reserve; farms and packing run whatever the stock (Pass 190)',`
+check('automatic inventory respects the reserve; farms and packing run full up to STOCK_FULL days of orders (Pass 190)',`
 var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.emp.farms.barn=5;g.emp.inventoryDays=3;g.money=10000;var r=operatingReserve(g);empireDay(g);
 if(g.money<r)throw Error('Inventory overspend');
-g.humans=WORLD;g.emp.proj.last=1;g.emp.regions=REGIONS.map(x=>x.id);g.kits.stock=0;g.money=1e9;var m0=g.money;empireDay(g);if(!(g.emp.prod>0))throw Error('Farms run whatever the demand (Pass 190)');
-var h=readyGame();h.stats.sold=KIT_UNLOCK;h.emp.kitsOpened=1;h.emp.farms.mhatch=3;h.kits.stock=5e4;h.money=1e9;h.emp.staff.tier=2;h.emp.staff.pack=10;empireDay(h);empireDay(h);if(!(h.emp.prod>0)||!(h.emp.packed>0))throw Error('3 mega hatcheries with 50k in stock: made '+h.emp.prod+' packed '+h.emp.packed);
+g.humans=WORLD;g.emp.proj.last=1;g.emp.regions=REGIONS.map(x=>x.id);g.kits.stock=0;g.money=1e9;var m0=g.money;empireDay(g);if(g.emp.prod!==0)throw Error('With no orders the warehouse is full and farms make what sells (Pass 190)');
+var h=readyGame();h.stats.sold=KIT_UNLOCK;h.emp.kitsOpened=1;h.emp.farms.mhatch=3;h.humans=2e6;h.emp.regions=['uae','gcc'].filter(function(r){return REGIONS.some(function(x){return x.id===r;});});h.money=1e9;h.emp.staff.tier=2;h.emp.staff.pack=10;var kd=Math.max(1,kitDemand(h));h.kits.stock=Math.ceil(kd*20);empireDay(h);empireDay(h);if(!(h.emp.prod>0)||!(h.emp.packed>0))throw Error('3 mega hatcheries with 20 days of orders in stock: made '+h.emp.prod+' packed '+h.emp.packed+' kd '+kd);if(!(STOCK_FULL>=30))throw Error('warehouse limit');
 `);
 check('manual kits protect actual adult breeder cohorts',`
 var g=readyGame(),t=g.tanks[0];g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=1000;t.set.keepL=6/t.vol;t.pop=[{age:100,n:6,g:30},{age:25,n:16,g:90}];

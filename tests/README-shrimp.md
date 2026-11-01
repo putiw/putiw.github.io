@@ -1810,3 +1810,31 @@ Test: hard 11 (new: no Next, Tap a group, grey before the goal, no filled goal b
 4. Fight club. Was: a free-time pick, each night pays 0.6 of a day's income (at least AED 100) and costs about 3 shrimp from Tank 1; 4% a night the police raid it, fine the larger of AED 2,000 and 10% of your cash, 90 days off. After 4 nights the investor (wash_offer) can come; Mira stops coming over after the first. Now: same 4% a night (`FIGHT_P`), the fine is uniform 20% to 1000% of its average monthly take over the last 3 months (what there is if shorter, `fightAvg`), 90 days off, the third raid shuts it for good with a Shrimp Times story and takes the pick away (`E.fightShut`). The pick shows the odds and "Caught n of 3 times" (`fightLine`).
 5. Empty Tank 1 before the land (after it has had shrimp): Check shrimp reads Buy shrimp in the same slot, adds 5 cherry shrimp at Trade's price (AED 15, `PACKS[0]`, greyed without the cash), then goes back to Check shrimp (`homeBuyMode`).
 Test: balance 132 (new: farms and packing with 50k in stock, fight fines and shutdown, data income), me 49, academy 9, tank1 with browser (Buy shrimp), frozen.
+
+### Pass 193 change before deploy: the warehouse limit
+
+Bots after "farms run full whatever the stock": the strong kind bot never finished (cash fell from AED 296B on day 2,001 to 2.8B by day 3,001, every farm breeding and every line packing kits nobody could buy once the easy half had a tank, so it couldn't pay for the hard part; stuck at 7.15B owners for 9,000 days). So farms and packing run full until the warehouse holds 60 days of orders (`STOCK_FULL`, `stockFull`), then make what sells; Making kits says "Warehouse full, 60 days of orders in stock. Farms and packing make what sells." Puti's case (43.5k in stock, a few days of orders) now keeps packing. Changed from the request, for Puti to look at.
+
+## Review: Puti's 17 items, 1 Nov afternoon (Passes 190 to 193)
+
+| # | Item | Status | Checked by | Look at |
+|---|---|---|---|---|
+| 1 | Kits after tank 2's first baby | Done (A1). The 200 sold and 60 L still apply | balance (kits need babies in tank 2) | Kits open about day 329 in the average bot (was 309) |
+| 2 | Care video after 10 kits | Changed: there is no care video in the code; the Kit development item at kits open is the Shrimp care guide leaflet, now after 10 kits | balance | Is the leaflet what you meant? |
+| 3 | Remove Show completed in Gear | Done (B1), closed Done (n) fold | screenshot 360 | |
+| 4 | Gear and tabs unfinished | Done (B2): tank chips and has-line, no reserved band for button-less rows, Sell in the right column, short prices, two-line ✦ costs, titles wrap, gala cost out of the title, safe-area strip, pill padding. The 250 px band was not reproduced (gap 8 px everywhere) | trunc scan 360/390 at five stages: 43 cut labels to 0; layout scan; stable | Header band on your phone |
+| 5 | Shelf card too late | Done (A3), first in the story line right after the farm chapter | card table | |
+| 6 | Farms header | Done (B4) | screenshot | |
+| 7 | Outdated help | Done (B5), Tanks ? fixed, other HELP entries checked, no other false claim | read against code | |
+| 8 | Shaping the world text | Done (B3), also Owners' tanks | screenshots | |
+| 9 | Bank freeze | Done (D1) | shrimp-frozen | |
+| 10 | Packing stopped | Changed (D2): runs full up to 60 days of orders in stock, not without limit (kind bot) | balance, bots | The 60-day limit |
+| 11 | Taps through story cards | Done (B6) | shrimp-cardtap (touch) | On an iPhone |
+| 12 | Customer data keeps paying | Done (D3) | balance | |
+| 13 | Fight club | Done (D4), kept the 4% a night raid chance | balance (fine range, shutdown) | The "what exists" note is in Pass 193 |
+| 14 | Story cards late, Mira's age | Done (A4), table in Pass 190; narrative cards older than 60 days are dropped, which at 12x and 40x drops some Mira cards | balance, me | Mira's adult jobs in the ending can show at 14 (strong win day 2,140) |
+| 15 | Hard part | Done (C1-C5). Running 90%/75% saves move to Every home that wants one, not to Stop counting | shrimp-hard, screenshots | Names: "Stop counting", "Never met anyone", "Can buy one" |
+| 16 | Empty home tank | Done (D5), AED 15 for 5 (Trade's cherry pack) | tank1 browser | |
+| 17 | Ending and Sell company layout | Done (B7), sticky footer, buyout sale in two taps, "Done before year ten" gone | shrimp-endcards (all 17 endings, game over, left, buyout, 360/390) | |
+
+Before deploy (Passes 190 to 193, BUILD 2026-11-01-pm-fixes): balance 132, me 49, academy 9, tank1 with browser, land-audio, hard 11, cardtap, endcards 48, frozen, space search 6, space bot passes. Bots seed 7: strong cold 2,201 empire_dictator (was 2,140), strong kind 3,156 question_prof (3,206), average Earth 6,357 garden_hermit (6,777), no INSOLVENT, no STUCK. Spotlight sweep 107 all good. Layout scan only the known 2 px win World chart label. Stable full run: 1,752 clicks, 12 buttons moved something (was 19): Gear and Kits rows that leave their list once bought, the first rack farm, the first store, the kit extras, the Grandma money picks (2 px), coin buy. Monkey 720 taps at six stages, 360 and 390, no errors, no NaN, no sideways scroll. Not seen on a real phone.
