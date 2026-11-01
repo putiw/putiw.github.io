@@ -247,7 +247,7 @@ These come from Puti's feedback. Treat them as requirements.
 
 **The screen never moves when you press a button** (Puti, 31 Oct, Pass 180: her worst issue, a rule for all future work)
 - No scroll tied to a tap, ever. The only scrolls left are spotlights and the guide's once-per-cue scroll (skipped for 2 s after any tap), and a jump to a card when a link takes you to another tab (`finGo`, the earth line). Every `focus()` has `{preventScroll:true}`.
-- Every box keeps its size whatever its text or state. Buttons stay in the same spot: on the right of their row in a fixed 112 px column (`itemHTML`), never dropped under the text. Labels don't wrap (ellipsis), descriptions are two lines, the full text is behind ? (`data-ht`). `.btns` rows don't wrap.
+- Every box keeps its size whatever its text or state. Buttons stay in the same spot: on the right of their row in a fixed 112 px column (`itemHTML`), never dropped under the text. Button labels don't wrap (ellipsis; prices short, `aedS`, money and ✦ on two lines, `costB`), row titles wrap to two lines, descriptions are two lines (four, full width, in `.wide` cards), the full text is behind ? (`data-ht`). While a story card is open the page is inert behind a backdrop (`cardShield`). `.btns` rows don't wrap.
 - A button you can't use right now keeps its space (`visibility:hidden`) instead of vanishing. Grids keep their column count.
 - A card that changes state (offer, running, done) keeps one skeleton: same rows, same button places. The running film shows the three cuts with the picked one marked; a running campaign keeps the offer list with the days left on its button. If states can't share rows, reserve the tallest state's height (`slotMin`).
 - Help (`#helpsheet`) opens right under its ?, or right above it when there's no room, never at the screen bottom; scrolling closes it (`hsPlace`, Pass 187). On the Tank tab a story card sits under the tank when it fits (`msPlace`).
@@ -318,7 +318,7 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 **Last chapter and late game, Oct 26 (check these stay true)**
 - Decisions show what happened after, in a popup you have to close. The screen holds still under the finger when content above changes (`anchorGet`/`anchorFix` wrap `render`), and a decision button ignores taps for half a second after it appears or moves (`SETTLE`).
 - Shrimpcoin plants one stretch of coast per tap (`COIN_BATCH`, about 5,000 taps for every coast), others plant ten times slower, and Sell says why it's off.
-- The hard part asks for the goal first, then shows one group at a time, under the people grid. No paragraphs: one sentence per group, details behind ?. What you fund shows on the grid, not in a popup (Pass 183). Story cards are at least a minute apart. 40× opens with the hard part.
+- The hard part asks for the goal first, then any group you tap opens under the people grid, names in a column on its left (Pass 192, no Next). No paragraphs: one sentence per group, details behind ?. What you fund shows on the grid, not in a popup (Pass 183). Story cards are at least a minute apart. 40× opens with the hard part.
 - No "x of y found" anywhere in research. Consultants never suggest regions once all are open. Dark single projects can be turned down.
 - No Breeding laboratory card, no home-tank gear once hatcheries are up, no Sales & shop card once there's nothing left in it.
 
@@ -497,7 +497,7 @@ Planned and agreed with Puti, not built yet:
 
 **Fix list from Claude's 1 Nov playtest** (project doc `claude/shrimp-fix-prompt-1nov.md`): all five parts done (Pass 184). World tab world-bank rows fixed in Pass 185. Average bot Earth day moved 6,609 to 6,777.
 
-**Fix list from Puti's 1 Nov afternoon playtest** (project doc `claude/shrimp-fix-prompt-1nov-pm.md`): Part A done (Pass 190): kits after tank 2's first baby, care guide after 10 kits, story cards tied to a moment go first and narrative ones drop after 60 days (`STORY_PROMPT`, `STORY_DROP`, `progress.at`), Mira 8 on day 0.
+**Fix list from Puti's 1 Nov afternoon playtest** (project doc `claude/shrimp-fix-prompt-1nov-pm.md`): Part A done (Pass 190): kits after tank 2's first baby, care guide after 10 kits, story cards tied to a moment go first and narrative ones drop after 60 days (`STORY_PROMPT`, `STORY_DROP`, `progress.at`), Mira 8 on day 0. Part B (Pass 191): Gear Done fold and tank chips, short prices and two-line costs in buttons, full-width project text (`.wide`), story card shield (`cardShield`, `tests/shrimp-cardtap.cjs`), ending buttons in a sticky footer (`tests/shrimp-endcards.cjs`). Part C (Pass 192): hard part labels left of the grid, no step order, Stop counting replaces Good enough and No number, 90% and 75% gone.
 
 **World tab rows** (Pass 185): on `#ow-body` the buy rows come first and a row bought there stays as Done (disabled) until you leave the tab (`OW_KEEP`). The same pattern could fix the other bought-row movers below if Puti agrees.
 
