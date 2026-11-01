@@ -1848,3 +1848,13 @@ Deployed 1 Nov (Passes 190 to 193, main at d9a44f5, BUILD 2026-11-01-pm-fixes). 
 5. Tank 1 caption: none with one stocked tank (header has the count), only "Some look sick" when that applies; empty, cycling and multi-tank captions stay. Care buttons that show share the row width (Pass 180's fixed three columns dropped at her request; tank1-browser now checks only the left edge).
 6. Story cards always at the top of the screen; Pass 18x's under-the-tank placement removed.
 Test: tank1 (with browser), cardtap, land-audio, a reset script (land save gone, colours kept, built coop gone, no decor, toast). Skipped at her request: bots, spotlight sweep, monkey, stable.
+
+### Pass 195: spelling, Nona, item help, Excel opens Money (1 Nov pm)
+
+1. American spelling in all player text in index, home and space (color, neighbor, gray, liter, license, favor, harbor, center, meter, kilometers, traveled, recognize, program, incentivized, catalog). Ids and keys left alone (`'grey'` project, `lab_colour`, `colourName`, `FAVOURS`, palette keys).
+2. Noor, the social media manager, is Nona. Old save text (later news, ripple log, You history) migrated once (`G.noorNona`). Tests updated.
+3. Staff card title "Staff" (it holds sales, the social media manager and shop managers).
+4. Items: the ? button above the title is gone. When the description is long, the title is a button with a dotted underline that opens the same help sheet (`.qhelp.qt`).
+5. Buy shrimp ?: the salt-dip sentence removed.
+6. Excel course: buying it opens the Money sheet (tap cash) with "Money over time" open and one line, "New: your books. Tap your cash at the top to come back here.", shown until the sheet is closed. `finOpen` = kits open or Excel bought, so the chart lives in the sheet from then on.
+Test: cardtap, tank1, me 49, a browser script (Excel opens the sheet with the card inside and the note; item title opens the help sheet). Not run: stable, endcards (needs bot runs), bots.

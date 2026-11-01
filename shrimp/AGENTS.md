@@ -203,6 +203,9 @@ Her messages usually name a symptom, give one example, and sketch a fix ("maybe 
 
 These come from Puti's feedback. Treat them as requirements.
 
+- American spelling in all game text (color, neighbor, gray, liter, license, favor, center). Keep old ids like `'grey'` and `lab_colour` as they are, saves use them (Pass 195).
+- No ? button on top of an item: a long item description makes the title tappable, dotted underline, opening the same help sheet (`.qhelp.qt`, Pass 195). Card-header ? buttons stay.
+
 **Progress and goals**
 - Salespeople leave the shrimp this week's packing needs (`kitHold`), sell the rest and culls, and sell everything when there's no cash to pack. Default, no toggle (Pass 131).
 - No goal card. Ideas live in the ? popup as loose suggestions (automate, more room, make the tank nicer), never an exact item to save for, never prices, counts or cash targets. Players pick their own order. Never mention something whose tab isn't open yet. Soft "Meanwhile" guide hints also go in the popup; the guide bar above the tank is only for a real next step.
@@ -500,6 +503,8 @@ Planned and agreed with Puti, not built yet:
 **Fix list from Puti's 1 Nov afternoon playtest** (project doc `claude/shrimp-fix-prompt-1nov-pm.md`): Part A done (Pass 190): kits after tank 2's first baby, care guide after 10 kits, story cards tied to a moment go first and narrative ones drop after 60 days (`STORY_PROMPT`, `STORY_DROP`, `progress.at`), Mira 8 on day 0. Part B (Pass 191): Gear Done fold and tank chips, short prices and two-line costs in buttons, full-width project text (`.wide`), story card shield (`cardShield`, `tests/shrimp-cardtap.cjs`), ending buttons in a sticky footer (`tests/shrimp-endcards.cjs`). Part C (Pass 192): hard part labels left of the grid, no step order, Stop counting replaces Good enough and No number, 90% and 75% gone. Part D (Pass 193): Frozen buttons (`freezeHTML`), farms and packing run full up to 60 days of orders in stock (`STOCK_FULL`), data pays AED 10 a new customer, fight club raids (`FIGHT_P`, third raid shuts it), Buy shrimp for an empty Tank 1 before the land. Review table and the Mira and goal names to approve are at the end of `tests/README-shrimp.md`. Deployed with Pass 193.
 
 **Pass 194 (1 Nov pm, quick fixes, deployed):** land music quieter (0.06) with a 5 s crossfade at the loop point (`ambLoop`); Start over removes the land iframe, clears `shrimp-land-v1`, and reloads from a clean save, keeping only the land's colours and drawn things (`shrimp-land-keep` -> `pal`, `made`); the company ignores land messages when the land isn't bought (old decor can't leak into a new game); no empty care-button band before the first button (`.tv-slot.empty`); the ? popup has no owners bar or letters, and says to cycle first until the tank has cycled; story cards always at the top (`msPlace`); no Tank 1 caption with one stocked tank; care buttons that show share the full width (this replaces Pass 180's fixed 3 columns).
+
+**Pass 195 (1 Nov pm):** American spelling across index, home and space; the social media manager is Nona (was Noor; old save text migrated once, `G.noorNona`; Nour, Mira's cousin, is a different person); the staff card is "Staff"; item titles replace the ? (above); Buy shrimp help has no salt-dip line; buying the Excel course opens the Money sheet (`finOpen` is now kits or Excel) with one "New:" line until it's closed.
 
 **World tab rows** (Pass 185): on `#ow-body` the buy rows come first and a row bought there stays as Done (disabled) until you leave the tab (`OW_KEEP`). The same pattern could fix the other bought-row movers below if Puti agrees.
 
