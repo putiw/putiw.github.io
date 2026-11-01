@@ -1883,3 +1883,10 @@ Deployed 1 Nov evening (Passes 195 to 197, BUILD 2026-11-01-p197). Before deploy
 3. The Stream ending is still there, hidden: the `stream` story card offers it when `streamReady` holds (Rewild stream and reserve or jar, mangroves, farm waste cleanup, Taiwan streams, a river answer, nothing forced).
 Test: balance 132 (one string updated), me 49, tank1 with browser (pest check compares spots), hard 12 (new: Change goal opens the pick, Keep this goes back; before a goal no grid). Not run: bots, stable, spotlights.
 Bigger questions from the same playtest (Tank 1 the same on both pages, Grandma's backlog, Question/Network/Drift endings) are in the project doc `claude/shrimp-design-prompt-1nov-eve.md`.
+
+### Pass 199: the hard part after Keep playing, Your day note, Space in the Lab (1 Nov, evening)
+
+1. After the win, Keep playing keeps the hard part live: groups open and options can be funded (`hardLive`: not ended, not left or in space, and not won unless `progress.sandbox`), the give slider works and giving runs (`giveDay`). The goal itself stays reached. Without Keep playing (the win card still up, or the ending review) it stays read-only, and the empty slot that showed under the grid is gone (the body's reserved height is cleared).
+2. Your day: the note under the title always keeps two lines (`.me-note` min-height, no longer hidden when empty), so the picks under it don't move as the note changes. Longest note is 75 characters, two lines at 360 px.
+3. Lab: a Space card at the bottom for everyone (`#lab-space`, order 99). Before Leave Earth opens: "You haven't met the conditions to unlock the space chapter." Once open: "You can leave Earth now. It's at the top of World." Hidden after leaving Earth or the company. The old science count line in the Research card (`voyageLabLine`) is gone, no hint.
+Test: balance 132, me 49, academy 9, hard 12, cardtap, a browser script (sandbox win: groups fundable, slider enabled; read-only win: body 0 px; Lab card text). Not run: bots, stable, spotlights.
