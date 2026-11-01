@@ -253,6 +253,10 @@ var m1=kitMaterials(g);setQCStrict(g,2);if(!(kitMaterials(g)>m1))throw Error('St
 if(html.includes("needs '+big(nextLine.sold)")||html.includes('show up once your first three tanks')||html.includes('Bacteria starter unlocks when'))throw Error('Unlock rules should not be shown');
 if(!html.includes("bar.hidden=true;\n  if(!g)return;")||!html.includes("$('ideas-now').hidden=!soft"))throw Error('Guide lines belong in the ? popup, never a bar over the game (Puti, 28 Oct)');
 if(!html.includes("if(SPOT||SPOTQ.length||!introOK())return;")||!html.includes("if(!s.now&&!introOK(s.gap))"))throw Error('One spotlight at a time');
+check('a tank seeded from Tank 1 stays cycled for 30 days with shrimp (1 Nov)',`
+var g=readyGame();var t=g.tanks[0];t.had=1;t.cycledAt=0;t.pop=[{age:100,n:40,g:60}];g.money=1e5;if(!addTank(g))throw Error('addTank');var T=g.tanks[1];T.vol=640;T.volTier=VOLS.length-1;T.pop=[{age:100,n:600,g:60}];T.had=1;
+for(var d=0;d<5;d++)tankRoll(g,T,1);if(T.chem.bacA<Math.min(capA(T),bacTarget(T))*0.99||T.chem.bacB<Math.min(capA(T),bacTarget(T))*0.99)throw Error('Seeded tank fell behind');
+`);
 check('kits need a second tank and room (1 Nov)',`
 var g=readyGame();g.stats.sold=KIT_UNLOCK;var t=g.tanks[0];t.had=1;t.vol=80;t.volTier=2;t.pop=[{age:100,n:20,g:60}];if(kitsOpen(g))throw Error('One 80 L tank should not open kits');
 var t2=newTank(1);t2.had=1;t2.pop=[{age:100,n:20,g:60}];g.tanks.push(t2);if(!kitsOpen(g))throw Error('A second tank with 80 L stocked should open kits');
@@ -635,7 +639,7 @@ var g=newGame();g.tanks[0].had=1;g.stats.sold=100;g.emp.staff.sales=1;g.tanks.fo
 if(!html.includes("fire('excel500'")||!html.includes('<h2>Quality checks</h2>')||!html.includes('Optional. Checks catch sick shrimp'))throw Error('Pass 135: Excel spotlight and optional QC card');
 if(!html.includes("&&!(hasSales(G)&&G.tanks.every(function(t){return t.set.autoSell;}))"))throw Error('Pass 135: top Sell hides with salespeople');
 // Puti's standing requests (29 Oct). Don't remove these under a general rule without asking her.
-check('Breeders are per litre, the same value keeps more in a bigger tank (Pass 151, Puti)',`var G=newGame();G.tanks.push(newTank(1));G.tanks[0].vol=320;G.tanks[1].vol=20;G.tanks.forEach(function(t){t.set.keepL=1;});if(keepN(G.tanks[0])!==320||keepN(G.tanks[1])!==20)throw Error('1 per L: '+keepN(G.tanks[0])+' '+keepN(G.tanks[1]));if(packAbove(G,G.tanks[1])!==keepN(G.tanks[1])*PACK_YOUNG)throw Error('Packing leaves the young');
+check('Breeders are per litre, the same value keeps more in a bigger tank (Pass 151, Puti)',`var G=newGame();G.tanks.push(newTank(1));G.tanks[0].vol=320;G.tanks[1].vol=20;G.tanks.forEach(function(t){t.set.keepL=1;});if(keepN(G.tanks[0])!==320||keepN(G.tanks[1])!==20)throw Error('1 per L: '+keepN(G.tanks[0])+' '+keepN(G.tanks[1]));if(packAbove(G,G.tanks[1])!==keepN(G.tanks[1]))throw Error('Packing takes everything above the breeders (1 Nov)');
 var O=newGame();O.tanks[0].vol=20;O.tanks[0].set.keep=16;delete O.tanks[0].set.keepL;migrate(O);if(O.tanks[0].set.keepL!==0.8)throw Error('old 16 in 20 L is 0.8 per L: '+O.tanks[0].set.keepL);if(SHARED_SET.indexOf('keepL')<0)throw Error('shared');`);
 if(!/function renderTankSheet[\s\S]{0,900}it\('feeder','Auto feeder'[\s\S]{0,200}it\('autoWC'/.test(html))throw Error('Puti: the new-tank sheet offers the auto feeder and auto water changer');
 if(!html.includes("if(!supNeed(G)||T.cycledAt!=null)sup='';"))throw Error('Puti: no seed bacteria rows for a cycled tank');

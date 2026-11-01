@@ -1672,3 +1672,13 @@ Deployed 1 Nov (Passes 185 and 186, BUILD 2026-11-01-world-rows). Before deploy:
 10. Help sheet opens right under its ?, or above when there's no room (`hsPlace`); a scroll closes it. Shrimp Times help no longer mentions people going shrimp-free until someone has (`ripple.free`).
 11. Packing at 1,440 with 240 breeders is the Pass 151 rule (packing waits for 6 shrimp per breeder, `PACK_YOUNG`). Not a bug, the line now says why: "Packing waits for 6 shrimp per breeder, 1,440, so the young grow up. You have 1,425."
 Test: balance 127 (kits test now needs a second tank), academy 9, me 49. Headless 390: header 167 → 138 px after feeder plus a scroll, help sheet top 6 px under its ?, cycle card 8 px under the tank. Not run: stable, layout scan, bots, spotlight sweep (the Ads reveal at 10 sold and the second-tank kit gate move pacing; check bots before deploy).
+
+## Pass 188: breeders, seeded tanks, one standard tank row, Farm tab (1 Nov)
+
+1. Breeders are breeders: packing takes every shrimp above the breeder count (`packAbove` = `keepN`), the 6-per-breeder wait is gone. Slow breeding is the player's call (raise Breeders). Note: Pass 151 found this about 240 days slower for the average bot; check bots before deploy.
+2. pH gauge ok range 6.6 to 8.0 (was 7.8), the same as the sim (6.5 to 8) and as KH 1.5 to 5. pH tip: the cycle uses up KH, lower-KH water lowers pH, under KH 2 it can crash.
+3. A tank seeded from Tank 1 stays cycled: for its first 30 days with shrimp its bacteria are kept at its load (`tankRoll`, `T.stockAt`). Before, the seed matched an empty tank and decayed, so moving hundreds of shrimp into a 640 L tank showed nitrite and the bacteria bars.
+4. Standard tank and the recipe are one row in Gear. The first standard tank costs AED 8,000 more (`SOP_COST`) and puts every tank on one recipe. The Standard operating procedure project row is gone. Standard tanks open with 3 tanks and kits.
+5. From the first farm the Gear tab is called Farm and Trade is hidden (was at 10 kits a day of farm output). The tank-at-home card says so.
+6. Header gap after automating: same cause as Pass 187 (`HFLOOR` held the tall header), the scroll release covers it. Headless: a fully automated 5-tank recipe header is 88 px with no floor.
+Test: balance 128 (new: seeded tank stays cycled; breeders test updated), me 49 (standard tank pays the recipe once), academy 9, tank1 all. Not run: stable, layout scan, bots, spotlight sweep.
