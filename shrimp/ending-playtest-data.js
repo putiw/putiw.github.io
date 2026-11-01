@@ -216,7 +216,7 @@ window.ENDING_TEST_DATA = {
             "drive": -0.3
           },
           "heart": 2,
-          "endingLine": "A breeder co-op that started with your neighbour."
+          "endingLine": "A breeder co-op that started with your neighbor."
         },
         {
           "id": "buyout",
@@ -411,7 +411,7 @@ window.ENDING_TEST_DATA = {
         {
           "id": "revfake",
           "label": "Give a bag of food for every review",
-          "description": "5,000 reviews in a month, all from real owners, mostly five stars. The marketplace labels them incentivised. Word of mouth up a lot.",
+          "description": "5,000 reviews in a month, all from real owners, mostly five stars. The marketplace labels them incentivized. Word of mouth up a lot.",
           "traits": {
             "drive": 0.5,
             "means": -0.5
@@ -454,7 +454,7 @@ window.ENDING_TEST_DATA = {
         {
           "id": "datasell",
           "label": "Sell it",
-          "description": "No names, and the terms already allow it. AED 7.5M now, and better-aimed ads.",
+          "description": "No names, and the terms already allow it. AED 7.5M now, AED 10 for every new customer after, and better-aimed ads.",
           "traits": {
             "drive": 0.5,
             "means": -0.5
@@ -779,17 +779,17 @@ window.ENDING_TEST_DATA = {
     {
       "id": "c_permit",
       "title": "The permit",
-      "body": "South Asia wants its own licence before another kit is sold there. Water, animal health, packaging, three ministries. A year, they say, if the file is complete.",
+      "body": "South Asia wants its own license before another kit is sold there. Water, animal health, packaging, three ministries. A year, they say, if the file is complete.",
       "options": [
         {
-          "label": "Wait for the licence",
+          "label": "Wait for the license",
           "description": "A year. Nothing sells in South Asia until then. Everything else runs.",
           "traits": {
             "risk": -0.8,
             "means": 0.3,
             "control": 0.3
           },
-          "endingLine": "You waited a year for the South Asia licence."
+          "endingLine": "You waited a year for the South Asia license."
         },
         {
           "label": "Hire a firm that knows people",
@@ -799,17 +799,17 @@ window.ENDING_TEST_DATA = {
             "control": -0.5,
             "know": -0.3
           },
-          "endingLine": "A firm that knew people got you the South Asia licence in four months."
+          "endingLine": "A firm that knew people got you the South Asia license in four months."
         },
         {
-          "label": "Ship under another company’s licence",
+          "label": "Ship under another company’s license",
           "description": "Sells from next month. 1 in 3, within two years, that every kit in the region is recalled.",
           "traits": {
             "risk": 0.5,
             "means": -0.3,
             "drive": 0.3
           },
-          "endingLine": "You sold in South Asia under someone else’s licence."
+          "endingLine": "You sold in South Asia under someone else’s license."
         }
       ]
     },
@@ -919,11 +919,20 @@ window.ENDING_TEST_DATA = {
       "tank": "The water was always perfect. The machine fed us, the machine cleaned us, the machine counted us. We were counted many times a day. Nobody came close to the glass.",
       "last": "Most of the tanks have your name on them, and nobody says no to you anymore."
     },
+    "empire_hard": {
+      "id": "empire_hard",
+      "end": "empire",
+      "name": "The Empire, the hard bargain",
+      "who": "You wanted it done and you did it on the numbers. When the cheap way was legal you took it, every time. You never broke a law you could read. The people who worked for you got paid on time and not a dirham more.",
+      "mira": "She runs a smaller company that pays more and grows slower. She sends you a card every New Year.",
+      "gp": "Your cousin says you're the cheapest rich person he knows. I told him that's how you got rich. [visit] Come for dinner, I'm paying.",
+      "tank": "The water was fine and the food was the cheapest food. There were a lot of us. When some died, more came the next day."
+    },
     "empire_cartel": {
       "id": "empire_cartel",
       "end": "empire",
       "name": "The Empire, the cartel",
-      "who": "You took the money when it was offered and you never gave it back. You gave them the routes, then the trucks, and somewhere along the way it stopped being a shrimp company that did favours and became something else with shrimp on top.",
+      "who": "You took the money when it was offered and you never gave it back. You gave them the routes, then the trucks, and somewhere along the way it stopped being a shrimp company that did favors and became something else with shrimp on top.",
       "mira": "She's a journalist now. She wrote the story about you. It won a prize, and nothing happened to you, and she knew that would be how it went.",
       "gp": "Mira came to see me, she showed me what she wrote. I told her I didn't want to read it and then I read it twice. I don't know what to say to you so I'll say what I always say, the tank's still running. [visit] Come for dinner, I'll leave the door unlocked.",
       "tank": "We were moved at night a lot. There were other boxes next to ours, heavy ones. People who carried us didn't look at us. Once a tank fell and nobody picked us up."
@@ -980,7 +989,7 @@ window.ENDING_TEST_DATA = {
       "who": "You went everywhere and talked to everyone, including people you shouldn't have. They needed routes, you had the best routes in the world. You told yourself the medicine still got through, and it did, next to the other boxes. You did a lot of good and a lot of the other thing, on the same trucks.",
       "mira": "She quit the year she found out what was in the other boxes. She runs a water charity now, it uses someone else's trucks.",
       "gp": "People tell me about you on the news and I don't know which story to believe, so I believe all of them a little. [visit] You can still stop. I'm old, I'm allowed to say that.",
-      "tank": "We travelled all the time. Next to us there were always other boxes. Some went to hospitals. Some went to places where people were afraid."
+      "tank": "We traveled all the time. Next to us there were always other boxes. Some went to hospitals. Some went to places where people were afraid."
     },
     "network_back": {
       "id": "network_back",
@@ -989,7 +998,7 @@ window.ENDING_TEST_DATA = {
       "who": "You went everywhere, you talked to everyone, and for a few years you said yes to people you shouldn't have. Then one night you went to the police. It cost you almost everything and a year of nothing. You rebuilt from the same trucks, and you made them carry the right things this time.",
       "mira": "She helped you through that year and didn't take any money. She runs your water routes now.",
       "gp": "I've been to forty countries since, and in every one of them somebody knew your trucks. Not the shrimp, the trucks, they said the water came on them. I know about the bad years, Mira told me. I won't say anything about it, you already know. What you did after is the part I tell people about. [visit]",
-      "tank": "We travelled a lot, always cold and always on time. Next to us there were boxes of other things, medicine sometimes, and for a long time things that weren't medicine. Then the boxes changed again."
+      "tank": "We traveled a lot, always cold and always on time. Next to us there were boxes of other things, medicine sometimes, and for a long time things that weren't medicine. Then the boxes changed again."
     },
     "drift_shop": {
       "id": "drift_shop",

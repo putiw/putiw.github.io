@@ -1909,3 +1909,49 @@ Puti: "You can ignore her for a long time and when you go back all the options a
 2. At most 2 things that can expire are open (`GT_MAX`, `gtTrim`): a third pushes the oldest out as missed. The TV and her call wait forever, don't count and are never pushed (Puti).
 3. Checking runs `gtDay` first (old saves and paused pages settle), then shows "While you were away: N things happened without you." as a fold with the dated misses since the last check. Misses from old saves are dated the day their window would have shut; `gtLog` keeps Her years in date order.
 Test: me 50 (new: 5 years ignored at 40x, never more than 2 open, nothing past 90 days, TV stays, away list matches the misses and empties on a second check, oldest pushed never the TV, old-save miss dated, at 1x a window lasts a month). Browser 360 and 390: away line shows (23 things after 5 years at 40x), Check doesn't move the page, no horizontal scroll, no errors. Not run: bots, stable, spotlights.
+
+### Pass 202: player profiles and a baseline (1 Nov, evening, plan `claude/shrimp-plan-choices-1nov.md` Part 0)
+
+Plan for this chat: Parts 0 to 9 of `claude/shrimp-plan-choices-1nov.md`, one Pass per part. Stops for Puti: the card table (Part 2) and the land-life list (Part 8).
+
+New `tests/shrimp-profiles.cjs` (2 s): profiles in `tests/shrimp-profiles-def.cjs` (Empire builder, Dictator, Grandma's kid, Do-gooder, Scientist, Shrimp nerd, Casual, Returning player), each weights on what a side pushes plus how they play (Your day hours, You page share, setting and ? taps, own tank looks, treats, culls, and the new measures Part 1 reads: `P.landMs`, `P.grB/grN`, `P.giveY`, `P.fw`, `P.ctr`). 1,000 players a profile answer every decision in `decisions()` (moved to `tests/shrimp-decs.cjs`, shared with balance) with noise, buy the tagged one-offs (trees, lifelines) they like and can afford. A rich run buys everything they don't object to and every hard part option. Also fair, cold, random choosers and the kind/cold bot orders. Targets from the plan are printed; they become asserts when the rework lands (`PROFILE_ASSERT=1` forces them).
+Bots: `PROFILE=<id>` picks cards (by trying each choice on a copy, `profPick`) and forks (`profFork`) by that profile's weights. Choices only, the bots' play stays.
+
+Baseline, current code (family %, normal / rich):
+
+| Profile | empire | garden | question | network | drift |
+|---|---|---|---|---|---|
+| Empire builder | 100 / 100 (99 dictator) | 0 | 0 | 0 | 0 |
+| Dictator | 100 / 100 (all cartel) | 0 | 0 | 0 | 0 |
+| Grandma's kid | 0 | 72 / 94 | 0 | 0 | 28 / 6 |
+| Do-gooder | 0 | 44 / 13 | 52 / 77 | 4 / 10 | 0 |
+| Scientist | 5 / 0 | 15 / 0 | 77 / 100 | 0 | 3 / 0 |
+| Shrimp nerd | 0 | 100 / 100 | 0 | 0 | 0 |
+| Casual | 0 | 81 / 27 | 0 | 19 / 73 | 0 |
+| Returning | 28 / 15 | 23 / 14 | 0 | 34 / 71 | 15 / 1 |
+| Fair chooser | 0 | 100 | 0 | 0 | 0 |
+| Cold chooser | 100 | 0 | 0 | 0 | 0 |
+| Random chooser (returning play) | 2 | 1 | 0 | 95 | 3 |
+
+Misses: Grandma's kid drift 28%, Do-gooder network 4%, Casual garden 81%, fair and cold choosers 100%, random never reaches question with few setting taps. Money moves endings: Casual and Returning go network when rich, Grandma's kid goes garden.
+Bots seed 7 (baseline): strong cold 2,216 empire_dictator, strong kind 3,148 question_prof, average Earth 6,357 garden_hermit, Leave Earth opens 5,996 (sci 532). Space bot passes (opens 4,582).
+
+### Pass 203: the trait model (plan Part 1)
+
+1. Means no longer picks the family, it picks the version inside it. `endingScores`: empire = company first, keeps it close (drive − care + 0.2), network = company first, strangers far away (drive + care), garden = life first, loves shrimp (−drive + kin), drift = life first, own people (−drive − care), question = curiosity (2 × know). Style terms as before.
+   Versions: empire_good (means ≥ 0), new **empire_hard** (cold, no evil acts; text below for Puti), empire_dictator (means < −0.15 and at least 2 evil acts, `evilActs`: the welfare bribe, fight club, dark hard part options, and `E.evil` from Part 5), empire_cartel (dirty money). garden_village drops "you usually picked better and lost some money" for a cold player (`endText`). The others make no fairness claim.
+2. Know is curiosity: research spend as a share of everything earned (`G.stats.rsp` over `G.stats.earned`, new saves start at 0, old saves null), plus basic science and ecology grants against applied (`P.grB/P.grN`, filled by Part 4). Setting changes, ? and chart opens no longer count. Bar labels: curious / growth first. `PLAY_W.know` 0.6.
+3. Care only counts what costs the company. Play: the give slider held over the hard part (`P.giveY` share-years, `P.giveD` years, in `giveDay`), `PLAY_W.care` 0.4. Hard part options lose their care tags except those paid as a share of income for years (`dues`); a group's slow fix bought while its faster workaround is open and not bought adds care 0.7 (`hardSlow`, `HARD_SLOW`). Lifelines are a share of income for 3 years (water 5%, medicine 8%, books 2%, seeds 2%), shown on the button (`duesLabel`).
+4. Drive: real time with the land open (`P.landMs`, in `tick`) against company play time; a quarter of play there reads −1. Evidence line "N% of your time on the land".
+5. Kin unchanged until Part 3b (farm wellbeing).
+
+Profiles after this pass (normal, rich within 5 points except where shown): Empire builder empire 94, Dictator cartel 97, Grandma's kid garden 72 / drift 28, Do-gooder network 81 (rich 96), Scientist question 100, Shrimp nerd garden 100, Casual drift 76, Returning 18/10/27/26/20, fair chooser 35 garden 42 question, cold chooser 52 network, random never garden.
+Left for the cards (Part 2): fair answers still lean life first and loves shrimp, so first options read garden or drift; Grandma's kid needs own-people choices to reach drift. That's what the card table fixes.
+
+New ending text for Puti to approve (empire_hard, "The Empire, the hard bargain"):
+- Who: You wanted it done and you did it on the numbers. When the cheap way was legal you took it, every time. You never broke a law you could read. The people who worked for you got paid on time and not a dirham more.
+- Mira: She runs a smaller company that pays more and grows slower. She sends you a card every New Year.
+- Grandma: Your cousin says you're the cheapest rich person he knows. I told him that's how you got rich. Come for dinner, I'm paying.
+- Tank: The water was fine and the food was the cheapest food. There were a lot of us. When some died, more came the next day.
+
+Test: balance 132 (the know check replaced: settings don't move curiosity, research share and grants do, giving held over years, land quarter reads −1), me 50 (cold empire without acts is empire_hard, dictator needs the acts, cold garden stays garden, fair empire stays empire), endcards 50, academy 9, profiles. Ending preview rebuilt and its formula updated. Pass 202 and 203 went into one commit (a stuck shell step held the first one).

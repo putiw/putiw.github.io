@@ -71,7 +71,11 @@ var old=newGame();old.emp.staff.pack=5;old.emp.staff.lines=1;old.emp.proj.layoff
 `);
 check('how you play and what you choose pick the ending',`
 function run(tr,ps,me){var g=newGame();g.tr=tr;if(ps)for(var k in ps)g.ps[k]=ps[k];if(me)for(var k2 in me)g.me[k2]=me[k2];return endingPick(g);}
-var e=run({drive:8,means:-6});if(e!=='empire_dictator')throw Error(e);
+var e=run({drive:8,means:-6});if(e!=='empire_hard')throw Error('cold, no evil acts: '+e);
+var gd=newGame();gd.tr={drive:8,means:-6};gd.emp.evil={bribe:2};if(endingPick(gd)!=='empire_dictator')throw Error('dictator needs the acts '+endingPick(gd));
+// Pass 203: means picks the version, not the family. A cold life-first shrimp lover is still garden, a fair company-first one empire.
+if(run({drive:-6,means:-4,kin:6}).split('_')[0]!=='garden')throw Error('cold garden '+run({drive:-6,means:-4,kin:6}));
+if(run({drive:6,means:4,care:-2}).split('_')[0]!=='empire')throw Error('fair empire');
 if(run({drive:8,means:1})!=='empire_good')throw Error('good');
 if(run({drive:-6,means:4,kin:6})!=='garden_village')throw Error('village');
 if(run({drive:-6,means:4,kin:6},null,{n:20,cnt:{nothing:20,design:20}})!=='garden_hermit')throw Error('hermit');

@@ -58,7 +58,7 @@ if(kitsOpen(G)){
  }
  for(var p of PROJ.filter(p=>p.c==='cult'))if(!pd(G,p.id)&&p.req(G)&&E.inf>=p.i)buyProj(G,p.id);
  // Choices: the fast player takes the cold answer (BOT_HEART=kind flips it).
- for(var fk in FORK_Q){if(forkDone(G,fk))continue;var opts=forkOpts(fk).filter(p=>p.req(G)).sort((a,b)=>(${process.env.BOT_HEART==='kind'}?b.h-a.h:a.h-b.h));var pk=opts[0];if(pk&&afford(pm(G,pk))&&E.inf>=pk.i)buyProj(G,pk.id);}
+ for(var fk in FORK_Q){if(forkDone(G,fk))continue;var opts=forkOpts(fk).filter(p=>p.req(G)).sort((a,b)=>(${process.env.BOT_HEART==='kind'}?b.h-a.h:a.h-b.h));if(BOTPROF)opts.sort((a,b)=>profFork(b)-profFork(a));var pk=opts[0];if(pk&&afford(pm(G,pk))&&E.inf>=pk.i)buyProj(G,pk.id);}
  if(pd(G,'ministry')&&E.op.offer&&!E.op.run&&E.inf>campCost(E.op.n)*4){var cms=E.op.offer.map(function(id){return MSGS.find(function(m){return m.id===id;});}).filter(function(m){return !BOTKIND||(m.h||0)>=0;}).sort(function(a,b){return b.e-a.e;});if(cms[0])runCampaign(G,cms[0].id);}
  if(pd(G,'studio')&&!(E.movie.left>0)&&E.movie.n<MOVIES.length){var ct=CUTS[E.movie.n]||[];var ci=ct.length>1?(BOTKIND?((ct[1][1].h||0)>=(ct[0][1].h||0)?1:0):(ct[1][1].b>ct[0][1].b?1:0)):0;if(afford(movieBudget(E.movie.n)))greenlight(G,ci);}
  if(academyOpen(G)&&G.academy.level){var RL=rlines(G);RLINES.forEach(function(l){if(RL[l.id].pd<1&&afford(posUsd(G,RPOS[1])*USD*3))rlHire(G,l.id,'pd');if(RL[l.id].phd<2&&afford(posUsd(G,RPOS[0])*USD*6))rlHire(G,l.id,'phd');});}
