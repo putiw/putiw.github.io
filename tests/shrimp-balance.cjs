@@ -257,6 +257,10 @@ check('a tank seeded from Tank 1 stays cycled for 30 days with shrimp (1 Nov)',`
 var g=readyGame();var t=g.tanks[0];t.had=1;t.cycledAt=0;t.pop=[{age:100,n:40,g:60}];g.money=1e5;if(!addTank(g))throw Error('addTank');var T=g.tanks[1];T.vol=640;T.volTier=VOLS.length-1;T.pop=[{age:100,n:600,g:60}];T.had=1;
 for(var d=0;d<5;d++)tankRoll(g,T,1);if(T.chem.bacA<Math.min(capA(T),bacTarget(T))*0.99||T.chem.bacB<Math.min(capA(T),bacTarget(T))*0.99)throw Error('Seeded tank fell behind');
 `);
+check('police year: loose farm shrimp sell by hand, inside weekly buyers (Pass 189)',`
+var g=readyGame();g.emp.farms.hatch=1;g.emp.rawShrimp=500;g.emp.nosale=g.day+100;if(!banSale(g))throw Error('ban sale on');var d=demandLeft(g),r=sellAll(g,true);if(r.count<1||r.count>d)throw Error('within buyers '+r.count+' '+d);
+var m=g.money;sellAll(g,false);var q=banSell(g,false,demandLeft(g));if(g.emp.rawShrimp>=500)throw Error('raw shrimp sold');g.emp.nosale=g.day-1;if(banSale(g))throw Error('ends with the ban');
+`);
 check('kits need a second tank and room (1 Nov)',`
 var g=readyGame();g.stats.sold=KIT_UNLOCK;var t=g.tanks[0];t.had=1;t.vol=80;t.volTier=2;t.pop=[{age:100,n:20,g:60}];if(kitsOpen(g))throw Error('One 80 L tank should not open kits');
 var t2=newTank(1);t2.had=1;t2.pop=[{age:100,n:20,g:60}];g.tanks.push(t2);if(!kitsOpen(g))throw Error('A second tank with 80 L stocked should open kits');

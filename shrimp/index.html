@@ -1448,10 +1448,11 @@ function empireDay(G){
   var fc=farmCap(G);E.prod=0;
   if(fc>0){
     pay(G,farmOverhead(G),'farms');if(E.won)fc=0;
-    var demand=kitDemand(G),remaining=Math.max(0,Math.ceil((E.inventoryDays||7)*demand)-G.kits.stock),rawTarget=Math.min(fc*3,Math.ceil(demand*3),remaining)*KIT_SHRIMP;
+    var demand=kitDemand(G),remaining=Math.max(0,Math.ceil((E.inventoryDays||7)*demand)-G.kits.stock),rawTarget=Math.min(fc*3,Math.ceil(demand*3),remaining)*KIT_SHRIMP;if(banSale(G))rawTarget=Math.max(rawTarget,Math.min(fc*7*KIT_SHRIMP,weeklyDemand(G)*2));
     var units=Math.floor(Math.min(fc,Math.max(0,(rawTarget-E.rawShrimp)/KIT_SHRIMP),Math.max(0,G.money-productionCashFloor(G))/(breedingUnitCost(G)+kitMaterials(G))));
     if(units>0){pay(G,units*breedingUnitCost(G),'farms');E.rawShrimp+=units*KIT_SHRIMP;E.prod=units*KIT_SHRIMP;}
   }
+  if(E.nosale&&G.day>=E.nosale&&!E.nosaleEnd&&farmBuilt(G)){E.nosaleEnd=1;newsLine(G,'The police close the case. Kits go back on sale, and the pet shops go back to their old suppliers.');}
   E.packed=packDay(G);E.soldToday=0;fillKitOrder(G);
   if(kitsOpen(G)&&!((E.nosale||0)>G.day)){
     E.acc+=kitDemand(G);
@@ -1926,8 +1927,16 @@ function sellAll(G,dry){
     var r=doSell(G,G.tanks[i],dry,bud);
     tot.count+=r.count;tot.normal+=r.normal;tot.culls+=r.culls;tot.revenue+=r.revenue;tot.limited=tot.limited||r.limited;bud=r.left;
   }
+  if(banSale(G)){var bs=banSell(G,dry,bud);tot.count+=bs.count;tot.normal+=bs.count;tot.revenue+=bs.revenue;}
   return tot;
 }
+// The police year (Pass 189, Puti): no kit sales, so the farms' loose shrimp go to pet shops by hand. Trade and a Sell button come back for the year.
+// Same price per shrimp as Tank 1's adults, inside the weekly buyers, so it's a small fraction of kit income.
+function banSale(G){return !!(G.emp&&(G.emp.nosale||0)>G.day&&farmBuilt(G)&&!G.voyage);}
+function banSell(G,dry,bud){var E=G.emp,n=Math.floor(Math.min(E.rawShrimp||0,Math.max(0,bud)));if(n<1)return {count:0,revenue:0};
+ var rev=n*priceAt(fleetGrade(G))*G.market.m*G.price;
+ if(!dry){E.rawShrimp-=n;earn(G,rev,'shrimp');G.stats.sold+=n;G.stats.revenue+=rev;G.soldWeek+=n;if(G.emp)G.emp.soldToday+=n;log(G,'Sold '+n+' farm shrimp to pet shops for AED '+Math.round(rev));}
+ return {count:n,revenue:rev};}
 function sellableStock(G){
   var n=0;for(var i=0;i<G.tanks.length;i++)n+=doSell(G,G.tanks[i],true,1e9).normal;return n;
 }
@@ -2987,7 +2996,7 @@ var FAVOURS=[
  {t:'The investor wants your routes. Your trucks get live shrimp to every town on time, and nobody opens a box of live shrimp. He wants to put his things next to them.',stay:'Give them the routes',sres:'Nobody stops your trucks at a border anymore.'}];
 function favourDue(G,n){var D=G.emp.dirty;return !!(D&&D.on&&!G.emp.network&&D.fav===n&&G.day>=D.next);}
 function favourOpts(G,n){var F=FAVOURS[n],cash=Math.max(0,G.money),out=Math.round(Math.max(cash*0.4,(G.emp.dirty.rate||500)*200));
- return [[F.stay,F.sres+(n===2?' After this they stop asking.':''),'stay'],['Go to the police','You lose almost all your cash, your accounts freeze and you sell no kits for a year. Half the farms close while they investigate.','police'],['Pay your way out, '+fmtA(out),'They leave. One route stays theirs.','out',out]];}
+ return [[F.stay,F.sres+(n===2?' After this they stop asking.':''),'stay'],['Go to the police','You lose almost all your cash, your accounts freeze and you sell no kits for a year, only loose shrimp to pet shops. Half the farms close while they investigate.','police'],['Pay your way out, '+fmtA(out),'They leave. One route stays theirs.','out',out]];}
 function favourPick(G,n,i){var E=G.emp,D=E.dirty,o=favourOpts(G,n)[i],now=Math.floor(G.day);if(!o)return false;
  if(o[2]==='stay'){D.fav=n+1;D.next=now+120;trAdd(G,{means:-1.5});addHeart(G,-1);if(n===0)E.staff.pack+=5;if(n===2){E.network=now+1;trAdd(G,{drive:1});newsLine(G,'Shrimp trucks cross every border without a check now.');}}
  if(o[2]==='police'){G.money=Math.min(G.money,Math.max(0,G.money*0.1));E.frozen=now+30;E.frozenWhy='police';E.nosale=now+365;E.inquiry=now+365;E.turned=now+1;D.on=0;trAdd(G,{means:4,risk:-1});newsLine(G,'A shrimp company owner walks into a police station with a box of files.');}
@@ -3704,7 +3713,7 @@ function trim(n,d){return String(+Number(n).toFixed(d));}
 (function(){var vv=window.visualViewport,fix=function(){var a=document.activeElement,typing=!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!/^(range|checkbox|radio|button)$/.test(a.type||''));document.body.classList.toggle('kbd',typing&&!!vv&&vv.height<window.innerHeight*0.8);var t=document.querySelector('.tabs');if(t&&t.style.transform)t.style.transform='';};if(vv){vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);}document.addEventListener('focusin',function(){setTimeout(fix,300);});document.addEventListener('focusout',function(){setTimeout(fix,50);setTimeout(fix,400);});})();
 // No browser feel: no pinch or double-tap zoom, no long-press menu outside text fields.
 (function(){var stop=function(e){e.preventDefault();};['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,stop,{passive:false});});document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea,[contenteditable]')))e.preventDefault();});})();
-var toastT=null,NF=null,BUILD='2026-11-01-breeders';
+var toastT=null,NF=null,BUILD='2026-11-01-police-year';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
@@ -6253,7 +6262,7 @@ function renderProgression(){
  selectTab(activeTab);renderMilestone();renderDream();var E=G.emp,open=kitsOpen(G),hasFarm=Object.keys(E.farms).some(function(k){return E.farms[k]>0;}),inBiz=open&&['emp','up','promote','world','research'].indexOf(activeTab)>=0,business=inBiz&&(topAway(G)||labMode()),phase=phaseInfo(G);
  var idl=ideas(G),idh=idl.map(function(x){return '<button type="button" class="idea" data-itab="'+x.tab+'" data-idea="'+x.k+'"><span>'+x.t+'</span><small>'+(x.tab==='fin'?'Money':tabWords(TAB_NAME[x.tab]||''))+' ›</small></button>';}).join('');$('ideas-k').hidden=!idl.length;$('ideas').hidden=!idl.length&&$('ideas-now').hidden;$('ideas-list').mhtml=idh;
  document.body.classList.toggle('business-context',business);var intro=G.progress.queue[0]==='intro';document.body.classList.toggle('story-intro',intro);if(intro){['tank','up','market','promote','emp','world','research'].forEach(function(tab){$('p-'+tab).hidden=true;});}
- var lateTrade=(labMode()||farmBuilt(G))&&!G.opt.all;var gn=farmBuilt(G)?'Farm':'Gear';if(TAB_NAME.up!==gn){TAB_NAME.up=gn;$('tab-up').querySelectorAll('.tl-l,.tl-s').forEach(function(x){x.textContent=gn;});}$('tab-market').hidden=!rv('market')||lateTrade;$('tab-research').hidden=!academyOpen(G);if(lateTrade&&activeTab==='market')selectTab('emp');$('tab-promote').hidden=!rv('sell');$('tab-world').hidden=!paperOpen(G)&&!(G.emp.ripple&&G.emp.ripple.n);if(G.left){['up','market','promote','emp','world','research','space'].forEach(function(k){var t=$('tab-'+k);if(t)t.hidden=true;});if(activeTab!=='tank'&&activeTab!=='me')selectTab('tank');}$('tab-land').hidden=!G.voyage;if(G.voyage){['tank','up','market','promote','emp','world','research'].forEach(function(k){var t=$('tab-'+k);if(t)t.hidden=true;});$('tab-space').hidden=false;if(activeTab!=='space'&&activeTab!=='me')selectTab('space');}
+ var lateTrade=(labMode()||farmBuilt(G))&&!G.opt.all&&!banSale(G);var gn=farmBuilt(G)?'Farm':'Gear';if(TAB_NAME.up!==gn){TAB_NAME.up=gn;$('tab-up').querySelectorAll('.tl-l,.tl-s').forEach(function(x){x.textContent=gn;});}$('tab-market').hidden=!rv('market')||lateTrade;$('tab-research').hidden=!academyOpen(G);if(lateTrade&&activeTab==='market')selectTab('emp');$('tab-promote').hidden=!rv('sell');$('tab-world').hidden=!paperOpen(G)&&!(G.emp.ripple&&G.emp.ripple.n);if(G.left){['up','market','promote','emp','world','research','space'].forEach(function(k){var t=$('tab-'+k);if(t)t.hidden=true;});if(activeTab!=='tank'&&activeTab!=='me')selectTab('tank');}$('tab-land').hidden=!G.voyage;if(G.voyage){['tank','up','market','promote','emp','world','research'].forEach(function(k){var t=$('tab-'+k);if(t)t.hidden=true;});$('tab-space').hidden=false;if(activeTab!=='space'&&activeTab!=='me')selectTab('space');}
 
  var tabs=document.querySelector('.tabs-in');tabs.insertBefore($('tab-emp'),$('tab-promote'));
  document.querySelector('.biznav').hidden=true;
@@ -6270,7 +6279,7 @@ function renderProgression(){
  $('speed').title=maxSpeed(G)<4?'4×: after your first farm.':maxSpeed(G)<12?(G.emp.fastReady?'12×: at a million owners ('+big(Math.floor(G.humans))+' now).':'12×: after auto packing, a barn, 7 days of AED '+fmt(FAST_PROFIT)+'+ kit profit a day, then a million owners.'):maxSpeed(G)<40?'40×: once '+big(HARD_AT)+' people have a tank.':'';setT('business-roadmap','');
  var limit=open&&consultHas(G,'fix')?bottleneck(G):null,target=limit?{packing:'emp',shrimp:'up',ceiling:'promote',demand:'promote',cash:'emp',paused:'up'}[limit.k]:null,action=target&&target!==activeTab?'<button class="btn" data-act="navigate" data-tab="'+target+'">'+({emp:'Open Kits',up:'Open Gear',world:'Open World',promote:'Open Ads'}[target])+'</button>':'';$('business-actions').mhtml=action;
  $('business-strip').hidden=true;$('business-guide').hidden=!business||(!$('business-roadmap').textContent&&!$('business-actions').innerHTML);
- if(business){var net=operatingNet(G),run=cashRunway(G),d=kitDemand(G);['vitals','vwater','acts','tankchips','fold'].forEach(function(id){$(id).hidden=true;});var bt=bnText(G);$('astrip').hidden=!bt;if(G.emp.won&&bt.indexOf('Goal reached.')===0){if(!$('astrip').querySelector('[data-act=review]'))$('astrip').mhtml='<span class="tx">Goal reached.</span><button class="btn" data-act="review">Look back</button>';}else setT('astrip',bt);lastAlerts='';}
+ if(business){var net=operatingNet(G),run=cashRunway(G),d=kitDemand(G);['vitals','vwater','acts','tankchips','fold'].forEach(function(id){$(id).hidden=true;});var bt=bnText(G);$('astrip').hidden=!bt;if(G.emp.won&&bt.indexOf('Goal reached.')===0){if(!$('astrip').querySelector('[data-act=review]'))$('astrip').mhtml='<span class="tx">Goal reached.</span><button class="btn" data-act="review">Look back</button>';}else if(banSale(G)){var bsa=sellAll(G,true);$('astrip').mhtml='<span class="tx">'+String(bt).replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</span><button class="btn primary" data-act="sellall" id="ban-sell"'+(bsa.count>0?'':' disabled')+'>'+(bsa.count>0?'Sell '+bsa.count+' · '+aed(bsa.revenue):sellWhyNot(G))+'</button>';}else setT('astrip',bt);lastAlerts='';}
  else if(activeTab!=='space'){$('tankchips').hidden=G.tanks.length<2||!!G.recipe||ownTank(G);}
  renderLandRow();
  $('inventory-days').value=String(E.inventoryDays);$('reserve-days').value=String(E.reserveDays);setT('operating-plan','Overhead '+aed(fixedOverhead(G))+'/day · reserve '+aed(operatingReserve(G))+' · '+aed(productionUnitCost(G))+'/kit');
@@ -6449,7 +6458,7 @@ function initControls(){
     if(a==='starter'){if(buyStarter(G,T))toast('Bacteria starter added to '+T.name);bump(b);}
     if(a==='seed'){if(seedFilter(G,T,G.tanks[+b.dataset.from]))toast('Filter seeded from '+G.tanks[+b.dataset.from].name);bump(b);}
     if(a==='sell'){var r1=doSell(G,T,false);if(r1.count)toast('Sold '+r1.count+' shrimp for '+aed(r1.revenue));bump(b);}
-    if(a==='sellall'){var r2=sellAll(G,true);if(r2.count){var rr=0,nn=0;G.tanks.forEach(function(t){var q=doSell(G,t,false,demandLeft(G));rr+=q.revenue;nn+=q.count;});toast('Sold '+nn+' shrimp for '+aed(rr));}bump(b);}
+    if(a==='sellall'){var r2=sellAll(G,true);if(r2.count){var rr=0,nn=0;G.tanks.forEach(function(t){var q=doSell(G,t,false,demandLeft(G));rr+=q.revenue;nn+=q.count;});if(banSale(G)){var qb=banSell(G,false,demandLeft(G));rr+=qb.revenue;nn+=qb.count;}toast('Sold '+nn+' shrimp for '+aed(rr));}bump(b);}
     if(a==='matchprice'){psNote('tw','price');G.priceAED=null;G.price=1;syncControls();}
     if(a==='buy'){var bt=T,first=!anyHad();if(RV()){bt=G.tanks[0];G.tanks.forEach(function(t){if(totalN(t)<totalN(bt))bt=t;});}if(buyPack(G,bt,+b.dataset.i)){toast('Added '+PACKS[+b.dataset.i].name+' to '+bt.name+(first?'. Time is running at 1×, they eat, grow and breed while it runs.':''));if(first){G.opt.pauseTold=1;var pq=ensureProgress(G);pq.nextStory=Math.max(pq.nextStory||0,storyClock(G)+40000);if(SPOT&&SPOT.on)SPOT.prev=1;else if(progressionBlocked(G)||!$('milestone-card').hidden)CARD_HOLD=1;else setSpeed(1);selectTab('tank');}}bump(b);}
     if(a==='order-take'){takeOrder(G);render();}

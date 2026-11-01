@@ -572,6 +572,7 @@ Left from that review, not done:
 - Standard tank and recipe are one Gear row (Pass 188): the first standard tank costs `SOP_COST` more and writes the recipe (`pd(G,'sop')`, `G.recipe`). The sop project row is hidden. Standard tanks open with 3 tanks and kits.
 - Tanks seeded from Tank 1 (`T.seeded`) keep bacteria at their load for their first 30 days with shrimp (`tankRoll`), so a new tank is cycled whatever goes in.
 - From the first farm, Gear is called Farm (`TAB_NAME.up`) and Trade is hidden; the owntank card says so.
+- Police year (Pass 189): while `E.nosale` runs after the first farm (`banSale`), Trade comes back and the business strip has a Sell button. It sells the farms' loose shrimp (`E.rawShrimp`, `banSell`) at Tank 1's price inside the weekly buyers; farms keep about two weeks of buyers in loose shrimp. When the ban ends a news line says kits are back, and Trade goes again.
 - Kits open after 200 home-bred sales, a second tank (Puti, 1 Nov, Pass 187) and 60 L of tanks with shrimp in them (`KIT_UNLOCK`, `KIT_ROOM`). From 100 sold one loose idea in the ? popup says more tank room is needed; the guide no longer names the route.
 - The opening is slow from the first sale (day ~120) to kits (day ~320) for a player who never buys ads. Worth a look with the bots.
 - The first babies trigger a few spotlights in a row (Colony, Recent events). They could be merged into one.
