@@ -860,7 +860,7 @@ if(!sp.includes("name:'Transit spectroscopy',cost:.2,")||!sp.includes("name:'Orb
 count++;console.log('PASS Pass 175 test costs and fixed panel');
 // Pass 179 (Puti, 31 Oct): Tank 1 on one real-time clock, 3 months from clean to covered, its jobs are the land's. Full checks: tests/shrimp-tank1.cjs
 {const home=require('fs').readFileSync(__dirname+'/../shrimp/home.html','utf8');
-if(!html.includes('var TANK_DAY_MS=2400,TANK_CATCH=30;')||!html.includes('var OWN_DUE=1/3,OWN_FULL=90;')||!html.includes('stepGame(G,0)||progressionBlocked(G))break;}')||!html.includes("var LAND_JOBS={glass:'glass',vac:'vac',sponge:'sponge',trim:'trim',pest:'pests'};"))throw Error('Pass 179: Tank 1 runs 2.4 s a tank day at any speed, 90 days to full, jobs on the land');
+if(!html.includes('var TANK_DAY_MS=2400,TANK_CATCH=30;')||!html.includes('var OWN_DUE=1/3,OWN_FULL=90;')||!html.includes('stepGame(G,0)||progressionBlocked(G))break;}')||!html.includes("var LAND_JOBS={glass:'glass',vac:'vac',sponge:'sponge',trim:'trim',pest:'pests',scape:'scape'};"))throw Error('Pass 179: Tank 1 runs 2.4 s a tank day at any speed, 90 days to full, jobs on the land');
 if(!home.includes("TOYS.push({id:'glass'")||!home.includes("var busy=jobOpen();")||!home.includes("name==='wipe'"))throw Error('Pass 179: the land has the glass wipe and leaves a job alone');
 count++;console.log('PASS Pass 179 one clock, one tank, slower mess');}
 // Pass 181 (Puti, 1 Nov): no wind on the land, one mute, the land banner never for the win. Full checks: tests/shrimp-land-audio.cjs
@@ -890,3 +890,5 @@ console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
 // Pass 196 (Puti, 1 Nov): after Start over, a built land from the old game can be bought back for AED 300k plus AED 100 a built thing.
 if(!html.includes('data-act="gplace-old"')||!html.includes('return 300000+100*o.n;')||!html.includes("localStorage.setItem('shrimp-land-old'"))throw Error('Old built land should be offered back after Start over');
+// Pass 200 (Puti, 1 Nov): Your tank reads the same on both pages: the land's tiles and lines, Wellbeing, Food and water. Browser check: tests/shrimp-yourtank.cjs
+if(!html.includes('function ownLines(G)')||!html.includes('id="owncare"')||!html.includes('id="wellcard"')||!html.includes("o0.lines=ownLines(G);o0.fw=ownFW(G);"))throw Error('Pass 200: Your tank the same on the company page and the land');

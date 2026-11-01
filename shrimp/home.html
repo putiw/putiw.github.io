@@ -193,6 +193,9 @@ body.locked .tabs{z-index:42}
 .bent b{white-space:normal;line-height:1.2;overflow:visible;text-overflow:clip}
 
 .tv.fadein{animation:tvIn .28s ease-out}@keyframes tvIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}@media(prefers-reduced-motion:reduce){.tv.fadein{animation:none}}
+/* Pass 200: Food and water for Your tank, the same as the company page */
+.fw-h{margin:8px 0 5px;font-size:13px}.fw-h:first-child{margin-top:0}.fw-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.fw-b{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5px 4px;min-height:58px;text-align:center;min-width:0}.fw-b b{font:600 12.5px/1.2 var(--font-body);max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal}.fw-b small{font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.fw-b.on{background:var(--accent,#2f6b3a);border-color:var(--accent,#2f6b3a);color:#fff}.fw-w{display:flex;flex-wrap:wrap;gap:6px}
+.fw-ctl{display:grid;grid-template-columns:88px minmax(0,1fr) 48px;align-items:center;gap:8px;margin:4px 0;font-size:13px}.fw-ctl span{text-align:right;font-variant-numeric:tabular-nums}.fw-ctl input{width:100%;accent-color:var(--accent)}
 
 /* ---- Home tab (land.js) ---- */
 .hcard{margin-bottom:8px}
@@ -1317,7 +1320,7 @@ var tankMod={name:'tank',
   var tbx=$('toybtns');if(tbx&&tbx._h!==jb){tbx.innerHTML=jb;tbx._h=jb;tbx.querySelectorAll('canvas[data-icon]').forEach(function(cv){var t=TOYS.find(function(z){return z.id===cv.dataset.icon;});var x=fitCanvas(cv,28,22);cv.style.width='28px';cv.style.height='22px';t.icon(x,28,22);});}
   if($('jobnone'))$('jobnone').hidden=true;
   // wellbeing: one bar and a word; the parts are behind ?
-  if(scoreMode()){var wb=wellbeing(T),wt=wb.total,low=wt<50,open=!!TV.wbHelp;
+  if(scoreMode()||T.own){var wb=wellbeing(T),wt=wb.total,low=wt<50,open=!!TV.wbHelp;
    var bar='<div class="wbar"><i style="width:'+wt+'%;background:'+(wt>=75?'#2f7a45':wt>=50?'#7d9b53':'#b23a2e')+'"></i><b style="left:50%"></b></div>';
    var help='<div class="helpbox" id="wb-help"'+(open?'':' hidden')+'><div class="chips">'+wb.parts.map(function(q){var f=q[1]/q[2];return '<span class="chip '+(f>=0.75?'ok':low&&f<0.4?'bad':'warn')+'">'+q[0]+' '+q[1]+'/'+q[2]+'</span>';}).join('')+'</div><p>About 50 is enough. Under 50 they breed slower and more babies die; above it they get happier and busier.</p></div>';
    side+=card('wb','Wellbeing',wt+' · '+moodOf(wt),bar+help+(low?'<p class="hint">The jobs above bring it back up.</p>':''),'<button class="qhelp" data-wbhelp aria-expanded="'+open+'" aria-label="What goes into it">?</button>');}
@@ -1325,6 +1328,7 @@ var tankMod={name:'tank',
    '<span class="chip '+(no>40?'bad':no>20?'warn':'ok')+'">Nitrate '+no+' ppm</span>'+(nh>0.05?'<span class="chip bad">Ammonia '+nh.toFixed(2)+'</span>':'<span class="chip ok">Ammonia 0</span>')+
    '<span class="chip '+(T.flow<0.35?'bad':T.flow<0.55?'warn':'ok')+'">Filter '+Math.round(T.flow*100)+'%</span><span class="chip '+(mulmMean(T)>0.65?'bad':mulmMean(T)>0.4?'warn':'ok')+'">Gravel '+(mulmMean(T)>0.65?'very dirty':mulmMean(T)>0.4?'dirty':mulmMean(T)>0.2?'a bit dirty':'clean')+'</span></div>'+
    (no>40?'<p class="hint">High nitrate slows breeding. The vacuum changes water as it cleans.</p>':'')+(nh>0.3?'<p class="hint">Ammonia is up. The filter bacteria are recovering.</p>':''));}
+  if(T.own&&typeof ownFWCard==='function')side+=ownFWCard(card);   // Pass 200: Food and water, the same card as the company page
   // colony
   var c=tankCounts(T),cb='<p class="hint" style="margin:0 0 6px">'+c.adults+' adults · '+(c.young+c.babies)+' young'+(c.berried?' · '+c.berried+' carrying eggs':'')+'</p>';
   var groups=Object.keys(c.by).map(function(k){return c.by[k];}).sort(function(a,b){return b.n-a.n||lineRank(a.col)-lineRank(b.col);});
@@ -4182,7 +4186,7 @@ if(typeof toyEnd==='function'){var _end=toyEnd;toyEnd=function(){var was=!!TOY;v
 // A job the company sent (a care button on its Tank tab) goes back to the company when it's done.
 var FROM_GAME=0,SPONGE_ON=0;
 function jobBegin(T){if(T!==ownT())return;try{LAST=ownVals(T);}catch(e){}post({type:'busy',on:1});}
-function jobDone(){try{report();}catch(e){}post({type:'busy',on:0});GLS=null;if(FROM_GAME){FROM_GAME=0;setTimeout(function(){try{LAND.settle();}catch(e){}save(true);post({type:'back'});},350);}}
+function jobDone(){try{report();}catch(e){}post({type:'busy',on:0,sc:ownT()?ownT().scape.length:null});GLS=null;if(FROM_GAME){FROM_GAME=0;setTimeout(function(){try{LAND.settle();}catch(e){}save(true);post({type:'back'});},350);}}
 var _ts=toyStart;toyStart=function(id){var T=S.tanks[S.sel];if(id==='glass'){if(TOY)toyEnd();if(T!==ownT()||!OWN||!OWN.glass)return;closeBubble();jobBegin(T);TOY=glassToy(T);TOY.id=id;TOY.T=T;hold();lockOn();TOY.start();tankMod.renderSide();return;}
   if(id==='sponge'){jobBegin(T);SPONGE_ON=T===ownT()?1:0;return _ts.apply(this,arguments);}
   var r=_ts.apply(this,arguments);if(TOY)jobBegin(T);return r;};
@@ -4233,8 +4237,31 @@ var _boot=boot;boot=function(data){quiet=1;try{_boot(data);}finally{quiet=0;}
   // Pass 194: Start over in the game keeps the player's colors and the things they drew (pal, made), nothing they built.
   try{var kp=JSON.parse(localStorage.getItem('shrimp-land-keep')||'null');if(kp){localStorage.removeItem('shrimp-land-keep');if(kp.pal)S.land.pal=kp.pal;if(Array.isArray(kp.made))S.land.made=kp.made;S.land.skin={};palBuild();mkRegister();save(true);}}catch(e){}
   S.stage=3;
-  setTab(S.tab==='tank'?'tank':'home');updateHeader();save(true);post({type:'ready'});
+  setTab(S.tab==='tank'?'tank':'home');updateHeader();save(true);post({type:'ready'});if(ownT())post({type:'scape',n:ownT().scape.length});
   setInterval(updateHeader,15000);};
+
+// Pass 200 (Puti, 1 Nov): Your tank reads the same here and at the company. The job tiles take the game's state lines
+// (OWN.lines), Wellbeing always shows, and Food and water (food, treats, water readings, automation) comes from the
+// game (OWN.fw); a tap or slider goes back to the game (oact, oset), which owns the tank.
+TOYS.forEach(function(t){var _i=t.idle;t.idle=function(T){if(T&&T.own&&OWN&&OWN.lines&&OWN.lines[t.id])return OWN.lines[t.id];return _i(T);};});
+var FW_DRAG=0;
+function ownFWCard(card){var f=OWN&&OWN.fw;if(!f)return '';var b=function(x,a,d){return '<button type="button" class="btn fw-b'+(x.on?' on':'')+'" data-fw="'+a+'" '+d+(x.dis?' disabled':'')+' aria-pressed="'+!!x.on+'"><b>'+esc(x.n)+'</b><small>'+esc(x.s)+'</small></button>';};
+  var h='<h3 class="fw-h">Food</h3><div class="fw-g">'+f.foods.map(function(x){return b(x,'food','data-i="'+x.i+'"');}).join('')+'</div>';
+  if(f.treats.length)h+='<h3 class="fw-h">Treats</h3><div class="fw-g">'+f.treats.map(function(x){return b(x,x.a,'data-id="'+esc(x.id)+'"');}).join('')+'</div>';
+  h+='<h3 class="fw-h">Water</h3><div class="fw-w">'+f.water.map(function(w){return '<span class="chip '+w[2]+'">'+esc(w[0]+' '+w[1])+'</span>';}).join('')+'</div>';
+  var A=f.auto||{},sl=function(k,lab,v,lo,hi,u){return v==null?'':'<div class="fw-ctl"><label>'+lab+'</label><input type="range" data-fwset="'+k+'" min="'+lo+'" max="'+hi+'" step="1" value="'+v+'"><span>'+v+u+'</span></div>';};
+  var au=sl('autoRation','Auto feed',A.feed,0,300,'%')+sl('autoWCPct','Auto change',A.wc,10,50,'%')+sl('autoWCDays','Every',A.days,2,21,' d');
+  if(au)h+='<h3 class="fw-h">Automation</h3>'+au;
+  var fd=f.foods.filter(function(x){return x.on;})[0];return card('fw','Food and water',fd?esc(fd.n):'',h);}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-fw]');if(!b||b.disabled)return;sfx('click');post({type:'oact',a:b.dataset.fw,i:b.dataset.i!=null?+b.dataset.i:null,id:b.dataset.id||null});});
+document.addEventListener('input',function(e){var t=e.target;if(!t.dataset||!t.dataset.fwset)return;var s=t.nextElementSibling,u=t.dataset.fwset==='autoWCDays'?' d':'%';if(s)s.textContent=t.value+u;});
+document.addEventListener('change',function(e){var t=e.target;if(!t.dataset||!t.dataset.fwset)return;FW_DRAG=0;post({type:'oset',k:t.dataset.fwset,v:+t.value});});
+document.addEventListener('pointerdown',function(e){if(e.target.dataset&&e.target.dataset.fwset)FW_DRAG=1;},true);
+document.addEventListener('pointerup',function(){if(FW_DRAG)setTimeout(function(){FW_DRAG=0;},300);},true);
+(function(){var _rs=tankMod.renderSide;tankMod.renderSide=function(){if(FW_DRAG)return;return _rs.apply(this,arguments);};})();
+
+window.ownFWCard=ownFWCard;
+var FW_SIG='';window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||d.type!=='own'||!OWN||OWN!==d)return;var sg=JSON.stringify([d.fw,d.lines,d.well&&d.well.total,d.due]);if(sg===FW_SIG)return;FW_SIG=sg;if(activeTab==='tank'&&!TOY)tankMod.renderSide();});
 })();
 
 /* ---- main.js ---- */
