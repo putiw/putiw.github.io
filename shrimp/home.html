@@ -591,7 +591,7 @@ function iconCanvas(w,h,draw){return miniCanvas(w,h,draw);}
 var AC=null,MASTER=null,BUS=null,NOISE=null,AMB={},SFX_LOOPS={};
 function sfxUnlock(){if(AC||!S||!S.opt.sound)return;try{var C=window.AudioContext||window.webkitAudioContext;if(!C)return;AC=new C();MASTER=AC.createGain();MASTER.gain.value=0.82;MASTER.connect(AC.destination);BUS=AC.createGain();BUS.gain.value=0.5;BUS.connect(MASTER);
   var len=AC.sampleRate*2,b=AC.createBuffer(1,len,AC.sampleRate),d=b.getChannelData(0);for(var i=0;i<len;i++)d[i]=Math.random()*2-1;NOISE=b;
-  loadAmb('water','water.mp3',0.34);loadAmb('music','music.mp3',0.13);loadCatch();sfxAmbient();}catch(e){AC=null;}}
+  loadAmb('water','water.mp3',0.34);loadAmb('music','music.mp3',0.06);loadCatch();sfxAmbient();}catch(e){AC=null;}}
 // Puti's two catch sounds from Shrimp Tanks; one is picked at random each time a shrimp is netted
 var CATCH=[];
 function loadCatch(){['catch-shrimp-1.mp3','catch-shrimp-2.mp3'].forEach(function(u){try{fetch(u).then(function(r){if(!r.ok)throw 0;return r.arrayBuffer();}).then(function(ab){return new Promise(function(res,rej){AC.decodeAudioData(ab,res,rej);});}).then(function(b){CATCH.push(b);}).catch(function(){});}catch(e){}});}
@@ -600,8 +600,13 @@ function sfxMute(m){$('tb-mute').classList.toggle('muted',m);if(MASTER)MASTER.ga
 function loadAmb(k,url,vol){var a={vol:vol,g:AC.createGain(),src:null,buf:null,on:false};a.g.gain.value=0;a.g.connect(MASTER);AMB[k]=a;
   // next to the page when published as an artifact, or the game's copy when served from the repo
   try{fetch(url).then(function(r){if(r.ok)return r;return fetch('../shrimp/'+url);}).then(function(r){if(!r.ok)throw 0;return r.arrayBuffer();}).then(function(ab){return new Promise(function(res,rej){AC.decodeAudioData(ab,res,rej);});}).then(function(buf){a.buf=buf;sfxAmbient();}).catch(function(){});}catch(e){}}
-function ambSet(k,on){var a=AMB[k];if(!a||!AC)return;if(on&&a.buf&&!a.src){a.src=AC.createBufferSource();a.src.buffer=a.buf;a.src.loop=true;a.src.connect(a.g);a.src.start();}
-  if(a.on===on)return;a.on=on;a.g.gain.cancelScheduledValues(AC.currentTime);a.g.gain.setTargetAtTime(on?a.vol:0,AC.currentTime,k==='water'?1.6:0.8);}
+// Music is quiet background (Pass 194): each pass of the track fades out over 5 s while the next fades in, so the loop
+// point is a slow crossfade, not a jump. Water still loops plainly.
+function ambPlay(a,at,off,fade){var len=Math.max(1,a.buf.duration-off),f=Math.min(fade,len*0.42),src=AC.createBufferSource(),g=AC.createGain();src.buffer=a.buf;src.connect(g);g.connect(a.g);
+  g.gain.setValueAtTime(1e-4,at);g.gain.linearRampToValueAtTime(1,at+f);g.gain.setValueAtTime(1,at+Math.max(f,len-f));g.gain.linearRampToValueAtTime(1e-4,at+len);src.start(at,off,len);src.stop(at+len+0.05);return len;}
+function ambLoop(a,fade){var at=AC.currentTime+0.05,off=0;var tick=function(){if(!a.src)return;while(at<AC.currentTime+8){var len=ambPlay(a,at,off,fade);at+=Math.max(1,len-fade);off=0;}a.src.t=setTimeout(tick,1500);};a.src={t:0};tick();}
+function ambSet(k,on){var a=AMB[k];if(!a||!AC)return;if(on&&a.buf&&!a.src){if(k==='music')ambLoop(a,5);else{a.src=AC.createBufferSource();a.src.buffer=a.buf;a.src.loop=true;a.src.connect(a.g);a.src.start();}}
+  if(a.on===on)return;a.on=on;a.g.gain.cancelScheduledValues(AC.currentTime);a.g.gain.setTargetAtTime(on?a.vol:0,AC.currentTime,k==='water'?1.6:2.5);}
 function sfxAmbient(){if(!AC||!S)return;var vis=!document.hidden&&!window.LAND_HID;ambSet('water',vis&&activeTab==='tank');ambSet('music',vis);}
 function env(g,t,a,peak,d){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+a+d);}
 function noiseSrc(){var s=AC.createBufferSource();s.buffer=NOISE;s.loop=true;s.playbackRate.value=0.8+Math.random()*0.4;return s;}
@@ -4223,6 +4228,8 @@ var _boot=boot;boot=function(data){quiet=1;try{_boot(data);}finally{quiet=0;}
   S.seen.hello=1;S.seen.cash1m=1;S.speed=1;S.opt.company='none';
   if(!S.land||!S.land.fresh){var c=S.cash;window.landFresh();S.cash=c;}
   else if(window.landOwnTank())save(true);
+  // Pass 194: Start over in the game keeps the player's colours and the things they drew (pal, made), nothing they built.
+  try{var kp=JSON.parse(localStorage.getItem('shrimp-land-keep')||'null');if(kp){localStorage.removeItem('shrimp-land-keep');if(kp.pal)S.land.pal=kp.pal;if(Array.isArray(kp.made))S.land.made=kp.made;S.land.skin={};palBuild();mkRegister();save(true);}}catch(e){}
   S.stage=3;
   setTab(S.tab==='tank'?'tank':'home');updateHeader();save(true);post({type:'ready'});
   setInterval(updateHeader,15000);};

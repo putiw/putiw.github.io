@@ -66,6 +66,6 @@ module.exports=async function(ok){
  const q=await b.newPage({viewport:{width:390,height:844}});await q.goto(url);await wait(600);
  const bs=await q.evaluate(()=>{G=newGame();G.progress.seen.intro=true;G.progress.queue=[];window.spotlight=function(){};var T=G.tanks[0];T.had=1;T.cycledAt=0;T.pop=[];G.money=500;selectTab('tank');render();careRow();
   var b=document.getElementById('tv-check'),r0=b.getBoundingClientRect(),l0=b.textContent.trim(),dis=b.disabled,vis=b.style.visibility;b.click();render();careRow();var r1=b.getBoundingClientRect();
-  return {l0:l0,dis:dis,vis:vis,n:totalN(T),m:G.money,l1:b.textContent.trim(),same:Math.abs(r0.width-r1.width)<1&&Math.abs(r0.left-r1.left)<1};});
+  return {l0:l0,dis:dis,vis:vis,n:totalN(T),m:G.money,l1:b.textContent.trim(),same:Math.abs(r0.left-r1.left)<1 /* Pass 194: width follows how many buttons show */};});
  ok(bs.l0==='Buy shrimp'&&!bs.dis&&bs.vis!=='hidden'&&bs.n===5&&bs.m===485&&bs.l1==='Check shrimp'&&bs.same,'empty Tank 1 before the land: Buy shrimp adds 5 for AED 15, then Check shrimp again, same slot ('+JSON.stringify(bs)+')');
  await b.close();srv.close();};
