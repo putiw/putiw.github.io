@@ -1979,3 +1979,20 @@ Replaces open access to the research lines (`grOf`, `grantDay`, `grPick`, `grSki
 Bots: average bot takes a grant every year (applied unless `PROFILE=scientist`), opens a centre when it can, staffs centres fully. Space bot does the same after the win.
 Seed 7: average Earth 6,609 (baseline 6,357), Leave Earth opens 5,921 (baseline 5,996), sci 493 at the win, ending empire_good (was garden_hermit, the Pass 203 model). Space bot passes, Leave Earth opens 7,218 (baseline 4,582): its slow road after a strong cold win is now 13.7 years, was 6.4.
 Test: academy 10 (new: two applicants in two directions, no lines before a centre, the top amount is fair, one a year, a grant starts the lab, same results at 150k and 240k, finds and plain papers both happen, skip, centre after 5 and one per 5, old saves keep lines, curiosity counts the grant), me 50 (research tests open their centres), balance 133, hard 12. Browser 360 and 390: the Fund button stays put on tap, no errors. The grant slider renders small in the Lab card, worth a look.
+
+### Pass 207: the evil route (plan Part 5)
+
+Five dark projects in World, Politics (one per track at a time, Turn it down works as for any dark project). Cold pays now, the bill is a later Times story (`risk`/`sc`), no lecture. Each counts toward `evilActs` through `E.evil`:
+- Pay the port inspectors (word of mouth +2%, bribe), A farm license in the protected bay (farm upkeep −10%, greys the planting map's mud for good), Buy out the capital's shrimp club (ceiling +1%, force), Run a rival out of two regions (ceiling +2%, force), Write the import rules (ceiling +2%, force).
+- Farm feed has a fourth pick, Culls: low-grade shrimp ground into feed, −10% upkeep, wellbeing −12, kin −1 once and an evil act.
+- Dirty investors' money was already there (`wash_offer` and the routes deal, cartel ending).
+Dictator needs means under −0.15 and 2 evil acts (Pass 203). Bots: kind bots, and profile bots with means over −0.5, turn the dark projects down.
+Seed 7: strong cold 2,168 empire_dictator, strong kind 3,058 garden_hermit (was question_prof before Pass 203), average Earth 6,889 empire_good (kind bot no longer buys posters, songs and the rest).
+Test: balance (all five buy and count, bay cuts upkeep, dictator needs two acts, culls lower wellbeing).
+
+### Pass 208: planting trees by hand (plan Part 6)
+
+The Rewilding card has Plant trees on the coast hills (`plSheet`): a fixed 48×36 bird's-eye map (`plGround`: sea, river, coastal mud, soil, rock outcrops), a bag of 50 seedlings for 0.2 days of income (`plCost`), one tap one seedling. No rules in text: a year after planting each lives or dies (`plOdds`: rock 0, mud 75%, soil by water 80%, other soil 50%, −25% for each neighbor). Living trees seed a free neighbor 10% a year (not counted as yours). The bay license greys the mud. Saved as `E.pl.t` [x, y, day, state, self-seeded], capped at 1,500.
+The stream ending now also needs 100 of your planted trees living (`PL_OWN`, `streamReady`). Whether the stream gets a hint stays Puti's call.
+Browser 360 and 390: canvas and sheet keep their place and size on six taps and a bag, no errors.
+Test: balance 135 (bag, no planting in water, one per spot, rock dies, water helps, neighbors choke, patches spread and aren't yours, bay greys mud, stream gate).

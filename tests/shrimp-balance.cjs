@@ -885,6 +885,26 @@ fwOf(g).s=0.5;if(!(sickKitRate(g)<k0))throw Error('Happy farms send out fewer si
 var h=newGame();h.ps.fw=[60,60];if(!(playVal(h,'kin')>0.9))throw Error('Kin reads the farm setting held '+playVal(h,'kin'));h.ps.fw=[0,60];if(playVal(h,'kin')!==0)throw Error('Default farm is neutral kin');
 var q=readyGame();q.emp.farms={barn:1};q.money=1e9;q.ps=q.ps||{};fwOf(q).s=0.5;fwOf(q).f=2;for(var i=0;i<40;i++){q.progress.queue=[];stepGame(q);}if(!(q.ps.fw&&q.ps.fw[1]>0&&q.ps.fw[0]>0)&&q.emp.prod>0)throw Error('Farm days add to the held setting '+JSON.stringify(q.ps.fw));
 `);
+check('Pass 207: the evil route counts as evil acts, and dictator needs them',`
+var g=readyGame();g.money=1e12;g.emp.inf=1e9;g.emp.farms={hatch:1};g.emp.regions=['auh','gcc','eu'];g.humans=2e7;g.emp.proj.farmlic=1;
+['ev_port','ev_bay','ev_club','ev_rival','ev_lobby'].forEach(function(id){if(!buyProj(g,id))throw Error('Buy '+id);});
+if(evilActs(g)<5||!g.emp.evil.bay)throw Error('Acts '+evilActs(g)+' '+JSON.stringify(g.emp.evil));
+var o=farmOverhead(g);delete g.emp.proj.ev_bay;if(!(farmOverhead(g)>o))throw Error('The bay license cuts upkeep');
+var d=newGame();d.tr={drive:8,means:-6};d.emp.evil={bribe:1,force:1};if(endingPick(d)!=='empire_dictator')throw Error('dictator '+endingPick(d));d.emp.evil={bribe:1};if(endingPick(d)!=='empire_hard')throw Error('one act is not enough');
+var f=readyGame();fwOf(f).f=3;if(!(farmWell(f)<FW_MID))throw Error('Culls feed lowers wellbeing');
+`);
+check('Pass 208: planting by hand, ground decides, a year to know, patches spread, 100 for the stream',`
+var g=readyGame();g.emp.trees={rewild:1};g.money=1e9;if(!plOpen(g)||!plBuy(g)||plOf(g).b!==PL_BAG)throw Error('Bag');
+var wet=null,rock=null,water=null,dry=null;for(var x=0;x<PL_W;x++)for(var y=0;y<PL_H;y++){var q=plGround(x,y);if(q===0&&!water)water=[x,y];if(q===3&&!rock)rock=[x,y];if(q===2&&plWet(x,y)&&!wet)wet=[x,y];if(q===2&&!plWet(x,y)&&!dry)dry=[x,y];}
+if(!water||!rock||!wet||!dry)throw Error('The map has water, rock, wet and dry soil');
+if(plPlant(g,water[0],water[1]))throw Error('No planting in water');if(!plPlant(g,rock[0],rock[1])||!plPlant(g,wet[0],wet[1]))throw Error('Plant');if(plPlant(g,wet[0],wet[1]))throw Error('One per spot');
+if(plOdds(g,rock[0],rock[1])!==0||!(plOdds(g,wet[0],wet[1])>plOdds(g,dry[0],dry[1])||plAt(g,dry[0],dry[1])))throw Error('Rock dies, water helps');
+g.day+=366;plDay(g);if(plAt(g,rock[0],rock[1]))throw Error('Rock seedling dead after a year');
+var c=readyGame();c.emp.trees={rewild:1};c.money=1e9;plBuy(c);plPlant(c,wet[0],wet[1]);var n0=plOdds(c,wet[0],wet[1]);plPlant(c,wet[0]+1,wet[1]);if(!(plOdds(c,wet[0],wet[1])<n0))throw Error('Neighbors choke');
+var s=readyGame();s.emp.trees={rewild:1};s.emp.pl={b:0,t:[]};for(var i=0;i<200;i++)s.emp.pl.t.push([i%PL_W,0,0,1,0]);s.day=365*3;var before=s.emp.pl.t.length;for(var k=0;k<20;k++){s.day=365*(3+k);plDay(s);}if(!(s.emp.pl.t.length>before))throw Error('Living patches spread');if(plLiving(s,true)!==200)throw Error('Spread trees are not yours');
+var b=readyGame();b.emp.evil={bay:1};b.emp.trees={rewild:1};b.money=1e9;plBuy(b);var mud=null;for(var x2=0;x2<PL_W&&!mud;x2++)for(var y2=0;y2<PL_H;y2++)if(plGround(x2,y2)===1){mud=[x2,y2];break;}if(plPlant(b,mud[0],mud[1]))throw Error('The bay license greys the mud');
+if(streamReady.toString().indexOf('plLiving(G,true)>=PL_OWN')<0)throw Error('The stream needs 100 of your trees');
+`);
 console.log(count+' focused balance and migration checks passed');
 module.exports={engine,html};
 // Pass 196 (Puti, 1 Nov): after Start over, a built land from the old game can be bought back for AED 300k plus AED 100 a built thing.

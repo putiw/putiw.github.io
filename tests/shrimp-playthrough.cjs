@@ -56,7 +56,7 @@ if(kitsOpen(G)){
   if(best&&(!fc||fc<d*1.5))buyFarm(G,best.id);
   if(fc)note('first farm');
  }
- for(var p of PROJ.filter(p=>p.c==='cult'))if(!pd(G,p.id)&&p.req(G)&&E.inf>=p.i)buyProj(G,p.id);
+ for(var p of PROJ.filter(p=>p.c==='cult'))if(!pd(G,p.id)&&p.req(G)&&E.inf>=p.i){if(p.h<0&&!p.fk&&(BOTPROF?(BOTPROF.means||0)>-0.5:BOTKIND)){projDecline(G,p.id);continue;}buyProj(G,p.id);}// Pass 207: kind turns the dark ones down
  // Choices: the fast player takes the cold answer (BOT_HEART=kind flips it).
  for(var fk in FORK_Q){if(forkDone(G,fk))continue;var opts=forkOpts(fk).filter(p=>p.req(G)).sort((a,b)=>(${process.env.BOT_HEART==='kind'}?b.h-a.h:a.h-b.h));if(BOTPROF)opts.sort((a,b)=>profFork(b)-profFork(a));var pk=opts[0];if(pk&&afford(pm(G,pk))&&E.inf>=pk.i)buyProj(G,pk.id);}
  if(pd(G,'ministry')&&E.op.offer&&!E.op.run&&E.inf>campCost(E.op.n)*4){var cms=E.op.offer.map(function(id){return MSGS.find(function(m){return m.id===id;});}).filter(function(m){return !BOTKIND||(m.h||0)>=0;}).sort(function(a,b){return b.e-a.e;});if(cms[0])runCampaign(G,cms[0].id);}
