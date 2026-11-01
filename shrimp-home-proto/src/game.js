@@ -185,6 +185,7 @@ var _boot=boot;boot=function(data){quiet=1;try{_boot(data);}finally{quiet=0;}
   $('tb-mute').onclick=function(){var m=!gameMuted();try{localStorage.setItem('shrimp-music',m?'0':'1');}catch(e){}S.opt.sound=!m;sfxUnlock();sfxMute(m);save();post({type:'mute',off:m?1:0});};
   S.seen.hello=1;S.seen.cash1m=1;S.speed=1;S.opt.company='none';
   if(!S.land||!S.land.fresh){var c=S.cash;window.landFresh();S.cash=c;}
+  else if(window.landOwnTank())save(true);
   S.stage=3;
   setTab(S.tab==='tank'?'tank':'home');updateHeader();save(true);post({type:'ready'});
   setInterval(updateHeader,15000);};
