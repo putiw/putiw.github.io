@@ -1644,3 +1644,10 @@ Test: balance 127, me 49 (spans from the farm, no-land lines, old saves), tank1 
 Before deploy: bots seed 7: strong cold 2,210 (was 2,215), strong kind 3,197 (3,201), average Earth 6,777 garden_hermit (6,609), no INSOLVENT. Space bot passes. Spotlight sweep 116 all good. Layout scan only the known 2 px win World chart label. Monkey 60 taps at six stages, 360 and 390, clean.
 
 Deployed 1 Nov (Pass 184, main at 0fd958d, BUILD 2026-11-01-playtest-1nov).
+
+## Pass 185: World tab rows, the trap, Tank 1 on the land (1 Nov)
+
+1. World tab, Owners' tanks: the world-bank buy rows (and the care plan fee) moved to the top of the card, above the thriving breakdown, and a row bought there stays in place as a disabled Done until you leave the tab (`OW_KEEP`, cleared in `selectTab`). Before, buying Fishmeal-free kit food added a breakdown line above the rows and dropped the row, so the next button slid in (52 px down at a million owners, 17 px up for Winter kit at the win). BUILD 2026-11-01-world-rows.
+2. Stream trap checked headless: set (AED 20), early check says Nothing yet with the hours left, after 6 real hours it holds 2 to 7 wild shrimp plus a find, Take the shrimp home works. No bug; the wait is real time (`TRAP_MS` 6 h).
+3. Grandma's land starts with Your tank (Tank 1) on her floor beside the armchair (land source `shrimp-proto`, `landOwnTank` in land.js, game.js runs it for old fresh lands). Tapping it opens the Tank tab.
+Test: `shrimp-stable` STABLE_TABS=world 158 clicks, 0 movers (was 3). balance 127, tank1, tank1-browser, land-audio pass. Not run: bots, spotlight sweep, monkey, layout scan.

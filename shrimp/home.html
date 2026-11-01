@@ -3760,7 +3760,16 @@ window.landFresh=function(){ensureLand();S.stage=3;var l=S.land,g=genStage(3),m=
   g.objs=g.objs.filter(function(o){return !(o.tx>=cx-2&&o.tx<=cx+2&&o.ty>=cy-2&&o.ty<=cy+3);});
   g.objs.push(mkObj('armchair',cx,cy,{gm:1}));m.catArea={x:cx-2,y:cy-1,w:5,h:4,back:true};m.start=[cx,cy+3];
   l.oid=l.oid||0;l.stage=3;l.map=m;l.objs=g.objs;l.edits=[];l.v=LAND_V;l.hens=[];l.wild=[];for(var k=0;k<4;k++)l.wild.push(newWild());l.pond=[];l.eggs=[];l.me=null;l.fresh=FRESH_V;
+  delete l.tank0;landOwnTank();
   S.cash=Math.max(S.cash||0,1000000);resetRuntime();save(true);setTab('home');updateHeader();};
+// Your tank (the game's Tank 1) stands on her floor from the start, beside the armchair (Pass 185). Once only: moving
+// it is free, and it can't be removed (it was never built). Old fresh lands get it on the next load.
+window.landOwnTank=function(){var l=S.land;if(!l||!l.map||l.tank0)return false;l.tank0=1;
+  if(l.objs.some(function(o){return o.k==='tank'&&o.i===0;}))return false;
+  var gm=l.objs.filter(function(o){return o.gm;})[0],ax=gm?gm.tx:13,ay=gm?gm.ty:7,o=mkObj('tank',0,0,{fw:2,i:0}),best=null,bd=1e9;
+  for(var y=ay-2;y<=ay+3;y++)for(var x=ax-4;x<=ax+3;x++){if(!canMove(o,x,y))continue;var fl=0;for(var q=0;q<o.fw;q++)if(mget(l.map,x+q,y)===G_FLOOR)fl++;
+    var d=Math.abs(y-(ay-1))*2+Math.abs(x-(ax+1))+(fl===o.fw?0:6);if(d<bd){bd=d;best=[x,y];}}
+  if(!best)return false;o.tx=best[0];o.ty=best[1];l.objs.push(o);resetRuntime();return true;};
 window.landFull=function(){ensureLand();if(S.stage<3||!S.land.map)landSetStage(3);var l=S.land;S.cash=Math.max(S.cash||0,1000000);
   l.pond=FISH.map(function(F){return {kind:F.id,len:F.len[1]};});
   resetRuntime();save(true);setTab('home');updateHeader();};
@@ -4212,6 +4221,7 @@ var _boot=boot;boot=function(data){quiet=1;try{_boot(data);}finally{quiet=0;}
   $('tb-mute').onclick=function(){var m=!gameMuted();try{localStorage.setItem('shrimp-music',m?'0':'1');}catch(e){}S.opt.sound=!m;sfxUnlock();sfxMute(m);save();post({type:'mute',off:m?1:0});};
   S.seen.hello=1;S.seen.cash1m=1;S.speed=1;S.opt.company='none';
   if(!S.land||!S.land.fresh){var c=S.cash;window.landFresh();S.cash=c;}
+  else if(window.landOwnTank())save(true);
   S.stage=3;
   setTab(S.tab==='tank'?'tank':'home');updateHeader();save(true);post({type:'ready'});
   setInterval(updateHeader,15000);};
