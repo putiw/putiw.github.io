@@ -404,7 +404,7 @@ if(STORY_FIRST.indexOf('coin_offer')<0)throw Error('The Shrimpcoin offer should 
 var o=readyGame();o.emp.hard={open:1,goal:'want',picks:{}};migrate(o);if(!o.emp.hard.goalOk||o.emp.hard.at!==HARD.length)throw Error('An old save already in the hard part skips the walk-through');
 var n=readyGame();n.emp.hard={open:1,goal:'home',picks:{}};migrate(n);if(n.emp.hard.goalOk)throw Error('A fresh hard part starts with the goal');
 `);
-if(!html.includes("data-act=\"hard-next\"")||!html.includes("Before the groups, decide what “everyone” means.")||!html.includes("move('lab-card','up',false);")||!html.includes("wrap.hidden=true;$('p-up').appendChild(wrap)")||!html.includes("salesOpen(G)&&!salesDone(G)"))throw Error('Hard part walk-through, no lab certification, no home-tank gear after hatcheries, no idle Sales card');
+if(html.includes("Group '+(at+1)")||!html.includes("The groups open once you decide what “everyone” means.")||!html.includes("move('lab-card','up',false);")||!html.includes("wrap.hidden=true;$('p-up').appendChild(wrap)")||!html.includes("salesOpen(G)&&!salesDone(G)"))throw Error('Hard part walk-through, no lab certification, no home-tank gear after hatcheries, no idle Sales card');
 if(/' of '\+l\.finds\.length\+' found/.test(html))throw Error('Research has no total to find');
 check('one tree a tap, others plant slowly for the coin, research opens Space',`
 var g=readyGame();g.humans=4e9;var C=coinOf(g);C.on=1;C.honest=1;C.price=30;g.money=1e12;
@@ -575,7 +575,7 @@ count++;console.log('PASS Pass 119 card headers and Money sheet');
  if(html.includes("['Adoption ceiling',")||html.includes("['Packed yesterday',"))throw Error('Ceiling lives with Regions, packing numbers with Making kits');}
 count++;console.log('PASS Pass 120 Kits tab in three cards');
 // Pass 121: Ads holds Ads, Shops, Sales staff, Marketing + Campaigns, Regions; World holds Shaping the world, Owners' tanks, the coast card, The Shrimp Times
-if(html.includes('id="c-op"')||!/<div id="e-proj"><\/div>\s*<div id="op-wrap" hidden>/.test(html))throw Error('Campaigns live inside the Marketing development card');
+if(html.includes('id="c-op"')||!/<div id="e-proj"( class="wide")?><\/div>\s*<div id="op-wrap" hidden>/.test(html))throw Error('Campaigns live inside the Marketing development card');
 if(!html.includes("move('c-reg','promote',rv('ereg'))")||!html.includes('<div id="coin-island"></div>'))throw Error('Regions in Ads, Shrimp Island in the coast card');
 if(!html.includes('class="btn adline"')||!html.includes('<details class="store-close"><summary>Close stores</summary>'))throw Error('One-off ads one per row, store closing in a fold');
 count++;console.log('PASS Pass 121 Ads and World tabs');
@@ -777,7 +777,7 @@ ensureProgress(n).seen.nour6=1;if(!/water engineering/.test(nourLines(n)[0]))thr
 var txt=['nour1','nour2','nour3','nour4','nour5','nour6'].map(function(k){var m=MILESTONES[k];return (m.bodyFn?m.bodyFn(n):m.body)+(m.opts?JSON.stringify(m.opts(n)):'');}).join(' ')+GIVE_LOSS.join(' ');
 if(/—/.test(txt))throw Error('No em-dashes');
 `);
-if(!html.includes("$('hard-sales').mhtml=won?'':hardSalesHTML(G,H);")||!html.includes("days since the hard part opened")||!html.includes('id="hard-give"')||!html.includes('Sources: WHO and UNICEF 2025'))throw Error('Pass 166: sales line, give slider and sources in the hard part');
+if(html.includes("hardSalesHTML")||!html.includes('id="hard-give"')||!html.includes('Sources: WHO and UNICEF 2025'))throw Error('Pass 166: sales line, give slider and sources in the hard part');
 for(const src of ['Hutton and Varughese 2016','Financing Electricity Access in Africa','givewell.org','WHO/UNICEF JMP','Tracking SDG 7'])if(!html.includes(src))throw Error('Pass 166: ledger source missing in a comment: '+src);
 count++;console.log('PASS Pass 166 hard part additions in the page');
 check('Pass 168: leaving Earth opens with the hard part and enough science, ends Earth, points buy the ship',`
@@ -856,9 +856,9 @@ count++;console.log('PASS Pass 179 one clock, one tank, slower mess');}
 if(home.includes("sfxLoop('wind')")||home.includes('outdoorAmb')||!home.includes("localStorage.getItem('shrimp-music')==='0'")||!home.includes("if(d.type==='vis')landVis(!!d.on);"))throw Error('Pass 181: land has no wind and shares the mute');
 if(!html.includes("k==='win'||k==='gameover'||LAND.seen[k]")||!html.includes("landPost({type:'vis',on:0});musicResume();")||!html.includes("landPost({type:'mute',off:off?1:0})"))throw Error('Pass 181: banner and audio');
 count++;console.log('PASS Pass 181 land banner, no wind, one mute');}
-check('Pass 183: the hard part is things you watch: weekly orders history, one-line groups, short Nour cards',`
+check('Pass 183: the hard part is things you watch (orders chart removed in Pass 190), one-line groups, short Nour cards',`
 var g=readyGame();g.humans=4.1e9;g.day=3000;var H=hardOf(g);hardDay(g);if(!H.open)throw Error('opens at 4B');
-for(var i=0;i<30;i++){g.day++;hardDay(g);}if(!H.oh||H.oh.length!==5||H.oh[0][0]!==0||H.oh[1][0]!==7)throw Error('one orders point a week: '+JSON.stringify(H.oh));
+for(var i=0;i<30;i++){g.day++;hardDay(g);}if(H.oh)throw Error('no orders history any more (Pass 190)');
 HARD.forEach(function(x){if(x.body.split('. ').length>1||x.body.length>95)throw Error('one sentence per group: '+x.name);});
 var n=readyGame();n.story.miraDay=1;n.emp.hard={open:1,goal:'home',picks:{},day:0};n.day=2000;
 ['nour1','nour2','nour3','nour4','nour5','nour6'].forEach(function(k){var m=MILESTONES[k],t=m.bodyFn?m.bodyFn(n):m.body;if(t.length>230||/\\n/.test(t))throw Error(k+' is longer than two lines: '+t.length);});

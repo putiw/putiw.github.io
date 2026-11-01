@@ -1775,3 +1775,29 @@ Story cards, average bot seed 7 (bot play clock 4 s a game day, so lags here are
 | nour6 | `hard part days, previous Nour card seen` | 6448 | 6229 | 6229 |
 | lastchap | `?` | 6777 | - | 6749 |
 | win | `!!G.emp.won` | 6777 | - | 6749 |
+
+## Pass 191: layout and text (1 Nov, afternoon fixes Part B)
+
+1. Gear: no Show completed. Bought items (and owned treats) go into a closed "Done (n)" fold at the bottom of Equipment. (Shipped in the Pass 190 commit.)
+2. Gear layout:
+   - Tank switch is one row of tank chips (Tank 1, Tank 2 ... All, `upchip`), 32 px, scrolls sideways past about five. Under it one line of what that tank already has (`upHas`: filter name, heater, fan, feeder, water changer, decor), "All have:" for All.
+   - Rows with no main button reserve no description height (`.nob`). Older farms and older packing lines put Sell 1 / Sell n in the right column (`sellCol`, two-line buttons, price under the label).
+   - Prices in row buttons use the short form from AED 10k (`aedS`, applied in `itemHTML`), money and ✦ costs show on two lines (`costB`, `costLabel`), kit extras read "+AED 30/kit". Gala cost moved from the title to the description. Item titles wrap to two lines instead of cutting off; film cuts wrap.
+   - Header covers the strip under the status bar (`.top` box-shadow 80 px up). With the paused pill showing, the page gets 130 px (190 with the guide bar) of bottom padding.
+   - The blank band under the header: not reproduced at 390 on the average bot's year 1 to 15 snapshots (gap 8 px on every tab); Passes 187 and 188 already free the header floor on scroll and on tab change. No change.
+   - Walk at 360 and 390, early, kits, farms, a million, hard part (`trunc` scan): before, 43 cut labels (Sell buttons, ✦ costs, campaign and project titles, film cuts, packing hall titles, +AED a kit); after, none.
+3. Shaping the world and Owners' tanks: descriptions run the full card width under the title, up to 4 lines, ? only past about 170 characters (`.wide`, `ITEM_QLEN`).
+4. Farms header: "AED 146k/d upkeep · 183k shrimp/d", shrimp a day is what the farms made last day (`E.prod`).
+5. Help: Tanks ? said new tanks need cycling or a starter. They start cycled from Tank 1 (`addTank`), text fixed. Read every `HELP` entry against the code (sales +25% each up to 4, kits 8 shrimp 20+ days, packing never takes breeders, QC, feeding): no other false claim found. The Another tank row's "Needs cycling" only shows when no tank is cycled, which is true.
+6. Taps through story cards: while a card is open every sibling up the tree is `inert` (header, tabs, the rest of main; never the land, space, help or spotlight) and a transparent full-screen backdrop (`#ms-shield`) swallows taps (`cardShield`). For 350 ms after a card opens or closes right after a tap, trusted clicks outside the card are dropped (iOS ghost click, `SHIELD_AT`). Test `tests/shrimp-cardtap.cjs` (touch emulation).
+7. Ending and win cards: the ending text is one column, the buttons sit in a sticky footer row at the bottom of the sheet (`.ms-foot`), normal height. The "read this again from the land" line moved into the text. Win text drops "Done before year ten." (the year follows). The buyout sale works in two taps (Tap again). Test `tests/shrimp-endcards.cjs`: every `ENDINGS` key on the win card, game over closed and sold, left, the buyout offer and the sale, at 360 and 390.
+Test: balance 130, me 49, academy 9, tank1, land-audio, cardtap, endcards 48. `shrimp-stable` farm license, first farm, a million owners on Farm, Kits, Ads, World: 267 clicks, 2 movers, both known (a kit extra row leaving its list, the kit price −).
+
+## Pass 192: the hard part (1 Nov, afternoon fixes Part C)
+
+1. The orders-a-day chart is gone, and its weekly record (`H.oh`, nothing else read it).
+2. Group names sit in a 96 px column left of the grid, one label per block, each block on its own rows, as tall as its rows or its two-line label (`hgLayout`, `hgLabHTML`, `HG_LW`). Short names for Puti to approve: Never met the outside world shows as "Never met anyone", the easy half as "Can buy one", the rest as they are. Under the grid only the state key (has a tank, put there, can get one, on the way).
+3. No step order: no Next, no "Group n of 10". Tap any group, label or block, its options open under the grid. Nothing picked at first: "Tap a group." Until a goal is picked the groups are grey and can't be tapped, and the line says the groups open once you decide what everyone means. The options slot is the tallest group, so a tap moves nothing.
+4. Goals: no button filled before you pick, the current goal has a ✓. Good enough and No number are one option, "Stop counting" (name for Puti to approve, ends the game). Nine in ten and Three in four are gone with their win body, titles, ending style keys and trait pushes. Old saves: a game already won or ended with them, or with Good enough, reads as Stop counting; a running 90% or 75% game moves to Every home that wants one (not to Stop counting, which would end it on load). Bots never picked them.
+5. After the win the grid and the read-only ledger stay (unchanged).
+Test: hard 11 (new: no Next, Tap a group, grey before the goal, no filled goal button, one ✓), balance 130, me 49 (merged goal, migration). Screenshots at 360 and 390 sent to Puti.
