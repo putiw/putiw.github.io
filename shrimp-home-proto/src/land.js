@@ -1598,12 +1598,13 @@ function trapsOn(){return objsOf('trap');}
 function trapMenu(t,wx,wy){var n=trapsOn().length,here=trapsOn().some(function(o){return o.tx===t[0]&&o.ty===t[1];});
   bubAt(wx,wy-14,'<b>The stream</b><div>Wild shrimp live under the stones.</div><div class="btns"><button class="btn primary" data-trap'+(n>=3||here?' disabled':'')+'>'+(n>=3?'Three traps is enough':here?'There’s one here':'Set a shrimp trap · AED 20')+'</button></div>',function(el){var b=el.querySelector('[data-trap]');if(b)b.onclick=function(){if(!spend(20,'a trap'))return;
     var me=L.me,o=mkObj('trap',t[0],t[1],{set:S.day,at:Date.now(),bank:[me.x,me.y-10]});LS().objs.push(o);LS().stats.traps++;sfx('plop');puff('ring',t[0]*T+T/2,t[1]*T+T/2+4,1,{speed:0,life:1});closeBub();
-    if(!LS().seen.trap){LS().seen.trap=1;toast('Check it after a few hours.');}save();};});}
+    if(!LS().seen.trap){LS().seen.trap=1;toast('Check it in about 10 minutes.');}save();};});}
 // traps run on real hours (Pass 151: land days are game days now, and barely move while you're here)
-var TRAP_MS=6*3600e3;function trapLeft(o){return o.at?TRAP_MS-(Date.now()-o.at):(0.25-(S.day-(o.set||0)))*86400e3;}
+// 10 real minutes (Puti, 1 Nov; was 6 hours). Real time, so speeding up the company doesn't fill it faster.
+var TRAP_MS=10*60e3;function trapLeft(o){return o.at?TRAP_MS-(Date.now()-o.at):Math.min(TRAP_MS,(0.25-(S.day-(o.set||0)))*86400e3);}
 function trapReady(o){return trapLeft(o)<=0;}
-function trapTap(o){if(trapReady(o)){openTrap(o);return;}var hrs=Math.max(1,Math.ceil(trapLeft(o)/3600e3));
-  bubAt(o.tx*T+T/2,o.ty*T,'<b>Nothing yet</b><div>Check back in about '+plural(hrs,'hour')+'.</div><div class="btns"><button class="btn" data-out>Take the trap out</button></div>',function(el){el.querySelector('[data-out]').onclick=function(){LS().objs=LS().objs.filter(function(q){return q!==o;});sfx('plop');closeBub();save();};});}
+function trapTap(o){if(trapReady(o)){openTrap(o);return;}var mins=Math.max(1,Math.ceil(trapLeft(o)/60e3));
+  bubAt(o.tx*T+T/2,o.ty*T,'<b>Nothing yet</b><div>Check back in about '+plural(mins,'minute')+'.</div><div class="btns"><button class="btn" data-out>Take the trap out</button></div>',function(el){el.querySelector('[data-out]').onclick=function(){LS().objs=LS().objs.filter(function(q){return q!==o;});sfx('plop');closeBub();save();};});}
 function rollFinds(){var out=[],r=Math.random();if(r<0.12)out.push('crab');else if(r<0.27)out.push('snail');else if(r<0.37)out.push('nymph');else if(r<0.57)out.push('leaf');else if(r<0.6)out.push('bottle');return out;}
 function spriteCanvas(s,scale,w,h){var c=document.createElement('canvas'),d=Math.min(2,window.devicePixelRatio||1);c.width=Math.round(w*d);c.height=Math.round(h*d);c.style.width=w+'px';c.style.height=h+'px';var x=c.getContext('2d');x.imageSmoothingEnabled=false;
   var sw=s.w*scale*d,sh=s.h*scale*d;x.drawImage(s.c,Math.round((c.width-sw)/2),Math.round((c.height-sh)/2),sw,sh);return c;}
@@ -1880,7 +1881,7 @@ function mountHome(){var p=$('p-home');ensureLand();
     '<p><b>Mow:</b> walk over the grass and the mower cuts it. Grandma pays AED 1 a tile, up to 300 a day. Short lawn brings hoopoes.</p>'+
     '<p><b>Grain:</b> tap the ground to throw some. Out on the land, step back and wait. When a wild chicken pecks the grain, tap it and Millie creeps up and catches it.</p>'+
     '<p><b>Rod:</b> tap the stream or the lake. Tap again when the float goes under. Keep the fish in the bucket and tap your pond to let them in.</p>'+
-    '<p><b>Shrimp trap:</b> with Walk, tap the stream. Check it after a few hours.</p>'+
+    '<p><b>Shrimp trap:</b> with Walk, tap the stream. Check it after about 10 minutes.</p>'+
     '<p><b>Build:</b> pick something, then tap where it goes. Drag to look around. Tap a thing you built to take it away.</p>');};
   var tl=$('ltools');tl.innerHTML=toolsHere().map(function(t){return '<button class="tslot" data-tool="'+t.id+'" aria-pressed="false" aria-label="'+t.name+'"><canvas class="ticon" width="22" height="22" data-icon="'+t.id+'"></canvas></button>';}).join('');
   tl.querySelectorAll('canvas[data-icon]').forEach(function(c){var x=c.getContext('2d');x.imageSmoothingEnabled=false;x.drawImage(toolIcon(c.dataset.icon).cv(),0,0);});

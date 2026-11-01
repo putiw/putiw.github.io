@@ -16,7 +16,7 @@ var PROPS=[
  {id:'birds',t:'Bird feeder',d:'Fill it, then sit on the bench or keep still and the birds come closer. Tap one and stay still while the ring fills. It goes in the book.',go:function(){landTry(Math.max(S.stage,0),'walk');}},
  {id:'hens',t:'Chickens and eggs',d:'Hens lay every day. Tap the eggs in the coop to collect them. On the land, throw grain, step back, and tap a wild chicken while it pecks.',go:function(){landTry(Math.max(2,S.stage),'walk');}},
  {id:'fish',t:'Fishing',d:'Tap the stream or the lake to cast. Tap again when the float goes under. Let your fish go in the pond.',go:function(){landTry(3,'rod');}},
- {id:'trap',t:'Shrimp trap in the stream',d:'Tap the stream to set a trap. Come back after a few hours and lift it. Take the wild shrimp home and see what colors they hide.',go:function(){landTry(3,'walk');}},
+ {id:'trap',t:'Shrimp trap in the stream',d:'Tap the stream to set a trap. Come back after about 10 minutes and lift it. Take the wild shrimp home and see what colors they hide.',go:function(){landTry(3,'walk');}},
  {id:'build',t:'Decorate',d:'Place flowers, trees, a bird bath, a bench. Some things bring birds.',go:function(){landTry(Math.max(S.stage,1),'build');}},
  {id:'company',t:'The company runs itself',d:'While you’re at home, the consultants run things. Weekly reports wait in this card, no pop-ups. Or you sold it and retired.',sw:{k:'company',v:[['running','Running'],['sold','Sold']]}},
  {id:'pace',t:'Time',d:'One day is 20 seconds at 1×, and home always runs at 1×. Does it feel slow and calm, or too slow?'},
