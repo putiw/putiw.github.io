@@ -2076,3 +2076,11 @@ Deployed 1 Nov night (Passes 201 to 214, BUILD 2026-11-01-p214). Tests before de
 
 Puti: the hardier line's settling cost is 90% less breeding, not 10%. `farmCap` multiplies by 0.1 while `G.emp.strain` is unsettled (3 to 9 months, hidden); card body and Switch button say 90%. Not deployed (main at Pass 214).
 Test: balance 135.
+
+### Pass 216: hardier line 3 to 6 months at 15%, better survival; empire_hard wording
+
+1. Hardier line: while it settles farm output is 15% (`farmCap` × 0.15) for 90 to 180 days (was 10% for 90 to 270). Kit survival +6 points (`E.q`, cap 0.97, was +2). Card body and Switch button updated.
+2. empire_hard Who: "You stayed inside the written law, used every loophole, and took the cheap way whenever it was legal." replaces the two sentences about cheap and legal.
+Tests: balance 135, me 50, academy 10, profiles (all targets met), cardtap, endcards 50, hard 12, spotlights 103 all good, layout (the known 2 px on win World). Bots seed 7: strong cold 2,194 empire_dictator, strong kind 3,178 garden_hermit, average Earth 7,029 empire_good, Leave Earth 5,908, no INSOLVENT. Not run: stable (no UI change), Space bot.
+
+Deployed 2 Nov (Passes 215 and 216, BUILD 2026-11-02-p216).
