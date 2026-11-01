@@ -410,7 +410,7 @@ main details:not(.card):not(.dream-tracker):not(#next-card)[open]>summary::befor
 #me-hint{margin:8px 0 0}.me-mom p{margin:0 0 10px;font-size:13.5px;line-height:1.45}.me-mbtn{display:grid;gap:6px}
 #land-ov{position:fixed;inset:0;z-index:9000;background:#efe9dc}.voy-pts{margin:4px 0 8px;padding-left:18px}.voy-pts li{margin:3px 0}.voy-step{display:flex;gap:6px;white-space:nowrap}.voy-go{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}body.left-on .tabs,body.left-on #speed{display:none!important}body.left-on #settings,body.left-on #review-box{z-index:9500}#review-box .sheet-in{max-height:88vh;max-height:88dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}#land-ov iframe,#space-ov iframe{border:0;width:100%;height:100%;display:block}#space-ov{position:fixed;inset:0;z-index:9000;background:#04050a}body.space-on{overflow:hidden}body.land-on{overflow:hidden}.me-mbtn .btn{white-space:normal;text-align:left;justify-content:flex-start}
 .me-letters{margin-top:14px}.me-letters>summary{font:600 13.5px var(--font-body);cursor:pointer}.me-letters details{margin:0;border-top:1px solid var(--line);padding:8px 0}.me-letters details>summary{font-size:13px;color:var(--ink-2);cursor:pointer}.me-letters details p{margin:6px 0 0}.me-letters p{font-size:13.5px;line-height:1.5}.me-hist{margin:10px 0 0;padding:0;list-style:none;font-size:13px;line-height:1.45;color:var(--ink-2)}.me-hist li{padding:7px 0 7px 10px;border-left:2px solid var(--line)}.me-hist:empty{display:none}
-.gt-top{margin-bottom:10px}#me-moment .me-mom+.me-mom{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}.gt-last{margin:0 0 10px;font-size:13.5px;line-height:1.45}.me-hist li.gt-miss{color:var(--ink-3)}.gt-years{margin-top:10px}.gt-years summary{font-size:13px;color:var(--ink-2);cursor:pointer}.me-act .ma-n .btn.pick{width:auto;min-width:76px;padding:0 12px;font-size:14px}.me-act .btn.pick.on{background:var(--accent);border-color:transparent;color:var(--accent-ink)}.me-hist li+li{margin-top:2px}
+.gt-top{margin-bottom:10px}#me-moment .me-mom+.me-mom{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}.gt-last{margin:0 0 10px;font-size:13.5px;line-height:1.45}.me-hist li.gt-miss{color:var(--ink-3)}.gt-away{margin:0 0 10px}.gt-away summary{font-size:13.5px;color:var(--ink-2);cursor:pointer}.gt-years{margin-top:10px}.gt-years summary{font-size:13px;color:var(--ink-2);cursor:pointer}.me-act .ma-n .btn.pick{width:auto;min-width:76px;padding:0 12px;font-size:14px}.me-act .btn.pick.on{background:var(--accent);border-color:transparent;color:var(--accent-ink)}.me-hist li+li{margin-top:2px}
 .apop-foot{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);display:flex;justify-content:flex-end}
 /* Pass 111: no one-word last lines on short text, rows that fill their width */
 h1,h2,h3,h4,summary,button,.btn,label,th,.scope-label{text-wrap:balance}p,li,small,td,.hint,.sub{text-wrap:pretty}
@@ -2672,7 +2672,7 @@ var MOMENT_NO={clinic:'Grandma took the bus to the clinic. She said the driver w
 MOMENTS.forEach(function(m){if(MOMENT_NO[m.id])m.nol=MOMENT_NO[m.id];});
 // ----- Grandma's timeline. Her year goes on whether you check on her or not. Everything waits a game month or three
 // minutes of play, whichever is longer, then it happens without you. Only her first birthday rings, after that you remember it.
-var GT_RT=180000,GT_WIN=30,GT_T0=Date.UTC(2026,9,20);
+var GT_RT=180000,GT_WIN=30,GT_CAP=90,GT_MAX=2,GT_T0=Date.UTC(2026,9,20);
 // First day of the lunar year, 2026 to 2070 (MMDD). The big dinner is the evening before.
 var CNY='0217,0206,0126,0213,0203,0123,0211,0131,0219,0208,0128,0215,0204,0124,0212,0201,0122,0210,0130,0217,0206,0126,0214,0202,0123,0211,0201,0219,0208,0128,0215,0204,0124,0212,0202,0121,0209,0129,0217,0205,0126,0214,0203,0123,0211'.split(',');
 var GT_MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -2686,7 +2686,7 @@ function gtOrd(n){var t=n%100,u=n%10;return n+(t>10&&t<14?'th':u===1?'st':u===2?
 function gtGift(){var r=Math.random();return r<0.6?100:r<0.9?150:200;}
 function gtBday(G){return /^\d\d-\d\d$/.test(G.bday||'')?G.bday:'01-01';}
 function gtOf(G){var M=G.me;if(!M.gt)M.gt={q:[],log:(M.hist||[]).map(function(t){return {d:null,t:t,k:'old'};}),mail:[],done:{},there:0,missed:0,no:0,n:0,chk:Math.floor(G.day),chkRt:gtNow(G)};return M.gt;}
-function gtLog(G,t,k,ev){var M=G.me,T=gtOf(G);M.hist.push(t);var L={d:Math.floor(G.day),t:t,k:k};if(ev)L.e=ev;T.log.push(L);if(T.log.length>300)T.log.shift();}
+function gtLog(G,t,k,ev,day){var M=G.me,T=gtOf(G);M.hist.push(t);var L={d:day!=null?day:Math.floor(G.day),t:t,k:k};if(ev)L.e=ev;var i=T.log.length;while(i>0&&T.log[i-1].d!=null&&T.log[i-1].d>L.d)i--;T.log.splice(i,0,L);if(T.log.length>300)T.log.shift();}
 function gtLetters(G){var M=G.me;while((M.letters||0)<Math.floor(M.lt||0)){M.letters=(M.letters||0)+1;var gs=GP_STORY.filter(function(x){return x[0]===M.letters;})[0];if(gs)gtLog(G,gs[1],'story');}}
 // Being there: a visit (a call once you live in the capital), a step toward her next story, and life first (drive-), never care.
 function gtThere(G,visit){var M=G.me,T=gtOf(G);T.there++;if(visit){if(M.moved||visit==='call')M.calls++;else M.visits++;trAdd(G,{drive:-.5});}if(!(M.gpSilent>G.day))M.lt=(M.lt||0)+1;gtLetters(G);if(T.there===12)noteLine(G,'grandma','Grandma says you’re the only one who still visits properly. She’s teaching you her fish soup.');}
@@ -2743,7 +2743,9 @@ function gtText(e,G,it){return typeof e.t==='function'?e.t(G,it):e.t;}
 function gtOpen(G,key,k,due,from,x){var T=gtOf(G),now=Math.floor(G.day);if(T.done[key]||T.q.some(function(it){return it.key===key;}))return;if(now>due){T.done[key]=1;return;}if(now<from)return;
  var it={key:key,k:k,due:due,d0:now,r0:gtNow(G)};for(var i in x)it[i]=x[i];T.q.push(it);if(it.ring&&!G.me.call)G.me.call='gt';}
 function gtShut(G,it){var T=gtOf(G);T.q=T.q.filter(function(x){return x!==it;});T.done[it.key]=1;}
-function gtMiss(G,it){var e=gtEv(it.k),T=gtOf(G);gtShut(G,it);if(!e||!e.miss)return;T.missed++;trAdd(G,{drive:.3});gtLog(G,typeof e.miss==='function'?e.miss(G,it):e.miss,'missed',it.k);}
+function gtMiss(G,it,day){var e=gtEv(it.k),T=gtOf(G);gtShut(G,it);if(!e||!e.miss)return;T.missed++;trAdd(G,{drive:.3});gtLog(G,typeof e.miss==='function'?e.miss(G,it):e.miss,'missed',it.k,day);}
+// At most GT_MAX things that can expire are open: when another opens, the oldest happens without you. stay:1 (the TV, her call) waits on top and is never pushed.
+function gtTrim(G){var T=gtOf(G),o;while((o=T.q.filter(function(x){return !x.stay;})).length>GT_MAX){o.sort(function(a,b){return a.d0-b.d0;});gtMiss(G,o[0]);}}
 function gtDay(G){var M=G.me;if(!M||!M.on)return;var T=gtOf(G),now=Math.floor(G.day),rt=gtNow(G),y=gtDate(now).getUTCFullYear(),b=gtBday(G).split('-');
  [y,y+1].forEach(function(yy){var gb=gtDayOf(yy,5,4);gtOpen(G,'gb'+yy,'gbday',gb,gb-GT_WIN,{age:80+yy-2027,ring:!T.gb1});if(T.q.some(function(it){return it.ring&&it.k==='gbday';}))T.gb1=1;
   var ce=cnyEve(yy);if(ce!=null)gtOpen(G,'ny'+yy,'cny',ce,ce-GT_WIN,{y:yy});
@@ -2751,10 +2753,11 @@ function gtDay(G){var M=G.me;if(!M||!M.on)return;var T=gtOf(G),now=Math.floor(G.
   if(T.boat==='keep'){var sd=gtDayOf(yy,3,20);gtOpen(G,'sail'+yy,'sail',sd+GT_WIN,sd,{});}});
  if(now>=(T.nextEv||0)){var e=GT_EV.filter(function(e){return !T.done[e.id]&&!T.q.some(function(it){return it.key===e.id;})&&e.w(G,now);})[0];if(e){T.q.push({key:e.id,k:e.id,due:now+GT_WIN,d0:now,r0:rt,stay:e.stay});T.nextEv=now+60;}}
  if(!T.called&&now-T.chk>=120&&rt-T.chkRt>=360000){T.called=1;T.q.push({key:'call',k:'call',due:now,d0:now,r0:rt,stay:1,ring:1});if(!M.call)M.call='gt';}
- // A window shuts once its day has passed and three minutes of play have gone by since it opened.
- T.q.slice().forEach(function(it){if(!it.stay&&now>=it.due&&rt-it.r0>=GT_RT)gtMiss(G,it);});}
+ // A window shuts once its day has passed and three minutes of play have gone by since it opened, or GT_CAP game days after it opened at the latest (at 40x three minutes is eight years, Puti 1 Nov).
+ T.q.slice().forEach(function(it){var cap=it.d0+GT_CAP;if(!it.stay&&now>=it.due&&(rt-it.r0>=GT_RT||now>=cap))gtMiss(G,it,now>cap?Math.max(it.due,cap):null);});
+ gtTrim(G);}
 // Checking on her: shows what's waiting, counts as a visit at most every two weeks.
-function gtCheck(G){var M=G.me;if(!M||!M.on||G.voyage)return false;var T=gtOf(G),now=Math.floor(G.day);T.n++;if(now-(T.vis==null?-99:T.vis)>=14){T.vis=now;if(M.moved)M.calls++;else M.visits++;if(!(M.gpSilent>G.day))M.lt=(M.lt||0)+0.25;gtLetters(G);}
+function gtCheck(G){var M=G.me;if(!M||!M.on||G.voyage)return false;gtDay(G);var T=gtOf(G),now=Math.floor(G.day);T.n++;var c0=T.chk==null?-1:T.chk;GT_AWAY=T.log.filter(function(x){return x.k==='missed'&&x.d!=null&&x.d>=c0;});if(now-(T.vis==null?-99:T.vis)>=14){T.vis=now;if(M.moved)M.calls++;else M.visits++;if(!(M.gpSilent>G.day))M.lt=(M.lt||0)+0.25;gtLetters(G);}
  T.chk=now;T.chkRt=gtNow(G);T.q.forEach(function(it){if(it.days==null)it.days=now-it.d0;});if(M.call==='gt')M.call=null;return true;}
 function gtAnswer(G,key,i){var T=gtOf(G),it=T.q.filter(function(x){return x.key===key;})[0],e=it&&gtEv(it.k),o=e&&e.a[i];if(!o)return false;var c=gtCost(o,G);if(c>G.money)return false;if(c)pay(G,c,'personal');
  gtShut(G,it);var t=typeof o[2]==='function'?o[2](G,it):o[2];if(o[3])gtLog(G,t,'there',it.k),gtThere(G,o[3]);else{T.no++;trAdd(G,{drive:.3});gtLog(G,t,'no',it.k);}return t;}
@@ -2772,7 +2775,7 @@ function personalDay(G){var M=G.me;if(!M)return;var now=Math.floor(G.day);
  M.per=7;pickFromOld(M);dayMigrate(M);lifeDay(G);landDay(G);if(now>=M.next){M.next=now+M.per;personalWeek(G);}
  M.nl=M.nl||{};['y'].forEach(function(l){if(!laneOpen(G,l))return;if(M.nl[l]==null)M.nl[l]=now+lanePer(l);if(now>=M.nl[l]){M.nl[l]=now+lanePer(l);personalPeriod(G,l);}});
  var rt=G.ps&&G.ps.t>0?G.ps.t:now*3000;
- if(M.cur&&(rt-M.cur.t>GT_RT&&now-M.cur.d>GT_WIN||now-M.cur.d>400)){var mm=momentById(M.cur.id);M.missed++;trAdd(G,{drive:.3});M.done[M.cur.id]=3;M.cur=null;if(mm&&mm.nol)gtLog(G,mm.nol,'missed');}
+ if(M.cur&&(rt-M.cur.t>GT_RT&&now-M.cur.d>GT_WIN||now-M.cur.d>GT_CAP)){var mm=momentById(M.cur.id);M.missed++;trAdd(G,{drive:.3});M.done[M.cur.id]=3;M.cur=null;if(mm&&mm.nol)gtLog(G,mm.nol,'missed');}
  if(!M.cur&&now>=M.mNext&&rt>=M.mT&&!(M.gpSilent>now)){var c=MOMENTS.filter(function(m){return !M.done[m.id]&&m.req(G);});if(c.length){M.cur={id:c[0].id,t:rt,d:now};M.mNext=now+30;M.mT=rt+180000;}}
  gtDay(G);}
 // Your own tank, after the industrial hatchery. Kept tanks get treats by hand, and happy treats that do nothing but make them happy.
@@ -3742,7 +3745,7 @@ function trim(n,d){return String(+Number(n).toFixed(d));}
 (function(){var vv=window.visualViewport,fix=function(){var a=document.activeElement,typing=!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!/^(range|checkbox|radio|button)$/.test(a.type||''));document.body.classList.toggle('kbd',typing&&!!vv&&vv.height<window.innerHeight*0.8);var t=document.querySelector('.tabs');if(t&&t.style.transform)t.style.transform='';};if(vv){vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);}document.addEventListener('focusin',function(){setTimeout(fix,300);});document.addEventListener('focusout',function(){setTimeout(fix,50);setTimeout(fix,400);});})();
 // No browser feel: no pinch or double-tap zoom, no long-press menu outside text fields.
 (function(){var stop=function(e){e.preventDefault();};['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,stop,{passive:false});});document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea,[contenteditable]')))e.preventDefault();});})();
-var toastT=null,NF=null,BUILD='2026-11-01-p200';
+var toastT=null,NF=null,BUILD='2026-11-01-p201';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
@@ -6040,7 +6043,7 @@ window.addEventListener('message',function(e){var d=e.data,f=$('land-if');if(!d|
 // ----- You: free time and Grandma -----
 var meBack='tank';
 function meWhen(G){return '';}
-var GT_OPEN=0,GT_LAST='',GT_FINE=['Grandma is fine. She says the shrimp look good.','Grandma is fine. She’s watching a cooking show and says it’s wrong.','Grandma is fine. The neighbor’s cat is in her kitchen again.','Grandma is fine. She wants to know if you’re eating.'];
+var GT_OPEN=0,GT_AWAY=[],GT_LAST='',GT_FINE=['Grandma is fine. She says the shrimp look good.','Grandma is fine. She’s watching a cooking show and says it’s wrong.','Grandma is fine. The neighbor’s cat is in her kitchen again.','Grandma is fine. She wants to know if you’re eating.'];
 function renderMe(){var M=G.me,b=$('tb-me');if(!M)return;var pq=G.progress||{},mi=['queue','soon','wait'].some(function(l){return (pq[l]||[]).indexOf('me_intro')>=0;})&&(pq.queue||[])[0]!=='me_intro';b.hidden=!M.on||mi;b.classList.toggle('fresh',!!M.on&&!G.opt.meSeen);b.classList.toggle('ring',!!(M.on&&M.call)&&activeTab!=='me');
  $('tab-tank').hidden=tankGone(G)||!!G.voyage;if(tankGone(G)&&!G.voyage&&activeTab==='tank')selectTab('emp');
  if(ownTank(G)){G.sel=0;$('tankchips').hidden=true;$('ovcard').hidden=true;$('charts').hidden=true;}
@@ -6067,7 +6070,7 @@ function renderMe(){var M=G.me,b=$('tb-me');if(!M)return;var pq=G.progress||{},m
  setT('me-hint',M.moved?'You live in the capital now. Checking on Grandma is a call. Seeing her is the yearly trip home.':'');
  var v=Math.round(M.visits||0),c=Math.round(M.calls||0);setT('me-gsum',!GT_OPEN&&!(M.trip>now)?'':M.trip>now?(M.tripWhy==='boat'?'Away on the coast until ':'Away with Grandma until ')+gtFmt(M.trip):v||c?[v?v+(v===1?' visit':' visits'):'',c?c+(c===1?' call':' calls'):''].filter(Boolean).join(' · '):'');
  if(activeTab!=='me'||G.voyage)GT_OPEN=0;var T=gtOf(G),m=M.cur&&momentById(M.cur.id),mh=G.voyage?'<p class="gt-last">Grandma is asleep on the ship.</p>':'<div class="me-mbtn gt-top"><button class="btn primary'+(M.call?' need':'')+'" data-act="gt-check">Check on Grandma</button></div>';
- if(GT_OPEN){var any=0,its=[];if(GT_LAST)mh+='<p class="gt-last">'+GT_LAST+'</p>';
+ if(GT_OPEN){var any=0,its=[];if(GT_AWAY.length)mh+='<details class="gt-away"><summary>While you were away: '+(GT_AWAY.length===1?'1 thing':GT_AWAY.length+' things')+' happened without you.</summary><ul class="me-hist">'+GT_AWAY.map(function(x){return '<li class="gt-miss"><b>'+gtFmt(x.d)+' '+gtDate(x.d).getUTCFullYear()+'</b> '+x.t+'</li>';}).join('')+'</ul></details>';if(GT_LAST)mh+='<p class="gt-last">'+GT_LAST+'</p>';
   if(M.call==='lesson'){any=1;its.push('<div class="me-mom gp-call"><p><b>Grandma called.</b> “Can I tell you the only thing I know about business? Don’t be scared of growing. Supply is how many shrimp you have and how many kits you can pack. Demand is how many orders come in. Keep those two even and you can grow as big as you like.”</p><div class="me-mbtn"><button class="btn primary" data-act="gp-call-ok">Thanks, Grandma</button></div></div>');}
   if(m){any=1;var yc=m.cost?' · '+aed(m.cost(G)):'';its.push('<div class="me-mom"><p>'+m.t+'</p><div class="me-mbtn"><button class="btn" data-act="mom-yes">'+m.yes+yc+'</button><button class="btn" data-act="mom-no">'+m.no+'</button></div></div>');}
   T.q.forEach(function(it){var e=gtEv(it.k);if(!e)return;any=1;its.push('<div class="me-mom"><p>'+gtText(e,G,it)+'</p><div class="me-mbtn">'+e.a.map(function(o,k){var c=gtCost(o,G);return '<button class="btn" data-act="gt-ans" data-k="'+it.key+'" data-i="'+k+'"'+(c>G.money?' disabled':'')+'>'+o[0]+(c?' · '+aed(c):'')+'</button>';}).join('')+'</div></div>');});

@@ -358,4 +358,17 @@ var h=own();h.day=50;ownTankNow(h);h.stats.careN=3;var d0=h.day;for(var k=0;k<4*
 if(h.stats.ownD<395||!endTankLines(h).length)throw Error('no land still counts and gets lines: '+h.stats.ownD+' '+endTankLines(h));
 var o=own();o.me.keep='self';o.stats.ownD=200;o.stats.ownFrom=1900;delete o.stats.ownCo;migrate(o);if(!o.stats.ownPart||endTankLines(o).length)throw Error('old saves: unsure spans give no lines');
 `);
+check('Grandma at 40x: windows shut by 90 days, never more than 2 open, the TV waits, a check lists what you missed',`
+var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;g.kits.sold=1;g.ps.t=1;personalDay(g);var T=gtOf(g),mx=0,old=0;
+for(var i=0;i<5*365;i++){g.day++;g.ps.t+=60;personalDay(g);mx=Math.max(mx,T.q.filter(function(x){return !x.stay;}).length);T.q.forEach(function(x){if(!x.stay&&g.day-x.d0>GT_CAP+1)old++;});if(i===300)T.q.push({key:'tv',k:'tv',due:g.day+30,d0:Math.floor(g.day),r0:g.ps.t,stay:1});}
+if(mx>GT_MAX)throw Error('open at once: '+mx);if(old)throw Error('items past 90 days: '+old);
+if(!T.q.some(function(x){return x.k==='tv';}))throw Error('The TV waits however long');
+var miss=T.log.filter(function(x){return x.k==='missed';}).length;if(miss<12)throw Error('things happened without you: '+miss);
+gtCheck(g);if(GT_AWAY.length!==miss)throw Error('away list '+GT_AWAY.length+' of '+miss);gtCheck(g);if(GT_AWAY.length)throw Error('second check lists nothing new');
+for(var j=1;j<T.log.length;j++)if(T.log[j].d!=null&&T.log[j-1].d!=null&&T.log[j].d<T.log[j-1].d)throw Error('Her years out of date order');
+var h=newGame();h.me.on=1;h.ps.t=1;var H=gtOf(h);H.q.push({key:'tv',k:'tv',due:60,d0:5,r0:1,stay:1},{key:'a',k:'wechat',due:40,d0:10,r0:1},{key:'b',k:'club',due:50,d0:20,r0:1},{key:'c',k:'dance',due:60,d0:30,r0:1});h.day=30;gtDay(h);
+if(H.q.length!==3||H.q.some(function(x){return x.key==='a';})||!H.q.some(function(x){return x.key==='tv';}))throw Error('the oldest is pushed, never the TV: '+H.q.map(function(x){return x.key;}));
+var o=newGame();o.me.on=1;o.ps.t=1;var O=gtOf(o);O.q.push({key:'gb2027',k:'gbday',due:200,d0:170,r0:1,age:80});o.day=1500;gtDay(o);var L=O.log.filter(function(x){return /turned 80/.test(x.t);})[0];if(!L||L.d!==260)throw Error('old save: missed with the day it would have shut '+JSON.stringify(L));
+var s=newGame();s.me.on=1;s.ps.t=1;var S=gtOf(s);S.q.push({key:'c',k:'club',due:30,d0:0,r0:1});for(var d=1;d<=29;d++){s.day=d;s.ps.t+=2400;gtDay(s);}if(!S.q.length)throw Error('at 1x a window lasts at least a month');
+`);
 console.log(count+' free time, Grandma and ending checks passed');
