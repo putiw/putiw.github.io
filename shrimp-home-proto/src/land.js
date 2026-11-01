@@ -593,7 +593,7 @@ defObj('tallplant',{base:40,name:'Plant',spr:function(o){var pb=new PB(48,112),r
   for(var l=0;l<7;l++){var bx=14+l*3+Math.floor(r()*2),h=46+Math.floor(r()*34),lean=(l-3)*1.6,w=4;for(var s=0;s<h;s++){var xx=Math.round(bx+lean*s/h),ww=s>h-8?Math.max(1,Math.round(w*(h-s)/8)):w;pb.rect(xx,78-s,ww,1,l%2?'#3d9134':PAL.PLANT);pb.set(xx,78-s,'#d9e26a');if(ww>2)pb.set(xx+ww-1,78-s,'#2f6b2a');if(s%7===3&&ww>2)pb.set(xx+1,78-s,'#2f6b2a');}}
   pb.rect(10,76,28,32,PAL.CAB);pb.rect(10,76,28,3,'#5b86a0');pb.rect(10,104,28,4,'#2f4d5c');pb.rect(12,80,3,22,'#5b86a0');pb.rect(33,80,2,24,'#36586a');pb.rect(8,74,32,3,'#5b86a0');
   ink(pb);return mk(pb,24,108);}});
-// -- cream sofa with sage, blue and grey cushions
+// -- cream sofa with sage, blue and gray cushions
 defObj('sofa',{fw:3,base:52,name:'Sofa',spr:function(o){var ys=yardSpr('sofa');if(ys)return ys;var W=192,pb=new PB(W,74),CR=PAL.CREAM,CS='#ddd3bd',CD='#c8bda5';
   pb.rect(10,8,W-20,34,CR);pb.rect(10,8,W-20,3,'#fbf8f0');pb.rect(10,36,W-20,6,CS);
   pb.rect(4,26,W-8,34,CR);pb.rect(4,52,W-8,8,CS);pb.rect(4,58,W-8,2,CD);
@@ -698,10 +698,10 @@ defObj('bench',{fw:2,base:50,name:'Bench',spr:function(o){var W=128,pb=new PB(W,
 defObj('birdbath',{base:56,name:'Bird bath',spr:function(o){var pb=new PB(48,48);shadowPB(pb,24,44,16,3,55);pb.rect(19,18,10,22,'#9badb7');pb.rect(19,18,3,22,'#cbdbfc');pb.rect(26,18,3,22,'#847e87');pb.rect(12,38,24,6,'#847e87');pb.rect(12,38,24,2,'#9badb7');
   pb.ell(24,14,20,7,'#847e87');pb.ell(24,12,20,6,'#9badb7');pb.ell(24,12,16,4,'#5fcde4');pb.rect(18,11,5,1,'#cbdbfc');ink(pb);var s=mk(pb,24,44);s.rim=[[-16,-32],[16,-32]];return s;}});
 defObj('lantern',{base:56,name:'Lantern',spr:function(o){var pb=new PB(24,76);pb.rect(10,22,4,52,'#2a2a2e');pb.rect(5,72,14,3,'#2a2a2e');pb.rect(4,6,16,18,'#2a2a2e');pb.rect(6,9,12,12,'#fbf236');pb.rect(7,10,4,4,'#fff9c8');pb.poly([[3,7],[12,0],[21,7]],'#2a2a2e');ink(pb);return mk(pb,12,74);}});
-// fences join up with their neighbours
+// fences join up with their neighbors
 function fenceMask(o){var ob=LS().objs,m=0;function has(dx,dy){return ob.some(function(p){return (p.k==='fence'||p.k==='gate'||(dy===0&&p.k==='wall'))&&p.tx<=o.tx+dx&&o.tx+dx<p.tx+p.fw&&p.ty===o.ty+dy;});}
   if(has(1,0))m|=1;if(has(-1,0))m|=2;if(has(0,-1))m|=4;if(has(0,1))m|=8;return m;}
-// a made fence (o.v 'c:<id>', Pass 170): the player's 64x96 drawing is one length of fence, so neighbours in a row join edge to edge;
+// a made fence (o.v 'c:<id>', Pass 170): the player's 64x96 drawing is one length of fence, so neighbors in a row join edge to edge;
 // a fence behind it gets the middle of the drawing as its post going back, like the plain fence's rail
 function fenceSkin(pb,id,base){var it=MADE_BY[id];if(!it)return false;var q=madePx(id),W=it.w,H=it.h,y0=base+1-H;
   for(var y=0;y<H;y++)for(var x=0;x<64;x++){var u=q.u[y*W+x];if(u>>>24)pb.d[(y0+y)*pb.w+x]=u;}return true;}
@@ -859,7 +859,7 @@ var FISH=[
  {id:'black-neon-tetra',name:'Black neon tetra',len:[2,4],where:'stream',hint:'A bright line down a black side',w:8},
  {id:'ember-tetra',name:'Ember tetra',len:[1.5,2.5],where:'stream',hint:'Small and orange',w:9},
  {id:'serpae-tetra',name:'Serpae tetra',len:[3,4.5],where:'both',hint:'Red with a black shoulder spot',w:6},
- {id:'black-phantom-tetra',name:'Black phantom tetra',len:[3,4.5],where:'lake',hint:'Grey with a black patch',w:5},
+ {id:'black-phantom-tetra',name:'Black phantom tetra',len:[3,4.5],where:'lake',hint:'Gray with a black patch',w:5},
  {id:'rosy-tetra',name:'Rosy tetra',len:[3,4.5],where:'lake',hint:'Pink with a tall fin',w:5},
  {id:'tricolor-swordtail',name:'Tricolor swordtail',len:[5,8],where:'both',hint:'Rare. Orange, black and white, with a sword',w:1.5},
  {id:'siamese-algae-eater',name:'Siamese algae eater',len:[8,15],where:'stream',hint:'Long, with a black stripe nose to tail',w:3},
@@ -912,7 +912,7 @@ function grandmaPB(f){var pb=new PB(64,86),SK='#ffc2a1',SK2='#f0a888',HA='#c4c7c
   pb.rect(22,54,5,5,SK);pb.rect(37,54,5,5,SK);
   if(f){pb.line(21,48,36,60,'#e8eef8');pb.line(43,48,28,60,'#e8eef8');}else{pb.line(23,46,38,59,'#e8eef8');pb.line(41,46,26,59,'#e8eef8');}
   pb.ell(54,66,5,5,PAL.CORAL);pb.line(51,63,57,69,'#b8695a');pb.line(50,64,57,64,'#b8695a');pb.line(49,64,40,58,PAL.CORAL);
-  // head: grey bob with a bun, face like Millie's
+  // head: gray bob with a bun, face like Millie's
   pb.ell(32,22,14,13,HA);pb.ell(32,7,6,5,HA);pb.ell(30,5,3,2,HH);pb.ell(26,15,6,3,HH);for(var h=0;h<12;h++)pb.set(20+Math.floor(hash2(h,3,8)*24),12+Math.floor(hash2(h,4,8)*20),HD);
   pb.rect(23,18,18,14,SK);pb.rect(24,32,16,2,SK);pb.rect(25,34,14,1,SK);pb.rect(23,18,18,3,HA);pb.rect(23,21,2,4,HA);pb.rect(39,21,2,4,HA);
   pb.set(25,29,SK2);pb.set(26,29,SK2);pb.set(38,29,SK2);pb.set(37,29,SK2);
@@ -1695,7 +1695,7 @@ var BUILD=[
  {k:'bookshelf',name:'Bookshelf',price:150,where:[G_FLOOR],stage:0},
  {k:'armchair',name:'Armchair',price:200,where:[G_FLOOR],stage:0,o:{v:'b'}},
  {k:'lamp',name:'Lamp',price:50,where:[G_FLOOR],stage:0}];
-// ground: paint one tile at a time, or drag to paint a run. The edges against the neighbours are worked out on the fly
+// ground: paint one tile at a time, or drag to paint a run. The edges against the neighbors are worked out on the fly
 var GROUND_ON=[G_GRASS,G_MEADOW,G_DIRT,G_STONE,G_SAND,G_STEP,G_TILE,G_FLOOR,G_WATER];
 [{k:'g-grass',name:'Lawn',edit:G_GRASS,price:2},{k:'g-meadow',name:'Long grass',edit:G_MEADOW,price:2},{k:'g-dirt',name:'Dirt',edit:G_DIRT,price:1},
  {k:'g-sand',name:'Sand',edit:G_SAND,price:3},{k:'g-stone',name:'Stone paving',edit:G_STONE,price:8},{k:'g-floor',name:'Wood deck',edit:G_FLOOR,price:10},

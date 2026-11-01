@@ -69,8 +69,8 @@ function decorSet(T,f){var D={wood:['wood'],plants:['sword','lotus'],moss:['moss
     else{T.scape=T.scape.filter(function(i){if(D[k].indexOf(i.k)<0)return true;delete T.moss[i.id];return false;});if(k==='plants')T.stems=[];if(k==='moss')T.moss={};}});
   if(ch&&typeof TV==='object')TV.L={};}
 // a pest from the game: its kind and place are the game's, its look comes from its seed, so it looks the same every visit
-function gamePest(g,was){var s=g.s>>>0,sn=g.k==='snail',glass=g.y<0.72;if(was&&was.k===(sn?'snail':'planaria')){was.x=g.x;was.y=g.y;was.glass=glass;return was;}
-  return {id:'g'+g.s,k:sn?'snail':'planaria',kind:sn?(s%5?'bladder':'ramshorn'):'',x:g.x,y:g.y,glass:glass,a:(s%628)/100,sz:0.8+(s%41)/100};}
+function gamePest(g,was){var s=g.s>>>0,sn=g.k==='snail',glass=g.y<0.72;if(was&&was.k===(sn?'snail':'planaria')){was.bx=g.x;was.by=g.y;was.gs=s;was.glass=glass;return was;}
+  return {id:'g'+g.s,k:sn?'snail':'planaria',kind:sn?(s%5?'bladder':'ramshorn'):'',x:g.x,y:g.y,bx:g.x,by:g.y,gs:s,glass:glass,a:(s%628)/100,sz:0.8+(s%41)/100};}
 function jobOpen(){return !!(TOY||$('sheet')&&!$('sheet').hidden);}
 function ownVals(T){var sn=0,pl=0;T.pests.forEach(function(p){if(p.k==='snail')sn++;else pl++;});return {mulm:mulmMean(T),flow:T.flow,og:overgrowth(T),sn:sn,pl:pl,no3:T.no3,wc:T.lastWC,dec:JSON.stringify(decorFlags(T))};}
 function applyOwn(T,d){var c=d.care;if(!c)return;var i;
@@ -138,7 +138,7 @@ if(typeof toyEnd==='function'){var _end=toyEnd;toyEnd=function(){var was=!!TOY;v
 // A job the company sent (a care button on its Tank tab) goes back to the company when it's done.
 var FROM_GAME=0,SPONGE_ON=0;
 function jobBegin(T){if(T!==ownT())return;try{LAST=ownVals(T);}catch(e){}post({type:'busy',on:1});}
-function jobDone(){try{report();}catch(e){}post({type:'busy',on:0});GLS=null;if(FROM_GAME){FROM_GAME=0;setTimeout(function(){try{LAND.settle();}catch(e){}save(true);post({type:'back'});},350);}}
+function jobDone(){try{report();}catch(e){}post({type:'busy',on:0,sc:ownT()?ownT().scape.length:null});GLS=null;if(FROM_GAME){FROM_GAME=0;setTimeout(function(){try{LAND.settle();}catch(e){}save(true);post({type:'back'});},350);}}
 var _ts=toyStart;toyStart=function(id){var T=S.tanks[S.sel];if(id==='glass'){if(TOY)toyEnd();if(T!==ownT()||!OWN||!OWN.glass)return;closeBubble();jobBegin(T);TOY=glassToy(T);TOY.id=id;TOY.T=T;hold();lockOn();TOY.start();tankMod.renderSide();return;}
   if(id==='sponge'){jobBegin(T);SPONGE_ON=T===ownT()?1:0;return _ts.apply(this,arguments);}
   var r=_ts.apply(this,arguments);if(TOY)jobBegin(T);return r;};
@@ -186,7 +186,32 @@ var _boot=boot;boot=function(data){quiet=1;try{_boot(data);}finally{quiet=0;}
   S.seen.hello=1;S.seen.cash1m=1;S.speed=1;S.opt.company='none';
   if(!S.land||!S.land.fresh){var c=S.cash;window.landFresh();S.cash=c;}
   else if(window.landOwnTank())save(true);
+  // Pass 194: Start over in the game keeps the player's colors and the things they drew (pal, made), nothing they built.
+  try{var kp=JSON.parse(localStorage.getItem('shrimp-land-keep')||'null');if(kp){localStorage.removeItem('shrimp-land-keep');if(kp.pal)S.land.pal=kp.pal;if(Array.isArray(kp.made))S.land.made=kp.made;S.land.skin={};palBuild();mkRegister();save(true);}}catch(e){}
   S.stage=3;
-  setTab(S.tab==='tank'?'tank':'home');updateHeader();save(true);post({type:'ready'});
+  setTab(S.tab==='tank'?'tank':'home');updateHeader();save(true);post({type:'ready'});if(ownT())post({type:'scape',n:ownT().scape.length});
   setInterval(updateHeader,15000);};
+
+// Pass 200 (Puti, 1 Nov): Your tank reads the same here and at the company. The job tiles take the game's state lines
+// (OWN.lines), Wellbeing always shows, and Food and water (food, treats, water readings, automation) comes from the
+// game (OWN.fw); a tap or slider goes back to the game (oact, oset), which owns the tank.
+TOYS.forEach(function(t){var _i=t.idle;t.idle=function(T){if(T&&T.own&&OWN&&OWN.lines&&OWN.lines[t.id])return OWN.lines[t.id];return _i(T);};});
+var FW_DRAG=0;
+function ownFWCard(card){var f=OWN&&OWN.fw;if(!f)return '';var b=function(x,a,d){return '<button type="button" class="btn fw-b'+(x.on?' on':'')+'" data-fw="'+a+'" '+d+(x.dis?' disabled':'')+' aria-pressed="'+!!x.on+'"><b>'+esc(x.n)+'</b><small>'+esc(x.s)+'</small></button>';};
+  var h='<h3 class="fw-h">Food</h3><div class="fw-g">'+f.foods.map(function(x){return b(x,'food','data-i="'+x.i+'"');}).join('')+'</div>';
+  if(f.treats.length)h+='<h3 class="fw-h">Treats</h3><div class="fw-g">'+f.treats.map(function(x){return b(x,x.a,'data-id="'+esc(x.id)+'"');}).join('')+'</div>';
+  h+='<h3 class="fw-h">Water</h3><div class="fw-w">'+f.water.map(function(w){return '<span class="chip '+w[2]+'">'+esc(w[0]+' '+w[1])+'</span>';}).join('')+'</div>';
+  var A=f.auto||{},sl=function(k,lab,v,lo,hi,u){return v==null?'':'<div class="fw-ctl"><label>'+lab+'</label><input type="range" data-fwset="'+k+'" min="'+lo+'" max="'+hi+'" step="1" value="'+v+'"><span>'+v+u+'</span></div>';};
+  var au=sl('autoRation','Auto feed',A.feed,0,300,'%')+sl('autoWCPct','Auto change',A.wc,10,50,'%')+sl('autoWCDays','Every',A.days,2,21,' d');
+  if(au)h+='<h3 class="fw-h">Automation</h3>'+au;
+  var fd=f.foods.filter(function(x){return x.on;})[0];return card('fw','Food and water',fd?esc(fd.n):'',h);}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-fw]');if(!b||b.disabled)return;sfx('click');post({type:'oact',a:b.dataset.fw,i:b.dataset.i!=null?+b.dataset.i:null,id:b.dataset.id||null});});
+document.addEventListener('input',function(e){var t=e.target;if(!t.dataset||!t.dataset.fwset)return;var s=t.nextElementSibling,u=t.dataset.fwset==='autoWCDays'?' d':'%';if(s)s.textContent=t.value+u;});
+document.addEventListener('change',function(e){var t=e.target;if(!t.dataset||!t.dataset.fwset)return;FW_DRAG=0;post({type:'oset',k:t.dataset.fwset,v:+t.value});});
+document.addEventListener('pointerdown',function(e){if(e.target.dataset&&e.target.dataset.fwset)FW_DRAG=1;},true);
+document.addEventListener('pointerup',function(){if(FW_DRAG)setTimeout(function(){FW_DRAG=0;},300);},true);
+(function(){var _rs=tankMod.renderSide;tankMod.renderSide=function(){if(FW_DRAG)return;return _rs.apply(this,arguments);};})();
+
+window.ownFWCard=ownFWCard;
+var FW_SIG='';window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||d.type!=='own'||!OWN||OWN!==d)return;var sg=JSON.stringify([d.fw,d.lines,d.well&&d.well.total,d.due]);if(sg===FW_SIG)return;FW_SIG=sg;if(activeTab==='tank'&&!TOY)tankMod.renderSide();});
 })();

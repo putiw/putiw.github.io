@@ -194,7 +194,7 @@ function drawPests(x,T,t){var W=TV.W,H=TV.H;T.pests.forEach(function(p){if(!(p.s
   else{var len=11*p.sz*Math.max(1,W/420),ang=p.a;x.save();x.translate(px,py);x.rotate(ang);x.fillStyle='rgba(245,240,232,.92)';x.beginPath();x.moveTo(len/2,0);x.lineTo(len/2-2.6,-1.6);x.quadraticCurveTo(-len/3,-1.6,-len/2,0);x.quadraticCurveTo(-len/3,1.6,len/2-2.6,1.6);x.closePath();x.fill();x.strokeStyle='rgba(120,110,96,.9)';x.lineWidth=0.6;x.stroke();
    x.fillStyle=INK;x.beginPath();x.arc(len/2-2.4,-0.6,0.45,0,6.283);x.arc(len/2-2.4,0.6,0.45,0,6.283);x.fill();x.restore();}});}
 // Physella, the bladder snail: a glossy amber shell that coils to the left, mottled, with a short
-// pointed spire at the back; the grey foot shows in front with two thin feelers.
+// pointed spire at the back; the gray foot shows in front with two thin feelers.
 function drawBladder(x,px,py,r,ang,t){x.save();x.translate(px,py);x.rotate(ang);var w=Math.sin(t*2.2)*0.12;
   x.fillStyle='rgba(120,118,110,.55)';x.beginPath();x.ellipse(r*0.55,0,r*0.95,r*0.42,0,0,6.283);x.fill();
   x.strokeStyle='rgba(90,88,80,.8)';x.lineWidth=0.7;x.beginPath();x.moveTo(r*1.35,-r*0.15);x.quadraticCurveTo(r*1.75,-r*(0.45+w),r*2.0,-r*(0.55+w));x.moveTo(r*1.35,r*0.15);x.quadraticCurveTo(r*1.75,r*(0.45-w),r*2.0,r*(0.55-w));x.stroke();
@@ -207,7 +207,9 @@ function drawBladder(x,px,py,r,ang,t){x.save();x.translate(px,py);x.rotate(ang);
 function drawRamshorn(x,px,py,r,ang){x.save();x.translate(px,py);x.rotate(ang*0.2);x.fillStyle='#8a4a30';x.beginPath();x.arc(0,0,r,0,6.283);x.fill();x.strokeStyle=INK;x.lineWidth=0.9;x.stroke();
   x.strokeStyle='rgba(44,26,16,.7)';x.lineWidth=0.7;x.beginPath();for(var a=0;a<5*Math.PI;a+=0.25){var rr=r*(0.92-a/(5*Math.PI)*0.85);var X=Math.cos(a)*rr,Y=Math.sin(a)*rr;if(a===0)x.moveTo(X,Y);else x.lineTo(X,Y);}x.stroke();
   x.fillStyle='rgba(255,220,190,.35)';x.beginPath();x.arc(-r*0.35,-r*0.4,r*0.25,0,6.283);x.fill();x.restore();}
-function pestsStep(T,dt){var W=TV.W,H=TV.H;T.pests.forEach(function(p){if(p.held)return;var sp=p.k==='snail'?0.006:0.03;p.a+=(Math.random()-0.5)*dt*(p.k==='snail'?0.8:2.4);p.x+=Math.cos(p.a)*sp*dt*(p.glass?1:0.6);p.y+=Math.sin(p.a)*sp*dt*(p.glass?1:0.25)*(W/H);
+// Pass 198 (hand edit, port to shrimp-proto src/tank.js and game.js): the game's pests crawl round their spot on the same path as the company page
+function pestCrawl(s,sn,t){s=s>>>0;var r1=(s%997)/997,r2=(s%613)/613,P=sn?140+r1*80:40+r1*30,w=6.283/P,ph=r2*6.283,A=sn?0.10:0.16,B=sn?0.03:0.05;return [A*Math.sin(w*t+ph),B*Math.sin(w*1.7*t+ph*2),Math.atan2(B*1.7*Math.cos(w*1.7*t+ph*2),A*Math.cos(w*t+ph))];}
+function pestsStep(T,dt){var W=TV.W,H=TV.H;T.pests.forEach(function(p){if(p.held)return;if(p.bx!=null){var c=pestCrawl(p.gs,p.k==='snail',performance.now()/1000);p.x=clamp(p.bx+c[0],0.03,0.97);p.y=clamp(p.by+c[1],0.25,0.97);p.a=c[2];return;}var sp=p.k==='snail'?0.006:0.03;p.a+=(Math.random()-0.5)*dt*(p.k==='snail'?0.8:2.4);p.x+=Math.cos(p.a)*sp*dt*(p.glass?1:0.6);p.y+=Math.sin(p.a)*sp*dt*(p.glass?1:0.25)*(W/H);
   if(p.glass){if(p.y<0.26||p.y>0.72)p.a=-p.a;p.y=clamp(p.y,0.25,0.73);}else{p.y=clamp(p.y,0.77,0.92);}if(p.x<0.04||p.x>0.96)p.a=Math.PI-p.a;p.x=clamp(p.x,0.03,0.97);});}
 function tvLoop(){if(!TV.on)return;requestAnimationFrame(tvLoop);if(!tvSize())return;var now=performance.now(),dt=TV.last?Math.min(0.1,(now-TV.last)/1000):0.016;TV.last=now;
   var live=running()||TOY;if(live){TV.t+=dt;agentsStep(dt);if(TV.T)pestsStep(TV.T,dt);}netStep(dt);holdStep();if(TOY&&TOY.step)TOY.step(dt);tvDraw();}
@@ -319,7 +321,7 @@ var tankMod={name:'tank',
   var tbx=$('toybtns');if(tbx&&tbx._h!==jb){tbx.innerHTML=jb;tbx._h=jb;tbx.querySelectorAll('canvas[data-icon]').forEach(function(cv){var t=TOYS.find(function(z){return z.id===cv.dataset.icon;});var x=fitCanvas(cv,28,22);cv.style.width='28px';cv.style.height='22px';t.icon(x,28,22);});}
   if($('jobnone'))$('jobnone').hidden=true;
   // wellbeing: one bar and a word; the parts are behind ?
-  if(scoreMode()){var wb=wellbeing(T),wt=wb.total,low=wt<50,open=!!TV.wbHelp;
+  if(scoreMode()||T.own){var wb=wellbeing(T),wt=wb.total,low=wt<50,open=!!TV.wbHelp;
    var bar='<div class="wbar"><i style="width:'+wt+'%;background:'+(wt>=75?'#2f7a45':wt>=50?'#7d9b53':'#b23a2e')+'"></i><b style="left:50%"></b></div>';
    var help='<div class="helpbox" id="wb-help"'+(open?'':' hidden')+'><div class="chips">'+wb.parts.map(function(q){var f=q[1]/q[2];return '<span class="chip '+(f>=0.75?'ok':low&&f<0.4?'bad':'warn')+'">'+q[0]+' '+q[1]+'/'+q[2]+'</span>';}).join('')+'</div><p>About 50 is enough. Under 50 they breed slower and more babies die; above it they get happier and busier.</p></div>';
    side+=card('wb','Wellbeing',wt+' · '+moodOf(wt),bar+help+(low?'<p class="hint">The jobs above bring it back up.</p>':''),'<button class="qhelp" data-wbhelp aria-expanded="'+open+'" aria-label="What goes into it">?</button>');}
@@ -327,6 +329,7 @@ var tankMod={name:'tank',
    '<span class="chip '+(no>40?'bad':no>20?'warn':'ok')+'">Nitrate '+no+' ppm</span>'+(nh>0.05?'<span class="chip bad">Ammonia '+nh.toFixed(2)+'</span>':'<span class="chip ok">Ammonia 0</span>')+
    '<span class="chip '+(T.flow<0.35?'bad':T.flow<0.55?'warn':'ok')+'">Filter '+Math.round(T.flow*100)+'%</span><span class="chip '+(mulmMean(T)>0.65?'bad':mulmMean(T)>0.4?'warn':'ok')+'">Gravel '+(mulmMean(T)>0.65?'very dirty':mulmMean(T)>0.4?'dirty':mulmMean(T)>0.2?'a bit dirty':'clean')+'</span></div>'+
    (no>40?'<p class="hint">High nitrate slows breeding. The vacuum changes water as it cleans.</p>':'')+(nh>0.3?'<p class="hint">Ammonia is up. The filter bacteria are recovering.</p>':''));}
+  if(T.own&&typeof ownFWCard==='function')side+=ownFWCard(card);   // Pass 200: Food and water, the same card as the company page
   // colony
   var c=tankCounts(T),cb='<p class="hint" style="margin:0 0 6px">'+c.adults+' adults · '+(c.young+c.babies)+' young'+(c.berried?' · '+c.berried+' carrying eggs':'')+'</p>';
   var groups=Object.keys(c.by).map(function(k){return c.by[k];}).sort(function(a,b){return b.n-a.n||lineRank(a.col)-lineRank(b.col);});
