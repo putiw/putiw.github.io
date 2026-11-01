@@ -62,4 +62,10 @@ module.exports=async function(ok){
  ok(!back.on&&!back.busy&&back.tab==='tank','Done goes back to the company Tank tab ('+JSON.stringify(back)+')');
  const grad=errs.filter(e=>/createLinearGradient|non-finite/i.test(e));ok(grad.length===0,'no non-finite gradient errors ('+grad.length+')');
  const other=errs.filter(e=>!/createLinearGradient|non-finite|Failed to load resource|AudioContext/i.test(e));ok(other.length===0,'no other page errors'+(other.length?': '+other.slice(0,3).join(' | '):''));
+ // Pass 190: an empty Tank 1 before the land: Check shrimp reads Buy shrimp in the same slot and buys 5
+ const q=await b.newPage({viewport:{width:390,height:844}});await q.goto(url);await wait(600);
+ const bs=await q.evaluate(()=>{G=newGame();G.progress.seen.intro=true;G.progress.queue=[];window.spotlight=function(){};var T=G.tanks[0];T.had=1;T.cycledAt=0;T.pop=[];G.money=500;selectTab('tank');render();careRow();
+  var b=document.getElementById('tv-check'),r0=b.getBoundingClientRect(),l0=b.textContent.trim(),dis=b.disabled,vis=b.style.visibility;b.click();render();careRow();var r1=b.getBoundingClientRect();
+  return {l0:l0,dis:dis,vis:vis,n:totalN(T),m:G.money,l1:b.textContent.trim(),same:Math.abs(r0.width-r1.width)<1&&Math.abs(r0.left-r1.left)<1};});
+ ok(bs.l0==='Buy shrimp'&&!bs.dis&&bs.vis!=='hidden'&&bs.n===5&&bs.m===485&&bs.l1==='Check shrimp'&&bs.same,'empty Tank 1 before the land: Buy shrimp adds 5 for AED 15, then Check shrimp again, same slot ('+JSON.stringify(bs)+')');
  await b.close();srv.close();};

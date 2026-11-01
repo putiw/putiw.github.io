@@ -71,10 +71,11 @@ if(buyFarm(g,'rack'))throw Error('Spent working capital');g.money=10000;if(!buyF
 if(farmCap(g)!==1)throw Error('Wrong capacity');if(changeFarm(g,'rack','pause'))throw Error('No pausing farms');var cash=g.money;changeFarm(g,'rack','sell');
 if(g.money<=cash||farmCap(g)||g.emp.farms.rack)throw Error('Sale inconsistent');
 `);
-check('automatic inventory respects reserve, target and zero-demand endgame',`
+check('automatic inventory respects the reserve; farms and packing run whatever the stock (Pass 190)',`
 var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.emp.farms.barn=5;g.emp.inventoryDays=3;g.money=10000;var r=operatingReserve(g);empireDay(g);
-if(g.money<r||g.kits.stock>Math.ceil(3*kitDemand(g)))throw Error('Inventory overspend');
-g.humans=WORLD;g.emp.proj.last=1;g.emp.regions=REGIONS.map(x=>x.id);g.kits.stock=0;empireDay(g);if(g.emp.prod!==0)throw Error('Produced with no demand');
+if(g.money<r)throw Error('Inventory overspend');
+g.humans=WORLD;g.emp.proj.last=1;g.emp.regions=REGIONS.map(x=>x.id);g.kits.stock=0;g.money=1e9;var m0=g.money;empireDay(g);if(!(g.emp.prod>0))throw Error('Farms run whatever the demand (Pass 190)');
+var h=readyGame();h.stats.sold=KIT_UNLOCK;h.emp.kitsOpened=1;h.emp.farms.mhatch=3;h.kits.stock=5e4;h.money=1e9;h.emp.staff.tier=2;h.emp.staff.pack=10;empireDay(h);empireDay(h);if(!(h.emp.prod>0)||!(h.emp.packed>0))throw Error('3 mega hatcheries with 50k in stock: made '+h.emp.prod+' packed '+h.emp.packed);
 `);
 check('manual kits protect actual adult breeder cohorts',`
 var g=readyGame(),t=g.tanks[0];g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.money=1000;t.set.keepL=6/t.vol;t.pop=[{age:100,n:6,g:30},{age:25,n:16,g:90}];
@@ -259,6 +260,17 @@ detectMilestones(g);var w=p.wait.concat(p.queue);if(w.indexOf('mira_teen')<0||p.
 var g2=readyGame(),p2=ensureProgress(g2);g2.day=500;p2.wait=['ev_paper','mira_teen'];p2.at={ev_paper:400,mira_teen:400};p2.queue=[];p2.soon=[];p2.seen.mira_teen=true;detectMilestones(g2);if(p2.wait.concat(p2.queue).indexOf('mira_teen')>=0||(p2.dropped||[]).indexOf('mira_teen')<0)throw Error('Stale Mira card dropped');
 if(miraAge(newGame())!==8||Math.round(miraAge({day:365*3}))!==11)throw Error('Mira is 8 on day 0');
 var g3=readyGame();g3.story.choices={ev_mira:0,bye_sales:0};if(milestoneConditions(g3).mira_bye)throw Error('Mira asks about the packing line only after the packers go');
+`);
+check('fight club: raid fine 20% to 1000% of a month, third raid shuts it (Pass 190)',`
+var g=readyGame();g.emp.fight=1;g.money=1e7;var F=fightOf(g.emp);F.hist=[1000,1000,1000];var r=Math.random,seq;
+var run=function(v){seq=v.slice();Math.random=function(){return seq.length?seq.shift():0.99;};var m0=g.money,t0=F.m;g.emp.fightBan=0;fightNight(g,1);var take=F.m-t0+(F.d===0?F.hist[F.hist.length-1]:0);return m0+Math.max(100,dayIncome(g)*0.6)-g.money;};
+var lo=run([0,0]);if(Math.abs(lo-200)>1)throw Error('low fine '+lo);var hi=run([0,0.9999999]);if(Math.abs(hi-10000)>2)throw Error('high fine '+hi);
+if(g.emp.fightShut)throw Error('two raids do not shut it');run([0,0.5]);Math.random=r;if(!g.emp.fightShut||F.caught!==3)throw Error('third raid shuts it');var m1=g.money;g.emp.fightBan=0;fightNight(g,1);if(g.money!==m1)throw Error('shut means no more nights');
+if(fightLine(g).indexOf('Shut')<0)throw Error('line');
+`);
+check('sold customer data pays AED 10 a new customer as kit income (Pass 190)',`
+var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.kits.stock=5000;g.humans=2e6;g.money=1e7;g.emp.proj.datasell=1;var k0=g.kits.sold;for(var i=0;i<5;i++){g.emp.acc=(g.emp.acc||0)+20;empireDay(g);}
+var k=g.kits.sold-k0;if(!(g.emp.dataAED>0)||Math.abs(g.emp.dataAED-k*DATA_AED)>k*DATA_AED*0.5+1)throw Error('data income '+g.emp.dataAED+' for '+k+' kits');
 `);
 check('a tank seeded from Tank 1 stays cycled for 30 days with shrimp (1 Nov)',`
 var g=readyGame();var t=g.tanks[0];t.had=1;t.cycledAt=0;t.pop=[{age:100,n:40,g:60}];g.money=1e5;if(!addTank(g))throw Error('addTank');var T=g.tanks[1];T.vol=640;T.volTier=VOLS.length-1;T.pop=[{age:100,n:600,g:60}];T.had=1;
