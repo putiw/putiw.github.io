@@ -630,7 +630,7 @@ g.money=0;if(kitHold(g)[0]!==0)throw Error('No cash, no hold');var k=newGame();i
 check('Pass 132: cards wait 15 s of play after the last one, urgent ones do not',`
 var g=newGame();acknowledgeMilestone(g);g.progress.lastAck=null;g.ps={t:100000};g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;detectMilestones(g);if(g.progress.queue[0]!=='sale')throw Error('First card now');
 acknowledgeMilestone(g);g.ps.t+=5000;detectMilestones(g);if(g.progress.queue.length||g.progress.soon[0]!=='kits')throw Error('Second card waits');
-g.ps.t+=11000;detectMilestones(g);if(g.progress.queue[0]!=='kits')throw Error('Second card after 15 s');acknowledgeMilestone(g);
+if(!(g.progress.gap>=10000&&g.progress.gap<=20000))throw Error('Gap 10 to 20 s');g.ps.t+=15000;detectMilestones(g);if(g.progress.queue[0]!=='kits')throw Error('Second card after 20 s');acknowledgeMilestone(g);
 g.ps.t+=1000;g.money=-1e6;g.emp.broke=1;var p=g.progress;p.seen.gameover=false;if(CARD_NOW.indexOf('broke')<0||CARD_NOW.indexOf('gameover')<0)throw Error('Urgent cards skip the gap');
 `);
 if(!html.includes('The babies can be sold at 60 days old'))throw Error('Pass 132: waiting note on the Babies card');
@@ -936,5 +936,16 @@ var f=newGame();f.emp.nfeed={m:'t',s:0};f.day=30;if(nfeedMul(f)!==0)throw Error(
 f.emp.nfeed={m:'r',s:0,bad:1};f.day=20;if(nfeedMul(f)!==0)throw Error('bad rollout stops breeding');f.day=80;if(nfeedMul(f)!==1)throw Error('bad rollout back to old feed');f.emp.nfeed={m:'r',s:0,bad:0};if(nfeedMul(f)!==1.08)throw Error('good rollout boost');
 var w=newGame();w.emp.lock={reg:w.day+365,farm:w.day+90};w.money=1e12;w.kits.sold=1e6;if(buyRegion(w))throw Error('wells: no region for a year');if(heldDays(w,'farm')!==90)throw Error('wells: farm held 3 months');
 var l=newGame();l.ps.t=1e6;l.ps.landMs=1e6;l.ps.landG=1e6;var k0=playVal(l,'kin'),c0=playVal(l,'care');l.ps.landG=0;l.ps.landH=1e6;if(!(k0>playVal(l,'kin'))||!(playVal(l,'care')<(c0==null?0:c0)))throw Error('land time: living things read kin, Grandma reads own people');
+`);
+check('Pass 219 (Puti): burnout bites until you rest, an hour over 8 pays late, facts every 200 to 400 h at least 3 min apart, pop-ups 10 to 20 s after close',`
+var g=newGame();g.me.on=1;g.me.hp=80;g.me.bo=99;g.me.hrs={};g.me.wh=12;g.humans=5e6;g.emp.farms.rack=1;var m0=workMult(g);if(!(m0>1.05))throw Error('an hour over 8 still pays late '+m0);
+g.me.bo=100;lifeDay(g);if(!(g.me.burnt>g.day))throw Error('burnt out');if(workMult(g)!==BURN_MULT||dayHours(g).work!==BURN_H||setWork(g,10))throw Error('half days, orders at 0.6');
+for(var d=0;d<20;d++){g.day++;lifeDay(g);}if(!(g.me.burnt>g.day))throw Error('still burnt out until strain is low');for(var d=0;d<80&&g.me.burnt>g.day;d++){g.day++;lifeDay(g);}if(g.me.burnt>g.day||g.me.bo>=BURN_LIM)throw Error('rest gets you out '+g.me.bo);
+g.me.bo=100;g.day+=30;lifeDay(g);if(g.me.bLim!==BURN_LIM2||storyChoices(g,'me_burnout').length!==1)throw Error('second within a year is longer, no keeping going');
+var f=newGame();f.me.on=1;f.me.hp=80;f.me.bo=0;f.me.hrs={papers:0};f.me.wh=8;f.me.p2=['papers'];f.ps={t:0};var n=0,got=[];for(var d=0;d<3000;d++){f.day++;f.ps.t+=4000;lifeDay(f);}
+var F=f.me.fx;if(!F||!F.n)throw Error('facts come');if(F.n>Math.ceil(9000/200))throw Error('not more than one per 200 h');if(new Set(F.seen).size!==F.seen.length)throw Error('no repeats');
+var f2=newGame();f2.me.on=1;f2.me.hp=80;f2.me.bo=0;f2.me.hrs={papers:5000};f2.me.fx={seen:[],next:0,at:null};f2.ps={t:1000};factDay(f2);f2.me.fx.next=0;f2.ps.t=100000;factDay(f2);if(f2.me.fx.n!==1)throw Error('3 minutes between facts');
+if(FACTS.some(function(x){return /!|colour|behaviour/.test(x[0])||!/[0-9][0-9][0-9][0-9][)][.]$/.test(x[0]);}))throw Error('facts: American spelling, no exclamation, citation in text');
+var c=newGame();introStamp(c);if(!(c.progress.gap>=10000&&c.progress.gap<=20000))throw Error('gap 10 to 20 s');
 `);
 console.log(count+' focused balance and migration checks passed');
