@@ -964,4 +964,9 @@ var h=newGame();h.day=500;h.emp.farms.rack=4;h.emp.strain={u:620};h.money=-20000
 h.emp.kindSaves=2;h.money=-5000;h.emp.brokeSnooze=0;var mc2=milestoneConditions(h);if(!mc2.kindend||mc2.kindsave)throw Error('third time ends it');storyChoose(h,'kindend',0);if(!h.emp.ended)throw Error('game over');
 var n=newGame();n.day=500;n.money=-20000;var mc3=milestoneConditions(n);if(!mc3.broke||mc3.kindsave)throw Error('no kind cost running, the usual card');
 `);
+check('Pass 225 (Puti): bulk order takes the share you set, a choice with no money cost works on low cash, Yes they\u2019ll be happier',`
+var g=newGame();g.kits.stock=1000;g.emp.packed=100;g.korder={n:500,price:10,who:'A school',due:30,offerEnd:7,taken:true,filled:0,pct:0.2};fillKitOrder(g);if(g.korder.filled!==20)throw Error('20% of 100 packed, got '+g.korder.filled);
+var h=newGame();h.kits.sold=400;h.money=1;h.emp.infOn=1;h.emp.inf=100;if(!buyProj(h,'revreal'))throw Error('photos costs only influence, low cash must not block it');
+if(CARDS3.c_letgo.ch[0][0]!=='Yes, they\u2019ll be happier')throw Error('Let them go yes label');
+`);
 console.log(count+' focused balance and migration checks passed');

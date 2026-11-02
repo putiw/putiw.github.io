@@ -2182,3 +2182,16 @@ Puti picked from the test page (https://claude.ai/artifact/SR9SQMnBPnUu7MnP9opXg
 - Land source (`shrimp-proto`, `src/sound.js`, `src/game.js`) edited and rebuilt with `build.py --game`; the fresh build matched the game's home.html before the change.
 - The Shrimp Times card (`ripplecard`) and its first-issue spotlight and news flashes wait until the ripple intro card is closed (`timesReady`). Before, the paper showed as soon as the first issue landed while its intro card was still queued behind others.
 - Checked: browser spy test (first baby, first kit, buy, card each fire once), a real play of all five plus the wipe loop with no errors, Times card hidden while its card is queued and shown after. `shrimp-tank1`, `shrimp-land-audio`, `shrimp-balance` pass. Not heard on a phone yet.
+
+## Pass 225 (3 Nov): Puti's playtest list
+
+- Let them go: Yes is "Yes, they'll be happier".
+- Bulk kit order: a slider "To the order" (0 to 100%, steps of 10, default 60%) sets how much of each day's packing goes to it (`G.korder.pct`, `fillKitOrder`, `koPct`). Text follows it. "Put in N" button (was cut off).
+- Making kits header: when packing waits because stock is full (60 days of orders with farms, the warehouse days before), a fine line under "Packed 0 of N today" says so (`.hfine`). The old body line is gone.
+- ✦ line on the projects card (Kit, Marketing, Equipment development): "✦ about 0 a day this week" when it rounds to zero. It is net influence: each kit sold adds 0.25 ✦ if its shrimp do well and takes 0.75 ✦ if they die, so at 75% kits doing well it is even. The card has a ? now (`HELP['c-proj']`, shows the current share).
+- Shops open once the online shop is bought (was 30 kits). Regions no longer wait for Shops (they need projects and 100 kits, as before).
+- Social media manager: each local ad row has a Repeat box on its own line (`.adrow`, `.adrep`), the Repeat automatically fold is gone.
+- Farm feed: Pellets / Pellets + greens / Varied fresh / Ground culls, cost lines wrap to two lines so nothing is cut at 360 px, Farm feed is tappable and says what each is. The Farms card has a ? (`HELP['c-farms']`). "Kin" removed from the wellbeing help.
+- Header Sell goes once a farm is built, unless sales are banned (police year).
+- Bug: a choice with no money cost (Ask happy owners for photos, ✦ 45) was greyed when cash was under the cash reserve. `okp` and `buyProj` only check cash when the choice costs cash.
+- Checks: `shrimp-balance` (new Pass 225 check), `shrimp-me`; screenshots at 360 px of the bulk order, Making kits header, ad rows and farm feed (tmp only).
