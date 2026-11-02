@@ -2099,3 +2099,11 @@ Profiles (family %, empire/garden/question/network/drift): random 12/26/33/22/7,
 Tests: balance 136 (new: reload keeps later(), Gulf held not rebought, bonus capped, new card pushes in order), me 50, profiles, cardtap, academy 10, tank1.
 
 Deployed 2 Nov (Passes 215 to 217, BUILD 2026-11-02-p217). Before deploy: balance 136, me 50, profiles, cardtap, academy 10, tank1, endcards 50, hard 12, frozen; bots seed 7: strong cold 2,405 empire_dictator, strong kind 3,246 garden_hermit, average Earth 7,001 empire_good, Leave Earth 5,684, no INSOLVENT; Space bot lands, passes; spotlights 103 all good; layout the known 2 px on win World at 360 and 390; stable 13 movers, all bought rows leaving their list (known).
+
+### Pass 218 (in progress): family pairs, retags, careful/bold, new cards, Stream in Garden, land by activity
+
+Plan `claude/shrimp-plan-pairs-2nov.md`. Puti 2 Nov: control merged into risk (careful/bold, keep staff to watch and no chatbot read careful), buying the Times is an evil act, Drift is called Home, loves shrimp is loves living things, Stream is a Garden version, the ocean ranch is a lake pen ranch.
+- Pairs (`node tests/shrimp-pairs.cjs`): before Network–Drift 83, Network–Garden 68, Empire–Garden 62, Empire–Drift 57, Empire–Network 23, Network–Question 9, Garden–Drift 9, Empire–Question 7, Drift–Question 6, Garden–Question 5. Now 89, 68, 67, 58, 28, 11, 13, 8, 7, 8.
+- New cards: c_nydin, c_fair, c_vet, c_price1, c_wells (`E.lock`, `heldDays`), c_feed (`nfeedMul` in `farmCap`), c_budget, c_bare, c_glass, c_kyoto. Grants: one basic or ecology, one applied (`grCands`).
+- Land: home.html posts `act` once a second ('h' near Grandma, 'g' fishing, birds, dog walk, bed, stream); `G.ps.landH` reads own people, `landG` reads kin.
+- Open: `shrimp-balance` drive checks fail (company first 53 up against 37 down, random median +0.057): the retags took life first off seven kind answers. Waiting for Puti to pick life-first cards from the drafts. Everything else passes: balance 137 otherwise, me 50, profiles (all targets), academy 10, cardtap, tank1 sim, land-life, land-audio.
