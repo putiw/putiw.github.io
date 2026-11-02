@@ -2158,3 +2158,5 @@ Puti: if the company runs out of money while a kind answer is still costing it (
   - The body names the reason (`KIND_WHY`). Only the costs show on the buttons, the line after.
 - Two rescues per game (`E.kindSaves`). The third time out of money with a kind cost running is `kindend`: one button, Close the company, the bankruptcy ending (`fallKind`). Out of money without a kind cost is the usual card.
 Tests: balance 140 (new Pass 222 check), me 50, cardtap. Card checked at 390. Not deployed.
+
+Deployed 2 Nov (Pass 222, BUILD 2026-11-02-p222). Before deploy: balance 140, me 50, academy 10, cardtap, profiles, endcards 50. Bots not rerun: the change only acts on out-of-money cards, and the bots stop at the first negative balance (`INSOLVENT`) before any card, so their runs match the Pass 221 deploy.
