@@ -2084,3 +2084,16 @@ Test: balance 135.
 Tests: balance 135, me 50, academy 10, profiles (all targets met), cardtap, endcards 50, hard 12, spotlights 103 all good, layout (the known 2 px on win World). Bots seed 7: strong cold 2,194 empire_dictator, strong kind 3,178 garden_hermit, average Earth 7,029 empire_good, Leave Earth 5,908, no INSOLVENT. Not run: stable (no UI change), Space bot.
 
 Deployed 2 Nov (Passes 215 and 216, BUILD 2026-11-02-p216).
+
+### Pass 217: card questions rebalanced (2 Nov)
+
+Puti asked which cards test curiosity and drift, and whether the questions are balanced. Count of what each decision mainly tests (largest spread across its options), before → after: drive 29 → 30, means 22 → 22, control 10 → 8, kin 10 → 9, care 7 → 9, curiosity 3 → 7, risk 4 → 3 (87 → 91 decisions).
+
+- Curiosity off the nice answer: holiday-proof kit (pain_crash), color the food (dye_offer), buy spares back (c_many). Poster already had none.
+- Test first against ship now: ev_ai gets "Try it on one route for three months first" (a fifth now, the same deal after, retried monthly until paid, `AI_SIGN`, `E.aiFull`); c_strain gets "Test it on one rack for a year, then switch" (six weeks of 85% less breeding after the year); pain_copy "Buy the biggest copycat" becomes "Have a lab test their shrimp and yours, then publish it". Retagged: ev_marine send know .5 / no drive .3 know −.3, ev_paper science know .4, sciacad know .5 care .3. Ship-now sides carry know −.3 so the random chooser stays centred.
+- New cards (company or strangers side listed first): c_wedding (Kiki marries the week of the Gulf launch, go and the Gulf is held two weeks, `E.regWait`), c_play (Mira's school play or the investors' dinner, 10 days of income booked as loans, before day 1100), c_flood (one set of trucks, packers or the town upriver first), c_bonus (a month of income to your people or the hard part, capped at cash).
+- Not done: turning Grandma moments into own-people-against-strangers. A balance check keeps Grandma time out of care, so drift doesn't come from visits alone; the new cards carry it instead.
+- Independent review (two rounds) fixed: `later()` callbacks were lost on reload (all 14, also c_knee); c_knee and the wedding pulled the region, which let the player buy it twice (now `regWait`); one-off loans and investor money inflated `operatingNet` and `dayIncome` for a week (both skip `loans` now); labels state costs; the bonus can't put you in debt.
+
+Profiles (family %, empire/garden/question/network/drift): random 12/26/33/22/7, fair 3/41/34/21/1, cold 27/9/31/30/4, casual 6/37/0/12/45, returning 18/29/18/20/14. All targets met. Drift is still rare for players who only answer cards; it comes mostly from Your day and land time.
+Tests: balance 136 (new: reload keeps later(), Gulf held not rebought, bonus capped, new card pushes in order), me 50, profiles, cardtap, academy 10, tank1.
