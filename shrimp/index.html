@@ -4118,7 +4118,7 @@ function trim(n,d){return String(+Number(n).toFixed(d));}
 (function(){var vv=window.visualViewport,fix=function(){var a=document.activeElement,typing=!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!/^(range|checkbox|radio|button)$/.test(a.type||''));document.body.classList.toggle('kbd',typing&&!!vv&&vv.height<window.innerHeight*0.8);var t=document.querySelector('.tabs');if(t&&t.style.transform)t.style.transform='';};if(vv){vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);}document.addEventListener('focusin',function(){setTimeout(fix,300);});document.addEventListener('focusout',function(){setTimeout(fix,50);setTimeout(fix,400);});})();
 // No browser feel: no pinch or double-tap zoom, no long-press menu outside text fields.
 (function(){var stop=function(e){e.preventDefault();};['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,stop,{passive:false});});document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea,[contenteditable]')))e.preventDefault();});})();
-var toastT=null,NF=null,BUILD='2026-11-03-p227';
+var toastT=null,NF=null,BUILD='2026-11-03-p228';
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
 var MUS={ctx:null,bus:null,loops:[],on:false,bufs:null};
@@ -6393,7 +6393,7 @@ function ownLines(G){var T=G.tanks[0];if(!T)return {};var C=careOf(T),due=ownDue
 var OWN_ORIG=null;
 function ownGrid(own){var el=$('tv-care');if(!el)return;var bs={vac:el.querySelector('[data-care="vac"]'),sponge:el.querySelector('[data-care="sponge"]'),trim:el.querySelector('[data-care="trim"]'),pests:el.querySelector('[data-care="pest"]'),scape:$('tv-scape'),glass:$('tv-clean'),check:$('tv-check')};
  if(!OWN_ORIG){OWN_ORIG={};for(var k0 in bs)OWN_ORIG[k0]=bs[k0].innerHTML;}
- el.classList.toggle('own',!!own);var land=!!own&&landOpen(G);bs.scape.hidden=!land;
+ el.classList.toggle('own',!!own);var land=false;bs.scape.hidden=true;/* Pass 228 (Puti): Check shrimp stays on the company page after the land; Aquascape is on the land */
  if(!own){for(var k1 in bs){if(bs[k1].innerHTML!==OWN_ORIG[k1]&&bs[k1].dataset.oh){bs[k1].innerHTML=OWN_ORIG[k1];delete bs[k1].dataset.oh;}bs[k1].style.order='';bs[k1].classList.remove('need');delete bs[k1].dataset.idle;}return;}
  var L=ownLines(G),due=ownDue(G),dmap={vac:'gravel',sponge:'sponge',trim:'trim',pests:'pests',glass:'glass'},T=G.tanks[0],N=T?Math.round(totalN(T)):0,bm=homeBuyMode(G,T),ord={vac:1,sponge:2,trim:3,pests:4,scape:5,check:5,glass:6};
  var nm={vac:'Vacuum',sponge:'Sponge',trim:'Trim',pests:'Pests',scape:'Aquascape',glass:'Glass'};

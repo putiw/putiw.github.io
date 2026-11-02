@@ -34,9 +34,9 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  await p.evaluate(()=>{document.querySelector('#oc-body [data-act="food"][data-i="2"]').click();});await wait(200);
  ok(await p.evaluate(()=>G.tanks[0].set.food===2),'a food tap on the company page sets the food');
  await p.screenshot({path:path.join(os.tmpdir(),'yt-company-'+W+'.png'),fullPage:true});
- // 2. with the land: Aquascape replaces Check shrimp, the land shows the same tiles and lines
+ // 2. with the land (Pass 228, Puti): the company page keeps Check shrimp, the land has Aquascape in that place
  await setup(true);t=await tiles();
- ok(t.map(x=>x.n).join(',')==='Vacuum,Sponge,Trim,Pests,Aquascape,Glass','with the land: '+t.map(x=>x.n).join(', '));
+ ok(t.map(x=>x.n).join(',')==='Vacuum,Sponge,Trim,Pests,Check shrimp,Glass','with the land: '+t.map(x=>x.n).join(', '));
  const sy=await p.evaluate(()=>scrollY);await p.evaluate(()=>render());
  await p.evaluate(()=>landShow());let f=null;for(let i=0;i<100&&!f;i++){f=p.frames().find(x=>x.url().includes('home.html'));await wait(100);}
  await f.waitForFunction(()=>typeof S!=='undefined'&&S&&S.tanks&&S.tanks[0]&&S.tanks[0].own,null,{timeout:20000});

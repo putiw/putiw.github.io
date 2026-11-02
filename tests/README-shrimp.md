@@ -2214,3 +2214,7 @@ Puti picked from the test page (https://claude.ai/artifact/SR9SQMnBPnUu7MnP9opXg
 - Tests: balance 142 (new check), me 50, tank1, yourtank, land-audio, cardtap. Before this pass on the same build: academy 10, land-life, profiles, pairs, endcards 50, frozen, hard 12, spotlights 103, layout (the known 2 px on win World), Space bot passes. Stable screen stopped part way (Puti interrupted).
 
 Deployed 3 Nov (Passes 223 to 227, BUILD 2026-11-03-p227). Bots seed 7 (Pass 226 build): strong cold won day 2,282 empire_dictator; average Earth day 7,197 question_prof, 41 min waiting; strong kind INSOLVENT day 1,022 (the open hardier line issue from Pass 218; the bots stop at the first negative balance, before Pass 222's help card).
+
+## Pass 228 (3 Nov): Check shrimp stays on the company page after the land
+
+Puti: Tank 1 got sick after the land, and the Check shrimp tile had turned into Aquascape, so there was no way to check them from the company page. The company Tank tab keeps Check shrimp (health check, cull, Buy shrimp when empty) after the land; Aquascape is only on the land, in the same place. Replaces the Pass 200 rule that both pages show the same six tiles. `shrimp-yourtank` updated; browser check: with and without the land, Check shrimp shows and opens the health check. balance, tank1 pass. Deployed with BUILD 2026-11-03-p228.
