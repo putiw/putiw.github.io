@@ -2097,3 +2097,5 @@ Puti asked which cards test curiosity and drift, and whether the questions are b
 
 Profiles (family %, empire/garden/question/network/drift): random 12/26/33/22/7, fair 3/41/34/21/1, cold 27/9/31/30/4, casual 6/37/0/12/45, returning 18/29/18/20/14. All targets met. Drift is still rare for players who only answer cards; it comes mostly from Your day and land time.
 Tests: balance 136 (new: reload keeps later(), Gulf held not rebought, bonus capped, new card pushes in order), me 50, profiles, cardtap, academy 10, tank1.
+
+Deployed 2 Nov (Passes 215 to 217, BUILD 2026-11-02-p217). Before deploy: balance 136, me 50, profiles, cardtap, academy 10, tank1, endcards 50, hard 12, frozen; bots seed 7: strong cold 2,405 empire_dictator, strong kind 3,246 garden_hermit, average Earth 7,001 empire_good, Leave Earth 5,684, no INSOLVENT; Space bot lands, passes; spotlights 103 all good; layout the known 2 px on win World at 360 and 390; stable 13 movers, all bought rows leaving their list (known).
