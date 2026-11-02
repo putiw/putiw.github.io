@@ -140,7 +140,7 @@ if(typeof toyEnd==='function'){var _end=toyEnd;toyEnd=function(){var was=!!TOY;v
 // A job the company sent (a care button on its Tank tab) goes back to the company when it's done.
 var FROM_GAME=0,SPONGE_ON=0;
 function jobBegin(T){if(T!==ownT())return;try{LAST=ownVals(T);}catch(e){}post({type:'busy',on:1});}
-function jobDone(){try{report();}catch(e){}post({type:'busy',on:0,sc:ownT()?ownT().scape.length:null});GLS=null;if(FROM_GAME){FROM_GAME=0;setTimeout(function(){try{LAND.settle();}catch(e){}save(true);post({type:'back'});},350);}}
+function jobDone(){var did=false;try{did=report();}catch(e){}if(did)sfxDone();post({type:'busy',on:0,sc:ownT()?ownT().scape.length:null});GLS=null;if(FROM_GAME){FROM_GAME=0;setTimeout(function(){try{LAND.settle();}catch(e){}save(true);post({type:'back'});},350);}}
 var _ts=toyStart;toyStart=function(id){var T=S.tanks[S.sel];if(id==='glass'){if(TOY)toyEnd();if(T!==ownT()||!OWN||!OWN.glass)return;closeBubble();jobBegin(T);TOY=glassToy(T);TOY.id=id;TOY.T=T;hold();lockOn();TOY.start();tankMod.renderSide();return;}
   if(id==='sponge'){jobBegin(T);SPONGE_ON=T===ownT()?1:0;return _ts.apply(this,arguments);}
   var r=_ts.apply(this,arguments);if(TOY)jobBegin(T);return r;};
