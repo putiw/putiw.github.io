@@ -2160,3 +2160,12 @@ Puti: if the company runs out of money while a kind answer is still costing it (
 Tests: balance 140 (new Pass 222 check), me 50, cardtap. Card checked at 390. Not deployed.
 
 Deployed 2 Nov (Pass 222, BUILD 2026-11-02-p222). Before deploy: balance 140, me 50, academy 10, cardtap, profiles, endcards 50. Bots not rerun: the change only acts on out-of-money cards, and the bots stop at the first negative balance (`INSOLVENT`) before any card, so their runs match the Pass 221 deploy.
+
+## Pass 223 (3 Nov): cycling hint when the ammonia bacteria are full
+
+Puti: with the ammonia bacteria at 100% and ammonia low, the start card said "Ammonia is near zero. Dose again." It should say wait.
+- Ammonia 0.25+: Wait (as before).
+- Ammonia bacteria 100% and nitrite 0.25+: "Wait. The ammonia bacteria are full. The nitrite bacteria are still eating the nitrite."
+- Ammonia bacteria 100% and nitrite near zero too: "Dose again. ... the nitrite bacteria need more nitrite to grow." In the sim the nitrite bacteria only grow while there is nitrite (`bacB` in the cycle step), so a plain Wait there would stall the cycle.
+- Checked in headless Chromium at 390 px, all three texts. `shrimp-tank1` passes.
+- Glass wipe sound: the company page plays the land's wipe loop at full level while the finger is down (`careAt` sets 1), the land scales it with speed. Sound options for the glass and five moments are on a test page for Puti; nothing changed in the game sound yet.
