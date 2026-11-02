@@ -940,12 +940,20 @@ var l=newGame();l.ps.t=1e6;l.ps.landMs=1e6;l.ps.landG=1e6;var k0=playVal(l,'kin'
 check('Pass 219 (Puti): burnout bites until you rest, an hour over 8 pays late, facts every 200 to 400 h at least 3 min apart, pop-ups 10 to 20 s after close',`
 var g=newGame();g.me.on=1;g.me.hp=80;g.me.bo=99;g.me.hrs={};g.me.wh=12;g.humans=5e6;g.emp.farms.rack=1;var m0=workMult(g);if(!(m0>1.05))throw Error('an hour over 8 still pays late '+m0);
 g.me.bo=100;lifeDay(g);if(!(g.me.burnt>g.day))throw Error('burnt out');if(workMult(g)!==BURN_MULT||dayHours(g).work!==BURN_H||setWork(g,10))throw Error('half days, orders at 0.6');
-for(var d=0;d<20;d++){g.day++;lifeDay(g);}if(!(g.me.burnt>g.day))throw Error('still burnt out until strain is low');for(var d=0;d<80&&g.me.burnt>g.day;d++){g.day++;lifeDay(g);}if(g.me.burnt>g.day||g.me.bo>=BURN_LIM)throw Error('rest gets you out '+g.me.bo);
+for(var d=0;d<12;d++){g.day++;lifeDay(g);}if(!(g.me.burnt>g.day))throw Error('still burnt out until strain is low');for(var d=0;d<80&&g.me.burnt>g.day;d++){g.day++;lifeDay(g);}if(g.me.burnt>g.day||g.me.bo>=BURN_LIM)throw Error('rest gets you out '+g.me.bo);
 g.me.bo=100;g.day+=30;lifeDay(g);if(g.me.bLim!==BURN_LIM2||storyChoices(g,'me_burnout').length!==1)throw Error('second within a year is longer, no keeping going');
 var f=newGame();f.me.on=1;f.me.hp=80;f.me.bo=0;f.me.hrs={papers:0};f.me.wh=8;f.me.p2=['papers'];f.ps={t:0};var n=0,got=[];for(var d=0;d<3000;d++){f.day++;f.ps.t+=4000;lifeDay(f);}
 var F=f.me.fx;if(!F||!F.n)throw Error('facts come');if(F.n>Math.ceil(9000/200))throw Error('not more than one per 200 h');if(new Set(F.seen).size!==F.seen.length)throw Error('no repeats');
 var f2=newGame();f2.me.on=1;f2.me.hp=80;f2.me.bo=0;f2.me.hrs={papers:5000};f2.me.fx={seen:[],next:0,at:null};f2.ps={t:1000};factDay(f2);f2.me.fx.next=0;f2.ps.t=100000;factDay(f2);if(f2.me.fx.n!==1)throw Error('3 minutes between facts');
 if(FACTS.some(function(x){return /!|colour|behaviour/.test(x[0])||!/[0-9][0-9][0-9][0-9][)][.]$/.test(x[0]);}))throw Error('facts: American spelling, no exclamation, citation in text');
 var c=newGame();introStamp(c);if(!(c.progress.gap>=10000&&c.progress.gap<=20000))throw Error('gap 10 to 20 s');
+`);
+check('Pass 219 (Puti): rest and getting better, courses finish once and pay, hours held move the traits',`
+var g=newGame();g.me.on=1;g.me.hp=80;g.me.bo=0;g.me.hrs={mba:299};g.me.p2=['mba','hiking'];g.emp.staff.pack=3;var c0=staffCost(g);g.me.hrs.mba=300;lifeDay(g);
+if(!crsDone(g,'mba')||actOk(g,'mba')||dayPicks(g).indexOf('mba')>=0)throw Error('course done, leaves the picks');if(!(staffCost(g)<c0))throw Error('MBA lowers running costs');
+var a=newGame();a.me.on=1;a.me.hp=80;a.me.bo=90;a.me.hrs={};a.me.wh=8;a.me.p2=['friends','hiking'];lifeDay(a);var b=newGame();b.me.on=1;b.me.hp=80;b.me.bo=90;b.me.hrs={};b.me.wh=8;b.me.p2=['mba','ai'];lifeDay(b);if(!(a.me.bo<b.me.bo))throw Error('rest takes more strain off than courses');
+var t=newGame();t.ps.t=1e6;t.me.hrs={work:30000,friends:3000};var c1=playVal(t,'care');t.me.hrs={work:30000,hiking:3000};var k1=playVal(t,'kin');t.me.hrs={work:30000,papers:3000};var n1=playVal(t,'know');
+if(!(c1<0)||!(k1>playVal(newGame(),'kin')||k1>0)||!(n1>0))throw Error('friends read own people, hiking loves living things, papers curious '+c1+' '+k1+' '+n1);
+var d=newGame();d.ps.t=1e6;d.me.hrs={work:20000,tv:30000};var d1=playVal(d,'drive');d.me.hrs={work:20000,mba:20000};if(!(d1<0)||!(d1<playVal(d,'drive')))throw Error('rest reads life first, courses do not');
 `);
 console.log(count+' focused balance and migration checks passed');

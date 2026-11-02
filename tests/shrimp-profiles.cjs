@@ -43,6 +43,8 @@ function player(p,rich){
  P.t=7.2e7;P.tw=pl.tw*(0.6+0.8*rnd());P.help=pl.help*(0.6+0.8*rnd());P.chart=0;
  P.home=1e7*pl.home;P.biz=1e7*(1-pl.home);P.look=pl.look;P.treat=pl.treat;P.cull=pl.cull;P.prep=[4,5];
  g.me.hrs={work:pl.hrs[0]*(0.85+0.3*rnd()),house:pl.hrs[1]*(0.85+0.3*rnd())};
+ // Pass 219: Your day picks held over the years (rest, getting better), hours like the rest of hrs.
+ const DAYP=['friends','cooking','hiking','books','tv','games','shopping','papers','mba','ai','tanks'];const dd=pl.day==='random'?(()=>{const o={};for(let i=0;i<2;i++)o[DAYP[Math.floor(rnd()*DAYP.length)]]=1500;return o;})():pl.day||{};for(const k in dd)g.me.hrs[k]=(g.me.hrs[k]||0)+dd[k]*(0.6+0.8*rnd());if(pl.pickT)g.me.pickT=1;
  // Measures the rework reads (Part 1): real hours on the land, grant directions, giving, farm wellbeing, research centres.
  const ls=val(pl.land,'land')*(0.5+rnd());P.landMs=ls<0.95?P.t*ls/(1-ls):P.t*20;const sp=pl.landSplit==='random'?[rnd()*0.5,rnd()*0.5]:pl.landSplit||[0.3,0.3];P.landH=P.landMs*sp[0];P.landG=P.landMs*sp[1];/* Pass 218: with Grandma, with living things */const gr=val(pl.grants,'grants');if(gr!=null){P.grN=6;P.grB=Math.round(6*gr);}
  P.giveD=4;P.giveY=val(pl.give,'give')*4*(0.6+0.8*rnd());P.fw=[Math.max(0,val(pl.farmWell,"farmWell"))*400,400];g.stats.earned=1e11;g.stats.rsp=1e11*val(pl.centre,'centre')*(0.6+0.8*rnd());
