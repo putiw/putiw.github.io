@@ -2169,3 +2169,16 @@ Puti: with the ammonia bacteria at 100% and ammonia low, the start card said "Am
 - Ammonia bacteria 100% and nitrite near zero too: "Dose again. ... the nitrite bacteria need more nitrite to grow." In the sim the nitrite bacteria only grow while there is nitrite (`bacB` in the cycle step), so a plain Wait there would stall the cycle.
 - Checked in headless Chromium at 390 px, all three texts. `shrimp-tank1` passes.
 - Glass wipe sound: the company page plays the land's wipe loop at full level while the finger is down (`careAt` sets 1), the land scales it with speed. Sound options for the glass and five moments are on a test page for Puti; nothing changed in the game sound yet.
+
+## Pass 224 (3 Nov): sounds for five moments, a softer glass wipe, the Times waits for its card
+
+Puti picked from the test page (https://claude.ai/artifact/SR9SQMnBPnUu7MnP9opXg1): 1A 2B 3A 4B 5B, glass Softer cloth.
+- `sfxMoment(k)` in index.html, small reverb (`sfxRev`, `sfxNote`), through `MUS.bus` so mute and music level apply:
+  - `done`, two soft notes up: a company tank job with `did` (`careFinish`), a glass wipe that cleaned something. Land: `sfxDone` in `sound.js` when `jobDone` reports a change.
+  - `first`, one small bell: the first baby (`G.stats.bornDay`) and the first kit sold, watched in `render` (`sfxWatch`, not on load).
+  - `buy`, warm low chord: a new farm kind, a region, a step of Grandma's place (wrappers on `buyFarm`, `buyRegion`, `buyGplace`, outside the sim).
+  - `card`, one low soft note: any story or milestone card when it first shows (`renderMilestone`). `end`, a slow swell, for win, gameover and left.
+- Glass wipe on both pages: lowpass 1100 Hz into a bandpass at 650 Hz, peak 0.05 (was white noise at 1900 Hz, 0.09). The company page now follows the finger's speed and goes quiet when nothing is wiped, like the land (it played full the whole time the finger was down).
+- Land source (`shrimp-proto`, `src/sound.js`, `src/game.js`) edited and rebuilt with `build.py --game`; the fresh build matched the game's home.html before the change.
+- The Shrimp Times card (`ripplecard`) and its first-issue spotlight and news flashes wait until the ripple intro card is closed (`timesReady`). Before, the paper showed as soon as the first issue landed while its intro card was still queued behind others.
+- Checked: browser spy test (first baby, first kit, buy, card each fire once), a real play of all five plus the wipe loop with no errors, Times card hidden while its card is queued and shown after. `shrimp-tank1`, `shrimp-land-audio`, `shrimp-balance` pass. Not heard on a phone yet.
