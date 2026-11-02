@@ -5,8 +5,7 @@ window.ENDING_TEST_DATA = {
     "know",
     "kin",
     "care",
-    "risk",
-    "control"
+    "risk"
   ],
   "forks": [
     {
@@ -19,8 +18,8 @@ window.ENDING_TEST_DATA = {
           "description": "They go back to the universities. The ones who stay ask the big questions, and once in a while one finds something nobody was looking for.",
           "traits": {
             "care": 0.5,
-            "control": -0.5,
-            "drive": -0.3
+            "drive": -0.3,
+            "risk": 0.5
           },
           "heart": 0,
           "endingLine": "A lot of good scientists stayed at the university because you paid them to."
@@ -31,7 +30,7 @@ window.ENDING_TEST_DATA = {
           "description": "Applied work, and fast. Kit materials 5% cheaper right away. Fewer people stay to ask the big questions.",
           "traits": {
             "drive": 1,
-            "control": 0.5
+            "risk": -0.5
           },
           "heart": 0,
           "endingLine": "Your company has its own scientists, they work on what sells."
@@ -127,7 +126,7 @@ window.ENDING_TEST_DATA = {
           "label": "Give the editor an interview",
           "description": "She asks hard questions and the jokes keep coming. People like you more for answering.",
           "traits": {
-            "control": -0.5
+            "risk": 0.5
           },
           "heart": 1,
           "endingLine": "A newspaper that still makes fun of you."
@@ -137,7 +136,6 @@ window.ENDING_TEST_DATA = {
           "label": "Buy The Shrimp Times",
           "description": "Its jokes scare off new buyers right when you need them. Owned, it stays on your side.",
           "traits": {
-            "control": 0.5,
             "drive": 0.5
           },
           "heart": -2,
@@ -156,7 +154,7 @@ window.ENDING_TEST_DATA = {
           "traits": {
             "kin": 0.5,
             "means": 0.5,
-            "control": -0.5
+            "risk": 0.5
           },
           "heart": 2,
           "endingLine": "A pet welfare law that covers shrimp."
@@ -166,9 +164,9 @@ window.ENDING_TEST_DATA = {
           "label": "Run your own audits instead",
           "description": "Your farms already pass. You publish your numbers and lobby to be exempt. Upkeep 15% lower. Smaller farms get the exemption too, and some of them don’t pass.",
           "traits": {
-            "control": 0.5,
             "means": -0.5,
-            "kin": -0.5
+            "kin": -0.5,
+            "risk": -0.5
           },
           "heart": -2,
           "endingLine": "Farms that check themselves."
@@ -182,23 +180,23 @@ window.ENDING_TEST_DATA = {
         {
           "id": "retrain",
           "label": "Retraining fund",
-          "description": "Crews learn kelp farming and reef tours. The towns stop blaming you.",
+          "description": "Crews learn fish farming and boat tours. The towns stop blaming you.",
           "traits": {
             "care": -0.5,
             "drive": -0.3
           },
           "heart": 2,
-          "endingLine": "Old fishing crews running reef tours."
+          "endingLine": "Old fishing crews running boat tours."
         },
         {
           "id": "harbors",
-          "label": "Lease the empty docks",
-          "description": "The towns need the rent. Ocean ranches 45% cheaper, and the old fishing ports smell of shrimp feed now.",
+          "label": "Hire the crews at fishing wages",
+          "description": "They know boats and nets, and they take less than your usual hires. Lake ranches 45% cheaper to set up.",
           "traits": {
             "drive": 0.7
           },
           "heart": -2,
-          "endingLine": "Old fishing docks turned into shrimp farms."
+          "endingLine": "Old fishing crews running your lake pens."
         }
       ]
     },
@@ -212,8 +210,8 @@ window.ENDING_TEST_DATA = {
           "description": "She knows a lot about shrimp, you share orders with her. Kit survival up a little.",
           "traits": {
             "care": -0.5,
-            "control": -0.5,
-            "drive": -0.3
+            "drive": -0.3,
+            "risk": 0.5
           },
           "heart": 2,
           "endingLine": "A breeder co-op that started with your neighbor."
@@ -224,7 +222,7 @@ window.ENDING_TEST_DATA = {
           "description": "Her kits die a lot, and every dead kit puts a family off shrimp. One seller, one standard, more orders come to you.",
           "traits": {
             "drive": 1,
-            "control": 0.5
+            "risk": -0.5
           },
           "heart": -2,
           "endingLine": "A closed shop down the road."
@@ -576,8 +574,7 @@ window.ENDING_TEST_DATA = {
           "description": "A pump that uses less than a phone charger, in about a year. The utilities have to come in on it.",
           "traits": {
             "know": 0.3,
-            "risk": 0.5,
-            "control": -0.3
+            "risk": 0.8
           },
           "endingLine": "Shrimp pumps use less power than a phone charger now."
         },
@@ -614,7 +611,7 @@ window.ENDING_TEST_DATA = {
           "traits": {
             "care": 0.5,
             "kin": -0.5,
-            "control": 0.5
+            "risk": -0.5
           },
           "endingLine": "River teams cleared the red shrimp from the warm rivers. Most of them."
         },
@@ -622,9 +619,8 @@ window.ENDING_TEST_DATA = {
           "label": "Leave them",
           "description": "The red rivers are a tourist thing now. 3% more people want a tank in those countries. Your money stays in kits.",
           "traits": {
-            "control": -0.5,
             "kin": -0.5,
-            "risk": 0.3
+            "risk": 0.8
           },
           "endingLine": "Red shrimp live in warm rivers on four continents."
         }
@@ -639,8 +635,7 @@ window.ENDING_TEST_DATA = {
           "label": "Buy spares back for new kits",
           "description": "Shops pay owners a little per shrimp, you pack them into kits. Free stock, 10% more kits a day for a year.",
           "traits": {
-            "kin": 0.5,
-            "know": 0.3
+            "kin": 0.5
           },
           "endingLine": "Kit shrimp are second-hand now. Nobody minds."
         },
@@ -659,8 +654,8 @@ window.ENDING_TEST_DATA = {
           "traits": {
             "kin": -0.3,
             "drive": -0.5,
-            "control": -0.3,
-            "know": -0.3
+            "know": -0.3,
+            "risk": 0.3
           },
           "endingLine": "A shrimp costs nothing now, people give them away at weddings."
         }
@@ -675,9 +670,8 @@ window.ENDING_TEST_DATA = {
           "label": "Battery pumps for the hot cities",
           "description": "The cities hand out a battery air pump and the frozen-bottle trick before next summer. The owners who lost shrimp this time get nothing.",
           "traits": {
-            "control": 0.5,
-            "risk": -0.5,
-            "care": 0.5
+            "care": 0.5,
+            "risk": -1
           },
           "endingLine": "Owners in hot cities keep a battery pump and a frozen bottle for the next blackout."
         },
@@ -687,7 +681,7 @@ window.ENDING_TEST_DATA = {
           "traits": {
             "means": 0.5,
             "kin": 0.5,
-            "control": -0.3
+            "risk": 0.3
           },
           "endingLine": "Everyone who lost shrimp in the blackout got new ones, and kits can come with a battery pump."
         },
@@ -695,9 +689,8 @@ window.ENDING_TEST_DATA = {
           "label": "A 24-hour help line",
           "description": "Move the tank to the floor, float a frozen bottle, skip feeding. Nothing else.",
           "traits": {
-            "control": -0.3,
-            "risk": 0.5,
-            "care": -0.5
+            "care": -0.5,
+            "risk": 0.8
           },
           "endingLine": "A help line talked owners through the next blackout. Some tanks still died."
         }
@@ -713,8 +706,7 @@ window.ENDING_TEST_DATA = {
           "description": "You go on TV with a planted tank. It goes fine. Sales unchanged.",
           "traits": {
             "kin": -0.5,
-            "control": 0.5,
-            "risk": 0.2
+            "risk": -0.3
           }
         },
         {
@@ -750,7 +742,7 @@ window.ENDING_TEST_DATA = {
           "traits": {
             "care": -0.5,
             "drive": 0.3,
-            "control": 0.3
+            "risk": -0.3
           },
           "endingLine": "Mira’s other grandpa works at your hatchery. He still calls them prawns."
         },
@@ -760,7 +752,7 @@ window.ENDING_TEST_DATA = {
           "traits": {
             "drive": -0.5,
             "means": 0.5,
-            "control": -0.3
+            "risk": 0.3
           },
           "endingLine": "Mira’s other grandpa takes visitors out to the reef. Mira sends photos."
         },
@@ -785,9 +777,8 @@ window.ENDING_TEST_DATA = {
           "label": "Wait for the license",
           "description": "A year. Nothing sells in South Asia until then. Everything else runs.",
           "traits": {
-            "risk": -0.8,
             "means": 0.3,
-            "control": 0.3
+            "risk": -1.1
           },
           "endingLine": "You waited a year for the South Asia license."
         },
@@ -795,9 +786,8 @@ window.ENDING_TEST_DATA = {
           "label": "Hire a firm that knows people",
           "description": "Four months. 1 in 5 that the Times finds out who the firm paid.",
           "traits": {
-            "risk": 0.3,
-            "control": -0.5,
-            "know": -0.3
+            "know": -0.3,
+            "risk": 0.8
           },
           "endingLine": "A firm that knew people got you the South Asia license in four months."
         },
@@ -822,9 +812,8 @@ window.ENDING_TEST_DATA = {
           "label": "Shut the lines for the audit",
           "description": "Two weeks, 20% fewer kits a day. They find two things you didn’t know about.",
           "traits": {
-            "risk": -0.5,
-            "control": 0.5,
-            "know": 0.3
+            "know": 0.3,
+            "risk": -1
           },
           "endingLine": "The inspector found two things. You fixed both."
         },
@@ -832,10 +821,9 @@ window.ENDING_TEST_DATA = {
           "label": "Show them last year’s numbers",
           "description": "The lines keep running. 1 in 4 that they come back unannounced.",
           "traits": {
-            "risk": 0.5,
             "means": -0.3,
-            "control": -0.3,
-            "know": -0.3
+            "know": -0.3,
+            "risk": 0.8
           }
         }
       ]
@@ -869,8 +857,8 @@ window.ENDING_TEST_DATA = {
           "label": "No, shrimp are the job",
           "description": "The farms you built keep running. Nothing new.",
           "traits": {
-            "control": 0.5,
-            "care": -0.7
+            "care": -0.7,
+            "risk": -0.5
           }
         }
       ]
@@ -893,7 +881,7 @@ window.ENDING_TEST_DATA = {
           "traits": {
             "kin": -0.5,
             "drive": -0.5,
-            "control": -0.5
+            "risk": 0.5
           }
         }
       ]
@@ -919,13 +907,19 @@ window.ENDING_TEST_DATA = {
     {
       "id": "c_strain",
       "title": "A hardier line",
-      "body": "The farm can breed a hardier line. Fewer die in shipping, the color is a bit duller. While the line settles breeding is 10% lower, for three to nine months, nobody knows how long.",
+      "body": "The farm can breed a hardier line. Fewer die in shipping, the color is a bit duller. While the line settles breeding is 85% lower, for three to six months, nobody knows how long.",
       "options": [
         {
-          "label": "Switch, 10% less breeding for 3 to 9 months, 1% fewer want one",
+          "label": "Switch, 85% less breeding for 3 to 6 months, kits survive better, 1% fewer want one",
           "description": "The new line goes into every rack.",
           "traits": {},
           "endingLine": "Your farms switched to a hardier, duller red."
+        },
+        {
+          "label": "Test it on one rack for a year, then switch, six weeks of 85% less breeding",
+          "description": "One rack gets the new line. Shipping losses stay as they are for now.",
+          "traits": {},
+          "endingLine": "You tested the hardier line on one rack for a year before switching."
         },
         {
           "label": "Keep the old line",
@@ -1083,6 +1077,353 @@ window.ENDING_TEST_DATA = {
           "traits": {}
         }
       ]
+    },
+    {
+      "id": "c_wedding",
+      "title": "The wedding",
+      "body": "Kiki has packed your kits since the third week. She’s getting married in her village, a day’s drive away, the week of the Gulf launch. She’d like you there.",
+      "options": [
+        {
+          "label": "Send a gift and stay for the launch",
+          "description": "The Gulf opens on the day. Kiki sends a photo of the cake.",
+          "traits": {}
+        },
+        {
+          "label": "Go, the Gulf opens two weeks later",
+          "description": "You dance badly. Kiki’s grandmother asks if you’re married.",
+          "traits": {},
+          "endingLine": "You went to Kiki’s wedding and the Gulf waited two weeks."
+        }
+      ]
+    },
+    {
+      "id": "c_play",
+      "title": "The school play",
+      "body": "Mira is a tree in the school play on Thursday. She has one line. Thursday is also dinner with the investors, the round closes that night.",
+      "options": [
+        {
+          "label": "Go to the dinner",
+          "description": "The round closes. Mira’s mom sends a video of the play.",
+          "traits": {}
+        },
+        {
+          "label": "Go to the play",
+          "description": "She says her line a bit too loud. She looks for you after and finds you.",
+          "traits": {},
+          "endingLine": "You saw Mira be a tree. It was the night the investors went elsewhere."
+        }
+      ]
+    },
+    {
+      "id": "c_flood",
+      "title": "The flood",
+      "body": "The river floods. Your packers’ flats are under a meter of water. The same night a fishing town upriver loses its boats. You have one set of trucks and crews. Whoever you don’t help waits two months.",
+      "options": [
+        {
+          "label": "The town first, your packers wait, 30% fewer kits for two months",
+          "description": "Your trucks go upriver. Your packers sleep at the farm for two months, packing is slower.",
+          "traits": {},
+          "endingLine": "Your trucks went to the fishing town first after the flood."
+        },
+        {
+          "label": "Your packers first, the town waits, a few fewer want one there",
+          "description": "The crews pump out the flats in a week. Upriver they wait for the government.",
+          "traits": {},
+          "endingLine": "Your packers were back home a week after the flood."
+        }
+      ]
+    },
+    {
+      "id": "c_bonus",
+      "title": "A good year",
+      "body": "A good year. There’s money left over, about a month of income.",
+      "options": [
+        {
+          "label": "Give it to the hard part",
+          "description": "It goes out with this month’s giving.",
+          "traits": {},
+          "endingLine": "You gave a good year away to people you never met."
+        },
+        {
+          "label": "Share it with your people",
+          "description": "Two packers put down deposits on flats. One sends her brother to college.",
+          "traits": {},
+          "endingLine": "You shared a good year with the people who’d been there since the jar."
+        }
+      ]
+    },
+    {
+      "id": "c_nydin",
+      "title": "New Year’s Eve",
+      "body": "Tank 2 is molting badly. Three dead this morning, more stuck half out of their shells. It’s the night of Grandma’s New Year’s Eve dinner.",
+      "options": [
+        {
+          "label": "Stay with the tank",
+          "description": "You drip in mineral water all night. By morning nobody else has died.",
+          "traits": {},
+          "endingLine": "You spent one New Year’s Eve with a tank of molting shrimp."
+        },
+        {
+          "label": "Go to the dinner, about half of tank 2 won’t make it",
+          "description": "Grandma puts the fish on the table whole, for luck. Tank 2 is half empty when you get home.",
+          "traits": {}
+        }
+      ]
+    },
+    {
+      "id": "c_fair",
+      "title": "The science fair",
+      "body": "Mira’s school has a science fair. She wants two of your shrimp in a jar on her desk for two weeks, so people can watch them molt.",
+      "options": [
+        {
+          "label": "Lend her two",
+          "description": "She names them and feeds them too much. One comes back.",
+          "traits": {},
+          "endingLine": "Mira took two of your shrimp to the science fair. One came back."
+        },
+        {
+          "label": "Say no, two weeks is long in a jar",
+          "description": "She’s upset for a day. She does a poster about molting instead.",
+          "traits": {}
+        }
+      ]
+    },
+    {
+      "id": "c_vet",
+      "title": "Money left over",
+      "body": "A good quarter. There’s money left over, about a month of income, and nothing the company needs it for.",
+      "options": [
+        {
+          "label": "Share it",
+          "description": "Your aunt pays off her car. Grandma gets a new washing machine and keeps using the old one.",
+          "traits": {},
+          "endingLine": "You shared a good quarter with your family."
+        },
+        {
+          "label": "Pay a vet",
+          "description": "Dr. Haddad does a course in Singapore. She opens two days a week for fish and shrimp.",
+          "traits": {},
+          "endingLine": "There’s a vet in town who treats shrimp because of you."
+        }
+      ]
+    },
+    {
+      "id": "c_price1",
+      "title": "One price",
+      "body": "Your kits cost the same everywhere. Where incomes are low that’s a week’s pay, and hardly anyone buys one.",
+      "options": [
+        {
+          "label": "Half price where incomes are low, 3% of income from then on",
+          "description": "Kits go on sale at half price in sixty countries. They sell.",
+          "traits": {},
+          "endingLine": "Your kits cost half as much where incomes are low."
+        },
+        {
+          "label": "Keep one price",
+          "description": "The price stays the same everywhere.",
+          "traits": {}
+        }
+      ]
+    },
+    {
+      "id": "c_wells",
+      "title": "The wells",
+      "body": "A dry year. The town upriver from your biggest farm lost its wells. Your farm has the engineers and the pumps to drill new ones.",
+      "options": [
+        {
+          "label": "Send them",
+          "description": "The farm crew drills for six weeks. The town has water by spring.",
+          "traits": {},
+          "endingLine": "Your farm crew drilled the wells upriver."
+        },
+        {
+          "label": "Pay the tax",
+          "description": "The tax goes to the district. The district drills the next year.",
+          "traits": {}
+        }
+      ]
+    },
+    {
+      "id": "c_feed",
+      "title": "A new feed",
+      "body": "The lab has a new feed. On paper the farms breed 8% more on it. Nobody has tried it on a whole farm.",
+      "options": [
+        {
+          "label": "Test it first, no breeding for 2 months, then 15% back a month, then 8% more",
+          "description": "The farms switch slowly. The lab weighs every batch.",
+          "traits": {},
+          "endingLine": "You tested the new feed before it went into every farm."
+        },
+        {
+          "label": "Roll it out now, 1 in 3 it works, 2 in 3 no breeding for 2 months and a restock bill",
+          "description": "The new feed goes into every farm tomorrow.",
+          "traits": {}
+        }
+      ]
+    },
+    {
+      "id": "c_budget",
+      "title": "One budget",
+      "body": "This year’s research money covers one thing. A study on whether shrimp feel pain, three years, it might find nothing. Or a clinic in the hot towns, where the heat makes people sick every summer.",
+      "options": [
+        {
+          "label": "The pain study, 5% of income for 3 years",
+          "description": "Three postdocs, two hundred shrimp, a lot of cameras.",
+          "traits": {},
+          "endingLine": "You paid three years to ask if shrimp feel pain."
+        },
+        {
+          "label": "The clinic, 5% of income for 3 years",
+          "description": "It opens in a school that’s empty in summer.",
+          "traits": {},
+          "endingLine": "You paid for a clinic in the hot towns."
+        }
+      ]
+    },
+    {
+      "id": "c_bare",
+      "title": "200 bare tanks",
+      "body": "Your lab’s vision study needs 200 shrimp in bare glass tanks for a year. No plants, no gravel, so the cameras can follow them. Shrimp in bare tanks are stressed, some stop eating.",
+      "options": [
+        {
+          "label": "Fund it, 1% of income for a year",
+          "description": "The tanks go in a room with the lights low.",
+          "traits": {},
+          "endingLine": "Your lab kept 200 shrimp in bare tanks for a year to see what they see."
+        },
+        {
+          "label": "Don’t, the postdoc who planned it leaves",
+          "description": "She takes a job in Kyoto.",
+          "traits": {}
+        }
+      ]
+    },
+    {
+      "id": "c_glass",
+      "title": "Glass shrimp",
+      "body": "Your lab can breed a clear-shelled line. You can watch the heart beat through the shell. They’re easier to study and harder to keep alive. Half the first batch will die.",
+      "options": [
+        {
+          "label": "Breed them",
+          "description": "The first batch hatches see-through. Half of them die in the first month.",
+          "traits": {},
+          "endingLine": "Your lab bred see-through shrimp to watch their hearts."
+        },
+        {
+          "label": "Don’t",
+          "description": "The lab keeps using red ones.",
+          "traits": {}
+        }
+      ]
+    },
+    {
+      "id": "c_kyoto",
+      "title": "Kyoto",
+      "body": "You’re asked to speak at the shrimp biology meeting in Kyoto. It’s the week of Grandma’s birthday.",
+      "options": [
+        {
+          "label": "Go, send her a cake",
+          "description": "The talk goes fine. Somebody asks a question you can’t answer and you think about it the whole flight home.",
+          "traits": {},
+          "endingLine": "You spoke in Kyoto the week of Grandma’s birthday."
+        },
+        {
+          "label": "Stay for her birthday",
+          "description": "You bring the cake. She says it’s too sweet and has two pieces.",
+          "traits": {}
+        }
+      ]
+    },
+    {
+      "id": "c_saturday",
+      "title": "Saturdays",
+      "body": "Mira’s school wants someone to run a shrimp club on Saturday mornings. Saturday is when you change the tank water, vacuum the gravel, trim the plants, water the pots on the balcony, turn the compost and distill water to top up the tanks.",
+      "options": [
+        {
+          "label": "Run the club, the tanks get Sunday evenings",
+          "description": "Twelve kids, eleven jars. One asks why shrimp eat their old shells and you look it up together.",
+          "traits": {},
+          "endingLine": "You ran the school shrimp club on Saturdays."
+        },
+        {
+          "label": "Keep Saturdays for the tanks and plants",
+          "description": "The balcony tomatoes come in. The moss needs a trim again by Wednesday.",
+          "traits": {},
+          "endingLine": "Your Saturdays went to the tanks, the plants and the compost."
+        }
+      ]
+    },
+    {
+      "id": "c_survey",
+      "title": "The stream survey",
+      "body": "A biologist in Taiwan asks you to spend a month in the mountain streams with her, counting wild cherry shrimp. Wet feet, no phone signal.",
+      "options": [
+        {
+          "label": "Go",
+          "description": "You count 3,412 shrimp under stones. Most of them are brown. A few are red.",
+          "traits": {},
+          "endingLine": "You spent a month counting wild shrimp in the streams of Taiwan."
+        },
+        {
+          "label": "Pay for her trip",
+          "description": "She sends a photo every few days, a stone, a hand, a shrimp.",
+          "traits": {}
+        }
+      ]
+    },
+    {
+      "id": "c_box",
+      "title": "The new box",
+      "body": "The lab has a new shipping box. It should cut deaths in the mail by a third. They want six months to test it before it goes out with every kit.",
+      "options": [
+        {
+          "label": "Test it, six months with the old box",
+          "description": "The old box goes out for six more months.",
+          "traits": {},
+          "endingLine": "You tested the new box for six months first."
+        },
+        {
+          "label": "Ship it now, replace the dead if it fails",
+          "description": "The new box goes out tomorrow.",
+          "traits": {}
+        }
+      ]
+    },
+    {
+      "id": "c_abroad",
+      "title": "Three weeks",
+      "body": "Your cousin starts university abroad. Your aunt was going to fly with her and settle her in, then had an emergency. She asks you to go instead, three weeks, you leave Thursday. It’s too late to find anyone to water the plants or feed the shrimp. Three weeks, they’ll probably be fine. Probably.",
+      "options": [
+        {
+          "label": "Go with her",
+          "description": "You carry two suitcases up four floors. She cries at the airport, then sends a photo of her new room.",
+          "traits": {},
+          "endingLine": "You flew your cousin to university and left the tanks for three weeks."
+        },
+        {
+          "label": "Stay, she’s a big girl, she’ll be fine",
+          "description": "Your aunt says of course. Your cousin sends a photo from the airport, on her own.",
+          "traits": {}
+        }
+      ]
+    },
+    {
+      "id": "c_sleep",
+      "title": "Eight hours",
+      "body": "The doctor says your blood pressure is up. Eight hours of sleep, she says, or pills.",
+      "options": [
+        {
+          "label": "Sleep",
+          "description": "You go to bed at ten. The first week you lie awake thinking about kits.",
+          "traits": {},
+          "endingLine": "You cut your hours for a year when the doctor asked."
+        },
+        {
+          "label": "Keep your hours",
+          "description": "The pills work. You set an alarm for them.",
+          "traits": {}
+        }
+      ]
     }
   ],
   "endingTypes": {
@@ -1109,7 +1450,7 @@ window.ENDING_TEST_DATA = {
       "id": "empire_hard",
       "end": "empire",
       "name": "The Empire, the hard bargain",
-      "who": "You wanted it done and you did it on the numbers. When the cheap way was legal you took it, every time. You never broke a law you could read. The people who worked for you got paid on time and not a dirham more.",
+      "who": "You wanted it done and you did it on the numbers. You stayed inside the written law, used every loophole, and took the cheap way whenever it was legal. The people who worked for you got paid on time and not a dirham more.",
       "mira": "She runs a smaller company that pays more and grows slower. She sends you a card every New Year.",
       "gp": "Your cousin says you're the cheapest rich person he knows. I told him that's how you got rich. [visit] Come for dinner, I'm paying.",
       "tank": "The water was fine and the food was the cheapest food. There were a lot of us. When some died, more came the next day."
@@ -1189,7 +1530,7 @@ window.ENDING_TEST_DATA = {
     "drift_shop": {
       "id": "drift_shop",
       "end": "drift",
-      "name": "The Drift, the happy shop",
+      "name": "Home, the happy shop",
       "who": "You had one shop and it was enough. Some years you meant to open a second one and then it was summer. You kept the first shop while other people built the farms and the networks. You knew which kid named which shrimp.",
       "mira": "She paints shrimp. Nobody buys the paintings. Three of them hang in your shop and you won't sell them either.",
       "gp": "Everyone keeps asking me if I'm disappointed you didn't do the big thing. I tell them I sit in your shop on Sundays and drink tea and look at the shrimp, why would I be disappointed. [visit]",
@@ -1198,7 +1539,7 @@ window.ENDING_TEST_DATA = {
     "drift_famous": {
       "id": "drift_famous",
       "end": "drift",
-      "name": "The Drift, accidentally famous",
+      "name": "Home, accidentally famous",
       "who": "You never tried very hard and somehow it kept working. A video of your tank went around the world when you weren't looking. People started copying what you did without you telling them anything. You're on a stamp in four countries. You still don't really know why.",
       "mira": "She manages your accounts because you never open them. She says you're the luckiest person alive and she's probably right.",
       "gp": "A man at the shrimp club asked me to sign his book because I'm your grandmother. I signed it Grandma. [visit] Don't let it go to your head, it hasn't so far, that's the good part.",
@@ -1246,8 +1587,8 @@ window.ENDING_TEST_DATA = {
     },
     "stream_world": {
       "id": "stream_world",
-      "end": "stream",
-      "name": "The Stream",
+      "end": "garden",
+      "name": "The Garden, the stream",
       "who": "You set out to put a tank in every home and somewhere along the way you stopped counting tanks. You cleaned the farm water, you planted the mangroves, you put native shrimp back in streams where they used to live.",
       "mira": "She runs the river surveys. She sends you a photo every Friday, a different stream each time, always with shrimp in it.",
       "gp": "I walked down to the stream behind the school today. Kids with nets, catching shrimp and letting them go. Nobody had to sell them anything. [visit] That's all I wanted, for people to stop and look.",
