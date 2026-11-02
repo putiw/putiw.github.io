@@ -2218,3 +2218,10 @@ Deployed 3 Nov (Passes 223 to 227, BUILD 2026-11-03-p227). Bots seed 7 (Pass 226
 ## Pass 228 (3 Nov): Check shrimp stays on the company page after the land
 
 Puti: Tank 1 got sick after the land, and the Check shrimp tile had turned into Aquascape, so there was no way to check them from the company page. The company Tank tab keeps Check shrimp (health check, cull, Buy shrimp when empty) after the land; Aquascape is only on the land, in the same place. Replaces the Pass 200 rule that both pages show the same six tiles. `shrimp-yourtank` updated; browser check: with and without the land, Check shrimp shows and opens the health check. balance, tank1 pass. Deployed with BUILD 2026-11-03-p228.
+
+## Pass 229 (3 Nov): empty Tank 1 with the land, hard part slot and help
+
+- With the land bought and Tank 1 empty, the Check shrimp tile shows small text "Catch some at Grandma's place" and is not a button (`landEmpty`, `.tv-catch`). Before the land, Buy shrimp stays as it was.
+- Hard part: before any group is picked there is no reserved empty slot under the grid (Puti); the card grows once on the first pick. Switching between groups still keeps one height (`slotMin` over the groups only). `shrimp-hard` checks no scroll on the first pick and the same height when switching.
+- Hard part option rows: the title is the help (dotted underline, `.qhelp.qt`), no ? button.
+- Tests: balance, hard 12, yourtank, cardtap; browser check of the empty-tank tile with and without the land.

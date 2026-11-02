@@ -22,11 +22,11 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
  const tap0=await p.evaluate(()=>({next:!!document.querySelector('[data-act="hard-next"]'),txt:document.querySelector('#hard-body .hard-step').textContent}));if(tap0.next||!/Tap a group/.test(tap0.txt))throw Error('no step order, nothing picked at first: '+JSON.stringify(tap0));ok('no Next, Tap a group at first (Pass 190)');
  await p.click('#hg-lab [data-g="hot"]');await p.waitForTimeout(300);
  const after=await p.evaluate(()=>({y:scrollY,h:document.getElementById('hard-card').offsetHeight,k:[...document.getElementById('hard-card').children].map(x=>x.offsetHeight).join(','),lab:document.querySelector('#hard-body .hard-now .scope-label').textContent}));
- if(!/Too hot/.test(after.lab))throw Error('legend tap did not select: '+after.lab);if(Math.abs(after.y-before.y)>1||Math.abs(after.h-before.h)>1)throw Error('legend tap moved the page '+JSON.stringify([before,after]));ok('legend tap selects a group, page still');
+ if(!/Too hot/.test(after.lab))throw Error('legend tap did not select: '+after.lab);if(Math.abs(after.y-before.y)>1)throw Error('legend tap scrolled the page '+JSON.stringify([before,after]));ok('legend tap selects a group, no scroll (Pass 229: no empty slot before the first pick, so the card grows once)');
  // tap on the water block in the grid
  const pt=await p.evaluate(()=>{var q=HGR.find(r=>r.id==='water'),c=document.getElementById('hg-cv').getBoundingClientRect();return q?{x:c.left+(q.x0+q.x1)/2,y:c.top+(q.y0+q.y1)/2}:null;});
  await p.mouse.click(pt.x,pt.y);await p.waitForTimeout(300);
- const lab2=await p.evaluate(()=>document.querySelector('#hard-body .hard-now .scope-label').textContent);if(!/No water/.test(lab2))throw Error('block tap did not select: '+lab2);ok('tapping a block selects it');
+ const lab2=await p.evaluate(()=>document.querySelector('#hard-body .hard-now .scope-label').textContent),h2=await p.evaluate(()=>document.getElementById('hard-card').offsetHeight);if(!/No water/.test(lab2))throw Error('block tap did not select: '+lab2);if(Math.abs(h2-after.h)>1)throw Error('switching groups changed the card height '+after.h+' '+h2);ok('tapping a block selects it, switching groups keeps the height');
  // before a goal is picked the groups are grey and can't be picked; goal buttons: none filled, the current one has a check
  const pre=await p.evaluate(()=>{var H=hardOf(G);H.goalOk=0;HARD_SEL=null;HGK='';render();var cv=document.getElementById('hg-cv');
   var r={grid:cv.getClientRects().length,prim:document.querySelectorAll('#hard-body [data-act^="hard-"].primary').length,check:[...document.querySelectorAll('#hard-body button')].filter(b=>/\u2713/.test(b.textContent)).length};H.goalOk=1;HGK='';render();return r;});
