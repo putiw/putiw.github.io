@@ -3154,7 +3154,7 @@ function vegSeason(){var m=new Date(Date.UTC(2026,9,20)+vegDay()*864e5).getUTCMo
 function vegCrop(id){var c=null;['cool','hot'].forEach(function(k){VEG_CROPS[k].forEach(function(x){if(x.id===id)c=x;});});return c;}
 function vegState(o){if(!o.crop)return 'empty';var c=vegCrop(o.crop),d=vegDay();if(d-(o.w||o.pl)>VEG_DRY)return 'dead';return d-o.pl>=c.d?'ripe':'growing';}
 function vegStage(o){var c=vegCrop(o.crop);if(!c)return 0;return clamp((Math.min(vegDay(),(o.w||o.pl)+VEG_DRY)-o.pl)/c.d,0,1);}
-function vegTap(o){var st=vegState(o),s=objSprite(o),bx=oX(o),by=oBase(o)-(s?s.ay:30);
+function vegTap(o){L.vegT=L.rt||0;var st=vegState(o),s=objSprite(o),bx=oX(o),by=oBase(o)-(s?s.ay:30);
  if(st==='empty'||st==='dead'){var list=VEG_CROPS[vegSeason()];bubAt(bx,by,'<b>'+(st==='dead'?'It dried out':'The bed')+'</b><div class="hint">'+(vegSeason()==='cool'?'Cool months.':'Hot months.')+' Water it at least every '+VEG_DRY+' days.</div><div class="btns">'+list.map(function(c){return '<button class="btn" data-veg="'+c.id+'">'+c.n+' · '+c.d+' days</button>';}).join('')+'</div>',function(el){el.querySelectorAll('[data-veg]').forEach(function(b){b.onclick=function(){o.crop=b.dataset.veg;o.pl=vegDay();o.w=o.pl;closeBub();sfx('scoop',{v:0.5});puff('dust',bx,oBase(o)-8,6,{speed:30,life:0.5});L.dirty=true;save();};});});return;}
  if(st==='growing'){o.w=vegDay();sfx('splash',{v:0.4});puff('drop',bx,oBase(o)-14,8,{col:'#5fcde4',speed:35,life:0.6});var c=vegCrop(o.crop),left=Math.max(0,c.d-(vegDay()-o.pl));toast('Watered. '+c.n+' in about '+left+' day'+(left===1?'':'s')+'.');L.dirty=true;save();return;}
  var cr=vegCrop(o.crop),n=cr.y,l=LS();l.harvest=l.harvest||{};l.harvest[cr.id]=(l.harvest[cr.id]||0)+n;(l.stats||(l.stats={})).veg=(l.stats.veg||0)+n;o.crop=null;o.pl=null;o.w=null;
@@ -3220,7 +3220,7 @@ function collectEggs(o){var l=LS(),n=l.eggs.length,s=objSprite(o),nx=oX(o)+(s&&s
     puff('spark',nx,ny,8,{col:'#fbf236',speed:40,life:0.6});Object.keys(kinds).forEach(function(k){bookAdd('coop','egg-'+k,{where:STAGES[S.stage].name});});var off=l.eggsOff||0;l.eggsOff=0;toast(plural(n,'egg')+' in the basket.'+(off?' '+plural(off,'egg')+' had gone off.':''));updateStat(true);save();}
   coopBub(o,nx,ny-60);}
 var GM_LINES=['The red ones are getting redder.','Did you eat?','Don’t change all the water at once.','That sparrow comes every morning. I call him Lao Wang.','When I was your age I kept fish in a washing bowl.','Sit with me a bit.','I still make two cups of tea some mornings.','Shrimp don’t like loud music. I checked.','Pierre was at the tank again. He only watches.','The dog brought me a sock. I said thank you.'];
-function grandmaSays(o){var lines=GM_LINES.slice();if(S.stage>=3)lines.push('Your grandpa would have fished this stream. Nothing in it’s big enough.');if(S.stage>=2)lines.push('The hens are louder than your grandpa’s radio.');
+function grandmaSays(o){L.gmT=L.rt||0;var lines=GM_LINES.slice();if(S.stage>=3)lines.push('Your grandpa would have fished this stream. Nothing in it’s big enough.');if(S.stage>=2)lines.push('The hens are louder than your grandpa’s radio.');
   var i=(L.gmI=(L.gmI==null?Math.floor(Math.random()*lines.length):L.gmI+1))%lines.length;var ss=gmSeats(),nx=ss.length>1?ss[(ss.indexOf(o)+1)%ss.length]:null;
   bubAt(oX(o),oBase(o)-105,'<b>Grandma</b><div>'+esc(lines[i])+'</div>'+(nx?'<div class="btns"><button class="btn" data-gmseat>Sit somewhere else</button></div>':''),function(el){var b=el.querySelector('[data-gmseat]');if(b)b.onclick=function(){closeBub();gmTo(nx);var nm=(OBJ[nx.k]&&OBJ[nx.k].name)||'chair';toast('Grandma moves to the '+String(nm).toLowerCase()+'.');sfx('click');};});sfx('click');}
 // Grandma sits in her armchair, or on a chair or sofa you made (Pass 170). Her armchairs first, then made seats; never where Millie sits.
@@ -3715,6 +3715,14 @@ OBJ.coop.live=function(x,o){var s=objSprite(o),eg=LS().eggs;if(!s||!s.nest||!eg.
   row(front,back,3,4);row(0,front,0,0);};
 // after Leave Earth Grandma is asleep on the ship (Pass 172): her chair stays empty
 function gmAway(){return !!window.GM_AWAY;}
+// Pass 218 (game): what Millie is doing right now, for the game's traits. 'h' with Grandma (sitting near her or just talked),
+// 'g' with living things (fishing, watching a bird, walking the dog, at the vegetable bed or the stream), '' anything else.
+function landAct(){var me=L.me;if(!L.shown||!me)return '';var now=L.rt||0;
+  if(!gmAway()){if(L.gmT!=null&&now-L.gmT<20)return 'h';var g=LS().objs.filter(function(q){return q.gm;})[0];if(g&&Math.hypot(me.x-oX(g),me.y-oBase(g))<T*3)return 'h';}
+  if((L.fishing&&L.fishing.st!=='idle')||L.watch)return 'g';var dg=L.dog;if(dg&&dg.bound&&dg.st==='follow'&&L.walk&&L.walk.t>0)return 'g';
+  if(L.vegT!=null&&now-L.vegT<20)return 'g';var t=tileOf(me.x,me.y);if(isStreamNear(t[0],t[1]))return 'g';
+  if(LS().objs.some(function(q){return q.k==='veg'&&Math.hypot(me.x-oX(q),me.y-oBase(q))<T*2;}))return 'g';return '';}
+window.LAND_ACT=landAct;
 OBJ.armchair.live=function(x,o){if(!o.gm||gmAway())return;drawSprK(x,grandmaSpr(Math.floor(L.rt*2.2)%2),oX(o)-2*CHK,oBase(o)-2*CHK,CHK);};
 // draw at full rate while things move, 30 fps for small animals, 8 fps when only water and Grandma's needles move
 function busy(){var me=L.me,dg=L.dog,c=L.cat;return L.dirty||L.camMoving||(me&&me.moving)||(dg&&(dg.run||dg.hop>0))||(c&&(c.st==='walk'||c.hop>0||c.reach>0))||L.parts.length>0||(L.fishing&&L.fishing.st!=='idle')||!!L.watch||!!L.marker||!!(L.ptr&&L.ptr.down);}
@@ -4096,6 +4104,7 @@ SAVE_KEY='shrimp-land-v1';
 var P=window.parent!==window?window.parent:(window.TEST_PARENT||null);   // the test page stands in for the company in the same page
 function post(m){if(!P)return;m.land=1;try{P.postMessage(m,'*');}catch(e){}}
 window.LAND_POST=post;// Pass 213: the land closure posts harvests and walks through this
+setInterval(function(){if(document.hidden||!window.LAND_ACT)return;var a='';try{a=window.LAND_ACT();}catch(e){}post({type:'act',a:a});},1000);// Pass 218: what you do on the land, once a second
 window.GAME_POST=post;
 // no browser feel inside the game: no pinch zoom, no long-press menu (Puti, 28 Oct)
 ['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,function(e){e.preventDefault();},{passive:false});});

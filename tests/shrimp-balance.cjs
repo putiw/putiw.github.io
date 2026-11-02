@@ -490,11 +490,11 @@ var o=newGame();delete o.trAbs;o.tr={care:-3,know:2};migrate(o);if(o.trAbs.care!
 // (story cards, staff goodbyes, growing pains, late cards, forks, hard-part options, Grandma moments). Repeatables (galas, campaigns) are left out.
 const DECS=require('./shrimp-decs.cjs');
 check('seven traits: ego and reach fold into drive, a stuck review is released, the Space hand-off keeps its flag',`
-if(TRAITS.length!==7||TRAITS.indexOf('ego')>=0||TRAITS.indexOf('reach')>=0)throw Error('Seven traits '+TRAITS);
+if(TRAITS.length!==6||TRAITS.indexOf('ego')>=0||TRAITS.indexOf('reach')>=0||TRAITS.indexOf('control')>=0)throw Error('Six traits (Pass 218) '+TRAITS);
 var o=newGame();o.tr={drive:1,ego:2,reach:-0.5,care:1};o.trAbs={drive:1,ego:3,reach:1.5,care:1};migrate(o);
 if(o.tr.drive!==2.5||o.trAbs.drive!==5.5||'ego' in o.tr||'reach' in o.tr||'ego' in o.trAbs||'reach' in o.trAbs||o.tr.care!==1)throw Error('Fold '+JSON.stringify([o.tr,o.trAbs]));
 var n=newGame();delete n.trAbs;n.tr={ego:2,reach:1};migrate(n);if(n.tr.drive!==3||n.trAbs.drive!==3||'ego' in n.tr)throw Error('Fold without sizes '+JSON.stringify([n.tr,n.trAbs]));
-var v=traitVals(o);if(Object.keys(v).length!==7||Object.keys(v).some(function(k){return !isFinite(v[k]);}))throw Error('Values '+JSON.stringify(v));
+var v=traitVals(o);if(Object.keys(v).length!==6||Object.keys(v).some(function(k){return !isFinite(v[k]);}))throw Error('Values '+JSON.stringify(v));
 var w=newGame();w.emp.won=2000;w.progress.reviewing=true;w.progress.queue=[];migrate(w);if(w.progress.reviewing)throw Error('Stuck review should be released so the win card offers Keep playing');
 `);
 if(html.includes('review-empire')||html.includes('Review your empire'))throw Error('The win card has no review button, it froze the game');
@@ -536,7 +536,7 @@ g.stats.rsp=2e5;var hi=playVal(g,'know');if(Math.abs(lo+0.6)>0.01||!(hi>0.45&&hi
 g.ps.grN=4;g.ps.grB=4;if(!(playVal(g,'know')>hi))throw Error('Basic science grants add curiosity');
 var c=newGame();if(playVal(c,'care')!=null)throw Error('No care from play before the hard part');c.ps.giveD=3;c.ps.giveY=0;var c0=playVal(c,'care');c.ps.giveY=0.3;if(!(c0==null&&playVal(c,'care')>0.6))throw Error('Giving '+c0+' '+playVal(c,'care'));
 var d=newGame();d.day=3000;d.ps.t=3.6e6;d.ps.landMs=1.2e6;if(!(playVal(d,'drive')<-0.9))throw Error('A quarter of play on the land is life first '+playVal(d,'drive'));
-var c=newGame();c.day=730;c.ps.t=4e6;c.ps.prep=[0.2,4];var lc=playVal(c,'control');c.ps.prep=[4,4];if(!(lc<-0.5&&playVal(c,'control')>0.5))throw Error('Control reads how ready you were at each big step');
+var c=newGame();c.day=730;c.ps.t=4e6;c.ps.prep=[0.2,4];var lc=playVal(c,'risk');c.ps.prep=[4,4];if(!(lc>0.5&&playVal(c,'risk')<-0.5))throw Error('Careful/bold reads how ready you were at each big step (Pass 218, control merged into risk)');
 var d=newGame();d.day=730;d.ps.t=4e6;if(playVal(d,'drive')!=null)throw Error('A player who never opened the You page says nothing about drive');
 `);
 if(!/psNote\('tw',p\[0\]\)/.test(html)||!/psNote\('help'/.test(html)||!/psNote\('chart'/.test(html)||!/G\.ps\.help\+\+/.test(html)||!/psNote\('tw','kitPrice'\)/.test(html))throw Error('Setting, ? and chart opens must reach G.ps');
@@ -921,5 +921,20 @@ w.day=915;if(regHeld(w,'gcc'))throw Error('Gulf still held after two weeks');
 var b=newGame();b.money=10;b.fin=[{kits:1e6}];card3Choose(b,'c_bonus',0);if(b.money<0)throw Error('bonus put you in debt');
 var P=PUSH;['c_wedding','c_play','c_flood','c_bonus'].forEach(function(k){if(P[k].length!==CARDS3[k].ch.length)throw Error('PUSH length '+k);});
 if((P.c_wedding[1].drive||0)>=0||(P.c_play[1].drive||0)>=0||(P.c_flood[0].care||0)<=0||(P.c_bonus[1].care||0)>=0)throw Error('new card pushes out of order');
+`);
+// Pass 218 (Puti, 2 Nov): risk and control are one trait, careful/bold; buying the Times is an evil act; the ocean ranch is a lake ranch;
+// grants pair a basic or ecology proposal with an applied one; the new cards; the land reports what you do there.
+{const home218=fs.readFileSync(path.join(__dirname,'../shrimp/home.html'),'utf8');if(home218.indexOf('LAND_ACT')<0||home218.indexOf("type:'act'")<0)throw Error('The land reports what you do there (Pass 218)');
+ if(html.indexOf('"id": "stream_world", "end": "garden"')<0)throw Error('The Stream is a Garden version (Pass 218)');
+ if(/[Oo]cean (shrimp )?ranch/.test(html)||/Floating pens/.test(html))throw Error('Cherry shrimp are freshwater: no ocean ranch (Pass 218)');}
+check('Pass 218: careful/bold, Times as evil, grants paired, new cards, land split, stream in garden',`
+var g=newGame();g.tr={control:1,risk:.2};g.trAbs={control:1,risk:.2};migrate(g);if(g.tr.control!=null||Math.abs(g.tr.risk+0.8)>1e-9||Math.abs(g.trAbs.risk-1.2)>1e-9)throw Error('Old control folds into careful '+JSON.stringify(g.tr));
+var p=newGame();p.emp.proj.paperbuy=1;if(evilActs(p)<1)throw Error('Buying the Times is an evil act');
+for(var i=0;i<40;i++){var c=grCands(newGame()),b=c.filter(function(x){return x.d==='basic'||x.d==='eco';}).length;if(b!==1)throw Error('One basic or ecology grant a year, one applied');}
+['c_nydin','c_fair','c_vet','c_price1','c_wells','c_feed','c_budget','c_bare','c_glass','c_kyoto'].forEach(function(k){if(!CARDS3[k]||!PUSH[k]||PUSH[k].length!==CARDS3[k].ch.length)throw Error('card '+k);});
+var f=newGame();f.emp.nfeed={m:'t',s:0};f.day=30;if(nfeedMul(f)!==0)throw Error('test feed: no breeding first 2 months');f.day=95;if(Math.abs(nfeedMul(f)-0.3)>1e-9)throw Error('test feed 15% a month '+nfeedMul(f));f.day=300;if(nfeedMul(f)!==1.08)throw Error('test feed boost');
+f.emp.nfeed={m:'r',s:0,bad:1};f.day=20;if(nfeedMul(f)!==0)throw Error('bad rollout stops breeding');f.day=80;if(nfeedMul(f)!==1)throw Error('bad rollout back to old feed');f.emp.nfeed={m:'r',s:0,bad:0};if(nfeedMul(f)!==1.08)throw Error('good rollout boost');
+var w=newGame();w.emp.lock={reg:w.day+365,farm:w.day+90};w.money=1e12;w.kits.sold=1e6;if(buyRegion(w))throw Error('wells: no region for a year');if(heldDays(w,'farm')!==90)throw Error('wells: farm held 3 months');
+var l=newGame();l.ps.t=1e6;l.ps.landMs=1e6;l.ps.landG=1e6;var k0=playVal(l,'kin'),c0=playVal(l,'care');l.ps.landG=0;l.ps.landH=1e6;if(!(k0>playVal(l,'kin'))||!(playVal(l,'care')<(c0==null?0:c0)))throw Error('land time: living things read kin, Grandma reads own people');
 `);
 console.log(count+' focused balance and migration checks passed');
