@@ -956,4 +956,12 @@ var t=newGame();t.ps.t=1e6;t.me.hrs={work:30000,friends:3000};var c1=playVal(t,'
 if(!(c1<0)||!(k1>playVal(newGame(),'kin')||k1>0)||!(n1>0))throw Error('friends read own people, hiking loves living things, papers curious '+c1+' '+k1+' '+n1);
 var d=newGame();d.ps.t=1e6;d.me.hrs={work:20000,tv:30000};var d1=playVal(d,'drive');d.me.hrs={work:20000,mba:20000};if(!(d1<0)||!(d1<playVal(d,'drive')))throw Error('rest reads life first, courses do not');
 `);
+check('Pass 222 (Puti): out of money while a kind answer still costs you, Grandma or the shrimp bank twice, the third time it ends',`
+var g=newGame();g.day=500;g.emp.farms.rack=4;g.emp.strain={u:600};g.money=-20000;g.me.sent=0;var mc=milestoneConditions(g);if(!mc.kindsave||mc.broke||mc.kindend)throw Error('kind save, not the usual card');
+var o=kindOpts(g);if(o.length!==3||!/1 year/.test(o[0][0])||!/10 years/.test(o[2][0]))throw Error('bank: 1, 5 or 10 years');var a=kindLoanAmt(g);storyChoose(g,'kindsave',1);if(!(g.money>0)||!g.emp.kindLoan||g.emp.kindLoan.y!==5||Math.abs(g.emp.kindLoan.left-a*1.05)>1)throw Error('1% a year, five years');
+var m0=g.money;g.day+=31;kindLoanDay(g);if(!(g.money<m0))throw Error('pays monthly');
+var h=newGame();h.day=500;h.emp.farms.rack=4;h.emp.strain={u:620};h.money=-20000;h.me.sent=5000;var gift=kindGift(h);if(!(gift>=20000+30*Math.max(incRef(h),fixedOverhead(h))*4-1))throw Error('debt plus a month of income per month left, at least one');storyChoose(h,'kindsave',0);if(!(h.money>0))throw Error('Grandma pays');
+h.emp.kindSaves=2;h.money=-5000;h.emp.brokeSnooze=0;var mc2=milestoneConditions(h);if(!mc2.kindend||mc2.kindsave)throw Error('third time ends it');storyChoose(h,'kindend',0);if(!h.emp.ended)throw Error('game over');
+var n=newGame();n.day=500;n.money=-20000;var mc3=milestoneConditions(n);if(!mc3.broke||mc3.kindsave)throw Error('no kind cost running, the usual card');
+`);
 console.log(count+' focused balance and migration checks passed');

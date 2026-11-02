@@ -2147,3 +2147,14 @@ Puti: chips shorter (28 px, 5 px gap), a ninth rest pick Lay flat that does noth
 
 Deployed 2 Nov (Passes 218 to 221, BUILD 2026-11-02-p221). Before deploy: balance 139, me 50, academy 10, profiles (targets met), pairs, cardtap, tank1, yourtank, land-audio, land-life, endcards 50, hard 12, frozen; bots seed 7: strong cold 2,282 empire_dictator (Pass 218 alone: 2,320), average Earth 7,141 question_prof, science 639 (Pass 217 deploy 7,001 empire_good); Space bot lands, passes; spotlights 103 all good; layout the known 2 px on win World; stable: the known bought-row movers only, the Grandma money line fixed.
 Strong kind bot: INSOLVENT on day 1,022 (Pass 218 alone: day 1,077, so it comes from Pass 218's cards, not Your day). It takes Switch on the hardier line (85% less breeding for 3 to 6 months, Puti's Pass 215/216 number) with 11 racks, 4 barns and mall stores running, and the bot has no money-trouble answers. A player gets the Out of money card. Flagged to Puti.
+
+### Pass 222: out of money because of a kind answer (2 Nov)
+
+Puti: if the company runs out of money while a kind answer is still costing it (the strong kind bot went broke on the hardier line), someone helps, twice; the third time the game ends.
+- `kindCost(G)`: days left on the longest kind cost running and which: hardier line settling (`E.strain`), testing the new feed (`E.nfeed` m 't', 240 days), the wells hold (`E.lock`), a region held for Kiki's wedding or Grandma's knee (`E.regWait`), giving a share of income (`E.dues`), the slower kind answers (`E.kind`, `kindSlow`).
+- When `brokeNow` and a kind cost is running, the card is `kindsave` instead of `broke` (urgent, `CARD_NOW`):
+  - sent Grandma money ever (`M.sent`>0): her crypto went to the moon, she gives the debt plus a month of income per month the cost has left (1 to 12, at least one; `kindGift`, income = `incRef` or overhead if higher).
+  - never sent: a bank owner who keeps shrimp lends the debt plus the overhead until the cost ends (30 to 365 days, `kindLoanAmt`) at 1% a year, paid monthly over 1, 5 or 10 years (`E.kindLoan`, `kindLoanDay`, booked as debt).
+  - The body names the reason (`KIND_WHY`). Only the costs show on the buttons, the line after.
+- Two rescues per game (`E.kindSaves`). The third time out of money with a kind cost running is `kindend`: one button, Close the company, the bankruptcy ending (`fallKind`). Out of money without a kind cost is the usual card.
+Tests: balance 140 (new Pass 222 check), me 50, cardtap. Card checked at 390. Not deployed.

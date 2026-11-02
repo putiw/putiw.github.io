@@ -5,7 +5,7 @@ function richGame(){var g=newGame();acknowledgeMilestone(g);g.day=2000;g.money=1
 function absOf(g){var o={};TRAITS.forEach(function(k){var v=(g.trAbs||{})[k]||0;if(v>1e-9)o[k]=v;});return o;}
 function pushOf(g){var o={};TRAITS.forEach(function(k){var v=(g.tr||{})[k]||0;if(Math.abs(v)>1e-9)o[k]=v;});return o;}
 function decisions(){var js=JSON.stringify(richGame()),out=[];
- for(var k in MILESTONES){var ch=null;try{ch=storyChoices(JSON.parse(js),k);}catch(e){}if(!ch||ch.length<2||k==='stream'||k==='broke')continue;
+ for(var k in MILESTONES){var ch=null;try{ch=storyChoices(JSON.parse(js),k);}catch(e){}if(!ch||ch.length<2||k==='stream'||k==='broke'||k==='kindsave'||k==='kindend')continue;
   var d={id:k,text:(MILESTONES[k].title||'')+' '+(MILESTONES[k].body||''),opts:[]};
   for(var i=0;i<ch.length;i++){var g=JSON.parse(js);g.tr={};g.trAbs={};storyChoose(g,k,i);d.opts.push({label:ch[i][0],push:pushOf(g),abs:absOf(g)});}out.push(d);}
  var fk={};PROJ.forEach(function(p){if(p.c==='fork'&&p.fk!=='layoff')(fk[p.fk]=fk[p.fk]||[]).push(p);});
