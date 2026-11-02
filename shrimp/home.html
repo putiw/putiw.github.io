@@ -1526,7 +1526,7 @@ function openSponge(T){var P={stage:'squeeze',dirt:clamp(1-T.flow,0.1,1),water:'
     cv.addEventListener('pointerdown',function(e){e.preventDefault();if(P.stage!=='squeeze')return;P.press=true;P.dn=performance.now();
       var take=P.dirt*0.2+0.01;P.dirt=Math.max(0,P.dirt-take);P.murk=Math.min(0.92,P.murk+take*1.05);sfx('squelch');var bcx=W*0.5,bcy=H*0.62+H*0.56*0.08;
       for(var i=0;i<Math.ceil(10+take*60);i++){var a=Math.random()*6.283,sp=rnd(30,110);P.parts.push({x:bcx+Math.cos(a)*W*0.06,y:bcy+Math.sin(a)*H*0.06,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp*0.7,r:rnd(3,7),t:0});}
-      if(P.dirt<0.06){P.stage='clean';btns('<button class="btn primary" id="sp-done">Put it back</button>');$('sp-done').onclick=finish;line('Clean. The bacteria are still in it, that’s what you want.');}});
+      if(P.dirt<0.06){P.stage='clean';P.dirt=0;/* clean is clean: flow reads 100% (Puti, 3 Nov) */btns('<button class="btn primary" id="sp-done">Put it back</button>');$('sp-done').onclick=finish;line('Clean. The bacteria are still in it, that’s what you want.');}});
     P.upH=function(){if(P.press){P.press=false;sfx('suck',{v:0.6});for(var i=0;i<6;i++)P.bub.push({x:W*0.5+rnd(-W*0.08,W*0.08),y:H*0.7,r:rnd(1.5,3.5)});}};window.addEventListener('pointerup',P.upH);
     function finish(){T.flow=1;T.lastClean.sponge=Math.floor(S.day);api.close();toast('The filter flows again. Bubbles are back.');sfx('plop');tankMod.renderSide();}
   }});}

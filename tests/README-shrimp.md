@@ -2195,3 +2195,11 @@ Puti picked from the test page (https://claude.ai/artifact/SR9SQMnBPnUu7MnP9opXg
 - Header Sell goes once a farm is built, unless sales are banned (police year).
 - Bug: a choice with no money cost (Ask happy owners for photos, ✦ 45) was greyed when cash was under the cash reserve. `okp` and `buyProj` only check cash when the choice costs cash.
 - Checks: `shrimp-balance` (new Pass 225 check), `shrimp-me`; screenshots at 360 px of the bulk order, Making kits header, ad rows and farm feed (tmp only).
+
+## Pass 226 (3 Nov): water and dip sounds, catch sound, sponge 100%, farm upkeep
+
+- Health check water change: holding Drain plays a low gurgle (`sfxLoop('drain')`), holding Refill a soft pour with small bubbles (`'fill'`), both stop when you let go (`cgHold`). Netting a shrimp plays Puti's catch sound from the other shrimp game (`catch-shrimp-1/2.mp3`, `sfxCatch`, loaded when the water change opens; a plop until it has loaded).
+- Salt dip: holding the net under plays a soft underwater hush with slow bubbles (`'under'`) and a small plop going in; it stops on lift. Same dip in QC and for new shrimp.
+- Sponge: the clean stage ended at dirt under 0.06, so the flow meter topped out at 95-96%. Clean now sets dirt to 0 on both pages (index.html sponge job, land `toys.js`), flow reads 100%. The tank still loses about 1% flow a tank day (2.4 s) after that, as before.
+- Farms header upkeep uses `farmOverhead(G)` every render, so the feed choice (and the MBA course, cheaper upkeep stories) shows at once. It used the raw farm sum cached when the farm list last changed.
+- Checks: browser run of the three loops and the catch mp3 (2 buffers loaded, no errors), farm header 12 to 15 AED/d on Varied fresh. `shrimp-balance`, `shrimp-tank1`. Not heard on a phone.
