@@ -2139,3 +2139,11 @@ Tests: balance 139 (new Pass 220 check), me 50, academy 10, profiles (targets me
 ### Pass 221: tighter chips, Lay flat, Papers fold (2 Nov)
 
 Puti: chips shorter (28 px, 5 px gap), a ninth rest pick Lay flat that does nothing (`flat`, no strain relief or health, reads life first like any rest pick), the facts fold is called Papers (n). The tab bar in the Pass 220 screenshots sat mid-page only because those were full-page captures; in the viewport it sits at the bottom (checked at 360 and 390). Tests: balance 139, me 50; no chip label cut at 360.
+
+### Pass 221b and the deploy of Passes 218 to 221 (2 Nov)
+
+- The pop-up gap (10 to 20 s) is drawn from the play clock, not `Math.random`, so bot runs keep the same random stream as before (with it the strong bots went broke on day 249 on a shifted stream).
+- Money for Grandma line keeps one height (`.me-sendrow>.hint` fixed 2 lines); it moved the You card 1 px on every tap (also on Pass 218).
+
+Deployed 2 Nov (Passes 218 to 221, BUILD 2026-11-02-p221). Before deploy: balance 139, me 50, academy 10, profiles (targets met), pairs, cardtap, tank1, yourtank, land-audio, land-life, endcards 50, hard 12, frozen; bots seed 7: strong cold 2,282 empire_dictator (Pass 218 alone: 2,320), average Earth 7,141 question_prof, science 639 (Pass 217 deploy 7,001 empire_good); Space bot lands, passes; spotlights 103 all good; layout the known 2 px on win World; stable: the known bought-row movers only, the Grandma money line fixed.
+Strong kind bot: INSOLVENT on day 1,022 (Pass 218 alone: day 1,077, so it comes from Pass 218's cards, not Your day). It takes Switch on the hardier line (85% less breeding for 3 to 6 months, Puti's Pass 215/216 number) with 11 racks, 4 barns and mall stores running, and the bot has no money-trouble answers. A player gets the Out of money card. Flagged to Puti.
