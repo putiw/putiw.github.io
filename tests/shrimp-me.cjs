@@ -139,7 +139,7 @@ var l=newGame();l.humans=6e7;l.day=900;l.tr={know:8,kin:-8,drive:6};treeDay(l);i
 `);
 check('Grandma’s place: three paid steps, the last opens the land; the old house chain is gone',`
 var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;g.kits.sold=Math.max(1,g.kits.sold);personalDay(g);g.me.on=1;g.money=1e6;if(typeof houseOffer!=='undefined'||typeof HOUSE!=='undefined')throw Error('Old house card');if(!gplaceOffer(g))throw Error('Offer');
-if(!buyGplace(g)||landOpen(g))throw Error('Balcony');if(!buyGplace(g)||landOpen(g))throw Error('House');if(!buyGplace(g)||!landOpen(g))throw Error('Land');if(buyGplace(g))throw Error('Nothing after the land');
+if(!buyGplace(g)||landOpen(g))throw Error('Balcony');if(!buyGplace(g)||landOpen(g))throw Error('House');if(buyGplace(g))throw Error('Pass 227: land waits for the card');storyChoose(g,'gp_land',1);if(!buyGplace(g)||!landOpen(g))throw Error('Land');if(buyGplace(g))throw Error('Nothing after the land');
 if(Math.round(g.money)!==1e6-294000)throw Error('Paid '+(1e6-g.money));
 g.tanks[0].pop=[{age:120,n:10,g:40},{age:20,n:4,g:30}];var o=landOwn(g);if(o.adults!==10||o.young!==4)throw Error('Own '+JSON.stringify(o));landTake(g,3,1);o=landOwn(g);if(o.adults!==7||o.young!==3)throw Error('Take '+JSON.stringify(o));
 `);
@@ -282,11 +282,11 @@ var c=storeDayCost(g);if(Math.abs(c-(13*800*1.1+4*800))>1)throw Error('Rent '+c)
 g.emp.frozen=g.day+5;if(buyStores(g,'auh',1))throw Error('Frozen accounts block stores');
 if(shopOk(g,SHOPS[3])||shopOk(g,SHOPS[4]))throw Error('Mall flagship and megastore are retired');
 `);
-check('Grandma asks you to look at land once you have sent her AED 500k',`
-var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;g.kits.sold=Math.max(1,g.kits.sold);personalDay(g);g.me.on=1;g.me.sent=5e5;g.money=1e6;if(!milestoneConditions(g).gp_land)throw Error('Offer at 500k');
-storyChoose(g,'gp_land',0);if(!frozen(g)||frozenText(g).indexOf('land')<0)throw Error('A month away');var d0=g.day;while(g.day<d0+31){g.day++;landDay(g);}if(!landOpen(g))throw Error('She finds land');
+check('Grandma asks you to look at land once she has the house (Pass 227)',`
+var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;g.kits.sold=Math.max(1,g.kits.sold);personalDay(g);g.me.on=1;g.me.sent=5e5;g.money=1e6;g.me.gplace={balcony:1,house:1};if(!milestoneConditions(g).gp_land)throw Error('Offer after the house');
+storyChoose(g,'gp_land',0);if(!frozen(g)||frozenText(g).indexOf('land')<0)throw Error('A month away');var d0=g.day;while(g.day<d0+31){g.day++;landDay(g);}if(landOpen(g)||!buyGplace(g)||!landOpen(g))throw Error('She finds land, you buy it');
 g.money=-100;if(brokeOpts(g).some(function(x){return x[2]==='save';}))throw Error('No envelope after the land');if(gpLines(g).join().indexOf('fig tree')<0)throw Error('Ending line');
-var h=newGame();h.tanks[0].feeder=1;h.tanks[0].autoWC=1;h.kits.sold=Math.max(1,h.kits.sold);personalDay(h);h.me.on=1;h.me.sent=5e5;h.money=2e6;storyChoose(h,'gp_land',1);if(frozen(h))throw Error('No means no trip');h.day=h.me.tour;if(!milestoneConditions(h).gp_scam)throw Error('The scam call');h.emp.infOn=1;var i0=h.emp.inf,m0=h.money;storyChoose(h,'gp_scam',0);if(h.emp.inf!==i0||Math.abs(m0-h.money-5e5)>1)throw Error('Paid back, no gala');if(gpLines(h).join().indexOf('paid back')<0)throw Error('Scam line');
+var h=newGame();h.tanks[0].feeder=1;h.tanks[0].autoWC=1;h.kits.sold=Math.max(1,h.kits.sold);personalDay(h);h.me.on=1;h.me.sent=5e5;h.money=2e6;h.me.gplace={balcony:1,house:1};storyChoose(h,'gp_land',1);if(frozen(h))throw Error('No means no trip');h.day=h.me.tour;if(!milestoneConditions(h).gp_scam)throw Error('The scam call');h.emp.infOn=1;var i0=h.emp.inf,m0=h.money;storyChoose(h,'gp_scam',0);if(h.emp.inf!==i0||Math.abs(m0-h.money-5e5)>1)throw Error('Paid back, no gala');if(gpLines(h).join().indexOf('paid back')<0)throw Error('Scam line');
 `);
 check('galas raise money for a cause you pick, and it shows up in the ending',`
 var g=newGame();g.money=1e7;g.emp.infOn=1;if(!buyProj(g,'gala','kids'))throw Error('Gala');if(!(g.emp.galaFor.kids>0))throw Error('Cause recorded');var i0=g.emp.inf;buyProj(g,'gala','own');if(!(g.emp.galaFor.own<g.emp.galaFor.kids))throw Error('Own foundation keeps most');if(gpLines(g).join().indexOf('children')<0)throw Error('Ending line '+gpLines(g).join('|'));

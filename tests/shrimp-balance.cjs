@@ -969,4 +969,10 @@ var g=newGame();g.kits.stock=1000;g.emp.packed=100;g.korder={n:500,price:10,who:
 var h=newGame();h.kits.sold=400;h.money=1;h.emp.infOn=1;h.emp.inf=100;if(!buyProj(h,'revreal'))throw Error('photos costs only influence, low cash must not block it');
 if(CARDS3.c_letgo.ch[0][0]!=='Yes, they\u2019ll be happier')throw Error('Let them go yes label');
 `);
+check('Pass 227 (Puti): Grandma\u2019s land card comes after the 40k house, and the 250k land is for sale only after it',`
+var g=newGame();g.me.on=1;g.money=1e6;g.me.gplace={balcony:1};if(milestoneConditions(g).gp_land)throw Error('not before the house');
+g.me.gplace.house=1;if(!milestoneConditions(g).gp_land)throw Error('card after the house');if(gplaceOffer(g)!=='wait'||buyGplace(g))throw Error('land not for sale before the card');
+storyChoose(g,'gp_land',1);if(gplaceOffer(g)!==true||!buyGplace(g)||!landOpen(g))throw Error('after Not this time the land is for sale');
+var h=newGame();h.me.on=1;h.money=1e6;h.me.gplace={balcony:1,house:1};storyChoose(h,'gp_land',0);if(gplaceOffer(h)==='wait'&&h.me.landTrip>h.day){}else throw Error('waits during the trip');h.day=h.me.landTrip;landDay(h);if(landOpen(h))throw Error('the trip finds the land, it does not buy it');if(gplaceOffer(h)!==true)throw Error('for sale after the trip');
+`);
 console.log(count+' focused balance and migration checks passed');

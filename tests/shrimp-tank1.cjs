@@ -29,7 +29,7 @@ for(const seed of [3,7,11]){const c=engine(seed);vm.runInContext(SETUP+`
  ok(c.o.mc.length===48&&c.o.pests.length===2&&c.o.pests[1].x===0.5,'landOwn sends 48 mulm columns and each pest with its place');
  ok(c.after,'cleaned columns stay clean in the game');ok(c.pests==='11','picked pests leave the game by id');}
 // 4. Pass 184: buying the land puts the full decor in Tank 1, sim flags too; old land saves get it once on load
-{const c=engine(9);vm.runInContext(`var g=newGame(),T=g.tanks[0];g.me=newMe();g.me.on=1;g.me.keep='self';g.money=1e7;g.me.gplace={balcony:1,house:1};T.wood=T.plants=T.moss=T.leaves=0;
+{const c=engine(9);vm.runInContext(`var g=newGame(),T=g.tanks[0];g.me=newMe();g.me.on=1;g.me.keep='self';g.money=1e7;g.me.gplace={balcony:1,house:1};g.me.landQ='no';T.wood=T.plants=T.moss=T.leaves=0;
  var before=T.wood+T.plants+T.moss+T.leaves,ok1=buyGplace(g),after=[T.wood,T.plants,T.moss,T.leaves].join(),sent=landOwn(g).decor;
  var o=newGame();o.me=newMe();o.me.gplace={balcony:1,house:1,land:1};migrate(o);var mig=[o.tanks[0].wood,o.tanks[0].plants,o.tanks[0].moss,o.tanks[0].leaves,o.tanks[0].ldec].join();
  var k=newGame();k.me=newMe();k.me.gplace={balcony:1,house:1,land:1};k.tanks[0].ldec=1;k.tanks[0].wood=0;migrate(k);var kept=k.tanks[0].wood;`,c);

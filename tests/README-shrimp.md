@@ -2203,3 +2203,14 @@ Puti picked from the test page (https://claude.ai/artifact/SR9SQMnBPnUu7MnP9opXg
 - Sponge: the clean stage ended at dirt under 0.06, so the flow meter topped out at 95-96%. Clean now sets dirt to 0 on both pages (index.html sponge job, land `toys.js`), flow reads 100%. The tank still loses about 1% flow a tank day (2.4 s) after that, as before.
 - Farms header upkeep uses `farmOverhead(G)` every render, so the feed choice (and the MBA course, cheaper upkeep stories) shows at once. It used the raw farm sum cached when the farm list last changed.
 - Checks: browser run of the three loops and the catch mp3 (2 buffers loaded, no errors), farm header 12 to 15 AED/d on Varied fresh. `shrimp-balance`, `shrimp-tank1`. Not heard on a phone.
+
+## Pass 227 (3 Nov): grant slider, farms idle line, banners under cards, company tank jobs, the land after its card
+
+- Grant amount slider has no − and +, so it sat in the 30 px stepper column. `.ctl.ctl-ns` gives it the whole middle (about 122 px at 360, was about 30).
+- Farms header: when the farms made 0 shrimp, a fine line says why (`60 d of orders in stock`, or `Not enough cash to breed`). Puti had 15 industrial hatcheries at AED 21k/d and 0 shrimp/d: the warehouse held 60 days of orders, so the farms wait and still pay upkeep (Pass 193 rule). The `.hfine` rule was inside a 360 px media query; moved to the global `.hd small` rule.
+- A story card opening hides the note and news banners (`cardShield`). The card made the banner inert, so it couldn't be swiped away over the card.
+- After the land, the company Tank tab runs its own tank jobs again (vacuum, sponge, trim, pests, glass), the same as before the land; only Aquascape, which only exists on the land, opens it (`landJob`). Puti: the land's tank view looked zoomed and the sponge didn't work from there. Checked in a browser: all five jobs open the same way with and without the land, tank view stays 159 px. `shrimp-tank1-browser` now checks the company job and the tank clock hold.
+- Grandma's land card (`gp_land`) comes after the 40k house (was at AED 500k sent), body no longer mentions money sent. The 250k land is for sale only after the card: Not this time puts it on sale, Go with her finds it after the month (`landDay` no longer buys it for you, `landReady`, `gplaceOffer` returns 'wait').
+- Tests: balance 142 (new check), me 50, tank1, yourtank, land-audio, cardtap. Before this pass on the same build: academy 10, land-life, profiles, pairs, endcards 50, frozen, hard 12, spotlights 103, layout (the known 2 px on win World), Space bot passes. Stable screen stopped part way (Puti interrupted).
+
+Deployed 3 Nov (Passes 223 to 227, BUILD 2026-11-03-p227). Bots seed 7 (Pass 226 build): strong cold won day 2,282 empire_dictator; average Earth day 7,197 question_prof, 41 min waiting; strong kind INSOLVENT day 1,022 (the open hardier line issue from Pass 218; the bots stop at the first negative balance, before Pass 222's help card).

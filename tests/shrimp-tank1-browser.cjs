@@ -50,16 +50,11 @@ module.exports=async function(ok){
  await compare(f,'10 s later');
  // 4. reload: both pages agree again
  await p.evaluate(()=>{landHide();save(true);});await boot();f=await land();await compare(f,'after a reload');
- // 5. a care button on the company page opens the land's job and comes back
+ // 5. Pass 227 (Puti): after the land, a care button on the company page runs the company's own job, same as before the land
  await p.evaluate(()=>{landHide();G.sel=0;selectTab('tank');render();});
- const j=await p.evaluate(async()=>{TVLOCK=null;tvLockOn('vac');await new Promise(r=>setTimeout(r,2500));return {on:LAND.on,busy:LAND.busy};});
- f=await frame();const tid=await f.evaluate(()=>TOY&&TOY.id);
- ok(j.on&&j.busy&&tid==='vac','Vacuum on the company Tank tab opens the land on its vacuum ('+JSON.stringify(j)+' '+tid+')');
- const held=await p.evaluate(async()=>{var t=G.tday+((G.tstep||0)+(G.tq||0))/4;await new Promise(r=>setTimeout(r,3000));return G.tday+((G.tstep||0)+(G.tq||0))/4-t;});
- ok(held===0,'Tank 1 holds while the job is open ('+held+')');
- await f.evaluate(()=>toyEnd());await wait(1200);
- const back=await p.evaluate(()=>({on:LAND.on,busy:LAND.busy,tab:activeTab}));
- ok(!back.on&&!back.busy&&back.tab==='tank','Done goes back to the company Tank tab ('+JSON.stringify(back)+')');
+ const j=await p.evaluate(async()=>{TVLOCK=null;tvLockOn('vac');await new Promise(r=>setTimeout(r,500));var t=G.tday+((G.tstep||0)+(G.tq||0))/4;await new Promise(r=>setTimeout(r,3000));var r={on:LAND.on,mode:TVLOCK&&TVLOCK.mode,job:!!(TVLOCK&&TVLOCK.job),held:G.tday+((G.tstep||0)+(G.tq||0))/4-t};tvLockOff();return r;});
+ ok(!j.on&&j.mode==='vac'&&j.job,'Vacuum on the company Tank tab runs on the company page after the land ('+JSON.stringify(j)+')');
+ ok(j.held===0,'Tank 1 holds while the job is open ('+j.held+')');
  const grad=errs.filter(e=>/createLinearGradient|non-finite/i.test(e));ok(grad.length===0,'no non-finite gradient errors ('+grad.length+')');
  const other=errs.filter(e=>!/createLinearGradient|non-finite|Failed to load resource|AudioContext/i.test(e));ok(other.length===0,'no other page errors'+(other.length?': '+other.slice(0,3).join(' | '):''));
  // Pass 190: an empty Tank 1 before the land: Check shrimp reads Buy shrimp in the same slot and buys 5
