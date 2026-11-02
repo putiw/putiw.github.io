@@ -2215,7 +2215,7 @@ if(p.nextStory!=null&&p.nextStory-now>300000)p.nextStory=now;
 function progressionBlocked(G){var p=ensureProgress(G);return p.queue.length>0||(!!G.emp.ended&&!G.left)||!!G.emp.won&&!p.sandbox&&!G.voyage;}
 // Pass 219 (Puti): the gap runs from when the last pop-up closed, a new random 10 to 20 s of play each time.
 function introGap(p){return p.gap||CARD_GAP;}
-function introStamp(G){var p=ensureProgress(G),n=storyClock(G);if(p.lastAck==null||p.lastAck<n)p.lastAck=n;p.gap=10000+Math.round(Math.random()*10000);}
+function introStamp(G){var p=ensureProgress(G),n=storyClock(G);if(p.lastAck==null||p.lastAck<n)p.lastAck=n;var hx=Math.imul((Math.floor(n)|0)^0x5bd1e995,2654435761)>>>0;p.gap=10000+hx%10001;}/* a fresh 10 to 20 s from the clock, so it doesn't take from the game's Math.random */
 function acknowledgeMilestone(G){var p=ensureProgress(G),key=p.queue.shift();if(!key)return null;introStamp(G);if(key==='ev_mira')G.emp.infOn=1;return key;}
 function activeFarms(G,id){return Math.max(0,(G.emp.farms[id]||0)-((G.emp.pausedFarms||{})[id]||0));}
 function farmOverhead(G){var c=0;FARMS.forEach(function(f){c+=activeFarms(G,f.id)*f.up;});return c*(crsDone(G,'mba')?0.97:1)*(1+FW_FEED[fwOf(G).f||0].up)*(rippleHas(G,'upkeep')?0.95:1)*(pd(G,'lawbribe')?0.85:1)*(pd(G,'ev_bay')?0.9:1)*(pd(G,'solar')?0.9:1)*(pd(G,'wastedump')?0.78:1)*(pd(G,'wasteclean')?1.1:1)*rlM(G,'energy',0.05);}
