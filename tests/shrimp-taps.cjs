@@ -37,8 +37,8 @@ const HOOK=()=>{window.__src=[];var P=(window.AudioContext||window.webkitAudioCo
   var z=document.createElement('button');z.id='tt-step';z.textContent='−';z.style.cssText='position:fixed;left:290px;top:400px;z-index:99999';document.body.appendChild(z);});
  let r=await tap('#tt-main');
  ok(r.src.length===1,'one tap, one buffer source ('+r.src.length+')');
- ok(r.src[0]&&Math.abs(r.src[0].g*BUS-NET*0.5)<1e-3,'main buttons at half of net 0.3 (Pass 237) (source '+(r.src[0]&&r.src[0].g.toFixed(3))+' x bus 0.41)');
- ok(r.src[0]&&r.src[0].r>=0.94&&r.src[0].r<=1.06,'playback rate within 0.94 to 1.06');
+ ok(r.src[0]&&Math.abs(r.src[0].g*BUS-0.12)<1e-3,'main buttons at net 0.12 (Pass 239) (source '+(r.src[0]&&r.src[0].g.toFixed(3))+' x bus 0.41)');
+ ok(r.src[0]&&r.src[0].r>=0.94*0.9-1e-6&&r.src[0].r<=1.06*0.9+1e-6,'playback rate 0.9 x 0.94 to 1.06 (Pass 239)');
  ok(r.role==='main'&&r.flip,'main action sound, hidden switch toggled once');
  ok(!r.focus,'hidden switch never takes focus');
  r=await tap('#tt-step');ok(r.role==='step','− is a stepper sound');
@@ -81,7 +81,7 @@ const HOOK=()=>{window.__src=[];var P=(window.AudioContext||window.webkitAudioCo
  await fr.evaluate(()=>{window.__src=[];TAPS.lastSnd=TAPS.lastTick=0;});const c0=await fr.evaluate(()=>TAPS.input&&TAPS.input.checked);
  const seg2=await fr.$$('#lseg [data-seg]');if(seg2[1])await seg2[1].click();await wait(150);
  const lr=await fr.evaluate(c0=>({n:__src.length,g:__src[0]&&__src[0].g,role:TAPS.last&&TAPS.last.role,flip:TAPS.input.checked!==c0}),c0);
- ok(lr.n===1&&lr.role==='tab'&&Math.abs(lr.g*BUS-NET)<1e-3,'land Home/Tank switch: one tab sound at 0.3 ('+lr.n+', '+lr.role+')');
+ ok(lr.n===1&&lr.role==='tab'&&Math.abs(lr.g*BUS-0.22)<1e-3,'land Home/Tank switch: one tab sound at 0.22 (Pass 239) ('+lr.n+', '+lr.role+')');
  ok(lr.flip,'land tick toggles');
  await p.evaluate(()=>setMute(true));await wait(300);
  await fr.evaluate(()=>{window.__src=[];TAPS.lastSnd=TAPS.lastTick=0;});if(seg2[0])await seg2[0].click();await wait(150);
@@ -95,7 +95,7 @@ const HOOK=()=>{window.__src=[];var P=(window.AudioContext||window.webkitAudioCo
  await q.evaluate(()=>{window.__src=[];TAPS.lastSnd=TAPS.lastTick=0;});const sc0=await q.evaluate(()=>TAPS.input?TAPS.input.checked:false);
  if(btn)await btn.click();await wait(150);
  const sr=await q.evaluate(c0=>({n:__src.length,g:__src[0]&&__src[0].g,flip:TAPS.input&&TAPS.input.checked!==c0}),sc0);
- ok(sr.n===1&&Math.abs(sr.g-NET*0.5)<1e-3&&sr.flip,'ship: one main sound at half of 0.3, tick toggles ('+sr.n+')');
+ ok(sr.n===1&&Math.abs(sr.g-0.12)<1e-3&&sr.flip,'ship: one main sound at 0.12, tick toggles ('+sr.n+')');
  ok(!errs.length,'no page errors'+(errs.length?': '+errs.join(' | '):''));
  await b.close();srv.close();console.log(fails?fails+' FAILED':'all ok');process.exit(fails?1:0);
 })().catch(e=>{console.error(e);process.exit(1);});

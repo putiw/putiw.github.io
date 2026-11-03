@@ -2309,3 +2309,11 @@ Deployed 3 Nov (Passes 233 to 235, BUILD 2026-11-03-p235). Bots seed 7: strong c
 - The worker keeps index, land, ship, taps.js, music, water, catch and the nine tap sounds on install, and Google Fonts when first fetched. Pages are network first (3 s, then the kept copy), so a new BUILD still arrives when online; everything else is the kept copy, refreshed in the background. Query strings ignored. Bump `CACHE` in sw.js only to drop old files.
 - iOS keeps a Home Screen app's storage apart from Safari's, so a game started in Safari doesn't carry over to the icon.
 - Tested: Chromium at 390 px, load online, go offline, reload: game, home.html and sounds load from the worker. Balance 142.
+
+## Pass 239 (3 Nov, Puti): sounds from her sound lab picks
+
+- Puti tuned each sound on the Shrimp Sound Lab artifact and sent the numbers; they go in as she sent them.
+- Buttons (`ROLE_SET` in taps.js, all three pages): net volume at the speakers, low-pass cut, fade in, pitch per role. main 0.12 / 850 Hz / 6 ms / 0.9, tab 0.22 / 1.8 kHz / 3 ms, chip 0.2 / 1.6 kHz / 3 ms / 0.95, step 0.18 / 1.5 kHz / 3 ms / 0.95, open 0.22 / 1.8 kHz / 3 ms, close 0.24 / 2 kHz / 2 ms. Feed, Water and Sell unchanged. The fade sits on its own gain after the level gain.
+- Catch (game `sfxCatch`, land `catch`): net 0.11 (source 0.268), low-pass 1285 Hz, 15.5 ms fade in, pitch 1.14.
+- Loops (`WLOOP` in index.html): drain 0.05 / low-pass 420 Q 1 / sway 2 Hz 70 / bubbles 0.01; fill 0.01 / band 1004 Q 0.7 / 6.2 Hz 70 / 0.014; vacuum 0.075 / low-pass 863 Q 0.7 / 0.8 Hz 190 / 0.041 (land siphon the same). Bubbles: 45% every 170 ms, 0.1 s rising blips.
+- Tests: shrimp-taps and shrimp-sound updated to the new levels (sound reads `WLOOP`), balance 142, land-audio pass.

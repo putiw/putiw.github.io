@@ -656,20 +656,20 @@ function sfx(name,o){if(!AC||!S||!S.opt.sound)return;o=o||{};if(typeof TAPS!=='u
  case 'pondin':soft(t,0.5,0.08*v,'lowpass',460,0.7,0.06);tone('sine',240,95,t+0.03,0.26,0.07*v);for(var b=0;b<4;b++)tone('sine',380+Math.random()*220,560,t+0.3+b*0.09+Math.random()*0.04,0.05,0.02*v);break;
  case 'thud':tone('sine',160,60,t,0.12,0.15*v);break;
  case 'pour':nburst(t,0.9,0.12*v,'bandpass',700,0.8);break;
- case 'catch':if(CATCH.length){var cs=AC.createBufferSource(),cg=AC.createGain();cs.buffer=CATCH[Math.floor(Math.random()*CATCH.length)];cg.gain.value=0.52*v;cs.connect(cg);cg.connect(BUS);cs.start(t);}else{tone('sine',700,180,t,0.09,0.18*v);}break;
+ case 'catch':if(CATCH.length){var cs=AC.createBufferSource(),cg=AC.createGain();cs.buffer=CATCH[Math.floor(Math.random()*CATCH.length)];cs.playbackRate.value=1.14;var clp=AC.createBiquadFilter();clp.type='lowpass';clp.frequency.value=1285;clp.Q.value=0.5;cg.gain.setValueAtTime(0,t);cg.gain.linearRampToValueAtTime(0.268*v,t+0.0155);cs.connect(clp);clp.connect(cg);cg.connect(BUS);cs.start(t);/* game Pass 239, Puti's sound lab */}else{tone('sine',700,180,t,0.09,0.18*v);}break;
  case 'push':tone('triangle',116,74,t,0.16,0.14*v);break;
  }}catch(e){}}
 // held loops: sfxLoop(name) -> {set(level 0..1), stop()}
 function sfxLoop(name){if(!AC||!S||!S.opt.sound)return {set:function(){},stop:function(){}};if(typeof TAPS!=='undefined')TAPS.marked();var t=AC.currentTime,g=AC.createGain();g.gain.value=0;g.connect(BUS);var nodes=[];
- try{if(name==='siphon'){var s=noiseSrc(),f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=520;f.Q.value=0.7;s.connect(f);f.connect(g);s.start();nodes.push(s);
-   var lfo=AC.createOscillator(),lg=AC.createGain();lfo.frequency.value=2.5;lg.gain.value=90;lfo.connect(lg);lg.connect(f.frequency);lfo.start();nodes.push(lfo);}
+ try{if(name==='siphon'){var s=noiseSrc(),f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=863;f.Q.value=0.7;s.connect(f);f.connect(g);s.start();nodes.push(s);
+   var lfo=AC.createOscillator(),lg=AC.createGain();lfo.frequency.value=0.8;lg.gain.value=190;lfo.connect(lg);lg.connect(f.frequency);lfo.start();nodes.push(lfo);}
   else if(name==='mower'){var o=AC.createOscillator(),f2=AC.createBiquadFilter();o.type='sawtooth';o.frequency.value=72;f2.type='lowpass';f2.frequency.value=420;o.connect(f2);f2.connect(g);o.start();nodes.push(o);var s2=noiseSrc(),f3=AC.createBiquadFilter();f3.type='bandpass';f3.frequency.value=2400;f3.Q.value=0.6;var g3=AC.createGain();g3.gain.value=0.25;s2.connect(f3);f3.connect(g3);g3.connect(g);s2.start();nodes.push(s2);}
   else if(name==='wipe'){var s6=noiseSrc(),f6=AC.createBiquadFilter(),b6=AC.createBiquadFilter();f6.type='lowpass';f6.frequency.value=1100;b6.type='bandpass';b6.frequency.value=650;b6.Q.value=0.6;s6.connect(f6);f6.connect(b6);b6.connect(g);s6.start();nodes.push(s6);}/* softer cloth, Puti 3 Nov */
   else if(name==='bubbles'){var s3=noiseSrc(),f4=AC.createBiquadFilter();f4.type='lowpass';f4.frequency.value=380;f4.Q.value=6;s3.connect(f4);f4.connect(g);s3.start();nodes.push(s3);}
  }catch(e){}
- var peak={siphon:0.09,mower:0.12,bubbles:0.16,wipe:0.05}[name]||0.1,lv=0,bub=null;
+ var peak={siphon:0.075,mower:0.12,bubbles:0.16,wipe:0.05}[name]||0.1,lv=0,bub=null;
  /* game Pass 237 (Puti): the vacuum lighter and softer, soft water blips inside, same as the company page */
- if(name==='siphon')bub=setInterval(function(){if(lv<0.05||!AC||!S.opt.sound)return;if(Math.random()<0.45)try{var f0=260+Math.random()*380;tone('sine',f0,f0*1.8,AC.currentTime,0.1,0.014*lv);}catch(e){}},170);
+ if(name==='siphon')bub=setInterval(function(){if(lv<0.05||!AC||!S.opt.sound)return;if(Math.random()<0.45)try{var f0=260+Math.random()*380;tone('sine',f0,f0*1.8,AC.currentTime,0.1,0.041*lv);}catch(e){}},170);
  return {set:function(l){lv=clamp(l,0,1);if(AC)g.gain.setTargetAtTime(peak*lv,AC.currentTime,name==='wipe'?0.09:0.06);},stop:function(){lv=0;if(bub)clearInterval(bub);if(!AC)return;g.gain.setTargetAtTime(0,AC.currentTime,0.08);setTimeout(function(){nodes.forEach(function(n){try{n.stop();}catch(e){}});g.disconnect();},500);}};}
 
 // A job on your tank is done: two soft notes, the same as the company page (Puti picked it, 3 Nov). Small room reverb so they ring.

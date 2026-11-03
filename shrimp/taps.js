@@ -8,8 +8,9 @@
 // The tick is a hidden <label for=X><input type=checkbox switch id=X></label>, clicked inside the tap: iOS 18+ Safari
 // gives a small tick when a switch toggles. No navigator.vibrate anywhere (no Android code, Puti can't test it).
 (function(){
-// Pass 237 (Puti 3 Nov): the default button even softer, half as loud and the click taken off the top
-var ROLE_GAIN={main:0.5};
+// Pass 239 (Puti picked these on the sound lab page, 3 Nov): per role net volume at the speakers, low-pass cut (Hz),
+// fade in (ms) and pitch. Feed, Water and Sell keep their files as they are (net 0.3, no filter).
+var ROLE_SET={main:{vol:0.12,cut:850,att:6,pitch:0.9},tab:{vol:0.22,cut:1800,att:3,pitch:1},chip:{vol:0.2,cut:1600,att:3,pitch:0.95},step:{vol:0.18,cut:1500,att:3,pitch:0.95},open:{vol:0.22,cut:1800,att:3,pitch:1},close:{vol:0.24,cut:2000,att:2,pitch:1}};
 var SFX_FILE={tab:'tap_felt',chip:'tap_tip',step:'tap_blip',main:'tap_tok',open:'tap_pop',close:'tap_pillow',feed:'feed_drop_002',water:'water_double',sell:'sell_coins_chime_b'};
 var GAP=40,RATE0=0.94,RATE1=1.06;
 var T={ctx:null,cfg:null,raw:{},bufs:{},bufCtx:null,lastSnd:0,lastTick:0,mark:0,pend:null,el:null,plays:0,ticks:0,
@@ -48,7 +49,8 @@ T.load=function(){var c=ctxNow();if(!c||T.bufCtx===c)return;T.bufCtx=c;T.bufs={}
   got.then(function(a){return new Promise(function(ok,no){c.decodeAudioData(a.slice(0),ok,no);});}).then(function(b){if(T.bufCtx===c)T.bufs[f]=b;}).catch(function(){});});};
 T.play=function(role){var now=performance.now();if(now-T.lastSnd<GAP)return false;if(!T.soundsOn()||!T.cfg||(T.cfg.ok&&!T.cfg.ok()))return false;
  var c=ctxNow();if(!c||c.state!=='running')return false;if(T.bufCtx!==c)T.load();var b=T.bufs[SFX_FILE[role]||SFX_FILE.main];if(!b)return false;
- try{var s=c.createBufferSource(),g=c.createGain();s.buffer=b;s.playbackRate.value=RATE0+Math.random()*(RATE1-RATE0);g.gain.value=T.cfg.gain*(ROLE_GAIN[role]||1);s.connect(g);if(role==='main'||!SFX_FILE[role]){var lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1600;lp.Q.value=0.5;g.connect(lp);lp.connect(T.cfg.dest());}else g.connect(T.cfg.dest());s.start();T.lastSnd=now;T.plays++;T.last={role:role,gain:g.gain.value,rate:s.playbackRate.value};return true;}catch(e){return false;}};
+ try{var R=ROLE_SET[SFX_FILE[role]?role:'main'],s=c.createBufferSource(),g=c.createGain(),t=c.currentTime;s.buffer=b;s.playbackRate.value=(R?R.pitch:1)*(RATE0+Math.random()*(RATE1-RATE0));g.gain.value=T.cfg.gain*(R?R.vol/0.3:1);s.connect(g);
+  if(R){var env=c.createGain(),lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=R.cut;lp.Q.value=0.5;env.gain.setValueAtTime(R.att?0:1,t);if(R.att)env.gain.linearRampToValueAtTime(1,t+R.att/1000);g.connect(env);env.connect(lp);lp.connect(T.cfg.dest());}else g.connect(T.cfg.dest());s.start(t);T.lastSnd=now;T.plays++;T.last={role:role,gain:g.gain.value,rate:s.playbackRate.value};return true;}catch(e){return false;}};
 // --- the tick ---
 function tickEl(){if(T.el)return T.el;var id='taps-tick',l=document.createElement('label'),i=document.createElement('input');i.type='checkbox';i.setAttribute('switch','');i.id=id;i.tabIndex=-1;l.htmlFor=id;
  l.setAttribute('aria-hidden','true');i.setAttribute('aria-hidden','true');l.appendChild(i);

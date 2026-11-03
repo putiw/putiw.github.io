@@ -28,5 +28,6 @@ for(const k in gs){ok(k in ls,'the land has the company sound '+k);if(k in ls)ok
 const pk=s=>{const m=s.match(/var peak=\{([^}]*)\}/);return m?m[1].replace(/\s+/g,''):'';};const gp=pk(game.slice(game.indexOf('function sfxLoop('))),lp=pk(land.slice(land.indexOf('function sfxLoop(')));
 // drain, fill and under are the health check's water change and salt dip, company only (the check is company-only)
 const lvl=(t,k,d)=>{const y=t.split(',').find(z=>z.split(':')[0]===k);return y?+y.split(':')[1]:d;};
-['siphon','wipe'].forEach(k=>{const a=lvl(gp,k,0.05),b2=lvl(lp,k,0.1);ok(a===b2,'loop '+k+' at the same level on both pages ('+a+' vs land '+b2+')');});
+const wl=k=>{const m=game.match(new RegExp('var WLOOP=\\{[^;]*'+k+':\\{vol:([0-9.]+)'));return m?+m[1]:null;};/* Pass 239: siphon, drain, fill levels live in WLOOP */
+['siphon','wipe'].forEach(k=>{const a=wl(k)!=null?wl(k):lvl(gp,k,0.05),b2=lvl(lp,k,0.1);ok(a===b2,'loop '+k+' at the same level on both pages ('+a+' vs land '+b2+')');});
 console.log(fails?fails+' FAILED':'all ok');process.exit(fails?1:0);
