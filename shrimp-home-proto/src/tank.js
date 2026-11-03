@@ -348,7 +348,7 @@ var tankMod={name:'tank',
 };
 registerMod(tankMod);registerTab('tank',tankMod);
 var HOLD_MS=450;
-function holdStep(){var h=TV.hold;if(!h||h.done||TOY)return;if(h.a&&TV.ag.indexOf(h.a)<0){TV.hold=null;return;}if(performance.now()-h.t0>=HOLD_MS){h.done=true;if(h.a){S.seen.tapShrimp=1;openBubble(h.a);sfx('click');try{navigator.vibrate&&navigator.vibrate(8);}catch(_){}capDefault();}}}
+function holdStep(){var h=TV.hold;if(!h||h.done||TOY)return;if(h.a&&TV.ag.indexOf(h.a)<0){TV.hold=null;return;}if(performance.now()-h.t0>=HOLD_MS){h.done=true;if(h.a){S.seen.tapShrimp=1;openBubble(h.a);sfx('click');hap();capDefault();}}}
 function bindTv(){var cv=TV.cv,down=null;
   cv.addEventListener('contextmenu',function(e){e.preventDefault();});
   cv.addEventListener('pointerdown',function(e){var r=cv.getBoundingClientRect(),p=[e.clientX-r.left,e.clientY-r.top];if(TOY){e.preventDefault();try{cv.setPointerCapture(e.pointerId);}catch(_){}TOY.down&&TOY.down(p,e);return;}down={p:p,t:performance.now()};try{cv.setPointerCapture(e.pointerId);}catch(_){}

@@ -25,7 +25,7 @@ function tone(type,f0,f1,t,dur,vol,dest){var o=AC.createOscillator(),g=AC.create
 function soft(t,dur,vol,ftype,freq,q,att){var s=noiseSrc(),f=AC.createBiquadFilter(),g=AC.createGain();f.type=ftype;f.frequency.value=freq;f.Q.value=q||1;g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.exponentialRampToValueAtTime(0.0001,t+att+dur);s.connect(f);f.connect(g);g.connect(BUS);s.start(t,Math.random());s.stop(t+att+dur+0.05);}
 function nburst(t,dur,vol,ftype,freq,q,dest){var s=noiseSrc(),f=AC.createBiquadFilter(),g=AC.createGain();f.type=ftype;f.frequency.value=freq;f.Q.value=q||1;env(g,t,0.004,vol,dur);s.connect(f);f.connect(g);g.connect(dest||BUS);s.start(t,Math.random());s.stop(t+dur+0.05);}
 // one-shot effects
-function sfx(name,o){if(!AC||!S||!S.opt.sound)return;o=o||{};var t=AC.currentTime,v=o.v||1;try{switch(name){
+function sfx(name,o){if(!AC||!S||!S.opt.sound)return;o=o||{};if(typeof TAPS!=='undefined'){if(name==='click'&&TAPS.pend)return;if(name!=='click')TAPS.marked();}var t=AC.currentTime,v=o.v||1;try{switch(name){
  case 'click':tone('sine',900,600,t,0.04,0.05*v);break;
  case 'nope':tone('triangle',220,160,t,0.12,0.08*v);break;
  case 'snip':nburst(t,0.025,0.25*v,'highpass',3500,0.8);nburst(t+0.035,0.03,0.18*v,'highpass',4200,0.8);tone('square',2600,1800,t,0.015,0.02*v);break;
@@ -56,7 +56,7 @@ function sfx(name,o){if(!AC||!S||!S.opt.sound)return;o=o||{};var t=AC.currentTim
  case 'push':tone('triangle',116,74,t,0.16,0.14*v);break;
  }}catch(e){}}
 // held loops: sfxLoop(name) -> {set(level 0..1), stop()}
-function sfxLoop(name){if(!AC||!S||!S.opt.sound)return {set:function(){},stop:function(){}};var t=AC.currentTime,g=AC.createGain();g.gain.value=0;g.connect(BUS);var nodes=[];
+function sfxLoop(name){if(!AC||!S||!S.opt.sound)return {set:function(){},stop:function(){}};if(typeof TAPS!=='undefined')TAPS.marked();var t=AC.currentTime,g=AC.createGain();g.gain.value=0;g.connect(BUS);var nodes=[];
  try{if(name==='siphon'){var s=noiseSrc(),f=AC.createBiquadFilter();f.type='bandpass';f.frequency.value=700;f.Q.value=1.4;s.connect(f);f.connect(g);s.start();nodes.push(s);
    var lfo=AC.createOscillator(),lg=AC.createGain();lfo.frequency.value=7;lg.gain.value=260;lfo.connect(lg);lg.connect(f.frequency);lfo.start();nodes.push(lfo);}
   else if(name==='mower'){var o=AC.createOscillator(),f2=AC.createBiquadFilter();o.type='sawtooth';o.frequency.value=72;f2.type='lowpass';f2.frequency.value=420;o.connect(f2);f2.connect(g);o.start();nodes.push(o);var s2=noiseSrc(),f3=AC.createBiquadFilter();f3.type='bandpass';f3.frequency.value=2400;f3.Q.value=0.6;var g3=AC.createGain();g3.gain.value=0.25;s2.connect(f3);f3.connect(g3);g3.connect(g);s2.start();nodes.push(s2);}
@@ -70,4 +70,13 @@ function sfxLoop(name){if(!AC||!S||!S.opt.sound)return {set:function(){},stop:fu
 var SFXR=null;
 function sfxRev(){if(SFXR&&SFXR.c===AC)return SFXR.n;var n=AC.sampleRate*1.6,b=AC.createBuffer(2,n,AC.sampleRate);for(var ch=0;ch<2;ch++){var d=b.getChannelData(ch);for(var i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);}var r=AC.createConvolver(),g=AC.createGain();r.buffer=b;g.gain.value=0.35;r.connect(g);g.connect(BUS);SFXR={c:AC,n:r};return r;}
 function sfxNote(f,t,dur,v){var g=AC.createGain(),a=AC.createOscillator(),b=AC.createOscillator(),g2=AC.createGain();a.frequency.value=f;b.frequency.value=f*2;g2.gain.value=0.18;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v,t+0.008);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);a.connect(g);b.connect(g2);g2.connect(g);g.connect(BUS);g.connect(sfxRev());a.start(t);b.start(t);a.stop(t+dur+0.05);b.stop(t+dur+0.05);}
-function sfxDone(){if(!AC||!S||!S.opt.sound)return;try{var t=AC.currentTime+0.02;sfxNote(784,t,0.9,0.05);sfxNote(1046.5,t+0.11,1.2,0.045);}catch(e){}}
+function sfxDone(){if(!AC||!S||!S.opt.sound)return;if(typeof TAPS!=='undefined')TAPS.marked();try{var t=AC.currentTime+0.02;sfxNote(784,t,0.9,0.05);sfxNote(1046.5,t+0.11,1.2,0.045);}catch(e){}}
+
+// Pass 233 (game, Puti 3 Nov): button sounds and the iPhone tick from the game's taps.js, same files and levels as the
+// company page. They ride BUS (0.5) and MASTER (0.82), so net 0.3 of the file; the game's mute (shrimp-music) and
+// Button sounds (shrimp-btnsfx) silence them, Taps you can feel (shrimp-taps) stops the tick. A button's own land
+// sound wins over the tap sound; the old generic 'click' gives way to it.
+if(typeof TAPS!=='undefined')TAPS.init({ctx:function(){return AC;},dest:function(){return BUS;},gain:0.3/(0.5*0.82),
+ ok:function(){var m=false;try{m=localStorage.getItem('shrimp-music')==='0';}catch(e){}return !!(S&&S.opt.sound)&&!m;},
+ table:[['#lseg [data-seg],.tabs [data-tab]','tab'],['#speed button,#tb-mute','chip'],['#tb-info','open']]});
+function hap(){if(typeof TAPS!=='undefined')TAPS.tick();}

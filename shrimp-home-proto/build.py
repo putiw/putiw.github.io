@@ -20,6 +20,11 @@ skel='<!doctype html><html><head><meta charset=utf8><meta name=viewport content=
 open(os.path.join(DIST,'index.html'),'w').write(skel+out+'</body></html>')
 # the water and music loops: assets/ here, or the game's copies when this sits in the repo
 # (the catch sounds are Puti's, from Shrimp Tanks)
+# Pass 233: the button sounds script and its nine sounds (the game's copies)
+sd=os.path.join(ROOT,'..','shrimp')
+if os.path.exists(os.path.join(sd,'taps.js')):
+    shutil.copy(os.path.join(sd,'taps.js'),os.path.join(DIST,'taps.js'));os.makedirs(os.path.join(DIST,'sfx'),exist_ok=True)
+    for w in os.listdir(os.path.join(sd,'sfx')):shutil.copy(os.path.join(sd,'sfx',w),os.path.join(DIST,'sfx',w))
 for a in ['water.mp3','music.mp3','catch-shrimp-1.mp3','catch-shrimp-2.mp3']:
     for d in [os.path.join(ROOT,'assets'),os.path.join(ROOT,'..','shrimp')]:
         if os.path.exists(os.path.join(d,a)):shutil.copy(os.path.join(d,a),os.path.join(DIST,a));break

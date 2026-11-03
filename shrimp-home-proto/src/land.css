@@ -135,3 +135,12 @@ body.in-game #tb-back i{font-style:normal}
 .cpan input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .cpan input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid var(--ink)}
 .cpan .cp-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+
+/* Pass 234 (game, Puti 3 Nov): in the game the land's map is full screen at the sides and the bottom, no margins.
+   The hint line floats over the map just above the tools. */
+body.in-game.on-home{padding-bottom:0;overflow:hidden}
+body.in-game.on-home .landwrap{margin:0 calc(-1 * var(--gut,16px));border:0;border-radius:0}
+body.in-game.on-home .lstat{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(60px + env(safe-area-inset-bottom,0px));z-index:7;max-width:calc(100% - 24px);min-height:0;padding:4px 10px;border-radius:999px;background:color-mix(in srgb,var(--surface) 92%,transparent);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+body.in-game.on-home .lstat:empty{display:none}
+body.in-game.on-home .landwrap .ltools{bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+body.in-game.on-home .landwrap .lzoom{margin-bottom:env(safe-area-inset-bottom,0px)}

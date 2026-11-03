@@ -1943,6 +1943,7 @@ function zoomBtns(){var a=$('lz-in'),b=$('lz-out'),z=zoomI();if(a)a.disabled=z>=
 function pickCpa(dpr){var d=dpr*0.6875;if(d>=1.75)return Math.round(d)/dpr;if(d>=1.2)return 1.5/dpr;return 1/dpr;}
 function sizeCanvas(){var wrap=$('lwrap');if(!wrap||!L.cv)return;var W=wrap.clientWidth,top=wrap.getBoundingClientRect().top,pal=$('lpal'),palH=0;// Pass 180: the build palette floats over the map, the map keeps its size
   var tb=document.querySelector('.tabs'),tabsH=tb?tb.getBoundingClientRect().height:62,tl=$('ltools'),toolsH=tl&&tl.parentNode&&tl.parentNode.id==='lwrap'?4:(tl?tl.offsetHeight:50)+14;var H=Math.round(clamp(window.innerHeight-top-toolsH-34-palH-tabsH-10,250,660));
+  if(document.body.classList.contains('in-game')&&document.body.classList.contains('on-home'))H=Math.max(250,Math.round(window.innerHeight-top));/* Pass 234: full screen in the game */
   var dpr=window.devicePixelRatio||1,cpa=zoomK()/dpr;if(Math.abs(H-L.cssH)<3&&W===L.cssW&&L.x&&L.sizedCv===L.cv&&cpa===L.cpa)return;L.sizedCv=L.cv;
   var mid=L.VW?[L.cam.x+L.VW/2,L.cam.y+L.VH/2]:null;L.cssW=W;L.cssH=H;L.dpr=dpr;L.cpa=cpa;L.s=1;// the canvas holds 2 pixels per art pixel (Pass 174), so people at 1.5x land on whole canvas pixels (3 per art pixel): Millie's eyes keep their shape
   var vw=Math.max(1,Math.round(W/cpa)),vh=Math.max(1,Math.round(H/cpa));L.R=2;L.cv.width=vw*L.R;L.cv.height=vh*L.R;L.cv.style.width=(vw*cpa)+'px';L.cv.style.height=(vh*cpa)+'px';L.VW=vw;L.VH=vh;
