@@ -503,6 +503,7 @@ Do not report a feature as finished just because its new path works once. Check 
 - **Unguarded UI calls in `updateReveal`.** They break the bots.
 - **Everything in the paper.** Running 10 km, the shrimp club and Grandma's fish soup came out as Shrimp Times stories, and the paper showed up long before the World tab. Ask whether a stranger would read it in a newspaper; if not, it's a note (`noteLine`).
 - **Story events that block the clock.** A late story event fired on the ten-year day and blocked a test. Gate new events by day and condition.
+- **Slow redraws feel like dead buttons.** `render` runs 4 times a second and a tap waits behind it. Pass 242 found 50 to 150 ms blocks on a phone-speed CPU from a reserve that re-summed a year of finance rows dozens of times a redraw and `toLocaleString` with options. Cache anything `render` calls often (`CTR_C`, `FMT_NF`); measure with CPU throttle 4x and a `longtask` observer.
 - **Bots going broke after new spending.** Keep cash cushions in bot policies and re-run them.
 
 **Design**
