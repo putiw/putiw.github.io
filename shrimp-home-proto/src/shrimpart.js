@@ -25,16 +25,19 @@ function bodyCanvas(sp){var C=COLOURS[sp.col]||COLOURS.red,h=sp.h!=null?sp.h:C.h
   var I=IMG,c=document.createElement('canvas');c.width=SW;c.height=SH;var x=c.getContext('2d');
   var col=document.createElement('canvas');col.width=SW;col.height=SH;var cx=col.getContext('2d');cx.drawImage(sp.male?I.cM:I.cF,0,0);cx.globalCompositeOperation='source-in';
   if(sp.legend&&sp.sick!=='dead'){var gr=cx.createLinearGradient(8,0,SW-8,0);for(var k=0;k<=6;k++){var rr=hslRGB(k*60,0.82,0.6);gr.addColorStop(k/6,'rgb('+rr.join(',')+')');}cx.fillStyle=gr;}
-  else{var rgb=sp.sick==='dead'?[214,206,196]:hslRGB(hq,sq/100,lq/100);cx.fillStyle='rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';}
+  else{var rgb=sp.sick==='dead'?[214,206,196]:sp.sick==='bact'?[236,214,206]:hslRGB(hq,sq/100,lq/100);cx.fillStyle='rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';}
   cx.fillRect(0,0,SW,SH);
   var d=cx.getImageData(0,0,SW,SH),px=d.data;
   for(var yy=0;yy<SH;yy++)for(var xx=0;xx<SW;xx++){var k2=(yy*SW+xx)*4+3;if(!px[k2])continue;
-    var cov=((xx+yy)%2?VG_DITHER[vg]:VG_BODY[vg])*mat;
+    var cov=sp.sick==='bact'?0.9:((xx+yy)%2?VG_DITHER[vg]:VG_BODY[vg])*mat;
     if(sp.rili&&xx>=60&&xx<=88)cov*=0.08;
     px[k2]=Math.round(px[k2]*cov);}
   cx.putImageData(d,0,0);x.drawImage(col,0,0);
   if(VG_HL[vg]&&sp.sick!=='dead'){x.globalAlpha=VG_HL[vg]*0.34*mat;x.drawImage(sp.male?I.hM:I.hF,0,0);x.globalAlpha=1;}
   x.drawImage(sp.male?I.oM:I.oF,0,0);if(sp.sick!=='dead')x.drawImage(I.ey,0,0);
+  x.strokeStyle='#fff';x.lineCap='round';
+  if(sp.sick==='scut'){x.lineWidth=1.4;[[22,14,18,6],[25,13,24,5],[28,14,31,7],[20,16,14,11]].forEach(function(l){x.beginPath();x.moveTo(l[0],l[1]);x.lineTo(l[2],l[3]);x.stroke();});}
+  if(sp.sick==='molt'){x.lineWidth=3.2;x.globalAlpha=0.95;x.beginPath();x.moveTo(60,24);x.quadraticCurveTo(58,34,54,42);x.stroke();x.globalAlpha=1;}
   BODY[key]=c;return c;}
 // Agent drawing, same layering as the game: eggs, rear legs, front legs, body, tail. To keep a full tank
 // smooth on a phone, the two leg layers are pre-joined (8 combinations, shared by every shrimp) and the

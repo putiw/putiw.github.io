@@ -23,7 +23,7 @@ function colOf(i){return lineOf(i);}
 function juvOf(i){return i.age<JUV_DAYS?2:i.age<ADULT_DAYS?1:0;}
 function lineRank(l){var k=LINE_ORDER.indexOf(l);return k<0?(l==='wild'?20:30):k;}
 // What the art needs. Babies are nearly clear and color up as they grow, like the game.
-function specOf(i){var p=phOf(i),j=juvOf(i);return {male:i.sex==='m',col:p.line,vg:p.grade,h:p.h,s:p.s,l:p.l,juv:j,mat:j===2?0.3:j===1?0.7:1,rili:p.rili,legend:p.legend,berried:!!i.eggs,size:p.body.size};}
+function specOf(i){var p=phOf(i),j=juvOf(i);return {male:i.sex==='m',col:p.line,vg:p.grade,h:p.h,s:p.s,l:p.l,juv:j,mat:j===2?0.3:j===1?0.7:1,rili:p.rili,legend:p.legend,berried:!!i.eggs,size:p.body.size,sick:i.ill||''};}
 function shrimpRGB(i){var p=phOf(i);return 'rgb('+GEN.hslRgb(p.h,p.s,p.l).join(',')+')';}
 function colourName(i,full){if(i.age<JUV_DAYS)return 'Baby';var p=phOf(i),n=(LINE_NAMES[p.line]||'Wild')+(p.rili?' rili':'');return full?n+' · '+GRADE_NAMES[p.grade]:n;}
 function pct(v){return Math.round(clamp(v,0,1)*100)+'%';}

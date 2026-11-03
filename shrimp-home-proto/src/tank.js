@@ -301,7 +301,7 @@ var tankMod={name:'tank',
     for(var i=0;i<T.mulm.length;i++)T.mulm[i]=0.12+Math.random()*0.1;T.flow=0.72;addPests(T,'snail',2);
     S.book.shrimp=S.book.shrimp||{};S.book.v2=1;T.shrimp.forEach(function(i){bookShrimpSeen(i,{tank:T.name,from:'grandma'},true);});}
    whenArt(function(){S.tanks.forEach(function(T){scapeNeedsMoss(T);if(T.shrimp.some(function(i){return i.from==='grandma';})&&!T.mossGrown){T.mossGrown=1;for(var k in T.moss)T.moss[k].forEach(function(m){m.len=rnd(30,50);});}});TV.L={};if(activeTab==='tank')tankMod.render();});},
- day:function(d){S.tanks.forEach(function(T){tankDay(T,d);});netDay();if(activeTab==='tank'){tvSync();tankMod.renderSide();}var dot=$('tankdot');if(dot)dot.hidden=!(S.opt.toys==='need'&&anyNeeds());},
+ day:function(d){S.tanks.forEach(function(T){tankDay(T,d);});netDay();sickDay();if(activeTab==='tank'){tvSync();tankMod.renderSide();}var dot=$('tankdot');if(dot)dot.hidden=!(S.opt.toys==='need'&&anyNeeds());},
  show:function(){newLook();TV.capUntil=0;tankMod.render();tvStart();if(S.fromHome){S.fromHome=0;var tv=$('tv');if(tv){tv.classList.remove('fadein');void tv.offsetWidth;tv.classList.add('fadein');}}},
  hide:function(){tvStop();closeBubble();TV.hold=null;if(TOY)toyEnd();},
  render:function(){if(activeTab!=='tank')return;var el=$('p-tank');if(!el.querySelector('#tv-canvas')){el.innerHTML='<div class="tchips" id="tchips"></div><div class="lockzone" id="lockzone"><div class="tv" id="tv"><canvas id="tv-canvas"></canvas><span class="tv-cap" id="tv-cap"></span></div><div class="jobslot" id="jobslot"><div class="toys" id="toybtns"></div><p class="hint jobnone" id="jobnone" hidden>Nothing needs doing. The tank is fine for now.</p><div class="netbar" id="netbar" hidden></div><div class="lockbar" id="lockbar"></div></div><div id="toypanel"></div></div><div id="tankside"></div>';
@@ -374,7 +374,7 @@ function renameTank(){var T=S.tanks[S.sel];openSheet({title:'Rename',keepTime:tr
 // Tap a shrimp to net it, tap one in the net to put it back. With a card open, a tap just closes it.
 function tvTap(p){if(TV.bubbleFor){closeBubble();return;}
   if(netList().length&&inNet(p)){var k=netAt(p);if(k>=0)netReturn(k);return;}
-  var a=agentAt(p);if(a){netCatch(a);return;}
+  var a=agentAt(p);if(a){if(a.ind.ill){sickSheet(a);return;}netCatch(a);return;}
   var fb=filterBox();if(p[0]>fb.x-8&&p[1]>fb.y-10)toast('That’s the sponge filter. Clean it under Needs doing when the flow drops.');}
 function closeBubble(){TV.bubbleFor=null;var b=document.querySelector('.bub');if(b)b.remove();}
 function openBubble(a){closeBubble();var i=a.ind,T=TV.T;TV.bubbleFor=i.id;var el=document.createElement('div');el.className='bub';
@@ -395,3 +395,29 @@ function openBubble(a){closeBubble();var i=a.ind,T=TV.T;TV.bubbleFor=i.id;var el
     else if(b.dataset.mv!=null){}});
   el.addEventListener('click',function(e){var mv=e.target.closest('[data-mv]');if(mv){var to=S.tanks[+mv.dataset.mv];liftOut(T,i);moveShrimp(i,T,to);toast('Moved to '+to.name);sfx('plop');closeBubble();tvSync(true);tankMod.renderSide();}
     var nm=e.target.closest('[data-nm]');if(nm){var v=el.querySelector('input').value.replace(/[^A-Za-z0-9 .'-]/g,'').trim().slice(0,14);i.name=v;closeBubble();toast(v?'Named '+v:'Name cleared');save();}});}
+
+// ---- Sickness on the land (Puti, 3 Nov): rare. Only after 5 minutes on the land with no tap at all, one shrimp
+// in one tank may fall ill, at most once per idle stretch. The three illnesses and cures are the game's
+// (ILLS/CURES in index.html). Tap the sick one: pick a cure (right one heals, wrong one costs and does nothing),
+// cull it, or net it as usual. Untreated it dies after 30 days.
+var LILLS=[{id:'molt',sign:'A pale ring behind the head.',cure:'minerals'},{id:'bact',sign:'A milky, cloudy body.',cure:'water'},{id:'scut',sign:'Tiny white threads on the head.',cure:'salt'}];
+var LCURES=[{id:'minerals',name:'Mineral pellets and a GH boost',cost:15},{id:'water',name:'Big water change',cost:5},{id:'salt',name:'Short salt dip',cost:12}];
+var IDLE_MS=5*60*1000,LAST_ACT=Date.now(),ILL_DONE=false;
+['pointerdown','keydown'].forEach(function(ev){window.addEventListener(ev,function(){LAST_ACT=Date.now();ILL_DONE=false;},true);});
+function anySick(){return S.tanks.some(function(T){return T.shrimp.some(function(i){return i.ill;});});}
+function illTick(){if(ILL_DONE||document.hidden||window.LAND_HID||!S||!S.tanks||Date.now()-LAST_ACT<IDLE_MS||anySick())return;
+  if(Math.random()>=0.1)return;ILL_DONE=true;
+  var ts=S.tanks.filter(function(T){return T.role!=='cull'&&T.shrimp.filter(function(i){return i.age>=ADULT_DAYS;}).length>=3;});if(!ts.length)return;
+  var T=ts[Math.floor(Math.random()*ts.length)],ad=T.shrimp.filter(function(i){return i.age>=ADULT_DAYS;}),i=ad[Math.floor(Math.random()*ad.length)];
+  i.ill=LILLS[Math.floor(Math.random()*LILLS.length)].id;i.illD=0;respec(i);save();}
+setInterval(illTick,30000);
+function sickDay(){S.tanks.forEach(function(T){T.shrimp.slice().forEach(function(i){if(!i.ill)return;i.illD=(i.illD||0)+1;if(i.illD>=30)cullShrimp(T,i,true);});});}
+function respec(i){if(TV.T)TV.ag.forEach(function(a){if(a.ind===i)agentSpec(a);});}
+function cullShrimp(T,i,died){T.shrimp=T.shrimp.filter(function(z){return z!==i;});if(T===TV.T){var a=TV.ag.find(function(z){return z.ind===i;});if(a){TV.ag=TV.ag.filter(function(z){return z!==a;});killAgent(a);}}
+  if(died&&T===TV.T)tvCap('A sick one died');sideSoon();save();}
+function sickSheet(a){var i=a.ind,T=TV.T,L=LILLS.filter(function(x){return x.id===i.ill;})[0]||LILLS[0];
+  openSheet({title:'This one looks sick',keepTime:true,html:'<p class="hint">'+L.sign+'</p><div class="btns" style="flex-direction:column;align-items:stretch">'+LCURES.map(function(c){return '<button class="btn sm" data-cure="'+c.id+'">'+c.name+' · AED '+c.cost+'</button>';}).join('')+'<button class="btn sm" data-cull>Cull it</button><button class="btn sm" data-netit>Net it</button></div>',
+   mount:function(el,api){el.querySelectorAll('[data-cure]').forEach(function(b){b.onclick=function(){var c=LCURES.filter(function(x){return x.id===b.dataset.cure;})[0];if(!spend(c.cost,'a cure'))return;api.close();
+      if(c.id===L.cure){delete i.ill;delete i.illD;respec(i);sfx('plop');tvCap('Treated. It looks better');}else{sfx('nope');tvCap('Didn’t help. Still sick');}save();};});
+    el.querySelector('[data-cull]').onclick=function(){api.close();cullShrimp(T,i,false);tvCap('Culled');};
+    el.querySelector('[data-netit]').onclick=function(){api.close();if(TV.ag.indexOf(a)>=0)netCatch(a);};}});}
