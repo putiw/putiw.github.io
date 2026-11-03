@@ -60,6 +60,18 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:15px/1
 <div id="ahead" hidden><div id="ah-t"></div><button class="btn go" id="flyb">Fly by, 1</button></div><button class="btn" id="brakeb" hidden></button>
 <div id="top"><button class="back" id="back" aria-label="Grandma’s land">⌂ Home</button><span id="fuel"></span><span id="wish"></span></div>
 <div id="panel"></div>
+<script src="taps.js?v=p234"></script>
+<script>
+// Pass 233: button sounds and the iPhone tick (taps.js). The ship has no other sound, so its own small context, made on
+// the first tap, straight to the speakers at 0.3. The game's mute and Button sounds silence it; Taps you can feel the tick.
+var SND=null;
+if(typeof TAPS!=='undefined')TAPS.init({ctx:function(){if(!SND){try{var C=window.AudioContext||window.webkitAudioContext;if(C)SND=new C();}catch(e){}}
+  if(SND&&SND.state==='suspended'&&!document.hidden){try{var r=SND.resume();if(r&&r.catch)r.catch(function(){});}catch(e){}}return SND;},
+ dest:function(){return SND.destination;},gain:0.3,
+ ok:function(){try{return localStorage.getItem('shrimp-music')!=='0';}catch(e){return true;}},
+ table:[['#back','close']]});
+document.addEventListener('visibilitychange',function(){if(SND){try{document.hidden?SND.suspend():SND.resume();}catch(e){}}});
+</script>
 <script>
 // ==SPACE-SIM-START==
 // ==PLANETS-START==

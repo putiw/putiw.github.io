@@ -131,7 +131,7 @@ var h=newGame();h.humans=1e6;var m=h.money;storyChoose(h,'buyout',0);if(endingPi
 `);
 check('only some players see each tree, and the steps add to the ending',`
 var g=newGame();g.humans=6e7;g.day=900;g.tr={drive:10,means:-6};treeDay(g);if(!treeHas(g,'island')||treeHas(g,'shop')||!milestoneConditions(g).tree_island)throw Error('Island for climbers '+JSON.stringify(g.emp.trees));
-g.money=1e8;if(!buyTreeStep(g,'isl_buy')||buyTreeStep(g,'isl_pass'))throw Error('Steps in order');g.emp.inf=1e5;buyTreeStep(g,'isl_nation');if(taxRate(g)!==0.045)throw Error('Island tax');
+g.money=5e8;if(!buyTreeStep(g,'isl_buy')||buyTreeStep(g,'isl_pass'))throw Error('Steps in order');g.money=2e9;g.emp.inf=1e5;if(buyTreeStep(g,'isl_nation'))throw Error('Independence needs ✦ 3B (Pass 234)');g.emp.inf=4e9;buyTreeStep(g,'isl_nation');if(taxRate(g)!==0.045)throw Error('Island tax');
 if(gpLines(g).join(' ').indexOf('Shrimp Island')<0)throw Error('Ending line');
 var h=newGame();h.humans=6e7;h.day=900;h.tr={drive:-10,care:-4};treeDay(h);if(!treeHas(h,'shop')||treeHas(h,'island'))throw Error('Shop for floaters');
 var q=newGame();q.tr={know:8,care:6};q.emp.won=4000;if(typeof spaceOpen!=='undefined'||treesFor(q).indexOf('space')<0)throw Error('The curious path is still marked, the old Space door is gone');

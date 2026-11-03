@@ -579,7 +579,7 @@ count++;console.log('PASS Pass 119 card headers and Money sheet');
 count++;console.log('PASS Pass 120 Kits tab in three cards');
 // Pass 121: Ads holds Ads, Shops, Sales staff, Marketing + Campaigns, Regions; World holds Shaping the world, Owners' tanks, the coast card, The Shrimp Times
 if(html.includes('id="c-op"')||!/<div id="e-proj"( class="wide")?><\/div>\s*<div id="op-wrap" hidden>/.test(html))throw Error('Campaigns live inside the Marketing development card');
-if(!html.includes("move('c-reg','promote',rv('ereg'))")||!html.includes('<div id="coin-island"></div>'))throw Error('Regions in Ads, Shrimp Island in the coast card');
+if(!html.includes("move('c-reg','promote',rv('ereg'))")||!html.includes('Shrimp Island has its own card'))throw Error('Regions in Ads, Shrimp Island in its own card (Pass 234, Puti)');
 if(!html.includes('class="btn adline"')||!html.includes('<details class="store-close"><summary>Close stores</summary>'))throw Error('One-off ads one per row, store closing in a fold');
 count++;console.log('PASS Pass 121 Ads and World tabs');
 // Pass 123: text fixes. No free bottleneck lines in the Next bar, ceiling and working-capital alerts only with consultants
@@ -894,18 +894,24 @@ var o=farmOverhead(g);delete g.emp.proj.ev_bay;if(!(farmOverhead(g)>o))throw Err
 var d=newGame();d.tr={drive:8,means:-6};d.emp.evil={bribe:1,force:1};if(endingPick(d)!=='empire_dictator')throw Error('dictator '+endingPick(d));d.emp.evil={bribe:1};if(endingPick(d)!=='empire_hard')throw Error('one act is not enough');
 var f=readyGame();fwOf(f).f=3;if(!(farmWell(f)<FW_MID))throw Error('Culls feed lowers wellbeing');
 `);
-check('Pass 208: planting by hand, ground decides, a year to know, patches spread, 100 for the stream',`
-var g=readyGame();g.emp.trees={rewild:1};g.money=1e9;if(!plOpen(g)||!plBuy(g)||plOf(g).b!==PL_BAG)throw Error('Bag');
-var wet=null,rock=null,water=null,dry=null;for(var x=0;x<PL_W;x++)for(var y=0;y<PL_H;y++){var q=plGround(x,y);if(q===0&&!water)water=[x,y];if(q===3&&!rock)rock=[x,y];if(q===2&&plWet(x,y)&&!wet)wet=[x,y];if(q===2&&!plWet(x,y)&&!dry)dry=[x,y];}
-if(!water||!rock||!wet||!dry)throw Error('The map has water, rock, wet and dry soil');
-if(plPlant(g,water[0],water[1]))throw Error('No planting in water');if(!plPlant(g,rock[0],rock[1])||!plPlant(g,wet[0],wet[1]))throw Error('Plant');if(plPlant(g,wet[0],wet[1]))throw Error('One per spot');
-if(plOdds(g,rock[0],rock[1])!==0||!(plOdds(g,wet[0],wet[1])>plOdds(g,dry[0],dry[1])||plAt(g,dry[0],dry[1])))throw Error('Rock dies, water helps');
-g.day+=366;plDay(g);if(plAt(g,rock[0],rock[1]))throw Error('Rock seedling dead after a year');
-var c=readyGame();c.emp.trees={rewild:1};c.money=1e9;plBuy(c);plPlant(c,wet[0],wet[1]);var n0=plOdds(c,wet[0],wet[1]);plPlant(c,wet[0]+1,wet[1]);if(!(plOdds(c,wet[0],wet[1])<n0))throw Error('Neighbors choke');
-var s=readyGame();s.emp.trees={rewild:1};s.emp.pl={b:0,t:[]};for(var i=0;i<200;i++)s.emp.pl.t.push([i%PL_W,0,0,1,0]);s.day=365*3;var before=s.emp.pl.t.length;for(var k=0;k<20;k++){s.day=365*(3+k);plDay(s);}if(!(s.emp.pl.t.length>before))throw Error('Living patches spread');if(plLiving(s,true)!==200)throw Error('Spread trees are not yours');
-var b=readyGame();b.emp.evil={bay:1};b.emp.trees={rewild:1};b.money=1e9;plBuy(b);var mud=null;for(var x2=0;x2<PL_W&&!mud;x2++)for(var y2=0;y2<PL_H;y2++)if(plGround(x2,y2)===1){mud=[x2,y2];break;}if(plPlant(b,mud[0],mud[1]))throw Error('The bay license greys the mud');
+check('Pass 208/234: planting by hand, mangroves on mud from the start, 9 a tap, one capacity with the coasts, ghaf after, a year to know, patches spread, 100 for the stream',`
+var g=readyGame();g.kits.sold=TREES_AT;g.money=1e9;if(!plOpen(g))throw Error('The map opens with the mangroves, before Rewilding');
+var mud=null,rock=null,water=null,wet=null,dry=null;for(var x=0;x<PL_W;x++)for(var y=0;y<PL_H;y++){var q=plGround(x,y);if(q===0&&!water)water=[x,y];if(q===1&&!mud)mud=[x,y];if(q===3&&!rock)rock=[x,y];if(q===2&&plWet(x,y)&&!wet)wet=[x,y];if(q===2&&!plWet(x,y)&&!dry)dry=[x,y];}
+if(!water||!mud||!rock||!wet||!dry)throw Error('The map has water, mud, rock, wet and dry soil');
+var C=coinOf(g),t0=C.trees,m0=g.money;if(plPlant(g,water[0],water[1],'m'))throw Error('No planting in water');
+if(!plPlant(g,mud[0],mud[1],'m'))throw Error('Plant mangroves on mud');if(C.trees-t0!==9||Math.round(m0-g.money)!==9*COIN_TREE)throw Error('9 seedlings a tap, AED 4 each, counted on the coast ('+(C.trees-t0)+')');
+if(plPlant(g,mud[0],mud[1],'m'))throw Error('One per spot');if(plPlant(g,wet[0],wet[1],'g'))throw Error('Ghaf waits for the mangroves');
+if(plOdds(g,rock[0],rock[1],'g')!==0||!(plOdds(g,wet[0],wet[1],'g')>plOdds(g,dry[0],dry[1],'g'))||plOdds(g,mud[0],mud[1],'m')!==COIN_SURV)throw Error('Rock dies, water helps, mangroves at the coin survival');
+var f=readyGame();f.kits.sold=TREES_AT;f.money=1e9;var F=coinOf(f);F.otrees=COIN_COAST;if(plPlant(f,mud[0],mud[1],'m'))throw Error('Full coasts are full on the map too');
+if(plFree(f,mud[0],mud[1])!==0)throw Error('Others fill the mud on the map');if(!plPlant(f,wet[0],wet[1],'g'))throw Error('Ghaf opens once the mangroves are done');
+f.day+=366;plDay(f);var t=plOf(f).t.filter(function(e){return e[3]==='g';})[0];if(!t||t[5]<0)throw Error('A year later you know');
+var s=readyGame();s.kits.sold=TREES_AT;s.emp.pl={b:0,t:[]};for(var i=0;i<200;i++)s.emp.pl.t.push([i%PL_W,Math.floor(i/PL_W),0,plGround(i%PL_W,Math.floor(i/PL_W))===1?'m':'g',1,1,0]);var before=s.emp.pl.t.length;for(var k=0;k<30;k++){s.day=365*(3+k);plDay(s);}
+if(!(s.emp.pl.t.length>before))throw Error('Living patches spread');var own=0;s.emp.pl.t.forEach(function(e){if(!e[6])own+=plBits(e[5]>0?e[5]:0);});if(plLiving(s,true)!==own)throw Error('Spread trees are not yours');
+var o=readyGame();o.kits.sold=TREES_AT;o.emp.pl={b:3,t:[[mud[0],mud[1],0,1,0]]};plOf(o);if(o.emp.pl.t[0].length!==7||o.emp.pl.t[0][5]!==511)throw Error('Old saves migrate');
+var b=readyGame();b.emp.evil={bay:1};b.kits.sold=TREES_AT;b.money=1e9;if(plPlant(b,mud[0],mud[1],'m'))throw Error('The bay license greys the mud');
 if(streamReady.toString().indexOf('plLiving(G,true)>=PL_OWN')<0)throw Error('The stream needs 100 of your trees');
 `);
+if(html.indexOf('data-act="pl-open"')<0||/itemHTML\('Plant a tree'/.test(html))throw Error('Mangroves by hand, no one-tap Plant button (Puti, 3 Nov)');
 
 module.exports={engine,html};
 // Pass 196 (Puti, 1 Nov): after Start over, a built land from the old game can be bought back for AED 300k plus AED 100 a built thing.
@@ -975,4 +981,5 @@ g.me.gplace.house=1;if(!milestoneConditions(g).gp_land)throw Error('card after t
 storyChoose(g,'gp_land',1);if(gplaceOffer(g)!==true||!buyGplace(g)||!landOpen(g))throw Error('after Not this time the land is for sale');
 var h=newGame();h.me.on=1;h.money=1e6;h.me.gplace={balcony:1,house:1};storyChoose(h,'gp_land',0);if(gplaceOffer(h)==='wait'&&h.me.landTrip>h.day){}else throw Error('waits during the trip');h.day=h.me.landTrip;landDay(h);if(landOpen(h))throw Error('the trip finds the land, it does not buy it');if(gplaceOffer(h)!==true)throw Error('for sale after the trip');
 `);
+if(!/function renderMilestone\(\)\{[\s\S]{0,400}busyUI\(\)/.test(html)||html.indexOf('LAND.on||LAND.busy')<0||html.indexOf('PL_SHOW')<0)throw Error('No story cards on the land, in a tank job or while planting (Pass 234, Puti)');
 console.log(count+' focused balance and migration checks passed');
