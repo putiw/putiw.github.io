@@ -271,7 +271,7 @@ These come from Puti's feedback. Treat them as requirements.
 - Things that come and go float over the page instead of pushing it: the story card (`#milestone-card`, a fixed sheet), help (`#helpsheet`), the Aquascape panel, the land's build palette. The job bar and the care buttons share one slot under the tank on both pages (`#tv-slot`, `#jobslot`).
 - Header numbers sit in fixed-width tabular slots. A tap never lets the page get shorter under you (`floorKeep`, freed on tab change).
 - A row a tap adds to or takes from the header waits for a scroll or tab change (`hdHold`); a list row bought or turned down stays greyed in place until then (`FRZ`, `frzTap`). Use these for any new list (Pass 232).
-- Check every UI change with `tests/shrimp-stable.cjs`, on both the strong cold and the average run before a deploy.
+- Check UI changes with `tests/shrimp-stable.cjs`, narrowed to what the edit touches (`STABLE_TABS`, `STABLE_STAGES`): the full run takes too long (Puti, 3 Nov: targeted tests, not the whole sweep every deploy).
 
 **Shrimp**
 - Lifespans: about 90% of babies reach adulthood, 80% reach a year, 20% reach two years.
