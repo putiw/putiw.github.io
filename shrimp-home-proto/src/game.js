@@ -65,6 +65,11 @@ function ownGrades(T,d){[['ga',function(i){return i.age>=ADULT_DAYS;}],['gy',fun
   list.forEach(function(i,k){var p=phOf(i);if(p.grade!==want[k]||p.line!=='red'||p.rili||p.legend){i.dna=GEN.forStrain('red',want[k]);}});});}
 function decorFlags(T){var has=function(k){return T.scape.some(function(i){return i.k===k;});},moss=0;for(var k in T.moss)moss+=T.moss[k].length;
   return {wood:has('wood')?1:0,plants:has('sword')||has('lotus')||T.stems.length?1:0,moss:has('mossrock')||moss?1:0,leaves:has('leaf')?1:0};}
+// Pass 231 (Puti): the stem plants stand where the company page draws them, seven across the sand, from the game's care seed (careH is the game's hash)
+function careH(i,s){var h=((i+1)*2654435761^(s+7)*40503)>>>0;h^=h>>>13;h=Math.imul(h,1274126177)>>>0;return (h%100000)/100000;}
+function stemSpread(T,cs,gr){var n=7,old=T.stems;T.stems=[];
+  for(var i=0;i<n;i++){var o=old[i]||{},x=ART_W*(0.05+0.88*(i+0.15+0.7*careH(i+60,cs))/n);T.stems.push({id:o.id||uid(),x:x,h:Math.max(20,ART_H*(0.05+gr*0.6*(0.75+0.5*careH(i+50,cs)))),seed:o.seed||Math.floor(careH(i+90,cs)*1e6),lean:(careH(i+80,cs)-0.5)*0.2});}
+  T.stSeed=cs;if(typeof TV==='object')TV.L={};}
 function decorSet(T,f){var D={wood:['wood'],plants:['sword','lotus'],moss:['mossrock'],leaves:['leaf']},now=decorFlags(T),ch=0;
   Object.keys(D).forEach(function(k){if(!!f[k]===!!now[k])return;ch=1;
     if(f[k]){var kk=D[k][0],ds=DECOR_SIZE[kk],it={id:uid(),k:kk,x:rnd(250,ART_W-250),y:kk==='leaf'?ART_H*0.9:ds.y+ds.h,s:kk==='leaf'?1:0.85,f:Math.random()<0.5?1:-1,r:kk==='leaf'?rnd(-0.5,0.5):0};T.scape.push(it);scapeResort(T,it);if(DECOR[kk].moss)seedMoss(T,it,6,true);if(k==='plants')defaultStems(T,it.x,4);}
@@ -84,6 +89,7 @@ function applyOwn(T,d){var c=d.care;if(!c)return;var i;
   else [['snail',c.snail|0],['planaria',c.flat|0]].forEach(function(q){var have=T.pests.filter(function(p){return p.k===q[0];});if(have.length<q[1])addPests(T,q[0],Math.min(40,q[1]-have.length));else if(have.length>q[1]){var gone=have.slice(q[1]);T.pests=T.pests.filter(function(p){return gone.indexOf(p)<0;});}});
   if(d.no3!=null)T.no3=d.no3;if(d.nh!=null)T.nh=d.nh;
   if(d.decor)decorSet(T,d.decor);
+  if(c.cs!=null&&T.stems.length&&T.stSeed!==c.cs)stemSpread(T,c.cs|0,clamp(+c.grow||0,0,1));
   LAST=ownVals(T);if(!d.decor)report(1);}
 // what a job on the land changed, back to the game; first=1 also sends the land's decor once, it wins for old saves
 function report(first){var T=ownT();if(!T||!LAST||TOY||$('sheet')&&!$('sheet').hidden)return false;var v=ownVals(T),m={type:'tank'},any=0;
@@ -202,7 +208,7 @@ var FW_DRAG=0;
 function ownFWCard(card){var f=OWN&&OWN.fw;if(!f)return '';var b=function(x,a,d){return '<button type="button" class="btn fw-b'+(x.on?' on':'')+'" data-fw="'+a+'" '+d+(x.dis?' disabled':'')+' aria-pressed="'+!!x.on+'"><b>'+esc(x.n)+'</b><small>'+esc(x.s)+'</small></button>';};
   var h='<h3 class="fw-h">Food</h3><div class="fw-g">'+f.foods.map(function(x){return b(x,'food','data-i="'+x.i+'"');}).join('')+'</div>';
   if(f.treats.length)h+='<h3 class="fw-h">Treats</h3><div class="fw-g">'+f.treats.map(function(x){return b(x,x.a,'data-id="'+esc(x.id)+'"');}).join('')+'</div>';
-  h+='<h3 class="fw-h">Water</h3><div class="fw-w">'+f.water.map(function(w){return '<span class="chip '+w[2]+'">'+esc(w[0]+' '+w[1])+'</span>';}).join('')+'</div>';
+  h+='<h3 class="fw-h">Water</h3><div class="fw-w">'+f.water.map(function(w){return '<span class="wcell '+esc(w[2])+'" title="'+esc(w[3]||w[0])+'"><small>'+esc(w[0])+'</small><b>'+esc(w[1])+'</b></span>';}).join('')+'</div>';
   var A=f.auto||{},sl=function(k,lab,v,lo,hi,u){return v==null?'':'<div class="fw-ctl"><label>'+lab+'</label><input type="range" data-fwset="'+k+'" min="'+lo+'" max="'+hi+'" step="1" value="'+v+'"><span>'+v+u+'</span></div>';};
   var au=sl('autoRation','Auto feed',A.feed,0,300,'%')+sl('autoWCPct','Auto change',A.wc,10,50,'%')+sl('autoWCDays','Every',A.days,2,21,' d');
   if(au)h+='<h3 class="fw-h">Automation</h3>'+au;
