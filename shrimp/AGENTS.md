@@ -512,6 +512,8 @@ Do not report a feature as finished just because its new path works once. Check 
 
 Planned and agreed with Puti, not built yet:
 
+**Puti's 3 Nov bug list** (project doc `claude/shrimp-fix-list-3nov.md`, her words per item, code pointers): half done in Pass 232. Left: mangroves by hand first, bigger pannable map, one tree capacity with Shrimpcoin, other trees after, 3x3 trees, Shrimp Island card and cost, no cards on the land / tank jobs / planting, land without margins, research card and grant cycle date. Then Parts 1 to 5 of `claude/shrimp-plan-human-checks-3nov.md`.
+
 **Fix list from Puti's 31 Oct playtest** (project doc `claude/shrimp-fix-prompt.md`): all five parts done (Pass 179 to 183).
 
 **Fix list from Claude's 1 Nov playtest** (project doc `claude/shrimp-fix-prompt-1nov.md`): all five parts done (Pass 184). World tab world-bank rows fixed in Pass 185. Average bot Earth day moved 6,609 to 6,777.
