@@ -1527,7 +1527,7 @@ function vegState(o){if(!o.crop)return 'empty';var c=vegCrop(o.crop),d=vegDay();
 function vegStage(o){var c=vegCrop(o.crop);if(!c)return 0;return clamp((Math.min(vegDay(),(o.w||o.pl)+VEG_DRY)-o.pl)/c.d,0,1);}
 function vegTap(o){L.vegT=L.rt||0;var st=vegState(o),s=objSprite(o),bx=oX(o),by=oBase(o)-(s?s.ay:30);
  if(st==='empty'||st==='dead'){var list=VEG_CROPS[vegSeason()];bubAt(bx,by,'<b>'+(st==='dead'?'It dried out':'The bed')+'</b><div class="hint">'+(vegSeason()==='cool'?'Cool months.':'Hot months.')+' Water it at least every '+VEG_DRY+' days.</div><div class="btns">'+list.map(function(c){return '<button class="btn" data-veg="'+c.id+'">'+c.n+' · '+c.d+' days</button>';}).join('')+'</div>',function(el){el.querySelectorAll('[data-veg]').forEach(function(b){b.onclick=function(){o.crop=b.dataset.veg;o.pl=vegDay();o.w=o.pl;closeBub();sfx('scoop',{v:0.5});puff('dust',bx,oBase(o)-8,6,{speed:30,life:0.5});L.dirty=true;save();};});});return;}
- if(st==='growing'){o.w=vegDay();sfx('splash',{v:0.4});puff('drop',bx,oBase(o)-14,8,{col:'#5fcde4',speed:35,life:0.6});var c=vegCrop(o.crop),left=Math.max(0,c.d-(vegDay()-o.pl));toast('Watered. '+c.n+' in about '+left+' day'+(left===1?'':'s')+'.');L.dirty=true;save();return;}
+ if(st==='growing'){o.w=vegDay();sfx('water');puff('drop',bx,oBase(o)-14,8,{col:'#5fcde4',speed:35,life:0.6});var c=vegCrop(o.crop),left=Math.max(0,c.d-(vegDay()-o.pl));toast('Watered. '+c.n+' in about '+left+' day'+(left===1?'':'s')+'.');L.dirty=true;save();return;}
  var cr=vegCrop(o.crop),n=cr.y,l=LS();l.harvest=l.harvest||{};l.harvest[cr.id]=(l.harvest[cr.id]||0)+n;(l.stats||(l.stats={})).veg=(l.stats.veg||0)+n;o.crop=null;o.pl=null;o.w=null;
  sfx('pop');puff('spark',bx,oBase(o)-16,8,{col:cr.c,speed:40,life:0.6});toast(n+' '+cr.n.toLowerCase()+', for the New Year dinner.');if(window.LAND_POST)window.LAND_POST({type:'harvest',crop:cr.n.toLowerCase(),n:n});bookAdd('garden',cr.id,{where:'the bed'});L.dirty=true;save();}
 // ----- Walks with the dog (Pass 213). Walking with him while he follows you counts as a walk once it lasts a minute; it ends when he
@@ -1671,7 +1671,7 @@ function openTrap(o){var n=2+Math.floor(Math.random()*6),list=[];if(typeof breed
       bt.innerHTML=(take?'<button class="btn primary" data-take>Take the shrimp home</button>':'')+'<button class="btn" data-go>'+(list.length?'Let them go':'Put it back')+'</button>';bt.hidden=false;
       o.set=S.day;o.at=Date.now();save();
       var tb=bt.querySelector('[data-take]');if(tb)tb.onclick=function(){closeSheet();setTimeout(function(){takeHome(list,'stream');},60);};
-      bt.querySelector('[data-go]').onclick=function(){closeSheet();sfx('splash');puff('drop',o.tx*T+T/2,o.ty*T+T/2,10,{speed:60,up:50,life:0.6});};}}});}
+      bt.querySelector('[data-go]').onclick=function(){closeSheet();sfx('letgo');puff('drop',o.tx*T+T/2,o.ty*T+T/2,10,{speed:60,up:50,life:0.6});};}}});}
 
 // ----- fishing in the stream and the lake; keep what you catch in a bucket and let it into your pond -----
 // the rod tip: sets L.tipX, L.tipY
@@ -1685,7 +1685,7 @@ function castAt(wx,wy){var me=L.me,d=Math.hypot(wx-me.x,wy-me.y),tx=wx,ty=wy;if(
     for(var q=0;deep&&q<40&&natW(tx/T,ty/T,streamCy(tx/T),streamW(tx/T))<0.5+0.3*NAT_K;q++){var ddx=deep[0]-tx,ddy=deep[1]-ty,dl=Math.hypot(ddx,ddy);if(dl<4)break;tx+=ddx/dl*4;ty+=ddy/dl*4;}}
   rodTip();L.fishing={st:'fly',x0:L.tipX,y0:L.tipY,x1:tx,y1:ty,x:L.tipX,y:L.tipY,t:0,water:isStream(t[0],t[1])?'stream':'lake'};sfx('cast');updateStat(true);}
 function rodTap(){var f=L.fishing;if(!f)return;if(f.st==='fly')return;if(f.st==='wait'){toast('Too soon, it swam off.');f.st='idle';updateStat(true);return;}
-  if(f.st==='bite'){f.st='reel';f.t=0;sfx('splash');sfx('reel');puff('drop',f.x,f.y,12,{speed:60,up:60,life:0.7});}}
+  if(f.st==='bite'){f.st='reel';f.t=0;sfx('hook');sfx('reel');puff('drop',f.x,f.y,12,{speed:60,up:60,life:0.7});}}
 function stepFishing(dt){var f=L.fishing;if(!f)return;f.t+=dt;var me=L.me;if(me&&me.moving&&f.st!=='reel'){L.fishing=null;updateStat(true);return;}
   if(f.st==='fly'){var k=clamp(f.t/0.55,0,1);f.x=lerp(f.x0,f.x1,k);f.y=lerp(f.y0,f.y1,k)-Math.sin(k*Math.PI)*70;if(k>=1){f.st='wait';f.t=0;f.bite=2+Math.random()*6;f.tw=[];for(var i=0;i<1+Math.floor(Math.random()*3);i++)f.tw.push(Math.random()*f.bite*0.85);f.tw.sort();puff('ring',f.x,f.y+2,1,{speed:0,life:1.1,r:1.2});sfx('plop');updateStat(true);}}
   else if(f.st==='wait'){while(f.tw.length&&f.t>=f.tw[0]){f.tw.shift();f.dip=0.25;puff('ring',f.x,f.y+2,1,{speed:0,life:0.6,r:0.5});sfx('plip',{v:0.35});}if(f.dip>0)f.dip-=dt;if(f.t>=f.bite){f.st='bite';f.t=0;puff('ring',f.x,f.y+2,1,{speed:0,life:0.9,r:1.4});sfx('plip');updateStat(true);}}
@@ -1700,11 +1700,11 @@ function landFish(water){var pool=FISH.filter(function(F){return F.where==='both
     var box=el.querySelector('.fishcv'),w=Math.min(el.clientWidth||320,520);box.style.cssText='width:'+w+'px;max-width:100%;height:124px;border-radius:10px;border:1px solid var(--line);margin:0 auto 8px;background:#89d8e4;display:flex;align-items:center;justify-content:center;overflow:hidden';
     var fs=fishSpr(F.id),sc=Math.max(1,Math.floor(Math.min((w-16)/fs.w,(124-16)/fs.h,4)));box.appendChild(spriteCanvas(fs,sc,fs.w*sc,fs.h*sc));
     bookAdd('fish',F.id,{where:water==='stream'?'the stream':'the lake',cm:len});
-    el.querySelector('[data-go]').onclick=function(){closeSheet();sfx('splash');var fb=L.fishing;if(fb)puff('drop',fb.x,fb.y,10,{speed:40,up:30,life:0.6});};
+    el.querySelector('[data-go]').onclick=function(){closeSheet();sfx('letgo');var fb=L.fishing;if(fb)puff('drop',fb.x,fb.y,10,{speed:40,up:30,life:0.6});};
     var kb=el.querySelector('[data-keep]');if(kb)kb.onclick=function(){bk.push({kind:F.id,len:len});closeSheet();sfx('plop');if(!LS().seen.bucket){LS().seen.bucket=1;toast('Walk to your pond and tap it to let it in, or tap the stream to let it go.',3800);}updateStat(true);save();};}});}
-function freeFish(wx,wy,k){var l=LS(),n=l.bucket.length;if(!n)return;l.bucket=[];sfx('splash');puff('drop',wx,wy,12,{speed:60,up:50,life:0.7});puff('ring',wx,wy+4,1,{speed:0,life:1.2,r:1.4});
+function freeFish(wx,wy,k){var l=LS(),n=l.bucket.length;if(!n)return;l.bucket=[];sfx('pondin');puff('drop',wx,wy,12,{speed:60,up:50,life:0.7});puff('ring',wx,wy+4,1,{speed:0,life:1.2,r:1.4});
   toast(n===1?'Back in the '+(k===W_LAKE?'lake':'stream')+'.':n+' fish back in the '+(k===W_LAKE?'lake':'stream')+'.');updateStat(true);save();}
-function releaseFish(wx,wy){var l=LS(),n=l.bucket.length;if(!n)return;l.bucket.forEach(function(f){l.pond.push(f);});l.bucket=[];syncAgents();sfx('splash');puff('drop',wx,wy,14,{speed:60,up:50,life:0.7});puff('ring',wx,wy+4,1,{speed:0,life:1.2,r:1.4});
+function releaseFish(wx,wy){var l=LS(),n=l.bucket.length;if(!n)return;l.bucket.forEach(function(f){l.pond.push(f);});l.bucket=[];syncAgents();sfx('pondin');puff('drop',wx,wy,14,{speed:60,up:50,life:0.7});puff('ring',wx,wy+4,1,{speed:0,life:1.2,r:1.4});
   toast(n===1?'It’s in the pond now.':n+' fish in the pond now.');updateStat(true);save();}
 
 // ----- building -----

@@ -22,6 +22,7 @@ function sfxAmbient(){if(!AC||!S)return;var vis=!document.hidden&&!window.LAND_H
 function env(g,t,a,peak,d){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+a+d);}
 function noiseSrc(){var s=AC.createBufferSource();s.buffer=NOISE;s.loop=true;s.playbackRate.value=0.8+Math.random()*0.4;return s;}
 function tone(type,f0,f1,t,dur,vol,dest){var o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);if(f1)o.frequency.exponentialRampToValueAtTime(f1,t+dur);env(g,t,0.006,vol,dur);o.connect(g);g.connect(dest||BUS);o.start(t);o.stop(t+dur+0.05);}
+function soft(t,dur,vol,ftype,freq,q,att){var s=noiseSrc(),f=AC.createBiquadFilter(),g=AC.createGain();f.type=ftype;f.frequency.value=freq;f.Q.value=q||1;g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.exponentialRampToValueAtTime(0.0001,t+att+dur);s.connect(f);f.connect(g);g.connect(BUS);s.start(t,Math.random());s.stop(t+att+dur+0.05);}
 function nburst(t,dur,vol,ftype,freq,q,dest){var s=noiseSrc(),f=AC.createBiquadFilter(),g=AC.createGain();f.type=ftype;f.frequency.value=freq;f.Q.value=q||1;env(g,t,0.004,vol,dur);s.connect(f);f.connect(g);g.connect(dest||BUS);s.start(t,Math.random());s.stop(t+dur+0.05);}
 // one-shot effects
 function sfx(name,o){if(!AC||!S||!S.opt.sound)return;o=o||{};var t=AC.currentTime,v=o.v||1;try{switch(name){
@@ -43,7 +44,12 @@ function sfx(name,o){if(!AC||!S||!S.opt.sound)return;o=o||{};var t=AC.currentTim
  case 'cast':nburst(t,0.25,0.08*v,'bandpass',2200,3);break;
  case 'cluck':tone('square',420,300,t,0.05,0.035*v);tone('square',380,260,t+0.09,0.07,0.03*v);break;
  case 'flap':for(var k=0;k<5;k++)nburst(t+k*0.06,0.04,0.08*v,'bandpass',800,1.2);break;
- case 'reel':for(var r=0;r<6;r++)tone('square',1800,1700,t+r*0.03,0.01,0.015*v);break;
+ case 'reel':for(var r=0;r<6;r++)tone('sine',760,700,t+r*0.05,0.03,0.012*v);break;
+ // Pass 230: soft water sounds, slow attacks and low filters, a different one per action
+ case 'water':for(var w=0;w<6;w++)soft(t+w*0.11,0.3,0.035*v,'bandpass',520+Math.random()*260,0.9,0.09);for(var w2=0;w2<3;w2++)tone('sine',420+Math.random()*120,260,t+0.25+w2*0.17+Math.random()*0.05,0.08,0.025*v);break;
+ case 'hook':soft(t,0.32,0.07*v,'lowpass',650,0.7,0.05);tone('sine',180,300,t,0.22,0.04*v);for(var h=0;h<3;h++)tone('sine',520+Math.random()*160,340,t+0.28+h*0.12,0.06,0.022*v);break;
+ case 'letgo':soft(t,0.28,0.06*v,'lowpass',520,0.7,0.04);tone('sine',300,150,t+0.02,0.16,0.05*v);break;
+ case 'pondin':soft(t,0.5,0.08*v,'lowpass',460,0.7,0.06);tone('sine',240,95,t+0.03,0.26,0.07*v);for(var b=0;b<4;b++)tone('sine',380+Math.random()*220,560,t+0.3+b*0.09+Math.random()*0.04,0.05,0.02*v);break;
  case 'thud':tone('sine',160,60,t,0.12,0.15*v);break;
  case 'pour':nburst(t,0.9,0.12*v,'bandpass',700,0.8);break;
  case 'catch':if(CATCH.length){var cs=AC.createBufferSource(),cg=AC.createGain();cs.buffer=CATCH[Math.floor(Math.random()*CATCH.length)];cg.gain.value=0.52*v;cs.connect(cg);cg.connect(BUS);cs.start(t);}else{tone('sine',700,180,t,0.09,0.18*v);}break;
