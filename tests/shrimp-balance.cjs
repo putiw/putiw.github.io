@@ -982,4 +982,6 @@ storyChoose(g,'gp_land',1);if(gplaceOffer(g)!==true||!buyGplace(g)||!landOpen(g)
 var h=newGame();h.me.on=1;h.money=1e6;h.me.gplace={balcony:1,house:1};storyChoose(h,'gp_land',0);if(gplaceOffer(h)==='wait'&&h.me.landTrip>h.day){}else throw Error('waits during the trip');h.day=h.me.landTrip;landDay(h);if(landOpen(h))throw Error('the trip finds the land, it does not buy it');if(gplaceOffer(h)!==true)throw Error('for sale after the trip');
 `);
 if(!/function renderMilestone\(\)\{[\s\S]{0,400}busyUI\(\)/.test(html)||html.indexOf('LAND.on||LAND.busy')<0||html.indexOf('PL_SHOW')<0)throw Error('No story cards on the land, in a tank job or while planting (Pass 234, Puti)');
+if(!html.includes('return {feed:G.tanks.some(function(t){return !t.feeder;}),wc:G.tanks.some(function(t){return !t.autoWC;}),'))throw Error('Feed and Water go once every tank is automated, no emergency comeback (Pass 244, Puti)');
+console.log('PASS Feed and Water leave once every tank is automated');
 console.log(count+' focused balance and migration checks passed');

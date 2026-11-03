@@ -2361,3 +2361,9 @@ Puti asked for a common sense pass: not hyper-real, nothing a shrimp keeper woul
 - Bug: a seeded tank 2 or 3 could be bought without the cash for its auto feeder and water changer. `addTank` and the Another tank button now need tank + `tankGear` + reserve. The new-tank sheet offers "I'll buy them later" only if the gear can't be paid (`gearLeft`).
 - Bug: Feed and Water stayed after both tanks were automated. Pass 232's header hold kept a row that was going away until a scroll or tab change. A hold now also lets go 4 s after the last tap.
 - Fast suites pass (balance test updated for the tank cash), page loads with no errors. BUILD p243.
+
+## Pass 244 (3 Nov, Puti): Feed and Water go once automated
+
+- Puti: once the tanks are automated the Feed and Water buttons should go. Pass 80 had brought them back whenever an automated tank had a red alert with a feed or water fix (`em` in `actNeed`), which is likely what she saw. Removed: Feed shows only while a tank lacks an auto feeder, Water only while one lacks an auto water changer.
+- A red feed or water alert on an automated tank now points at Gear, Automation (`#auto-feed`, `#auto-wc1`), "Raise Auto feed/change under Automation", instead of the hidden header button.
+- Balance check locks the rule. Fast suites pass. BUILD p244.
