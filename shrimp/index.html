@@ -2202,6 +2202,8 @@ function migrateProgress(G){
 function detectMilestones(G){
   updateStory(G);var p=ensureProgress(G),conditions=milestoneConditions(G);
   if(!p.wait)p.wait=[];if(!p.soon)p.soon=[];
+  // Pass 241: the cycled card skips the card gap (no blank screen after the cycling card hides), so once shrimp are in it is old news and never shows
+  if(!p.seen.cycle&&G.tanks.some(function(t){return t.had;}))p.seen.cycle=true;
   Object.keys(MILESTONES).forEach(function(k){if(conditions[k]&&!p.seen[k]){p.seen[k]=true;markEvent(G);if(!G.opt.all||k==='win'){if(storyWaits(k)){(p.at||(p.at={}))[k]=Math.floor(G.day);if(STORY_FIRST.indexOf(k)>=0)p.wait.unshift(k);else if(storyFresh(k)){var fi=0;while(fi<p.wait.length&&storyFresh(p.wait[fi]))fi++;p.wait.splice(fi,0,k);}else p.wait.push(k);}else if(CARD_NOW.indexOf(k)>=0)p.queue.push(k);else p.soon.push(k);}if(k==='farm')p.home='emp';if(k==='owntank')ownTankNow(G);}});
   if(p.seen.owntank&&!(G.me&&G.me.keep==='self')&&farmBuilt(G)&&!G.emp.won)ownTankNow(G);
   // Chapter cards wait for 15 s of play after the last card, story cards wait for that too and for no chapter card pending.
@@ -3915,7 +3917,7 @@ function foodIncome(G){return careGoods(G)+topupShrimp(G)/CARE_TOPUP_N*CARE_TOPU
 function sideIncome(G){var E=G.emp,h=G.humans,c3=E.c3||{},t=E.tree||{},x=0;if(c3.c_water===0||(E.hard&&E.hard.picks.water&&E.hard.picks.water.desal))x+=h*0.0004;if(t.lm_water)x+=h*0.0002;if(t.lm_med)x+=h*0.0003;if(t.isl_pass)x+=50000;if(pd(G,'solar'))x+=farmCap(G)*0.5;if(E.green&&E.green.sell&&G.day>=E.green.from)x+=E.green.gw*2e6/365*0.15;return x;}
 var SIDE_NEWS=[{k:'topup',ok:function(G){return topupShrimp(G)>=1000;},t:'Owners whose colony thins out buy ten shrimp to top it up. The farms breed them on racks the kits don’t need.'},{k:'solar',ok:function(G){return pd(G,'solar');},t:'Your farms sell their spare power to the grid. A wind farm in Inner Mongolia joins next spring.'},{k:'desal',ok:function(G){return (G.emp.c3||{}).c_water===0||!!(G.emp.hard&&G.emp.hard.picks.water&&G.emp.hard.picks.water.desal);},t:'Your desalination plants sell water to three coastal cities.'},{k:'freight',ok:function(G){return !!(G.emp.tree&&(G.emp.tree.lm_water||G.emp.tree.lm_med));},t:'Hospitals and water companies pay your trucks to carry their boxes.'}];
 function incomeDay(G){var f=foodIncome(G),x=sideIncome(G),E=G.emp,N=E.sideNews||(E.sideNews={});if(f>0){earn(G,f,'foodsales');pay(G,careGoods(G)*CARE_COST,'supplies');}planDay(G);if(x>0)earn(G,x,'side');SIDE_NEWS.forEach(function(n){if(!N[n.k]&&n.ok(G)){N[n.k]=1;newsLine(G,n.t);}});}
-var STORY_FIRST=['coin_offer'],CARD_GAP=15000,CARD_NOW=['broke','kindsave','kindend','gameover','left','me_ill','crash','win','intro','tenyears','health'];
+var STORY_FIRST=['coin_offer'],CARD_GAP=15000,CARD_NOW=['cycle','broke','kindsave','kindend','gameover','left','me_ill','crash','win','intro','tenyears','health'];
 function storyClock(G){return G.ps&&G.ps.t>0?G.ps.t:G.day*4000;}
 // Pass 190: story cards tied to a moment. STORY_DROP: no choices, dropped once STALE_DAYS old. STORY_PROMPT: choices or a change already made, never dropped, just first in line.
 var STALE_DAYS=60,STORY_DROP=['mira_dye','mira_fight','mira_scholar','mira_dirty','mira_teen','mira_bye','mira_house','mira_net','mira_grown','mira_back','gp_net','me_doctor'],STORY_PROMPT=['c_nydin','c_kyoto','c_knee','c_wedding','c_heat','c_lie','owntank','bye_pack','bye_sales','bye_mgr','bye_social','me_burnout','tree_island','tree_rewild','tree_lastmile','tree_lab','tree_shop'];

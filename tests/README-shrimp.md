@@ -2322,3 +2322,9 @@ Deployed 3 Nov (Passes 233 to 235, BUILD 2026-11-03-p235). Bots seed 7: strong c
 
 - Feeding to Colony had about 16 px while the rest had 8: the Water care / Water test pair (`.two`) kept its 8 px bottom margin when both cards were hidden, and Colony had an inline 8 px top margin. `.two` with no visible card is now `display:none`, Colony's inline margin is gone, and the care row slot (`.tv-slot`) is 8 px from the next card (was 10). Measured in Chromium at 390 px: care row, Feeding, Colony, Readings, Recent events all 8 px apart.
 - Water care and Water test still open only the first time the tank needs a change (Pass 115 reveal order: nitrate over 20, KH under 2.5, GH under 5, any ammonia or nitrite).
+
+## Pass 241 (3 Nov, Puti): no blank screen before "Your tank is cycled"
+
+- When the water turned safe, the cycling card hid at once but the cycled card waited in `p.soon` for the 15 s card gap (`CARD_GAP`) after the last closed card, so the Tank tab sat empty for up to 15 s of play. `cycle` is now in `CARD_NOW` and shows the same tick.
+- Because it no longer waits, `detectMilestones` marks `cycle` seen once any tank has had shrimp (old news, Pass of 31 Oct), so it never shows after stocking.
+- Checked: fresh game, card just closed, tank turns safe: queue `["cycle"]`, card open (before: queue empty, start card hidden, blank). Tank with shrimp: queue empty. Fast suites, cardtap pass. Bots, spotlight sweep and monkey not run (urgent deploy).
