@@ -2389,3 +2389,5 @@ Deployed 4 Nov (Passes 245 and 246, BUILD 2026-11-04T01:20-p246). Before deploy:
 - Puti: the Your tank card came long after the first grow rack took the tanks. It was a story card, so it waited in the story queue (30 s to 2 min apart, behind other waiting cards). Now `owntank` is in `CARD_NOW` and out of `storyWaits`: it shows right after the farm is bought, with the intro gap skipped like crash and health.
 - Clock check, no change: a company day at 1x is 4 steps of 600 ms, 2.4 s, the same as `TANK_DAY_MS`. So the Pass 246 tank clocks (poop 4 to 10 min, glass 3 to 6, plants 5) are the same at 1x before and after the land; before the land they speed up with the company speed like everything else.
 - Balance check locks it. Fast suites: balance 143, academy 10, me 50. BUILD p247. Not deployed.
+
+Deployed 4 Nov (Pass 247, BUILD 2026-11-04T01:40-p247). Fast suites and cardtap pass. Bots, spotlight sweep and monkey not rerun: one-line queue change on top of the Pass 246 deploy an hour earlier, which ran them all.
