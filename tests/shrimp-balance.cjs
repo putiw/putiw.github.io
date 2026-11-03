@@ -427,13 +427,19 @@ if(s.space||s.progress.queue.indexOf('spaceDream')>=0||s.progress.reviewing||s.a
 `);
 if(!html.includes('id="after"')||!html.includes("showAfter(slab,stx,aft)")||!html.includes("if(pp&&pp.fk){showAfter(pp.name,pp.d,kindNote());}"))throw Error('Decisions show what happened afterwards, in a popup');
 if(!html.includes("var renderInner=render;render=function(){var a=anchorGet();renderInner.apply(this,arguments);anchorFix(a);settleScan();};")||!html.includes('SETTLE_MS=500'))throw Error('The screen holds still under the finger and fresh decisions ignore taps for half a second');
+if(html.includes('.tv-care.own .btn[data-idle]{opacity')||fs.readFileSync(path.join(__dirname,'../shrimp/home.html'),'utf8').includes('.toys .btn[data-idle]{opacity'))throw Error('Job buttons never grey out, do them any time (Puti, 4 Nov)');
 check('own tank keeps 20 shrimp, care builds up only then, Look over from the first shrimp',`
 var g=readyGame(),T=g.tanks[0];T.pop=[{n:80,age:120,g:40},{n:30,age:120,g:80},{n:10,age:20,g:90}];g.emp.rawShrimp=0;
 careDay(g);if(T.care&&T.care.mulm>0)throw Error('No care chores before your own tank');
 var moved=keepTwenty(g);if(Math.round(totalN(T))!==20||Math.round(moved)!==100||g.emp.rawShrimp<99)throw Error('Twenty stay home, the rest go to the farm: '+totalN(T)+' '+moved);
 if(T.pop.some(function(k){return k.g===40;}))throw Error('The best coloured adults stay');
-g.me=g.me||newMe();g.me.keep='self';for(var d=0;d<24;d++)careDay(g);var C=careOf(T);if(ownDue(g).some(function(k){return k!=='pests';}))throw Error('Nothing but pests due in the first 24 tank days: '+ownDue(g));
-for(d=24;d<46;d++)careDay(g);['gravel','sponge','trim'].forEach(function(k){if(ownDue(g).indexOf(k)<0)throw Error('Each job due about once a tank month (Pass 161): '+k+' '+JSON.stringify(C));});
+g.me=g.me||newMe();g.me.keep='self';var C=careOf(T),d;
+/* Pass 246 (Puti, 4 Nov): after a clean, poop is full in a random 4 to 10 min (100 to 250 tank days), glass 3 to 6 min (75 to 150), plants always 5 min (125) */
+var full=[];for(var r=0;r<40;r++){C.mulm=0;C.grow=0;careDay(g);for(d=1;d<400&&C.mulm<1;d++)careDay(g);full.push(d);}
+if(Math.min.apply(null,full)<99||Math.max.apply(null,full)>251||Math.max.apply(null,full)-Math.min.apply(null,full)<40)throw Error('Poop full in 100 to 250 tank days, random each clean: '+full);
+C.grow=0;for(d=0;d<125;d++)careDay(g);if(Math.abs(C.grow-1)>1e-6)throw Error('Plants full in exactly 125 tank days: '+C.grow);
+T.had=1;var gl=[];for(r=0;r<20;r++){T.glass=null;glassGrow(g,T);T.glass=T.glass.map(function(){return 0;});var gd=0;while(glassMean(T)<0.95&&gd<400){glassGrow(g,T);gd++;}gl.push(gd);}
+if(Math.min.apply(null,gl)<55||Math.max.apply(null,gl)>170)throw Error('Glass about full in 75 to 150 tank days: '+gl);
 T.pop=[];var m1=C.mulm=0.3;for(d=0;d<30;d++)careDay(g);if(C.mulm!==m1)throw Error('No new mulm in an empty tank, after a crash poop stops (Puti, 30 Oct)');
 var f0=C.pests.filter(function(p){return p.k==='flat';}).length;for(d=0;d<200;d++)careDay(g);if(C.pests.filter(function(p){return p.k==='flat';}).length!==f0)throw Error('No new flatworms without shrimp');
 var h=readyGame(),U=h.tanks[0];U.pop=[{n:5,age:120,g:30,b:1},{n:5,age:120,g:70}];var m0=h.money,r=cullPick(h,U,[{age:120,g:30,b:1},{age:120,g:70}]);if(r.n!==2||r.gave!==0||Math.round(totalN(U))!==8||U.pop.filter(function(k){return k.b;})[0].n!==4)throw Error('A bought one can be taken out');
@@ -721,7 +727,7 @@ if(!T.wood||T.plants||!T.ldec||!landOwn(g).decor.wood)throw Error('The land deci
 if(ownDue(g).length)throw Error('Nothing due after the jobs: '+ownDue(g));`);
 check('Pass 161/179: own-tank jobs about once a tank month, the tank stays fine between',OWN_SETUP+`
 var g=ownGame(),T=g.tanks[0],C=careOf(T);T.glass=null;C.mulm=C.sponge=C.grow=0;C.pests=[];for(var d=0;d<30;d++){g.tday++;glassGrow(g,T);careDay(g);}
-var gm=glassMean(T);if(gm<0.25||gm>0.45)throw Error('Pass 179: glass about a third green after a tank month: '+gm);
+var gm=glassMean(T);if(gm<0.1||gm>0.5)throw Error('Pass 246: glass partly green after 30 tank days (full in 75 to 150): '+gm);
 if(ownWell(g).total<50)throw Error('A month of mess still reads Fine: '+ownWell(g).total);
 for(d=0;d<90;d++){g.tday++;glassGrow(g,T);careDay(g);}if(ownWell(g).total>=60)throw Error('Months of nothing shows: '+ownWell(g).total);`);
 check('Pass 161: leaving after the win, without the land too',OWN_SETUP+`

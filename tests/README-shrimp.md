@@ -2376,3 +2376,9 @@ Deployed 3 Nov (Passes 243 and 244, BUILD 2026-11-03T17:05-p244). Before deploy:
 - Old saves: a loan without `deal` is converted on the next day tick (`fix:1`, `next` = later of due and today, plus 30).
 - Scratch check: old save with 20,000 owed is converted and each take now lowers the debt; a new broke-card loan is paid off by takes. Fast suites: balance 142, academy 10, me 50. BUILD p245. Not deployed.
 - Puti: the take is not news. Removed the Shrimp Times line; the take now goes to the log and to You, What happened (`dayLog`), saying why: "You didn’t pay back the man from the market. Two of his men took the X at night, counted as AED N off the AED M you owed. You still owe ... It grows 20% a month and they come back every month until it’s paid." Same for the half-the-shrimp take. Fast suites pass again.
+
+## Pass 246 (4 Nov, Puti): tank mess clocks, job buttons, favour pay-out reason
+- Your tank (Tank 1, from the farm on): after each clean poop is full again in a random 4 to 10 min (`MULM_D` 100 to 250 tank days at 2.4 s, `rollM`, with 20+ shrimp), glass algae in 3 to 6 min (`GLASS_D` 75 to 150, `rollL`), plants always 5 min (`GROW_D` 125). Rolled again after every clean; old saves roll once (`rk.v` 2). Sponge unchanged. Before the land Tank 1 moves with the company, so these are game days there.
+- Job buttons (company and land) no longer fade when the job isn't due: `.tv-care.own .btn[data-idle]` and the land's `.toys .btn[data-idle]` opacity rules removed (home.html and `shrimp-proto` `src/style.css`). They were always tappable.
+- Favour cards: a pay-out you can't afford was already greyed with "not enough money or kits"; it now says the price and what you have.
+- Tests: balance locks the new clocks and no faded job buttons (old Pass 161/179 timing checks replaced), shrimp-tank1 Pass 237 checks moved to the new clocks. Fast suites: balance 142, academy 10, me 50, tank1 sim ok.
