@@ -2367,3 +2367,5 @@ Puti asked for a common sense pass: not hyper-real, nothing a shrimp keeper woul
 - Puti: once the tanks are automated the Feed and Water buttons should go. Pass 80 had brought them back whenever an automated tank had a red alert with a feed or water fix (`em` in `actNeed`), which is likely what she saw. Removed: Feed shows only while a tank lacks an auto feeder, Water only while one lacks an auto water changer.
 - A red feed or water alert on an automated tank now points at Gear, Automation (`#auto-feed`, `#auto-wc1`), "Raise Auto feed/change under Automation", instead of the hidden header button.
 - Balance check locks the rule. Fast suites pass. BUILD p244.
+
+Deployed 3 Nov (Passes 243 and 244, BUILD 2026-11-03T17:05-p244). Before deploy: balance 142, academy 10, me 50, human 390 px all ok to the first farm, strong bot seed 7 WIN day 2,229 empire_dictator (same as Pass 242), average Earth 7,197 question_prof against 7,225 on the build before (seed 23: 7,393 both), no INSOLVENT, spotlight sweep 103 all good, monkey 120 taps at 360 and 390 px on seven stages, no errors, no sideways scroll, no NaN.
