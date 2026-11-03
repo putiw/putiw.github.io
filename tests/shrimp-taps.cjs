@@ -37,7 +37,7 @@ const HOOK=()=>{window.__src=[];var P=(window.AudioContext||window.webkitAudioCo
   var z=document.createElement('button');z.id='tt-step';z.textContent='−';z.style.cssText='position:fixed;left:290px;top:400px;z-index:99999';document.body.appendChild(z);});
  let r=await tap('#tt-main');
  ok(r.src.length===1,'one tap, one buffer source ('+r.src.length+')');
- ok(r.src[0]&&Math.abs(r.src[0].g*BUS-NET)<1e-3,'net gain 0.3 at the speakers (source '+(r.src[0]&&r.src[0].g.toFixed(3))+' x bus 0.41)');
+ ok(r.src[0]&&Math.abs(r.src[0].g*BUS-NET*0.5)<1e-3,'main buttons at half of net 0.3 (Pass 237) (source '+(r.src[0]&&r.src[0].g.toFixed(3))+' x bus 0.41)');
  ok(r.src[0]&&r.src[0].r>=0.94&&r.src[0].r<=1.06,'playback rate within 0.94 to 1.06');
  ok(r.role==='main'&&r.flip,'main action sound, hidden switch toggled once');
  ok(!r.focus,'hidden switch never takes focus');
@@ -95,7 +95,7 @@ const HOOK=()=>{window.__src=[];var P=(window.AudioContext||window.webkitAudioCo
  await q.evaluate(()=>{window.__src=[];TAPS.lastSnd=TAPS.lastTick=0;});const sc0=await q.evaluate(()=>TAPS.input?TAPS.input.checked:false);
  if(btn)await btn.click();await wait(150);
  const sr=await q.evaluate(c0=>({n:__src.length,g:__src[0]&&__src[0].g,flip:TAPS.input&&TAPS.input.checked!==c0}),sc0);
- ok(sr.n===1&&Math.abs(sr.g-NET)<1e-3&&sr.flip,'ship: one sound at 0.3, tick toggles ('+sr.n+')');
+ ok(sr.n===1&&Math.abs(sr.g-NET*0.5)<1e-3&&sr.flip,'ship: one main sound at half of 0.3, tick toggles ('+sr.n+')');
  ok(!errs.length,'no page errors'+(errs.length?': '+errs.join(' | '):''));
  await b.close();srv.close();console.log(fails?fails+' FAILED':'all ok');process.exit(fails?1:0);
 })().catch(e=>{console.error(e);process.exit(1);});

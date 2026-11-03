@@ -11,11 +11,11 @@ const SETUP=`var g=newGame(),T=g.tanks[0];T.had=1;T.cycledAt=0;T.pop=[{n:30,age:
  var C=careOf(T);T.glass=null;C.mulm=C.sponge=C.grow=0;C.pests=[];C.pestAt=g.tday;function days(n){for(var d=0;d<n;d++){g.tday++;glassGrow(g,T);careDay(g);}}`;
 // 1. due at about a month, full at about three
 for(const seed of [3,7,11]){const c=engine(seed);vm.runInContext(SETUP+`
- days(27);var due27=ownDue(g).filter(function(k){return k!=='pests';});days(6);var due33=ownDue(g);days(48);var at81={m:C.mulm,s:C.sponge,g:C.grow,gl:glassMean(T)};days(18);var at99={m:C.mulm,s:C.sponge,g:C.grow,gl:glassMean(T)};`,c);
+ days(27);var due27=ownDue(g).filter(function(k){return k!=='pests';});days(9);var due33=ownDue(g);days(10);var due46=ownDue(g);days(35);var at81={m:C.mulm,s:C.sponge,g:C.grow,gl:glassMean(T)};days(27);var at99={m:C.mulm,s:C.sponge,g:C.grow,gl:glassMean(T)};days(32);var at140=C.mulm;`,c);
  ok(c.due27.length===0,'seed '+seed+': nothing due at day 27 ('+c.due27+')');
- ok(['gravel','sponge','trim','glass'].every(k=>c.due33.indexOf(k)>=0),'seed '+seed+': gravel, sponge, trim and glass due by day 33 ('+c.due33+')');
+ ok(['sponge','trim','glass'].every(k=>c.due33.indexOf(k)>=0)&&c.due46.indexOf('gravel')>=0,'seed '+seed+': sponge, trim and glass due by day 36, gravel by day 46 (Pass 237) ('+c.due33+' / '+c.due46+')');
  ok(c.at81.m<0.95&&c.at81.s<0.95&&c.at81.g<0.95&&c.at81.gl<0.95,'seed '+seed+': not fully covered at day 81 '+JSON.stringify(c.at81));
- ok(c.at99.m>=0.99&&c.at99.s>=0.99&&c.at99.g>=0.99&&c.at99.gl>=0.95,'seed '+seed+': fully covered by day 99 '+JSON.stringify(c.at99));}
+ ok(c.at99.s>=0.99&&c.at99.g>=0.99&&c.at99.gl>=0.95&&c.at99.m<0.97&&c.at140>=0.99,'seed '+seed+': sponge, plants, glass full by day 108, poop on its own slower clock, full by day 140 (Pass 237) '+JSON.stringify(c.at99)+' '+c.at140);}
 // 2. pests: quiet month after a pest clean, rare for a monthly cleaner, no flatworms in clean gravel
 {let early=0,flatClean=0,seen=0,runs=40;for(let s=1;s<=runs;s++){const c=engine(s*97);vm.runInContext(SETUP+`
  var early=0,flatClean=0,seen=0;for(var mo=0;mo<12;mo++){for(var d=0;d<30;d++){g.tday++;careDay(g);if(mo===0&&C.pests.length)early=1;if(C.mulm<OWN_DUE&&C.pests.some(function(p){return p.k==='flat';}))flatClean=1;}

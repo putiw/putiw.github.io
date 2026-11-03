@@ -2294,3 +2294,11 @@ Deployed 3 Nov (Passes 233 to 235, BUILD 2026-11-03-p235). Bots seed 7: strong c
 - Tapping a sick shrimp opens a sheet instead of netting it: the sign, the three cures at the game's prices (right one heals, wrong one costs and does nothing), Cull it, Net it. Untreated it dies after 30 land days (`sickDay`). A cull or death in Your tank posts `take` (`cullShrimp` wrapper in `game.js`). Land source `tank.js` (`illTick`, `sickSheet`, `cullShrimp`), `breed.js` (`specOf` passes `sick`).
 - `BUILD` carries the time (`2026-11-03T13:45-p236`); the ? footer reads "Updated 3 Nov 2026, 13:45 UAE". Bump it with date and time from now on.
 - Tests: shrimp-balance 142 pass; land flow checked in a 390 px browser on the prototype build (sick shrimp, sheet, right cure heals, AED 5 spent). Bots and sweeps skipped (Puti: quick deploy).
+
+## Pass 237 (3 Nov, Puti): softer vacuum, poop on its own clock, full-width care row, softer default button
+
+- Vacuum (`siphon` loop, game and land `sound.js`): low-pass hush at 520 Hz with a slow 2.5 Hz sway instead of the 700 Hz band with a 7 Hz wobble, peak 0.09 (was 0.22), plus soft water blips inside (sine, 260 to 640 Hz, 0.014).
+- Mulm runs on its own clock, `OWN_MULM` 115 tank days to full (sponge, plants and glass stay on `OWN_FULL` 90). Every job starts at its own pace (`rkNew`, 0.85 to 1.0), so they no longer move together on a fresh tank; after each clean the Pass 232 reroll still applies.
+- Care row: before Your tank's jobs, the buttons showing (Check shrimp, Clean glass) share the full width (`careRow`); with the jobs it stays three a row.
+- Default button (`main`, `tap_tok`) at half the gain with a 1.6 kHz low-pass (`ROLE_GAIN`, taps.js).
+- Tests: shrimp-balance 142, shrimp-tank1 sim (new timings: sponge/trim/glass due by 36, gravel by 46, poop full by 140), shrimp-taps all ok.

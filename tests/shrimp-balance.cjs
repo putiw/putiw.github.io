@@ -433,7 +433,7 @@ careDay(g);if(T.care&&T.care.mulm>0)throw Error('No care chores before your own 
 var moved=keepTwenty(g);if(Math.round(totalN(T))!==20||Math.round(moved)!==100||g.emp.rawShrimp<99)throw Error('Twenty stay home, the rest go to the farm: '+totalN(T)+' '+moved);
 if(T.pop.some(function(k){return k.g===40;}))throw Error('The best coloured adults stay');
 g.me=g.me||newMe();g.me.keep='self';for(var d=0;d<24;d++)careDay(g);var C=careOf(T);if(ownDue(g).some(function(k){return k!=='pests';}))throw Error('Nothing but pests due in the first 24 tank days: '+ownDue(g));
-for(d=24;d<32;d++)careDay(g);['gravel','sponge','trim'].forEach(function(k){if(ownDue(g).indexOf(k)<0)throw Error('Each job due about once a tank month (Pass 161): '+k+' '+JSON.stringify(C));});
+for(d=24;d<46;d++)careDay(g);['gravel','sponge','trim'].forEach(function(k){if(ownDue(g).indexOf(k)<0)throw Error('Each job due about once a tank month (Pass 161): '+k+' '+JSON.stringify(C));});
 T.pop=[];var m1=C.mulm=0.3;for(d=0;d<30;d++)careDay(g);if(C.mulm!==m1)throw Error('No new mulm in an empty tank, after a crash poop stops (Puti, 30 Oct)');
 var f0=C.pests.filter(function(p){return p.k==='flat';}).length;for(d=0;d<200;d++)careDay(g);if(C.pests.filter(function(p){return p.k==='flat';}).length!==f0)throw Error('No new flatworms without shrimp');
 var h=readyGame(),U=h.tanks[0];U.pop=[{n:5,age:120,g:30,b:1},{n:5,age:120,g:70}];var m0=h.money,r=cullPick(h,U,[{age:120,g:30,b:1},{age:120,g:70}]);if(r.n!==2||r.gave!==0||Math.round(totalN(U))!==8||U.pop.filter(function(k){return k.b;})[0].n!==4)throw Error('A bought one can be taken out');
@@ -851,7 +851,7 @@ if(!sp.includes("name:'Transit spectroscopy',cost:.2,")||!sp.includes("name:'Orb
 count++;console.log('PASS Pass 175 test costs and fixed panel');
 // Pass 179 (Puti, 31 Oct): Tank 1 on one real-time clock, 3 months from clean to covered, its jobs are the land's. Full checks: tests/shrimp-tank1.cjs
 {const home=require('fs').readFileSync(__dirname+'/../shrimp/home.html','utf8');
-if(!html.includes('var TANK_DAY_MS=2400,TANK_CATCH=30;')||!html.includes('var OWN_DUE=1/3,OWN_FULL=90;')||!html.includes('stepGame(G,0)||progressionBlocked(G))break;}')||!html.includes("var LAND_JOBS={glass:'glass',vac:'vac',sponge:'sponge',trim:'trim',pest:'pests',scape:'scape'};"))throw Error('Pass 179: Tank 1 runs 2.4 s a tank day at any speed, 90 days to full, jobs on the land');
+if(!html.includes('var TANK_DAY_MS=2400,TANK_CATCH=30;')||!html.includes('var OWN_DUE=1/3,OWN_FULL=90,OWN_MULM=115;')||!html.includes('stepGame(G,0)||progressionBlocked(G))break;}')||!html.includes("var LAND_JOBS={glass:'glass',vac:'vac',sponge:'sponge',trim:'trim',pest:'pests',scape:'scape'};"))throw Error('Pass 179: Tank 1 runs 2.4 s a tank day at any speed, 90 days to full, jobs on the land');
 if(!home.includes("TOYS.push({id:'glass'")||!home.includes("var busy=jobOpen();")||!home.includes("name==='wipe'"))throw Error('Pass 179: the land has the glass wipe and leaves a job alone');
 count++;console.log('PASS Pass 179 one clock, one tank, slower mess');}
 // Pass 181 (Puti, 1 Nov): no wind on the land, one mute, the land banner never for the win. Full checks: tests/shrimp-land-audio.cjs
