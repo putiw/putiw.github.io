@@ -2302,3 +2302,10 @@ Deployed 3 Nov (Passes 233 to 235, BUILD 2026-11-03-p235). Bots seed 7: strong c
 - Care row: before Your tank's jobs, the buttons showing (Check shrimp, Clean glass) share the full width (`careRow`); with the jobs it stays three a row.
 - Default button (`main`, `tap_tok`) at half the gain with a 1.6 kHz low-pass (`ROLE_GAIN`, taps.js).
 - Tests: shrimp-balance 142, shrimp-tank1 sim (new timings: sponge/trim/glass due by 36, gravel by 46, poop full by 140), shrimp-taps all ok.
+
+## Pass 238 (3 Nov, Puti, urgent): play offline from the Home Screen
+
+- `shrimp/manifest.webmanifest` (standalone, portrait, cream theme, icons 192/512/180; `icon-512.png` scaled from 192) and `shrimp/sw.js`, registered from index.html on https only (tests on http are untouched).
+- The worker keeps index, land, ship, taps.js, music, water, catch and the nine tap sounds on install, and Google Fonts when first fetched. Pages are network first (3 s, then the kept copy), so a new BUILD still arrives when online; everything else is the kept copy, refreshed in the background. Query strings ignored. Bump `CACHE` in sw.js only to drop old files.
+- iOS keeps a Home Screen app's storage apart from Safari's, so a game started in Safari doesn't carry over to the icon.
+- Tested: Chromium at 390 px, load online, go offline, reload: game, home.html and sounds load from the worker. Balance 142.

@@ -1,0 +1,16 @@
+{
+  "name": "Universal Shrimp",
+  "short_name": "Shrimp",
+  "description": "Grandma gives you her old shrimp tank. Breed shrimp, sell starter kits, and try to get one into every home on Earth.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#efe9dc",
+  "theme_color": "#efe9dc",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icon-180.png", "sizes": "180x180", "type": "image/png"}
+  ]
+}

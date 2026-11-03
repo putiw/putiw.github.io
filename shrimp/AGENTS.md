@@ -32,6 +32,7 @@ Universal Shrimp is a single-file HTML idle/sim game in the spirit of Universal 
 | `shrimp/index.html` | The whole game: markup, CSS, sim and UI in one file, sprites embedded as data URIs. |
 | `shrimp/home.html` | Grandma's land (27 Oct): the pixel map built from the Shrimp Home Prototype (`shrimp-proto` branch, `shrimp-home-proto/`, `python3 build.py --game`). Generated, don't edit by hand: Pass 180 did, and Pass 181 had to port it back to the source first (diff a fresh build against the game's copy before you start). Opened full screen over the game in an iframe. |
 | `shrimp/space.html` | The planet search (Pass 169): the ship's map, opened full screen over the game in an iframe after Launch. Hand-written, one file. Its sim sits between `// ==SPACE-SIM-START==` and `// ==SPACE-SIM-END==`, tested by `tests/shrimp-space-search.cjs`. Open it on its own (`space.html`) for a dev trip saved in localStorage `shrimp-space-dev`; ‹ Space there starts a new one. |
+| `shrimp/sw.js`, `shrimp/manifest.webmanifest` | Offline play from the Home Screen (Pass 238). Add any new file the game loads to `FILES` in sw.js. |
 | `shrimp-tanks/` | A different, older game (Phaser build). Don't confuse the two. |
 | `tests/shrimp-balance.cjs` | Focused checks for mechanics, migrations and key UI strings. Must pass. |
 | `tests/shrimp-academy.cjs` | Research and chapter checks. Must pass. |
