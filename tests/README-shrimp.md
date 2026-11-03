@@ -2287,3 +2287,10 @@ Deployed 3 Nov (Pass 231, BUILD 2026-11-03-p231). Bots seed 7: strong cold won d
 - Not covered: the river trap and other land-only actions (land-life test), an iPhone by hand.
 
 Deployed 3 Nov (Passes 233 to 235, BUILD 2026-11-03-p235). Bots seed 7: strong cold won day 2,282 empire_dictator (same as Pass 231); strong kind won day 3,343 garden_village (was 3,339); average Earth day 7,337 question_prof (was 7,169). Endcards 50, hard 12, frozen, cardtap, Space bot, spotlight sweep, land-life, human (390, 360), effects, fresh, sound, taps, land-audio pass; layout has the same 2 px empty-text flag as Pass 231. Stable screen ran on all tabs on the strong run (the 5 known movers, see Pass 234); the average-run stable pass was stopped (Puti: too slow, test only what the edits touch).
+
+## Pass 236 (3 Nov, Puti): sickness on the land, Updated with the time
+
+- Grandma's land tanks can get sick again, rarely: only after 5 minutes on the land with no tap or key, a 10% chance every 30 s, at most once per idle stretch and never while another shrimp is sick. One adult in one tank (not the cull tank) gets one of the game's three illnesses (failed molts, bacterial, Scutariella), drawn with the game's signs (pale ring, milky body, white threads; `shrimpart.js`).
+- Tapping a sick shrimp opens a sheet instead of netting it: the sign, the three cures at the game's prices (right one heals, wrong one costs and does nothing), Cull it, Net it. Untreated it dies after 30 land days (`sickDay`). A cull or death in Your tank posts `take` (`cullShrimp` wrapper in `game.js`). Land source `tank.js` (`illTick`, `sickSheet`, `cullShrimp`), `breed.js` (`specOf` passes `sick`).
+- `BUILD` carries the time (`2026-11-03T13:45-p236`); the ? footer reads "Updated 3 Nov 2026, 13:45 UAE". Bump it with date and time from now on.
+- Tests: shrimp-balance 142 pass; land flow checked in a 390 px browser on the prototype build (sick shrimp, sheet, right cure heals, AED 5 spent). Bots and sweeps skipped (Puti: quick deploy).
