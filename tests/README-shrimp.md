@@ -2234,3 +2234,9 @@ Puti: Tank 1 got sick after the land, and the Check shrimp tile had turned into 
 - Tests: shrimp-hard 12 (with a fresh average run), shrimp-land-audio; screenshot of the water group with five done options and of the ? popup at 390 px. Sounds not checked by ear.
 
 Deployed 3 Nov (Passes 229 and 230, BUILD 2026-11-03-p230). Bots seed 7: strong cold won day 2,282 empire_dictator; average Earth day 7,169 question_prof; strong kind INSOLVENT day 1,022 (same open hardier line issue as the last deploy); Space bot lands. Fast suites, cardtap, tank1, yourtank, land audio and life, endcards, hard, spotlights, layout, stable pass. `shrimp-frozen` fails on the research tab with this average run's year 6 save (no buyable research row); it fails the same on the Pass 229 build, so it is the save, not these passes.
+
+## Pass 231 (3 Nov): strong kind bot takes the rescue, grant Fund buttons freeze
+
+- The strong bot stopped at the first negative balance (day 1,022 kind), before the game calls you broke (`brokeNow` counts stock and shrimp you could sell) and before Pass 222's rescue. Now it stops only when `brokeNow` or `kindend`, or after a year below zero, and takes the `kindsave` card (option 1, the 5-year loan). Seed 7 kind: below zero day 1,022, rescued day 1,146 (1 of 2), won day 3,339, garden_village.
+- Freeze: grant Fund buttons (`gr-pick`) now read Frozen while the accounts are frozen. `grPick` already refused, but the button said Fund and the tap gave "Not enough spare cash". Status labels (Funded, Not this year, 3 running) stay. `shrimp-frozen` counts `gr-pick`; the year 6 research tab has no `rl-hire` since grants replaced open lines, which is why it failed. It passes on a fresh average run.
+Tests: balance 142, frozen, strong kind bot seed 7. Not deployed.
