@@ -876,7 +876,7 @@ var h=readyGame();h.fin=[];h.mh=[];for(var i=0;i<5;i++){h.fin.push({shrimp:100})
 if(Math.abs(netPerDay(h)-100)>1e-6)throw Error('netPerDay counts a personal buy: '+netPerDay(h));
 `);
 if(!html.includes("if(!G.ob.sp4c&&speed>=4)G.ob.sp4c=1;")||!html.includes("top:calc(24px + env(safe-area-inset-top,0px))"))throw Error('Pass 184: no 4x spotlight at 4x or more, story card near the top');count++;
-if(!html.includes("var HG_COLS=120")||!html.includes('id="hg-cv"')||!html.includes('id="nour-cv"')||html.includes("showAfter(ho.t,ho.news"))throw Error('Pass 183: people grid, Nour jar, no popup after a hard-part option');count++;
+if(!html.includes("var HG_COLS=80")||!html.includes('id="hg-cv"')||!html.includes('id="nour-cv"')||html.includes("showAfter(ho.t,ho.news"))throw Error('Pass 183: people grid, Nour jar, no popup after a hard-part option');count++;
 check('Pass 205: farm wellbeing, many or happy',`
 var g=readyGame();g.emp.farms={barn:4};g.money=1e9;var c0=farmCap(g),o0=farmOverhead(g),w0=farmWell(g),k0=sickKitRate(g);
 if(w0!==FW_MID||farmWellMult(g)!==1)throw Error('The default farm changes nothing '+w0);

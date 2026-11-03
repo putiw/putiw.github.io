@@ -25,7 +25,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  await setup(false);let t=await tiles();
  ok(t.map(x=>x.n).join(',')==='Vacuum,Sponge,Trim,Pests,Check shrimp,Glass','before the land: '+t.map(x=>x.n).join(', '));
  ok(t.every(x=>x.vis&&x.s),'every tile shows with a state line ('+t.map(x=>x.s).join(' / ')+')');
- const c1=await p.evaluate(()=>({name:G.tanks[0].name,well:!$('wellcard').hidden,fw:!$('owncare').hidden,feed:$('feedcard').hidden,wt:$('wtcard').hidden,auto:$('oc-auto').contains($('auto-feed')),food:$('oc-body').querySelectorAll('[data-act="food"]').length,chips:$('oc-body').querySelectorAll('.chip').length,
+ const c1=await p.evaluate(()=>({name:G.tanks[0].name,well:!$('wellcard').hidden,fw:!$('owncare').hidden,feed:$('feedcard').hidden,wt:$('wtcard').hidden,auto:$('oc-auto').contains($('auto-feed')),food:$('oc-body').querySelectorAll('[data-act="food"]').length,chips:$('oc-body').querySelectorAll('.wcell').length,
   order:['wellcard','owncare','colcard','logcard'].map(id=>$(id).getBoundingClientRect().top)}));
  ok(c1.name==='Your tank','the tank is called Your tank');
  ok(c1.well&&c1.fw&&c1.feed&&c1.wt,'company shows Wellbeing and Food and water, not Feeding or Water test');
@@ -36,7 +36,10 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  await p.screenshot({path:path.join(os.tmpdir(),'yt-company-'+W+'.png'),fullPage:true});
  // 2. with the land (Pass 228, Puti): the company page keeps Check shrimp, the land has Aquascape in that place
  await setup(true);t=await tiles();
- ok(t.map(x=>x.n).join(',')==='Vacuum,Sponge,Trim,Pests,Check shrimp,Glass','with the land: '+t.map(x=>x.n).join(', '));
+ ok(t.map(x=>x.n).join(',')==='Vacuum,Sponge,Trim,Pests,Aquascape,Glass','with the land: '+t.map(x=>x.n).join(', '));
+ // Pass 231: a sick Tank 1 swaps Check shrimp in for Aquascape on the company page (the health check is company-only)
+ await p.evaluate(()=>{G.tanks[0].ill={day:G.day,st:1};render();});await wait(200);const ts=await tiles();await p.evaluate(()=>{delete G.tanks[0].ill;render();});await wait(200);
+ ok(ts.map(x=>x.n).join(',')==='Vacuum,Sponge,Trim,Pests,Check shrimp,Glass','sick with the land: '+ts.map(x=>x.n).join(', '));
  const sy=await p.evaluate(()=>scrollY);await p.evaluate(()=>render());
  await p.evaluate(()=>landShow());let f=null;for(let i=0;i<100&&!f;i++){f=p.frames().find(x=>x.url().includes('home.html'));await wait(100);}
  await f.waitForFunction(()=>typeof S!=='undefined'&&S&&S.tanks&&S.tanks[0]&&S.tanks[0].own,null,{timeout:20000});

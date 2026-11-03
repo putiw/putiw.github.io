@@ -44,7 +44,7 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
  if(typeof fund==='string'||fund.k0===fund.k1||!(fund.way>1e8)||fund.after)throw Error('funding did not outline: '+JSON.stringify(fund));ok('funding outlines the squares it will reach, no popup');
  // Nour's jar
  const jar=await p.evaluate(()=>({hid:document.getElementById('nour-jar').hidden,cap:document.getElementById('nour-cap').textContent,h:document.getElementById('nour-cv').getBoundingClientRect().height}));
- if(jar.hid||!/Nour’s jar · \d+ shrimp/.test(jar.cap)||jar.h<100)throw Error('jar '+JSON.stringify(jar));ok('Nour’s jar: '+jar.cap);
+ if(jar.hid||!/^\d+ shrimp/.test(jar.cap)||jar.h<100)throw Error('jar '+JSON.stringify(jar));ok('Milo’s jar: '+jar.cap);
  // Pass 184: a one-option group leaves no big gap, and every legend name is readable at 360 px
  for(const w of [360,390]){const q=await b.newPage({viewport:{width:w,height:844}});await q.setContent('<body>'+html+'</body>');await q.waitForTimeout(300);
   const r=await q.evaluate(s=>{G=s;migrate(G);G.progress.queue=[];window.spotlight=function(){};speed=0;var H=hardOf(G);H.goalOk=1;H.at=HARD.length-1;HARD_SEL='never';ensureProgress(G).seen.nour1=1;nourOf(G);selectTab('world');render();
