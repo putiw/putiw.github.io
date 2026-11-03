@@ -2317,3 +2317,8 @@ Deployed 3 Nov (Passes 233 to 235, BUILD 2026-11-03-p235). Bots seed 7: strong c
 - Catch (game `sfxCatch`, land `catch`): net 0.11 (source 0.268), low-pass 1285 Hz, 15.5 ms fade in, pitch 1.14.
 - Loops (`WLOOP` in index.html): drain 0.05 / low-pass 420 Q 1 / sway 2 Hz 70 / bubbles 0.01; fill 0.01 / band 1004 Q 0.7 / 6.2 Hz 70 / 0.014; vacuum 0.075 / low-pass 863 Q 0.7 / 0.8 Hz 190 / 0.041 (land siphon the same). Bubbles: 45% every 170 ms, 0.1 s rising blips.
 - Tests: shrimp-taps and shrimp-sound updated to the new levels (sound reads `WLOOP`), balance 142, land-audio pass.
+
+## Pass 240 (3 Nov, Puti): every Tank tab card 8 px apart
+
+- Feeding to Colony had about 16 px while the rest had 8: the Water care / Water test pair (`.two`) kept its 8 px bottom margin when both cards were hidden, and Colony had an inline 8 px top margin. `.two` with no visible card is now `display:none`, Colony's inline margin is gone, and the care row slot (`.tv-slot`) is 8 px from the next card (was 10). Measured in Chromium at 390 px: care row, Feeding, Colony, Readings, Recent events all 8 px apart.
+- Water care and Water test still open only the first time the tank needs a change (Pass 115 reveal order: nitrate over 20, KH under 2.5, GH under 5, any ammonia or nitrite).
