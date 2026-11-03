@@ -2328,3 +2328,23 @@ Deployed 3 Nov (Passes 233 to 235, BUILD 2026-11-03-p235). Bots seed 7: strong c
 - When the water turned safe, the cycling card hid at once but the cycled card waited in `p.soon` for the 15 s card gap (`CARD_GAP`) after the last closed card, so the Tank tab sat empty for up to 15 s of play. `cycle` is now in `CARD_NOW` and shows the same tick.
 - Because it no longer waits, `detectMilestones` marks `cycle` seen once any tank has had shrimp (old news, Pass of 31 Oct), so it never shows after stocking.
 - Checked: fresh game, card just closed, tank turns safe: queue `["cycle"]`, card open (before: queue empty, start card hidden, blank). Tank with shrimp: queue empty. Fast suites, cardtap pass. Bots, spotlight sweep and monkey not run (urgent deploy).
+
+## Pass 242 (3 Nov, Puti): buttons that sometimes lag
+
+Puti: buttons occasionally don't respond for a moment, can't reproduce. Measured in Chromium at 390 px with the CPU slowed 4x (about a phone), strong bot snapshots, 20 s at play speed:
+
+| Stage, tab | Redraw before → after (ms, unthrottled) | Blocks over 50 ms in 20 s, before → after | Longest block before → after (ms) |
+|---|---|---|---|
+| first kit, Tank | 6.5 → 5.7 | 22 → 2 | 100 → 149 (one) |
+| first farm, Farm | 10.9 → 6.4 | 69 → 23 | 109 → 86 |
+| 10k owners, Ads | | 43 → 19 | 155 → 88 |
+| million owners, World | 11.5 → 7.3 | 69 → 13 | 134 → 70 |
+| win, World | | 30 → 14 | 123 → 68 |
+
+- A tap waits behind any block on the main thread, so these were the likely lag. `render` runs 4 times a second.
+- `corporateTaxReserve` added up a year of finance rows on every call, and `capitalReserve`/`operatingReserve` call it dozens of times a redraw (about 35% of a redraw from the first farm on). It now keeps its answer while day, step, cash, row count and tax day are the same (`CTR_C`, `ctrCalc`).
+- `fmt` built a new number formatter on every call (14% of an early redraw). One `Intl.NumberFormat` per decimals now (`FMT_NF`), same output.
+- Strong bot seed 7 unchanged: WIN day 2,229, same cash to the last digit.
+- Also checked, not the cause: the story card tap guard (350 ms after a card opens or closes after a tap) and the half-second settle guard on decision buttons. With no input, decision buttons sat in the settle window 0 to 5% of the time, from real layout moves (the bulk order card appearing, a Kits line going) and new cards. The page behind a story card does not scroll, so scrolling never resets the guard there.
+- Left: a save every 5 s takes 8 to 28 ms throttled (110 to 300 kB of JSON); redraw is still 20 to 36 ms throttled, spread over many small parts (`newThingKeys`, `projAvail`, layout reads in `anchorGet`).
+- BUILD bumped (Pass 241 shipped without a bump).
