@@ -1829,7 +1829,7 @@ consolidate(T);illDay(G,T,i);glassGrow(G,T);if(T.treats)for(var tk in T.treats)i
   if(T.autoWC&&day%T.set.autoWCDays===0){if(wcWeek(G,T)+T.set.autoWCPct<=WC_AUTO_MAX)waterChange(G,T,T.set.autoWCPct,true);}
   else if(techCover(G,i)&&N>=1&&day-(T.lastWC||-99)>=2){
     var P2=ppm(T);
-    if(((!T.autoWC&&day%7===0)||P2.no3>25||P2.nh>0.1||P2.no2>0.1||c.kh<2||c.gh<4.5)&&wcWeek(G,T)+T.set.wcPct<=WC_AUTO_MAX){waterChange(G,T,T.set.wcPct,true);}
+    if(((!T.autoWC&&day%7===0)||P2.no3>40||P2.nh>0.1||P2.no2>0.1||c.kh<1||c.gh<4.5)&&wcWeek(G,T)+T.set.wcPct<=WC_AUTO_MAX){waterChange(G,T,T.set.wcPct,true);}
   }
   if(T.set.autoDose&&N<1){
     var tg=bacTarget(T);
@@ -2051,9 +2051,10 @@ function tankGear(G){return G.tanks.some(function(t){return t.cycledAt!=null;})?
 // Supplies only matter while a second tank still waits for bacteria. Seeded tanks don't (Puti, 31 Oct).
 function supNeed(G){return !(typeof RV==='function'&&RV())&&G.tanks.length>1&&G.tanks.some(function(t){return t.cycledAt==null;});}
 function gearDone(T){return !T.gearDue||(T.feeder&&T.autoWC);}
+function gearLeft(G,T){return (T.feeder?0:upgradeCost(G,T,'feeder'))+(T.autoWC?0:upgradeCost(G,T,'autoWC'));}
 function addTank(G){
   if(G.tanks.length>=MAX_TANKS||ownTank(G))return false;
-  var cost=NEW_TANK_COST[G.tanks.length];if(G.money<cost+capitalReserve(G))return false;
+  var cost=NEW_TANK_COST[G.tanks.length];if(G.money<cost+tankGear(G)+capitalReserve(G))return false;
   pay(G,cost,'equipment');var T=newTank(G.tanks.length);if(G.tanks[0])shareSet({tanks:[G.tanks[0],T]},G.tanks[0].set);
   // Seeded from Tank 1: a scoop of gravel and a squeeze of its sponge bring the bacteria over, so a new tank needs no cycling.
   if(G.tanks.some(function(t){return t.cycledAt!=null;})){var tg=bacTarget(T);T.chem.bacA=T.chem.bacB=tg*1.05;T.cycledAt=G.day;T.seeded=1;T.gearDue=1;}
@@ -3244,7 +3245,7 @@ var TREES={
   {id:'isl_nation',name:'Declare independence',d:'A flag with a red shrimp on it. Two countries recognize it, both have your tanks in parliament.',m:1e9,i:3e9,iD:730,tr:{drive:1.2,care:-.5},line:'Shrimp Island calls itself a country. Two others agree.'},
   {id:'isl_pass',name:'Passports',d:'They’re red, and the shrimp on the cover is life size.',m:2e8,mD:30,tr:{drive:.8},line:'Four thousand people carry a Shrimp Island passport.'},
   {id:'isl_un',name:'A seat at the UN ocean conference',d:'As an observer. Most of the delegates have one of your tanks in the office.',i:5e9,iD:1095,tr:{drive:.8},line:'Shrimp Island sits at the UN ocean conference as an observer. Its delegate brings a tank.'}]},
- rewild:{name:'Rewilding',open:'Mira sends a photo from a stream up north. There are red shrimp in it, wild, a lot of them. Somebody let a few go years ago and they made it.',steps:[
+ rewild:{name:'Rewilding',open:'Mira sends a photo from a stream up north. There are shrimp in it, wild, a lot of them, mostly brown and a few still red. Somebody let some cherries go years ago and they made it.',steps:[
   {id:'rw_stream',name:'Shrimp back in the old streams',d:'Only native shrimp, only where they used to live. It takes a year of surveys first.',i:5000,tr:{kin:1.5,drive:-.3},line:'Native shrimp live in the old streams again.'},
   {id:'rw_reserve',name:'A wild shrimp reserve',d:'A valley nobody farms anymore, with a fence and a ranger.',m:2e7,tr:{kin:1,care:.5},line:'There is a wild shrimp reserve with one ranger, he knows every pool.'},
   {id:'rw_jar',name:'Sealed jar kits',d:'A closed jar, plants clean the water and the shrimp eat the algae. No water changes, ever.',m:5e7,tr:{know:.3,kin:1},line:'Sealed jars sit on windowsills that never had a tank. Nobody changes the water, nobody has to.',eff:function(G){G.emp.q=Math.min(0.97,G.emp.q+0.02);}},
@@ -3275,7 +3276,7 @@ function buyTreeStep(G,id){var E=G.emp,r=treeStep(G,id);if(!r||frozen(G)||treeNe
 function treeDay(G){var E=G.emp,now=Math.floor(G.day);if(now%30||G.humans<5e7&&!E.won)return;var t=treesFor(G);E.trees=E.trees||{};t.forEach(function(k){if(!E.trees[k]&&(TREES[k]||k==='space'||k==='underground'))E.trees[k]=now+1;});}
 function treeLines(G){var E=G.emp,o=[];if(!E.tree)return o;TREE_ORDER.forEach(function(k){TREES[k].steps.forEach(function(s){if(E.tree[s.id]&&s.line)o.push(s.line);});});return o;}
 // The last chapter: the place you built, shown before the ending
-var LASTCH={island:['Shrimp Island','The ferry still runs on Sundays. From the jetty you can see the whole country, it takes four minutes to walk across.'],rewild:['The streams','A ranger sends you photos on Fridays. Red shrimp in cold clear water, nobody feeding them.'],lastmile:['The Tuesday truck','The truck gets to the desert town at nine. The nurse signs for the box and doesn’t open the shrimp first.'],lab:['The lab','The lights stay on all night. Somebody is always counting something.'],shop:['The corner shop','The bell on the door rings. A kid presses her nose against forty tanks and picks one. The cat watches.']};
+var LASTCH={island:['Shrimp Island','The ferry still runs on Sundays. From the jetty you can see the whole country, it takes four minutes to walk across.'],rewild:['The streams','A ranger sends you photos on Fridays. Native shrimp in cold clear water, nobody feeding them.'],lastmile:['The Tuesday truck','The truck gets to the desert town at nine. The nurse signs for the box and doesn’t open the shrimp first.'],lab:['The lab','The lights stay on all night. Somebody is always counting something.'],shop:['The corner shop','The bell on the door rings. A kid presses her nose against forty tanks and picks one. The cat watches.']};
 function lastChapter(G){var E=G.emp,best=null,bn=-1;TREE_ORDER.forEach(function(k){if(!treeHas(G,k))return;var n=TREES[k].steps.filter(function(s){return E.tree&&E.tree[s.id];}).length;if(n>bn){bn=n;best=k;}});if(best)return best;var sc=endingScores(G),top=null,tv=-1e9;for(var k2 in sc)if(sc[k2]>tv){tv=sc[k2];top=k2;}var t=TYPE_TREE[top];if(t==='space')t='lab';return LASTCH[t]?t:'shop';}
 MILESTONES.lastchap={chapter:'Final chapter',title:'The last chapter',body:'You reached the goal.',tab:'emp',more:function(G){var k=lastChapter(G);if(!k)return '';var T=TREES[k],E=G.emp,L=T.steps.filter(function(s){return E.tree&&E.tree[s.id]&&s.line;}).map(function(s){return s.line;});return LASTCH[k][0]+'\n'+LASTCH[k][1]+(L.length?'\n\n'+L.join(' '):'\n\nYou never built much here.');}};
 // (A place of your own was removed in Pass 151, Grandma's place replaced it. Old saves keep G.me.house for the ending lines.)
@@ -3354,10 +3355,10 @@ var CARDS3={
   ['Low-power kits','LED on a timer, a 1-watt pump, a heater only where it gets cold. AED 7.50 more a kit, and the lines retool for four months, 10% fewer kits a day.',{know:.5,care:.3,risk:-.5},function(G){G.emp.mat=(G.emp.mat||0)+7.5;slowKits(G,0.1,120);},'Every new kit has a light on a timer and a pump that uses a watt.'],
   ['Fund the engineers','A pump that uses less than a phone charger, in about a year. The utilities have to come in on it.',{know:.3,risk:.8},seq(needDays(20),needIDays(30),function(G){later(G,365,'Shrimp pumps use less power than a phone charger now. The same chip runs the fans.',function(g){g.emp.mat=Math.max(0,(g.emp.mat||0)-3);hardMul(g,'hot',0.9);});}),'Shrimp pumps use less power than a phone charger now.'],
   ['Leave it to the power companies','Kits stay cheap. They build more plants, mostly gas. 5% more people want one this year.',{drive:.5,care:-.5,know:-.5},function(G){G.emp.ceil+=0.05;later(G,365,'Six new gas plants. The power company thanks the shrimp.',function(g){hardMul(g,'hot',1.2);});},'Power companies built six gas plants for shrimp tanks. The hot towns got hotter.']]},
- c_rivers:{at:5.5e9,title:'Shrimp in the rivers',body:'Some owners dump their shrimp when they get bored. Red shrimp breed in a few warm rivers now, one in Germany runs below a power plant. The river agencies want them out. The shops say most owners would hand them back if someone asked.',ch:[
+ c_rivers:{at:5.5e9,title:'Shrimp in the rivers',body:'Some owners dump their shrimp when they get bored. Cherry shrimp breed in a few warm rivers now, one in Germany runs below a power plant. The river agencies want them out. The shops say most owners would hand them back if someone asked.',ch:[
   ['Shops take them back','You pay the shops to run it, and stock goes to re-homing for six months, 15% fewer kits a day. The ones already in the rivers stay.',{kin:.5,care:-.5,risk:-.3},seq(needDays(10),function(G){slowKits(G,0.15,180);}),'Unwanted shrimp go back to the shop, not the river.'],
   ['Clear the rivers','Permits and volunteers on every river. They catch most of them. The shrimp they catch are killed, an invasive species can’t go back in a river or a tank.',{care:.5,kin:-.5,risk:-.5},seq(needDays(5),needIDays(30)),'River teams cleared the red shrimp from the warm rivers. Most of them.'],
-  ['Leave them','The red rivers are a tourist thing now. 3% more people want a tank in those countries. Your money stays in kits.',{kin:-.5,risk:.8},function(G){G.emp.ceil+=0.03;later(G,730,'Red shrimp live in warm rivers on four continents now.',function(g){g.emp.riversLost=1;});},'Red shrimp live in warm rivers on four continents.']]},
+  ['Leave them','The shrimp rivers are a tourist thing now. 3% more people want a tank in those countries. Your money stays in kits.',{kin:-.5,risk:.8},function(G){G.emp.ceil+=0.03;later(G,730,'Cherry shrimp live in warm rivers on four continents now, most of them brown again.',function(g){g.emp.riversLost=1;});},'Cherry shrimp live in warm rivers on four continents.']]},
  c_many:{at:6e9,title:'Too many shrimp',body:'Every tank breeds. Owners have hundreds and give them to friends, so fewer people buy kits.',ch:[
   ['Buy spares back for new kits','Shops pay owners a little per shrimp, you pack them into kits. Free stock, 10% more kits a day for a year.',{kin:.5},seq(needDays(3),function(G){slowKits(G,-0.1,365);}),'Kit shrimp are second-hand now. Nobody minds.'],
   ['Sell them on as fish food','Somebody has to. The farms stay the only source.',{kin:-1.5,drive:.3},function(G){sideMoney(G,7);moodAdd(G,-3,365);},'Spare pet shrimp end up as fish food.'],
@@ -3415,9 +3416,9 @@ var PAINS={
   ['Grow your own moss','Four months of building grow rooms. Then you never run out.',{c:10,min:30000,d:120,mat:0.97,q:0.01,tr:{know:.2,risk:-.3}},'You grew your own moss, rooms of it, under purple light.'],
   ['Buy from a hundred small farms','A month of contracts. Costs more per kit, money goes to small growers.',{c:9,min:20000,d:30,mat:1.05,h:1,tr:{care:.3,drive:-.3}},'A hundred small moss farms in Java and Vietnam grew up selling to you.'],
   ['Plastic plants, in the kits next week','In the kits next week. The shrimp don’t like them much.',{c:0.5,min:2000,d:7,q:-0.013,mood:-1.3,h:-1,tr:{means:-.3,know:-.3}},'For a while your kits came with plastic plants.']]},
- pain_crash:{at:400000,title:'Month three',body:'The numbers come back. One owner in eight has a tank crash in the third month, a heater fails or they go on holiday, and the shrimp die. They don’t buy again and they don’t recommend you.',ch:[
+ pain_crash:{at:400000,title:'Month three',body:'The numbers come back. One owner in eight has a tank crash in the third month, a heater fails, or they go on holiday and the neighbor feeds them every day, and the shrimp die. They don’t buy again and they don’t recommend you.',ch:[
   ['A free check-up call at day 60','Four months to set up a team that calls every new owner.',{c:12,min:1e5,d:120,q:0.02,day:300,h:1,tr:{care:-.3,kin:.2}},'Every new owner got a phone call at day sixty.'],
-  ['A holiday-proof kit: slow feeder and a backup heater','Six weeks to redesign. Every kit costs more.',{c:5,min:8e4,d:40,mat:1.08,q:0.03,tr:{know:.3}},'Your kits came with a slow feeder for holidays.'],
+  ['A holiday-proof kit: a backup heater and a card that says don’t feed while away','Six weeks to redesign. Every kit costs more.',{c:5,min:8e4,d:40,mat:1.08,q:0.03,tr:{know:.3}},'Your kits came with a backup heater and a card: don’t feed while you’re away.'],
   ['Sell them a new kit at a discount','No wait. Crashes are a sale, about three days of profit in discount kits right away.',{c:0,d:0,mood:-1.3,h:-1,gain:3,tr:{means:-.3,drive:.3,know:-.2}},'A crashed tank always came with a discount code.']]},
  pain_payout:{at:1.5e6,title:'Payouts on hold',body:'Your payment processor sees sales tripling and a lot of refunds and holds all payouts for a risk review. Money comes in and you can’t touch it. Ads and orders slow down while you sort it out.',ch:[
   ['Open the books and wait for the review','Five months. They clear you.',{c:4.5,min:2e5,d:140,tr:{means:.3,drive:-.3,risk:-.3}},'A payment company once read every line of your books.'],
@@ -3660,7 +3661,7 @@ CARDS3.c_cousin={title:'The cousin',tab:'emp',body:'Your cousin is funny, everyo
  ['Don’t','Your aunt is quiet at the New Year dinner. Grandma tells you about it twice.',{},function(G){if(G.me&&G.me.on)gtLog(G,'Your aunt was quiet at New Year. Grandma told you about it twice.','note','cousin');},null]]};
 CARDS3.c_letgo={title:'Let them go',tab:'tank',body:'Mira wants to let her shrimp go in the stream behind the school. They’d be happier, she says. Cherry shrimp aren’t from here.',
  cond:function(G){var m=G.story&&G.story.choices&&G.story.choices.ev_mira;return m===0&&G.day>=(G.story.miraDay||0)+300&&G.day<(G.story.miraDay||0)+1500&&!c3Was(G,'c_letgo');},ch:[
- ['Yes, they\u2019ll be happier','She lets them go one at a time and waves at each.',{},function(G){later(G,240,null,function(g){if(typeof noteLine==='function')noteLine(g,'word','Kids catch red shrimp in the stream behind the school.');});},'Mira let her shrimp go in the stream behind the school.'],
+ ['Yes, they\u2019ll be happier','She lets them go one at a time and waves at each.',{},function(G){later(G,240,null,function(g){if(typeof noteLine==='function')noteLine(g,'word','Kids catch shrimp in the stream behind the school. A few are still red.');});},'Mira let her shrimp go in the stream behind the school.'],
  ['No, they aren’t from here','She’s cross for a week. Then she asks what is from here.',{},null,'Mira knows which shrimp belong in the stream behind the school.']]};
 CARDS3.c_lie={title:'How’s the company',tab:'emp',body:'Grandma calls. How’s the company.',
  cond:function(G){var hi=G.stats.cashHi||0;return hi>=1e6&&G.money<hi*0.1&&!!(G.me&&G.me.on)&&!c3Was(G,'c_lie');},ch:[
@@ -4161,7 +4162,7 @@ function trim(n,d){return String(+Number(n).toFixed(d));}
 (function(){var vv=window.visualViewport,fix=function(){var a=document.activeElement,typing=!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!/^(range|checkbox|radio|button)$/.test(a.type||''));document.body.classList.toggle('kbd',typing&&!!vv&&vv.height<window.innerHeight*0.8);var t=document.querySelector('.tabs');if(t&&t.style.transform)t.style.transform='';};if(vv){vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);}document.addEventListener('focusin',function(){setTimeout(fix,300);});document.addEventListener('focusout',function(){setTimeout(fix,50);setTimeout(fix,400);});})();
 // No browser feel: no pinch or double-tap zoom, no long-press menu outside text fields.
 (function(){var stop=function(e){e.preventDefault();};['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,stop,{passive:false});});document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea,[contenteditable]')))e.preventDefault();});})();
-var toastT=null,NF=null,BUILD='2026-11-03T15:20-p242';
+var toastT=null,NF=null,BUILD='2026-11-03T16:50-p243';
 function buildDate(){var m=BUILD.match(/^(\d{4})-(\d\d)-(\d\d)(?:T(\d\d:\d\d))?/);if(!m)return '';return 'Updated '+(+m[3])+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m[2]-1]+' '+m[1]+(m[4]?', '+m[4]+' UAE':'');}
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
@@ -4327,8 +4328,8 @@ function gaugeById(id){for(var i=0;i<GAUGES.length;i++)if(GAUGES[i].id===id)retu
 var PARAM_TIPS={
  nh:{name:'Ammonia (NH₃)',up:'Ammonia doses, shrimp waste, and rotting leftover food or dead matter.',down:'Filter bacteria consume it. Water changes dilute it.'},
  no2:{name:'Nitrite (NO₂)',up:'Ammonia-eating bacteria turn ammonia into nitrite.',down:'Nitrite-eating bacteria turn it into nitrate. Water changes dilute it.'},
- no3:{name:'Nitrate (NO₃)',up:'Nitrite-eating bacteria turn nitrite into nitrate.',down:'Water changes remove it.'},
- ph:{name:'pH',up:'pH follows KH. Raise KH under Water care, then change water.',down:'The cycle uses up KH, and pH drops with it. Lower KH in the new water lowers it too, but under KH 2 pH can crash.'},
+ no3:{name:'Nitrate (NO₃)',up:'Nitrite-eating bacteria turn nitrite into nitrate.',down:'Water changes remove it. Live plants use some.'},
+ ph:{name:'pH',up:'pH follows KH. Raise KH under Water care, then change water.',down:'The cycle uses up KH, and pH drops with it. Lower KH in the new water lowers it too, but under KH 1 pH can crash.'},
  kh:{name:'KH · carbonate hardness',up:'A water change adds the KH you set under Water care.',down:'Ammonia-to-nitrite bacteria use KH as they work. Low KH can stall the cycle and drop pH.'},
  gh:{name:'GH · general hardness',up:'A water change adds the GH you set under Water care.',down:'Shrimp gradually use minerals. Higher stocking density uses GH faster.'},
  temp:{name:'Temperature',up:'A warmer room or a higher heater setting raises it. Water changes move it toward room temperature.',down:'A cooling fan, a thermostat chiller, a frozen bottle, or a cooler room lowers it.'},
@@ -4337,7 +4338,7 @@ var PARAM_TIPS={
 var CTL_TIPS={gramt:'Each grant runs 3 years and is paid monthly. At the end it brings 3 papers, and sometimes a find. A bigger grant doesn\u2019t bring more, it only changes how fair the pay is. Two new applicants come once a year, you can fund up to 3 at a time.',koPct:'How much of each day\u2019s packing goes to the bulk order. The rest goes to normal orders.',ration:'How much food each feeding gives, as a share of what they eat in a day. Under 100% they also graze biofilm. Too much rots into ammonia.',
  wcPct:'How much of the tank water each Water change swaps for new water. 30% is a normal change. Big swaps swing the water, and more than 200% in a week makes them all molt at once.',
  remGH:'Hardness of the new water you pour in. GH is the minerals shrimp use to build their shells. 6–8 gives clean molts.',
- remKH:'Buffer in the new water. KH keeps pH steady and feeds the bacteria. Under 2 the pH can crash.',
+ remKH:'Buffer in the new water. KH keeps pH steady and feeds the bacteria. Under 1 the pH can crash.',
  heat:'The temperature the heater or chiller holds. Cherry shrimp like about 22–26 °C.',
  move:'How many shrimp to net out and move into another tank.',
  sellAge:'Shrimp younger than this stay in the tank to grow. Older ones can be sold.',
@@ -4391,8 +4392,8 @@ function tips(T){
   if(N>=1&&c.nutr<0.5)out.push({sev:c.nutr<0.2?'bad':'warn',t:pre+'Nutrition is '+Math.round(c.nutr*100)+'%. They\u2019re living on biofilm, so fewer babies and paler ones. Feed them.',act:'feed'});
   else if(N>=1&&c.nutr<0.75)out.push({sev:'warn',t:pre+'Nutrition is '+Math.round(c.nutr*100)+'%, they could eat more.',act:'feed'});
   if(N>0&&(pa<0.8||pb<0.8))out.push({sev:'warn',t:pre+'Filter bacteria only keep up with '+Math.round(Math.min(pa,pb)*100)+'% of the waste. Feed lightly for now.'});
-  if(c.kh<2.5&&N>0)out.push({sev:c.kh<1?'bad':'warn',t:pre+'KH is down to '+c.kh.toFixed(1)+'. At zero the pH crashes. Water changes refill it.',act:'wc'});
-  if(P.no3>40&&N>=1)out.push({sev:'warn',t:pre+'Nitrate is '+Math.round(P.no3)+' ppm. Only water changes take it out.',act:'wc'});
+  if(c.kh<1&&N>0)out.push({sev:c.kh<0.5?'bad':'warn',t:pre+'KH is down to '+c.kh.toFixed(1)+'. At zero the pH crashes. Water changes refill it.',act:'wc'});
+  if(P.no3>40&&N>=1)out.push({sev:'warn',t:pre+'Nitrate is '+Math.round(P.no3)+' ppm. Water changes take it out, live plants use some.',act:'wc'});
   else if(P.no3>20&&N>0)out.push({sev:'info',t:pre+'Nitrate is '+Math.round(P.no3)+' ppm, a bit high for breeding.',act:'wc'});
   if(N>0&&c.food>2.5*appetite(T)+3)out.push({sev:'warn',t:pre+'About '+Math.round(c.food)+' mg of food is left over and rotting.'});
   if(N/T.vol>5)out.push({sev:'info',t:pre+'Crowded, '+(N/T.vol).toFixed(1)+' shrimp per liter, breeding is slowing.'});
@@ -4659,7 +4660,7 @@ function actNeed(G){var em=function(a){return G.tanks.some(function(t){return to
 // Pass 232 (Part 0 of the 3 Nov brief): a header row that comes or goes because of a tap waits until the player scrolls or changes tab,
 // so the header never changes height under a finger (Hire took Sell away, the first gala added the earth line). A held row is the real one.
 var HD_HOLD={};function hdHold(k,el,hide,both){var now=Date.now()-(typeof TAP_AT==='number'?TAP_AT:0)<1500,was=!el.hidden;   // acts hold only a row going away, so a new cue (Water) still shows at once
- if(HD_HOLD[k]==null&&now&&hide===was&&(both||was))HD_HOLD[k]=was;if(HD_HOLD[k]!=null)return !HD_HOLD[k];return hide;}
+ if(HD_HOLD[k]==null&&now&&hide===was&&(both||was))HD_HOLD[k]=was;if(HD_HOLD[k]!=null&&!now&&Date.now()-(typeof TAP_AT==='number'?TAP_AT:0)>4000)delete HD_HOLD[k];if(HD_HOLD[k]!=null)return !HD_HOLD[k];return hide;}
 // Pass 232: a list row bought or turned down keeps its place, greyed, until the player scrolls or changes tab (FRZ: lists not rewritten meanwhile)
 var FRZ={};function frzTap(id,b,lab){FRZ[id]=1;var row=b.closest('.item')||b.parentNode;if(row)row.querySelectorAll('button').forEach(function(x){if(x.classList.contains('qhelp'))return;x.disabled=true;});if(lab){var sp=b.querySelector('span');(sp||b).textContent=lab;}}
 function hdFree(){var f=Object.keys(FRZ).length;if(!Object.keys(HD_HOLD).length&&!f)return;HD_HOLD={};FRZ={};if(f&&typeof cache!=='undefined'){cache.eproj=cache.estore=cache.eshop=cache.estaff=null;}if(typeof render==='function')render();}
@@ -5232,7 +5233,7 @@ function renderTankSheet(){if(!TS)return;var T=G.tanks[TS.i];if(!T){closeTankShe
  var it=function(id,name,note){var c=upgradeCost(G,T,id);return '<div class="item"><div><h3>'+name+'</h3><p>'+note+'</p></div>'+(c==null?'<button class="btn" disabled>Done</button>':'<button class="btn primary" data-act="ts-upg" data-id="'+id+'"'+(G.money<c?' disabled':'')+'>'+aed(c)+'</button>')+'</div>';};
  var h='<div class="sheet-hd"><h2 id="ts-h">'+T.name+' is ready</h2></div><p class="sub">You moved a scoop of gravel and a squeeze of the sponge from Tank 1, so the good bacteria came along. <b>No cycling this time.</b> Move some shrimp in from Tank 1, or buy a few in Trade.</p>'+
   '<h3 class="track">Make it run itself</h3>'+it('feeder','Auto feeder','Feeds '+T.name+' every day.')+it('autoWC','Auto water changer','Changes some water on a schedule.')+
-  '<div class="btns" style="margin-top:12px"><button class="btn primary" data-act="ts-close"'+(gearDone(T)?'':' disabled')+'>Got it, show me'+(gearDone(T)?'':'<small>Buy both first</small>')+'</button>'+(gearDone(T)?'':'<button class="btn" data-act="ts-later">I’ll buy '+(T.feeder||T.autoWC?'it':'them')+' later</button>')+'</div>';
+  '<div class="btns" style="margin-top:12px"><button class="btn primary" data-act="ts-close"'+(gearDone(T)?'':' disabled')+'>Got it, show me'+(gearDone(T)?'':'<small>Buy both first</small>')+'</button>'+(gearDone(T)||G.money>=gearLeft(G,T)?'':'<button class="btn" data-act="ts-later">I’ll buy '+(T.feeder||T.autoWC?'it':'them')+' later</button>')+'</div>';
  $('ts-in').innerHTML=h;}
 function closeTankSheet(){if(!TS)return;var i=TS.i,pv=TS.prev;TS=null;$('tsheet').hidden=true;setSpeed(Math.min(pv,maxSpeed(G)));lastChips='';render();
  setTimeout(function(){var ch=document.querySelector('#tankchips .tchip[data-sel="'+i+'"]')||$('tankchips');if(ch&&ch.getClientRects().length&&typeof spotlight==='function'){spotWatch.last=0;spotlight(ch,'Your tanks live here. Tap one to switch, everything below is for the tank you picked.');}},300);}
@@ -6080,7 +6081,7 @@ function updateUpgrades(){
     else if(!stdUnlocked(G))$('newtank').mhtml='';
     else{if(!G.recipe)sc+=SOP_COST;$('newtank').mhtml=itemHTML('Standard tank',G.recipe?VOLS[VOLS.length-1]+' L, fully equipped, cycled, 10 adults, on your recipe.':'Fully equipped, cycled. The first one puts every tank on one recipe.',bbtn('stdtank','',aed(sc),G.money>=sc,true,sc));}
   }else $('newtank').mhtml=ownTank(G)?'':
-    (function(){var tg=tankGear(G),need=nc+capitalReserve(G);return itemHTML('Another tank',tg?'Fresh 20 L tank seeded from Tank 1.':'Fresh 20 L tank and sponge filter. Needs cycling or a bacteria starter.','<button class="btn primary" data-act="addtank"'+(G.money<need?' disabled':'')+'>'+aed(nc)+'</button>',G.money<need?loanRow(need):'');})();
+    (function(){var tg=tankGear(G),need=nc+tg+capitalReserve(G);return itemHTML('Another tank',tg?'Fresh 20 L tank seeded from Tank 1.':'Fresh 20 L tank and sponge filter. Needs cycling or a bacteria starter.','<button class="btn primary" data-act="addtank"'+(G.money<need?' disabled':'')+'>'+aed(nc)+'</button>',G.money<need?loanRow(need):'');})();
   var multi=G.tanks.length>1,all=multi&&!!G.opt.upAll;
   setT('u-for',all?G.tanks.length+' tanks':T.name);
   // Pass 190: one row of tank chips (Tank 1, Tank 2 ... All), then one line of what that tank already has

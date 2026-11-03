@@ -512,6 +512,7 @@ Do not report a feature as finished just because its new path works once. Check 
 - **Fixing the one example instead of the rule.** Spotlight on water care only, when she meant every new section; softening the goal card three times when she wanted no push at all.
 - **Explanations in card bodies, and goals that read like homework.** Both drew complaints. Move text behind ?. A goal card with one item to save for still felt linear and got removed.
 - **Overwriting the other agent's work.** Always diff before you write.
+- **Common sense with shrimp (Pass 243).** Not hyper-real, but nothing a shrimp keeper would laugh at. Weekly 20–30% water changes should be enough for a full tank, so KH alerts start under 1 and the technician's nitrate trigger is 40. Shrimp skip food on holiday, they don't need a feeder. Released cherries turn brown in a few generations, and a native-only reserve has no red shrimp.
 
 ## Open work
 

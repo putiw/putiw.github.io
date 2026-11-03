@@ -2348,3 +2348,16 @@ Puti: buttons occasionally don't respond for a moment, can't reproduce. Measured
 - Also checked, not the cause: the story card tap guard (350 ms after a card opens or closes after a tap) and the half-second settle guard on decision buttons. With no input, decision buttons sat in the settle window 0 to 5% of the time, from real layout moves (the bulk order card appearing, a Kits line going) and new cards. The page behind a story card does not scroll, so scrolling never resets the guard there.
 - Left: a save every 5 s takes 8 to 28 ms throttled (110 to 300 kB of JSON); redraw is still 20 to 36 ms throttled, spread over many small parts (`newThingKeys`, `projAvail`, layout reads in `anchorGet`).
 - BUILD bumped (Pass 241 shipped without a bump).
+
+## Pass 243 (3 Nov, Puti): common sense check, second tank gear, header buttons
+
+Puti asked for a common sense pass: not hyper-real, nothing a shrimp keeper would call nonsense. She was changing 30% every 3 days because the alerts pushed her there.
+- Sim check, full 20 L colony (~135 shrimp), new water KH 4, 30% weekly: KH settles about 1.5, nitrate 25–29, GH about 5. That tripped the KH warning (under 2.5) and the technician's extra changes (nitrate over 25, KH under 2). Real cherries are fine at KH 1–2 and nitrate under 40.
+- KH alert now under 1 (bad under 0.5). Technician extra changes at nitrate over 40 or KH under 1. Tooltips say pH can crash under KH 1. Default new water unchanged (player's choice, Puti).
+- Nitrate alert and tooltip mention that live plants use some (the sim already had plants taking nitrate out).
+- Month three event: the holiday crash is now a neighbor feeding every day, and the holiday-proof kit is a backup heater and a "don't feed while away" card, not a slow feeder.
+- Released cherries: the rewilding photo and the stream behind the school say mostly brown, a few still red; the rivers event says cherry shrimp, most brown again; the native reserve's ranger photo shows native shrimp.
+- Left as is: the fish market line (Grandpa telling Grandma his own fish was too expensive), 200%-a-week molt crash counts volume only.
+- Bug: a seeded tank 2 or 3 could be bought without the cash for its auto feeder and water changer. `addTank` and the Another tank button now need tank + `tankGear` + reserve. The new-tank sheet offers "I'll buy them later" only if the gear can't be paid (`gearLeft`).
+- Bug: Feed and Water stayed after both tanks were automated. Pass 232's header hold kept a row that was going away until a scroll or tab change. A hold now also lets go 4 s after the last tap.
+- Fast suites pass (balance test updated for the tank cash), page loads with no errors. BUILD p243.
