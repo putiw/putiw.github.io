@@ -2384,3 +2384,8 @@ Deployed 3 Nov (Passes 243 and 244, BUILD 2026-11-03T17:05-p244). Before deploy:
 - Tests: balance locks the new clocks and no faded job buttons (old Pass 161/179 timing checks replaced), shrimp-tank1 Pass 237 checks moved to the new clocks. Fast suites: balance 142, academy 10, me 50, tank1 sim ok.
 
 Deployed 4 Nov (Passes 245 and 246, BUILD 2026-11-04T01:20-p246). Before deploy: balance 142, academy 10, me 50, tank1 sim ok, strong bot seed 7 WIN day 2,229 empire_dictator (same as Pass 244), average Earth seed 7 7,617 question_prof against 7,197 on the deployed build (no market loan taken; seed 23 7,393 on both builds, so the seed 7 shift is the random stream moving with the new Tank 1 rolls), no STUCK or INSOLVENT, spotlight sweep 103 all good, monkey 120 taps at 360 and 390 px on six stages, no errors, no sideways scroll, no NaN. Human 390 px not run (changes start at the farm, past where it stops).
+
+## Pass 247 (4 Nov, Puti): the tank card comes with the farm
+- Puti: the Your tank card came long after the first grow rack took the tanks. It was a story card, so it waited in the story queue (30 s to 2 min apart, behind other waiting cards). Now `owntank` is in `CARD_NOW` and out of `storyWaits`: it shows right after the farm is bought, with the intro gap skipped like crash and health.
+- Clock check, no change: a company day at 1x is 4 steps of 600 ms, 2.4 s, the same as `TANK_DAY_MS`. So the Pass 246 tank clocks (poop 4 to 10 min, glass 3 to 6, plants 5) are the same at 1x before and after the land; before the land they speed up with the company speed like everything else.
+- Balance check locks it. Fast suites: balance 143, academy 10, me 50. BUILD p247. Not deployed.
