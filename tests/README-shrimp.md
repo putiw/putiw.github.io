@@ -2369,3 +2369,9 @@ Puti asked for a common sense pass: not hyper-real, nothing a shrimp keeper woul
 - Balance check locks the rule. Fast suites pass. BUILD p244.
 
 Deployed 3 Nov (Passes 243 and 244, BUILD 2026-11-03T17:05-p244). Before deploy: balance 142, academy 10, me 50, human 390 px all ok to the first farm, strong bot seed 7 WIN day 2,229 empire_dictator (same as Pass 242), average Earth 7,197 question_prof against 7,225 on the build before (seed 23: 7,393 both), no INSOLVENT, spotlight sweep 103 all good, monkey 120 taps at 360 and 390 px on seven stages, no errors, no sideways scroll, no NaN.
+
+## Pass 245 (4 Nov, Birol via Puti): the out-of-money loan stops smashing farms for nothing
+- Birol: farms and barn kept disappearing, the news kept saying someone smashes up his farm. Cause: "Borrow from a man at the market" on the out-of-money card ran an old pre-Pass 81 loan (`E.shark` without `deal`). Overdue, it took a farm with `takeFarm` every 30 days, did not count it against the debt, added 30%, and showed only a news line. No alert, no pay button, so every rebuilt farm went too.
+- Now that loan is a normal `deal` loan with `fix:1`: owes 30% more, due in 60 days, no growth before then, then the Pass 81 rules (20% a month, takes the newest farm or best gear at half price against the debt, log line, news names the debt, Grandma hears). It shows in alerts with Pay him back. The old overdue branch in `debtDay` is gone.
+- Old saves: a loan without `deal` is converted on the next day tick (`fix:1`, `next` = later of due and today, plus 30).
+- Scratch check: old save with 20,000 owed is converted and each take now lowers the debt; a new broke-card loan is paid off by takes. Fast suites: balance 142, academy 10, me 50. BUILD p245. Not deployed.
