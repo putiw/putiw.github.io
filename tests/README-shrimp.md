@@ -2225,3 +2225,10 @@ Puti: Tank 1 got sick after the land, and the Check shrimp tile had turned into 
 - Hard part: before any group is picked there is no reserved empty slot under the grid (Puti); the card grows once on the first pick. Switching between groups still keeps one height (`slotMin` over the groups only). `shrimp-hard` checks no scroll on the first pick and the same height when switching.
 - Hard part option rows: the title is the help (dotted underline, `.qhelp.qt`), no ? button.
 - Tests: balance, hard 12, yourtank, cardtap; browser check of the empty-tank tile with and without the land.
+
+## Pass 230 (3 Nov): update date, soft land water sounds, one-line done options
+
+- The ? popup (top right) shows "Updated 3 Nov 2026" left of Settings, read from `BUILD` (`buildDate`, `#apop-upd`).
+- Grandma's land: the harsh `splash` (high-passed noise, 4 ms attack) is gone from every water action. New soft sounds with slow attacks and low filters, a different one each: watering the bed `water` (a trickle with a few low drips), a fish coming out on the line `hook` (low swoosh, a rising tone, drips), putting a fish back `letgo` (a small plunk), the bucket into the pond or stream `pondin` (a deeper plunk and bubbles). The reel ticks are sine, not square. Edited in `shrimp-proto` `src/sound.js` and `src/land.js`, rebuilt with `build.py --game` (a fresh build matched the game's copy before the change).
+- Hard part: a done option has no "Done" text under its title, the button says Done (was Chosen), the row is one line with the title centred on the button (`.hdone`, rows 53 px against about 75). Options under way or waiting keep their status line and "Under way"/"Chosen".
+- Tests: shrimp-hard 12 (with a fresh average run), shrimp-land-audio; screenshot of the water group with five done options and of the ? popup at 390 px. Sounds not checked by ear.
