@@ -88,5 +88,14 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  // Back with the job open: the job is ended and reported first
  await f.evaluate(()=>{toyStart('scape');var el=[...document.querySelectorAll('[data-add]')].find(b=>b.dataset.add==='wood');el.click();$('tb-back').click();});await wait(2500);
  ok(await f.evaluate(()=>!TOY)&&await p.evaluate(()=>G.tanks[0].wood===1),'Back with Aquascape open finishes it and the game gets the driftwood');
+ // Pass 257: the tank you can hear, a row under Your tank once the blind group's research is found, ear.html over the game
+ await p.evaluate(()=>{landHide&&LAND.on&&landHide();var H=hardOf(G);H.picks.blind={ear:{day:G.day,start:G.day}};G.sel=0;selectTab('tank');render();});await wait(300);
+ const er=await p.evaluate(()=>{var c=document.getElementById('earcard');return {vis:!c.hidden&&c.offsetHeight>0,btn:!!c.querySelector('[data-act="ear-go"]'),y:scrollY};});ok(er.vis&&er.btn,'Try the tank you can hear sits under Your tank');
+ await p.evaluate(()=>document.querySelector('#earcard [data-act="ear-go"]').click());let ef=null;for(let i=0;i<50&&!ef;i++){ef=p.frames().find(x=>x.url().includes('ear.html'));await wait(100);}
+ await ef.waitForFunction(()=>window.S&&S.shrimp);await wait(300);
+ const eo=await p.evaluate(()=>({on:EAR.on,busy:busyUI(),ov:!document.getElementById('ear-ov').hidden,y:scrollY}));ok(eo.on&&eo.busy&&eo.ov&&Math.abs(eo.y-er.y)<2,'it opens full screen, nothing new comes while it is open, the page under it stays put');
+ const n0=await p.evaluate(()=>G.stats.care||0);await ef.evaluate(()=>{document.getElementById('b-feed').click();document.getElementById('b-water').click();});await wait(400);
+ const n1=await p.evaluate(()=>({care:G.stats.care||0,ear:G.stats.earN||0}));ok(n1.care-n0===1&&n1.ear===1,'a feed and a water change there count as care on Your tank, once: '+JSON.stringify(n1));
+ await ef.evaluate(()=>document.getElementById('b-back').click());await wait(400);ok(await p.evaluate(()=>!EAR.on&&document.getElementById('ear-ov').hidden),'Back returns to the game');
  ok(!errs.length,'no page errors'+(errs.length?': '+errs.slice(0,3).join(' | '):''));
  await b.close();srv.close();console.log(fails?fails+' FAILED':'all passed');process.exit(fails?1:0);})();

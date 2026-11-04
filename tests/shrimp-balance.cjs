@@ -1089,4 +1089,11 @@ C.otrees=COIN_COAST*0.99;if(!(coastSlow(c)<0.001))throw Error('nearly full, othe
 var t=readyGame();t.me.keep='self';t.me.on=1;var T=t.tanks[0];T.had=1;T.cycledAt=0;for(var k=0;k<30;k++)T.pop.push({age:100,n:1,g:2});var K=careOf(T);K.mulm=0;K.vacD=t.day;careDay(t);if(K.mulm!==0)throw Error('no poop right after a vacuum');t.day+=CLEAN_HOLD+1;careDay(t);if(!(K.mulm>0))throw Error('poop again after the hold');
 T.glass=null;glassGrow(t,T);var g0=T.glass.reduce(function(a,b){return a+b;},0);T.wipeD=t.day;glassGrow(t,T);if(T.glass.reduce(function(a,b){return a+b;},0)!==g0)throw Error('no algae right after a wipe');
 `);
+check('Pass 257 (Puti): the tank you can hear is a blind-group research option that never fades, needs a find, and its care counts once a day',`
+var g=hardGroup('blind'),o=hardOp(g,'ear');if(!o||!o.req||o.life||o.floor)throw Error('ear option: needs req and no life/floor');
+var t=readyGame();t.academy.rl=t.academy.rl||{};if(o.req(t))throw Error('needs a find in automation and AI first');t.academy.rl.auto={found:1};if(!o.req(t))throw Error('a find opens it');
+var P={ear:{day:0,start:0},touch:{day:0,start:0}};if(hardFaded(t,o,P.ear,g))throw Error('never fades');t.day=99999;if(hardFaded(t,o,P.ear,g))throw Error('never fades, 270 years on');if(hardOpReach(t,o,P.ear,g)<o.f-1e-9)throw Error('keeps its reach');
+if(hardWorkLive(t,g,{ear:{day:t.day,start:t.day}}))throw Error('it does not block the group running workaround');
+var c0=t.stats.care||0;earCare(t);earCare(t);if((t.stats.care||0)-c0!==1)throw Error('care once a day');t.day+=1;earCare(t);if((t.stats.care||0)-c0!==2)throw Error('and again the next day');
+`);
 console.log(count+' focused balance and migration checks passed');

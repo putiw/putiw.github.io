@@ -1,0 +1,499 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>The tank you can hear</title><style>
+:root{--bg:#efe9dc;--surface:#fbf8f1;--ink:#22201b;--ink-2:#524c3d;--ink-3:#716a57;--line:#dcd2be;--accent:#2d6a4f;--accent-ink:#fff}
+[hidden]{display:none!important}*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "Inter",system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%}
+body{padding:calc(10px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));max-width:480px;margin:0 auto;overflow-x:hidden}
+.top{display:flex;align-items:center;gap:8px;margin-bottom:12px}.top h1{flex:1;font-size:18px;margin:0;text-align:center}
+.top button{min-height:40px;width:auto;min-width:44px;padding:6px 12px;margin:0;border-radius:10px;text-align:center}
+button{font:inherit;font-weight:600;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;min-height:72px;padding:12px 14px;width:100%;text-align:left;margin:0 0 10px;display:block;touch-action:manipulation}
+button.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}button:focus-visible{outline:3px solid #b5651d;outline-offset:2px}
+p{margin:0 0 12px}.muted{color:var(--ink-3);font-size:14px}#st{min-height:1.4em;color:var(--ink-2)}
+#help{position:fixed;inset:0;z-index:5;background:var(--bg);overflow:auto;padding:calc(10px + env(safe-area-inset-top)) 16px 24px}
+#help .in{max-width:480px;margin:0 auto}.snd{min-height:0;padding:10px 12px;margin:0 0 6px}.snd b{display:block}.snd span{display:block;font-weight:400;font-size:14px;color:var(--ink-2)}
+</style></head><body>
+<div class="top"><button id="b-back" aria-label="Back to the game">‹ Back</button><h1>The tank you can hear</h1><button id="b-help" aria-label="Every sound, tap to hear it" aria-expanded="false">?</button></div>
+<p id="day" class="muted" aria-live="off"></p>
+<button class="pri" id="b-feed">Feed</button>
+<button class="pri" id="b-water">Change water</button>
+<button id="b-hear">Hear the tank</button>
+<p>Soft random ticks are shrimp eating. If it hisses or the beep gets fast, feed less and change some water.</p>
+<p id="st" role="status" aria-live="polite"></p>
+<button id="again" hidden>Start a new tank</button>
+<div id="help" hidden><div class="in"><div class="top"><button onclick="document.getElementById('b-help').click()" aria-label="Close">‹ Back</button><h1>Every sound</h1><span style="min-width:44px"></span></div><p class="muted">Tap one to hear it.</p><div id="help-list"></div></div></div>
+<script>
+'use strict';
+/* ---------- SOUND: every number you may want to tune by ear ---------- */
+var SOUND={
+  master:0.6,
+  /* the water pulse: one soft low beep, slow when the water is fine, faster as any reading goes bad */
+  /* the monitor: a soft beep that follows nitrite and nitrate. Slow and low when fine, faster and higher as it goes bad. */
+  /* the monitor style: a beat every 1.1 s when fine, every 0.4 s when bad (like a heart rate going from 55 to 150) */
+  /* water zone z: 0 perfect, 1 the start of amber, 2 the start of red (the test strip's lines). A beep every 8 s at 0, every 1 s at 1, nonstop at 2, straight lines between. */
+  monitor:{lo:880,hi:1250,ms:110,gain:0.6,at0:8,at1:1,at2:0.14},
+  pulse:{gain:0.05,ms:140, hzGood:520,hzBad:1050, slow:6,fast:0.55},
+  /* the filter: a soft water flow all the time (pink noise, low-passed, slowly breathing) plus a trickle where the outflow hits the surface */
+  flow:{gain:0,lo:220,hi:900,breathe:0.08,depth:0.35, trickle:{gain:0,hz:1400,q:0.9,rate:0.31,depth:0.6}}, /* off: it sounded like wind */
+  /* the filter as a small fountain: many tiny droplets, each a short sine that rises in pitch (that's how a drop rings), at random times.
+     rate a second, a slow swell in rate so it isn't a machine; a clogged filter drips less. */
+  /* other filter sounds to pick from (Filter sound on the Play screen) */
+  trickle:{rate:3.5,cLo:2,cHi:7,lo:900,hi:3200,riseLo:1.6,riseHi:3,msLo:10,msHi:28,gain:0.05,bed:0.08},
+  bubbler:{rate:30,lo:260,hi:720,rise:1.5,msLo:20,msHi:45,gain:0.035,bed:0.07},
+  brook:{gain:0.8,voices:[[520,380,10],[900,600,14],[1500,900,18]],q:9,modHz:11},
+  fountain:{rate:16,swell:0.35,swellHz:0.05,gain:0.05,lo:550,hi:2400,rise:1.9,msLo:14,msHi:45, big:{p:0.06,lo:320,hi:520,ms:70,gain:0.03}},
+  room:{noiseGain:0.0,noiseLo:350,noiseHi:1200, bubbleGain:0.05,bubbleHz:700,bubbleRise:1.6,bubbleMs:45, bubbleEvery:0.55, tempSpan:0.18, clogSlow:0.8,clogDull:0.45},
+  /* eating: a short munch, 2 to 4 scrapes. Babies high and quick, adults low wooden. Every shrimp has its own pace (rate). */
+  eat:{gain:0.16, baby:{hz:1700,n:3,gap:0.055,ms:18,type:'sine'}, juv:{hz:1000,n:3,gap:0.08,ms:30,type:'triangle'}, adult:{hz:560,n:3,gap:0.11,ms:50,type:'triangle'}, jitter:0.08, every:2.2, rateLo:0.6,rateHi:1.6, surface:0.06, stressMs:14},
+  /* stationary: a faint antenna flick now and then. Fades in as the eating fades out. */
+  idle:{gain:0.035,hz:2600,ms:16,every:9},
+  /* swimming: a dart through the water, a soft whoosh that rises then falls. Babies shorter and higher. More darting right after feeding, when they move toward the food. */
+  swim:{gain:0.045,lo:450,hi:1300, short:{s:0.22},long:{s:0.9,wob:5}, longP:0.3, every:28,feedMul:0.25},
+  tick:{gain:0.11,baby:1500,juv:950,adult:620,jitter:0.06},
+  molt:{gain:0.16,from:1400,to:420,s:0.7, fail:{s:0.45,wob:9,knock:220,knockMs:380,gain:0.26}},
+  berried:{gapMs:130},
+  babies:{gain:0.03,hz:2300,n:7,span:0.9},
+  feed:{gain:0.09,hz:1300,n:7,span:1.0,ms:70,bloop:{hz:380,ms:160,gain:0.07},clusterS:60,clusterMul:0.3, delay:0.9,
+    /* the shaker: three soft shakes, each a spray of tiny grains */
+    game:0.5,
+    shake:{nLo:3,nHi:8,gapLo:0.3,gapHi:0.55,grLo:8,grHi:22,lenLo:0.07,lenHi:0.16,hzLo:4200,hzHi:8000,gain:0.06}},
+  /* ammonia: from barely there at 0.1 ppm to hard to ignore past 1.5 */
+  hiss:{gain:0.01,max:0.22,hz:5000,q:0.7,full:1.5},
+  dull:{clearHz:9000,oldHz:1700,oldAt:80},
+  /* water change: a soft drain (low gurgle, 2 s) then a refill (a trickle, 3 s), both filtered noise with slow fades */
+  /* water change, four to pick from on the Play screen (WC). A: filtered-noise trickle. B: bubbly pour, many rising sine pops over a soft noise. C: droplets, falling plips that get dense then thin. D: glugs, low wobbling tones then a smooth pour. */
+  pour:{drain:{gain:0.05,hz:520,q:0.9,s:2.0,wob:4}, fill:{gain:0.055,hz:1600,q:0.6,s:3.0,wob:7}},
+  pourB:{n:60,s:3.5,hz:600,rise:2.2,ms:60,gain:0.045,bed:0.02},
+  pourC:{n:40,s:3.5,hz:1500,ms:80,gain:0.05,bedHz:700,bed:0.015},
+  pourD:{glugs:6,hz:240,ms:220,gain:0.06,s:1.6,fill:{gain:0.035,hz:1200,q:0.5,s:2.6,wob:9}},
+  /* the water change: the old water glugs out, then a tap runs (pink noise, two bands, a fast flutter) */
+  tap:{glugsLo:7,glugsHi:12,hz:260,ms:230,gain:0.09,gapLo:0.18,gapHi:0.4, run:{s:3.2,gain:0.07,lo:900,hi:2600,flutter:13}},
+  /* death: babies a small high tap, adults a low knock with a long tail, louder */
+  death:{baby:{gain:0.06,hz:900,ms:60},adult:{gain:0.3,hz:240,ms:420}},
+  minGapS:1.4
+};
+/* ---------- model ---------- */
+var KEY='shrimp-ear-v1', SPEEDS=[['real time',1/3600],['a day every 2 minutes',24/120],['a day a minute',24/60],['a day in 5 seconds',24/5]];
+var THINGS=['nothing','rock','driftwood','moss','a plant'];
+var S=null, UI={}, A=null, speaking=false, vol=0.6, lastReal=0, speedIx=3, playMode=true, cluster=0, evq=[], lastEv=0, teachOn=false;
+function $(id){return document.getElementById(id)}
+function rnd(a,b){return a+Math.random()*(b-a)}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function mkShrimp(age,sex){var id=++S.nid;return {id:id,age:age,rate:rnd(SOUND.eat.rateLo,SOUND.eat.rateHi),sex:sex||(Math.random()<0.5?'f':'m'),hunger:rnd(0.1,0.5),berried:0,moltIn:age<75?rnd(2,12):rnd(8,45)}}
+function newState(scape,n,history){
+  S={v:1,h:0,day:0,nid:0,scape:scape,shrimp:[],food:0,nh3:0,no2:0,no3:10,temp:24,clog:0,moss:0,ration:1,jobs:[],log:[],seen:{},history:history||'',last:Date.now(),speed:0,voice:true,vol:60,taught:false};
+  for(var i=0;i<scape.length;i++)if(scape[i]===3)S.moss+=0.25;
+  S.moss=Math.min(1,S.moss);
+  for(i=0;i<n;i++)S.shrimp.push(mkShrimp(rnd(60,300)));
+  save();
+}
+function save(){S.last=Date.now();S.speed=speedIx;S.voice=speaking;S.vol=Math.round(vol*100);try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function load(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===1){S=s;speedIx=s.speed==null?3:s.speed;speaking=s.voice===true;vol=(s.vol==null?60:s.vol)/100;return true}}catch(e){}return false}
+function sizeOf(s){return s.age<30?'baby':s.age<75?'juv':'adult'}
+function adults(){return S.shrimp.filter(function(s){return s.age>=75})}
+function logit(t){S.log.unshift('Day '+Math.floor(S.day)+', '+t);if(S.log.length>30)S.log.length=30}
+function ev(k,d){evq.push({k:k,d:d||{}})}
+/* one hour at most per call */
+function step(h){
+  var n=S.shrimp.length, i, s;
+  S.h+=h; S.day=S.h/24;
+  // jobs the store does
+  for(i=S.jobs.length-1;i>=0;i--){var j=S.jobs[i];if(S.h>=j.at){S.jobs.splice(i,1);doJob(j.k)}}
+  // temperature: slow drift round 24, the store keeps a heater on
+  S.temp+= (24-S.temp)*0.02*h + rnd(-0.08,0.08)*h; S.temp=Math.max(20,Math.min(30,S.temp));
+  // filter clogs over a month
+  S.clog=Math.min(1,S.clog+h/720);
+  var bact=(0.025+n*0.002)*(1-0.6*S.clog); // ppm an hour the filter can take
+  // eating
+  var eaters=S.shrimp.filter(function(x){return x.hunger>0.1}).length;
+  var eat=Math.min(S.food, eaters*0.01*h);
+  S.food-=eat;
+  for(i=0;i<n;i++){s=S.shrimp[i];s.hunger=Math.min(1,s.hunger+h/72);}
+  if(eat>0){var share=eat/Math.max(1,eaters);for(i=0;i<n;i++){s=S.shrimp[i];if(s.hunger>0.1)s.hunger=Math.max(0,s.hunger-share*25);}}
+  // moss and biofilm feed them a little
+  for(i=0;i<n;i++){s=S.shrimp[i];s.hunger=Math.max(0,s.hunger-(0.004+0.006*S.moss)*h);}
+  // leftover food rots
+  var rot=S.food*0.03*h; S.food-=rot; S.nh3+=rot*0.8 + n*0.0005*h;
+  var c1=Math.min(S.nh3,bact*h); S.nh3-=c1; S.no2+=c1;
+  var c2=Math.min(S.no2,bact*0.9*h); S.no2-=c2; S.no3+=c2*3;
+  S.no3+= (0.01 + n*0.0005)*h; // with the nitrite that turns, about 5 ppm a week for a small colony
+  S.no3-= S.moss*0.004*h; S.no3=Math.max(0,S.no3);
+  var bad=S.nh3+S.no2*0.7;
+  // each shrimp
+  for(i=n-1;i>=0;i--){
+    s=S.shrimp[i]; s.age+=h/24; s.moltIn-=h/24;
+    var die=0;
+    if(bad>0.3)die+= (bad-0.3)*0.004*h;
+    if(S.temp>28.5)die+= (S.temp-28.5)*0.003*h;
+    if(s.age>600)die+= (s.age-600)/900*0.004*h;
+    if(s.age<30)die+= 0.00028*h; // about 60% of babies make it
+    if(n>40)die+= (n-40)/40*0.0006*h; // crowding: a soft cap around 50
+    if(s.moltIn<=0){
+      s.moltIn=s.age<75?rnd(3,12):rnd(15,45);
+      var wc7=(S.wc||[]).filter(function(d){return S.day-d<7}).length; /* water changed more than twice in a week: molts fail (the game's too-much-new-water rule) */
+      var fail=0.02+S.no3/400+bad*0.1+Math.max(0,wc7-2)*0.25;
+      if(Math.random()<fail){die=1}else ev('molt',{id:s.id})
+    }
+    if(Math.random()<die){S.shrimp.splice(i,1);logit(die===1?'a molt failed':sizeOf(s)==='baby'?'a baby died':'a shrimp died');if(die!==1)ev('death',{id:s.id,age:s.age});else ev('moltfail',{id:s.id,age:s.age});continue}
+    if(s.berried>0){s.berried-=h/24;if(s.berried<=0){s.berried=0;var k=Math.floor(rnd(5,12));for(var b=0;b<k;b++)S.shrimp.push(mkShrimp(0));logit(k+' babies');ev('babies',{n:k})}}
+    else if(s.sex==='f'&&s.age>=75&&s.hunger<0.6&&bad<0.15&&S.no3<60&&Math.random()<h/(24*18)*Math.max(0,1-n/60)){s.berried=rnd(22,28);logit('a female is carrying eggs');ev('berried',{id:s.id})}
+  }
+}
+function doJob(k){
+  if(k==='feed'){S.food+= (S.ration*0.5)*Math.max(1,S.shrimp.length/10)*0.6; ev('feed');logit('fed')}
+  else if(k==='water'){S.nh3*=0.7;S.no2*=0.7;S.no3*=0.7;S.wc=(S.wc||[]).filter(function(d){return S.day-d<7});S.wc.push(S.day);ev('pour');logit('water changed, 30%')}
+  else if(k==='filter'){S.clog=0;logit('filter cleaned')}
+  else if(k==='moss'){S.moss=Math.min(1,S.moss+0.25);logit('moss added')}
+  else if(k==='add'){for(var i=0;i<5;i++)S.shrimp.push(mkShrimp(rnd(60,120)));logit('5 shrimp added')}
+}
+function advance(hours){var guard=0;while(hours>0&&guard++<20000){var h=Math.min(1,hours);step(h);hours-=h}}
+function job(k,delayH,say){S.jobs.push({at:S.h+delayH,k:k});save();speak(say)}
+/* ---------- speech ---------- */
+function speak(t,head){var e=$('st');if(e)e.textContent=t;}
+function howText(){
+  var n=S.shrimp.length, b=S.shrimp.filter(function(s){return s.berried>0}).length, babies=S.shrimp.filter(function(s){return s.age<30}).length;
+  var a=[], w=[];
+  if(n===0)a.push('No shrimp left.');
+  else{a.push(n+(n===1?' shrimp':' shrimp')+(b?', '+(b===1?'one carrying eggs':b+' carrying eggs'):'')+(babies?', '+babies+' babies':'')+'.');}
+  var hungry=S.shrimp.filter(function(s){return s.hunger>0.6}).length;
+  var bad=S.nh3+S.no2*0.7;
+  if(bad>0.5)w.push('The water is bad, change some today.');
+  else if(bad>0.2)w.push('The water is off, change some.');
+  else if(S.no3>60)w.push('The water is old, change some this week.');
+  else if(S.no3>40)w.push('The water is getting old.');
+  if(S.clog>0.8)w.push('The filter is slow, clean it.');
+  if(n&&hungry>n/2)w.push('They are hungry.');
+  else if(n&&S.food>1.5)w.push('There is food left on the floor, skip a day.');
+  if(S.temp>28)w.push('It is warm in there.');
+  if(!w.length)w.push(n?'They are fine.':'');
+  return a.concat(w.slice(0,2)).join(' ');
+}
+/* ---------- audio ---------- */
+function audio(){
+  if(A)return A;
+  var C=window.AudioContext||window.webkitAudioContext; if(!C)return null;
+  var ctx=new C();
+  A={ctx:ctx};
+  A.master=ctx.createGain();A.master.gain.value=SOUND.master*vol;
+  A.lp=ctx.createBiquadFilter();A.lp.type='lowpass';A.lp.frequency.value=SOUND.dull.clearHz;A.lp.Q.value=0.5;
+  A.comp=ctx.createDynamicsCompressor();A.comp.threshold.value=-18;A.comp.ratio.value=4;
+  A.lp.connect(A.comp);A.comp.connect(A.master);A.master.connect(ctx.destination);
+  A.tank=ctx.createGain();A.tank.gain.value=1;A.tank.connect(A.lp);mixBuses(); /* everything the tank makes goes through here, one-sound buttons bypass it */
+  // noise buffer
+  var len=ctx.sampleRate*2, buf=ctx.createBuffer(1,len,ctx.sampleRate), d=buf.getChannelData(0);
+  for(var i=0;i<len;i++)d[i]=Math.random()*2-1;
+  A.noise=buf;
+  // pink noise, 6 s, ends matched so the loop has no click
+  var pl=ctx.sampleRate*6,pb=ctx.createBuffer(1,pl,ctx.sampleRate),pd=pb.getChannelData(0),b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+  for(i=0;i<pl;i++){var w=Math.random()*2-1;b0=0.99886*b0+w*0.0555179;b1=0.99332*b1+w*0.0750759;b2=0.969*b2+w*0.153852;b3=0.8665*b3+w*0.3104856;b4=0.55*b4+w*0.5329522;b5=-0.7616*b5-w*0.016898;pd[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)*0.11;b6=w*0.115926}
+  var fadeN=ctx.sampleRate*0.5;for(i=0;i<fadeN;i++){var a=i/fadeN;pd[i]=pd[i]*a+pd[pl-fadeN+i]*(1-a)}
+  pb=(function(){var nb=ctx.createBuffer(1,pl-fadeN,ctx.sampleRate);nb.getChannelData(0).set(pd.subarray(0,pl-fadeN));return nb})();
+  A.pink=pb;
+  // the filter: flow plus trickle, each breathing slowly
+  var F=SOUND.flow;
+  function loopSrc(){var x=ctx.createBufferSource();x.buffer=A.pink;x.loop=true;x.loopStart=0;x.loopEnd=A.pink.duration;return x}
+  var fs=loopSrc(),fhp=ctx.createBiquadFilter(),flp=ctx.createBiquadFilter();fhp.type='highpass';fhp.frequency.value=F.lo;flp.type='lowpass';flp.frequency.value=F.hi;flp.Q.value=0.3;
+  A.flowG=ctx.createGain();A.flowG.gain.value=0;var fl=ctx.createOscillator(),flg=ctx.createGain();fl.frequency.value=F.breathe;flg.gain.value=F.gain*F.depth;fl.connect(flg);flg.connect(A.flowG.gain);fl.start();
+  fs.connect(fhp);fhp.connect(flp);flp.connect(A.flowG);A.flowG.connect(A.tank);fs.start(0,Math.random()*3);
+  var T2=F.trickle,ts=loopSrc(),tb=ctx.createBiquadFilter();tb.type='bandpass';tb.frequency.value=T2.hz;tb.Q.value=T2.q;
+  A.trickG=ctx.createGain();A.trickG.gain.value=0;var tl=ctx.createOscillator(),tlg=ctx.createGain();tl.frequency.value=T2.rate;tlg.gain.value=T2.gain*T2.depth;tl.connect(tlg);tlg.connect(A.trickG.gain);tl.start();
+  var tl2=ctx.createOscillator(),tlg2=ctx.createGain();tl2.frequency.value=T2.rate*2.7;tlg2.gain.value=T2.gain*T2.depth*0.5;tl2.connect(tlg2);tlg2.connect(A.trickG.gain);tl2.start();
+  ts.connect(tb);tb.connect(A.trickG);A.trickG.connect(A.tank);ts.start(0,1.5+Math.random()*3);
+  /* a soft bed under the trickle and the bubbler: pink noise low-passed at 600 Hz */
+  var bs=loopSrc(),blp=ctx.createBiquadFilter(),bhp=ctx.createBiquadFilter();blp.type='lowpass';blp.frequency.value=600;bhp.type='highpass';bhp.frequency.value=200;A.bedG=ctx.createGain();A.bedG.gain.value=0;bs.connect(bhp);bhp.connect(blp);blp.connect(A.bedG);A.bedG.connect(A.busT.drop.g);bs.start(0,Math.random()*4);
+  /* the brook: noise through narrow bandpasses whose centre is pushed around by slow noise, the classic procedural water */
+  A.brookG=ctx.createGain();A.brookG.gain.value=0;A.brookG.connect(A.busT.drop.g);A.brookBP=[];A.brookMod=[];
+  SOUND.brook.voices.forEach(function(v){var src2=loopSrc(),bp2=ctx.createBiquadFilter();bp2.type='bandpass';bp2.frequency.value=v[0];bp2.Q.value=SOUND.brook.q;
+    var mod=ctx.createBufferSource();mod.buffer=A.noise;mod.loop=true;var mlp=ctx.createBiquadFilter();mlp.type='lowpass';mlp.frequency.value=v[2];A.brookBP.push([bp2,v]);A.brookMod.push([mlp,v]);var mg=ctx.createGain();mg.gain.value=v[1]*6;mod.connect(mlp);mlp.connect(mg);mg.connect(bp2.frequency);
+    var vg=ctx.createGain();vg.gain.value=1/SOUND.brook.voices.length;src2.connect(bp2);bp2.connect(vg);vg.connect(A.brookG);src2.start(0,Math.random()*4);mod.start(0,Math.random()*1.5)});
+  A.roomG=ctx.createGain();
+  // ammonia hiss
+  var hs=ctx.createBufferSource();hs.buffer=buf;hs.loop=true;
+  var hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=SOUND.hiss.hz;hp.Q.value=SOUND.hiss.q;
+  A.hissG=ctx.createGain();A.hissG.gain.value=0;
+  hs.connect(hp);hp.connect(A.hissG);A.hissG.connect(A.busT.hiss.g);hs.start();
+  A.nextBubble=ctx.currentTime+0.3;
+  A.voices={};
+  return A;
+}
+var LIGHTS=[['drop','Fountain'],['plop','Fountain plop'],['beep','Monitor beep'],['hiss','Hiss'],['eatA','Adult eating'],['eatJ','Young eating'],['eatB','Baby eating'],['idle','Sitting still'],['swimS','Swim, short'],['swimL','Swim, long'],['eggs','Eggs (double)'],['molt','Molt'],['moltfail','Failed molt'],['babies','Babies hatch'],['deathB','Death, baby'],['deathA','Death, adult'],['feed','Feeding'],['pour','Water change']],LEL={};
+function lit(k,at,dur){var el=LEL[k];if(!el)return;var d=Math.max(0,((at||0)-(A?A.ctx.currentTime:0))*1000);setTimeout(function(){el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('on')},Math.max(160,(dur||0)*1000))},d)}
+/* the filter sounds; each event at a random time (Poisson), rate × Density. Pitch and Size scale every drop. */
+var FRATE={trickle:3.5,bubbler:30,drip:0.7,rain:45,glug:1.3};
+var FPD={dens:1,pitch:1,size:1,bed:1},FPS={"bubbler":{"dens":1.2,"pitch":1.05,"size":1.35,"bed":0.5}};/* Puti's settings, 5 Nov */
+function fpOf(m){return Object.assign({},FPD,FPS[m]||{})}
+function filterEvent(m,at,P){var Fo=SOUND.fountain,i,t;
+  if(m==='drops'){var big=Math.random()<Fo.big.p,dh=(big?rnd(Fo.big.lo,Fo.big.hi):Fo.lo*Math.pow(Fo.hi/Fo.lo,Math.random()))*P.pitch;if(big){as('plop',at,function(){tone(dh,Fo.big.ms*P.size,Fo.big.gain*rnd(0.4,1),at,'sine',dh*Fo.rise)});lit('plop',at,0.15)}else{tone(dh,rnd(Fo.msLo,Fo.msHi)*P.size,Fo.gain*rnd(0.4,1),at,'sine',dh*Fo.rise);if(Math.random()<0.25)lit('drop',at,0.12)}}
+  else if(m==='trickle'){var Tr=SOUND.trickle,cn=Math.round(rnd(Tr.cLo,Tr.cHi));t=at;for(i=0;i<cn;i++){var f0=rnd(Tr.lo,Tr.hi)*P.pitch;tone(f0,rnd(Tr.msLo,Tr.msHi)*P.size,Tr.gain*rnd(0.3,1),t,'sine',f0*rnd(Tr.riseLo,Tr.riseHi));t+=rnd(0.008,0.04)*P.size}if(Math.random()<0.3)lit('drop',at,0.12)}
+  else if(m==='bubbler'){var Bb=SOUND.bubbler,b0=rnd(Bb.lo,Bb.hi)*P.pitch;tone(b0,rnd(Bb.msLo,Bb.msHi)*P.size,Bb.gain*rnd(0.3,1),at,'sine',b0*Bb.rise);if(Math.random()<0.1)lit('drop',at,0.12)}
+  else if(m==='drip'){/* one drop, a ring and a soft echo off the glass */var d0=rnd(800,1500)*P.pitch,g0=rnd(0.08,0.13);tone(d0,60*P.size,g0,at,'sine',d0*2.3);tone(d0*1.02,60*P.size,g0*0.35,at+0.09*P.size,'sine',d0*2.2);if(Math.random()<0.3){var pl=rnd(300,450)*P.pitch;as('plop',at,function(){tone(pl,90*P.size,0.03,at+0.02,'sine',pl*1.6)});lit('plop',at,0.15)}lit('drop',at,0.2)}
+  else if(m==='rain'){var r0=rnd(1800,5200)*P.pitch;tone(r0,rnd(5,12)*P.size,rnd(0.006,0.02),at,'sine',r0*1.5);if(Math.random()<0.05)lit('drop',at,0.1)}
+  else if(m==='glug'){var gn=Math.round(rnd(2,4));t=at;for(i=0;i<gn;i++){var gh=rnd(150,300)*P.pitch;tone(gh,rnd(90,160)*P.size,rnd(0.07,0.12),t,'sine',gh*1.8);t+=rnd(0.08,0.18)*P.size}lit('drop',at,0.3)}
+}
+var FOUNT='bubbler',BEEP={"style":"monitor","pitch":1.4,"vol":1.8};
+function beepAt(hz,at,gain,bz){as('beep',at,function(){beepAt0(hz,at,gain,bz)})}
+/* the game's own Feed sound (shrimp/sfx/feed_drop_002.wav, Kenney, CC0), embedded */
+var FEED_WAV='sfx/feed_drop_002.wav',FEEDBUF=null;/* the game's Feed sound, by path */
+/* the feeding sound as stacked layers. Each has: on, vol, delay (s from the tap), pitch (×), count, spread (s), vary (0 even to 1 random), soft (0 bright to 1 muffled) */
+var FEEDL=[
+  ['shake','Salt shake','shakes of tiny grains, count is how many shakes, spread is the gap between them',{on:1,vol:1,delay:0,pitch:1,count:5,spread:0.42,vary:0.6,soft:0}],
+  ['drop','Game feed sound','the game\'s own Feed sound, count repeats it',{on:1,vol:1,delay:0,pitch:1,count:1,spread:0.3,vary:0,soft:0}],
+  ['plink','Pellets plink','pellets landing, a little falling note each',{on:1,vol:1,delay:1.9,pitch:1,count:7,spread:1,vary:0.5,soft:0}],
+  ['bloop','Low bloop','a low round bloop as the food goes under',{on:1,vol:1,delay:2.1,pitch:1,count:1,spread:0.4,vary:0.3,soft:0}],
+  ['sprinkle','Sprinkle','very small high taps on the surface',{on:0,vol:1,delay:1.7,pitch:1,count:20,spread:0.8,vary:0.7,soft:0}],
+  ['plop','Plop','water drop plops',{on:0,vol:1,delay:1.8,pitch:1,count:4,spread:0.7,vary:0.6,soft:0}],
+  ['bubble','Bubbles','small bubbles rising after the food sinks',{on:0,vol:1,delay:2.6,pitch:1,count:6,spread:1.4,vary:0.6,soft:0}],
+  ['patter','Patter','soft low taps, food hitting the gravel',{on:0,vol:1,delay:2.4,pitch:1,count:8,spread:1.2,vary:0.7,soft:0}]];
+var FEEDS={"drop":{"count":6,"vary":1,"soft":0.3,"pitch":0.7,"vol":0.4,"spread":0.16},"plink":{"vol":0.25,"on":0,"delay":0,"soft":0.85,"vary":0.8,"spread":0.4},"bloop":{"count":4,"spread":0.16,"delay":0,"vol":0.3,"pitch":1.65,"soft":0.55,"vary":0.4},"patter":{"on":1,"delay":0,"vol":0.4},"shake":{"count":5,"pitch":0.6,"soft":0.55,"spread":0.22,"vary":0.2,"delay":0.35,"vol":0.4}};
+function feedOf(id){var d=FEEDL.filter(function(l){return l[0]===id})[0][3];return Object.assign({},d,FEEDS[id]||{})}
+function vr(x,v){return x*(1+(Math.random()*2-1)*v)}
+function feedLayer(id,t0,P){var ctx=A.ctx,out=ctx.createBiquadFilter(),g=ctx.createGain();out.type='lowpass';out.frequency.value=softHz(P.soft);out.Q.value=0.5;g.gain.value=P.vol;out.connect(g);g.connect(dest());
+  var pd=DESTO;DESTO=out;try{var t=t0+P.delay,n=Math.max(1,Math.round(vr(P.count,P.vary*0.5))),i,j,at;
+  if(id==='shake'){var Sh=SOUND.feed.shake;for(i=0;i<n;i++){var gr=Math.round(rnd(Sh.grLo,Sh.grHi)),ln=rnd(Sh.lenLo,Sh.lenHi),shz=vr(rnd(Sh.hzLo,Sh.hzHi),P.vary*0.3)*P.pitch,sg=Sh.gain*rnd(0.5,1.1);for(j=0;j<gr;j++)burst(shz*rnd(0.8,1.25),3,6,sg*rnd(0.3,1),t+Math.pow(Math.random(),1.5)*ln,'bandpass');t+=Math.max(0.05,vr(P.spread,P.vary*0.5))}}
+  else if(id==='drop'){for(i=0;i<n;i++)gameFeed(t+i*P.spread+(Math.random()*P.vary*P.spread),P.pitch*vr(1,P.vary*0.1),SOUND.feed.game,out)}
+  else{for(i=0;i<n;i++){at=t+(n>1?(P.vary>0.05?Math.random():i/(n-1)):0)*P.spread;var q=P.pitch*vr(1,P.vary*0.25);
+    if(id==='plink'){var fh=SOUND.feed.hz*q*rnd(0.85,1.2);tone(fh,SOUND.feed.ms,SOUND.feed.gain*rnd(0.6,1),at,'sine',fh*0.55)}
+    else if(id==='bloop'){var bh=SOUND.feed.bloop.hz*q;tone(bh,SOUND.feed.bloop.ms,SOUND.feed.bloop.gain,at,'sine',bh*1.5)}
+    else if(id==='sprinkle'){var sh=rnd(3000,5500)*q;tone(sh,rnd(6,14),rnd(0.01,0.03),at,'sine',sh*1.3)}
+    else if(id==='plop'){var ph=rnd(500,900)*q;tone(ph,70,rnd(0.05,0.09),at,'sine',ph*2.2)}
+    else if(id==='bubble'){var uh=rnd(350,800)*q;tone(uh,rnd(35,70),rnd(0.03,0.06),at,'sine',uh*1.7)}
+    else if(id==='patter'){var th=rnd(180,320)*q;tone(th,40,rnd(0.04,0.08),at,'triangle',th*0.8)}}}
+  }finally{DESTO=pd}}
+function feedSound(t,only){FEEDL.forEach(function(l){var P=feedOf(l[0]);if(only?l[0]===only:P.on)feedLayer(l[0],t,P)})}
+function gameFeed(at,rate,gain,dst){if(!A)return;dst=dst||dest();function go(){var x=A.ctx.createBufferSource(),g=A.ctx.createGain();x.buffer=FEEDBUF;x.playbackRate.value=rate||1;g.gain.value=gain==null?SOUND.feed.game:gain;x.connect(g);g.connect(dst);x.start(Math.max(A.ctx.currentTime,at))}
+  if(FEEDBUF)return go();fetch(FEED_WAV).then(function(r){return r.arrayBuffer()}).then(function(b){return new Promise(function(ok,no){A.ctx.decodeAudioData(b,ok,no)})}).then(function(d){FEEDBUF=d;go()}).catch(function(){})}
+/* the worst reading on the strip as a zone: 0..1 green, 1..2 amber, 2 red */
+function zoneOf(v,a,r){return v<=a?v/a:v<=r?1+(v-a)/(r-a):2}
+function waterZone(){if(!S)return 0;return Math.max(zoneOf(S.nh3,0.1,0.3),zoneOf(S.no2,0.1,0.3),zoneOf(S.no3,20,40))}
+function zoneGap(z){var M=SOUND.monitor;return z<=1?M.at0+(M.at1-M.at0)*z:z<2?M.at1+(M.at2-M.at1)*(z-1):M.at2}
+function flat(hz,ms,gain,at){var ctx=A.ctx,t=at||ctx.currentTime,o=ctx.createOscillator(),f=ctx.createBiquadFilter(),g=ctx.createGain();o.type='square';o.frequency.value=hz;f.type='lowpass';f.frequency.value=hz*2.2;f.Q.value=0.7;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.004);g.gain.setValueAtTime(gain,t+ms/1000-0.015);g.gain.linearRampToValueAtTime(0,t+ms/1000);o.connect(f);f.connect(g);g.connect(dest());o.start(t);o.stop(t+ms/1000+0.02)}
+function beepAt0(hz,at,gain,bz){var P=SOUND.pulse,h=hz*BEEP.pitch,g=gain*BEEP.vol;
+  if(BEEP.style==='soft')tone(h,P.ms,g,at,'sine');
+  else if(BEEP.style==='monitor'){/* a bedside monitor's pulse tone: a flat square beep, quick on and off, pitch climbs as it goes bad; past 0.75 every third beat is the three-note alarm */
+    var M=SOUND.monitor,mh=(M.lo+(M.hi-M.lo)*bz)*BEEP.pitch;flat(mh,M.ms,g*M.gain,at);
+}
+  else if(BEEP.style==='heart'){tone(h*0.55,110,g*1.3,at,'triangle',h*0.45);tone(h*0.5,110,g*0.9,at+0.22,'triangle',h*0.4)}
+  else if(BEEP.style==='bell'){tone(h,700,g*0.9,at,'sine');tone(h*2.76,350,g*0.25,at,'sine')}
+}
+/* the default tank (wood, plants, mossy rocks, sword plant from the game's tank art), decor only, gray, cut into 10 columns by 24 rows; each cell is its mean brightness, top row first, scaled so the brightest cell is 1 */
+/* the default tank's decor as masks, 233 by 108, one bit a pixel (alpha over half), from the game's tank art layers */
+var PIC_W=233,PIC_H=108,PIC_MASK={"twood": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAADwAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAHgAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAAAAAAAAOAAAAAAAAAAAAAAAAAAAAAAAAAAAPgAAAAAAAAA8AAAAAAAAAAAAAAAAAAAAAAAAAAAfwAAAAAAAAB4AAAAAAAAAAAAAAAAAAAAAAAAAAA/gHAAAAAAADwAAAAAAAAAAAAAAAAAAAAAAAAAAA/gPgAAAAAAPPAAAAAAAAAAAAAAAAAAAAAAAAAAB/AfgAAAAAAe+AAAAAAAAAAAAAAAAAAAAAAAAAAD/A/gAAAAAB/8AAAAAAAAAAAAAAAAAAAAAAAAAAH/D+AAAAAAD/4AAAAAAAAAAAAAAAAAAAAAAAAAAP+H+AAAAAAP/gAAAAAAAAAAAAAAAAAAAAAAAAAAP+P8AAAAAAf+AAAAAAAAAAAAAAAAAAAAAAAAAAAf8f4AAAAAA/4AAAAAAAAAAAAAAAAAAAAAAAAAAA/8/wAAAAAD/gAAAAAAAAAAAAAAAAAAAAAAAAAAA/5/gAAAAAH+AB//8AAAAAAAAAAAAAAAAAAAAAAB/7/AAAAAAf8A///4AAAAAAAAAAAAAAAAAAAAAAD///AAAAAA/wP///AAAAAAAAAAAAAAAAAAAAAAAD//+AAAAAD/g///8AAAAAAAAAAAAAAAAAAAAAAAH//8AAAAAP/H///AAAAAAAAAAAAAAAAAAAAAAAAP//4AAAAAf8f//4AAAAAAAAAAAAAAAAAAAAAAAAP//4AAAAB/7//+AAAAAAAAAAAAAAAAAAAAAAAAAf//4AAAAH////wAAAAAAAAAAAAAAAAAAAAAAAAAf//4AAAAf///+AAAAAAAAAAAAAAAAAAAAAAAAAAf//4AAAB////8AAAAAAAAAAAAAAAAAAAAAAAH/g///8AAAH////wAAAAAAAAAAAAAAAAAAAAAAB///////AAAf////gAAAAAAAAAAAAAAAAAAAAAAH///////+AB/////AAAAAAAAAAAAAAAAAAAAAAAf///////////////gAAAAAAAAAAAAAAAAAAAAAA////////////////gAAAAAAAAAAAAAAAAAAAAAD////////////////wAAAAAAAAAAAAAAAAAAAAAH////////////////wAAAAAAAAAAAAAAAAAAAAAP////////////////wAAAAAAAAAAAAAAAAAAAAAf////////////////wAAAAAAAAAAAAAAAAAAAAA/////////////////wAAAAAAAAAAAAAAAAAAAAB/////////////////gAAAAAAAAAAAAAAAAAAAAB/////////////////gAAAAAAAAAAAAAAAAAAAAB/////////////////wAAAAAAAAAAAAAAAAAAAAAf////////////////4AAAAAAAAAAAAAAAAAAAAAH////////////////4AAAAAAAAAAAAAAAAAAAAAAH///////////////4AAAAAAAAAAAAAAAAAAAAAAD////+D/////////wAAAAAAAAAAAAAAAAAAAAAAA////gADgD8Af///wAAAAAAAAAAAAAAAAAAAAAAAH//8AAAAAAAH///AAAAAAAAAAAAAAAAAAAAAAAAAAfAAAAAAAAADgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=", "trocks": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/4BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQP/8KP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIBg//8d/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQzD//8//+AAAAAAAAAAAAAAAAAAABwEAAAAAAAAxkP//8//8AAAAAAAAAAHgAAAAAAAPwIAAAAAAfAzI//////8AAAAAAAAAA/gAAAAAAA/4eAAAAAP/xmz//////8QAAAAAAAAH/wAAAAAAH///AAAAD//xtv//////+gAAAAAAAAf/wAAAAAAf///AAAAf//zb////////wAAAAAAAB//wAAAAAB////AAAH///y3////////gAAAAAAAD//gAA1gAH///+AAA////3/////////AAAAAAAAH//AAH/8AP///+AAD////3////////0AAAAAAAAH/+AA//+A////8AAP////v///////wAAAAAAAAAD/wAP///B////4AB///////////n8AAAAAAAAAAAAAAf///B////gAH///////////HAAAAAAAAAAAAAAA////D///+AAP/////+D///8AAAAAAAAAAAAAAAD///+D///AAA//////gB///wAAAAAAAAAAAAAAAH///8H//wAAF//////gAP/8AAAAAAAAAAAAAAAAP///4f//6AA///////AAAAAAAAAAAAAAAAAAAAAf///w///8AE///////AAAAAAAAAAAAAAAAAAAAB////j///4AN///////AAAAAAAAAAAAAAAAAAAAD///+H///wAf//////+wAAAAAAAAAAAAAAAAAAAD///+P///wAf///////oAAAAAAAAAAAAAAAAAAAD///4f///gAf///////wAAAAAAAAAAAAAAAAAAAAAD+Af//8AAH///////gAAAAAAAAAAAAAAAAAAAAAAAAf//wAAA///////AAAAAAAAAAAAAAAAAAAAAAAAAP/8AAAAB/////+AAAAAAAAAAAAAAAAAAAAAAAAAA+AAAAAAL////4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH//8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=", "tplants": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgAOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMHgAeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/PgB8AAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAH+cAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAD4AAAB/+JAPAAAAAAAAAAAAAAAAAAAAAAAAAAAAD7gAAf/4fAeAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/gAH//z8B8EAAAAAAAAAAAAAAAAAAAAAAAAAAAB/gAf//j8HAcAAAAAAAAAAAAAAAAAAAAAAAAAAAB/8B//+EgHg4AAAAAAAAAAAAAAAAAAAAAAAAAAAA/+H//4DwOHwAAAAAAAAAAAAAAAAAAAAAAAAAAAA/g///wHwzOAAAAAAAAAAAAAAAAAAAAAAAAAAAAADD//+A/nucAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//4B8P/4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///gNOf/AAAAAAAAAAAAAAAAAAAAAAAAAAAAABB/42B5+ZPIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/gIBx8We4AAAAAAAAAAAAAAAAAAAAAAAAAAAACOeQABHjvhgAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAwgADBP/DAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPgACAHnvvEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwAAAPPv84AAAAAAAAAAAAAAAAAAAAAAAAAAAAAf4AQAMfXj4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAf4BAAP+vjwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwDAAOT/GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPi8AAdn+YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/gAAPrxwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf9AAAfTDwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC+wAAA+mHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJIAAAdM8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEXAAAA+ZwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4AAAAczwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJwAAAAZngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAA/MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAegAAAA+wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAAB/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4AAAAD8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAD4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgAAAAHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAdgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=", "tsword": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB4eAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADw8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHz4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPn4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfPwQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/fhgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/+MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/8QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/4gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+P/GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/feIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP+8RAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH8wmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH5hcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6D4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP8HgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf4fAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfw+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/z8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/nwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/vgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="};
+var PIC_TYPES=[['wood','Wood',['twood']],['stone','Stones',['trocks']],['plant','Plants',['tplants','tsword']]];
+var PIC_SOUNDS=[['off','Off'],['sine','Sine'],['tri','Soft'],['square','Buzzy'],['hum','Hum'],['pluck','Pluck'],['chime','Chime'],['knock','Knock'],['bell','Bell']];
+var PICD={cols:10,secs:10,rows:24,lo:300,hi:3200,tick:1,types:{wood:{snd:'knock',oct:0.5,vol:1},stone:{snd:'chime',oct:1,vol:1},plant:{snd:'hum',oct:2,vol:1}}};
+var PICS=JSON.parse(JSON.stringify(PICD));(function(pj){PICS=Object.assign(PICS,pj);PICS.types=Object.assign(JSON.parse(JSON.stringify(PICD.types)),pj.types||{});})({"cols":40,"secs":5,"rows":12,"lo":300,"hi":2450,"tick":1,"types":{"wood":{"snd":"bell","oct":0.5,"vol":0.5},"stone":{"snd":"square","oct":1,"vol":0.5},"plant":{"snd":"hum","oct":2,"vol":1}}});
+var PIC_BITS={};(function(){for(var k in PIC_MASK){var b=atob(PIC_MASK[k]),a=new Uint8Array(PIC_W*PIC_H);for(var i=0;i<a.length;i++)a[i]=(b.charCodeAt(i>>3)>>(7-(i&7)))&1;PIC_BITS[k]=a}})();
+/* cell value per type: mean over the cell of 0.2 per layer that covers the pixel */
+function picGrid(){var C=PICS.cols,R=PICS.rows,out={};PIC_TYPES.forEach(function(T){var g=[];for(var c=0;c<C;c++){var col=[];var x0=Math.floor(c*PIC_W/C),x1=Math.floor((c+1)*PIC_W/C);for(var r=0;r<R;r++){var y0=Math.floor(r*PIC_H/R),y1=Math.max(y0+1,Math.floor((r+1)*PIC_H/R)),sum=0,n=0;for(var y=y0;y<y1;y++)for(var x=x0;x<x1;x++){n++;T[2].forEach(function(L){sum+=0.2*PIC_BITS[L][y*PIC_W+x]})}col.push(n?sum/n:0)}g.push(col)}out[T[0]]=g});return out}
+SOUND.pic={gain:0.22,tick:0.02};
+SOUND.scan={step:0.55,stagger:0.07,tick:2000,tickGain:0.03,row:[330,520,820],gain:0.12};
+/* what each thing sounds like when the scan passes it; row sets the pitch (front low, back high) */
+function placeSound(k,row,at){var C=SOUND.scan,h=C.row[row],g=C.gain;
+  if(k===1){tone(h*2,45,g,at,'triangle');tone(h*3.1,30,g*0.5,at+0.01,'sine')}
+  else if(k===2){tone(h,160,g*1.2,at,'triangle',h*0.8);tone(h*0.5,180,g*0.5,at,'sine')}
+  else if(k===3){for(var i=0;i<5;i++)tone(h*1.5*rnd(0.94,1.06),40,g*0.35,at+i*0.045,'sine')}
+  else if(k===4){tone(h,320,g*0.8,at,'sine',h*1.7)}
+}
+/* per-sound mix: volume (×), softness (0 bright to 1 muffled, a low-pass), speed (how often for sounds that repeat, how fast for one-off sounds) */
+var RATE_K={drop:1,plop:1,beep:1,eatA:1,eatJ:1,eatB:1,idle:1,swimS:1,swimL:1},STRETCH_K={eggs:1,molt:1,moltfail:1,babies:1,deathB:1,deathA:1,feed:1,pour:1};
+var MIX={"molt":{"vol":0.55,"soft":0.75,"speed":1},"deathA":{"vol":2.7,"soft":0,"speed":0.35},"deathB":{"vol":0.9,"speed":0.45,"soft":0.2},"feed":{"vol":3,"soft":0.45},"pour":{"vol":2.1,"soft":0.4,"speed":0.85},"babies":{"vol":3,"speed":0.95},"swimS":{"speed":0.25,"soft":0.6},"swimL":{"speed":0.25,"soft":0.7},"beep":{"vol":0.8,"speed":0.35,"soft":0.7},"hiss":{"soft":0.65,"vol":3},"plop":{"vol":1.45,"soft":0.05,"speed":1.95},"drop":{"soft":0.95,"vol":1.95},"eatA":{"soft":0.45}};
+function mixOf(k){var m=MIX[k]||{};return {vol:m.vol==null?1:m.vol,soft:m.soft==null?0:m.soft,speed:m.speed==null?1:m.speed}}
+function softHz(v){return 14000*Math.pow(350/14000,v)}
+function mixBuses(){var ctx=A.ctx;A.busT={};A.busD={};LIGHTS.forEach(function(l){var k=l[0];['T','D'].forEach(function(w){var g=ctx.createGain(),f=ctx.createBiquadFilter();f.type='lowpass';f.Q.value=0.5;g.connect(f);f.connect(w==='T'?A.tank:A.lp);(w==='T'?A.busT:A.busD)[k]={g:g,f:f}})});LIGHTS.forEach(function(l){applyMix(l[0])})}
+function applyMix(k){if(!A||!A.busT)return;var m=mixOf(k),now=A.ctx.currentTime;[A.busT[k],A.busD[k]].forEach(function(b){if(!b)return;b.g.gain.setTargetAtTime(m.vol,now,0.05);b.f.frequency.setTargetAtTime(softHz(m.soft),now,0.05)})}
+function saveMix(){try{localStorage.setItem('eartank-mix',JSON.stringify(MIX))}catch(e){}}
+var CUR=null,T0=0;function as(k,t,fn){var pc=CUR,pt=T0;CUR=k;T0=t;try{fn()}finally{CUR=pc;T0=pt}}
+function sp(k){return mixOf(k).speed}
+var DESTO=null;var DEMO=false;function dest(){if(DESTO)return DESTO;if(CUR&&A.busT){var b=(DEMO?A.busD:A.busT)[CUR];if(b)return b.g}return DEMO?A.lp:A.tank}
+function stretch(t,ms){if(CUR&&STRETCH_K[CUR]){var v=sp(CUR);return [T0+(t-T0)/v,ms/v]}return [t,ms]}
+function burst(hz,q,ms,gain,at,type){ // short filtered noise
+  var ctx=A.ctx,t=at||ctx.currentTime,st_=stretch(t,ms);t=st_[0];ms=st_[1];var s=ctx.createBufferSource();s.buffer=A.noise;s.loop=true;
+  var f=ctx.createBiquadFilter();f.type=type||'bandpass';f.frequency.value=hz;f.Q.value=q;
+  var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.012);g.gain.exponentialRampToValueAtTime(0.0005,t+ms/1000+0.012);
+  s.connect(f);f.connect(g);g.connect(dest());s.start(t);s.stop(t+ms/1000+0.04);
+}
+function tone(hz,ms,gain,at,type,to){
+  var ctx=A.ctx,t=at||ctx.currentTime,st_=stretch(t,ms);t=st_[0];ms=st_[1];var o=ctx.createOscillator();o.type=type||'triangle';o.frequency.setValueAtTime(hz,t);if(to)o.frequency.exponentialRampToValueAtTime(to,t+ms/1000);
+  var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.003);g.gain.exponentialRampToValueAtTime(0.0005,t+ms/1000);
+  o.connect(g);g.connect(dest());o.start(t);o.stop(t+ms/1000+0.02);
+}
+function sweep(from,to,sec,gain,at,q){var ctx=A.ctx,t=at||ctx.currentTime,s=ctx.createBufferSource();s.buffer=A.noise;s.loop=true;var f=ctx.createBiquadFilter();f.type='bandpass';f.Q.value=q||1;f.frequency.setValueAtTime(from,t);f.frequency.exponentialRampToValueAtTime(to,t+sec);var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.15);g.gain.linearRampToValueAtTime(0,t+sec);s.connect(f);f.connect(g);g.connect(dest());s.start(t);s.stop(t+sec+0.05)}
+function water(W,at,dir){ /* soft filtered noise with a slow wobble; dir -1 pitch sinks (drain), +1 rises (refill) */
+  var ctx=A.ctx,t=at||ctx.currentTime,s=ctx.createBufferSource();s.buffer=A.noise;s.loop=true;
+  var f=ctx.createBiquadFilter();f.type='bandpass';f.Q.value=W.q;f.frequency.setValueAtTime(W.hz*(dir<0?1.3:0.8),t);f.frequency.exponentialRampToValueAtTime(W.hz*(dir<0?0.8:1.3),t+W.s);
+  var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(W.gain,t+0.5);g.gain.setValueAtTime(W.gain,t+W.s-0.6);g.gain.linearRampToValueAtTime(0,t+W.s);
+  var lfo=ctx.createOscillator(),lg=ctx.createGain();lfo.frequency.value=W.wob;lg.gain.value=W.gain*0.5;lfo.connect(lg);lg.connect(g.gain);lfo.start(t);lfo.stop(t+W.s);
+  s.connect(f);f.connect(g);g.connect(dest());s.start(t);s.stop(t+W.s+0.05)}
+var WC='T';
+function pourSound(kind,t){var ctx=A.ctx,i;t=t||ctx.currentTime+0.05;
+  if(kind==='T'){/* the old water glugs out, nothing else */var P=SOUND.tap,gn=Math.round(rnd(P.glugsLo,P.glugsHi)),gt=t;for(i=0;i<gn;i++){var gh=P.hz*rnd(0.75,1.3),gg=P.gain*rnd(0.6,1)*(i>gn-3?0.6:1);tone(gh,P.ms*rnd(0.8,1.3),gg,gt,'sine',gh*rnd(1.4,1.8));if(Math.random()<0.4)tone(gh*1.5,P.ms*0.6,gg*0.4,gt+0.03,'sine',gh*2.2);gt+=rnd(P.gapLo,P.gapHi)}return}
+  if(kind==='A'){var Pp=SOUND.pour;water(Pp.drain,t,-1);water(Pp.fill,t+Pp.drain.s+0.2,1)}
+  else if(kind==='B'){var B=SOUND.pourB;water({gain:B.bed,hz:900,q:0.5,s:B.s,wob:6},t,1);for(i=0;i<B.n;i++){var u=i/B.n,bh=B.hz*rnd(0.7,1.4);tone(bh,B.ms,B.gain*Math.sin(u*Math.PI)*rnd(0.5,1),t+u*B.s+rnd(0,0.05),'sine',bh*B.rise)}}
+  else if(kind==='C'){var Cc=SOUND.pourC;water({gain:Cc.bed,hz:Cc.bedHz,q:0.7,s:Cc.s,wob:3},t,1);for(i=0;i<Cc.n;i++){var u=Math.pow(Math.random(),0.7),ch=Cc.hz*rnd(0.7,1.3);tone(ch,Cc.ms,Cc.gain*Math.sin(u*Math.PI)*rnd(0.5,1),t+u*Cc.s,'sine',ch*0.5)}}
+  else{var D=SOUND.pourD;for(i=0;i<D.glugs;i++){var gh=D.hz*rnd(0.8,1.2);tone(gh,D.ms,D.gain,t+i*D.s/D.glugs,'sine',gh*1.5)}water(D.fill,t+D.s,1)}
+}
+function chime(){if(audio())tone(880,120,0.05)}
+function tankSt(){return S||{nh3:0,no2:0,scape:buildScape,moss:0}}
+function surfaces(){var st=tankSt(),c={rock:0,wood:0,moss:0,plant:0},i;for(i=0;i<st.scape.length;i++){var k=st.scape[i];if(k===1)c.rock++;else if(k===2)c.wood++;else if(k===3)c.moss++;else if(k===4)c.plant++}c.moss+=st.moss*2;return c}
+function pickSurface(){var c=surfaces(),tot=c.rock+c.wood+c.moss+c.plant+1,r=Math.random()*tot;if((r-=c.rock)<0)return 'rock';if((r-=c.wood)<0)return 'wood';if((r-=c.moss)<0)return 'moss';if((r-=c.plant)<0)return 'plant';return 'glass'}
+var HIT={};
+function shrimpHz(s,base){return base*(1+(((s.id*7919)%100)/100-0.5)*2*SOUND.eat.jitter)}
+/* activity 0..1: how much this shrimp is eating right now. Food on the floor: 1. No food: biofilm only, fades as it gets hungry. */
+function activity(s){var st=tankSt();if(st.food>0.02)return 1;return Math.max(0,0.35-s.hunger*0.6)}
+function eatSound(s,at,force){var z=sizeOf(s);as(z==='adult'?'eatA':z==='juv'?'eatJ':'eatB',at||A.ctx.currentTime,function(){eatSound0(s,at,force)})}
+function eatSound0(s,at,force){HIT[s.id]=Date.now();
+  var E=SOUND.eat,sz=sizeOf(s),P=E[sz],st=tankSt(),bad=st.nh3+st.no2*0.7,ctx=A.ctx,t=at||ctx.currentTime,hz=shrimpHz(s,P.hz);lit(sz==='adult'?'eatA':sz==='juv'?'eatJ':'eatB',t,0.3);
+  var ms=bad>0.3?Math.min(P.ms,E.stressMs):P.ms, n=force?P.n:Math.max(2,Math.round(P.n*(0.6+Math.random()*0.8)));
+  var gap=P.gap/ (s.rate||1);
+  for(var i=0;i<n;i++)tone(hz*rnd(0.97,1.03),ms,E.gain*(sz==='baby'?0.55:sz==='juv'?0.8:1)*(1-i*0.12),t+i*gap,P.type);
+  var sf=pickSurface();
+  if(sf==='wood')tone(330,55,E.surface*1.3,t,'triangle',260);
+  else if(sf==='moss'){tone(hz*0.5,40,E.surface*0.6,t,'sine');tone(hz*0.5,40,E.surface*0.5,t+0.05,'sine')}
+  else if(sf==='rock')tone(hz*2.4,25,E.surface*0.8,t,'sine');
+  if(s.berried>0){as('eggs',t,function(){tone(hz,ms,E.gain*0.8,t+n*gap+SOUND.berried.gapMs/1000,'triangle')});lit('eggs',t,0.4)}
+}
+function idleSound(s,at,gain){HIT[s.id]=Date.now();lit('idle',at,0.2);var I=SOUND.idle;var hz=I.hz*(sizeOf(s)==='baby'?1.4:1);as('idle',at,function(){tone(hz,I.ms,(gain==null?1:gain)*I.gain,at,'sine',hz*0.8)})}
+function swimSound(s,at,kind){HIT[s.id]=Date.now();var W=SOUND.swim,sz=sizeOf(s),k=sz==='baby'?1.8:sz==='juv'?1.3:1,ctx=A.ctx,t=at||ctx.currentTime;
+  var long=kind==='long'||(kind==null&&Math.random()<W.longP),sec=(long?W.long.s:W.short.s)/(sz==='baby'?1.6:1);lit(long?'swimL':'swimS',t,sec);
+  var n=ctx.createBufferSource();n.buffer=A.noise;n.loop=true;var f=ctx.createBiquadFilter();f.type='bandpass';f.Q.value=1.2;
+  f.frequency.setValueAtTime(W.lo*k,t);f.frequency.exponentialRampToValueAtTime(W.hi*k,t+sec*0.35);f.frequency.exponentialRampToValueAtTime(W.lo*k*0.8,t+sec);
+  var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(W.gain*(sz==='baby'?0.5:1),t+sec*0.25);g.gain.linearRampToValueAtTime(0,t+sec);
+  if(long){var lfo=ctx.createOscillator(),lg=ctx.createGain();lfo.frequency.value=W.long.wob;lg.gain.value=W.gain*0.4;lfo.connect(lg);lg.connect(g.gain);lfo.start(t);lfo.stop(t+sec)}
+  as(long?'swimL':'swimS',t,function(){n.connect(f);f.connect(g);g.connect(dest())});n.start(t);n.stop(t+sec+0.05)}
+function shrimpTick(s,at){eatSound(s,at,true)}
+function evKey(e){return e.k==='death'?((e.d.age==null||e.d.age>=60)?'deathA':'deathB'):e.k==='berried'?'eggs':e.k}
+function playEv(e){var t=A.ctx.currentTime+0.05,k=evKey(e);lit(k,t,(e.k==='pour'?4:e.k==='feed'?1.6:e.k==='babies'?1:0.8)/(STRETCH_K[k]?sp(k):1));as(k,t,function(){playEv0(e,t)})}
+function playEv0(e,t){
+  var ctx=A.ctx,i;
+  if(e.k==='molt'){tone(SOUND.molt.from,SOUND.molt.s*1000,SOUND.molt.gain,t,'sine',SOUND.molt.to)}
+  else if(e.k==='moltfail'){var Mf=Object.assign({},SOUND.molt.fail),mfv=sp('moltfail');Mf.s/=mfv;var ctx2=A.ctx,o=ctx2.createOscillator(),og=ctx2.createGain(),lf=ctx2.createOscillator(),lfg=ctx2.createGain();
+    /* the slide starts, shakes and stops halfway, then a heavy knock */
+    o.type='sine';o.frequency.setValueAtTime(SOUND.molt.from,t);o.frequency.exponentialRampToValueAtTime(SOUND.molt.from*0.6,t+Mf.s);lf.frequency.value=Mf.wob;lfg.gain.value=60;lf.connect(lfg);lfg.connect(o.frequency);
+    og.gain.setValueAtTime(0,t);og.gain.linearRampToValueAtTime(Mf.gain,t+0.02);og.gain.setValueAtTime(Mf.gain,t+Mf.s-0.05);og.gain.linearRampToValueAtTime(0,t+Mf.s);o.connect(og);og.connect(dest());o.start(t);o.stop(t+Mf.s+0.02);lf.start(t);lf.stop(t+Mf.s+0.02);
+    tone(Mf.knock,Mf.knockMs,Mf.gain,t+Mf.s*mfv+0.15*mfv,'triangle',Mf.knock*0.7);tone(Mf.knock*0.5,Mf.knockMs*1.2,Mf.gain*0.5,t+Mf.s*mfv+0.16*mfv,'sine')}
+  else if(e.k==='babies'){for(i=0;i<SOUND.babies.n;i++)tone(SOUND.babies.hz*rnd(0.9,1.15),30,SOUND.babies.gain,t+Math.random()*SOUND.babies.span,'sine')}
+  else if(e.k==='feed'){feedSound(t);cluster=ctx.currentTime+SOUND.feed.clusterS}
+  else if(e.k==='pour'){pourSound(WC,t)}
+  else if(e.k==='death'){var Dd=SOUND.death,ag=Math.min(1,Math.max(0,((e.d.age==null?200:e.d.age)-10)/90)),dg=Dd.baby.gain+(Dd.adult.gain-Dd.baby.gain)*ag,dh=Dd.baby.hz*Math.pow(Dd.adult.hz/Dd.baby.hz,ag),dm=Dd.baby.ms+(Dd.adult.ms-Dd.baby.ms)*ag;
+    tone(dh,dm,dg,t,'triangle',dh*0.75);if(ag>0.5)tone(dh*0.5,dm*1.3,dg*0.5,t+0.02,'sine',dh*0.4)}
+  else if(e.k==='berried'){var sh=S.shrimp.filter(function(x){return x.id===e.d.id})[0];if(sh)shrimpTick(sh,t)}
+  // name it once in speech the first time
+  var names={moltfail:'That broken slide and knock is a failed molt.',molt:'That slide is a molt.',babies:'Those high ticks are babies.',berried:'That double tick is a female carrying eggs.',death:'That low tap is a death.',feed:'That is food going in.',pour:'That is the water change.'};
+  if(names[e.k]&&!S.seen[e.k]){S.seen[e.k]=1;save();setTimeout(function(){speak(names[e.k])},700)}
+}
+function drain(){
+  if(!A||A.ctx.state!=='running'||teachOn)return;
+  var now=A.ctx.currentTime;
+  if(evq.length>12){ // a catch-up pile: one death tap, one summary, drop the rest
+    var deaths=evq.filter(function(e){return e.k==='death'}).length;
+    evq=[];if(deaths)evq.push({k:'death',d:{}});
+  }
+  var k=0;while(evq.length&&k++<4){var e=evq.shift();(function(e){setTimeout(function(){if(A&&A.ctx.state==='running')playEv(e)},Math.random()*900)})(e)}
+}
+function sched(){ // every 100 ms
+  if(PAUSED)return;
+  if(!A||A.ctx.state!=='running'||!S||teachOn)return;
+  var ctx=A.ctx,now=ctx.currentTime,look=now+0.25,R=SOUND.room;
+  // room tone follows the model
+  var tempo=R.bubbleEvery*(1-R.tempSpan*(S.temp-24)/4)*(1+R.clogSlow*S.clog);
+  A.flowG.gain.setTargetAtTime(SOUND.flow.gain*(1-0.5*S.clog),now,0.8);A.trickG.gain.setTargetAtTime(SOUND.flow.trickle.gain*(1-0.6*S.clog),now,0.8);
+  /* the water pulse */
+  var Pu=SOUND.pulse,wz=waterZone(),badness=wz/2,every=zoneGap(wz),phz=Pu.hzGood+(Pu.hzBad-Pu.hzGood)*badness;
+  if(!A.nextPulse)A.nextPulse=now+1;
+  var quiet=now<(A.quietUntil||0);
+  var Fo=SOUND.fountain,FP=fpOf(FOUNT),frate=Fo.rate*(1+Fo.swell*Math.sin(now*2*Math.PI*Fo.swellHz))*(1-0.6*S.clog),dsp=sp('drop');
+  if(!A.nextDrop)A.nextDrop=now+0.2;if(FOUNT==='off'||FOUNT==='brook'){A.nextDrop=look+0.05}
+  while(A.nextDrop<look){var at=A.nextDrop;as('drop',at,function(){filterEvent(FOUNT,at,FP)});
+    A.nextDrop+=-Math.log(1-Math.random())/Math.max(0.2,(FRATE[FOUNT]||frate)*FP.dens*dsp*(1-0.5*S.clog))}
+  if(FOUNT==='brook'){if(Math.random()<0.1)lit('drop',now,0.12);A.brookBP.forEach(function(x){x[0].frequency.setTargetAtTime(x[1][0]*FP.pitch,now,0.2);x[0].Q.setTargetAtTime(SOUND.brook.q/FP.size,now,0.2)});A.brookMod.forEach(function(x){x[0].frequency.setTargetAtTime(x[1][2]*FP.dens*dsp,now,0.2)})}
+  var bedL={trickle:SOUND.trickle.bed,bubbler:SOUND.bubbler.bed,rain:0.07,drip:0.03}[FOUNT]||0;A.bedG.gain.setTargetAtTime(bedL*FP.bed*(1-0.5*S.clog),now,0.5);A.brookG.gain.setTargetAtTime(FOUNT==='brook'?SOUND.brook.gain*FP.bed*(1-0.5*S.clog):0,now,0.5);
+  while(A.nextPulse<look){if(!quiet&&BEEP.style!=='off'){lit('beep',A.nextPulse,0.25);beepAt(phz,A.nextPulse,Pu.gain*(1+badness*0.6),badness)}A.nextPulse+=every/sp('beep')}
+  if(A.nextPulse>now+every+0.3)A.nextPulse=now+every; /* the rate sped up: don't wait out the old gap */
+  while(A.nextBubble<look){var bh=R.bubbleHz*(1-R.clogDull*S.clog)*rnd(0.85,1.15);tone(bh,R.bubbleMs,R.bubbleGain*rnd(0.5,1),A.nextBubble,'sine',bh*R.bubbleRise);A.nextBubble+=tempo*rnd(0.85,1.15)}
+  var bad=Math.min(1,S.nh3+S.no2*0.7);
+  var Hs=SOUND.hiss,amm=S.nh3+S.no2*0.5;if(LEL.hiss){var hon=amm>=0.08&&!quiet;LEL.hiss.classList.toggle('warm',hon);LEL.hiss.style.opacity=hon?Math.min(1,0.45+amm):'';}A.hissG.gain.setTargetAtTime(amm<0.08||quiet?0:Hs.gain+(Hs.max-Hs.gain)*Math.pow(Math.min(1,(amm-0.08)/Hs.full),1.2),now,1);
+  A.lp.frequency.setTargetAtTime(SOUND.dull.clearHz-(SOUND.dull.clearHz-SOUND.dull.oldHz)*Math.min(1,S.no3/SOUND.dull.oldAt),now,1.5);
+  // shrimp voices
+  var E=SOUND.eat,mul=now<cluster?SOUND.feed.clusterMul:1,i,s;
+  var NV=quiet?0:Math.min(50,S.shrimp.length); /* at most 50 voices */
+  for(i=0;i<NV;i++){
+    s=S.shrimp[i];var v=A.voices[s.id];
+    if(!v){v=A.voices[s.id]={at:now+Math.random()*E.every,idle:now+Math.random()*SOUND.idle.every,swim:now+Math.random()*SOUND.swim.every}}
+    var act=activity(s);
+    /* eating: at the shrimp's own pace, more often with food down; a quiet shrimp skips turns */
+    while(v.at<look){if(Math.random()<act)eatSound(s,v.at);var zk=sizeOf(s),every=E.every/(s.rate||1)*mul/sp(zk==='adult'?'eatA':zk==='juv'?'eatJ':'eatB');v.at+=every*rnd(0.5,1.6)}
+    /* stationary: a faint flick, more of them as the eating goes */
+    while(v.idle<look){idleSound(s,v.idle,1-act*0.7);v.idle+=SOUND.idle.every*rnd(0.5,1.8)/sp('idle')}
+    /* swimming: a dart now and then, a lot more in the minute after feeding */
+    while(v.swim<look){swimSound(s,v.swim);v.swim+=SOUND.swim.every*(now<cluster?SOUND.swim.feedMul:1)*rnd(0.4,1.8)*2/(sp('swimS')+sp('swimL'))}
+  }
+  for(var id in A.voices)if(!S.shrimp.some(function(x){return x.id==id}))delete A.voices[id];
+  drain();
+}
+var PAUSED=false,MUTED=false,buildScape=[],teachOn=false,SOLO=true,TANK=true,soloT=0;
+function setVol(v){vol=v;if(A)A.master.gain.setTargetAtTime(MUTED?0:SOUND.master*vol,A.ctx.currentTime,0.1)}
+function tankLevel(){if(!A)return;var now=A.ctx.currentTime;A.tank.gain.setTargetAtTime(!TANK||PAUSED||now<soloT?0:1,now,0.15)}
+  var PICRUN=null;
+  function picStop(){if(!PICRUN)return;var now=A.ctx.currentTime;PICRUN.osc.forEach(function(o){try{o[1].gain.cancelScheduledValues(now);o[1].gain.setTargetAtTime(0,now,0.03);o[0].stop(now+0.3)}catch(e){}});PICRUN.nodes.forEach(function(n){try{n.disconnect()}catch(e){}});PICRUN.timers.forEach(clearTimeout);PICRUN=null;soloT=0;tankLevel();0}
+  /* one cell's sound for a struck timbre */
+  function picHit(snd,hz,g,at,dur,out){var ctx=A.ctx,o=ctx.createOscillator(),e=ctx.createGain();o.connect(e);e.connect(out);
+    if(snd==='pluck'){o.type='triangle';o.frequency.value=hz;e.gain.setValueAtTime(0,at);e.gain.linearRampToValueAtTime(g*1.6,at+0.004);e.gain.exponentialRampToValueAtTime(0.0005,at+Math.min(dur,0.6));o.start(at);o.stop(at+Math.min(dur,0.6)+0.02)}
+    else if(snd==='chime'){o.type='sine';o.frequency.value=hz;e.gain.setValueAtTime(0,at);e.gain.linearRampToValueAtTime(g*1.4,at+0.003);e.gain.exponentialRampToValueAtTime(0.0005,at+Math.min(dur,0.9));o.start(at);o.stop(at+Math.min(dur,0.9)+0.02);var o2=ctx.createOscillator(),e2=ctx.createGain();o2.frequency.value=hz*2.76;e2.gain.setValueAtTime(0,at);e2.gain.linearRampToValueAtTime(g*0.4,at+0.003);e2.gain.exponentialRampToValueAtTime(0.0005,at+Math.min(dur,0.4));o2.connect(e2);e2.connect(out);o2.start(at);o2.stop(at+Math.min(dur,0.4)+0.02)}
+    else if(snd==='bell'){o.type='sine';o.frequency.value=hz;e.gain.setValueAtTime(0,at);e.gain.linearRampToValueAtTime(g*1.2,at+0.002);e.gain.exponentialRampToValueAtTime(0.0005,at+Math.max(dur,0.8));o.start(at);o.stop(at+Math.max(dur,0.8)+0.02);var o3=ctx.createOscillator(),e3=ctx.createGain();o3.frequency.value=hz*2.0;e3.gain.setValueAtTime(0,at);e3.gain.linearRampToValueAtTime(g*0.5,at+0.002);e3.gain.exponentialRampToValueAtTime(0.0005,at+0.5);o3.connect(e3);e3.connect(out);o3.start(at);o3.stop(at+0.52)}
+    else if(snd==='knock'){o.disconnect();var n=Math.max(1,Math.round(dur/0.2));for(var i=0;i<n;i++){var ok=ctx.createOscillator(),ek=ctx.createGain(),tk=at+i*dur/n;ok.type='triangle';ok.frequency.setValueAtTime(hz,tk);ok.frequency.exponentialRampToValueAtTime(hz*0.8,tk+0.06);ek.gain.setValueAtTime(0,tk);ek.gain.linearRampToValueAtTime(g*1.5,tk+0.003);ek.gain.exponentialRampToValueAtTime(0.0005,tk+0.07);ok.connect(ek);ek.connect(out);ok.start(tk);ok.stop(tk+0.09)}}}
+  /* play the picture: only one type when solo is given */
+  function picPlay(solo){if(!audio())return;picStop();var ctx=A.ctx,P=SOUND.pic,G=picGrid(),C=PICS.cols,R=PICS.rows,dur=PICS.secs/C,t=ctx.currentTime+0.12,run={osc:[],timers:[],nodes:[]},end=t+PICS.secs;PICRUN=run;soloT=end+0.6;tankLevel();
+    var bus=ctx.createGain();bus.gain.value=1;bus.connect(A.lp);run.nodes.push(bus);
+    PIC_TYPES.forEach(function(T){var k=T[0],st=PICS.types[k];if(!st||st.snd==='off'||(solo&&solo!==k))return;var tg=ctx.createGain();tg.gain.value=st.vol;tg.connect(bus);run.nodes.push(tg);
+      for(var r=0;r<R;r++){var hz=PICS.lo*Math.pow(PICS.hi/PICS.lo,R>1?(R-1-r)/(R-1):0.5)*st.oct;if(hz>9000)continue;
+        if(st.snd==='sine'||st.snd==='tri'||st.snd==='square'||st.snd==='hum'){var o=ctx.createOscillator(),g=ctx.createGain(),out=g;o.type=st.snd==='tri'?'triangle':st.snd==='square'?'square':'sine';o.frequency.value=hz;
+            if(st.snd==='square'){var lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=Math.min(8000,hz*3);g.connect(lp);lp.connect(tg);run.nodes.push(lp)}else g.connect(tg);
+            if(st.snd==='hum'){var v=ctx.createOscillator(),vg=ctx.createGain();v.frequency.value=5+r%3;vg.gain.value=hz*0.012;v.connect(vg);vg.connect(o.frequency);v.start(t);v.stop(end+0.3);run.osc.push([v,vg])}
+            g.gain.value=0;o.connect(g);o.start(t);o.stop(end+0.3);run.osc.push([o,g]);var any=false;
+            for(var c=0;c<C;c++){var val=G[k][c][r];g.gain.setTargetAtTime(val*P.gain,t+c*dur,0.015);if(val>0)any=true}g.gain.setTargetAtTime(0,end,0.03);if(!any){try{o.stop()}catch(e){}}}
+        else{for(var c2=0;c2<C;c2++){var v2=G[k][c2][r];if(v2>0.002)picHit(st.snd,hz,v2*P.gain,t+c2*dur,dur,tg)}}}});
+    for(var c3=0;c3<C;c3++){if(PICS.tick){DEMO=true;tone(2400,12,P.tick,t+c3*dur,'sine');DEMO=false}(function(c){run.timers.push(setTimeout(function(){0},Math.max(0,(t+c*dur-ctx.currentTime)*1000)))})(c3)}
+    run.timers.push(setTimeout(function(){if(PICRUN===run){PICRUN=null;0}},(PICS.secs+0.4)*1000))}
+  function demoKey(k){if(!audio())return;var t=A.ctx.currentTime+0.05;
+    if(k==='drop'||k==='plop'||k==='hiss'){soloT=0;A.quietUntil=A.ctx.currentTime+5;tankLevel();if(k==='hiss'){var hs=A.ctx.createBufferSource();hs.buffer=A.noise;hs.loop=true;var hp=A.ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=SOUND.hiss.hz;hp.Q.value=SOUND.hiss.q;var hg=A.ctx.createGain();hg.gain.setValueAtTime(0,t);hg.gain.linearRampToValueAtTime(SOUND.hiss.max*0.6,t+0.6);hg.gain.setValueAtTime(SOUND.hiss.max*0.6,t+3);hg.gain.linearRampToValueAtTime(0,t+3.6);hs.connect(hp);hp.connect(hg);hg.connect(A.busD.hiss.g);hs.start(t);hs.stop(t+3.7)}return}
+    soloT=t+3.5;tankLevel();DEMO=true;
+    var fake={eatA:200,eatJ:50,eatB:10,idle:200,swimS:200,swimL:200,eggs:200};
+    if(k==='eatA'||k==='eatJ'||k==='eatB'){eatSound({id:950,age:fake[k],hunger:0.2,berried:0,rate:1},t,true);eatSound({id:950,age:fake[k],hunger:0.2,berried:0,rate:1},t+0.9,true)}
+    else if(k==='eggs')eatSound({id:951,age:200,hunger:0.2,berried:10,rate:1},t,true);
+    else if(k==='idle'){idleSound({id:952,age:200},t,1);idleSound({id:952,age:200},t+0.7,1)}
+    else if(k==='swimS'||k==='swimL'){swimSound({id:953,age:200},t,k==='swimL'?'long':'short');swimSound({id:953,age:200},t+1.3,k==='swimL'?'long':'short')}
+    else if(k==='beep'){for(var i=0;i<4;i++)beepAt(SOUND.pulse.hzGood,t+i*1.2/sp('beep'),SOUND.pulse.gain,0)}
+    else{var seen=S?S.seen:null;if(S)S.seen=Object.assign({},S.seen,{molt:1,moltfail:1,babies:1,death:1,feed:1,pour:1});var cl=cluster,ek={deathA:['death',{age:200}],deathB:['death',{age:5}],eggs:['berried',{}]}[k]||[k,{}];playEv({k:ek[0],d:ek[1]});cluster=cl;if(S)S.seen=seen}
+    DEMO=false}
+/* ---------- the game's ear tank (Pass 257) ----------
+   A clean 5-shrimp tank, 3 females, the default decor, a cycled filter. A day in 5 seconds, its own clock, only while this page shows.
+   Feed, Change water (it rinses the filter too), Hear the tank. The ? lists every sound to tap. */
+var DAY_S=5;
+function post(m){try{m.ear=1;parent.postMessage(m,'*')}catch(e){}}
+function fresh(){newState([2,0,1,0,3,0,0,1,4,0,0,3],5,'');S.no3=0;S.shrimp.forEach(function(x,i){x.sex=i<3?'f':'m';x.age=rnd(90,200)});S.food=0.3;S.taught=true;save();if(A)A.voices={};evq=[]}
+var SOUNDS=[['drop','The filter','An air stone. It runs all the time, softer when it needs a rinse.'],['beep','Monitor beep','Slow when the water is clean, faster as it gets dirty. Fast means change water.'],['hiss','Hiss','Ammonia, from food rotting. Feed less and change water.'],
+ ['eatA','Adult eating','A grown shrimp picking at food.'],['eatJ','Young eating','The same, smaller and higher.'],['eatB','Baby eating','Tiny and very high.'],['idle','Sitting still','A faint flick, a shrimp resting.'],
+ ['swimS','Swim, short','A quick dart.'],['swimL','Swim, long','A long swim, there are more right after you feed.'],['eggs','Eggs','A female carrying eggs.'],['molt','Molt','A shrimp leaves its old shell. Normal.'],
+ ['moltfail','Failed molt','It got stuck. Too many water changes in a week, or bad water.'],['babies','Babies hatch','New babies.'],['deathB','Baby death','A baby died. Some always do.'],['deathA','Adult death','An adult died, old age or bad water.'],
+ ['feed','Feeding','Food going in.'],['pour','Water change','A third of the water out, new water in.'],['p:wood','Wood','From Hear the tank, the driftwood. A low bell.'],['p:stone','Stones','From Hear the tank, the rocks. Buzzy.'],['p:plant','Plants','From Hear the tank, the plants. A high hum.']];
+function helpHTML(){return SOUNDS.map(function(s){return '<button class="snd" data-k="'+s[0]+'"><b>'+s[1]+'</b><span>'+s[2]+'</span></button>'}).join('')}
+function wake(){var a=audio();if(!a)return null;if(a.ctx.state!=='running')a.ctx.resume();return a}
+function hear(k){if(!wake())return;if(k.indexOf('p:')===0)picPlay(k.slice(2));else demoKey(k)}
+function line(){if(!S)return;var n=S.shrimp.length;$('day').textContent='Day '+(Math.floor(S.day)+1)+', '+n+(n===1?' shrimp':' shrimp');$('again').hidden=n>0}
+function start(){
+ if(!load())fresh();S.last=Date.now();lastReal=Date.now();line();
+ $('help-list').innerHTML=helpHTML();
+ document.body.addEventListener('pointerdown',wake);document.body.addEventListener('keydown',wake);
+ $('b-feed').onclick=function(){wake();doJob('feed');save();speak('Fed.');post({type:'care',k:'feed'})};
+ $('b-water').onclick=function(){wake();doJob('water');S.clog=0;save();speak('A third of the water changed, and the filter rinsed.');post({type:'care',k:'water'})};
+ $('b-hear').onclick=function(){if(!wake())return;picPlay(null);speak('Left to right: wood is the bell, stones buzz, plants hum. High is the top of the tank.')};
+ $('b-help').onclick=function(){var h=$('help'),on=h.hidden;h.hidden=!on;this.setAttribute('aria-expanded',on)};
+ $('b-back').onclick=function(){save();if(A)A.ctx.suspend();post({type:'back'})};
+ $('again').onclick=function(){fresh();line();speak('A new tank, 5 shrimp.')};
+ $('help-list').onclick=function(e){var b=e.target.closest('[data-k]');if(b)hear(b.dataset.k)};
+ setInterval(function(){if(document.hidden||PAUSED){lastReal=Date.now();return}var now=Date.now(),dt=(now-lastReal)/1000;lastReal=now;if(dt<0||dt>5)dt=0.25;advance(dt*24/DAY_S);line();if(Math.random()<0.05)save()},250);
+ setInterval(sched,100);
+ document.addEventListener('visibilitychange',function(){if(document.hidden){if(A)A.ctx.suspend();if(S)save()}else{lastReal=Date.now();if(A&&!PAUSED)A.ctx.resume()}});
+ window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game)return;if(d.type==='vis'){PAUSED=!d.on;lastReal=Date.now();if(A){if(d.on)A.ctx.resume();else A.ctx.suspend()}if(!d.on&&S)save()}});
+ post({type:'ready'});
+}
+start();
+</script></body></html>
