@@ -3279,9 +3279,14 @@ var TREE_ORDER=['island','rewild','lastmile','lab','shop'];
 /* Pass 234: a step's cost; mD/iD are days of income (money, ✦), never under the fixed m/i */
 function treeCost(G,st){var m=st.m||0,i=st.i||0;if(st.mD)m=Math.max(m,incRef(G)*st.mD);if(st.iD)i=Math.max(i,infIncome(G)*st.iD);return [Math.round(m),Math.round(i)];}
 function treeStep(G,id){var r=null;TREE_ORDER.forEach(function(k){TREES[k].steps.forEach(function(s){if(s.id===id)r={k:k,s:s};});});return r;}
-function treeNext(G,k){var T=TREES[k],E=G.emp;if(!treeHas(G,k))return null;return T.steps.filter(function(s){return !(E.tree&&E.tree[s.id])&&!(E.treeNo&&E.treeNo[s.id]);})[0]||null;}
+// Pass 256 (Puti): Not now sends a letter or a tree step away for 90 days to 3 years, then the same one (or its cousin) writes again; the traits move on the first no and half as much each time after
+var NO_BACK=[90,1095];function noBack(){return NO_BACK[0]+Math.floor(Math.random()*(NO_BACK[1]-NO_BACK[0]+1));}
+function noPush(G,tr,n){var neg={},f=1/Math.pow(2,n||0);Object.keys(tr||{}).forEach(function(k){if(k==='know')neg[k]=-tr[k]*f;else if(k==='care'||k==='kin')neg[k]=-tr[k]/2*f;});trAdd(G,neg);}
+function treeBackDay(E,id){if(!E.treeNo||E.treeNo[id]==null)return null;return E.treeBack&&E.treeBack[id]!=null?E.treeBack[id]:E.treeNo[id]+365;}
+function treeWhy(G,id){var E=G.emp,r=treeStep(G,id);if(!r)return 'That step is gone';if(frozen(G))return 'Accounts are frozen';if(E.tree&&E.tree[id])return 'Already funded';if(treeNext(G,r.k)!==r.s)return 'Not the next step yet';var c=treeCost(G,r.s);if(G.money<c[0])return 'Not enough cash';if(E.inf<c[1])return 'Not enough ✦';return 'Not enough cash for the dues';}
+function treeNext(G,k){var T=TREES[k],E=G.emp;if(!treeHas(G,k))return null;var s=T.steps.filter(function(s){return !(E.tree&&E.tree[s.id]);})[0];if(!s)return null;var b=treeBackDay(E,s.id);return b!=null&&Math.floor(G.day)<b?null:s;}/* one step per tree: a step you said Not now to holds the tree until it writes again */
 /* Pass 255 (Puti): a tree step is a letter, Fund or Not now. Not now skips that step for good and the next one writes. */
-function treeDecline(G,id){var E=G.emp,r=treeStep(G,id);if(!r||treeNext(G,r.k)!==r.s)return false;(E.treeNo||(E.treeNo={}))[id]=Math.floor(G.day);var neg={};Object.keys(r.s.tr||{}).forEach(function(k){if(k==='know')neg[k]=-r.s.tr[k];else if(k==='care'||k==='kin')neg[k]=-r.s.tr[k]/2;});trAdd(G,neg);return true;}
+function treeDecline(G,id){var E=G.emp,r=treeStep(G,id);if(!r||treeNext(G,r.k)!==r.s)return false;var n=(E.treeNn||(E.treeNn={}))[id]||0;(E.treeNo||(E.treeNo={}))[id]=Math.floor(G.day);(E.treeBack||(E.treeBack={}))[id]=Math.floor(G.day)+noBack();E.treeNn[id]=n+1;noPush(G,r.s.tr,n);return true;}
 function buyTreeStep(G,id){var E=G.emp,r=treeStep(G,id);if(!r||frozen(G)||treeNext(G,r.k)!==r.s)return false;var tc=treeCost(G,r.s),m=tc[0],i=tc[1];if(G.money<m||E.inf<i)return false;if(r.s.dues&&G.money<dayIncome(G)*r.s.dues[0]*30)return false;
  if(r.s.dues)duesAdd(G,r.s.dues[0],r.s.dues[1],'tree:'+id);// Pass 203: lifelines are a share of income for years
  if(m)pay(G,m,'projects');if(i)E.inf-=i;(E.tree||(E.tree={}))[id]=Math.floor(G.day)+1;trAdd(G,r.s.tr);if(r.s.eff)r.s.eff(G);
@@ -3916,7 +3921,7 @@ function propInf(G,o){return o.inf?Math.max(si(G,1000),infIncome(G)*o.inf):0;}
 function propCan(G,o,x){var b=propBuild(G,o,x&&x.grad),i=propInf(G,o),k=propKeep(G,o);if(frozen(G)&&(b||k))return false;if(b&&G.money<b+capitalReserve(G))return false;if(i&&G.emp.inf<i)return false;if(k&&k[0]>0&&G.money<dayIncome(G)*k[0]*30)return false;return true;}
 // who can write in now: the group still has people to reach, the idea isn't open or running, a declined one waits a year or two and comes from someone else
 function propOK(G,H,o,now,grad){var R=propOf(H),fd=(R.f||{})[o.id]||0;if(fd>o.alt.length)return false;/* each cousin once */if(R.open.some(function(x){return x.id===o.id;}))return false;var p=R.run[o.id];if(p&&!p.stop&&!(o.r&&p.r>=p.full-1e-9))return false;if(p&&p.stop&&o.r===0)return false;
- if(R.no[o.id]&&now-R.no[o.id]<365&&!grad)return false;if(o.g){var g=hardGroup(o.g);if(!g||hardReach(G,g)>=0.97)return false;}
+ if(R.no[o.id]&&now<(R.back&&R.back[o.id]!=null?R.back[o.id]:R.no[o.id]+365)&&!grad)return false;if(o.g){var g=hardGroup(o.g);if(!g||hardReach(G,g)>=0.97)return false;}
  if(o.id==='talks'){var P=H.picks.war||{};if(Object.keys(P).some(function(k){var x=hardOp(hardGroup('war'),k);return x&&x.ends;}))return false;if(!Object.keys(R.run).length)return false;}
  if(o.id==='levy'&&!Object.keys(R.run).some(function(k){var q=propDef(k);return q&&q.keep&&q.g;}))return false;/* the levy needs crews to pay */
  if(o.id==='school'&&!Object.keys(R.run).some(function(k){return propDef(k).g==='water';}))return false;
@@ -3933,7 +3938,7 @@ function propFund(G,id){var H=hardOf(G),R=propOf(H),x=R.open.filter(function(q){
  if(id==='talks'){var P=H.picks.war||(H.picks.war={});P.pay={day:now,start:now};}
  trAdd(G,o.tr);var ph=propHeart(o);if(ph){G.emp.heart=(G.emp.heart||0)+ph;trAdd(G,{means:ph*HEART_TR});}
  newsLine(G,propTxt(o,x.alt,o.news));return true;}
-function propDecline(G,id){var H=hardOf(G),R=propOf(H),x=R.open.filter(function(q){return q.id===id;})[0];if(!x)return false;R.open=R.open.filter(function(q){return q.id!==id;});R.no[id]=Math.floor(G.day);var o=propDef(id),neg={};if(o){Object.keys(o.tr).forEach(function(k){if(k==='know')neg[k]=-o.tr[k];else if(k==='care'||k==='kin')neg[k]=-o.tr[k]/2;});trAdd(G,neg);}/* turning it down says something too (PUSH_SKIP rule): growth first in full, own people half: own people over strangers, growth over the class */return true;}
+function propDecline(G,id){var H=hardOf(G),R=propOf(H),x=R.open.filter(function(q){return q.id===id;})[0];if(!x)return false;R.open=R.open.filter(function(q){return q.id!==id;});R.no[id]=Math.floor(G.day);(R.back||(R.back={}))[id]=R.no[id]+noBack();var nn=(R.nn||(R.nn={}))[id]||0;R.nn[id]=nn+1;var o=propDef(id);if(o)noPush(G,o.tr,nn);/* turning it down says something too (PUSH_SKIP rule): growth first in full, own people half: own people over strangers, growth over the class */return true;}
 function propStop(G,id){var H=hardOf(G),R=propOf(H),p=R.run[id],o=propDef(id);if(!p||p.stop||!o)return false;p.stop=Math.floor(G.day);var E=G.emp;if(E.dues)E.dues=E.dues.filter(function(d){return d.k!=='prop:'+id;});
  if(id==='talks'){var P=H.picks.war;if(P&&P.pay)P.pay.ended=1;}if(o.stop)newsLine(G,propTxt(o,p.alt,o.stop));if(G.me&&G.me.hist&&o.g)G.me.hist.push('Grandma asks who '+propName(o,p.alt).who+' is, and why the letter sounds sad.');return true;}
 /* Pass 255 (Puti): a stopped letter can be started again. The crews come back on the same dues, reach goes on from where it fell to. */
@@ -7492,7 +7497,7 @@ function initControls(){
     if(a==='ts-upg'){if(TS&&buyUpgrade(G,G.tanks[TS.i],b.dataset.id)){toast('Installed on '+G.tanks[TS.i].name);cache.upsig=null;renderTankSheet();}return;}
     if(a==='treat-unlock'){if(unlockTreat(G,b.dataset.id)){var tu=TREATS.filter(function(x){return x.id===b.dataset.id;})[0];toast(tu.name+' unlocked. Pick it under Feeding.');cache={};render();}return;}
     if(a==='fw-feed'){var F0=fwOf(G);F0.f=clamp(+b.dataset.i|0,0,FW_FEED.length-1);if(F0.f===3){var V0=G.emp.evil||(G.emp.evil={});if(!V0.culls){V0.culls=1;trAdd(G,{kin:-1});}}cache.efarm=null;render();return;}
-    if(a==='tree-step'){if(buyTreeStep(G,b.dataset.id)){$('treecard').dataset.h='';render();}else toast('Not enough for that yet');return;}
+    if(a==='tree-step'){if(buyTreeStep(G,b.dataset.id)){if(b.closest('#hard-al'))frzTap('hard-al',b,'Funded');$('treecard').dataset.h='';render();save();}else toast(treeWhy(G,b.dataset.id));return;}// Pass 256: the row greys in place (the panel holds still until a scroll, so the old step stayed tappable), and the toast says why
     if(a==='tree-no'){if(treeDecline(G,b.dataset.id)){frzTap('hard-al',b);$('treecard').dataset.h='';render();save();}return;}
     if(a==='gplace'){var wasLand=gplaceNext(G)&&gplaceNext(G).id==='land';if(buyGplace(G)){if(wasLand)try{localStorage.removeItem('shrimp-land-old');}catch(e){}$('me-gplace').dataset.h='';save();render();}return;}
     if(a==='gplace-old'){var lo=landOld();if(!lo||gplaceNext(G).id!=='land')return;if(buyGplace(G,landOldCost(lo))){try{lo.S.gday=null;localStorage.setItem('shrimp-land-v1',JSON.stringify(lo.S));localStorage.removeItem('shrimp-land-old');localStorage.removeItem('shrimp-land-keep');}catch(e){}log(G,'Bought back the land from your old game, '+lo.n+' things built');$('me-gplace').dataset.h='';save();render();}return;}
