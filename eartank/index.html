@@ -38,7 +38,7 @@ button .sub{font-weight:400;font-size:13px;color:inherit;opacity:.75;white-space
 .sr{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .bar{display:flex;gap:10px;align-items:center;margin-bottom:10px}
 .bar input{flex:1}
-#stats{font-size:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 12px;line-height:1.5}#strip{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 12px;font-size:13px}#strip .t{display:grid;grid-template-columns:70px 1fr 66px;font-size:12px;gap:8px;align-items:center;margin:4px 0}#strip .tr{position:relative;height:12px;border-radius:6px;background:linear-gradient(90deg,var(--zone-ok) 0 var(--a),var(--zone-warn) var(--a) var(--b),var(--zone-bad) var(--b) 100%)}#strip .m{position:absolute;top:-3px;width:4px;height:18px;margin-left:-2px;background:var(--ink);border-radius:2px}#strip .v{text-align:right;font-variant-numeric:tabular-nums}#stats{overflow-x:auto}#stats table{border-collapse:collapse;width:100%;margin-top:6px}#stats td,#stats th{text-align:left;padding:1px 4px;font-weight:400;white-space:nowrap}#stats th{color:var(--ink-3);font-size:11px}#stats tr.hit td{background:#e6f0e3}#stats .b{display:inline-block;height:8px;background:var(--accent);vertical-align:middle;border-radius:2px}#stats .w{display:inline-block;width:40px;height:8px;background:var(--off);vertical-align:middle;border-radius:2px;overflow:hidden}
+#stats{font-size:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 12px;line-height:1.5}#strip{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 12px;font-size:13px}#strip .t{display:grid;grid-template-columns:70px 1fr 66px;font-size:12px;gap:8px;align-items:center;margin:4px 0}#strip .tr{position:relative;height:12px;border-radius:6px;background:linear-gradient(90deg,var(--zone-ok) 0 var(--a),var(--zone-warn) var(--a) var(--b),var(--zone-bad) var(--b) 100%)}#strip .m{position:absolute;top:-3px;width:4px;height:18px;margin-left:-2px;background:var(--ink);border-radius:2px}#strip .v{text-align:right;font-variant-numeric:tabular-nums}#lights{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 12px}#lights span{font-size:11px;line-height:1.2;text-align:center;padding:7px 2px;border-radius:8px;background:var(--surface);border:1px solid var(--line);color:var(--ink-3);transition:background .35s,color .35s;min-height:40px;display:flex;align-items:center;justify-content:center}#lights span.on{background:var(--accent);color:#fff;border-color:var(--accent);transition:none}#lights span.warm{background:var(--zone-bad);color:var(--ink)}#stats{overflow-x:auto}#stats table{border-collapse:collapse;width:100%;margin-top:6px}#stats td,#stats th{text-align:left;padding:1px 4px;font-weight:400;white-space:nowrap}#stats th{color:var(--ink-3);font-size:11px}#stats tr.hit td{background:#e6f0e3}#stats .b{display:inline-block;height:8px;background:var(--accent);vertical-align:middle;border-radius:2px}#stats .w{display:inline-block;width:40px;height:8px;background:var(--off);vertical-align:middle;border-radius:2px;overflow:hidden}
 .state{font-size:13px;color:var(--ink-3);margin:0 0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>
@@ -88,6 +88,7 @@ button .sub{font-weight:400;font-size:13px;color:inherit;opacity:.75;white-space
 
 <section id="s-play" class="screen" aria-label="Play">
   <div id="strip" aria-hidden="true"></div>
+  <div id="lights" aria-hidden="true"></div>
   <div class="row"><button class="pri" id="p-feed">Feed</button><button class="pri" id="p-water">Change water</button></div>
   <div class="row"><button class="sm" id="p-speed">Speed<span class="sub" id="p-speed-sub"></span></button><button class="sm" id="p-new">New tank, 5 shrimp</button></div>
 
@@ -312,6 +313,8 @@ function audio(){
   A.voices={};
   return A;
 }
+var LIGHTS=[['drop','Fountain'],['plop','Fountain plop'],['beep','Monitor beep'],['hiss','Hiss'],['eatA','Adult eating'],['eatJ','Young eating'],['eatB','Baby eating'],['idle','Sitting still'],['swimS','Swim, short'],['swimL','Swim, long'],['eggs','Eggs (double)'],['molt','Molt'],['moltfail','Failed molt'],['babies','Babies hatch'],['deathB','Death, baby'],['deathA','Death, adult'],['feed','Feeding'],['pour','Water change']],LEL={};
+function lit(k,at,dur){var el=LEL[k];if(!el)return;var d=Math.max(0,((at||0)-(A?A.ctx.currentTime:0))*1000);setTimeout(function(){el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('on')},Math.max(160,(dur||0)*1000))},d)}
 var DEMO=false;function dest(){return DEMO?A.lp:A.tank}
 function burst(hz,q,ms,gain,at,type){ // short filtered noise
   var ctx=A.ctx,t=at||ctx.currentTime,s=ctx.createBufferSource();s.buffer=A.noise;s.loop=true;
@@ -352,7 +355,7 @@ function shrimpHz(s,base){return base*(1+(((s.id*7919)%100)/100-0.5)*2*SOUND.eat
 /* activity 0..1: how much this shrimp is eating right now. Food on the floor: 1. No food: biofilm only, fades as it gets hungry. */
 function activity(s){var st=tankSt();if(st.food>0.02)return 1;return Math.max(0,0.35-s.hunger*0.6)}
 function eatSound(s,at,force){HIT[s.id]=Date.now();
-  var E=SOUND.eat,sz=sizeOf(s),P=E[sz],st=tankSt(),bad=st.nh3+st.no2*0.7,ctx=A.ctx,t=at||ctx.currentTime,hz=shrimpHz(s,P.hz);
+  var E=SOUND.eat,sz=sizeOf(s),P=E[sz],st=tankSt(),bad=st.nh3+st.no2*0.7,ctx=A.ctx,t=at||ctx.currentTime,hz=shrimpHz(s,P.hz);lit(sz==='adult'?'eatA':sz==='juv'?'eatJ':'eatB',t,0.3);
   var ms=bad>0.3?Math.min(P.ms,E.stressMs):P.ms, n=force?P.n:Math.max(2,Math.round(P.n*(0.6+Math.random()*0.8)));
   var gap=P.gap/ (s.rate||1);
   for(var i=0;i<n;i++)tone(hz*rnd(0.97,1.03),ms,E.gain*(sz==='baby'?0.55:sz==='juv'?0.8:1)*(1-i*0.12),t+i*gap,P.type);
@@ -360,11 +363,11 @@ function eatSound(s,at,force){HIT[s.id]=Date.now();
   if(sf==='wood')tone(330,55,E.surface*1.3,t,'triangle',260);
   else if(sf==='moss'){tone(hz*0.5,40,E.surface*0.6,t,'sine');tone(hz*0.5,40,E.surface*0.5,t+0.05,'sine')}
   else if(sf==='rock')tone(hz*2.4,25,E.surface*0.8,t,'sine');
-  if(s.berried>0)tone(hz,ms,E.gain*0.8,t+n*gap+SOUND.berried.gapMs/1000,'triangle');
+  if(s.berried>0){tone(hz,ms,E.gain*0.8,t+n*gap+SOUND.berried.gapMs/1000,'triangle');lit('eggs',t,0.4)}
 }
-function idleSound(s,at,gain){HIT[s.id]=Date.now();var I=SOUND.idle;var hz=I.hz*(sizeOf(s)==='baby'?1.4:1);tone(hz,I.ms,(gain==null?1:gain)*I.gain,at,'sine',hz*0.8)}
+function idleSound(s,at,gain){HIT[s.id]=Date.now();lit('idle',at,0.2);var I=SOUND.idle;var hz=I.hz*(sizeOf(s)==='baby'?1.4:1);tone(hz,I.ms,(gain==null?1:gain)*I.gain,at,'sine',hz*0.8)}
 function swimSound(s,at,kind){HIT[s.id]=Date.now();var W=SOUND.swim,sz=sizeOf(s),k=sz==='baby'?1.8:sz==='juv'?1.3:1,ctx=A.ctx,t=at||ctx.currentTime;
-  var long=kind==='long'||(kind==null&&Math.random()<W.longP),sec=(long?W.long.s:W.short.s)/(sz==='baby'?1.6:1);
+  var long=kind==='long'||(kind==null&&Math.random()<W.longP),sec=(long?W.long.s:W.short.s)/(sz==='baby'?1.6:1);lit(long?'swimL':'swimS',t,sec);
   var n=ctx.createBufferSource();n.buffer=A.noise;n.loop=true;var f=ctx.createBiquadFilter();f.type='bandpass';f.Q.value=1.2;
   f.frequency.setValueAtTime(W.lo*k,t);f.frequency.exponentialRampToValueAtTime(W.hi*k,t+sec*0.35);f.frequency.exponentialRampToValueAtTime(W.lo*k*0.8,t+sec);
   var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(W.gain*(sz==='baby'?0.5:1),t+sec*0.25);g.gain.linearRampToValueAtTime(0,t+sec);
@@ -373,6 +376,7 @@ function swimSound(s,at,kind){HIT[s.id]=Date.now();var W=SOUND.swim,sz=sizeOf(s)
 function shrimpTick(s,at){eatSound(s,at,true)}
 function playEv(e){
   var ctx=A.ctx,t=ctx.currentTime+0.05,i;
+  lit(e.k==='death'?((e.d.age==null||e.d.age>=60)?'deathA':'deathB'):e.k,t,e.k==='pour'?4:e.k==='feed'?1.6:e.k==='babies'?1:0.8);
   if(e.k==='molt'){tone(SOUND.molt.from,SOUND.molt.s*1000,SOUND.molt.gain,t,'sine',SOUND.molt.to)}
   else if(e.k==='moltfail'){var Mf=SOUND.molt.fail,ctx2=A.ctx,o=ctx2.createOscillator(),og=ctx2.createGain(),lf=ctx2.createOscillator(),lfg=ctx2.createGain();
     /* the slide starts, shakes and stops halfway, then a heavy knock */
@@ -411,12 +415,12 @@ function sched(){ // every 100 ms
   var Fo=SOUND.fountain,frate=Fo.rate*(1+Fo.swell*Math.sin(now*2*Math.PI*Fo.swellHz))*(1-0.6*S.clog);
   if(!A.nextDrop)A.nextDrop=now+0.2;
   while(A.nextDrop<look){var big=Math.random()<Fo.big.p,dh=big?rnd(Fo.big.lo,Fo.big.hi):Fo.lo*Math.pow(Fo.hi/Fo.lo,Math.random());
-    tone(dh,big?Fo.big.ms:rnd(Fo.msLo,Fo.msHi),(big?Fo.big.gain:Fo.gain)*rnd(0.4,1),A.nextDrop,'sine',dh*Fo.rise);A.nextDrop+=-Math.log(1-Math.random())/Math.max(1,frate)}
-  while(A.nextPulse<look){if(!quiet)tone(phz,Pu.ms,Pu.gain*(1+badness*0.6),A.nextPulse,'sine');A.nextPulse+=every}
+    tone(dh,big?Fo.big.ms:rnd(Fo.msLo,Fo.msHi),(big?Fo.big.gain:Fo.gain)*rnd(0.4,1),A.nextDrop,'sine',dh*Fo.rise);if(big)lit('plop',A.nextDrop,0.15);else if(Math.random()<0.25)lit('drop',A.nextDrop,0.12);A.nextDrop+=-Math.log(1-Math.random())/Math.max(1,frate)}
+  while(A.nextPulse<look){if(!quiet)lit('beep',A.nextPulse,0.25);if(!quiet)tone(phz,Pu.ms,Pu.gain*(1+badness*0.6),A.nextPulse,'sine');A.nextPulse+=every}
   if(A.nextPulse>now+every+0.3)A.nextPulse=now+every; /* the rate sped up: don't wait out the old gap */
   while(A.nextBubble<look){var bh=R.bubbleHz*(1-R.clogDull*S.clog)*rnd(0.85,1.15);tone(bh,R.bubbleMs,R.bubbleGain*rnd(0.5,1),A.nextBubble,'sine',bh*R.bubbleRise);A.nextBubble+=tempo*rnd(0.85,1.15)}
   var bad=Math.min(1,S.nh3+S.no2*0.7);
-  var Hs=SOUND.hiss,amm=S.nh3+S.no2*0.5;A.hissG.gain.setTargetAtTime(amm<0.08||quiet?0:Hs.gain+(Hs.max-Hs.gain)*Math.pow(Math.min(1,(amm-0.08)/Hs.full),1.2),now,1);
+  var Hs=SOUND.hiss,amm=S.nh3+S.no2*0.5;if(LEL.hiss){var hon=amm>=0.08&&!quiet;LEL.hiss.classList.toggle('warm',hon);LEL.hiss.style.opacity=hon?Math.min(1,0.45+amm):'';}A.hissG.gain.setTargetAtTime(amm<0.08||quiet?0:Hs.gain+(Hs.max-Hs.gain)*Math.pow(Math.min(1,(amm-0.08)/Hs.full),1.2),now,1);
   A.lp.frequency.setTargetAtTime(SOUND.dull.clearHz-(SOUND.dull.clearHz-SOUND.dull.oldHz)*Math.min(1,S.no3/SOUND.dull.oldAt),now,1.5);
   // shrimp voices
   var E=SOUND.eat,mul=now<cluster?SOUND.feed.clusterMul:1,i,s;
@@ -562,6 +566,7 @@ function start(){
     else if(k==='hiss'){var hs=A.ctx.createBufferSource();hs.buffer=A.noise;hs.loop=true;var hp=A.ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=SOUND.hiss.hz;hp.Q.value=SOUND.hiss.q;var hg=A.ctx.createGain();hg.gain.setValueAtTime(0,t);hg.gain.linearRampToValueAtTime(SOUND.hiss.gain,t+0.8);hg.gain.setValueAtTime(SOUND.hiss.gain,t+4);hg.gain.linearRampToValueAtTime(0,t+5);hs.connect(hp);hp.connect(hg);hg.connect(A.lp);hs.start(t);hs.stop(t+5.1)}
     else{var seen=S?S.seen:null;if(S)S.seen=Object.assign({},S.seen,{molt:1,moltfail:1,babies:1,death:1,feed:1,pour:1});var cl=cluster;playEv({k:k,d:{}});if(k==='feed')cluster=cl;if(S)S.seen=seen}
     DEMO=false;speak(b.textContent+'.','Sound')}});
+  $('lights').innerHTML=LIGHTS.map(function(l){return '<span data-l="'+l[0]+'">'+l[1]+'</span>'}).join('');LIGHTS.forEach(function(l){LEL[l[0]]=document.querySelector('#lights [data-l="'+l[0]+'"]')});
   function play(){show('s-play');$('p-speed-sub').textContent=SPEEDS[speedIx][0];lastReal=Date.now()}
   function playTank(){newState([2,0,1,0,3,0,0,1,4,0,0,3],5,'Play tank, 5 shrimp.');S.shrimp.forEach(function(x,i){x.sex=i<3?'f':'m';x.age=rnd(90,200)});S.food=0.3;S.taught=true;save();if(A)A.voices={};evq=[]}
   $('p-feed').onclick=function(){doJob('feed');save();speak('Fed.')};
