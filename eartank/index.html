@@ -90,6 +90,7 @@ button .sub{font-weight:400;font-size:13px;color:inherit;opacity:.75;white-space
   <div id="strip" aria-hidden="true"></div>
   <div id="lights" aria-hidden="true"></div>
   <div class="row"><button class="pri" id="p-feed">Feed</button><button class="pri" id="p-water">Change water</button></div>
+  <div class="row"><button class="sm" id="p-pause" aria-pressed="false">Pause<span class="sub">time and sound</span></button><button class="sm" id="p-mute" aria-pressed="false">Sound off<span class="sub">time runs</span></button></div>
   <div class="row"><button class="sm" id="p-speed">Speed<span class="sub" id="p-speed-sub"></span></button><button class="sm" id="p-new">New tank, 5 shrimp</button></div>
 
   <h2>Filter sound</h2>
@@ -480,7 +481,8 @@ function sched(){ // every 100 ms
   for(var id in A.voices)if(!S.shrimp.some(function(x){return x.id==id}))delete A.voices[id];
   drain();
 }
-function setVol(v){vol=v;if(A)A.master.gain.setTargetAtTime(SOUND.master*vol,A.ctx.currentTime,0.1)}
+var PAUSED=false,MUTED=false;
+function setVol(v){vol=v;if(A)A.master.gain.setTargetAtTime(MUTED?0:SOUND.master*vol,A.ctx.currentTime,0.1)}
 /* ---------- teach ---------- */
 function teach(done){
   if(!audio()){done&&done();return}
@@ -613,6 +615,9 @@ function start(){
   $('p-feed').onclick=function(){doJob('feed');save();speak('Fed.')};
   $('p-water').onclick=function(){doJob('water');save();speak('A third of the water changed.')};
   $('p-speed').onclick=function(){speedIx=(speedIx+1)%SPEEDS.length;save();play()};
+  function pmMark(){var p=$('p-pause'),m=$('p-mute');p.firstChild.textContent=PAUSED?'Play':'Pause';p.classList.toggle('pri',PAUSED);p.setAttribute('aria-pressed',PAUSED);m.firstChild.textContent=MUTED?'Sound on':'Sound off';m.classList.toggle('pri',MUTED);m.setAttribute('aria-pressed',MUTED)}
+  $('p-pause').onclick=function(){PAUSED=!PAUSED;if(A){if(PAUSED)A.ctx.suspend();else A.ctx.resume()}lastReal=Date.now();pmMark();$('st-head').textContent=PAUSED?'Paused':'Your tank';$('st-body').textContent=PAUSED?'Time and sound stopped. Tap Play to go on.':howText()};
+  $('p-mute').onclick=function(){MUTED=!MUTED;setVol(vol);pmMark()};
   $('p-new').onclick=function(){playTank();play();speak('New tank, 5 shrimp.')};
   $('p-bench').onclick=function(){home()};
   function chips(id,get,set){var box=$(id);function mark(){box.querySelectorAll('button[data-v]').forEach(function(b){b.classList.toggle('on',String(get())===b.dataset.v)})}box.querySelectorAll('button[data-v]').forEach(function(b){b.onclick=function(){set(b.dataset.v);mark()}});mark()}
@@ -656,6 +661,7 @@ function start(){
   $('btn-voice').setAttribute('aria-pressed',speaking);$('voice-sub').textContent=speaking?'on':'off';
   // model clock
   setInterval(function(){
+    if(PAUSED){lastReal=Date.now();return}
     if(!S||S===previewTank)return;
     var now=Date.now(), dt=(now-lastReal)/1000; lastReal=now;
     if(dt<0||dt>120)dt=1;
@@ -665,7 +671,7 @@ function start(){
   },1000);
   setInterval(sched,100);
   setInterval(function(){var el=$('stats');var h=statsHTML();if(el.innerHTML!==h)el.innerHTML=h;var st=$('strip'),sh=stripHTML();if(st.innerHTML!==sh)st.innerHTML=sh},250);
-  document.addEventListener('visibilitychange',function(){if(!A)return;if(document.hidden){A.ctx.suspend();if(S)save()}else{lastReal=Date.now();A.ctx.resume()}});
+  document.addEventListener('visibilitychange',function(){if(!A)return;if(document.hidden){A.ctx.suspend();if(S)save()}else{lastReal=Date.now();if(!PAUSED)A.ctx.resume()}});
   // load
   if(load()){
     var gone=Math.min(30*24,(Date.now()-S.last)/3600000); if(gone>0.02){advance(gone);evq=[];}
