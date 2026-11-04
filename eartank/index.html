@@ -95,8 +95,11 @@ button .sub{font-weight:400;font-size:13px;color:inherit;opacity:.75;white-space
   <div class="row"><button class="sm" data-play="molt">Molt</button><button class="sm" data-play="berried">Eggs (double tick)</button></div>
   <div class="row"><button class="sm" data-play="babies">Babies</button><button class="sm" data-play="death">Death</button></div>
   <div class="row"><button class="sm" data-play="eatA">Adult eating</button><button class="sm" data-play="eatB">Baby eating</button></div>
-  <div class="row"><button class="sm" data-play="idle">Stationary flick</button><button class="sm" data-play="feed">Feeding (sound only)</button></div>
+  <div class="row"><button class="sm" data-play="idle">Stationary flick</button><button class="sm" data-play="swim">Swimming (adult)</button></div>
+  <div class="row"><button class="sm" data-play="swimB">Swimming (baby)</button><button class="sm" data-play="feed">Feeding (sound only)</button></div>
   <div class="row"><button class="sm" data-play="pour">Water change (sound only)</button><button class="sm" data-play="hiss">Hiss 5 s</button></div>
+  <div class="row"><button class="sm" data-play="bubbles">Bubbles 4 s</button><button class="sm" id="btn-solo" aria-pressed="true">Solo<span class="sub" id="solo-sub">tank quiet while it plays</span></button></div>
+  <button class="sm" id="btn-tank" aria-pressed="true">Tank sound<span class="sub" id="tank-sub">on</span></button>
   <h2>Keep it</h2>
   <button class="pri" id="btn-how">How are they</button>
   <div class="row"><button id="btn-feed">Feed</button><button id="btn-less" aria-pressed="false">Feed less</button></div>
@@ -119,20 +122,22 @@ button .sub{font-weight:400;font-size:13px;color:inherit;opacity:.75;white-space
 /* ---------- SOUND: every number you may want to tune by ear ---------- */
 var SOUND={
   master:0.6,
-  room:{noiseGain:0.012,noiseLo:350,noiseHi:1200, bubbleGain:0.07,bubbleHz:1100,bubbleQ:6,bubbleMs:28, bubbleEvery:0.55, tempSpan:0.18, clogSlow:0.8,clogDull:0.45},
+  room:{noiseGain:0.010,noiseLo:350,noiseHi:1200, bubbleGain:0.05,bubbleHz:700,bubbleRise:1.6,bubbleMs:45, bubbleEvery:0.55, tempSpan:0.18, clogSlow:0.8,clogDull:0.45},
   /* eating: a short munch, 2 to 4 scrapes. Babies high and quick, adults low wooden. Every shrimp has its own pace (rate). */
-  eat:{gain:0.10, baby:{hz:1700,n:3,gap:0.055,ms:18,type:'sine'}, juv:{hz:1000,n:3,gap:0.08,ms:30,type:'triangle'}, adult:{hz:560,n:3,gap:0.11,ms:50,type:'triangle'}, jitter:0.08, every:3.0, rateLo:0.6,rateHi:1.6, surface:0.06, stressMs:14},
+  eat:{gain:0.16, baby:{hz:1700,n:3,gap:0.055,ms:18,type:'sine'}, juv:{hz:1000,n:3,gap:0.08,ms:30,type:'triangle'}, adult:{hz:560,n:3,gap:0.11,ms:50,type:'triangle'}, jitter:0.08, every:2.2, rateLo:0.6,rateHi:1.6, surface:0.06, stressMs:14},
   /* stationary: a faint antenna flick now and then. Fades in as the eating fades out. */
-  idle:{gain:0.03,hz:3200,ms:22,every:9},
+  idle:{gain:0.035,hz:2600,ms:16,every:9},
+  /* swimming: a dart through the water, a soft whoosh that rises then falls. Babies shorter and higher. More darting right after feeding, when they move toward the food. */
+  swim:{gain:0.07,lo:500,hi:1500,s:0.32,every:28,feedMul:0.25},
   tick:{gain:0.11,baby:1500,juv:950,adult:620,jitter:0.06},
-  molt:{gain:0.09,from:1300,to:480,s:0.5},
+  molt:{gain:0.16,from:1400,to:420,s:0.7},
   berried:{gapMs:130},
-  babies:{gain:0.045,hz:2300,n:8,span:1.6},
+  babies:{gain:0.07,hz:2300,n:10,span:1.6},
   feed:{gain:0.16,hz:2600,n:14,span:1.1,sink:{gain:0.05,from:2500,to:700,s:1.4},clusterS:60,clusterMul:0.3},
   hiss:{gain:0.035,hz:6500,q:0.8},
   dull:{clearHz:9000,oldHz:1700,oldAt:80},
   pour:{gain:0.14,from:500,to:1400,s:2.6, drain:{gain:0.06,hz:900,s:1.5}},
-  death:{gain:0.12,hz:310,ms:90},
+  death:{gain:0.2,hz:300,ms:140},
   minGapS:1.4
 };
 /* ---------- model ---------- */
@@ -244,6 +249,7 @@ function audio(){
   A.lp=ctx.createBiquadFilter();A.lp.type='lowpass';A.lp.frequency.value=SOUND.dull.clearHz;A.lp.Q.value=0.5;
   A.comp=ctx.createDynamicsCompressor();A.comp.threshold.value=-18;A.comp.ratio.value=4;
   A.lp.connect(A.comp);A.comp.connect(A.master);A.master.connect(ctx.destination);
+  A.tank=ctx.createGain();A.tank.gain.value=1;A.tank.connect(A.lp); /* everything the tank makes goes through here, one-sound buttons bypass it */
   // noise buffer
   var len=ctx.sampleRate*2, buf=ctx.createBuffer(1,len,ctx.sampleRate), d=buf.getChannelData(0);
   for(var i=0;i<len;i++)d[i]=Math.random()*2-1;
@@ -252,28 +258,29 @@ function audio(){
   var src=ctx.createBufferSource();src.buffer=buf;src.loop=true;
   var bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=(SOUND.room.noiseLo+SOUND.room.noiseHi)/2;bp.Q.value=0.7;
   A.roomG=ctx.createGain();A.roomG.gain.value=0;
-  src.connect(bp);bp.connect(A.roomG);A.roomG.connect(A.lp);src.start();
+  src.connect(bp);bp.connect(A.roomG);A.roomG.connect(A.tank);src.start();
   // ammonia hiss
   var hs=ctx.createBufferSource();hs.buffer=buf;hs.loop=true;
   var hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=SOUND.hiss.hz;hp.Q.value=SOUND.hiss.q;
   A.hissG=ctx.createGain();A.hissG.gain.value=0;
-  hs.connect(hp);hp.connect(A.hissG);A.hissG.connect(A.lp);hs.start();
+  hs.connect(hp);hp.connect(A.hissG);A.hissG.connect(A.tank);hs.start();
   A.nextBubble=ctx.currentTime+0.3;
   A.voices={};
   return A;
 }
+var DEMO=false;function dest(){return DEMO?A.lp:A.tank}
 function burst(hz,q,ms,gain,at,type){ // short filtered noise
   var ctx=A.ctx,t=at||ctx.currentTime,s=ctx.createBufferSource();s.buffer=A.noise;s.loop=true;
   var f=ctx.createBiquadFilter();f.type=type||'bandpass';f.frequency.value=hz;f.Q.value=q;
-  var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.004);g.gain.exponentialRampToValueAtTime(0.0005,t+ms/1000);
-  s.connect(f);f.connect(g);g.connect(A.lp);s.start(t);s.stop(t+ms/1000+0.02);
+  var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.012);g.gain.exponentialRampToValueAtTime(0.0005,t+ms/1000+0.012);
+  s.connect(f);f.connect(g);g.connect(dest());s.start(t);s.stop(t+ms/1000+0.04);
 }
 function tone(hz,ms,gain,at,type,to){
   var ctx=A.ctx,t=at||ctx.currentTime,o=ctx.createOscillator();o.type=type||'triangle';o.frequency.setValueAtTime(hz,t);if(to)o.frequency.exponentialRampToValueAtTime(to,t+ms/1000);
   var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.003);g.gain.exponentialRampToValueAtTime(0.0005,t+ms/1000);
-  o.connect(g);g.connect(A.lp);o.start(t);o.stop(t+ms/1000+0.02);
+  o.connect(g);g.connect(dest());o.start(t);o.stop(t+ms/1000+0.02);
 }
-function sweep(from,to,sec,gain,at,q){var ctx=A.ctx,t=at||ctx.currentTime,s=ctx.createBufferSource();s.buffer=A.noise;s.loop=true;var f=ctx.createBiquadFilter();f.type='bandpass';f.Q.value=q||1;f.frequency.setValueAtTime(from,t);f.frequency.exponentialRampToValueAtTime(to,t+sec);var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.15);g.gain.linearRampToValueAtTime(0,t+sec);s.connect(f);f.connect(g);g.connect(A.lp);s.start(t);s.stop(t+sec+0.05)}
+function sweep(from,to,sec,gain,at,q){var ctx=A.ctx,t=at||ctx.currentTime,s=ctx.createBufferSource();s.buffer=A.noise;s.loop=true;var f=ctx.createBiquadFilter();f.type='bandpass';f.Q.value=q||1;f.frequency.setValueAtTime(from,t);f.frequency.exponentialRampToValueAtTime(to,t+sec);var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.15);g.gain.linearRampToValueAtTime(0,t+sec);s.connect(f);f.connect(g);g.connect(dest());s.start(t);s.stop(t+sec+0.05)}
 function chime(){if(audio())tone(880,120,0.05)}
 function tankSt(){return S||{nh3:0,no2:0,scape:buildScape,moss:0}}
 function surfaces(){var st=tankSt(),c={rock:0,wood:0,moss:0,plant:0},i;for(i=0;i<st.scape.length;i++){var k=st.scape[i];if(k===1)c.rock++;else if(k===2)c.wood++;else if(k===3)c.moss++;else if(k===4)c.plant++}c.moss+=st.moss*2;return c}
@@ -281,7 +288,7 @@ function pickSurface(){var c=surfaces(),tot=c.rock+c.wood+c.moss+c.plant+1,r=Mat
 var HIT={};
 function shrimpHz(s,base){return base*(1+(((s.id*7919)%100)/100-0.5)*2*SOUND.eat.jitter)}
 /* activity 0..1: how much this shrimp is eating right now. Food on the floor: 1. No food: biofilm only, fades as it gets hungry. */
-function activity(s){var st=tankSt();if(st.food>0.02)return 1;return Math.max(0,0.5-s.hunger*0.7)}
+function activity(s){var st=tankSt();if(st.food>0.02)return 1;return Math.max(0,0.35-s.hunger*0.6)}
 function eatSound(s,at,force){HIT[s.id]=Date.now();
   var E=SOUND.eat,sz=sizeOf(s),P=E[sz],st=tankSt(),bad=st.nh3+st.no2*0.7,ctx=A.ctx,t=at||ctx.currentTime,hz=shrimpHz(s,P.hz);
   var ms=bad>0.3?Math.min(P.ms,E.stressMs):P.ms, n=force?P.n:Math.max(2,Math.round(P.n*(0.6+Math.random()*0.8)));
@@ -294,7 +301,12 @@ function eatSound(s,at,force){HIT[s.id]=Date.now();
   else if(sf==='plant')burst(2500,1.5,40,E.surface*0.5,t);
   if(s.berried>0)tone(hz,ms,E.gain*0.8,t+n*gap+SOUND.berried.gapMs/1000,'triangle');
 }
-function idleSound(s,at,gain){HIT[s.id]=Date.now();var I=SOUND.idle;burst(I.hz*(sizeOf(s)==='baby'?1.4:1),1.5,I.ms,(gain==null?1:gain)*I.gain,at,'highpass')}
+function idleSound(s,at,gain){HIT[s.id]=Date.now();var I=SOUND.idle;var hz=I.hz*(sizeOf(s)==='baby'?1.4:1);tone(hz,I.ms,(gain==null?1:gain)*I.gain,at,'sine',hz*0.8)}
+function swimSound(s,at){HIT[s.id]=Date.now();var W=SOUND.swim,sz=sizeOf(s),k=sz==='baby'?1.8:sz==='juv'?1.3:1,ctx=A.ctx,t=at||ctx.currentTime,sec=W.s/(sz==='baby'?1.8:1);
+  var n=ctx.createBufferSource();n.buffer=A.noise;n.loop=true;var f=ctx.createBiquadFilter();f.type='bandpass';f.Q.value=2.5;
+  f.frequency.setValueAtTime(W.lo*k,t);f.frequency.exponentialRampToValueAtTime(W.hi*k,t+sec*0.4);f.frequency.exponentialRampToValueAtTime(W.lo*k*0.8,t+sec);
+  var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(W.gain*(sz==='baby'?0.5:1),t+sec*0.3);g.gain.linearRampToValueAtTime(0,t+sec);
+  n.connect(f);f.connect(g);g.connect(dest());n.start(t);n.stop(t+sec+0.05)}
 function shrimpTick(s,at){eatSound(s,at,true)}
 function playEv(e){
   var ctx=A.ctx,t=ctx.currentTime+0.05,i;
@@ -323,7 +335,7 @@ function sched(){ // every 100 ms
   // room tone follows the model
   var tempo=R.bubbleEvery*(1-R.tempSpan*(S.temp-24)/4)*(1+R.clogSlow*S.clog);
   A.roomG.gain.setTargetAtTime(R.noiseGain*(1-0.5*S.clog),now,0.5);
-  while(A.nextBubble<look){burst(R.bubbleHz*(1-R.clogDull*S.clog)*rnd(0.92,1.08),R.bubbleQ,R.bubbleMs,R.bubbleGain*rnd(0.6,1),A.nextBubble);A.nextBubble+=tempo*rnd(0.85,1.15)}
+  while(A.nextBubble<look){var bh=R.bubbleHz*(1-R.clogDull*S.clog)*rnd(0.85,1.15);tone(bh,R.bubbleMs,R.bubbleGain*rnd(0.5,1),A.nextBubble,'sine',bh*R.bubbleRise);A.nextBubble+=tempo*rnd(0.85,1.15)}
   var bad=Math.min(1,S.nh3+S.no2*0.7);
   A.hissG.gain.setTargetAtTime(bad<0.08?0:SOUND.hiss.gain*Math.min(1,bad),now,1);
   A.lp.frequency.setTargetAtTime(SOUND.dull.clearHz-(SOUND.dull.clearHz-SOUND.dull.oldHz)*Math.min(1,S.no3/SOUND.dull.oldAt),now,1.5);
@@ -331,12 +343,14 @@ function sched(){ // every 100 ms
   var E=SOUND.eat,mul=now<cluster?SOUND.feed.clusterMul:1,i,s;
   for(i=0;i<S.shrimp.length;i++){
     s=S.shrimp[i];var v=A.voices[s.id];
-    if(!v){v=A.voices[s.id]={at:now+Math.random()*E.every,idle:now+Math.random()*SOUND.idle.every}}
+    if(!v){v=A.voices[s.id]={at:now+Math.random()*E.every,idle:now+Math.random()*SOUND.idle.every,swim:now+Math.random()*SOUND.swim.every}}
     var act=activity(s);
     /* eating: at the shrimp's own pace, more often with food down; a quiet shrimp skips turns */
     while(v.at<look){if(Math.random()<act)eatSound(s,v.at);var every=E.every/(s.rate||1)*mul;v.at+=every*rnd(0.5,1.6)}
     /* stationary: a faint flick, more of them as the eating goes */
     while(v.idle<look){idleSound(s,v.idle,1-act*0.7);v.idle+=SOUND.idle.every*rnd(0.5,1.8)}
+    /* swimming: a dart now and then, a lot more in the minute after feeding */
+    while(v.swim<look){swimSound(s,v.swim);v.swim+=SOUND.swim.every*(now<cluster?SOUND.swim.feedMul:1)*rnd(0.4,1.8)}
   }
   for(var id in A.voices)if(!S.shrimp.some(function(x){return x.id==id}))delete A.voices[id];
   drain();
@@ -434,14 +448,25 @@ function start(){
     quick:function(){newState([2,0,1,0,3,0,0,1,4,0,0,3],10,'Quick start, 10 shrimp.');S.food=0.3}
   };
   document.querySelectorAll('[data-prof]').forEach(function(b){b.onclick=function(){PROF[b.dataset.prof]();S.taught=true;S.temp=24;save();if(A)A.voices={};evq=[];home();speak(b.textContent+'.','Tank')}});
+  var SOLO=true,TANK=true,soloT=0;
+  function tankLevel(){if(!A)return;var now=A.ctx.currentTime;A.tank.gain.setTargetAtTime(!TANK||now<soloT?0:1,now,0.15)}
+  $('btn-solo').onclick=function(){SOLO=!SOLO;this.setAttribute('aria-pressed',SOLO);$('solo-sub').textContent=SOLO?'tank quiet while it plays':'tank keeps playing'};
+  $('btn-tank').onclick=function(){TANK=!TANK;this.setAttribute('aria-pressed',TANK);$('tank-sub').textContent=TANK?'on':'off';tankLevel()};
+  setInterval(tankLevel,200);
   document.querySelectorAll('[data-play]').forEach(function(b){b.onclick=function(){if(!audio())return;var k=b.dataset.play,t=A.ctx.currentTime+0.05;
+    if(SOLO){soloT=t+(k==='hiss'||k==='bubbles'?5:3.5);tankLevel()}
+    DEMO=true;
+    if(k==='bubbles'){var R=SOUND.room;for(var i=0,tb=t;tb<t+4;i++){var bh=R.bubbleHz*rnd(0.85,1.15);tone(bh,R.bubbleMs,R.bubbleGain*rnd(0.5,1),tb,'sine',bh*R.bubbleRise);tb+=R.bubbleEvery*rnd(0.85,1.15)}}
+    else
     if(k==='eatA')eatSound({id:901,age:200,hunger:0.2,berried:0,rate:1},t,true);
     else if(k==='eatB')eatSound({id:902,age:10,hunger:0.2,berried:0,rate:1},t,true);
     else if(k==='idle')idleSound({id:903,age:200},t,1);
+    else if(k==='swim'){swimSound({id:905,age:200},t);swimSound({id:905,age:200},t+1.2)}
+    else if(k==='swimB'){swimSound({id:906,age:10},t);swimSound({id:906,age:10},t+0.9)}
     else if(k==='berried')eatSound({id:904,age:200,hunger:0.2,berried:10,rate:1},t,true);
-    else if(k==='hiss'){A.hissG.gain.setTargetAtTime(SOUND.hiss.gain,t,0.5);setTimeout(function(){A.hissG.gain.setTargetAtTime(0,A.ctx.currentTime,0.5)},5000)}
+    else if(k==='hiss'){var hs=A.ctx.createBufferSource();hs.buffer=A.noise;hs.loop=true;var hp=A.ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=SOUND.hiss.hz;hp.Q.value=SOUND.hiss.q;var hg=A.ctx.createGain();hg.gain.setValueAtTime(0,t);hg.gain.linearRampToValueAtTime(SOUND.hiss.gain,t+0.8);hg.gain.setValueAtTime(SOUND.hiss.gain,t+4);hg.gain.linearRampToValueAtTime(0,t+5);hs.connect(hp);hp.connect(hg);hg.connect(A.lp);hs.start(t);hs.stop(t+5.1)}
     else{var seen=S?S.seen:null;if(S)S.seen=Object.assign({},S.seen,{molt:1,babies:1,death:1,feed:1,pour:1});var cl=cluster;playEv({k:k,d:{}});if(k==='feed')cluster=cl;if(S)S.seen=seen}
-    speak(b.textContent+'.','Sound')}});
+    DEMO=false;speak(b.textContent+'.','Sound')}});
   $('btn-how').onclick=function(){speak(howText(),'Your tank')};
   $('btn-feed').onclick=function(){doJob('feed');save();speak('Fed.')};
   $('btn-less').onclick=function(){S.ration=S.ration<1?1:0.5;save();home();speak(S.ration<1?'Half rations from now.':'Full rations from now.')};
