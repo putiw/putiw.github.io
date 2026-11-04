@@ -116,6 +116,9 @@ button .sub{font-weight:400;font-size:13px;color:inherit;opacity:.75;white-space
   <div class="row"><button class="pri" id="b-pic">Hear the picture</button><button class="sm" id="b-picstop">Stop</button></div>
   <div class="panel" id="picset"></div>
   <div class="panel" id="pictypes"></div>
+  <h2>Your settings</h2>
+  <div class="row"><button class="sm" id="p-export">Copy my settings</button><button class="sm" id="p-import">Paste settings</button></div>
+  <textarea id="p-exp" rows="5" style="width:100%;font:12px/1.3 ui-monospace,monospace;border:1px solid var(--line);border-radius:10px;padding:8px;margin:0 0 12px" placeholder="Your settings show here. Copy them into the chat."></textarea>
   <button class="sm" id="p-bench">Sound bench<span class="sub">compare tanks, single sounds</span></button>
 </section>
 <section id="s-home" class="screen" aria-label="Your tank">
@@ -810,6 +813,9 @@ function start(){
     FEEDL.forEach(function(l){['vol','delay','pitch','count','spread','vary','soft'].forEach(function(k){var el=$('fd-'+l[0]+'-'+k);el.oninput=function(){FEEDS[l[0]]=FEEDS[l[0]]||{};FEEDS[l[0]][k]=+el.value;$('fd-'+l[0]+'-'+k+'-v').textContent=(k==='vol'||k==='vary'||k==='soft'?pct:k==='pitch'?xx:k==='count'?num:sec)(el.value);feedSave()};el.onchange=function(){feedDemo(l[0])}})})}
   $('fd-play').onclick=function(){feedDemo(null)};$('fd-reset').onclick=function(){FEEDS={};feedSave();renderFeed()};
   renderFeed();
+  var EXPK=['eartank-mix','eartank-feed','eartank-pic','eartank-fp','eartank-fount','eartank-beep'];
+  $('p-export').onclick=function(){var o={};EXPK.forEach(function(k){try{var v=localStorage.getItem(k);if(v!=null)o[k]=v}catch(e){}});var txt=JSON.stringify(o);$('p-exp').value=txt;$('p-exp').select();try{navigator.clipboard.writeText(txt).then(function(){speak('Copied.','Settings')},function(){speak('Select the text and copy it.','Settings')})}catch(e){speak('Select the text and copy it.','Settings')}};
+  $('p-import').onclick=function(){try{var o=JSON.parse($('p-exp').value);EXPK.forEach(function(k){if(o[k]!=null)localStorage.setItem(k,o[k])});location.reload()}catch(e){speak('That text is not settings.','Settings')}};
   function wcMark(){document.querySelectorAll('[data-wc]').forEach(function(b){b.className='sm'+(b.dataset.wc===WC?' pri':'')})}
   document.querySelectorAll('[data-wc]').forEach(function(b){b.onclick=function(){WC=b.dataset.wc;try{localStorage.setItem('eartank-wc',WC)}catch(e){}wcMark();if(audio()){DEMO=true;pourSound(WC);DEMO=false}}});
   wcMark();
