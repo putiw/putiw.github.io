@@ -80,10 +80,11 @@ function gamePest(g,was){var s=g.s>>>0,sn=g.k==='snail',glass=g.y<0.72;if(was&&w
   return {id:'g'+g.s,k:sn?'snail':'planaria',kind:sn?(s%5?'bladder':'ramshorn'):'',x:g.x,y:g.y,bx:g.x,by:g.y,gs:s,glass:glass,a:(s%628)/100,sz:0.8+(s%41)/100};}
 function jobOpen(){return !!(TOY||$('sheet')&&!$('sheet').hidden);}
 function ownVals(T){var sn=0,pl=0;T.pests.forEach(function(p){if(p.k==='snail')sn++;else pl++;});return {mulm:mulmMean(T),flow:T.flow,og:overgrowth(T),sn:sn,pl:pl,no3:T.no3,wc:T.lastWC,dec:JSON.stringify(decorFlags(T)),sck:scapeKey(T)+'|'+T.stems.length+'|'+Object.keys(T.moss).length};}
-// Pass 254 (Puti 5 Nov): the pieces as one picture for the company page, drawn at the art size with no shrimp or water
-function scapeImg(T){var W=TV.W,H=TV.H,D=TV.dpr,c=document.createElement('canvas');c.width=ART_W;c.height=ART_H;TV.W=ART_W;TV.H=ART_H;TV.dpr=1;TV.L={};
-  try{var x=c.getContext('2d');drawScapeAll(x,T,tvGeom());}catch(e){}TV.W=W;TV.H=H;TV.dpr=D;TV.L={};
-  var u='';try{u=c.toDataURL('image/webp',0.86);if(u.indexOf('data:image/webp')!==0)u=c.toDataURL('image/png');}catch(e){u='';}return u;}
+// Pass 257 (Puti 5 Nov): the pieces as a list, not a picture. The company page draws them with the same sprites in the same order.
+// scape [kind,x,y,scale,flip,rot,id], stems [x,h,seed,lean], moss {id:[[u,a,len,seed]]}, all in the 932x430 art frame
+function scapePack(T){var r=function(v,d){var m=Math.pow(10,d||0);return Math.round(v*m)/m;};var mo={};
+  T.scape.forEach(function(it){var ms=T.moss[it.id];if(ms&&ms.length)mo[it.id]=ms.map(function(m){return [r(m.u,3),r(m.a,3),r(m.len,1),m.seed];});});
+  return {v:1,s:T.scape.map(function(it){return [it.k,r(it.x,1),r(it.y,1),r(it.s,3),it.f<0?-1:1,r(it.r||0,3),it.id];}),t:T.stems.map(function(st){return [r(st.x,1),r(st.h,1),st.seed,r(st.lean,3)];}),m:mo};}
 function applyOwn(T,d){var c=d.care;if(!c)return;var i;
   if(Array.isArray(d.mc)&&d.mc.length===MULM_N){for(i=0;i<MULM_N;i++)T.mulm[i]=clamp((+d.mc[i]||0)*MM_K,0,1);}
   else{var tg=clamp(c.mulm*MM_K,0,1),mm=mulmMean(T);if(Math.abs(mm-tg)>0.002){if(mm<0.002){var w=0;for(i=0;i<MULM_N;i++)w+=mulmWeight(T,i);for(i=0;i<MULM_N;i++)T.mulm[i]=clamp(tg*mulmWeight(T,i)*MULM_N/w,0,1);}else for(i=0;i<MULM_N;i++)T.mulm[i]=clamp(T.mulm[i]*tg/mm,0,1);}}
@@ -104,7 +105,7 @@ function report(first){var T=ownT();if(!T||!LAST||TOY||$('sheet')&&!$('sheet').h
   if(GLD){m.gl=GLD;if(OWN)OWN.glass=GLD;GLD=null;any=1;}
   if(v.wc!==LAST.wc&&LAST.no3>0){m.wc=Math.round(clamp(1-v.no3/LAST.no3,0,0.9)*100);any=1;}
   if(any)m.job=1;
-  if(first||v.dec!==LAST.dec||v.sck!==LAST.sck||m.grow!=null){m.decor=JSON.parse(v.dec);m.sci=scapeImg(T);any=1;}
+  if(first||v.dec!==LAST.dec||v.sck!==LAST.sck||m.grow!=null){m.decor=JSON.parse(v.dec);m.scp=scapePack(T);any=1;}
   if(!any)return false;m.seq=++SEQ;post(m);LAST=v;return true;}
 // the game's glass algae, drawn the same way on the land
 var GLC=null,GLK='';
