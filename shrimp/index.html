@@ -3334,7 +3334,7 @@ function landTank(G,d){var T=G.tanks[0];if(!T||!d)return;var C=careOf(T),n=funct
  if(typeof d.gl==='string'&&T.glass&&d.gl.length===T.glass.length){var wiped=0;for(var j=0;j<T.glass.length;j++){var gv=+d.gl[j]||0;if(gv<Math.round(T.glass[j]*9)){T.glass[j]=gv/9;wiped++;}}T.glassV=(T.glassV||0)+1;if(wiped)T.wipeD=td(G,T);}
  if(d.wc>0&&totalN(T)>=0)waterChange(G,T,clamp(d.wc|0,1,90),true);
  if(d.decor){T.wood=d.decor.wood?1:0;T.plants=d.decor.plants?1:0;T.moss=d.decor.moss?1:0;T.leaves=d.decor.leaves?1:0;T.ldec=1;}
- if(typeof d.sci==='string'&&d.sci.length<300000&&/^data:image\/(png|webp);base64,[A-Za-z0-9+\/=]+$/.test(d.sci)&&d.sci!==G.opt.scImg){G.opt.scImg=d.sci;scImgLoad();}// Pass 254: the land's Aquascape as one picture, drawn on this page
+ if(typeof d.sci==='string'&&d.sci.length<1500000&&/^data:image\/(png|webp);base64,[A-Za-z0-9+\/=]+$/.test(d.sci)&&d.sci!==G.opt.scImg){G.opt.scImg=d.sci;scImgLoad();}// Pass 254: the land's Aquascape as one picture, drawn on this page
  if(d.job)careDone(G,'land');}
 function houseLines(G){var H=G.me&&G.me.house;if(!H||!H.land)return [];if(!H.complete)return ['A half-built house stands on a piece of land near the water.'];
  if(H.who==='gp')return ['Grandma lives in a house that makes its own power. She grows tomatoes and complains about them.'];if(H.who==='both')return ['You and Grandma share a house with a well, a wind turbine and a shrimp room. She took the bigger bedroom.'];
@@ -5185,7 +5185,9 @@ SPR.bottle='data:image/webp;base64,UklGRghXAABXRUJQVlA4WAoAAAAQAAAA2wAAWgAAQUxQS
 var TVIMG={},TVREADY=false,TVBODY={};
 // Pass 254 (Puti 5 Nov): Tank 1's pieces as the land drew them (G.opt.scImg, a data URL from the land's report); until it comes, the four stock pieces
 var SCIMG={src:'',img:null,ok:0,v:0};
-function scImgLoad(){var src=G&&G.opt&&G.opt.scImg||'';if(src===SCIMG.src)return;SCIMG.src=src;SCIMG.ok=0;SCIMG.img=null;if(!src)return;var im=new Image();im.onload=function(){if(SCIMG.src!==src)return;SCIMG.img=im;SCIMG.ok=1;SCIMG.v++;tvAll(function(v){v.bgKey='';});};im.src=src;}
+function scImgLoad(){var src=G&&G.opt&&G.opt.scImg||'';if(src===SCIMG.src)return;SCIMG.src=src;SCIMG.ok=0;SCIMG.img=null;if(!src)return;var im=new Image();im.onload=function(){if(SCIMG.src!==src)return;SCIMG.img=im;SCIMG.ok=1;SCIMG.v++;tvAll(function(v){v.bgKey='';});if(src.length>300000)scImgShrink(im);};im.src=src;}
+// Pass 256: Safari can't encode webp, so the land sends a full-size png (over 300 kB, it used to be dropped); keep a half-size copy in the save
+function scImgShrink(im){try{var c=document.createElement('canvas');c.width=Math.round(im.width/2);c.height=Math.round(im.height/2);c.getContext('2d').drawImage(im,0,0,c.width,c.height);var u=c.toDataURL('image/webp',0.86);if(u.indexOf('data:image/webp')!==0)u=c.toDataURL('image/png');if(u.length<G.opt.scImg.length){G.opt.scImg=u;SCIMG.src=u;}}catch(e){}}
 function scImgOn(T){if(G&&G.opt&&(G.opt.scImg||'')!==SCIMG.src)scImgLoad();return !!(T&&G&&T===G.tanks[0]&&T.ldec&&SCIMG.ok&&SCIMG.img);}
 (function(){var ks=Object.keys(SPR),left=ks.length;ks.forEach(function(k){var im=new Image();im.onload=im.onerror=function(){if(--left===0){TVREADY=true;tvAll(function(v){v.bgKey='';});}};im.src=SPR[k];TVIMG[k]=im;});})();
 var TV_SW=114,TV_SH=58;

@@ -75,6 +75,9 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  await f.waitForFunction(()=>window.S&&S.tanks&&S.tanks[0]);await wait(2500);
  ok((await pieces())===before,'after a reload the land still has them: '+(await pieces()));
  ok(await p.evaluate(()=>G.tanks[0].wood===0&&(G.opt.scImg||'').length>2000&&SCIMG.ok===1),'after a reload the game draws the picture');
+ // Pass 256: Safari sends a full-size png (no webp encoder), over the old 300 kB cap; the game must take it and keep a smaller copy
+ const big=await p.evaluate(()=>new Promise(r=>{var c=document.createElement('canvas');c.width=932;c.height=430;var x=c.getContext('2d'),d=x.createImageData(932,430);for(var i=0;i<d.data.length;i++)d.data[i]=(Math.random()*255)|0;x.putImageData(d,0,0);var u=c.toDataURL('image/png');landTank(G,{sci:u});setTimeout(()=>r({sent:u.length,kept:(G.opt.scImg||'').length,ok:SCIMG.ok}),1500);}));
+ ok(big.sent>300000&&big.ok===1&&big.kept>0&&big.kept<big.sent,'a big png scape (Safari) is drawn and kept smaller: '+JSON.stringify(big));
  // Back with the job open: the job is ended and reported first
  await f.evaluate(()=>{toyStart('scape');var el=[...document.querySelectorAll('[data-add]')].find(b=>b.dataset.add==='wood');el.click();$('tb-back').click();});await wait(2500);
  ok(await f.evaluate(()=>!TOY)&&await p.evaluate(()=>G.tanks[0].wood===1),'Back with Aquascape open finishes it and the game gets the driftwood');
