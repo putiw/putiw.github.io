@@ -128,12 +128,12 @@ var SOUND={
   /* stationary: a faint antenna flick now and then. Fades in as the eating fades out. */
   idle:{gain:0.035,hz:2600,ms:16,every:9},
   /* swimming: a dart through the water, a soft whoosh that rises then falls. Babies shorter and higher. More darting right after feeding, when they move toward the food. */
-  swim:{gain:0.07,lo:500,hi:1500,s:0.32,every:28,feedMul:0.25},
+  swim:{gain:0.045,lo:450,hi:1300,s:0.36,every:28,feedMul:0.25},
   tick:{gain:0.11,baby:1500,juv:950,adult:620,jitter:0.06},
   molt:{gain:0.16,from:1400,to:420,s:0.7},
   berried:{gapMs:130},
-  babies:{gain:0.07,hz:2300,n:10,span:1.6},
-  feed:{gain:0.16,hz:2600,n:14,span:1.1,sink:{gain:0.05,from:2500,to:700,s:1.4},clusterS:60,clusterMul:0.3},
+  babies:{gain:0.05,hz:2300,n:9,span:0.9},
+  feed:{gain:0.09,hz:1300,n:7,span:1.0,ms:70,bloop:{hz:380,ms:160,gain:0.07},clusterS:60,clusterMul:0.3},
   hiss:{gain:0.035,hz:6500,q:0.8},
   dull:{clearHz:9000,oldHz:1700,oldAt:80},
   pour:{gain:0.14,from:500,to:1400,s:2.6, drain:{gain:0.06,hz:900,s:1.5}},
@@ -295,15 +295,14 @@ function eatSound(s,at,force){HIT[s.id]=Date.now();
   var gap=P.gap/ (s.rate||1);
   for(var i=0;i<n;i++)tone(hz*rnd(0.97,1.03),ms,E.gain*(sz==='baby'?0.55:sz==='juv'?0.8:1)*(1-i*0.12),t+i*gap,P.type);
   var sf=pickSurface();
-  if(sf==='wood')burst(420,4,45,E.surface*1.4,t);
-  else if(sf==='moss')burst(4000,0.6,80,E.surface*0.7,t,'highpass');
+  if(sf==='wood')tone(330,55,E.surface*1.3,t,'triangle',260);
+  else if(sf==='moss'){tone(hz*0.5,40,E.surface*0.6,t,'sine');tone(hz*0.5,40,E.surface*0.5,t+0.05,'sine')}
   else if(sf==='rock')tone(hz*2.4,25,E.surface*0.8,t,'sine');
-  else if(sf==='plant')burst(2500,1.5,40,E.surface*0.5,t);
   if(s.berried>0)tone(hz,ms,E.gain*0.8,t+n*gap+SOUND.berried.gapMs/1000,'triangle');
 }
 function idleSound(s,at,gain){HIT[s.id]=Date.now();var I=SOUND.idle;var hz=I.hz*(sizeOf(s)==='baby'?1.4:1);tone(hz,I.ms,(gain==null?1:gain)*I.gain,at,'sine',hz*0.8)}
 function swimSound(s,at){HIT[s.id]=Date.now();var W=SOUND.swim,sz=sizeOf(s),k=sz==='baby'?1.8:sz==='juv'?1.3:1,ctx=A.ctx,t=at||ctx.currentTime,sec=W.s/(sz==='baby'?1.8:1);
-  var n=ctx.createBufferSource();n.buffer=A.noise;n.loop=true;var f=ctx.createBiquadFilter();f.type='bandpass';f.Q.value=2.5;
+  var n=ctx.createBufferSource();n.buffer=A.noise;n.loop=true;var f=ctx.createBiquadFilter();f.type='bandpass';f.Q.value=1.2;
   f.frequency.setValueAtTime(W.lo*k,t);f.frequency.exponentialRampToValueAtTime(W.hi*k,t+sec*0.4);f.frequency.exponentialRampToValueAtTime(W.lo*k*0.8,t+sec);
   var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(W.gain*(sz==='baby'?0.5:1),t+sec*0.3);g.gain.linearRampToValueAtTime(0,t+sec);
   n.connect(f);f.connect(g);g.connect(dest());n.start(t);n.stop(t+sec+0.05)}
@@ -312,9 +311,9 @@ function playEv(e){
   var ctx=A.ctx,t=ctx.currentTime+0.05,i;
   if(e.k==='molt'){tone(SOUND.molt.from,SOUND.molt.s*1000,SOUND.molt.gain,t,'sine',SOUND.molt.to)}
   else if(e.k==='babies'){for(i=0;i<SOUND.babies.n;i++)tone(SOUND.babies.hz*rnd(0.9,1.15),30,SOUND.babies.gain,t+Math.random()*SOUND.babies.span,'sine')}
-  else if(e.k==='feed'){var F=SOUND.feed;for(i=0;i<F.n;i++)burst(F.hz*rnd(0.8,1.2),2,25,F.gain*rnd(0.6,1),t+i*F.span/F.n+rnd(0,0.04),'highpass');sweep(F.sink.from,F.sink.to,F.sink.s,F.sink.gain,t+0.3,1.5);cluster=ctx.currentTime+F.clusterS}
-  else if(e.k==='pour'){var Pp=SOUND.pour;/* drain: a gurgle, then the pour */for(i=0;i<10;i++)burst(Pp.drain.hz*rnd(0.7,1.3),5,60,Pp.drain.gain,t+i*Pp.drain.s/10);sweep(Pp.from,Pp.to,Pp.s,Pp.gain,t+Pp.drain.s,1.2)}
-  else if(e.k==='death'){tone(SOUND.death.hz,SOUND.death.ms,SOUND.death.gain,t,'triangle');burst(380,3,50,SOUND.death.gain*0.6,t)}
+  else if(e.k==='feed'){var F=SOUND.feed;/* pellets plip into the water, one low bloop as the first sinks */for(i=0;i<F.n;i++){var fh=F.hz*rnd(0.8,1.25);tone(fh,F.ms,F.gain*rnd(0.6,1),t+i*F.span/F.n+rnd(0,0.06),'sine',fh*0.55)}tone(F.bloop.hz,F.bloop.ms,F.bloop.gain,t+0.25,'sine',F.bloop.hz*1.5);cluster=ctx.currentTime+F.clusterS}
+  else if(e.k==='pour'){var Pp=SOUND.pour;/* drain: a gurgle, then the pour */for(i=0;i<10;i++){var dh=Pp.drain.hz*rnd(0.6,1.2);tone(dh,70,Pp.drain.gain,t+i*Pp.drain.s/10,'sine',dh*1.6)}sweep(Pp.from,Pp.to,Pp.s,Pp.gain,t+Pp.drain.s,1.2)}
+  else if(e.k==='death'){tone(SOUND.death.hz,SOUND.death.ms,SOUND.death.gain,t,'triangle',SOUND.death.hz*0.8)}
   else if(e.k==='berried'){var sh=S.shrimp.filter(function(x){return x.id===e.d.id})[0];if(sh)shrimpTick(sh,t)}
   // name it once in speech the first time
   var names={molt:'That slide is a molt.',babies:'Those high ticks are babies.',berried:'That double tick is a female carrying eggs.',death:'That low tap is a death.',feed:'That is food going in.',pour:'That is the water change.'};
