@@ -253,7 +253,7 @@ var m1=kitMaterials(g);setQCStrict(g,2);if(!(kitMaterials(g)>m1))throw Error('St
 `);
 if(html.includes("needs '+big(nextLine.sold)")||html.includes('show up once your first three tanks')||html.includes('Bacteria starter unlocks when'))throw Error('Unlock rules should not be shown');
 if(!html.includes("bar.hidden=true;\n  if(!g)return;")||!html.includes("$('ideas-now').hidden=!soft"))throw Error('Guide lines belong in the ? popup, never a bar over the game (Puti, 28 Oct)');
-if(!html.includes("if(SPOT||SPOTQ.length||!introOK())return;")||!html.includes("if(!s.now&&!introOK(s.gap))"))throw Error('One spotlight at a time');
+if(!html.includes("if(SPOT||SPOTQ.length||!introOK())return;")||!html.includes("if(!s.now&&(!introOK(s.gap)||momentWait(G)>=0))"))throw Error('One spotlight at a time');
 check('story cards about a moment go first, narrative ones go stale after 60 days (Pass 190)',`
 var g=readyGame();var p=ensureProgress(g);p.seen.ev_mira=true;g.story.choices={ev_mira:0};g.day=1200;p.wait=['ev_paper','ev_rival'];p.at={ev_paper:1100,ev_rival:1100};p.queue=[];p.soon=[];
 detectMilestones(g);var w=p.wait.concat(p.queue);if(w.indexOf('mira_teen')<0||p.queue.indexOf('mira_teen')<0&&p.wait[0]!=='mira_teen')throw Error('Mira at eleven goes first '+JSON.stringify(w));

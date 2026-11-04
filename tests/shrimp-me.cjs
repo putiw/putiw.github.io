@@ -383,10 +383,13 @@ var h=newGame();h.me.on=1;h.me.hrs=h.me.hrs||{};h.me.hrs.papers=15207;h.me.fx={s
 for(var d=0;d<30;d++){h.day++;h.ps.t+=50;factDay(h);}if((h.me.dlog||[]).length)throw Error('a reset clock skipped the gap');
 h.ps.t+=FACT_GAP+1;h.me.hrs.papers=99999;factDay(h);if((h.me.dlog||[]).length!==1)throw Error('the next fact comes after 3 minutes');
 `);
-check('Pass 256: a fresh gp_land goes in front of five waiting stories, a Milo card whose window closed is skipped',`
+check('Pass 257: a fresh gp_land goes in front of five waiting stories, a Milo card behind five stories shows within one gap, nothing dropped',`
 var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;g.kits.sold=Math.max(1,g.kits.sold);personalDay(g);g.me.on=1;g.me.sent=5e5;g.money=1e6;g.me.gplace={balcony:1,house:1};var p=ensureProgress(g);p.wait=['c_cash','c_power','c_rivers','c_many','c_blackout'];['c_cash','c_power','c_rivers','c_many','c_blackout'].forEach(function(k){p.seen[k]=true;});detectMilestones(g);
 var at=p.wait.indexOf('gp_land'),inq=p.queue.indexOf('gp_land')>=0;if(!(at===0||inq))throw Error('gp_land first: '+p.wait.join(','));
-if(STORY_STILL(g,'nour2'))throw Error('no hard part, no Milo card');if(!STORY_STILL(g,'c_cash'))throw Error('a late card still holds before the win');g.emp.won=1;if(STORY_STILL(g,'c_cash'))throw Error('late cards skip after the win');
+if((p.dropped||[]).length)throw Error('dropped: '+p.dropped);
+var q=newGame();q.ps.t=100000;var P=ensureProgress(q);var five=['c_cash','c_power','c_rivers','c_many','c_blackout'];P.wait=five.concat(['nour2']);five.concat(['nour2']).forEach(function(k){P.seen[k]=true;});P.soon=['ch_test'];P.lastAck=q.ps.t;P.gap=20000;var t0=q.ps.t,got=null,order=[];
+for(var i=0;i<400&&!got;i++){q.ps.t+=250;detectMilestones(q);if(P.queue.length){var k=P.queue.shift();order.push(k);introStamp(q);if(k==='nour2')got=q.ps.t-t0;}}
+if(got==null||got>20000+250)throw Error('nour2 waited '+got+' ms, order '+order.join(','));order=order.filter(function(k){return CARD_NOW.indexOf(k)<0;});if(order[0]!=='nour2')throw Error('nour2 not first: '+order.join(','));if((P.dropped||[]).length)throw Error('dropped '+P.dropped);
 `);
 check('Pass 256: late Tank 1 sickness moves by real time, a catch-up never crosses a stage, no crash without stage 4 held a minute',`
 var g=newGame();g.me.keep='self';g.ps=g.ps||{};g.ps.t=0;g.emp.healed=1;var T=g.tanks[0];T.had=1;T.vol=20;T.pop=[{age:100,n:4000,g:2}];T.chem.gh=7;startIll(g,T,'bact');T.ill.frac=0.3;T.ill.st=2;
