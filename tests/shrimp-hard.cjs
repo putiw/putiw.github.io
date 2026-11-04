@@ -75,6 +75,8 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
    desk:!document.getElementById('hard-desk').hidden,deskIn:!!document.querySelector('#hard-desk-in #e-proj'),cproj:document.getElementById('c-proj').hidden};});
  if(tr0.n<2||!tr0.cardHidden||!tr0.desk||!tr0.deskIn||!tr0.cproj)throw Error('trees in the hard part '+JSON.stringify(tr0));ok('Rewilding and The last mile write letters (Pass 255), their cards are gone, Shaping the world sits in the card');
  await p.evaluate(()=>{[...document.querySelectorAll('#hard-al button[data-act="tree-step"]')][0].click();});await p.waitForTimeout(400);
+ const tr1f=await p.evaluate(()=>{var b=[...document.querySelectorAll('#hard-al button[data-act="tree-step"]')][0];return !!b&&b.disabled&&/Funded/.test(b.textContent);});if(!tr1f)throw Error('Pass 256: the funded tree row greys in place as Funded');
+ await p.evaluate(()=>{hdFree();render();});await p.waitForTimeout(400);/* the scroll that lets the panel go */
  const tr1=await p.evaluate(()=>({y:scrollY,h:document.getElementById('hard-card').offsetHeight,done:[...document.querySelectorAll('#hard-al .pr-row .qhelp, #hard-al .pr-run .qhelp')].map(x=>x.dataset.ht).join('|')}));
  if(Math.abs(tr1.y-tr0.y)>1||Math.abs(tr1.h-tr0.h)>1||!/Done: /.test(tr1.done||''))throw Error('tree step '+JSON.stringify([tr0,tr1]));ok('a tree step keeps the card height and scrolls nothing, the step goes to Done');
  const led=await p.evaluate(()=>({t:document.querySelector('#hard-led .led-t').textContent,h:document.querySelector('#hard-led .qhelp').dataset.ht,key:document.getElementById('hg-key').textContent,slider:!!document.querySelector('#hard-led input')}));
