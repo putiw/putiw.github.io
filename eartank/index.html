@@ -38,6 +38,7 @@ button .sub{font-weight:400;font-size:13px;color:inherit;opacity:.75;white-space
 .sr{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .bar{display:flex;gap:10px;align-items:center;margin-bottom:10px}
 .bar input{flex:1}
+#stats{font-size:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 12px;line-height:1.5}#stats table{border-collapse:collapse;width:100%;margin-top:6px}#stats td,#stats th{text-align:left;padding:1px 4px;font-weight:400;white-space:nowrap}#stats th{color:var(--ink-3);font-size:11px}#stats tr.hit td{background:#e6f0e3}#stats .b{display:inline-block;height:8px;background:var(--accent);vertical-align:middle;border-radius:2px}#stats .w{display:inline-block;width:60px;height:8px;background:var(--off);vertical-align:middle;border-radius:2px;overflow:hidden}
 .state{font-size:13px;color:var(--ink-3);margin:0 0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>
@@ -63,7 +64,8 @@ button .sub{font-weight:400;font-size:13px;color:inherit;opacity:.75;white-space
 </div>
 
 <div id="status" role="status" aria-live="polite"><b id="st-head">Tap to start</b><span id="st-body">Tap anywhere to turn the sound on.</span></div>
-<p class="state" id="stateline" aria-hidden="true"></p>
+<p class="state sr" id="stateline" aria-hidden="true"></p>
+<div id="stats" aria-hidden="true"></div>
 
 <section id="s-start" class="screen on" aria-label="Start">
   <button class="pri" id="btn-adopt">Adopt a tank<span class="sub">one that exists, with its history</span></button>
@@ -121,7 +123,7 @@ var SOUND={
 /* ---------- model ---------- */
 var KEY='eartank-v1', SPEEDS=[['real time',1/3600],['a day a minute',24/60],['a week a minute',168/60]];
 var THINGS=['nothing','rock','driftwood','moss','a plant'];
-var S=null, UI={}, A=null, speaking=true, vol=0.6, lastReal=0, speedIx=0, cluster=0, evq=[], lastEv=0, teachOn=false;
+var S=null, UI={}, A=null, speaking=false, vol=0.6, lastReal=0, speedIx=1, cluster=0, evq=[], lastEv=0, teachOn=false;
 function $(id){return document.getElementById(id)}
 function rnd(a,b){return a+Math.random()*(b-a)}
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
@@ -134,7 +136,7 @@ function newState(scape,n,history){
   save();
 }
 function save(){S.last=Date.now();S.speed=speedIx;S.voice=speaking;S.vol=Math.round(vol*100);try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-function load(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===1){S=s;speedIx=s.speed||0;speaking=s.voice!==false;vol=(s.vol==null?60:s.vol)/100;return true}}catch(e){}return false}
+function load(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===1){S=s;speedIx=s.speed==null?1:s.speed;speaking=s.voice===true;vol=(s.vol==null?60:s.vol)/100;return true}}catch(e){}return false}
 function sizeOf(s){return s.age<30?'baby':s.age<75?'juv':'adult'}
 function adults(){return S.shrimp.filter(function(s){return s.age>=75})}
 function logit(t){S.log.unshift('Day '+Math.floor(S.day)+', '+t);if(S.log.length>30)S.log.length=30}
@@ -260,7 +262,8 @@ function chime(){if(audio())tone(880,120,0.05)}
 function tankSt(){return S||{nh3:0,no2:0,scape:buildScape,moss:0}}
 function surfaces(){var st=tankSt(),c={rock:0,wood:0,moss:0,plant:0},i;for(i=0;i<st.scape.length;i++){var k=st.scape[i];if(k===1)c.rock++;else if(k===2)c.wood++;else if(k===3)c.moss++;else if(k===4)c.plant++}c.moss+=st.moss*2;return c}
 function pickSurface(){var c=surfaces(),tot=c.rock+c.wood+c.moss+c.plant+1,r=Math.random()*tot;if((r-=c.rock)<0)return 'rock';if((r-=c.wood)<0)return 'wood';if((r-=c.moss)<0)return 'moss';if((r-=c.plant)<0)return 'plant';return 'glass'}
-function shrimpTick(s,at,hungryOverride){
+var HIT={};
+function shrimpTick(s,at,hungryOverride){HIT[s.id]=Date.now();
   var T=SOUND.tick,sz=sizeOf(s),base=sz==='baby'?T.baby:sz==='juv'?T.juv:T.adult;
   var hz=base*(1+(((s.id*7919)%100)/100-0.5)*2*T.jitter);
   var st=tankSt(),hungry=hungryOverride!=null?hungryOverride:s.hunger>0.6, bad=st.nh3+st.no2*0.7;
@@ -370,21 +373,35 @@ function thingSound(k){if(!audio())return;var t=A.ctx.currentTime+0.05,i;
   else if(k===4)for(i=0;i<3;i++)burst(2500,1.5,40,0.03,t+i*0.5);
 }
 function densitySound(n){if(!audio())return;var t=A.ctx.currentTime;for(var i=0;i<n;i++){var s={id:100+i,age:rnd(60,300),hunger:0.2,berried:0};for(var j=0;j<3;j++)shrimpTick(s,t+0.1+Math.random()*4,false)}}
+function statsHTML(){
+  if(!S)return'';var R=SOUND.room,bad=Math.min(1,S.nh3+S.no2*0.7),now=Date.now();
+  var tempo=R.bubbleEvery*(1-R.tempSpan*(S.temp-24)/4)*(1+R.clogSlow*S.clog);
+  var lp=SOUND.dull.clearHz-(SOUND.dull.clearHz-SOUND.dull.oldHz)*Math.min(1,S.no3/SOUND.dull.oldAt);
+  function bar(v){return '<span class="w"><span class="b" style="width:'+Math.round(Math.max(0,Math.min(1,v))*60)+'px"></span></span>'}
+  var h='<b>Day '+Math.floor(S.day)+'</b> · '+SPEEDS[speedIx][0]+' · '+S.shrimp.length+' shrimp'
+  +'<br>Ammonia+nitrite '+(S.nh3+S.no2).toFixed(2)+' ppm → hiss '+(bad<0.08?'off':Math.round(Math.min(1,bad)*100)+'%')
+  +'<br>Nitrate '+Math.round(S.no3)+' ppm → low-pass '+Math.round(lp)+' Hz (clear 9000, old 1700)'
+  +'<br>Filter clog '+Math.round(S.clog*100)+'% · temp '+S.temp.toFixed(1)+'° → bubble every '+tempo.toFixed(2)+' s'
+  +'<br>Food on the floor '+S.food.toFixed(2)+' · moss '+Math.round(S.moss*100)+'% · ration '+(S.ration<1?'half':'full')+(S.jobs.length?' · store job in '+Math.max(0,S.jobs[0].at-S.h).toFixed(1)+' h':'')
+  +'<table><tr><th>#</th><th>size</th><th>age d</th><th>hunger</th><th>state</th><th>molt in</th></tr>';
+  S.shrimp.forEach(function(x){h+='<tr'+(now-(HIT[x.id]||0)<300?' class="hit"':'')+'><td>'+x.id+'</td><td>'+sizeOf(x)+'</td><td>'+Math.round(x.age)+'</td><td>'+bar(x.hunger)+(x.hunger>0.6?' hungry':'')+'</td><td>'+(x.berried>0?'eggs '+Math.ceil(x.berried)+' d':x.sex)+'</td><td>'+Math.ceil(x.moltIn)+'</td></tr>'});
+  return h+'</table>';
+}
 function stateLine(){if(!S)return'';return 'Day '+Math.floor(S.day)+' · '+S.shrimp.length+' shrimp · ammonia '+S.nh3.toFixed(2)+' · nitrate '+Math.round(S.no3)+' · filter '+Math.round(S.clog*100)+'% · food '+S.food.toFixed(1)+' · '+S.temp.toFixed(1)+'°'}
 /* ---------- wiring ---------- */
 function home(){show('s-home');$('speed-sub').textContent=SPEEDS[speedIx][0];$('btn-less').setAttribute('aria-pressed',S.ration<1);$('btn-less').textContent=S.ration<1?'Feed more':'Feed less';if(A)A.voices={};lastReal=Date.now()}
 function start(){
   var started=false;
-  function go(){if(started)return;var a=audio();if(!a){speak('No sound on this browser.','No sound');started=true;return}a.ctx.resume().then(function(){started=true;if(S&&!S.taught&&!teachOn)teach(function(){speak(howText(),'Your tank')});else if(S)speak(howText(),'Your tank');else speak('Adopt a tank that exists, or build one at the store.','Ear tank')})}
+  function go(){if(started)return;var a=audio();if(!a){speak('No sound on this browser.','No sound');started=true;return}a.ctx.resume().then(function(){started=true;if(S&&!S.taught&&!teachOn&&speaking)teach(function(){speak(howText(),'Your tank')});else if(S)speak(howText(),'Your tank');else speak('Adopt a tank that exists, or build one at the store.','Ear tank')})}
   document.body.addEventListener('pointerdown',go);document.body.addEventListener('keydown',go);
   $('btn-help').onclick=function(){var h=$('help');h.classList.toggle('on');this.setAttribute('aria-expanded',h.classList.contains('on'))};
   $('btn-adopt').onclick=function(){renderAdopt();show('s-adopt');speak('Three tanks. Tap one to hear it for ten seconds.','Adopt')};
   $('btn-build').onclick=function(){buildScape=[0,0,0,0,0,0,0,0,0,0,0,0];buildPlace=-1;buildN=10;renderBuild();show('s-build');speak('Twelve places, front row to back. Pick a place, then what goes there. Then how many shrimp.','Build')};
   $('btn-adopt-back').onclick=function(){S=null;previewTank=null;clearTimeout(prevTimer);adoptPick=-1;$('btn-keep').disabled=true;if(A)A.voices={};show('s-start');speak('Adopt a tank, or build one.')};
-  $('btn-keep').onclick=function(){var a=ADOPT[adoptPick];previewTank=null;clearTimeout(prevTimer);newState(a.scape,a.n,a.h);S.no3=a.no3;S.clog=a.clog;S.taught=false;save();if(A)A.voices={};home();speak(a.name+' is yours. It plays from now.','Your tank');setTimeout(function(){if(!S.taught&&A&&A.ctx.state==='running')teach(function(){speak(howText(),'Your tank')})},3000)};
+  $('btn-keep').onclick=function(){var a=ADOPT[adoptPick];previewTank=null;clearTimeout(prevTimer);newState(a.scape,a.n,a.h);S.no3=a.no3;S.clog=a.clog;S.taught=false;save();if(A)A.voices={};home();speak(a.name+' is yours. It plays from now.','Your tank');setTimeout(function(){if(!S.taught&&speaking&&A&&A.ctx.state==='running')teach(function(){speak(howText(),'Your tank')})},3000)};
   $('btn-build-back').onclick=function(){show('s-start');speak('Adopt a tank, or build one.')};
   document.querySelectorAll('#counts button').forEach(function(b){b.onclick=function(){buildN=+b.dataset.n;renderBuild();speak(buildN+' shrimp. Listen.');densitySound(buildN)}});
-  $('btn-build-done').onclick=function(){newState(buildScape.slice(),buildN,'Built by you.');S.taught=false;save();if(A)A.voices={};home();speak('Done, the store sets it up, come back tomorrow. The filter is cycled.','Your tank');setTimeout(function(){if(!S.taught&&A&&A.ctx.state==='running')teach(function(){speak(howText(),'Your tank')})},4000)};
+  $('btn-build-done').onclick=function(){newState(buildScape.slice(),buildN,'Built by you.');S.taught=false;save();if(A)A.voices={};home();speak('Done, the store sets it up, come back tomorrow. The filter is cycled.','Your tank');setTimeout(function(){if(!S.taught&&speaking&&A&&A.ctx.state==='running')teach(function(){speak(howText(),'Your tank')})},4000)};
   $('btn-how').onclick=function(){speak(howText(),'Your tank')};
   $('btn-feed').onclick=function(){job('feed',2,'Feeding, the store does it this afternoon.')};
   $('btn-less').onclick=function(){S.ration=S.ration<1?1:0.5;save();home();speak(S.ration<1?'Half rations from now.':'Full rations from now.')};
@@ -400,6 +417,7 @@ function start(){
   $('btn-voice').onclick=function(){speaking=!speaking;this.setAttribute('aria-pressed',speaking);$('voice-sub').textContent=speaking?'on':'off';save();speak(speaking?'Voice on.':'Voice off.');if(!speaking&&'speechSynthesis'in window)speechSynthesis.cancel()};
   $('btn-teach').onclick=function(){teach(function(){speak('Done.','Settings')})};
   $('btn-reset').onclick=function(){if(!confirm('Start over? The tank is gone.'))return;S=null;try{localStorage.removeItem(KEY)}catch(e){}if(A)A.voices={};evq=[];show('s-start');speak('Gone. Adopt a tank, or build one.','Ear tank')};
+  $('btn-voice').setAttribute('aria-pressed',speaking);$('voice-sub').textContent=speaking?'on':'off';
   // model clock
   setInterval(function(){
     if(!S||S===previewTank)return;
@@ -410,13 +428,14 @@ function start(){
     if(Math.random()<0.1)save();
   },1000);
   setInterval(sched,100);
+  setInterval(function(){var el=$('stats');var h=statsHTML();if(el.innerHTML!==h)el.innerHTML=h},250);
   document.addEventListener('visibilitychange',function(){if(!A)return;if(document.hidden){A.ctx.suspend();if(S)save()}else{lastReal=Date.now();A.ctx.resume()}});
   // load
   if(load()){
     var gone=Math.min(30*24,(Date.now()-S.last)/3600000); if(gone>0.02){advance(gone);evq=[];}
     $('vol').value=Math.round(vol*100);$('btn-voice').setAttribute('aria-pressed',speaking);$('voice-sub').textContent=speaking?'on':'off';
     home();$('st-head').textContent='Tap to start';$('st-body').textContent='Tap anywhere to turn the sound on. '+(gone>1?Math.round(gone/24*10)/10+' days passed.':'');
-  }else{show('s-start')}
+  }else if(/quick=0/.test(location.search)){show('s-start')}else{newState([2,0,1,0,3,0,0,1,4,0,0,3],10,'Quick start, 10 shrimp.');S.taught=true;save();home();$('st-head').textContent='Tap to start';$('st-body').textContent='Tap anywhere to turn the sound on. A tank with 10 shrimp, a day a minute. Voice is off, Settings turns it on.'}
   $('stateline').textContent=stateLine();
 }
 start();
