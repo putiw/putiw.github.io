@@ -383,4 +383,9 @@ var h=newGame();h.me.on=1;h.me.hrs=h.me.hrs||{};h.me.hrs.papers=15207;h.me.fx={s
 for(var d=0;d<30;d++){h.day++;h.ps.t+=50;factDay(h);}if((h.me.dlog||[]).length)throw Error('a reset clock skipped the gap');
 h.ps.t+=FACT_GAP+1;h.me.hrs.papers=99999;factDay(h);if((h.me.dlog||[]).length!==1)throw Error('the next fact comes after 3 minutes');
 `);
+check('Pass 256: a fresh gp_land goes in front of five waiting stories, a Milo card whose window closed is skipped',`
+var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;g.kits.sold=Math.max(1,g.kits.sold);personalDay(g);g.me.on=1;g.me.sent=5e5;g.money=1e6;g.me.gplace={balcony:1,house:1};var p=ensureProgress(g);p.wait=['c_cash','c_power','c_rivers','c_many','c_blackout'];['c_cash','c_power','c_rivers','c_many','c_blackout'].forEach(function(k){p.seen[k]=true;});detectMilestones(g);
+var at=p.wait.indexOf('gp_land'),inq=p.queue.indexOf('gp_land')>=0;if(!(at===0||inq))throw Error('gp_land first: '+p.wait.join(','));
+if(STORY_STILL(g,'nour2'))throw Error('no hard part, no Milo card');if(!STORY_STILL(g,'c_cash'))throw Error('a late card still holds before the win');g.emp.won=1;if(STORY_STILL(g,'c_cash'))throw Error('late cards skip after the win');
+`);
 console.log(count+' free time, Grandma and ending checks passed');
