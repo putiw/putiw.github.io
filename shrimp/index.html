@@ -3341,6 +3341,13 @@ function landOwn(G){var T=G.tanks[0],a=0,y=0,gs=0,ga=[0,0,0,0,0,0,0,0],gy=[0,0,0
   o.glass=(T.glass||[]).map(function(v){return Math.min(9,Math.round(v*9));}).join('');o.no3=+P.no3.toFixed(1);o.nh=+P.nh.toFixed(2);o.decor=T.ldec?{wood:T.wood?1:0,plants:T.plants?1:0,moss:T.moss?1:0,leaves:T.leaves?1:0}:null;o.well=ownWell(G);o.due=ownDue(G);}
  return o;}
 // what a job on the land changed (Pass 161)
+// Pass 257: the land's piece list, checked before it's kept (sim, no UI)
+var SCP_KINDS={wood:[53,150,454,192,'twood'],rockpile:[15,277,394,142,'trocks'],pebble:[605,302,69,45,'trocks'],mossrock:[695,321,115,69,'trocks'],rocks:[811,299,120,102,'trocks'],lotus:[520,181,179,175,'tplants'],stem:[685,169,123,163,'tplants'],sword:[298,195,116,166,'tsword'],leaf:[0,0,120,65,'tleaf']};
+function scpClean(p){if(!p||typeof p!=='object'||!Array.isArray(p.s)||!Array.isArray(p.t))return null;var n=function(v){v=+v;return isFinite(v)?v:0;},o={v:1,s:[],t:[],m:{}};
+ p.s.slice(0,200).forEach(function(i){if(Array.isArray(i)&&SCP_KINDS[i[0]])o.s.push([i[0],n(i[1]),n(i[2]),Math.max(0.05,Math.min(4,n(i[3])||1)),i[4]<0?-1:1,n(i[5]),String(i[6]).slice(0,24)]);});
+ p.t.slice(0,200).forEach(function(i){if(Array.isArray(i))o.t.push([n(i[0]),Math.max(0,Math.min(600,n(i[1]))),n(i[2])|0,n(i[3])]);});
+ if(p.m&&typeof p.m==='object')Object.keys(p.m).slice(0,200).forEach(function(k){var a=p.m[k];if(Array.isArray(a))o.m[String(k).slice(0,24)]=a.slice(0,60).filter(Array.isArray).map(function(m){return [n(m[0]),n(m[1]),Math.max(0,Math.min(300,n(m[2]))),n(m[3])|0];});});
+ return o;}
 function landTank(G,d){var T=G.tanks[0];if(!T||!d)return;var C=careOf(T),n=function(v){return clamp(+v||0,0,1);};T.cleanT=Date.now();/* Pass 235: any land job report */
  if(d.mulm!=null)C.mulm=n(d.mulm);if(d.sponge!=null)C.sponge=n(d.sponge);if(d.grow!=null)C.grow=n(d.grow);
  // Pass 179: the land sends the columns it cleaned and the pests still there, so what was cleaned stays clean
@@ -3350,7 +3357,7 @@ function landTank(G,d){var T=G.tanks[0];if(!T||!d)return;var C=careOf(T),n=funct
  if(typeof d.gl==='string'&&T.glass&&d.gl.length===T.glass.length){var wiped=0;for(var j=0;j<T.glass.length;j++){var gv=+d.gl[j]||0;if(gv<Math.round(T.glass[j]*9)){T.glass[j]=gv/9;wiped++;}}T.glassV=(T.glassV||0)+1;if(wiped)T.wipeD=td(G,T);}
  if(d.wc>0&&totalN(T)>=0)waterChange(G,T,clamp(d.wc|0,1,90),true);
  if(d.decor){T.wood=d.decor.wood?1:0;T.plants=d.decor.plants?1:0;T.moss=d.decor.moss?1:0;T.leaves=d.decor.leaves?1:0;T.ldec=1;}
- if(typeof d.sci==='string'&&d.sci.length<1500000&&/^data:image\/(png|webp);base64,[A-Za-z0-9+\/=]+$/.test(d.sci)&&d.sci!==G.opt.scImg){G.opt.scImg=d.sci;scImgLoad();}// Pass 254: the land's Aquascape as one picture, drawn on this page
+ var sp=scpClean(d.scp);if(sp){T.scp=sp;T.scpK=(T.scpK||0)+1;if(G.opt.scImg)delete G.opt.scImg;}// Pass 257 (Puti): the land's Aquascape as its piece list, drawn here with the same sprites; the old picture is dropped once a list comes
  if(d.job)careDone(G,'land');}
 function houseLines(G){var H=G.me&&G.me.house;if(!H||!H.land)return [];if(!H.complete)return ['A half-built house stands on a piece of land near the water.'];
  if(H.who==='gp')return ['Grandma lives in a house that makes its own power. She grows tomatoes and complains about them.'];if(H.who==='both')return ['You and Grandma share a house with a well, a wind turbine and a shrimp room. She took the bigger bedroom.'];
@@ -4399,7 +4406,7 @@ function trim(n,d){return String(+Number(n).toFixed(d));}
 (function(){var vv=window.visualViewport,fix=function(){var a=document.activeElement,typing=!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!/^(range|checkbox|radio|button)$/.test(a.type||''));document.body.classList.toggle('kbd',typing&&!!vv&&vv.height<window.innerHeight*0.8);var t=document.querySelector('.tabs');if(t&&t.style.transform)t.style.transform='';};if(vv){vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);}document.addEventListener('focusin',function(){setTimeout(fix,300);});document.addEventListener('focusout',function(){setTimeout(fix,50);setTimeout(fix,400);});})();
 // No browser feel: no pinch or double-tap zoom, no long-press menu outside text fields.
 (function(){var stop=function(e){e.preventDefault();};['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,stop,{passive:false});});document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea,[contenteditable]')))e.preventDefault();});})();
-var toastT=null,NF=null,BUILD='2026-11-05T03:50-p257';
+var toastT=null,NF=null,BUILD='2026-11-05T04:30-p257';
 function buildDate(){var m=BUILD.match(/^(\d{4})-(\d\d)-(\d\d)(?:T(\d\d:\d\d))?/);if(!m)return '';return 'Updated '+(+m[3])+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m[2]-1]+' '+m[1]+(m[4]?', '+m[4]+' UAE':'');}
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
@@ -5213,7 +5220,34 @@ var SCIMG={src:'',img:null,ok:0,v:0};
 function scImgLoad(){var src=G&&G.opt&&G.opt.scImg||'';if(src===SCIMG.src)return;SCIMG.src=src;SCIMG.ok=0;SCIMG.img=null;if(!src)return;var im=new Image();im.onload=function(){if(SCIMG.src!==src)return;SCIMG.img=im;SCIMG.ok=1;SCIMG.v++;tvAll(function(v){v.bgKey='';});if(src.length>300000)scImgShrink(im);};im.src=src;}
 // Pass 256: Safari can't encode webp, so the land sends a full-size png (over 300 kB, it used to be dropped); keep a half-size copy in the save
 function scImgShrink(im){try{var c=document.createElement('canvas');c.width=Math.round(im.width/2);c.height=Math.round(im.height/2);c.getContext('2d').drawImage(im,0,0,c.width,c.height);var u=c.toDataURL('image/webp',0.86);if(u.indexOf('data:image/webp')!==0)u=c.toDataURL('image/png');if(u.length<G.opt.scImg.length){G.opt.scImg=u;SCIMG.src=u;}}catch(e){}}
-function scImgOn(T){if(G&&G.opt&&(G.opt.scImg||'')!==SCIMG.src)scImgLoad();return !!(T&&G&&T===G.tanks[0]&&T.ldec&&SCIMG.ok&&SCIMG.img);}
+function scImgOn(T){if(T&&T.scp)return false;if(G&&G.opt&&(G.opt.scImg||'')!==SCIMG.src)scImgLoad();return !!(T&&G&&T===G.tanks[0]&&T.ldec&&SCIMG.ok&&SCIMG.img);}/* Pass 257: only for old saves with a picture and no list */
+// Pass 257 (Puti 5 Nov): Tank 1's Aquascape as data. The land sends its pieces (T.scp: scape [kind,x,y,scale,flip,rot,id], stems [x,h,seed,lean],
+// moss {id:[[u,a,len,seed]]}, the 932x430 art frame) and this page draws them like the land's drawScapeAll, with the decor cut from the same art layers.
+function scpOn(T){return !!(T&&G&&T===G.tanks[0]&&T.ldec&&T.scp&&TVREADY);}
+var SCPI={},SCPTOP={};function scpRand(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function scpImg(k){if(SCPI[k])return SCPI[k];var d=SCP_KINDS[k],im=d&&TVIMG[d[4]];if(!im||!im.width)return null;if(k==='leaf')return SCPI[k]=im;var c=document.createElement('canvas');c.width=d[2];c.height=d[3];c.getContext('2d').drawImage(im,d[0]*im.width/932,d[1]*im.height/430,d[2]*im.width/932,d[3]*im.height/430,0,0,d[2],d[3]);return SCPI[k]=c;}
+function scpTop(k){if(SCPTOP[k])return SCPTOP[k];var im=scpImg(k);if(!im)return null;var c=document.createElement('canvas');c.width=im.width;c.height=im.height;var x=c.getContext('2d');x.drawImage(im,0,0);var d=x.getImageData(0,0,c.width,c.height).data,out=[];
+ for(var cx=0;cx<c.width;cx+=4){var y=-1;for(var cy=0;cy<c.height;cy++){if(d[(cy*c.width+cx)*4+3]>140){y=cy;break;}}out.push(y);}return SCPTOP[k]={y:out};}
+var SCP_MOSS=['#6f9f4a','#7fae55','#5f8f3f','#8cbb62'];
+function scpDraw(x,P){/* drawn at the art size (1 px = 1 art px), the caller scales */
+ P.t.forEach(function(st){var sx=st[0],sh=st[1],seed=st[2],lean=st[3],top=430*0.215+3,pts=[[sx,430*0.765]],len=sh,y=430*0.765,xx=sx,i=0;
+  while(len>0&&i<200){var dy=Math.min(4,len);if(y-dy>top){y-=dy;xx+=lean*dy+Math.sin((y+seed%50)/17)*0.35;}else{xx+=(lean>=0?1:-1)*dy;}len-=dy;pts.push([xx,y]);i++;}
+  var r=scpRand(seed);x.strokeStyle='#4f7f33';x.lineWidth=1.3;x.beginPath();pts.forEach(function(p,j){if(j)x.lineTo(p[0],p[1]);else x.moveTo(p[0],p[1]);});x.stroke();
+  for(var j=2;j<pts.length;j+=2){var p=pts[j],q=pts[j-1],ang=Math.atan2(p[1]-q[1],p[0]-q[0]),lw=(4.2+r()*1.6)*(1/0.48);
+   [-1,1].forEach(function(sd){var a=ang+sd*1.15,ex=p[0]+Math.cos(a)*lw,ey=p[1]+Math.sin(a)*lw;x.beginPath();x.ellipse((p[0]+ex)/2,(p[1]+ey)/2,lw/2,lw*0.24,a,0,6.283);x.fillStyle=j>pts.length-7?'#9fd06a':'#7cbf4f';x.fill();x.lineWidth=0.7;x.strokeStyle='#3d6e2a';x.stroke();});}});
+ P.s.forEach(function(it){var k=it[0],d=SCP_KINDS[k],im=scpImg(k);if(!im)return;var w=d[2]*it[3],h=d[3]*it[3];x.save();x.translate(it[1],it[2]);if(it[4]<0)x.scale(-1,1);
+  if(k==='leaf'){x.rotate(it[5]||0.2);x.drawImage(im,-w/2,-h*0.7,w,h);}else{if(it[5])x.rotate(it[5]);x.drawImage(im,-w/2,-h,w,h);}x.restore();
+  var ms=P.m[it[6]],tp=ms&&scpTop(k);if(!tp)return;
+  ms.forEach(function(m){var ix=Math.max(0,Math.min(tp.y.length-1,Math.floor(m[0]*tp.y.length))),px=ix*4,py=tp.y[ix]+2,lx=(it[4]<0?(d[2]-px):px)*it[3],ax=it[1]-w/2+lx,ay=it[2]-h+py*it[3];
+   if(it[5]&&k!=='leaf'){var dx=ax-it[1],dy=ay-it[2],fl=it[4]<0?-1:1,c=Math.cos(it[5]),sn=Math.sin(it[5]);dx*=fl;ax=it[1]+fl*(dx*c-dy*sn);ay=it[2]+(dx*sn+dy*c);}
+   var r=scpRand(m[3]),L=m[2],n=Math.max(1,Math.floor(L/3)),qx=ax,qy=ay,ang=m[1],curl=(r()-0.5)*0.14,pf=[],up=m[1]>-Math.PI/2?1:-1;
+   for(var i=0;i<n;i++){ang+=curl+(r()-0.5)*0.55;ang+=up*Math.min(0.06,i*0.004);qx+=Math.cos(ang)*3;qy+=Math.sin(ang)*3;
+    var rr=(4.2+r()*3)*(1-Math.min(0.35,i*0.01))*(i>=n-2?0.7:1);pf.push({x:qx+(r()-0.5)*2.2,y:qy+(r()-0.5)*2.2,r:rr,c:SCP_MOSS[Math.floor(r()*4)],al:0.86+r()*0.14,rot:r()*3,ang:ang});
+    if(i%3===2){var ta=ang+(r()<0.5?-1:1)*(0.6+r()*0.6),tx=qx,ty=qy,tl=1+Math.floor(r()*3);for(var kk=0;kk<tl;kk++){tx+=Math.cos(ta)*2.6;ty+=Math.sin(ta)*2.6;ta+=(r()-0.5)*0.5;pf.push({x:tx,y:ty,r:rr*(0.72-kk*0.14),c:SCP_MOSS[Math.floor(r()*4)],al:0.9,rot:r()*3,ang:ta});}}}
+   x.fillStyle='#3a6528';pf.forEach(function(p){x.beginPath();x.ellipse(p.x,p.y,p.r*1.15+1,p.r*0.85+1,p.rot,0,6.283);x.fill();});
+   pf.forEach(function(p){x.globalAlpha=p.al;x.fillStyle=p.c;x.beginPath();x.ellipse(p.x,p.y,p.r*1.15,p.r*0.85,p.rot,0,6.283);x.fill();});x.globalAlpha=1;
+   x.strokeStyle='rgba(44,78,30,.7)';x.lineWidth=0.7;pf.forEach(function(p,j){if(j%2)return;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(p.x+Math.cos(p.ang+1.3)*p.r*1.2,p.y+Math.sin(p.ang+1.3)*p.r*1.2);x.stroke();});
+   x.fillStyle='rgba(206,232,150,.55)';pf.forEach(function(p,j){if(j%4)return;x.beginPath();x.arc(p.x-p.r*0.3,p.y-p.r*0.35,p.r*0.28,0,6.283);x.fill();});});});}
 (function(){var ks=Object.keys(SPR),left=ks.length;ks.forEach(function(k){var im=new Image();im.onload=im.onerror=function(){if(--left===0){TVREADY=true;tvAll(function(v){v.bgKey='';});}};im.src=SPR[k];TVIMG[k]=im;});})();
 var TV_SW=114,TV_SH=58;
 // Body colour: pale pink for low grades up to a warm cherry red, more see-through when young or low grade.
@@ -5309,7 +5343,7 @@ function tvFoodSync(v,T){if(!v.W)return;var mg=T&&T.chem?T.chem.food:0,live=v.fo
  while(live.length>want){var near=null,bn=1e9;live.forEach(function(f){var c=0;v.ag.forEach(function(a){if(Math.abs(a.x-f.x)<20&&Math.abs(a.y-f.y)<20)c++;});var sc=-c*100+Math.random();if(sc<bn){bn=sc;near=f;}});near.gone=true;near.a=1;live.splice(live.indexOf(near),1);}
  var sand=tvSand(v),init=!v.foodInit;v.foodInit=1;while(live.length<want){var fl=sand+v.H*(0.03+Math.random()*0.06),f={x:v.W*(0.1+Math.random()*0.75),y:init?fl:v.H*0.22-Math.random()*v.H*0.02,floor:fl,a:1};v.food.push(f);live.push(f);}}
 function tvFeed(v,mg){if(!v)return;var n=clamp(Math.round(4+mg/4),4,14);v.pmg=Math.max(0.3,mg/n);}
-function tvBg(v,T){if(v.opt.slow)T=v.opt.deco||null;var W=v.W,H=v.H,P=T&&T.chem&&T.vol?ppm(T):{nh:0,no3:0},key=[v.opt.slow?1:0,W,H,v.dpr,T&&T.wood?1:0,T&&T.moss?1:0,T&&T.plants?1:0,T&&T.leaves?1:0,T&&T.milo?1:0,scImgOn(T)?'s'+SCIMG.v:0,Math.min(3,Math.floor((P.no3||0)/12)),Math.min(3,Math.floor((P.nh||0)*4)),TVREADY?1:0].join();
+function tvBg(v,T){if(v.opt.slow)T=v.opt.deco||null;var W=v.W,H=v.H,P=T&&T.chem&&T.vol?ppm(T):{nh:0,no3:0},key=[v.opt.slow?1:0,W,H,v.dpr,T&&T.wood?1:0,T&&T.moss?1:0,T&&T.plants?1:0,T&&T.leaves?1:0,T&&T.milo?1:0,scpOn(T)?'p'+(T.scpK||0):scImgOn(T)?'s'+SCIMG.v:0,Math.min(3,Math.floor((P.no3||0)/12)),Math.min(3,Math.floor((P.nh||0)*4)),TVREADY?1:0].join();
  if(v.bgKey===key)return v.bg;v.bgKey=key;var c=v.bg||document.createElement('canvas');c.width=W*v.dpr;c.height=H*v.dpr;var x=c.getContext('2d');x.setTransform(v.dpr,0,0,v.dpr,0,0);
  var I=TVIMG,sand=tvSand(v);
  if(TVREADY)x.drawImage(I.tbg,0,0,W,H);else{x.fillStyle='#8fc6d8';x.fillRect(0,0,W,H);x.fillStyle='#e8d6ad';x.fillRect(0,H*0.7,W,H*0.3);}
@@ -5319,10 +5353,11 @@ function tvBg(v,T){if(v.opt.slow)T=v.opt.deco||null;var W=v.W,H=v.H,P=T&&T.chem&
    x.strokeStyle='rgba('+g[3]+','+g[4]+')';x.lineWidth=Math.max(1,3.1*g[2]*k);x.beginPath();x.moveTo(bx,by);x.quadraticCurveTo(bx+sw*0.28,by-bh*0.5,bx+sw,by-bh);x.stroke();}});
  if(TVREADY&&T&&T.milo){var ks=H/430*0.95;x.drawImage(I.tplants,520,168,170,194,W*0.5-85*ks,H*0.84-194*ks,170*ks,194*ks);x.drawImage(I.trocks,604,301,70,47,W*0.62,H*0.84-40*ks,70*ks*1.2,47*ks*1.2);x.drawImage(I.trocks,604,301,70,47,W*0.08,H*0.86-28*ks,70*ks*0.8,47*ks*0.8);x.drawImage(I.trocks,604,301,70,47,W*0.3,H*0.88-20*ks,70*ks*0.55,47*ks*0.55);
   var psc=W/320,pwy=H*0.2;[0.25,0.7].forEach(function(fx,ci){var cx=W*fx;for(var j=0;j<6;j++){var an=Math.PI*2*j/6,ex=cx+Math.cos(an)*16*psc,ey=pwy+Math.sin(an)*6*psc;x.fillStyle='rgba(140,198,95,.88)';x.beginPath();x.ellipse(ex,ey,11*psc,5*psc,0,0,6.283);x.fill();x.fillStyle='rgba(212,236,160,.28)';x.beginPath();x.ellipse(ex-3*psc,ey-2*psc,4*psc,2*psc,0,0,6.283);x.fill();}});}   // Pass 231 (Puti): Milo's small square tank, one lotus and one rock
- if(scImgOn(T)){x.drawImage(SCIMG.img,0,0,W,H);}
+ if(scpOn(T)){x.save();x.scale(W/932,H/430);scpDraw(x,T.scp);x.restore();}
+ else if(scImgOn(T)){x.drawImage(SCIMG.img,0,0,W,H);}
  else if(TVREADY){if(T&&T.wood)x.drawImage(I.twood,0,0,W,H);if(T&&T.plants)x.drawImage(I.tplants,0,0,W,H);if(T&&T.moss)x.drawImage(I.trocks,0,0,W,H);if(T&&T.plants)x.drawImage(I.tsword,0,0,W,H);
-  if(T&&T.leaves&&!scImgOn(T)){var lw=W*0.12,lh=lw*I.tleaf.height/I.tleaf.width;[[0.47,0.9,0.25],[0.15,0.95,-0.35],[0.66,0.93,2.9]].forEach(function(l){x.save();x.translate(W*l[0],H*l[1]);x.rotate(l[2]);x.drawImage(I.tleaf,-lw/2,-lh/2,lw,lh);x.restore();});}}
- if(T&&T.plants&&!scImgOn(T)){var sc=1.64*W/2000,wy=H*0.215+1;[0.22,0.3,0.68,0.74,0.8].forEach(function(fx,ci){var cx=W*fx;x.strokeStyle='rgba(106,139,81,.36)';x.lineWidth=1.2;for(var i=0;i<9;i++){var dir=ci%2?-1:1,rx=cx+dir*(-30*sc+i*8*sc),rh=(42+(i%4)*9)*sc;x.beginPath();x.moveTo(rx,wy+8*sc);x.quadraticCurveTo(rx+dir*Math.sin(i+ci)*8*sc,wy+rh*0.55,rx+dir*Math.cos(i)*4*sc,wy+rh);x.stroke();}
+  if(T&&T.leaves&&!scImgOn(T)&&!scpOn(T)){var lw=W*0.12,lh=lw*I.tleaf.height/I.tleaf.width;[[0.47,0.9,0.25],[0.15,0.95,-0.35],[0.66,0.93,2.9]].forEach(function(l){x.save();x.translate(W*l[0],H*l[1]);x.rotate(l[2]);x.drawImage(I.tleaf,-lw/2,-lh/2,lw,lh);x.restore();});}}
+ if(T&&T.plants&&!scImgOn(T)&&!scpOn(T)){var sc=1.64*W/2000,wy=H*0.215+1;[0.22,0.3,0.68,0.74,0.8].forEach(function(fx,ci){var cx=W*fx;x.strokeStyle='rgba(106,139,81,.36)';x.lineWidth=1.2;for(var i=0;i<9;i++){var dir=ci%2?-1:1,rx=cx+dir*(-30*sc+i*8*sc),rh=(42+(i%4)*9)*sc;x.beginPath();x.moveTo(rx,wy+8*sc);x.quadraticCurveTo(rx+dir*Math.sin(i+ci)*8*sc,wy+rh*0.55,rx+dir*Math.cos(i)*4*sc,wy+rh);x.stroke();}
   for(var j=0;j<8;j++){var an=Math.PI*2*j/8,ex=cx+Math.cos(an)*17*sc,ey=wy+Math.sin(an)*7*sc;x.fillStyle='rgba(140,198,95,.88)';x.beginPath();x.ellipse(ex,ey,12*sc,6*sc,0,0,6.283);x.fill();x.fillStyle='rgba(212,236,160,.28)';x.beginPath();x.ellipse(ex-3*sc,ey-2*sc,5*sc,2*sc,0,0,6.283);x.fill();}});}
  if(!v.opt.slow||v.opt.air){x.fillStyle='#3d3a33';x.fillRect(W*0.93-1,H*0.17,3,sand-H*0.32);x.fillStyle='#4a4a40';x.beginPath();x.roundRect?x.roundRect(W*0.905,sand-H*0.2,W*0.06,H*0.18,4):x.rect(W*0.905,sand-H*0.2,W*0.06,H*0.18);x.fill();}
  if(T&&T.leaves){x.fillStyle='rgba(150,95,30,.10)';x.fillRect(0,H*0.215,W,H);}

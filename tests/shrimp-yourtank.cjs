@@ -60,13 +60,20 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  await f.evaluate(()=>scrollTo(0,0));await p.screenshot({path:path.join(os.tmpdir(),'yt-land-'+W+'.png'),fullPage:false});
  await f.evaluate(()=>{var s=document.querySelector('#tankside [data-k="fw"]');if(s)s.scrollIntoView();});await p.screenshot({path:path.join(os.tmpdir(),'yt-land2-'+W+'.png')});
  // Pass 254 (Puti 5 Nov): the Aquascape sticks. Take the driftwood out, add a rock pile, turn it, finish: the game's flags, the
- // picture it draws (G.opt.scImg) and the land's pieces all keep the edit after Back, a reload and the next visit.
+ // piece list it draws (T.scp, Pass 257; was a picture) and the land's pieces all keep the edit after Back, a reload and the next visit.
  await f.evaluate(()=>{var T=S.tanks[0];T.scape=T.scape.filter(i=>i.k!=='wood');toyStart('scape');});await wait(400);
  await f.evaluate(()=>{var el=[...document.querySelectorAll('[data-add]')].find(b=>b.dataset.add==='rockpile');el.click();TOY.edit('rot');TOY.edit('rot');});await wait(200);
  const pieces=()=>f.evaluate(()=>S.tanks[0].scape.map(i=>i.k+(i.r?'r'+i.r.toFixed(2):'')).sort().join(','));
  const before=await pieces();await f.evaluate(()=>TOY.finish());await wait(2500);
- const g1=await p.evaluate(()=>({w:G.tanks[0].wood,img:(G.opt.scImg||'').slice(0,15),len:(G.opt.scImg||'').length,on:SCIMG.ok}));
- ok(g1.w===0&&/^data:image\/(webp|png)/.test(g1.img)&&g1.len>2000&&g1.len<300000&&g1.on===1,'after the job the game has no driftwood and the land\'s picture ('+g1.len+' chars)');
+ const g1=await p.evaluate(()=>{var P=G.tanks[0].scp;return {w:G.tanks[0].wood,n:P&&P.s.length,len:P?JSON.stringify(P).length:0,img:!!G.opt.scImg,on:scpOn(G.tanks[0]),k:P&&P.s.map(i=>i[0]+(i[5]?'r'+(+i[5]).toFixed(2):'')).sort().join(',')};});
+ ok(g1.w===0&&g1.n>0&&g1.len<20000&&!g1.img&&g1.on,'after the job the game has no driftwood and the land\'s piece list ('+g1.len+' chars, no picture)');
+ ok(g1.k===before,'the game\'s list has the same pieces as the land: '+g1.k);
+ // the same pieces drawn on both pages at the art size: same pixels, give or take antialiasing
+ const pxl=async(fr,fn)=>fr.evaluate(fn);
+ const landPx=await pxl(f,()=>{var c=document.createElement('canvas');c.width=932;c.height=430;var W=TV.W,H=TV.H,D=TV.dpr;TV.W=932;TV.H=430;TV.dpr=1;TV.L={};try{drawScapeAll(c.getContext('2d'),S.tanks[0],tvGeom());}finally{TV.W=W;TV.H=H;TV.dpr=D;TV.L={};}return Array.from(c.getContext('2d').getImageData(0,0,932,430).data.filter((v,i)=>i%4===3&&(i>>2)%7===0));});
+ const gamePx=await pxl(p,()=>{var c=document.createElement('canvas');c.width=932;c.height=430;scpDraw(c.getContext('2d'),G.tanks[0].scp);return Array.from(c.getContext('2d').getImageData(0,0,932,430).data.filter((v,i)=>i%4===3&&(i>>2)%7===0));});
+ let dif=0,on=0;for(let i=0;i<landPx.length;i++){if(landPx[i]>40)on++;if(Math.abs(landPx[i]-gamePx[i])>60)dif++;}
+ ok(on>2000&&dif/on<0.03,'the company page draws the same scape as the land ('+dif+' of '+on+' covered pixels differ)');
  ok(before.indexOf('rockpiler')>=0,'a rotated rock pile is in the pieces: '+before);
  await f.evaluate(()=>$('tb-back').click());await wait(600);ok(await p.evaluate(()=>!LAND.on),'Back leaves the land');
  await p.evaluate(()=>landShow());await wait(2500);
@@ -74,10 +81,10 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  await p.reload();await p.waitForFunction(()=>window.G&&G.tanks&&G.me);await p.evaluate(()=>{window.spotlight=function(){};landShow();});f=null;for(let i=0;i<100&&!f;i++){f=p.frames().find(x=>x.url().includes('home.html'));await wait(100);}
  await f.waitForFunction(()=>window.S&&S.tanks&&S.tanks[0]);await wait(2500);
  ok((await pieces())===before,'after a reload the land still has them: '+(await pieces()));
- ok(await p.evaluate(()=>G.tanks[0].wood===0&&(G.opt.scImg||'').length>2000&&SCIMG.ok===1),'after a reload the game draws the picture');
- // Pass 256: Safari sends a full-size png (no webp encoder), over the old 300 kB cap; the game must take it and keep a smaller copy
- const big=await p.evaluate(()=>new Promise(r=>{var c=document.createElement('canvas');c.width=932;c.height=430;var x=c.getContext('2d'),d=x.createImageData(932,430);for(var i=0;i<d.data.length;i++)d.data[i]=(Math.random()*255)|0;x.putImageData(d,0,0);var u=c.toDataURL('image/png');landTank(G,{sci:u});setTimeout(()=>r({sent:u.length,kept:(G.opt.scImg||'').length,ok:SCIMG.ok}),1500);}));
- ok(big.sent>300000&&big.ok===1&&big.kept>0&&big.kept<big.sent,'a big png scape (Safari) is drawn and kept smaller: '+JSON.stringify(big));
+ ok(await p.evaluate(()=>G.tanks[0].wood===0&&G.tanks[0].scp&&G.tanks[0].scp.s.length>0&&scpOn(G.tanks[0])),'after a reload the game draws the list');
+ // Pass 257: an old save with a picture and no list still draws the picture, until a list comes
+ const mig=await p.evaluate(()=>{var T=G.tanks[0],keep=T.scp;delete T.scp;var c=document.createElement('canvas');c.width=93;c.height=43;G.opt.scImg=c.toDataURL('image/png');scImgLoad();return new Promise(r=>setTimeout(()=>{var a=scImgOn(T);landTank(G,{scp:keep});r({pic:a,after:scImgOn(T),gone:!G.opt.scImg,list:scpOn(T)});},500));});
+ ok(mig.pic&&!mig.after&&mig.gone&&mig.list,'an old picture is drawn until the land sends a list, then dropped: '+JSON.stringify(mig));
  // Back with the job open: the job is ended and reported first
  await f.evaluate(()=>{toyStart('scape');var el=[...document.querySelectorAll('[data-add]')].find(b=>b.dataset.add==='wood');el.click();$('tb-back').click();});await wait(2500);
  ok(await f.evaluate(()=>!TOY)&&await p.evaluate(()=>G.tanks[0].wood===1),'Back with Aquascape open finishes it and the game gets the driftwood');
