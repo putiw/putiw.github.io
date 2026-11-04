@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ear tank</title>
+<meta name="description" content="A shrimp tank you keep by listening. A prototype.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#efe9dc;--surface:#fbf8f1;--surface-2:#f2ecdf;--ink:#22201b;--ink-2:#524c3d;--ink-3:#716a57;--line:#dcd2be;--accent:#2d6a4f;--accent-ink:#fff;--shrimp:#bf3a2b;--off:#e4ddcf;--off-ink:#8a8270;color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "Inter",system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%}
+body{padding:14px 14px calc(24px + env(safe-area-inset-bottom));max-width:480px;margin:0 auto;overflow-x:hidden}
+h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:17px;margin:14px 0 8px}
+p{margin:0 0 10px}
+.muted{color:var(--ink-3);font-size:14px}
+.screen{display:none}.screen.on{display:block}
+button{font:inherit;font-weight:600;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;min-height:64px;padding:12px 14px;width:100%;text-align:left;margin:0 0 10px;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:space-between;gap:10px}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+button.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.sm{min-height:48px;padding:8px 12px;font-weight:500}
+button[disabled]{background:var(--off);color:var(--off-ink);border-color:var(--off);cursor:default}
+button .sub{font-weight:400;font-size:13px;color:inherit;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row button{margin:0}
+.row{margin-bottom:10px}
+#status{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-height:72px;margin:0 0 12px;font-size:15px}
+#status b{display:block;font-weight:600;margin-bottom:2px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 12px}
+.grid button{margin:0;min-height:72px;justify-content:center;text-align:center;font-size:14px;padding:6px}
+.grid button.sel{outline:3px solid var(--accent);outline-offset:-3px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.top .q{width:44px;min-height:44px;margin:0;padding:0;justify-content:center;border-radius:22px}
+#help{display:none;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 12px;font-size:14px}
+#help.on{display:block}
+#help ol{padding-left:20px;margin:6px 0}
+.sr{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.bar{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.bar input{flex:1}
+.state{font-size:13px;color:var(--ink-3);margin:0 0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1 id="title">Ear tank</h1>
+  <button class="q" id="btn-help" aria-label="Help and what to test" aria-expanded="false">?</button>
+</div>
+<div id="help" aria-label="Help">
+  <p>A tank you keep by ear. Phone speaker is fine, mono. Tap anything to start the sound.</p>
+  <p><b>What to test, eyes closed</b></p>
+  <ol>
+    <li>Feed, then skip two days. Can you tell fed from hungry?</li>
+    <li>Run a fortnight at a week a minute. Can you hear the water getting old, and the change fixing it?</li>
+    <li>6 shrimp, 14, 30. Can you tell roughly how many?</li>
+    <li>A molt, a berried female, babies, one death. Do you notice them without being told?</li>
+    <li>Leave it on 20 minutes. Do you want to turn it off?</li>
+    <li>A tank you built and one you adopted. Do they sound different?</li>
+  </ol>
+  <p><b>The sounds</b></p>
+  <p class="muted">Bubbles are the filter. Each tick is a shrimp, high is small, low is big. Hungry ticks are thin and quick. A rustle is moss, a knock is wood, a clink is rock. A slide down is a molt. A double tick is a female with eggs. A thin hiss is bad water, change it. When everything goes dull the water is old. One low tap is a death.</p>
+</div>
+
+<div id="status" role="status" aria-live="polite"><b id="st-head">Tap to start</b><span id="st-body">Tap anywhere to turn the sound on.</span></div>
+<p class="state" id="stateline" aria-hidden="true"></p>
+
+<section id="s-start" class="screen on" aria-label="Start">
+  <button class="pri" id="btn-adopt">Adopt a tank<span class="sub">one that exists, with its history</span></button>
+  <button id="btn-build">Build one<span class="sub">at the store, by hand</span></button>
+</section>
+
+<section id="s-adopt" class="screen" aria-label="Adopt a tank">
+  <div id="adopt-list"></div>
+  <div class="row"><button class="pri" id="btn-keep" disabled>Keep this one</button><button id="btn-adopt-back">Back</button></div>
+</section>
+
+<section id="s-build" class="screen" aria-label="Build a tank">
+  <p class="muted" id="build-hint">Twelve places, front row to back. Pick a place, then what goes there.</p>
+  <div class="grid" id="places" role="group" aria-label="Places in the tank"></div>
+  <div class="grid" id="things" role="group" aria-label="What goes there"></div>
+  <h2>How many shrimp</h2>
+  <div class="row" id="counts"><button class="sm" data-n="6">6</button><button class="sm" data-n="10">10</button><button class="sm" data-n="14">14</button></div>
+  <div class="row"><button class="pri" id="btn-build-done">Done</button><button id="btn-build-back">Back</button></div>
+</section>
+
+<section id="s-home" class="screen" aria-label="Your tank">
+  <button class="pri" id="btn-how">How are they</button>
+  <div class="row"><button id="btn-feed">Feed</button><button id="btn-less" aria-pressed="false">Feed less</button></div>
+  <div class="row"><button id="btn-water">Change water</button><button id="btn-filter">Clean the filter</button></div>
+  <div class="row"><button id="btn-moss">Add moss</button><button id="btn-add">Add 5 shrimp</button></div>
+  <div class="row"><button id="btn-speed">Speed<span class="sub" id="speed-sub">real time</span></button><button id="btn-log">Log</button></div>
+  <button class="sm" id="btn-settings">Settings</button>
+</section>
+
+<section id="s-settings" class="screen" aria-label="Settings">
+  <div class="bar"><label for="vol">Volume</label><input id="vol" type="range" min="0" max="100" value="60"></div>
+  <button id="btn-voice" aria-pressed="true">Voice<span class="sub" id="voice-sub">on</span></button>
+  <button id="btn-teach">Teach the sounds again</button>
+  <button id="btn-reset">Reset the tank<span class="sub">starts over</span></button>
+  <button class="pri" id="btn-settings-back">Back</button>
+</section>
+
+<script>
+'use strict';
+/* ---------- SOUND: every number you may want to tune by ear ---------- */
+var SOUND={
+  master:0.6,
+  room:{noiseGain:0.012,noiseLo:350,noiseHi:1200, bubbleGain:0.07,bubbleHz:1100,bubbleQ:6,bubbleMs:28, bubbleEvery:0.55, tempSpan:0.18, clogSlow:0.8,clogDull:0.45},
+  tick:{gain:0.11,baby:1500,juv:950,adult:620,jitter:0.06, fullMs:70,hungryMs:28, fullEvery:7,hungryEvery:2.6, stressMs:18, surface:0.05},
+  molt:{gain:0.09,from:1300,to:480,s:0.5},
+  berried:{gapMs:130},
+  babies:{gain:0.045,hz:2300,n:8,span:1.6},
+  feed:{gain:0.08,hz:2600,n:9,span:0.8,clusterS:60,clusterMul:0.3},
+  hiss:{gain:0.035,hz:6500,q:0.8},
+  dull:{clearHz:9000,oldHz:1700,oldAt:80},
+  pour:{gain:0.06,from:500,to:1400,s:1.6},
+  death:{gain:0.12,hz:310,ms:90},
+  minGapS:1.4
+};
+/* ---------- model ---------- */
+var KEY='eartank-v1', SPEEDS=[['real time',1/3600],['a day a minute',24/60],['a week a minute',168/60]];
+var THINGS=['nothing','rock','driftwood','moss','a plant'];
+var S=null, UI={}, A=null, speaking=true, vol=0.6, lastReal=0, speedIx=0, cluster=0, evq=[], lastEv=0, teachOn=false;
+function $(id){return document.getElementById(id)}
+function rnd(a,b){return a+Math.random()*(b-a)}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function mkShrimp(age,sex){var id=++S.nid;return {id:id,age:age,sex:sex||(Math.random()<0.5?'f':'m'),hunger:rnd(0.1,0.5),berried:0,moltIn:age<75?rnd(4,9):rnd(20,40)}}
+function newState(scape,n,history){
+  S={v:1,h:0,day:0,nid:0,scape:scape,shrimp:[],food:0,nh3:0,no2:0,no3:10,temp:24,clog:0,moss:0,ration:1,jobs:[],log:[],seen:{},history:history||'',last:Date.now(),speed:0,voice:true,vol:60,taught:false};
+  for(var i=0;i<scape.length;i++)if(scape[i]===3)S.moss+=0.25;
+  S.moss=Math.min(1,S.moss);
+  for(i=0;i<n;i++)S.shrimp.push(mkShrimp(rnd(60,300)));
+  save();
+}
+function save(){S.last=Date.now();S.speed=speedIx;S.voice=speaking;S.vol=Math.round(vol*100);try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function load(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===1){S=s;speedIx=s.speed||0;speaking=s.voice!==false;vol=(s.vol==null?60:s.vol)/100;return true}}catch(e){}return false}
+function sizeOf(s){return s.age<30?'baby':s.age<75?'juv':'adult'}
+function adults(){return S.shrimp.filter(function(s){return s.age>=75})}
+function logit(t){S.log.unshift('Day '+Math.floor(S.day)+', '+t);if(S.log.length>30)S.log.length=30}
+function ev(k,d){evq.push({k:k,d:d||{}})}
+/* one hour at most per call */
+function step(h){
+  var n=S.shrimp.length, i, s;
+  S.h+=h; S.day=S.h/24;
+  // jobs the store does
+  for(i=S.jobs.length-1;i>=0;i--){var j=S.jobs[i];if(S.h>=j.at){S.jobs.splice(i,1);doJob(j.k)}}
+  // temperature: slow drift round 24, the store keeps a heater on
+  S.temp+= (24-S.temp)*0.02*h + rnd(-0.08,0.08)*h; S.temp=Math.max(20,Math.min(30,S.temp));
+  // filter clogs over a month
+  S.clog=Math.min(1,S.clog+h/720);
+  var bact=0.08*(1-0.6*S.clog); // ppm an hour the filter can take
+  // eating
+  var eaters=S.shrimp.filter(function(x){return x.hunger>0.1}).length;
+  var eat=Math.min(S.food, eaters*0.01*h);
+  S.food-=eat;
+  for(i=0;i<n;i++){s=S.shrimp[i];s.hunger=Math.min(1,s.hunger+h/72);}
+  if(eat>0){var share=eat/Math.max(1,eaters);for(i=0;i<n;i++){s=S.shrimp[i];if(s.hunger>0.1)s.hunger=Math.max(0,s.hunger-share*25);}}
+  // moss and biofilm feed them a little
+  for(i=0;i<n;i++){s=S.shrimp[i];s.hunger=Math.max(0,s.hunger-(0.004+0.006*S.moss)*h);}
+  // leftover food rots
+  var rot=S.food*0.03*h; S.food-=rot; S.nh3+=rot*0.4 + n*0.0005*h;
+  var c1=Math.min(S.nh3,bact*h); S.nh3-=c1; S.no2+=c1;
+  var c2=Math.min(S.no2,bact*0.9*h); S.no2-=c2; S.no3+=c2*3;
+  S.no3+= (0.01 + n*0.0005)*h; // with the nitrite that turns, about 5 ppm a week for a small colony
+  S.no3-= S.moss*0.004*h; S.no3=Math.max(0,S.no3);
+  var bad=S.nh3+S.no2*0.7;
+  // each shrimp
+  for(i=n-1;i>=0;i--){
+    s=S.shrimp[i]; s.age+=h/24; s.moltIn-=h/24;
+    var die=0;
+    if(bad>0.3)die+= (bad-0.3)*0.004*h;
+    if(S.temp>28.5)die+= (S.temp-28.5)*0.003*h;
+    if(s.age>600)die+= (s.age-600)/900*0.004*h;
+    if(s.age<30)die+= 0.00006*h; // about 90% of babies make it
+    if(s.moltIn<=0){
+      s.moltIn=s.age<75?rnd(5,9):rnd(22,40);
+      var fail=0.02+S.no3/400+bad*0.1;
+      if(Math.random()<fail){die=1}else ev('molt',{id:s.id})
+    }
+    if(Math.random()<die){S.shrimp.splice(i,1);logit(sizeOf(s)==='baby'?'a baby died':'a shrimp died');ev('death',{id:s.id});continue}
+    if(s.berried>0){s.berried-=h/24;if(s.berried<=0){s.berried=0;var k=Math.floor(rnd(8,18));for(var b=0;b<k;b++)S.shrimp.push(mkShrimp(0));logit(k+' babies');ev('babies',{n:k})}}
+    else if(s.sex==='f'&&s.age>=75&&s.hunger<0.6&&bad<0.15&&S.no3<60&&Math.random()<h/(24*18)){s.berried=rnd(22,28);logit('a female is carrying eggs');ev('berried',{id:s.id})}
+  }
+}
+function doJob(k){
+  if(k==='feed'){S.food+= (S.ration*0.5)*Math.max(1,S.shrimp.length/10)*0.6; ev('feed');logit('fed')}
+  else if(k==='water'){S.nh3*=0.7;S.no2*=0.7;S.no3*=0.7;ev('pour');logit('water changed, 30%')}
+  else if(k==='filter'){S.clog=0;logit('filter cleaned')}
+  else if(k==='moss'){S.moss=Math.min(1,S.moss+0.25);logit('moss added')}
+  else if(k==='add'){for(var i=0;i<5;i++)S.shrimp.push(mkShrimp(rnd(60,120)));logit('5 shrimp added')}
+}
+function advance(hours){var guard=0;while(hours>0&&guard++<20000){var h=Math.min(1,hours);step(h);hours-=h}}
+function job(k,delayH,say){S.jobs.push({at:S.h+delayH,k:k});save();speak(say)}
+/* ---------- speech ---------- */
+function speak(t,head){
+  $('st-head').textContent=head||'';$('st-body').textContent=t;
+  if(!speaking)return;
+  if(!('speechSynthesis'in window)){chime();return}
+  try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=0.95;speechSynthesis.speak(u)}catch(e){}
+}
+function howText(){
+  var n=S.shrimp.length, b=S.shrimp.filter(function(s){return s.berried>0}).length, babies=S.shrimp.filter(function(s){return s.age<30}).length;
+  var a=[], w=[];
+  if(n===0)a.push('No shrimp left.');
+  else{a.push(n+(n===1?' shrimp':' shrimp')+(b?', '+(b===1?'one carrying eggs':b+' carrying eggs'):'')+(babies?', '+babies+' babies':'')+'.');}
+  var hungry=S.shrimp.filter(function(s){return s.hunger>0.6}).length;
+  var bad=S.nh3+S.no2*0.7;
+  if(bad>0.5)w.push('The water is bad, change some today.');
+  else if(bad>0.2)w.push('The water is off, change some.');
+  else if(S.no3>60)w.push('The water is old, change some this week.');
+  else if(S.no3>40)w.push('The water is getting old.');
+  if(S.clog>0.8)w.push('The filter is slow, clean it.');
+  if(n&&hungry>n/2)w.push('They are hungry.');
+  else if(n&&S.food>1.5)w.push('There is food left on the floor, skip a day.');
+  if(S.temp>28)w.push('It is warm in there.');
+  if(!w.length)w.push(n?'They are fine.':'');
+  return a.concat(w.slice(0,2)).join(' ');
+}
+/* ---------- audio ---------- */
+function audio(){
+  if(A)return A;
+  var C=window.AudioContext||window.webkitAudioContext; if(!C)return null;
+  var ctx=new C();
+  A={ctx:ctx};
+  A.master=ctx.createGain();A.master.gain.value=SOUND.master*vol;
+  A.lp=ctx.createBiquadFilter();A.lp.type='lowpass';A.lp.frequency.value=SOUND.dull.clearHz;A.lp.Q.value=0.5;
+  A.comp=ctx.createDynamicsCompressor();A.comp.threshold.value=-18;A.comp.ratio.value=4;
+  A.lp.connect(A.comp);A.comp.connect(A.master);A.master.connect(ctx.destination);
+  // noise buffer
+  var len=ctx.sampleRate*2, buf=ctx.createBuffer(1,len,ctx.sampleRate), d=buf.getChannelData(0);
+  for(var i=0;i<len;i++)d[i]=Math.random()*2-1;
+  A.noise=buf;
+  // room tone: filtered noise
+  var src=ctx.createBufferSource();src.buffer=buf;src.loop=true;
+  var bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=(SOUND.room.noiseLo+SOUND.room.noiseHi)/2;bp.Q.value=0.7;
+  A.roomG=ctx.createGain();A.roomG.gain.value=0;
+  src.connect(bp);bp.connect(A.roomG);A.roomG.connect(A.lp);src.start();
+  // ammonia hiss
+  var hs=ctx.createBufferSource();hs.buffer=buf;hs.loop=true;
+  var hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=SOUND.hiss.hz;hp.Q.value=SOUND.hiss.q;
+  A.hissG=ctx.createGain();A.hissG.gain.value=0;
+  hs.connect(hp);hp.connect(A.hissG);A.hissG.connect(A.lp);hs.start();
+  A.nextBubble=ctx.currentTime+0.3;
+  A.voices={};
+  return A;
+}
+function burst(hz,q,ms,gain,at,type){ // short filtered noise
+  var ctx=A.ctx,t=at||ctx.currentTime,s=ctx.createBufferSource();s.buffer=A.noise;s.loop=true;
+  var f=ctx.createBiquadFilter();f.type=type||'bandpass';f.frequency.value=hz;f.Q.value=q;
+  var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.004);g.gain.exponentialRampToValueAtTime(0.0005,t+ms/1000);
+  s.connect(f);f.connect(g);g.connect(A.lp);s.start(t);s.stop(t+ms/1000+0.02);
+}
+function tone(hz,ms,gain,at,type,to){
+  var ctx=A.ctx,t=at||ctx.currentTime,o=ctx.createOscillator();o.type=type||'triangle';o.frequency.setValueAtTime(hz,t);if(to)o.frequency.exponentialRampToValueAtTime(to,t+ms/1000);
+  var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.003);g.gain.exponentialRampToValueAtTime(0.0005,t+ms/1000);
+  o.connect(g);g.connect(A.lp);o.start(t);o.stop(t+ms/1000+0.02);
+}
+function chime(){if(audio())tone(880,120,0.05)}
+function tankSt(){return S||{nh3:0,no2:0,scape:buildScape,moss:0}}
+function surfaces(){var st=tankSt(),c={rock:0,wood:0,moss:0,plant:0},i;for(i=0;i<st.scape.length;i++){var k=st.scape[i];if(k===1)c.rock++;else if(k===2)c.wood++;else if(k===3)c.moss++;else if(k===4)c.plant++}c.moss+=st.moss*2;return c}
+function pickSurface(){var c=surfaces(),tot=c.rock+c.wood+c.moss+c.plant+1,r=Math.random()*tot;if((r-=c.rock)<0)return 'rock';if((r-=c.wood)<0)return 'wood';if((r-=c.moss)<0)return 'moss';if((r-=c.plant)<0)return 'plant';return 'glass'}
+function shrimpTick(s,at,hungryOverride){
+  var T=SOUND.tick,sz=sizeOf(s),base=sz==='baby'?T.baby:sz==='juv'?T.juv:T.adult;
+  var hz=base*(1+(((s.id*7919)%100)/100-0.5)*2*T.jitter);
+  var st=tankSt(),hungry=hungryOverride!=null?hungryOverride:s.hunger>0.6, bad=st.nh3+st.no2*0.7;
+  var ms=hungry?T.hungryMs:T.fullMs; if(bad>0.3)ms=Math.min(ms,T.stressMs);
+  var ctx=A.ctx,t=at||ctx.currentTime;
+  tone(hz,ms,T.gain*(sz==='baby'?0.6:1),t,hungry?'sine':'triangle');
+  var sf=pickSurface();
+  if(sf==='wood')burst(420,4,45,T.surface*1.4,t,'bandpass');
+  else if(sf==='moss')burst(4000,0.6,80,T.surface*0.7,t,'highpass');
+  else if(sf==='rock')tone(hz*2.4,25,T.surface*0.8,t,'sine');
+  else if(sf==='plant')burst(2500,1.5,40,T.surface*0.5,t,'bandpass');
+  if(s.berried>0)tone(hz,ms,T.gain*0.8,t+SOUND.berried.gapMs/1000,'triangle');
+}
+function playEv(e){
+  var ctx=A.ctx,t=ctx.currentTime+0.05,i;
+  if(e.k==='molt'){tone(SOUND.molt.from,SOUND.molt.s*1000,SOUND.molt.gain,t,'sine',SOUND.molt.to)}
+  else if(e.k==='babies'){for(i=0;i<SOUND.babies.n;i++)tone(SOUND.babies.hz*rnd(0.9,1.15),30,SOUND.babies.gain,t+Math.random()*SOUND.babies.span,'sine')}
+  else if(e.k==='feed'){for(i=0;i<SOUND.feed.n;i++)burst(SOUND.feed.hz,2,25,SOUND.feed.gain,t+i*SOUND.feed.span/SOUND.feed.n+rnd(0,0.04),'highpass');cluster=ctx.currentTime+SOUND.feed.clusterS}
+  else if(e.k==='pour'){var s=ctx.createBufferSource();s.buffer=A.noise;s.loop=true;var f=ctx.createBiquadFilter();f.type='bandpass';f.Q.value=1.2;f.frequency.setValueAtTime(SOUND.pour.from,t);f.frequency.exponentialRampToValueAtTime(SOUND.pour.to,t+SOUND.pour.s);var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(SOUND.pour.gain,t+0.2);g.gain.linearRampToValueAtTime(0,t+SOUND.pour.s);s.connect(f);f.connect(g);g.connect(A.lp);s.start(t);s.stop(t+SOUND.pour.s+0.05)}
+  else if(e.k==='death'){tone(SOUND.death.hz,SOUND.death.ms,SOUND.death.gain,t,'triangle');burst(380,3,50,SOUND.death.gain*0.6,t)}
+  else if(e.k==='berried'){var sh=S.shrimp.filter(function(x){return x.id===e.d.id})[0];if(sh)shrimpTick(sh,t)}
+  // name it once in speech the first time
+  var names={molt:'That slide is a molt.',babies:'Those high ticks are babies.',berried:'That double tick is a female carrying eggs.',death:'That low tap is a death.',feed:'That is food going in.',pour:'That is the water change.'};
+  if(names[e.k]&&!S.seen[e.k]){S.seen[e.k]=1;save();setTimeout(function(){speak(names[e.k])},700)}
+}
+function drain(){
+  if(!A||A.ctx.state!=='running'||teachOn)return;
+  var now=A.ctx.currentTime;
+  if(evq.length>12){ // a catch-up pile: one death tap, one summary, drop the rest
+    var deaths=evq.filter(function(e){return e.k==='death'}).length;
+    evq=[];if(deaths)evq.push({k:'death',d:{}});
+  }
+  if(evq.length&&now-lastEv>SOUND.minGapS){lastEv=now;playEv(evq.shift())}
+}
+function sched(){ // every 100 ms
+  if(!A||A.ctx.state!=='running'||!S||teachOn)return;
+  var ctx=A.ctx,now=ctx.currentTime,look=now+0.25,R=SOUND.room;
+  // room tone follows the model
+  var tempo=R.bubbleEvery*(1-R.tempSpan*(S.temp-24)/4)*(1+R.clogSlow*S.clog);
+  A.roomG.gain.setTargetAtTime(R.noiseGain*(1-0.5*S.clog),now,0.5);
+  while(A.nextBubble<look){burst(R.bubbleHz*(1-R.clogDull*S.clog)*rnd(0.92,1.08),R.bubbleQ,R.bubbleMs,R.bubbleGain*rnd(0.6,1),A.nextBubble);A.nextBubble+=tempo*rnd(0.85,1.15)}
+  var bad=Math.min(1,S.nh3+S.no2*0.7);
+  A.hissG.gain.setTargetAtTime(bad<0.08?0:SOUND.hiss.gain*Math.min(1,bad),now,1);
+  A.lp.frequency.setTargetAtTime(SOUND.dull.clearHz-(SOUND.dull.clearHz-SOUND.dull.oldHz)*Math.min(1,S.no3/SOUND.dull.oldAt),now,1.5);
+  // shrimp voices
+  var T=SOUND.tick,mul=now<cluster?SOUND.feed.clusterMul:1,i,s;
+  for(i=0;i<S.shrimp.length;i++){
+    s=S.shrimp[i];var v=A.voices[s.id];
+    if(!v){v=A.voices[s.id]={at:now+Math.random()*T.fullEvery}}
+    while(v.at<look){shrimpTick(s,v.at);var every=(s.hunger>0.6?T.hungryEvery:T.fullEvery)*mul;v.at+=every*rnd(0.4,1.8)}
+  }
+  for(var id in A.voices)if(!S.shrimp.some(function(x){return x.id==id}))delete A.voices[id];
+  drain();
+}
+function setVol(v){vol=v;if(A)A.master.gain.setTargetAtTime(SOUND.master*vol,A.ctx.currentTime,0.1)}
+/* ---------- teach ---------- */
+function teach(done){
+  if(!audio()){done&&done();return}
+  teachOn=true;var ctx=A.ctx,steps=[
+    ['A shrimp.',function(){var s={id:1,age:120,hunger:0.2,berried:0};for(var i=0;i<4;i++)shrimpTick(s,ctx.currentTime+0.1+i*0.9,false)}],
+    ['A hungry shrimp.',function(){var s={id:2,age:120,hunger:0.9,berried:0};for(var i=0;i<6;i++)shrimpTick(s,ctx.currentTime+0.1+i*0.45,true)}],
+    ['The water getting old. Everything goes dull.',function(){A.lp.frequency.setValueAtTime(SOUND.dull.clearHz,ctx.currentTime);A.lp.frequency.exponentialRampToValueAtTime(SOUND.dull.oldHz,ctx.currentTime+2.5);var s={id:3,age:120,hunger:0.2,berried:0};for(var i=0;i<5;i++)shrimpTick(s,ctx.currentTime+0.1+i*0.7,false);setTimeout(function(){A.lp.frequency.setTargetAtTime(SOUND.dull.clearHz,ctx.currentTime,0.5)},3200)}],
+    ['A molt.',function(){tone(SOUND.molt.from,SOUND.molt.s*1000,SOUND.molt.gain,ctx.currentTime+0.1,'sine',SOUND.molt.to)}],
+    ['Feeding.',function(){var t=ctx.currentTime+0.1;for(var i=0;i<SOUND.feed.n;i++)burst(SOUND.feed.hz,2,25,SOUND.feed.gain,t+i*0.09,'highpass')}]
+  ],i=0;
+  speak('Five sounds, one at a time. Tap anywhere to skip.','Learning the sounds');
+  var skip=function(){i=99};document.body.addEventListener('pointerdown',skip,{once:true});
+  function next(){
+    if(i>=steps.length){teachOn=false;document.body.removeEventListener('pointerdown',skip);if(S){S.taught=true;save()}done&&done();return}
+    var st=steps[i++];speak(st[0],'Learning the sounds');setTimeout(function(){if(i<99)st[1]()},900);setTimeout(next,4200);
+  }
+  setTimeout(next,2600);
+}
+/* ---------- screens ---------- */
+function show(id){document.querySelectorAll('.screen').forEach(function(e){e.classList.toggle('on',e.id===id)});var h=document.querySelector('#'+id+' button');if(h)h.focus({preventScroll:true})}
+var ADOPT=[
+  {name:'Tank 4',h:'Tank 4, two years old, twenty shrimp, the owner moved to Oman.',n:20,scape:[2,0,1,0,3,3,0,1,4,0,2,4],no3:45,clog:0.6},
+  {name:'Tank 9',h:'Tank 9, six months old, eight shrimp, mostly rock, a student set it up and stopped coming.',n:8,scape:[1,1,0,1,0,0,1,1,0,1,0,0],no3:25,clog:0.3},
+  {name:'Tank 2',h:'Tank 2, four years old, thirty shrimp, moss everywhere, the owner died.',n:30,scape:[3,3,3,2,3,0,3,3,4,3,2,3],no3:70,clog:0.9}
+];
+var adoptPick=-1,buildScape=[],buildPlace=-1,buildN=10,previewTank=null,prevTimer=0;
+function preview(a){
+  // play the adopted tank for ten seconds, through the normal scheduler
+  var keep=S; S={v:1,h:0,day:0,nid:0,scape:a.scape,shrimp:[],food:0,nh3:0,no2:0,no3:a.no3,temp:24,clog:a.clog,moss:0,ration:1,jobs:[],log:[],seen:{}};
+  for(var i=0;i<a.n;i++)S.shrimp.push(mkShrimp(rnd(60,400)));
+  previewTank=S; if(A)A.voices={};
+  clearTimeout(prevTimer);prevTimer=setTimeout(function(){if(S===previewTank){S=keep||null;if(A)A.voices={}}},10000);
+}
+function renderAdopt(){
+  var el=$('adopt-list');el.innerHTML='';
+  ADOPT.forEach(function(a,i){var b=document.createElement('button');b.textContent=a.name;var s=document.createElement('span');s.className='sub';s.textContent=a.n+' shrimp';b.appendChild(s);
+    b.onclick=function(){adoptPick=i;$('btn-keep').disabled=false;speak(a.h+' Listen.',a.name);preview(a)};el.appendChild(b)});
+}
+function renderBuild(){
+  var p=$('places');p.innerHTML='';
+  for(var i=0;i<12;i++)(function(i){var b=document.createElement('button');b.className=i===buildPlace?'sel':'';b.setAttribute('aria-pressed',i===buildPlace);var row=i<4?'front':i<8?'middle':'back';b.textContent=THINGS[buildScape[i]]==='nothing'?'·':THINGS[buildScape[i]];b.setAttribute('aria-label','Place '+(i+1)+', '+row+' row, '+THINGS[buildScape[i]]);
+    b.onclick=function(){buildPlace=i;speak('Place '+(i+1)+', '+row+' row, '+THINGS[buildScape[i]]+'. Now pick what goes there.');renderBuild()};p.appendChild(b)})(i);
+  var t=$('things');t.innerHTML='';
+  THINGS.forEach(function(name,k){var b=document.createElement('button');b.textContent=name;b.disabled=buildPlace<0;
+    b.onclick=function(){buildScape[buildPlace]=k;thingSound(k);speak(name+(k?' at place '+(buildPlace+1):' at place '+(buildPlace+1)+', empty')+'.');renderBuild()};t.appendChild(b)});
+  document.querySelectorAll('#counts button').forEach(function(b){b.setAttribute('aria-pressed',+b.dataset.n===buildN);b.className='sm'+(+b.dataset.n===buildN?' pri':'')});
+}
+function thingSound(k){if(!audio())return;var t=A.ctx.currentTime+0.05,i;
+  if(k===1)for(i=0;i<3;i++)tone(1500,25,0.05,t+i*0.5,'sine');
+  else if(k===2)for(i=0;i<3;i++)burst(420,4,45,0.07,t+i*0.5);
+  else if(k===3)for(i=0;i<3;i++)burst(4000,0.6,80,0.04,t+i*0.5,'highpass');
+  else if(k===4)for(i=0;i<3;i++)burst(2500,1.5,40,0.03,t+i*0.5);
+}
+function densitySound(n){if(!audio())return;var t=A.ctx.currentTime;for(var i=0;i<n;i++){var s={id:100+i,age:rnd(60,300),hunger:0.2,berried:0};for(var j=0;j<3;j++)shrimpTick(s,t+0.1+Math.random()*4,false)}}
+function stateLine(){if(!S)return'';return 'Day '+Math.floor(S.day)+' · '+S.shrimp.length+' shrimp · ammonia '+S.nh3.toFixed(2)+' · nitrate '+Math.round(S.no3)+' · filter '+Math.round(S.clog*100)+'% · food '+S.food.toFixed(1)+' · '+S.temp.toFixed(1)+'°'}
+/* ---------- wiring ---------- */
+function home(){show('s-home');$('speed-sub').textContent=SPEEDS[speedIx][0];$('btn-less').setAttribute('aria-pressed',S.ration<1);$('btn-less').textContent=S.ration<1?'Feed more':'Feed less';if(A)A.voices={};lastReal=Date.now()}
+function start(){
+  var started=false;
+  function go(){if(started)return;var a=audio();if(!a){speak('No sound on this browser.','No sound');started=true;return}a.ctx.resume().then(function(){started=true;if(S&&!S.taught&&!teachOn)teach(function(){speak(howText(),'Your tank')});else if(S)speak(howText(),'Your tank');else speak('Adopt a tank that exists, or build one at the store.','Ear tank')})}
+  document.body.addEventListener('pointerdown',go);document.body.addEventListener('keydown',go);
+  $('btn-help').onclick=function(){var h=$('help');h.classList.toggle('on');this.setAttribute('aria-expanded',h.classList.contains('on'))};
+  $('btn-adopt').onclick=function(){renderAdopt();show('s-adopt');speak('Three tanks. Tap one to hear it for ten seconds.','Adopt')};
+  $('btn-build').onclick=function(){buildScape=[0,0,0,0,0,0,0,0,0,0,0,0];buildPlace=-1;buildN=10;renderBuild();show('s-build');speak('Twelve places, front row to back. Pick a place, then what goes there. Then how many shrimp.','Build')};
+  $('btn-adopt-back').onclick=function(){S=null;previewTank=null;clearTimeout(prevTimer);adoptPick=-1;$('btn-keep').disabled=true;if(A)A.voices={};show('s-start');speak('Adopt a tank, or build one.')};
+  $('btn-keep').onclick=function(){var a=ADOPT[adoptPick];previewTank=null;clearTimeout(prevTimer);newState(a.scape,a.n,a.h);S.no3=a.no3;S.clog=a.clog;S.taught=false;save();if(A)A.voices={};home();speak(a.name+' is yours. It plays from now.','Your tank');setTimeout(function(){if(!S.taught&&A&&A.ctx.state==='running')teach(function(){speak(howText(),'Your tank')})},3000)};
+  $('btn-build-back').onclick=function(){show('s-start');speak('Adopt a tank, or build one.')};
+  document.querySelectorAll('#counts button').forEach(function(b){b.onclick=function(){buildN=+b.dataset.n;renderBuild();speak(buildN+' shrimp. Listen.');densitySound(buildN)}});
+  $('btn-build-done').onclick=function(){newState(buildScape.slice(),buildN,'Built by you.');S.taught=false;save();if(A)A.voices={};home();speak('Done, the store sets it up, come back tomorrow. The filter is cycled.','Your tank');setTimeout(function(){if(!S.taught&&A&&A.ctx.state==='running')teach(function(){speak(howText(),'Your tank')})},4000)};
+  $('btn-how').onclick=function(){speak(howText(),'Your tank')};
+  $('btn-feed').onclick=function(){job('feed',2,'Feeding, the store does it this afternoon.')};
+  $('btn-less').onclick=function(){S.ration=S.ration<1?1:0.5;save();home();speak(S.ration<1?'Half rations from now.':'Full rations from now.')};
+  $('btn-water').onclick=function(){job('water',3,'A water change, a third. The store does it this afternoon.')};
+  $('btn-filter').onclick=function(){job('filter',3,'The filter gets a rinse this afternoon.')};
+  $('btn-moss').onclick=function(){job('moss',3,'More moss goes in this afternoon.')};
+  $('btn-add').onclick=function(){job('add',3,'Five shrimp come this afternoon.')};
+  $('btn-speed').onclick=function(){speedIx=(speedIx+1)%SPEEDS.length;save();home();speak(SPEEDS[speedIx][0]+'.','Speed')};
+  $('btn-log').onclick=function(){speak(S.log.length?S.log.slice(0,5).join('. ')+'.':'Nothing yet.','Log')};
+  $('btn-settings').onclick=function(){show('s-settings');$('vol').value=Math.round(vol*100);speak('Settings. Volume, voice, teach, reset.','Settings')};
+  $('btn-settings-back').onclick=home;
+  $('vol').oninput=function(){setVol(+this.value/100);save()};
+  $('btn-voice').onclick=function(){speaking=!speaking;this.setAttribute('aria-pressed',speaking);$('voice-sub').textContent=speaking?'on':'off';save();speak(speaking?'Voice on.':'Voice off.');if(!speaking&&'speechSynthesis'in window)speechSynthesis.cancel()};
+  $('btn-teach').onclick=function(){teach(function(){speak('Done.','Settings')})};
+  $('btn-reset').onclick=function(){if(!confirm('Start over? The tank is gone.'))return;S=null;try{localStorage.removeItem(KEY)}catch(e){}if(A)A.voices={};evq=[];show('s-start');speak('Gone. Adopt a tank, or build one.','Ear tank')};
+  // model clock
+  setInterval(function(){
+    if(!S||S===previewTank)return;
+    var now=Date.now(), dt=(now-lastReal)/1000; lastReal=now;
+    if(dt<0||dt>120)dt=1;
+    advance(dt*SPEEDS[speedIx][1]);
+    $('stateline').textContent=stateLine();
+    if(Math.random()<0.1)save();
+  },1000);
+  setInterval(sched,100);
+  document.addEventListener('visibilitychange',function(){if(!A)return;if(document.hidden){A.ctx.suspend();if(S)save()}else{lastReal=Date.now();A.ctx.resume()}});
+  // load
+  if(load()){
+    var gone=Math.min(30*24,(Date.now()-S.last)/3600000); if(gone>0.02){advance(gone);evq=[];}
+    $('vol').value=Math.round(vol*100);$('btn-voice').setAttribute('aria-pressed',speaking);$('voice-sub').textContent=speaking?'on':'off';
+    home();$('st-head').textContent='Tap to start';$('st-body').textContent='Tap anywhere to turn the sound on. '+(gone>1?Math.round(gone/24*10)/10+' days passed.':'');
+  }else{show('s-start')}
+  $('stateline').textContent=stateLine();
+}
+start();
+</script>
+</body>
+</html>
