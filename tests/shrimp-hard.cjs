@@ -66,8 +66,17 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
  await p.evaluate(()=>{document.querySelector('#hard-al .pr-row button[data-act="prop-fund"]').click();});await p.waitForTimeout(400);
  const pr1=await p.evaluate(()=>({y:scrollY,h:document.getElementById('hard-card').offsetHeight,al:document.getElementById('hard-al').offsetHeight,run:Object.keys(propOf(hardOf(G)).run),lab:document.querySelector('#hard-al .pr-row button[data-act="prop-fund"]').textContent}));
  if(Math.abs(pr1.y-pr0.y)>1||pr1.h!==pr0.h||pr1.al!==pr0.al||pr1.run.indexOf(pr0.id)<0||pr1.lab!=='Funded')throw Error('fund '+JSON.stringify([pr0,pr1]));ok('Fund keeps the card height and scrolls nothing, the row reads Funded until a scroll');
- await p.evaluate(()=>{FRZ={};render();});const pr2=await p.evaluate(()=>{var r=document.querySelector('#hard-al .pr-run');return {run:!!r,t:r&&r.textContent,stop:!!(r&&r.querySelector('button[data-act="prop-stop"]'))};});
+ await p.evaluate(()=>{FRZ={};render();});const pr2=await p.evaluate(()=>{var r=[...document.querySelectorAll('#hard-al .pr-run')].filter(x=>x.querySelector('button[data-act="prop-stop"]'))[0];return {run:!!r,t:r&&r.textContent,stop:!!(r&&r.querySelector('button[data-act="prop-stop"]'))};});
  if(!pr2.run||!/people|paid|done/.test(pr2.t))throw Error('running list '+JSON.stringify(pr2));ok('the Running list has the funded one with its state');
+ // Pass 253: trees as Running rows, Shaping the world inside the card
+ const tr0=await p.evaluate(()=>{G.emp.trees=G.emp.trees||{};G.emp.trees.rewild=1;G.emp.trees.lastmile=1;G.money=Math.max(G.money,1e13);G.emp.inf=Math.max(G.emp.inf,1e12);FRZ={};render();
+  var rows=[...document.querySelectorAll('#hard-al .pr-run')].filter(x=>x.querySelector('button[data-act="tree-step"]'));var tc=document.getElementById('treecard');
+  return {n:rows.length,t:rows.map(x=>x.textContent),cardHidden:tc.hidden||!tc.innerHTML.match(/Rewilding|The last mile/),y:scrollY,h:document.getElementById('hard-card').offsetHeight,
+   desk:!document.getElementById('hard-desk').hidden,deskIn:!!document.querySelector('#hard-desk-in #e-proj'),cproj:document.getElementById('c-proj').hidden};});
+ if(tr0.n<2||!tr0.cardHidden||!tr0.desk||!tr0.deskIn||!tr0.cproj)throw Error('trees in the hard part '+JSON.stringify(tr0));ok('Rewilding and The last mile are Running rows, their cards are gone, Shaping the world sits in the card');
+ await p.evaluate(()=>{[...document.querySelectorAll('#hard-al button[data-act="tree-step"]')][0].click();});await p.waitForTimeout(400);
+ const tr1=await p.evaluate(()=>({y:scrollY,h:document.getElementById('hard-card').offsetHeight,done:[...document.querySelectorAll('#hard-al .pr-run .qhelp')].map(x=>x.dataset.ht).join('|')}));
+ if(Math.abs(tr1.y-tr0.y)>1||Math.abs(tr1.h-tr0.h)>1||!/Done: /.test(tr1.done||''))throw Error('tree step '+JSON.stringify([tr0,tr1]));ok('a tree step keeps the card height and scrolls nothing, the step goes to Done');
  const led=await p.evaluate(()=>({t:document.querySelector('#hard-led .led-t').textContent,h:document.querySelector('#hard-led .qhelp').dataset.ht,key:document.getElementById('hg-key').textContent,slider:!!document.querySelector('#hard-led input')}));
  if(!/Elon Musk/.test(led.t)||!/0\.1% of his net worth/.test(led.h)||!/thousand lives/.test(led.h)||!/for now/.test(led.key)||led.slider)throw Error('ledger '+JSON.stringify(led));ok('the ledger reads in the richest person’s fortune, lives capped at what GiveWell can place, the key has "for now", the give slider lives in the panel');
  // after the win: grid and ledger stay, read-only

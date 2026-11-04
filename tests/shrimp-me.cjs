@@ -376,4 +376,11 @@ if(H.q.length!==3||H.q.some(function(x){return x.key==='a';})||!H.q.some(functio
 var o=newGame();o.me.on=1;o.ps.t=1;var O=gtOf(o);O.q.push({key:'gb2027',k:'gbday',due:200,d0:170,r0:1,age:80});o.day=1500;gtDay(o);var L=O.log.filter(function(x){return /turned 80/.test(x.t);})[0];if(!L||L.d!==260)throw Error('old save: missed with the day it would have shut '+JSON.stringify(L));
 var s=newGame();s.me.on=1;s.ps.t=1;var S=gtOf(s);S.q.push({key:'c',k:'club',due:30,d0:0,r0:1});for(var d=1;d<=29;d++){s.day=d;s.ps.t+=2400;gtDay(s);}if(!S.q.length)throw Error('at 1x a window lasts at least a month');
 `);
+check('Pass 253: a save full of paper hours gives one fact at most on load, and none when the clock was reset',`
+var g=newGame();g.me.on=1;g.me.hrs=g.me.hrs||{};g.me.hrs.papers=5000;delete g.me.fx;g.ps.t=1;var n0=(g.me.dlog||[]).length;
+for(var d=0;d<30;d++){g.day++;factDay(g);}var n=(g.me.dlog||[]).length-n0;if(n>1)throw Error('facts on load: '+n);
+var h=newGame();h.me.on=1;h.me.hrs=h.me.hrs||{};h.me.hrs.papers=15207;h.me.fx={seen:[1],next:15000,at:21496000,n:51,got:[1]};h.ps.t=1;
+for(var d=0;d<30;d++){h.day++;h.ps.t+=50;factDay(h);}if((h.me.dlog||[]).length)throw Error('a reset clock skipped the gap');
+h.ps.t+=FACT_GAP+1;h.me.hrs.papers=99999;factDay(h);if((h.me.dlog||[]).length!==1)throw Error('the next fact comes after 3 minutes');
+`);
 console.log(count+' free time, Grandma and ending checks passed');
