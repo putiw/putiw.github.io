@@ -819,7 +819,7 @@ if(!propOK(fb,FH,propDef('board'),fb.day))throw Error('a cousin brings the next 
 // stop paying the crews: reach falls 10% a year, the dues go, a news line, Grandma asks once
 var r0=p.r;if(!propStop(fb,'board'))throw Error('stop');if(fb.emp.dues.some(function(x){return x.k==='prop:board';}))throw Error('stopping removes the dues');for(d=365*7+1;d<=365*8;d++){fb.day=d;hardDay(fb);}
 if(!(p.r<r0&&Math.abs(p.r/r0-0.905)<0.01))throw Error('reach falls 10% a year after you stop: '+r0+' '+p.r);if(!rip(fb).log.some(function(x){return /mechanics went to the city/.test(x.tx);}))throw Error('she writes once');
-if(!fb.me.hist.some(function(x){return /who Esther Achieng is/.test(x);}))throw Error('Grandma asks who she is');
+if(!fb.me.hist.some(function(x){return /who Lana is/.test(x);}))throw Error('Grandma asks who she is');
 // three in one group share the 7% a year cap
 var c3=readyGame();c3.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};c3.humans=4.1e9;c3.money=1e13;c3.fin=g.fin;var CR=propOf(hardOf(c3));['board','loan','desal'].forEach(function(k){CR.open.push({id:k,day:0,alt:0,grad:0});CR.t[k]=1;if(!propFund(c3,k))throw Error('fund '+k);});for(d=1;d<=365;d++){c3.day=d;hardDay(c3);}
 if(propReach(c3,'water')>BUILD_CAP+1e-9)throw Error('a group grows at most 7% a year: '+propReach(c3,'water'));if(!(rip(c3).log.some(function(x){return /desal plant opens/.test(x.tx);})))throw Error('the cold ones have their news');
