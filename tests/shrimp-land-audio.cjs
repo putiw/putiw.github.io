@@ -48,6 +48,14 @@ let fails=0;const ok=(c,m)=>{console.log((c?'ok   ':'FAIL ')+m);if(!c)fails++;};
  ok(l2.ac==='suspended'&&l2.hid,'land suspended when hidden ('+l2.ac+')');
  await p.mouse.click(5,300);await wait(800);
  ok(await p.evaluate(()=>MUS.on&&MUS.ctx&&MUS.ctx.state==='running'),'company music back after the land');
+ // 5b (Pass 256): the company keeps its place across show and hide, and three quick round trips never leave both playing
+ const t0=await p.evaluate(()=>MUS.ctx.currentTime);
+ await p.evaluate(()=>{for(var i=0;i<3;i++){landShow();landHide();}landShow();});await wait(700);
+ const r3=await p.evaluate(()=>({mus:MUS.ctx.state,t:MUS.ctx.currentTime}));const l3=await fr().evaluate(()=>AC&&AC.state);
+ ok(r3.mus!=='running','after three quick round trips only the land plays (company '+r3.mus+', land '+l3+')');
+ await p.evaluate(()=>landHide());await p.mouse.click(5,300);await wait(800);
+ const r4=await p.evaluate(()=>({mus:MUS.ctx.state,t:MUS.ctx.currentTime}));
+ ok(r4.mus==='running'&&r4.t>=t0,'company music resumes where it was ('+t0.toFixed(1)+' to '+r4.t.toFixed(1)+' s)');
  // 6. one mute: company mute reaches the land, land mute reaches the company
  await p.evaluate(()=>setMute(true));await wait(200);
  ok(await fr().evaluate(()=>!S.opt.sound&&document.getElementById('tb-mute').classList.contains('muted')),'company mute mutes the land');
