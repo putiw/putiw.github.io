@@ -90,9 +90,7 @@ button .sub{font-weight:400;font-size:13px;color:inherit;opacity:.75;white-space
   <div id="strip" aria-hidden="true"></div>
   <div class="row"><button class="pri" id="p-feed">Feed</button><button class="pri" id="p-water">Change water</button></div>
   <div class="row"><button class="sm" id="p-speed">Speed<span class="sub" id="p-speed-sub"></span></button><button class="sm" id="p-new">New tank, 5 shrimp</button></div>
-  <p class="muted" style="margin:4px 0 6px">Water change sound, tap to try and keep</p>
-  <div class="row"><button class="sm" data-wc="A">A trickle</button><button class="sm" data-wc="B">B bubbly pour</button></div>
-  <div class="row"><button class="sm" data-wc="C">C droplets</button><button class="sm" data-wc="D">D glugs then pour</button></div>
+
   <button class="sm" id="p-bench">Sound bench<span class="sub">compare tanks, single sounds</span></button>
 </section>
 <section id="s-home" class="screen" aria-label="Your tank">
@@ -103,14 +101,15 @@ button .sub{font-weight:400;font-size:13px;color:inherit;opacity:.75;white-space
   <div class="row"><button class="sm" data-prof="dying">Dying, ammonia high</button><button class="sm" data-prof="quick">Quick tank, 10</button></div>
   <h2>Play one sound</h2>
   <div class="row"><button class="sm" data-play="molt">Molt</button><button class="sm" data-play="berried">Eggs (double tick)</button></div>
-  <div class="row"><button class="sm" data-play="babies">Babies</button><button class="sm" data-play="death">Death</button></div>
+  <div class="row"><button class="sm" data-play="babies">Babies</button><button class="sm" data-play="death">Death, adult</button></div>
   <div class="row"><button class="sm" data-play="eatA">Adult eating</button><button class="sm" data-play="eatB">Baby eating</button></div>
   <div class="row"><button class="sm" data-play="idle">Stationary flick</button><button class="sm" data-play="swim">Swimming (adult)</button></div>
   <div class="row"><button class="sm" data-play="swimB">Swimming (baby)</button><button class="sm" data-play="feed">Feeding (sound only)</button></div>
   <div class="row"><button class="sm" data-play="moltfail">Failed molt</button><button class="sm" data-play="swimL">Swimming, long</button></div>
-  <div class="row"><button class="sm" data-play="pulse">Water pulse, good → bad</button><button class="sm" data-play="babiesQ">Babies (quiet)</button></div>
+  <div class="row"><button class="sm" data-play="pulse">Monitor beep, good → bad</button><button class="sm" data-play="babiesQ">Babies (quiet)</button></div>
+  <div class="row"><button class="sm" data-play="deathB">Death, baby</button><button class="sm" data-play="hissLoud">Hiss, bad water</button></div>
   <div class="row"><button class="sm" data-play="pour">Water change (sound only)</button><button class="sm" data-play="hiss">Hiss 5 s</button></div>
-  <div class="row"><button class="sm" data-play="bubbles">Bubbles 4 s</button><button class="sm" id="btn-solo" aria-pressed="true">Solo<span class="sub" id="solo-sub">tank quiet while it plays</span></button></div>
+  <div class="row"><button class="sm" data-play="bubbles">Bubbles 4 s</button><button class="sm" data-play="flow">Filter flow 6 s</button></div><div class="row"><button class="sm" id="btn-solo" aria-pressed="true">Solo<span class="sub" id="solo-sub">tank quiet while it plays</span></button></div>
   <button class="sm" id="btn-tank" aria-pressed="true">Tank sound<span class="sub" id="tank-sub">on</span></button>
   <h2>Keep it</h2>
   <button class="pri" id="btn-how">How are they</button>
@@ -135,7 +134,10 @@ button .sub{font-weight:400;font-size:13px;color:inherit;opacity:.75;white-space
 var SOUND={
   master:0.6,
   /* the water pulse: one soft low beep, slow when the water is fine, faster as any reading goes bad */
-  pulse:{gain:0.045,hz:300,ms:110,slow:7,fast:0.7},
+  /* the monitor: a soft beep that follows nitrite and nitrate. Slow and low when fine, faster and higher as it goes bad. */
+  pulse:{gain:0.05,ms:140, hzGood:520,hzBad:1050, slow:6,fast:0.55},
+  /* the filter: a soft water flow all the time (pink noise, low-passed, slowly breathing) plus a trickle where the outflow hits the surface */
+  flow:{gain:0.09,lo:220,hi:900,breathe:0.08,depth:0.35, trickle:{gain:0.05,hz:1400,q:0.9,rate:0.31,depth:0.6}},
   room:{noiseGain:0.0,noiseLo:350,noiseHi:1200, bubbleGain:0.05,bubbleHz:700,bubbleRise:1.6,bubbleMs:45, bubbleEvery:0.55, tempSpan:0.18, clogSlow:0.8,clogDull:0.45},
   /* eating: a short munch, 2 to 4 scrapes. Babies high and quick, adults low wooden. Every shrimp has its own pace (rate). */
   eat:{gain:0.16, baby:{hz:1700,n:3,gap:0.055,ms:18,type:'sine'}, juv:{hz:1000,n:3,gap:0.08,ms:30,type:'triangle'}, adult:{hz:560,n:3,gap:0.11,ms:50,type:'triangle'}, jitter:0.08, every:2.2, rateLo:0.6,rateHi:1.6, surface:0.06, stressMs:14},
@@ -144,11 +146,12 @@ var SOUND={
   /* swimming: a dart through the water, a soft whoosh that rises then falls. Babies shorter and higher. More darting right after feeding, when they move toward the food. */
   swim:{gain:0.045,lo:450,hi:1300, short:{s:0.22},long:{s:0.9,wob:5}, longP:0.3, every:28,feedMul:0.25},
   tick:{gain:0.11,baby:1500,juv:950,adult:620,jitter:0.06},
-  molt:{gain:0.16,from:1400,to:420,s:0.7, fail:{s:0.3,knock:260,knockMs:120,gain:0.14}},
+  molt:{gain:0.16,from:1400,to:420,s:0.7, fail:{s:0.45,wob:9,knock:220,knockMs:380,gain:0.26}},
   berried:{gapMs:130},
   babies:{gain:0.03,hz:2300,n:7,span:0.9},
   feed:{gain:0.09,hz:1300,n:7,span:1.0,ms:70,bloop:{hz:380,ms:160,gain:0.07},clusterS:60,clusterMul:0.3},
-  hiss:{gain:0.035,hz:6500,q:0.8},
+  /* ammonia: from barely there at 0.1 ppm to hard to ignore past 1.5 */
+  hiss:{gain:0.01,max:0.22,hz:5000,q:0.7,full:1.5},
   dull:{clearHz:9000,oldHz:1700,oldAt:80},
   /* water change: a soft drain (low gurgle, 2 s) then a refill (a trickle, 3 s), both filtered noise with slow fades */
   /* water change, four to pick from on the Play screen (WC). A: filtered-noise trickle. B: bubbly pour, many rising sine pops over a soft noise. C: droplets, falling plips that get dense then thin. D: glugs, low wobbling tones then a smooth pour. */
@@ -156,7 +159,10 @@ var SOUND={
   pourB:{n:60,s:3.5,hz:600,rise:2.2,ms:60,gain:0.045,bed:0.02},
   pourC:{n:40,s:3.5,hz:1500,ms:80,gain:0.05,bedHz:700,bed:0.015},
   pourD:{glugs:6,hz:240,ms:220,gain:0.06,s:1.6,fill:{gain:0.035,hz:1200,q:0.5,s:2.6,wob:9}},
-  death:{gain:0.2,hz:300,ms:140},
+  /* the water change: the old water glugs out, then a tap runs (pink noise, two bands, a fast flutter) */
+  tap:{glugs:6,hz:260,ms:230,gain:0.07,gap:0.28, run:{s:3.2,gain:0.07,lo:900,hi:2600,flutter:13}},
+  /* death: babies a small high tap, adults a low knock with a long tail, louder */
+  death:{baby:{gain:0.06,hz:900,ms:60},adult:{gain:0.3,hz:240,ms:420}},
   minGapS:1.4
 };
 /* ---------- model ---------- */
@@ -190,7 +196,7 @@ function step(h){
   S.temp+= (24-S.temp)*0.02*h + rnd(-0.08,0.08)*h; S.temp=Math.max(20,Math.min(30,S.temp));
   // filter clogs over a month
   S.clog=Math.min(1,S.clog+h/720);
-  var bact=0.08*(1-0.6*S.clog); // ppm an hour the filter can take
+  var bact=(0.025+n*0.002)*(1-0.6*S.clog); // ppm an hour the filter can take
   // eating
   var eaters=S.shrimp.filter(function(x){return x.hunger>0.1}).length;
   var eat=Math.min(S.food, eaters*0.01*h);
@@ -200,7 +206,7 @@ function step(h){
   // moss and biofilm feed them a little
   for(i=0;i<n;i++){s=S.shrimp[i];s.hunger=Math.max(0,s.hunger-(0.004+0.006*S.moss)*h);}
   // leftover food rots
-  var rot=S.food*0.03*h; S.food-=rot; S.nh3+=rot*0.4 + n*0.0005*h;
+  var rot=S.food*0.03*h; S.food-=rot; S.nh3+=rot*0.8 + n*0.0005*h;
   var c1=Math.min(S.nh3,bact*h); S.nh3-=c1; S.no2+=c1;
   var c2=Math.min(S.no2,bact*0.9*h); S.no2-=c2; S.no3+=c2*3;
   S.no3+= (0.01 + n*0.0005)*h; // with the nitrite that turns, about 5 ppm a week for a small colony
@@ -219,9 +225,9 @@ function step(h){
       s.moltIn=s.age<75?rnd(3,12):rnd(15,45);
       var wc7=(S.wc||[]).filter(function(d){return S.day-d<7}).length; /* water changed more than twice in a week: molts fail (the game's too-much-new-water rule) */
       var fail=0.02+S.no3/400+bad*0.1+Math.max(0,wc7-2)*0.25;
-      if(Math.random()<fail){die=1;ev('moltfail',{id:s.id})}else ev('molt',{id:s.id})
+      if(Math.random()<fail){die=1}else ev('molt',{id:s.id})
     }
-    if(Math.random()<die){S.shrimp.splice(i,1);logit(die===1?'a molt failed':sizeOf(s)==='baby'?'a baby died':'a shrimp died');if(die!==1)ev('death',{id:s.id});continue}
+    if(Math.random()<die){S.shrimp.splice(i,1);logit(die===1?'a molt failed':sizeOf(s)==='baby'?'a baby died':'a shrimp died');if(die!==1)ev('death',{id:s.id,age:s.age});else ev('moltfail',{id:s.id,age:s.age});continue}
     if(s.berried>0){s.berried-=h/24;if(s.berried<=0){s.berried=0;var k=Math.floor(rnd(5,12));for(var b=0;b<k;b++)S.shrimp.push(mkShrimp(0));logit(k+' babies');ev('babies',{n:k})}}
     else if(s.sex==='f'&&s.age>=75&&s.hunger<0.6&&bad<0.15&&S.no3<60&&Math.random()<h/(24*18)*Math.max(0,1-n/60)){s.berried=rnd(22,28);logit('a female is carrying eggs');ev('berried',{id:s.id})}
   }
@@ -275,11 +281,23 @@ function audio(){
   var len=ctx.sampleRate*2, buf=ctx.createBuffer(1,len,ctx.sampleRate), d=buf.getChannelData(0);
   for(var i=0;i<len;i++)d[i]=Math.random()*2-1;
   A.noise=buf;
-  // room tone: filtered noise
-  var src=ctx.createBufferSource();src.buffer=buf;src.loop=true;
-  var bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=(SOUND.room.noiseLo+SOUND.room.noiseHi)/2;bp.Q.value=0.7;
-  A.roomG=ctx.createGain();A.roomG.gain.value=0;
-  src.connect(bp);bp.connect(A.roomG);A.roomG.connect(A.tank);src.start();
+  // pink noise, 6 s, ends matched so the loop has no click
+  var pl=ctx.sampleRate*6,pb=ctx.createBuffer(1,pl,ctx.sampleRate),pd=pb.getChannelData(0),b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+  for(i=0;i<pl;i++){var w=Math.random()*2-1;b0=0.99886*b0+w*0.0555179;b1=0.99332*b1+w*0.0750759;b2=0.969*b2+w*0.153852;b3=0.8665*b3+w*0.3104856;b4=0.55*b4+w*0.5329522;b5=-0.7616*b5-w*0.016898;pd[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)*0.11;b6=w*0.115926}
+  var fadeN=ctx.sampleRate*0.5;for(i=0;i<fadeN;i++){var a=i/fadeN;pd[i]=pd[i]*a+pd[pl-fadeN+i]*(1-a)}
+  pb=(function(){var nb=ctx.createBuffer(1,pl-fadeN,ctx.sampleRate);nb.getChannelData(0).set(pd.subarray(0,pl-fadeN));return nb})();
+  A.pink=pb;
+  // the filter: flow plus trickle, each breathing slowly
+  var F=SOUND.flow;
+  function loopSrc(){var x=ctx.createBufferSource();x.buffer=A.pink;x.loop=true;x.loopStart=0;x.loopEnd=A.pink.duration;return x}
+  var fs=loopSrc(),fhp=ctx.createBiquadFilter(),flp=ctx.createBiquadFilter();fhp.type='highpass';fhp.frequency.value=F.lo;flp.type='lowpass';flp.frequency.value=F.hi;flp.Q.value=0.3;
+  A.flowG=ctx.createGain();A.flowG.gain.value=0;var fl=ctx.createOscillator(),flg=ctx.createGain();fl.frequency.value=F.breathe;flg.gain.value=F.gain*F.depth;fl.connect(flg);flg.connect(A.flowG.gain);fl.start();
+  fs.connect(fhp);fhp.connect(flp);flp.connect(A.flowG);A.flowG.connect(A.tank);fs.start(0,Math.random()*3);
+  var T2=F.trickle,ts=loopSrc(),tb=ctx.createBiquadFilter();tb.type='bandpass';tb.frequency.value=T2.hz;tb.Q.value=T2.q;
+  A.trickG=ctx.createGain();A.trickG.gain.value=0;var tl=ctx.createOscillator(),tlg=ctx.createGain();tl.frequency.value=T2.rate;tlg.gain.value=T2.gain*T2.depth;tl.connect(tlg);tlg.connect(A.trickG.gain);tl.start();
+  var tl2=ctx.createOscillator(),tlg2=ctx.createGain();tl2.frequency.value=T2.rate*2.7;tlg2.gain.value=T2.gain*T2.depth*0.5;tl2.connect(tlg2);tlg2.connect(A.trickG.gain);tl2.start();
+  ts.connect(tb);tb.connect(A.trickG);A.trickG.connect(A.tank);ts.start(0,1.5+Math.random()*3);
+  A.roomG=ctx.createGain();
   // ammonia hiss
   var hs=ctx.createBufferSource();hs.buffer=buf;hs.loop=true;
   var hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=SOUND.hiss.hz;hp.Q.value=SOUND.hiss.q;
@@ -308,8 +326,13 @@ function water(W,at,dir){ /* soft filtered noise with a slow wobble; dir -1 pitc
   var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(W.gain,t+0.5);g.gain.setValueAtTime(W.gain,t+W.s-0.6);g.gain.linearRampToValueAtTime(0,t+W.s);
   var lfo=ctx.createOscillator(),lg=ctx.createGain();lfo.frequency.value=W.wob;lg.gain.value=W.gain*0.5;lfo.connect(lg);lg.connect(g.gain);lfo.start(t);lfo.stop(t+W.s);
   s.connect(f);f.connect(g);g.connect(dest());s.start(t);s.stop(t+W.s+0.05)}
-var WC='B';try{WC=localStorage.getItem('eartank-wc')||'B'}catch(e){}
+var WC='T';
 function pourSound(kind,t){var ctx=A.ctx,i;t=t||ctx.currentTime+0.05;
+  if(kind==='T'){var P=SOUND.tap,R2=P.run;for(i=0;i<P.glugs;i++){var gh=P.hz*rnd(0.8,1.2);tone(gh,P.ms,P.gain*rnd(0.7,1),t+i*P.gap+rnd(0,0.06),'sine',gh*1.6)}
+    var t2=t+P.glugs*P.gap+0.3,x=ctx.createBufferSource();x.buffer=A.pink;x.loop=true;var a=ctx.createBiquadFilter(),b=ctx.createBiquadFilter();a.type='bandpass';a.frequency.value=R2.lo;a.Q.value=0.8;b.type='bandpass';b.frequency.value=R2.hi;b.Q.value=0.8;
+    var g=ctx.createGain();g.gain.setValueAtTime(0,t2);g.gain.linearRampToValueAtTime(R2.gain,t2+0.25);g.gain.setValueAtTime(R2.gain,t2+R2.s-0.6);g.gain.linearRampToValueAtTime(0,t2+R2.s);
+    var fl=ctx.createOscillator(),flg=ctx.createGain();fl.frequency.value=R2.flutter;flg.gain.value=R2.gain*0.25;fl.connect(flg);flg.connect(g.gain);fl.start(t2);fl.stop(t2+R2.s);
+    x.connect(a);x.connect(b);a.connect(g);b.connect(g);g.connect(dest());x.start(t2);x.stop(t2+R2.s+0.05);return}
   if(kind==='A'){var Pp=SOUND.pour;water(Pp.drain,t,-1);water(Pp.fill,t+Pp.drain.s+0.2,1)}
   else if(kind==='B'){var B=SOUND.pourB;water({gain:B.bed,hz:900,q:0.5,s:B.s,wob:6},t,1);for(i=0;i<B.n;i++){var u=i/B.n,bh=B.hz*rnd(0.7,1.4);tone(bh,B.ms,B.gain*Math.sin(u*Math.PI)*rnd(0.5,1),t+u*B.s+rnd(0,0.05),'sine',bh*B.rise)}}
   else if(kind==='C'){var Cc=SOUND.pourC;water({gain:Cc.bed,hz:Cc.bedHz,q:0.7,s:Cc.s,wob:3},t,1);for(i=0;i<Cc.n;i++){var u=Math.pow(Math.random(),0.7),ch=Cc.hz*rnd(0.7,1.3);tone(ch,Cc.ms,Cc.gain*Math.sin(u*Math.PI)*rnd(0.5,1),t+u*Cc.s,'sine',ch*0.5)}}
@@ -346,11 +369,16 @@ function shrimpTick(s,at){eatSound(s,at,true)}
 function playEv(e){
   var ctx=A.ctx,t=ctx.currentTime+0.05,i;
   if(e.k==='molt'){tone(SOUND.molt.from,SOUND.molt.s*1000,SOUND.molt.gain,t,'sine',SOUND.molt.to)}
-  else if(e.k==='moltfail'){var Mf=SOUND.molt.fail;/* the slide starts and breaks off, then a dull knock */tone(SOUND.molt.from,Mf.s*1000,SOUND.molt.gain,t,'sine',SOUND.molt.from*0.7);tone(Mf.knock,Mf.knockMs,Mf.gain,t+Mf.s+0.12,'triangle',Mf.knock*0.8)}
+  else if(e.k==='moltfail'){var Mf=SOUND.molt.fail,ctx2=A.ctx,o=ctx2.createOscillator(),og=ctx2.createGain(),lf=ctx2.createOscillator(),lfg=ctx2.createGain();
+    /* the slide starts, shakes and stops halfway, then a heavy knock */
+    o.type='sine';o.frequency.setValueAtTime(SOUND.molt.from,t);o.frequency.exponentialRampToValueAtTime(SOUND.molt.from*0.6,t+Mf.s);lf.frequency.value=Mf.wob;lfg.gain.value=60;lf.connect(lfg);lfg.connect(o.frequency);
+    og.gain.setValueAtTime(0,t);og.gain.linearRampToValueAtTime(Mf.gain,t+0.02);og.gain.setValueAtTime(Mf.gain,t+Mf.s-0.05);og.gain.linearRampToValueAtTime(0,t+Mf.s);o.connect(og);og.connect(dest());o.start(t);o.stop(t+Mf.s+0.02);lf.start(t);lf.stop(t+Mf.s+0.02);
+    tone(Mf.knock,Mf.knockMs,Mf.gain,t+Mf.s+0.15,'triangle',Mf.knock*0.7);tone(Mf.knock*0.5,Mf.knockMs*1.2,Mf.gain*0.5,t+Mf.s+0.16,'sine')}
   else if(e.k==='babies'){for(i=0;i<SOUND.babies.n;i++)tone(SOUND.babies.hz*rnd(0.9,1.15),30,SOUND.babies.gain,t+Math.random()*SOUND.babies.span,'sine')}
   else if(e.k==='feed'){var F=SOUND.feed;/* pellets plip into the water, one low bloop as the first sinks */for(i=0;i<F.n;i++){var fh=F.hz*rnd(0.8,1.25);tone(fh,F.ms,F.gain*rnd(0.6,1),t+i*F.span/F.n+rnd(0,0.06),'sine',fh*0.55)}tone(F.bloop.hz,F.bloop.ms,F.bloop.gain,t+0.25,'sine',F.bloop.hz*1.5);cluster=ctx.currentTime+F.clusterS}
   else if(e.k==='pour'){pourSound(WC,t)}
-  else if(e.k==='death'){tone(SOUND.death.hz,SOUND.death.ms,SOUND.death.gain,t,'triangle',SOUND.death.hz*0.8)}
+  else if(e.k==='death'){var Dd=SOUND.death,ag=Math.min(1,Math.max(0,((e.d.age==null?200:e.d.age)-10)/90)),dg=Dd.baby.gain+(Dd.adult.gain-Dd.baby.gain)*ag,dh=Dd.baby.hz*Math.pow(Dd.adult.hz/Dd.baby.hz,ag),dm=Dd.baby.ms+(Dd.adult.ms-Dd.baby.ms)*ag;
+    tone(dh,dm,dg,t,'triangle',dh*0.75);if(ag>0.5)tone(dh*0.5,dm*1.3,dg*0.5,t+0.02,'sine',dh*0.4)}
   else if(e.k==='berried'){var sh=S.shrimp.filter(function(x){return x.id===e.d.id})[0];if(sh)shrimpTick(sh,t)}
   // name it once in speech the first time
   var names={moltfail:'That broken slide and knock is a failed molt.',molt:'That slide is a molt.',babies:'Those high ticks are babies.',berried:'That double tick is a female carrying eggs.',death:'That low tap is a death.',feed:'That is food going in.',pour:'That is the water change.'};
@@ -370,19 +398,20 @@ function sched(){ // every 100 ms
   var ctx=A.ctx,now=ctx.currentTime,look=now+0.25,R=SOUND.room;
   // room tone follows the model
   var tempo=R.bubbleEvery*(1-R.tempSpan*(S.temp-24)/4)*(1+R.clogSlow*S.clog);
-  A.roomG.gain.setTargetAtTime(R.noiseGain*(1-0.5*S.clog),now,0.5);
+  A.flowG.gain.setTargetAtTime(SOUND.flow.gain*(1-0.5*S.clog),now,0.8);A.trickG.gain.setTargetAtTime(SOUND.flow.trickle.gain*(1-0.6*S.clog),now,0.8);
   /* the water pulse */
-  var Pu=SOUND.pulse,badness=Math.min(1,Math.max(S.nh3/0.3,S.no2/0.3,S.no3/40)),every=Pu.slow+(Pu.fast-Pu.slow)*Math.pow(badness,1.5);
+  var Pu=SOUND.pulse,badness=Math.min(1,Math.max(S.no2/0.4,Math.max(0,S.no3-15)/45)),every=Pu.slow+(Pu.fast-Pu.slow)*Math.pow(badness,1.3),phz=Pu.hzGood+(Pu.hzBad-Pu.hzGood)*badness;
   if(!A.nextPulse)A.nextPulse=now+1;
-  while(A.nextPulse<look){tone(Pu.hz,Pu.ms,Pu.gain,A.nextPulse,'sine',Pu.hz*0.9);A.nextPulse+=every}
+  var quiet=now<(A.quietUntil||0);
+  while(A.nextPulse<look){if(!quiet)tone(phz,Pu.ms,Pu.gain*(1+badness*0.6),A.nextPulse,'sine');A.nextPulse+=every}
   if(A.nextPulse>now+every+0.3)A.nextPulse=now+every; /* the rate sped up: don't wait out the old gap */
   while(A.nextBubble<look){var bh=R.bubbleHz*(1-R.clogDull*S.clog)*rnd(0.85,1.15);tone(bh,R.bubbleMs,R.bubbleGain*rnd(0.5,1),A.nextBubble,'sine',bh*R.bubbleRise);A.nextBubble+=tempo*rnd(0.85,1.15)}
   var bad=Math.min(1,S.nh3+S.no2*0.7);
-  A.hissG.gain.setTargetAtTime(bad<0.08?0:SOUND.hiss.gain*Math.min(1,bad),now,1);
+  var Hs=SOUND.hiss,amm=S.nh3+S.no2*0.5;A.hissG.gain.setTargetAtTime(amm<0.08||quiet?0:Hs.gain+(Hs.max-Hs.gain)*Math.pow(Math.min(1,(amm-0.08)/Hs.full),1.2),now,1);
   A.lp.frequency.setTargetAtTime(SOUND.dull.clearHz-(SOUND.dull.clearHz-SOUND.dull.oldHz)*Math.min(1,S.no3/SOUND.dull.oldAt),now,1.5);
   // shrimp voices
   var E=SOUND.eat,mul=now<cluster?SOUND.feed.clusterMul:1,i,s;
-  var NV=Math.min(50,S.shrimp.length); /* at most 50 voices */
+  var NV=quiet?0:Math.min(50,S.shrimp.length); /* at most 50 voices */
   for(i=0;i<NV;i++){
     s=S.shrimp[i];var v=A.voices[s.id];
     if(!v){v=A.voices[s.id]={at:now+Math.random()*E.every,idle:now+Math.random()*SOUND.idle.every,swim:now+Math.random()*SOUND.swim.every}}
@@ -504,17 +533,21 @@ function start(){
   $('btn-tank').onclick=function(){TANK=!TANK;this.setAttribute('aria-pressed',TANK);$('tank-sub').textContent=TANK?'on':'off';tankLevel()};
   setInterval(tankLevel,200);
   document.querySelectorAll('[data-play]').forEach(function(b){b.onclick=function(){if(!audio())return;var k=b.dataset.play,t=A.ctx.currentTime+0.05;
-    if(SOLO){soloT=t+(k==='hiss'||k==='bubbles'||k==='pulse'?6:3.5);tankLevel()}
+    if(SOLO){soloT=t+(k==='hiss'||k==='hissLoud'||k==='bubbles'?6:k==='pulse'?16:k==='pour'?6:3.5);tankLevel()}
     DEMO=true;
-    if(k==='bubbles'){var R=SOUND.room;for(var i=0,tb=t;tb<t+4;i++){var bh=R.bubbleHz*rnd(0.85,1.15);tone(bh,R.bubbleMs,R.bubbleGain*rnd(0.5,1),tb,'sine',bh*R.bubbleRise);tb+=R.bubbleEvery*rnd(0.85,1.15)}}
+    if(k==='flow'){A.tank.gain.cancelScheduledValues(t);soloT=0;var keepT=TANK;TANK=true;var R0=SOUND.room;setTimeout(function(){TANK=keepT},6000);/* tank on, everything but the flow and bubbles muted would need its own bus; play the tank for 6 s with shrimp quiet */A.quietUntil=A.ctx.currentTime+6;var hv=A.hissG.gain.value;A.hissG.gain.setValueAtTime(0,t)}
+    else if(k==='bubbles'){var R=SOUND.room;for(var i=0,tb=t;tb<t+4;i++){var bh=R.bubbleHz*rnd(0.85,1.15);tone(bh,R.bubbleMs,R.bubbleGain*rnd(0.5,1),tb,'sine',bh*R.bubbleRise);tb+=R.bubbleEvery*rnd(0.85,1.15)}}
     else
     if(k==='eatA')eatSound({id:901,age:200,hunger:0.2,berried:0,rate:1},t,true);
     else if(k==='eatB')eatSound({id:902,age:10,hunger:0.2,berried:0,rate:1},t,true);
     else if(k==='idle')idleSound({id:903,age:200},t,1);
     else if(k==='swim'){swimSound({id:905,age:200},t,'short');swimSound({id:905,age:200},t+1.2,'short')}
     else if(k==='swimL'){swimSound({id:907,age:200},t,'long');swimSound({id:907,age:200},t+1.6,'long')}
-    else if(k==='pulse'){var Pu=SOUND.pulse;for(var pi=0,pt=t;pi<10;pi++){tone(Pu.hz,Pu.ms,Pu.gain,pt,'sine',Pu.hz*0.9);pt+=Pu.slow-(Pu.slow-Pu.fast)*Math.pow(pi/9,1.5)*0.9}}
+    else if(k==='pulse'){var Pu=SOUND.pulse;for(var pi=0,pt=t;pi<16;pi++){var bz=pi/15;tone(Pu.hzGood+(Pu.hzBad-Pu.hzGood)*bz,Pu.ms,Pu.gain*(1+bz*0.6),pt,'sine');pt+=Math.max(Pu.fast,2.2-(2.2-Pu.fast)*Math.pow(bz,1.3))}}
+    else if(k==='hissLoud'){var hs2=A.ctx.createBufferSource();hs2.buffer=A.noise;hs2.loop=true;var hp2=A.ctx.createBiquadFilter();hp2.type='highpass';hp2.frequency.value=SOUND.hiss.hz;hp2.Q.value=SOUND.hiss.q;var hg2=A.ctx.createGain();hg2.gain.setValueAtTime(0,t);hg2.gain.linearRampToValueAtTime(SOUND.hiss.max,t+1);hg2.gain.setValueAtTime(SOUND.hiss.max,t+4);hg2.gain.linearRampToValueAtTime(0,t+5);hs2.connect(hp2);hp2.connect(hg2);hg2.connect(A.lp);hs2.start(t);hs2.stop(t+5.1)}
     else if(k==='babiesQ'){playEv({k:'babies',d:{}})}
+    else if(k==='deathB'){playEv({k:'death',d:{age:5}})}
+    else if(k==='death'){playEv({k:'death',d:{age:200}})}
     else if(k==='swimB'){swimSound({id:906,age:10},t);swimSound({id:906,age:10},t+0.9)}
     else if(k==='berried')eatSound({id:904,age:200,hunger:0.2,berried:10,rate:1},t,true);
     else if(k==='hiss'){var hs=A.ctx.createBufferSource();hs.buffer=A.noise;hs.loop=true;var hp=A.ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=SOUND.hiss.hz;hp.Q.value=SOUND.hiss.q;var hg=A.ctx.createGain();hg.gain.setValueAtTime(0,t);hg.gain.linearRampToValueAtTime(SOUND.hiss.gain,t+0.8);hg.gain.setValueAtTime(SOUND.hiss.gain,t+4);hg.gain.linearRampToValueAtTime(0,t+5);hs.connect(hp);hp.connect(hg);hg.connect(A.lp);hs.start(t);hs.stop(t+5.1)}
