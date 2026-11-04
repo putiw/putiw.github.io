@@ -2474,3 +2474,4 @@ Pass 249k (Puti): Filter sound picker on the Play screen (`FOUNT`, saved in `ear
 - Tests: balance 145, me 51, academy 10, hard 20 on a fresh average run (new: trees are rows and the cards hide, desk in the card, a tree step moves nothing), stable World on year 15 / nour3 / year 18: one failure, `#sp40` header 169→148, same on Pass 252 (not this pass). `dev-hard.json` rebuilt. BUILD p253.
 
 Pass 249l (Puti): Pause (stops time and suspends the audio, button turns to Play) and Sound off (time keeps running, master to 0) on the Play screen, above Speed.
+Pass 249m: Pause keeps the audio running and mutes only the tank bus and the scheduler, so single sounds, beep options and the tank-by-ear scan still play while paused.
