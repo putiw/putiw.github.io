@@ -1957,7 +1957,7 @@ function renderCard(){var nm=$('h-name');if(!nm)return;nm.textContent=STAGES[S.s
 // Pass 254 (Puti 5 Nov): the line that says what the build tool does, shown inside the palette so it never covers the items
 function buildHint(){var b=L.buildSel&&BUILDI[L.buildSel];
   if(L.moving)return L.moveObj?'Tap where the '+esc(((OBJ[L.moveObj.k]||{}).name||'thing').toLowerCase())+' goes. Tap it again to put it down.':'Tap anything to pick it up. Moving is free.';
-  if(L.making)return 'Draw your own things.';
+  if(L.making)return '';
   if(L.colouring)return 'Tap a thing or the ground to change its colors. Free.';
   if(L.removing)return 'Tap or drag over things you built to take them away. You get half back.';
   if(b)return b.ground?esc(b.name)+': tap a tile, or drag to paint. '+fmtA(b.price)+' a tile.':'Tap where the '+esc(b.name.toLowerCase())+' goes. '+fmtA(b.price)+'.';
