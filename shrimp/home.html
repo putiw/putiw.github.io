@@ -246,6 +246,8 @@ body.locked .tabs{z-index:42}
 .bgrid button canvas{width:56px;height:36px}
 .bgrid button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent)}
 .bnote{font-size:12.5px;color:var(--ink-2);padding:4px 2px 2px}
+.bhint{font-size:12.5px;line-height:1.3;color:var(--ink);padding:0 2px 6px;min-height:16px}
+.bcat.bdone{color:var(--ink);border-color:var(--ink);font-weight:700}
 .bcat.bmv{margin-left:auto}
 .bcat.brm{margin-left:0}
 /* group chips fill their rows evenly: no lone chip, no gap at the end */
@@ -302,7 +304,7 @@ body.in-game #b-money{min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:cl
 body.in-game #tb-back i{font-style:normal}
 @media (max-width:410px){body.in-game #tb-back i{display:none}body.in-game #tb-back{width:36px;padding:6px 0;justify-content:center}body.in-game #b-money{font-size:16px}}
 /* tools sit on the map, bottom left, like the zoom buttons (28 Oct): small square slots, no labels, the line under the map says what the picked tool does */
-.landwrap .lpal{position:absolute;left:6px;right:6px;bottom:58px;z-index:6;margin:0;padding:6px!important;background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid var(--line);border-radius:10px;max-height:46%;overflow:auto!important;box-shadow:0 4px 14px rgba(0,0,0,.14)}.landwrap .lpal[hidden]{display:none}
+.landwrap .lpal{position:absolute;left:6px;right:6px;bottom:calc(58px + env(safe-area-inset-bottom,0px));z-index:6;margin:0;padding:6px!important;background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid var(--line);border-radius:10px;max-height:46%;overflow:auto!important;box-shadow:0 4px 14px rgba(0,0,0,.14)}.landwrap .lpal[hidden]{display:none}
 .landwrap .ltools{position:absolute;left:8px;bottom:8px;z-index:5;margin:0;gap:6px;justify-content:flex-start}
 .landwrap .tslot{flex:0 0 auto;width:44px;height:44px;padding:0;border-radius:9px;box-shadow:0 2px 0 #21181b}
 .landwrap .tslot .ticon{width:30px;height:30px}
@@ -1054,7 +1056,9 @@ function decorTop(k){if(TOPS[k])return TOPS[k];var im=decorImg(k);if(!im||!im.wi
 function seedMoss(T,item,n,grown){var top=decorTop(item.k);if(!top)return;var list=T.moss[item.id]=[];var r=mulberry32(item.id*31+7);
   for(var i=0;i<n;i++){var u=0.1+r()*0.8,ix=Math.floor(u*top.y.length);if(top.y[ix]<0)continue;var side=r()<0.25;list.push({u:u,a:side?(r()<0.5?-0.35:-Math.PI+0.35)+(r()-0.5)*0.6:-Math.PI/2+(r()-0.5)*1.4,len:grown?rnd(34,56):rnd(14,22),max:rnd(78,118),seed:Math.floor(r()*1e6)});}}
 function mossAnchor(item,m){var top=decorTop(item.k);var d=DECOR_SIZE[item.k];var ix=clamp(Math.floor(m.u*top.y.length),0,top.y.length-1),px=ix*top.step,py=top.y[ix]+2;
-  var w=d.w*item.s,h=d.h*item.s,lx=(item.f<0?(d.w-px):px)*item.s;return [item.x-w/2+lx,item.y-h+py*item.s];}
+  var w=d.w*item.s,h=d.h*item.s,lx=(item.f<0?(d.w-px):px)*item.s,ax=item.x-w/2+lx,ay=item.y-h+py*item.s;
+  if(item.r&&item.k!=='leaf'){var dx=ax-item.x,dy=ay-item.y,fl=item.f<0?-1:1,c=Math.cos(item.r),sn=Math.sin(item.r);dx*=fl;ax=item.x+fl*(dx*c-dy*sn);ay=item.y+(dx*sn+dy*c);}// Pass 254: moss turns with the wood
+  return [ax,ay];}
 function scapeNeedsMoss(T){T.scape.forEach(function(it){if(DECOR[it.k]&&DECOR[it.k].moss&&!T.moss[it.id])seedMoss(T,it,it.k==='wood'?16:it.k==='mossrock'?10:8,false);});}
 function hideScore(T){var h=0;T.scape.forEach(function(it){var d=DECOR[it.k];if(d)h+=d.hide*it.s;});var moss=0;for(var k in T.moss)T.moss[k].forEach(function(m){moss+=m.len;});h+=Math.min(0.3,moss/900);h+=Math.min(0.15,T.stems.length*0.02);return clamp(h,0,1);}
 function plantMass(T){var m=0;T.scape.forEach(function(it){var d=DECOR[it.k];if(d&&d.plant)m+=d.plant*it.s;});T.stems.forEach(function(st){m+=st.h/400;});for(var k in T.moss)T.moss[k].forEach(function(mm){m+=mm.len/600;});return m;}
@@ -1109,8 +1113,8 @@ function drawBg(x){var g=tvGeom(),W=TV.W,H=TV.H;if(ART_READY)x.drawImage(IMG.tbg
    for(var i=0;i<gr[1];i++){var bx=W*gr[0]+(i-gr[1]/2)*8.5*gr[2]*k,by=H*0.72+(i%3)*1.2,bh=H*(0.18+((i+gi)%6)*0.035)*gr[2],sw=Math.sin(i*0.74+gi)*10*gr[2]*k;
     x.strokeStyle='rgba('+gr[3]+','+gr[4]+')';x.lineWidth=Math.max(1,3.1*gr[2]*k);x.beginPath();x.moveTo(bx,by);x.quadraticCurveTo(bx+sw*0.28,by-bh*0.5,bx+sw,by-bh);x.stroke();}});}
 function drawItem(x,it,alpha){var im=decorImg(it.k),d=DECOR_SIZE[it.k];if(!im||!d)return;var g=tvGeom(),w=d.w*it.s*g.s,h=d.h*it.s*g.s,p=f2s(it.x,it.y);x.save();if(alpha!=null)x.globalAlpha=alpha;x.translate(p[0],p[1]);if(it.f<0)x.scale(-1,1);
-  if(it.k==='leaf'){x.rotate(it.r||0.2);x.drawImage(im,-w/2,-h*0.7,w,h);}else x.drawImage(im,-w/2,-h,w,h);x.restore();}
-function scapeKey(T){return T.scape.map(function(i){return i.k+i.x.toFixed(0)+i.y.toFixed(0)+i.s+i.f;}).join('|');}
+  if(it.k==='leaf'){x.rotate(it.r||0.2);x.drawImage(im,-w/2,-h*0.7,w,h);}else{if(it.r)x.rotate(it.r);x.drawImage(im,-w/2,-h,w,h);}x.restore();}// Pass 254: Rotate in Aquascape, any piece turns about its base
+function scapeKey(T){return T.scape.map(function(i){return i.k+i.x.toFixed(0)+i.y.toFixed(0)+i.s+i.f+(i.r?'r'+i.r.toFixed(2):'');}).join('|');}
 // moss: soft green puffs along a curve from the anchor, with a few dark ticks for texture
 var MOSS_C=['#6f9f4a','#7fae55','#5f8f3f','#8cbb62'];
 function drawMossStrand(x,a0,m,g,alpha){var r=mulberry32(m.seed),L=m.len*g.s,step=3.2,n=Math.max(1,Math.floor(L/step)),px=a0[0],py=a0[1],ang=m.a,bend=(r()-0.5)*0.09;
@@ -1662,7 +1666,7 @@ function scapeToy(T){var A={sel:null,drag:null,spent:0};
   A.start=function(){A.bar();A.panel();};
   A.bar=function(){toyBar(barHtml(A.sel?'Drag to move it. Tap the water to let go.':'Tap a piece below to add it, or drag what’s there.',''));};
   A.panel=function(){var tp=$('toypanel');if(!tp)return;var h='<div class="card"><div class="palette" id="sc-pal">'+SCAPE_SHOP.map(function(s){var nm=s[0]==='stems'?'Stem plants':s[0]==='moss'?'Java moss':DECOR[s[0]].name;return '<button data-add="'+s[0]+'"><canvas data-th="'+s[0]+'" width="112" height="72"></canvas>'+nm+'<small>'+fmtA(s[1])+'</small></button>';}).join('')+'</div>';
-    if(A.sel){h+='<div class="btns" style="margin-top:4px"><button class="btn sm" data-sc="flip">Flip</button><button class="btn sm" data-sc="small">Smaller</button><button class="btn sm" data-sc="big">Bigger</button><button class="btn sm" data-sc="del">Remove</button></div>';}
+    if(A.sel){h+='<div class="btns" style="margin-top:4px"><button class="btn sm" data-sc="flip">Flip</button><button class="btn sm" data-sc="small">Smaller</button><button class="btn sm" data-sc="big">Bigger</button><button class="btn sm" data-sc="rot">Rotate</button><button class="btn sm" data-sc="del">Remove</button></div>';}
     var hs=hideScore(T),pm=plantMass(T),gz=0;T.scape.forEach(function(it){var d=DECOR[it.k];if(d&&d.graze)gz+=d.graze;});for(var k in T.moss)gz+=0.1;
     var dots=function(v){var n=Math.round(clamp(v,0,1)*5);return '●●●●●'.slice(0,n)+'<span style="color:var(--line)">'+'●●●●●'.slice(0,5-n)+'</span>';};
     h+='<div class="kv" style="margin-top:8px"><span>Hiding spots</span><b>'+dots(hs/0.7)+'</b><span>Plants</span><b>'+dots(pm/1.2)+'</b><span>Grazing</span><b>'+dots(gz/0.9)+'</b></div><p class="hint">More hiding spots, more babies make it. Plants soak up nitrate. Wood, leaves and moss grow the film shrimp graze on.</p></div>';
@@ -1674,7 +1678,7 @@ function scapeToy(T){var A={sel:null,drag:null,spent:0};
     if(k==='stems'){var cx=rnd(160,ART_W-160);defaultStems(T,cx,4);T.stems.slice(-4).forEach(function(s){s.h=rnd(40,70);});sfx('plop');A.panel();return;}
     var d=DECOR_SIZE[k],it2={id:uid(),k:k,x:rnd(250,ART_W-250),y:ART_H*0.86+rnd(-6,10),s:k==='leaf'?1:0.85,f:Math.random()<0.5?1:-1,r:k==='leaf'?rnd(-0.5,0.5):0};
     if(k==='leaf')it2.y=ART_H*0.9;T.scape.push(it2);scapeResort(T,it2);if(DECOR[k].moss)seedMoss(T,it2,k==='wood'?5:3,false);A.sel=it2;sfx('thud');A.bar();A.panel();};
-  A.edit=function(k){var it=A.sel;if(!it)return;if(k==='flip')it.f=-it.f;if(k==='small')it.s=Math.max(0.5,it.s-0.12);if(k==='big')it.s=Math.min(1.4,it.s+0.12);
+  A.edit=function(k){var it=A.sel;if(!it)return;if(k==='flip')it.f=-it.f;if(k==='small')it.s=Math.max(0.5,it.s-0.12);if(k==='big')it.s=Math.min(1.4,it.s+0.12);if(k==='rot'){it.r=((it.r||0)+Math.PI/12)%(Math.PI*2);}// Pass 254: 15° a tap
     if(k==='del'){T.scape.splice(T.scape.indexOf(it),1);delete T.moss[it.id];var back=Math.round((SCAPE_SHOP.find(function(s){return s[0]===it.k;})||[0,0])[1]/2);earn(back,'decor');A.sel=null;sfx('pop');}
     A.bar();A.panel();};
   A.hit=function(p){var g=tvGeom(),best=null;for(var i=T.scape.length-1;i>=0;i--){var it=T.scape[i],d=DECOR_SIZE[it.k];if(!d)continue;var w=d.w*it.s*g.s,h=d.h*it.s*g.s,sp=f2s(it.x,it.y);if(p[0]>sp[0]-w/2&&p[0]<sp[0]+w/2&&p[1]>sp[1]-h&&p[1]<sp[1]+4){best=it;break;}}return best;};
@@ -3550,13 +3554,14 @@ function renderBuildPal(pal){var list=buildList(),cats=BCAT.filter(function(c){r
   if(!L.buildCat||!cats.some(function(c){return c.id===L.buildCat;}))L.buildCat=cats.length?cats[0].id:null;
   var items=list.filter(function(b){return b.cat===L.buildCat;});
   pal.innerHTML='<div class="bcats" role="tablist">'+cats.map(function(c){return '<button class="bcat" role="tab" data-cat="'+c.id+'" aria-pressed="'+(!L.removing&&!L.moving&&!L.colouring&&!L.making&&L.buildCat===c.id)+'">'+esc(c.name)+'</button>';}).join('')+
-    '<button class="bcat bmk" data-kmode aria-pressed="'+!!L.making+'">Make</button><button class="bcat bmv" data-mmode aria-pressed="'+!!L.moving+'">Move</button><button class="bcat bcl" data-cmode aria-pressed="'+!!L.colouring+'">Colors</button><button class="bcat brm" data-rmode aria-pressed="'+!!L.removing+'">Remove</button></div>'+
-    (L.making?mkPanelHtml():L.colouring?'<div class="bnote">One of a kind changes them all, the ones that came with the place too. Free.</div>':L.moving?'<div class="bnote">Tap a thing to pick it up, then tap where it goes. Moving is free.</div>':L.removing?'<div class="bnote">Tap something you built or painted to take it away. You get half back.</div>':
+    '<button class="bcat bmk" data-kmode aria-pressed="'+!!L.making+'">Make</button><button class="bcat bmv" data-mmode aria-pressed="'+!!L.moving+'">Move</button><button class="bcat bcl" data-cmode aria-pressed="'+!!L.colouring+'">Colors</button><button class="bcat brm" data-rmode aria-pressed="'+!!L.removing+'">Remove</button><button class="bcat bdone" data-done>Done</button></div><div class="bhint" id="lph">'+buildHint()+'</div>'+
+    (L.making?mkPanelHtml():L.colouring?'<div class="bnote">One of a kind changes them all, the ones that came with the place too.</div>':L.moving||L.removing?'':
     '<div class="bgrid" style="grid-template-columns:repeat('+gridCols(items.length)+',minmax(0,1fr))">'+items.map(function(b){return '<button data-item="'+b.id+'" aria-pressed="'+(L.buildSel===b.id)+'"><span class="pi"></span><b>'+esc(b.name)+'</b><small>'+fmtA(b.price)+(b.ground?' a tile':'')+'</small></button>';}).join('')+'</div>');
   pal.querySelectorAll('[data-cat]').forEach(function(bt){bt.onclick=function(){L.buildCat=bt.dataset.cat;L.removing=false;L.moving=false;L.colouring=false;L.making=false;L.moveObj=null;L.buildSel=null;sfx('click');renderBuildPal(pal);updateStat(true);L.hints=null;L.dirty=true;};});
   pal.querySelector('[data-cmode]').onclick=function(){closeCol();L.colouring=!L.colouring;L.making=false;L.moving=false;L.removing=false;L.moveObj=null;L.buildSel=null;L.hints=null;closeBub();sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
   pal.querySelector('[data-mmode]').onclick=function(){L.moving=!L.moving;L.removing=false;L.colouring=false;L.making=false;L.moveObj=null;L.buildSel=null;L.hints=null;sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
   pal.querySelector('[data-kmode]').onclick=function(){L.making=!L.making;L.colouring=false;L.moving=false;L.removing=false;L.moveObj=null;L.buildSel=null;L.hints=null;closeBub();sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
+  pal.querySelector('[data-done]').onclick=function(){sfx('click');setTool('walk');};
   if(L.making)mkPanelBind(pal);
   var rm=pal.querySelector('[data-rmode]');rm.onclick=function(){L.removing=!L.removing;L.moving=false;L.colouring=false;L.making=false;L.moveObj=null;L.buildSel=null;sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
   pal.querySelectorAll('[data-item]').forEach(function(bt){var ic=bt.querySelector('.pi');try{ic.appendChild(itemIcon(BUILDI[bt.dataset.item]));}catch(e){}
@@ -3644,17 +3649,20 @@ function renderCard(){var nm=$('h-name');if(!nm)return;nm.textContent=STAGES[S.s
   if(!nx){mv.innerHTML='';mv.hidden=true;return;}mv.hidden=false;var sure=L.confirmMove>performance.now();
   var html='<span>Next: '+esc(nx.name)+'</span><button class="btn sm'+(sure?'':' primary')+'" id="h-go"'+(S.cash<nx.cost?' disabled':'')+'>'+(sure?'Tap again to move':'Move · '+fmtA(nx.cost))+'</button>';
   if(mv._h!==html){mv.innerHTML=html;mv._h=html;var b=$('h-go');if(b)b.onclick=function(){if(L.confirmMove>performance.now()){L.confirmMove=0;if(!spend(nx.cost,'the move'))return;landSetStage(S.stage+1);sfx('book');toast('You moved. '+STAGES[S.stage].name+'.');return;}L.confirmMove=performance.now()+3000;renderCard();setTimeout(renderCard,3100);};}}
+// Pass 254 (Puti 5 Nov): the line that says what the build tool does, shown inside the palette so it never covers the items
+function buildHint(){var b=L.buildSel&&BUILDI[L.buildSel];
+  if(L.moving)return L.moveObj?'Tap where the '+esc(((OBJ[L.moveObj.k]||{}).name||'thing').toLowerCase())+' goes. Tap it again to put it down.':'Tap anything to pick it up. Moving is free.';
+  if(L.making)return '';
+  if(L.colouring)return 'Tap a thing or the ground to change its colors. Free.';
+  if(L.removing)return 'Tap or drag over things you built to take them away. You get half back.';
+  if(b)return b.ground?esc(b.name)+': tap a tile, or drag to paint. '+fmtA(b.price)+' a tile.':'Tap where the '+esc(b.name.toLowerCase())+' goes. '+fmtA(b.price)+'.';
+  return 'Pick something to build. Drag the map to look around.';}
 function updateStat(force){var el=$('lstat');if(!el)return;var l=LS(),html='',eggsN=0,me=L.me;Object.keys(l.basket).forEach(function(k){eggsN+=l.basket[k];});
-  var f=L.fishing,b=L.tool==='build'&&L.buildSel&&BUILDI[L.buildSel];
+  var f=L.fishing;
   if(L.watch)html='Stay still while the ring fills.';
   else if(f&&(f.st==='wait'||f.st==='fly'))html='Wait for the float to go under, then tap.';
   else if(f&&f.st==='bite')html='<b>Now!</b> Tap.';
-  else if(L.tool==='build'&&L.moving)html=L.moveObj?'Tap where the '+esc(((OBJ[L.moveObj.k]||{}).name||'thing').toLowerCase())+' goes. Tap it again to put it down.':'Tap anything to pick it up.';
-  else if(L.tool==='build'&&L.making)html='Draw your own things.';
-  else if(L.tool==='build'&&L.colouring)html='Tap a thing or the ground to change its colors.';
-  else if(L.tool==='build'&&L.removing)html='Tap or drag over things you built to take them away.';
-  else if(b)html=b.ground?esc(b.name)+': tap a tile, or drag to paint. '+fmtA(b.price)+' a tile.':'Tap where the '+esc(b.name.toLowerCase())+' goes. '+fmtA(b.price)+'.';
-  else if(L.tool==='build')html='Pick something to build. Drag the map to look around.';
+  else if(L.tool==='build'){var ph=$('lph');if(ph)ph.innerHTML=buildHint();html='';}// Pass 254: the build hint lives in the palette, not over it
   else if(l.carry)html='<span>Carrying a '+esc(HEN[l.carry.kind].name.toLowerCase())+'. Tap the yard by the coop to put her down.</span>';
   else if(l.bucket.length)html='<span>Carrying '+plural(l.bucket.length,'fish','fish')+'. Tap your pond to let '+(l.bucket.length>1?'them':'it')+' in, or the stream to let '+(l.bucket.length>1?'them':'it')+' go.</span>';
   else if(eggsN)html='<span>Basket: '+plural(eggsN,'egg')+'</span><button class="btn sm" data-sell>Sell · '+fmtA(eggsN*EGG_AED)+'</button><button class="btn sm" data-gm>Give Grandma</button>';
@@ -4235,7 +4243,11 @@ function decorSet(T,f){var D={wood:['wood'],plants:['sword','lotus'],moss:['moss
 function gamePest(g,was){var s=g.s>>>0,sn=g.k==='snail',glass=g.y<0.72;if(was&&was.k===(sn?'snail':'planaria')){was.bx=g.x;was.by=g.y;was.gs=s;was.glass=glass;return was;}
   return {id:'g'+g.s,k:sn?'snail':'planaria',kind:sn?(s%5?'bladder':'ramshorn'):'',x:g.x,y:g.y,bx:g.x,by:g.y,gs:s,glass:glass,a:(s%628)/100,sz:0.8+(s%41)/100};}
 function jobOpen(){return !!(TOY||$('sheet')&&!$('sheet').hidden);}
-function ownVals(T){var sn=0,pl=0;T.pests.forEach(function(p){if(p.k==='snail')sn++;else pl++;});return {mulm:mulmMean(T),flow:T.flow,og:overgrowth(T),sn:sn,pl:pl,no3:T.no3,wc:T.lastWC,dec:JSON.stringify(decorFlags(T))};}
+function ownVals(T){var sn=0,pl=0;T.pests.forEach(function(p){if(p.k==='snail')sn++;else pl++;});return {mulm:mulmMean(T),flow:T.flow,og:overgrowth(T),sn:sn,pl:pl,no3:T.no3,wc:T.lastWC,dec:JSON.stringify(decorFlags(T)),sck:scapeKey(T)+'|'+T.stems.length+'|'+Object.keys(T.moss).length};}
+// Pass 254 (Puti 5 Nov): the pieces as one picture for the company page, drawn at the art size with no shrimp or water
+function scapeImg(T){var W=TV.W,H=TV.H,D=TV.dpr,c=document.createElement('canvas');c.width=ART_W;c.height=ART_H;TV.W=ART_W;TV.H=ART_H;TV.dpr=1;TV.L={};
+  try{var x=c.getContext('2d');drawScapeAll(x,T,tvGeom());}catch(e){}TV.W=W;TV.H=H;TV.dpr=D;TV.L={};
+  var u='';try{u=c.toDataURL('image/webp',0.86);if(u.indexOf('data:image/webp')!==0)u=c.toDataURL('image/png');}catch(e){u='';}return u;}
 function applyOwn(T,d){var c=d.care;if(!c)return;var i;
   if(Array.isArray(d.mc)&&d.mc.length===MULM_N){for(i=0;i<MULM_N;i++)T.mulm[i]=clamp((+d.mc[i]||0)*MM_K,0,1);}
   else{var tg=clamp(c.mulm*MM_K,0,1),mm=mulmMean(T);if(Math.abs(mm-tg)>0.002){if(mm<0.002){var w=0;for(i=0;i<MULM_N;i++)w+=mulmWeight(T,i);for(i=0;i<MULM_N;i++)T.mulm[i]=clamp(tg*mulmWeight(T,i)*MULM_N/w,0,1);}else for(i=0;i<MULM_N;i++)T.mulm[i]=clamp(T.mulm[i]*tg/mm,0,1);}}
@@ -4244,7 +4256,7 @@ function applyOwn(T,d){var c=d.care;if(!c)return;var i;
   if(Array.isArray(d.pests)){var old={};T.pests.forEach(function(p){old[p.id]=p;});T.pests=d.pests.map(function(g){return gamePest(g,old['g'+g.s]);});}
   else [['snail',c.snail|0],['planaria',c.flat|0]].forEach(function(q){var have=T.pests.filter(function(p){return p.k===q[0];});if(have.length<q[1])addPests(T,q[0],Math.min(40,q[1]-have.length));else if(have.length>q[1]){var gone=have.slice(q[1]);T.pests=T.pests.filter(function(p){return gone.indexOf(p)<0;});}});
   if(d.no3!=null)T.no3=d.no3;if(d.nh!=null)T.nh=d.nh;
-  if(d.decor)decorSet(T,d.decor);
+  if(d.decor){if(T.scd){if(JSON.stringify(d.decor)!==JSON.stringify(decorFlags(T))){LAST=ownVals(T);report(1);return;}}else decorSet(T,d.decor);}// Pass 254: after an Aquascape here the land decides, the game follows
   if(c.cs!=null&&T.stems.length&&T.stSeed!==c.cs)stemSpread(T,c.cs|0,clamp(+c.grow||0,0,1));
   LAST=ownVals(T);if(!d.decor)report(1);}
 // what a job on the land changed, back to the game; first=1 also sends the land's decor once, it wins for old saves
@@ -4256,7 +4268,7 @@ function report(first){var T=ownT();if(!T||!LAST||TOY||$('sheet')&&!$('sheet').h
   if(GLD){m.gl=GLD;if(OWN)OWN.glass=GLD;GLD=null;any=1;}
   if(v.wc!==LAST.wc&&LAST.no3>0){m.wc=Math.round(clamp(1-v.no3/LAST.no3,0,0.9)*100);any=1;}
   if(any)m.job=1;
-  if(first||v.dec!==LAST.dec){m.decor=JSON.parse(v.dec);any=1;}
+  if(first||v.dec!==LAST.dec||v.sck!==LAST.sck||m.grow!=null){m.decor=JSON.parse(v.dec);m.sci=scapeImg(T);any=1;}
   if(!any)return false;m.seq=++SEQ;post(m);LAST=v;return true;}
 // the game's glass algae, drawn the same way on the land
 var GLC=null,GLK='';
@@ -4276,7 +4288,7 @@ function gameTime(day){if(day==null||!isFinite(day))return;window.GDAY=day;if(S.
 // after leaving Earth (the game sends voy) the back button goes to Space (Pass 170)
 function leftBack(){var b=$('tb-back');if(!b)return;b.innerHTML=LEFT?'<span aria-hidden="true">≡</span><i> Your years</i>':'<span aria-hidden="true">‹</span><i> '+(VOY?'Space':'Company')+'</i>';b.setAttribute('aria-label',LEFT?'Your years at the company, settings':VOY?'Back to Space':'Back to the company');}
 // a card waiting at the company, or frozen accounts
-function needBar(){var b=$('lneed');if(!NEED){if(b)b.remove();return;}if(!b){b=document.createElement('button');b.type='button';b.id='lneed';b.className='lneed';b.onclick=function(){try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};document.body.appendChild(b);}b.textContent=NEED+' Tap to go back.';}
+function needBar(){var b=$('lneed');if(!NEED){if(b)b.remove();return;}if(!b){b=document.createElement('button');b.type='button';b.id='lneed';b.className='lneed';b.onclick=function(){jobClose();try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};document.body.appendChild(b);}b.textContent=NEED+' Tap to go back.';}
 window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||!S)return;
   if(d.type==='cash'){S.cash=d.cash;FROZEN=d.frozen||'';if(!!d.left!==!!LEFT||!!d.voy!==!!VOY){LEFT=d.left?1:0;VOY=d.voy?1:0;window.GM_AWAY=!!VOY;leftBack();}var nd=d.need||'';if(nd!==NEED){NEED=nd;needBar();}gameTime(d.day);updateHeader();}
   if(d.type==='own')syncOwn(d);
@@ -4296,12 +4308,13 @@ if(typeof addToTank==='function'){var _add=addToTank;addToTank=function(T,list,f
 var _cull=cullShrimp;cullShrimp=function(T,i,died){var own=T===ownT(),ad=i.age>=ADULT_DAYS;_cull(T,i,died);if(own)post({type:'take',adults:ad?1:0,young:ad?0:1,seq:++SEQ});};
 var _sell=sellShrimp;sellShrimp=function(T,i){var own=T===ownT(),ad=i.age>=ADULT_DAYS;var p=_sell(T,i);if(own)post({type:'take',adults:ad?1:0,young:ad?0:1,seq:++SEQ});return p;};
 // care jobs count as caring for your tank in the game
-if(typeof toyEnd==='function'){var _end=toyEnd;toyEnd=function(){var was=!!TOY;var r=_end.apply(this,arguments);if(was)jobDone();return r;};}
+if(typeof toyEnd==='function'){var _end=toyEnd;toyEnd=function(){var was=!!TOY,sc=TOY&&TOY.id==='scape'&&TOY.T===ownT();var r=_end.apply(this,arguments);if(sc)ownT().scd=1;if(was)jobDone();return r;};}
 
 // ----- jobs on Your tank (Pass 179) -----
 // While a job is open the game's clock for Tank 1 holds (busy), and the result goes back against the values from when it started.
 // A job the company sent (a care button on its Tank tab) goes back to the company when it's done.
 var FROM_GAME=0,SPONGE_ON=0;
+function jobClose(){if(!TOY)return;FROM_GAME=0;try{if(TOY.finish)TOY.finish();else toyEnd();}catch(e){}}// Pass 254: Back with a job open ends the job first
 function jobBegin(T){if(T!==ownT())return;try{LAST=ownVals(T);}catch(e){}post({type:'busy',on:1});}
 function jobDone(){var did=false;try{did=report();}catch(e){}if(did)sfxDone();post({type:'busy',on:0,sc:ownT()?ownT().scape.length:null});GLS=null;if(FROM_GAME){FROM_GAME=0;setTimeout(function(){try{LAND.settle();}catch(e){}save(true);post({type:'back'});},350);}}
 var _ts=toyStart;toyStart=function(id){var T=S.tanks[S.sel];if(id==='glass'){if(TOY)toyEnd();if(T!==ownT()||!OWN||!OWN.glass)return;closeBubble();jobBegin(T);TOY=glassToy(T);TOY.id=id;TOY.T=T;hold();lockOn();TOY.start();tankMod.renderSide();return;}
@@ -4333,7 +4346,7 @@ function clock(){var d=new Date();return d.toLocaleDateString('en-GB',{weekday:'
 var _uh=updateHeader;updateHeader=function(){_uh();var b=$('b-date');if(b)b.textContent=clock();var lc=$('lclock');if(lc){lc.hidden=false;lc.textContent=clock();}var s=$('b-sub');if(s)s.textContent='';};
 function shell(){['tb-info'].forEach(function(id){var e=$(id);if(e)e.remove();});var tag=document.querySelector('.devtag');if(tag)tag.remove();var sp=$('speed');if(sp)sp.remove();
   document.querySelectorAll('.tabs [data-tab="book"],.tabs [data-tab="try"]').forEach(function(b){b.remove();});
-  var row=document.querySelector('.top .brand');if(row&&!$('tb-back')){var bb=document.createElement('button');bb.className='btn sm';bb.id='tb-back';bb.type='button';bb.innerHTML='<span aria-hidden="true">‹</span><i> Company</i>';bb.setAttribute('aria-label','Back to the company');bb.onclick=function(){try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:LEFT?'menu':'back'});};row.insertBefore(bb,row.firstChild);}
+  var row=document.querySelector('.top .brand');if(row&&!$('tb-back')){var bb=document.createElement('button');bb.className='btn sm';bb.id='tb-back';bb.type='button';bb.innerHTML='<span aria-hidden="true">‹</span><i> Company</i>';bb.setAttribute('aria-label','Back to the company');bb.onclick=function(){jobClose();try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:LEFT?'menu':'back'});};row.insertBefore(bb,row.firstChild);}
   // one header row: back, cash, the Home / Tank switch, sound (Puti, 28 Oct: the big bottom tabs took room from the map)
   if(row&&!$('lseg')){var mo=$('b-money');if(mo)row.insertBefore(mo,$('tb-mute'));var sg=document.createElement('div');sg.className='lseg';sg.id='lseg';sg.setAttribute('role','tablist');
     sg.innerHTML='<button type="button" data-seg="home">Home</button><button type="button" data-seg="tank">Tank</button>';row.insertBefore(sg,$('tb-mute'));

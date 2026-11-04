@@ -59,5 +59,24 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  ok(await p.evaluate(()=>G.tanks[0].set.autoRation===150),'the auto feed slider on the land sets the game\'s auto feed');
  await f.evaluate(()=>scrollTo(0,0));await p.screenshot({path:path.join(os.tmpdir(),'yt-land-'+W+'.png'),fullPage:false});
  await f.evaluate(()=>{var s=document.querySelector('#tankside [data-k="fw"]');if(s)s.scrollIntoView();});await p.screenshot({path:path.join(os.tmpdir(),'yt-land2-'+W+'.png')});
+ // Pass 254 (Puti 5 Nov): the Aquascape sticks. Take the driftwood out, add a rock pile, turn it, finish: the game's flags, the
+ // picture it draws (G.opt.scImg) and the land's pieces all keep the edit after Back, a reload and the next visit.
+ await f.evaluate(()=>{var T=S.tanks[0];T.scape=T.scape.filter(i=>i.k!=='wood');toyStart('scape');});await wait(400);
+ await f.evaluate(()=>{var el=[...document.querySelectorAll('[data-add]')].find(b=>b.dataset.add==='rockpile');el.click();TOY.edit('rot');TOY.edit('rot');});await wait(200);
+ const pieces=()=>f.evaluate(()=>S.tanks[0].scape.map(i=>i.k+(i.r?'r'+i.r.toFixed(2):'')).sort().join(','));
+ const before=await pieces();await f.evaluate(()=>TOY.finish());await wait(2500);
+ const g1=await p.evaluate(()=>({w:G.tanks[0].wood,img:(G.opt.scImg||'').slice(0,15),len:(G.opt.scImg||'').length,on:SCIMG.ok}));
+ ok(g1.w===0&&/^data:image\/(webp|png)/.test(g1.img)&&g1.len>2000&&g1.len<300000&&g1.on===1,'after the job the game has no driftwood and the land\'s picture ('+g1.len+' chars)');
+ ok(before.indexOf('rockpiler')>=0,'a rotated rock pile is in the pieces: '+before);
+ await f.evaluate(()=>$('tb-back').click());await wait(600);ok(await p.evaluate(()=>!LAND.on),'Back leaves the land');
+ await p.evaluate(()=>landShow());await wait(2500);
+ ok((await pieces())===before&&(await p.evaluate(()=>G.tanks[0].wood))===0,'the next visit keeps the pieces and the game keeps the flags');
+ await p.reload();await p.waitForFunction(()=>window.G&&G.tanks&&G.me);await p.evaluate(()=>{window.spotlight=function(){};landShow();});f=null;for(let i=0;i<100&&!f;i++){f=p.frames().find(x=>x.url().includes('home.html'));await wait(100);}
+ await f.waitForFunction(()=>window.S&&S.tanks&&S.tanks[0]);await wait(2500);
+ ok((await pieces())===before,'after a reload the land still has them: '+(await pieces()));
+ ok(await p.evaluate(()=>G.tanks[0].wood===0&&(G.opt.scImg||'').length>2000&&SCIMG.ok===1),'after a reload the game draws the picture');
+ // Back with the job open: the job is ended and reported first
+ await f.evaluate(()=>{toyStart('scape');var el=[...document.querySelectorAll('[data-add]')].find(b=>b.dataset.add==='wood');el.click();$('tb-back').click();});await wait(2500);
+ ok(await f.evaluate(()=>!TOY)&&await p.evaluate(()=>G.tanks[0].wood===1),'Back with Aquascape open finishes it and the game gets the driftwood');
  ok(!errs.length,'no page errors'+(errs.length?': '+errs.slice(0,3).join(' | '):''));
  await b.close();srv.close();console.log(fails?fails+' FAILED':'all passed');process.exit(fails?1:0);})();
