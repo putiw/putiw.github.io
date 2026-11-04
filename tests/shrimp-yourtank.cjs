@@ -47,7 +47,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  const lt=await f.evaluate(()=>Array.from(document.querySelectorAll('#toybtns .btn')).map(b=>({n:b.childNodes[1]?b.childNodes[1].textContent.trim():b.textContent,s:(b.querySelector('small')||{}).textContent})));
  const gl=await p.evaluate(()=>{var L=ownLines(G);return L;});
  ok(lt.map(x=>x.n).join(',')==='Vacuum,Sponge,Trim,Pests,Aquascape,Glass','land tiles: '+lt.map(x=>x.n).join(', '));
- ok(['vac','sponge','trim','pests','glass'].every((k,i)=>lt[[0,1,2,3,5][i]].s===gl[k]),'land state lines match the game ('+lt.map(x=>x.s).join(' / ')+')');
+ ok(['vac','sponge','trim','pests','glass'].every((k,i)=>lt[[0,1,2,3,5][i]].s===gl[k]),'land state lines match the game ('+lt.map(x=>x.s).join(' / ')+' vs '+['vac','sponge','trim','pests','glass'].map(k=>gl[k]).join(' / ')+')');
  const lc=await f.evaluate(()=>Array.from(document.querySelectorAll('#tankside .card h2')).map(h=>h.textContent));
  ok(lc.slice(0,3).join(',')==='Wellbeing,Food and water,Colony','land cards: '+lc.join(', '));
  const wbL=await f.evaluate(()=>document.querySelector('#tankside [data-k="wb"] small').textContent),wbG=await p.evaluate(()=>$('wb-sum').textContent);

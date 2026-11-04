@@ -1068,4 +1068,22 @@ if(JSON.stringify(GP_STORY).indexOf('Maryam')>=0||JSON.stringify(GT_EV).indexOf(
 if(!html.includes("if(!E.sharkTook)E.sharkTook={day:now,what:'the '+tk.what}")||!html.includes("his men took '+tk.what+' at night")||html.includes('They smashed the first farm in October'))throw Error('Pass 248: the loan shark ending says what happened (Puti)');
 if(!html.includes('function fmtH(t)')||!/r\{color:var\(--shrimp\)\}g\{color:var\(--good\)\}/.test(html))throw Error('Pass 248: <b> <i> <r> <g> in game text');
 console.log('PASS Pass 248 static checks');
+check('Pass 255 (Puti): a stopped letter restarts, tree steps are letters with Not now, gala causes do something, the coast soft cap, the clean hold',`
+var g=readyGame();g.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};g.humans=4.1e9;g.money=1e13;g.fin=g.fin||[];var R=propOf(hardOf(g));R.open.push({id:'board',day:0,alt:0,grad:0});R.t.board=1;if(!propFund(g,'board'))throw Error('fund');
+var d;for(d=1;d<=365;d++){g.day=d;hardDay(g);}var p=R.run.board,r1=p.r;if(!propStop(g,'board'))throw Error('stop');for(d=366;d<=730;d++){g.day=d;hardDay(g);}var r2=p.r;if(!(r2<r1))throw Error('falls while stopped');
+if(!propStart(g,'board'))throw Error('restart');if(p.stop||!g.emp.dues.some(function(x){return x.k==='prop:board';}))throw Error('restart brings the dues back');for(d=731;d<=1095;d++){g.day=d;hardDay(g);}if(!(p.r>r2))throw Error('reach climbs again after a restart: '+r2+' '+p.r);
+// tree steps: Not now skips the step for good, the next one comes
+g.emp.trees={rewild:1};var s1=treeNext(g,'rewild');if(!s1||s1.id!=='rw_stream')throw Error('first step');if(!treeDecline(g,'rw_stream'))throw Error('decline');var s2=treeNext(g,'rewild');if(!s2||s2.id!=='rw_reserve')throw Error('next step after Not now: '+(s2&&s2.id));if(buyTreeStep(g,'rw_stream'))throw Error('a declined step cannot be bought');
+// galas: water queues an Aid batch, kids reach a little of Can't do it alone, pets bring the vet card sooner
+var H=hardOf(g);g.emp.inf=1e9;g.emp.infOn=1;if(!buyProj(g,'gala','water'))throw Error('water gala');if(!(H.gq&&H.gq.length&&H.gv>0))throw Error('the water gala queues an Aid batch');
+var c0=galaReach(g,hardGroup('care'));if(!buyProj(g,'gala','kids'))throw Error('kids gala');if(!(galaReach(g,hardGroup('care'))>c0&&hardReach(g,hardGroup('care'))>=GALA_CARE-1e-9))throw Error('the kids gala reaches the group');for(var i=0;i<20;i++)buyProj(g,'gala','kids');if(H.galaCare>GALA_CARE_MAX+1e-9)throw Error('capped');
+if(!buyProj(g,'gala','pets')||!g.emp.galaPets)throw Error('pets gala');
+// coast soft cap: spread and the coin planters slow as it fills, your taps always plant, ghaf at half, sidr at three quarters
+var c=readyGame();c.kits.sold=1e5;var C=coinOf(c);C.trees=1e6;C.otrees=0;var s0=treeSpread(c);C.otrees=COIN_COAST*0.5-1e6;var sh=treeSpread(c)/(C.trees+C.otrees);if(!(Math.abs(sh/(s0/1e6)-0.25)<0.02))throw Error('spread at half the coast is a quarter of the pace: '+sh+' '+s0/1e6);
+if(!(plFill(c)>=0.5&&plKindOk(c,'g')&&!plKindOk(c,'s')))throw Error('ghaf opens at half, sidr not yet');C.otrees=COIN_COAST*0.75;if(!plKindOk(c,'s'))throw Error('sidr at three quarters');if(!(plFree(c,32,2)>0||plFree(c,10,2)>0||[0,1,2,3,4,5,6,7,8,9].some(function(x){return plGround(x*6,2)===3&&plFree(c,x*6,2)>0;})))throw Error('the hills take seedlings');
+C.otrees=COIN_COAST*0.99;if(!(coastSlow(c)<0.001))throw Error('nearly full, others nearly stop');
+// the clean hold: no poop for 25 tank days after a vacuum, no algae after a wipe
+var t=readyGame();t.me.keep='self';t.me.on=1;var T=t.tanks[0];T.had=1;T.cycledAt=0;for(var k=0;k<30;k++)T.pop.push({age:100,n:1,g:2});var K=careOf(T);K.mulm=0;K.vacD=t.day;careDay(t);if(K.mulm!==0)throw Error('no poop right after a vacuum');t.day+=CLEAN_HOLD+1;careDay(t);if(!(K.mulm>0))throw Error('poop again after the hold');
+T.glass=null;glassGrow(t,T);var g0=T.glass.reduce(function(a,b){return a+b;},0);T.wipeD=t.day;glassGrow(t,T);if(T.glass.reduce(function(a,b){return a+b;},0)!==g0)throw Error('no algae right after a wipe');
+`);
 console.log(count+' focused balance and migration checks passed');
