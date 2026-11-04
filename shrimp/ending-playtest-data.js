@@ -531,7 +531,7 @@ window.ENDING_TEST_DATA = {
     {
       "id": "c_cash",
       "title": "The hatchery bust",
-      "body": "Pelagonia lent money to anyone who wanted to start a shrimp hatchery. Most of them failed. The bank wants to sell you the good ones cheap, the taxpayers cover the rest.",
+      "body": "Aspendos lent money to anyone who wanted to start a shrimp hatchery. Most of them failed. The bank wants to sell you the good ones cheap, the taxpayers cover the rest.",
       "options": [
         {
           "label": "Buy the good ones",
@@ -541,7 +541,7 @@ window.ENDING_TEST_DATA = {
             "drive": 0.7,
             "care": -0.3
           },
-          "endingLine": "You bought Pelagonia’s best hatcheries and kept most of the crews."
+          "endingLine": "You bought Aspendos's best hatcheries and kept most of the crews."
         },
         {
           "label": "Let the bank sell them off",
@@ -550,7 +550,7 @@ window.ENDING_TEST_DATA = {
             "means": 0.5,
             "drive": -0.5
           },
-          "endingLine": "Pelagonia’s bank sold the failed hatcheries for parts."
+          "endingLine": "Aspendos’s bank sold the failed hatcheries for parts."
         }
       ]
     },
@@ -593,7 +593,7 @@ window.ENDING_TEST_DATA = {
     {
       "id": "c_rivers",
       "title": "Shrimp in the rivers",
-      "body": "Some owners dump their shrimp when they get bored. Red shrimp breed in a few warm rivers now, one in Germany runs below a power plant. The river agencies want them out. The shops say most owners would hand them back if someone asked.",
+      "body": "Some owners dump their shrimp when they get bored. Cherry shrimp breed in a few warm rivers now, one in Germany runs below a power plant. The river agencies want them out. The shops say most owners would hand them back if someone asked.",
       "options": [
         {
           "label": "Shops take them back",
@@ -617,12 +617,12 @@ window.ENDING_TEST_DATA = {
         },
         {
           "label": "Leave them",
-          "description": "The red rivers are a tourist thing now. 3% more people want a tank in those countries. Your money stays in kits.",
+          "description": "The shrimp rivers are a tourist thing now. 3% more people want a tank in those countries. Your money stays in kits.",
           "traits": {
             "kin": -0.5,
             "risk": 0.8
           },
-          "endingLine": "Red shrimp live in warm rivers on four continents."
+          "endingLine": "Cherry shrimp live in warm rivers on four continents."
         }
       ]
     },
@@ -1031,7 +1031,7 @@ window.ENDING_TEST_DATA = {
       "body": "Mira wants to let her shrimp go in the stream behind the school. They’d be happier, she says. Cherry shrimp aren’t from here.",
       "options": [
         {
-          "label": "Yes",
+          "label": "Yes, they’ll be happier",
           "description": "She lets them go one at a time and waves at each.",
           "traits": {},
           "endingLine": "Mira let her shrimp go in the stream behind the school."
@@ -1432,7 +1432,7 @@ window.ENDING_TEST_DATA = {
       "end": "empire",
       "name": "The Empire, the good emperor",
       "who": "You wanted to be the best, and you were. You built the biggest shrimp company in history and you mostly played fair. People respected you, a lot of them liked you, a few were scared of how much you owned. You still answer emails on Sundays.",
-      "mira": "Your head of operations. She runs the company better than you do and you both know it.",
+      "mira": "Your head of operations. She runs the company better than you do.",
       "gp": "They put you on the cover of a magazine at the airport. I bought three. You did everything you said you would. [visit] One thing, take a day off. Come fishing.",
       "tank": "Everything was good. The water was good, the food was good, there was a lot of us and we were all fine. Every tank was the same tank."
     },
@@ -1450,16 +1450,16 @@ window.ENDING_TEST_DATA = {
       "id": "empire_hard",
       "end": "empire",
       "name": "The Empire, the hard bargain",
-      "who": "You wanted it done and you did it on the numbers. You stayed inside the written law, used every loophole, and took the cheap way whenever it was legal. The people who worked for you got paid on time and not a dirham more.",
+      "who": "You wanted it done and you did it on the numbers. You stayed inside the written law, used every loophole, and took the cheap way whenever it was legal. The people who worked for you got paid on time and not a penny more.",
       "mira": "She runs a smaller company that pays more and grows slower. She sends you a card every New Year.",
-      "gp": "Your cousin says you're the cheapest rich person he knows. I told him that's how you got rich. [visit] Come for dinner, I'm paying.",
+      "gp": "Your cousin says you're the cheapest rich person he knows. I told him that's how you got rich. [visit] Come for dinner, it's free.",
       "tank": "The water was fine and the food was the cheapest food. There were a lot of us. When some died, more came the next day."
     },
     "empire_cartel": {
       "id": "empire_cartel",
       "end": "empire",
       "name": "The Empire, the cartel",
-      "who": "You took the money when it was offered and you never gave it back. You gave them the routes, then the trucks, and somewhere along the way it stopped being a shrimp company that did favors and became something else with shrimp on top.",
+      "who": "You took the money when it was offered and you never gave it back. You gave them the routes, then the trucks, and somewhere along the way, you gave them you and you became them. Your company stopped being a shrimp company that did favors and became something else with shrimp on top.",
       "mira": "She's a journalist now. She wrote the story about you. It won a prize, and nothing happened to you, and she knew that would be how it went.",
       "gp": "Mira came to see me, she showed me what she wrote. I told her I didn't want to read it and then I read it twice. I don't know what to say to you so I'll say what I always say, the tank's still running. [visit] Come for dinner, I'll leave the door unlocked.",
       "tank": "We were moved at night a lot. There were other boxes next to ours, heavy ones. People who carried us didn't look at us. Once a tank fell and nobody picked us up."
@@ -1468,9 +1468,9 @@ window.ENDING_TEST_DATA = {
       "id": "garden_village",
       "end": "garden",
       "name": "The Garden, the village",
-      "who": "You never moved far. You built one thing well and you let it take the time it took. You knew the names of the people who packed your kits. When it was faster or better, you usually picked better and lost some money. You thought shrimp were worth looking after properly, all of them, even the pale ones nobody wanted.",
+      "who": "You never moved far. You built one thing well and you let it take the time it took. You knew the family of the people who packed your kits. When it was faster or better, you usually picked better and lost some money. You thought shrimp were worth looking after properly, all of them, even the transparent ones nobody wanted.",
       "mira": "She studied the sea. She lives on the coast two hours away and still sends photos of the mangroves.",
-      "gp": "I sit in the garden most mornings now. The shrimp room is warmer than my old flat, don't tell the shrimp club. You took longer than you had to, everyone said so. I think you knew that and didn't mind. [visit] I'm proud of you, I don't say it enough, so I'm writing it down.",
+      "gp": "I sit in the garden most mornings now. The shrimp room is warmer than my old flat. You took longer than you had to, everyone said so. I think you knew that and didn't mind. [visit] I'm proud of you, I don't say it enough... You grow up so well, it is so good that you were born.",
       "tank": "There was a lot of green. Food came at the same time every day. Sometimes a big face came close to the glass and stayed a long time. We didn't know what it wanted. It never took anyone away."
     },
     "garden_hermit": {
@@ -1478,17 +1478,17 @@ window.ENDING_TEST_DATA = {
       "end": "garden",
       "name": "The Garden, the hermit",
       "who": "At some point you stopped going to the meetings. You built the house, you built the shrimp room, you put a sign on the gate. The company kept going without you and you were fine with that. You talk to the shrimp more than to people.",
-      "mira": "She visits once a year and fixes your solar panels. She says you're impossible. She keeps coming.",
-      "gp": "You're the only person I know who got everything they wanted and then went to live in a field. Now the shrimp club wants a well, thanks a lot. [visit] Call me sometimes, the shrimp can't tell you what's going on in the world.",
+      "mira": "She visits once a year and fixes your solar panels. She says you're impossible but she keeps coming.",
+      "gp": "You're the only person I know who got everything they wanted and then went to live in a field. Back in my days people would think you are crazy for wanting to live a life like my grandpa, haha. [visit] Call me sometimes, the shrimp can't tell you what's going on in the world.",
       "tank": "It was very quiet. The light came from the sun, not from a lamp. Someone sat with us every evening and did nothing. We liked it."
     },
     "question_prof": {
       "id": "question_prof",
       "end": "question",
       "name": "The Question, the professor",
-      "who": "Somewhere around the first research grant the shrimp stopped being a business and became a question. Why do they molt when they do. How a jar of water stays alive for years. You didn't get rich. You trained a lot of people who went further than you did.",
+      "who": "Somewhere around the first research grant the shrimp stopped being a business and became a question. Why do they molt when they do. How a jar of water stays alive for years. You didn't get rich. You trained a lot of people who went further than you did. ",
       "mira": "A marine biologist. She was one of your first scholarship students. She calls you her old professor even though you never taught her a class.",
-      "gp": "I don't understand half of what you write to me now. I read it anyway, out loud, to the shrimp. You were always like this, you took the radio apart when you were six. [visit] Find out why they molt, then come tell me.",
+      "gp": "I don't understand half of what you write to me now. I read it anyway, out loud, to the shrimp. You were always like this, you took the radio apart when you were six. [visit] Find out everything about shrimps, then come tell me.",
       "tank": "People watched us very carefully. They wrote things down. Sometimes they changed the water a little and waited to see what we did."
     },
     "question_lucky": {
@@ -1515,16 +1515,16 @@ window.ENDING_TEST_DATA = {
       "name": "The Network, the dark network",
       "who": "You went everywhere and talked to everyone, including people you shouldn't have. They needed routes, you had the best routes in the world. You told yourself the medicine still got through, and it did, next to the other boxes. You did a lot of good and a lot of the other thing, on the same trucks.",
       "mira": "She quit the year she found out what was in the other boxes. She runs a water charity now, it uses someone else's trucks.",
-      "gp": "People tell me about you on the news and I don't know which story to believe, so I believe all of them a little. [visit] You can still stop. I'm old, I'm allowed to say that.",
-      "tank": "We traveled all the time. Next to us there were always other boxes. Some went to hospitals. Some went to places where people were afraid."
+      "gp": "People tell me about you on the news and I don't know which story to believe, so I believe all of them a little. [visit] You can still stop. You should stop, you are still just a kid.",
+      "tank": "We traveled all the time. Next to us there were always other boxes. Some went to hospitals. Some went to places where people were crying."
     },
     "network_back": {
       "id": "network_back",
       "end": "network",
       "name": "The Network, the one who turned back",
-      "who": "You went everywhere, you talked to everyone, and for a few years you said yes to people you shouldn't have. Then one night you went to the police. It cost you almost everything and a year of nothing. You rebuilt from the same trucks, and you made them carry the right things this time.",
+      "who": "You went everywhere, you talked to everyone, and for a few years you said yes to people you shouldn't have. Then one night you went to the police. It cost you almost everything. You rebuilt from the same trucks, and you made them carry the right things this time.",
       "mira": "She helped you through that year and didn't take any money. She runs your water routes now.",
-      "gp": "I've been to forty countries since, and in every one of them somebody knew your trucks. Not the shrimp, the trucks, they said the water came on them. I know about the bad years, Mira told me. I won't say anything about it, you already know. What you did after is the part I tell people about. [visit]",
+      "gp": "I've been to forty countries since, and in every one of them somebody knew your trucks. Not the shrimp, the trucks, they said the water came to them. I know about the bad years, Mira told me. What you did was not easy, I am proud of you. [visit]",
       "tank": "We traveled a lot, always cold and always on time. Next to us there were boxes of other things, medicine sometimes, and for a long time things that weren't medicine. Then the boxes changed again."
     },
     "drift_shop": {
@@ -1532,7 +1532,7 @@ window.ENDING_TEST_DATA = {
       "end": "drift",
       "name": "Home, the happy shop",
       "who": "You had one shop and it was enough. Some years you meant to open a second one and then it was summer. You kept the first shop while other people built the farms and the networks. You knew which kid named which shrimp.",
-      "mira": "She paints shrimp. Nobody buys the paintings. Three of them hang in your shop and you won't sell them either.",
+      "mira": "She paints shrimp. Nobody buys the paintings. Three of them hang in your shop and you will never sell them to others.",
       "gp": "Everyone keeps asking me if I'm disappointed you didn't do the big thing. I tell them I sit in your shop on Sundays and drink tea and look at the shrimp, why would I be disappointed. [visit]",
       "tank": "Nothing much happened, for a long time, in a good way. The cat watched us. We watched the cat."
     },
@@ -1550,16 +1550,16 @@ window.ENDING_TEST_DATA = {
       "end": "fall",
       "name": "The fall, too far too fast",
       "who": "You bought the next farm before the last one paid for itself, every time. It worked until it didn't. The bank took the hatcheries in the spring and the shops in the summer. You were three months from turning it around, or you were never going to, you'll think about that for a while.",
-      "mira": "She came to the auction and bought one tank, the first one you ever sold her family.",
+      "mira": "She came to the auction and bought one tank, it's the model of the first one you ever sold her family.",
       "next": "Someone bought your farms cheap and finished the job. Everyone has a tank eleven years after you stopped.",
-      "gp": "I've lost a boat once, it's not the end. You tried too hard, that's all. [visit] Your first tank is still on your shelf. Start again if you want.",
+      "gp": "I've lost a boat once, it's not the end. You tried too hard, that's all. [visit] Your first tank is still on your shelf. Start again if you want. You are still a kid.",
       "tank": "One day the lights didn't come on. Then new people came, and the lights came back on, different lights."
     },
     "fall_shark": {
       "id": "fall_shark",
       "end": "fall",
       "name": "The fall, the loan shark",
-      "who": "It was supposed to be one loan, for one bad month. Then it was the interest on the loan, then a loan for the interest. They smashed the first farm in October. You went to the police, then you declared bankruptcy.",
+      "who": "It was supposed to be one loan, for one bad month. You couldn’t pay him back and it grew 20% a month. You declared bankruptcy.",
       "mira": "She doesn't know the whole story. Her mom told her not to ask.",
       "next": "Your trucks belong to someone else now. Nobody's sure who. Everyone has a tank eventually, the trucks never stop at borders.",
       "gp": "Why didn't you ask me, I would have given you all of it. I know why. I'd have done the same at your age. [visit] Come home for a bit. Nobody needs to know where you are.",
@@ -1579,8 +1579,8 @@ window.ENDING_TEST_DATA = {
       "id": "sold",
       "end": "sold",
       "name": "Sold",
-      "who": "Someone offered you more money than you could spend and you took it. Maybe you were tired, maybe you'd done what you wanted, maybe the number was just too big. You signed in an office with no shrimp in it.",
-      "mira": "She works for the company that bought you. She says it's fine, mostly.",
+      "who": "Someone offered you more money than you could spend and you took it. Maybe you were tired, maybe you'd done what you wanted, maybe the number was just too big. You bought a villa with no shrimp in it.",
+      "mira": "She works for the company that bought you. She says they tripled the tank price.",
       "next": "They finished the job their way, faster in some places, worse in others. Everyone has a tank seven years after you sold. Your name isn't on any of them.",
       "gp": "So now you're rich and you're bored, I can tell from your letters. [visit] Buy a small tank, a 20 L, start again for fun. That's how it started last time.",
       "tank": "The logo on the box changed. Nothing else did."

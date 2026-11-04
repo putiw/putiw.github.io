@@ -627,7 +627,7 @@ check('Pass 130: Grandma pays AED 15 for the first babies, social media manager 
 var g=newGame();g.stats.born=1;var m=g.money;checkGoals(g);if(g.money-m!==15||!(g.today.loans>=15))throw Error('Grandma gift in Loans and gifts');if(!g.log.some(function(l){return /Grandma sent AED 15/.test(l.t||l.m||l);}))throw Error('Gift is logged');
 var sm=PROJ.find(p=>p.id==='social'),k=newGame();k.stats.sold=59;if(sm.req(k))throw Error('Not before sales staff');k.stats.sold=60;if(!sm.req(k)||!salesOpen(k))throw Error('Opens with sales staff');
 `);
-if(!html.includes('Grandma sent AED 15. For the babies')||html.includes('the defaults work fine')||html.includes('id="h-ice"'))throw Error('Pass 130: copy and stable cooling');
+if(!html.includes('Grandma sent <b><g>AED 15</g></b>. For the babies')/* Pass 248: Puti's formatting */||html.includes('the defaults work fine')||html.includes('id="h-ice"'))throw Error('Pass 130: copy and stable cooling');
 check('Pass 131: salespeople leave the shrimp this week\'s packing needs, sell when there is no cash to pack',`
 var g=newGame();g.emp.kitsOpened=1;g.emp.staff.tier=1;g.emp.staff.sales=1;g.money=5000;g.humans=500;var T=g.tanks[0];T.set.autoSell=true;T.set.keepL=0.25;T.pop=[{age:90,n:60,g:50}];
 var h=kitHold(g);if(!(h[0]>0))throw Error('Holds for packing');if(doSell(g,T,true,undefined,true,h[0]).normal!==0)throw Error('Nothing sold while packing needs it');if(!(doSell(g,T,true,undefined,true,0).normal>0))throw Error('Sells without a hold');
@@ -991,4 +991,12 @@ var h=newGame();h.me.on=1;h.money=1e6;h.me.gplace={balcony:1,house:1};storyChoos
 if(!/function renderMilestone\(\)\{[\s\S]{0,400}busyUI\(\)/.test(html)||html.indexOf('LAND.on||LAND.busy')<0||html.indexOf('PL_SHOW')<0)throw Error('No story cards on the land, in a tank job or while planting (Pass 234, Puti)');
 if(!html.includes('return {feed:G.tanks.some(function(t){return !t.feeder;}),wc:G.tanks.some(function(t){return !t.autoWC;}),'))throw Error('Feed and Water go once every tank is automated, no emergency comeback (Pass 244, Puti)');
 console.log('PASS Feed and Water leave once every tank is automated');
+check('Pass 248: Sea Cow in old saves, loan shark remembers what it took',`
+var g=newGame();g.me=g.me||{};g.me.hist=['Grandma wrote about Grandpa’s fishing boat. It’s called Maryam, after his mother, and she still pays the harbor fee.','Maryam stayed at the dock all year.'];g.me.gv=3;fixGpText(g);
+if(g.me.gv!==4||g.me.hist.join(' ').indexOf('Maryam')>=0||g.me.hist[1]!=='The Sea Cow stayed at the dock all year.')throw Error('Maryam lines not moved to the Sea Cow: '+JSON.stringify(g.me.hist));
+if(JSON.stringify(GP_STORY).indexOf('Maryam')>=0||JSON.stringify(GT_EV).indexOf('Maryam')>=0)throw Error('Maryam still in the text');
+`);
+if(!html.includes("if(!E.sharkTook)E.sharkTook={day:now,what:'the '+tk.what}")||!html.includes("his men took '+tk.what+' at night")||html.includes('They smashed the first farm in October'))throw Error('Pass 248: the loan shark ending says what happened (Puti)');
+if(!html.includes('function fmtH(t)')||!/r\{color:var\(--shrimp\)\}g\{color:var\(--good\)\}/.test(html))throw Error('Pass 248: <b> <i> <r> <g> in game text');
+console.log('PASS Pass 248 static checks');
 console.log(count+' focused balance and migration checks passed');
