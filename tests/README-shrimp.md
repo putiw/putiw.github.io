@@ -2460,3 +2460,5 @@ Project doc `claude/shrimp-handoff-proposals-4nov.md`. Built on Pass 250, not de
 - Milo's tank: 96 px square beside the text (`.nour-jar` 96px column), shrimp base 20, two more rocks, two lotus pad clusters at the surface.
 - `credit` (Sell on credit, too poor) is `old:1`.
 - Tests: balance 145, me 50, academy 10, hard on a fresh average run (see below). BUILD p252. Not done, for Puti: items 6 (Rewild / last mile / shop trees) and 7 (gala and Shaping the world into Chapter 6), design calls.
+
+Pass 249i (Puti): the flow and trickle sounded like wind, both off. The filter is a small fountain now (`fountain`): about 16 tiny droplets a second at random times, each a short sine that rises in pitch, 550 to 2,400 Hz, with a few lower plops; the rate swells slowly and drops as the filter clogs. Feeding starts with a salt shaker (three soft shakes of tiny high grains), then the pellets plip in 0.9 s later.

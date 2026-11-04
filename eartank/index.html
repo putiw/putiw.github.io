@@ -109,7 +109,7 @@ button .sub{font-weight:400;font-size:13px;color:inherit;opacity:.75;white-space
   <div class="row"><button class="sm" data-play="pulse">Monitor beep, good → bad</button><button class="sm" data-play="babiesQ">Babies (quiet)</button></div>
   <div class="row"><button class="sm" data-play="deathB">Death, baby</button><button class="sm" data-play="hissLoud">Hiss, bad water</button></div>
   <div class="row"><button class="sm" data-play="pour">Water change (sound only)</button><button class="sm" data-play="hiss">Hiss 5 s</button></div>
-  <div class="row"><button class="sm" data-play="bubbles">Bubbles 4 s</button><button class="sm" data-play="flow">Filter flow 6 s</button></div><div class="row"><button class="sm" id="btn-solo" aria-pressed="true">Solo<span class="sub" id="solo-sub">tank quiet while it plays</span></button></div>
+  <div class="row"><button class="sm" data-play="bubbles">Bubbles 4 s</button><button class="sm" data-play="flow">Fountain 6 s</button></div><div class="row"><button class="sm" id="btn-solo" aria-pressed="true">Solo<span class="sub" id="solo-sub">tank quiet while it plays</span></button></div>
   <button class="sm" id="btn-tank" aria-pressed="true">Tank sound<span class="sub" id="tank-sub">on</span></button>
   <h2>Keep it</h2>
   <button class="pri" id="btn-how">How are they</button>
@@ -137,7 +137,10 @@ var SOUND={
   /* the monitor: a soft beep that follows nitrite and nitrate. Slow and low when fine, faster and higher as it goes bad. */
   pulse:{gain:0.05,ms:140, hzGood:520,hzBad:1050, slow:6,fast:0.55},
   /* the filter: a soft water flow all the time (pink noise, low-passed, slowly breathing) plus a trickle where the outflow hits the surface */
-  flow:{gain:0.09,lo:220,hi:900,breathe:0.08,depth:0.35, trickle:{gain:0.05,hz:1400,q:0.9,rate:0.31,depth:0.6}},
+  flow:{gain:0,lo:220,hi:900,breathe:0.08,depth:0.35, trickle:{gain:0,hz:1400,q:0.9,rate:0.31,depth:0.6}}, /* off: it sounded like wind */
+  /* the filter as a small fountain: many tiny droplets, each a short sine that rises in pitch (that's how a drop rings), at random times.
+     rate a second, a slow swell in rate so it isn't a machine; a clogged filter drips less. */
+  fountain:{rate:16,swell:0.35,swellHz:0.05,gain:0.022,lo:550,hi:2400,rise:1.9,msLo:14,msHi:45, big:{p:0.06,lo:320,hi:520,ms:70,gain:0.03}},
   room:{noiseGain:0.0,noiseLo:350,noiseHi:1200, bubbleGain:0.05,bubbleHz:700,bubbleRise:1.6,bubbleMs:45, bubbleEvery:0.55, tempSpan:0.18, clogSlow:0.8,clogDull:0.45},
   /* eating: a short munch, 2 to 4 scrapes. Babies high and quick, adults low wooden. Every shrimp has its own pace (rate). */
   eat:{gain:0.16, baby:{hz:1700,n:3,gap:0.055,ms:18,type:'sine'}, juv:{hz:1000,n:3,gap:0.08,ms:30,type:'triangle'}, adult:{hz:560,n:3,gap:0.11,ms:50,type:'triangle'}, jitter:0.08, every:2.2, rateLo:0.6,rateHi:1.6, surface:0.06, stressMs:14},
@@ -149,7 +152,9 @@ var SOUND={
   molt:{gain:0.16,from:1400,to:420,s:0.7, fail:{s:0.45,wob:9,knock:220,knockMs:380,gain:0.26}},
   berried:{gapMs:130},
   babies:{gain:0.03,hz:2300,n:7,span:0.9},
-  feed:{gain:0.09,hz:1300,n:7,span:1.0,ms:70,bloop:{hz:380,ms:160,gain:0.07},clusterS:60,clusterMul:0.3},
+  feed:{gain:0.09,hz:1300,n:7,span:1.0,ms:70,bloop:{hz:380,ms:160,gain:0.07},clusterS:60,clusterMul:0.3, delay:0.9,
+    /* the shaker: three soft shakes, each a spray of tiny grains */
+    shake:{n:3,gap:0.2,grains:22,len:0.09,hz:6500,gain:0.03}},
   /* ammonia: from barely there at 0.1 ppm to hard to ignore past 1.5 */
   hiss:{gain:0.01,max:0.22,hz:5000,q:0.7,full:1.5},
   dull:{clearHz:9000,oldHz:1700,oldAt:80},
@@ -375,7 +380,7 @@ function playEv(e){
     og.gain.setValueAtTime(0,t);og.gain.linearRampToValueAtTime(Mf.gain,t+0.02);og.gain.setValueAtTime(Mf.gain,t+Mf.s-0.05);og.gain.linearRampToValueAtTime(0,t+Mf.s);o.connect(og);og.connect(dest());o.start(t);o.stop(t+Mf.s+0.02);lf.start(t);lf.stop(t+Mf.s+0.02);
     tone(Mf.knock,Mf.knockMs,Mf.gain,t+Mf.s+0.15,'triangle',Mf.knock*0.7);tone(Mf.knock*0.5,Mf.knockMs*1.2,Mf.gain*0.5,t+Mf.s+0.16,'sine')}
   else if(e.k==='babies'){for(i=0;i<SOUND.babies.n;i++)tone(SOUND.babies.hz*rnd(0.9,1.15),30,SOUND.babies.gain,t+Math.random()*SOUND.babies.span,'sine')}
-  else if(e.k==='feed'){var F=SOUND.feed;/* pellets plip into the water, one low bloop as the first sinks */for(i=0;i<F.n;i++){var fh=F.hz*rnd(0.8,1.25);tone(fh,F.ms,F.gain*rnd(0.6,1),t+i*F.span/F.n+rnd(0,0.06),'sine',fh*0.55)}tone(F.bloop.hz,F.bloop.ms,F.bloop.gain,t+0.25,'sine',F.bloop.hz*1.5);cluster=ctx.currentTime+F.clusterS}
+  else if(e.k==='feed'){var F=SOUND.feed,Sh=F.shake;for(var si=0;si<Sh.n;si++)for(var gi=0;gi<Sh.grains;gi++){var gt=t+si*Sh.gap+Math.random()*Sh.len;burst(Sh.hz*rnd(0.7,1.3),3,6,Sh.gain*rnd(0.3,1),gt,'bandpass')}t+=F.delay;/* pellets plip into the water, one low bloop as the first sinks */for(i=0;i<F.n;i++){var fh=F.hz*rnd(0.8,1.25);tone(fh,F.ms,F.gain*rnd(0.6,1),t+i*F.span/F.n+rnd(0,0.06),'sine',fh*0.55)}tone(F.bloop.hz,F.bloop.ms,F.bloop.gain,t+0.25,'sine',F.bloop.hz*1.5);cluster=ctx.currentTime+F.clusterS}
   else if(e.k==='pour'){pourSound(WC,t)}
   else if(e.k==='death'){var Dd=SOUND.death,ag=Math.min(1,Math.max(0,((e.d.age==null?200:e.d.age)-10)/90)),dg=Dd.baby.gain+(Dd.adult.gain-Dd.baby.gain)*ag,dh=Dd.baby.hz*Math.pow(Dd.adult.hz/Dd.baby.hz,ag),dm=Dd.baby.ms+(Dd.adult.ms-Dd.baby.ms)*ag;
     tone(dh,dm,dg,t,'triangle',dh*0.75);if(ag>0.5)tone(dh*0.5,dm*1.3,dg*0.5,t+0.02,'sine',dh*0.4)}
@@ -403,6 +408,10 @@ function sched(){ // every 100 ms
   var Pu=SOUND.pulse,badness=Math.min(1,Math.max(S.no2/0.4,Math.max(0,S.no3-15)/45)),every=Pu.slow+(Pu.fast-Pu.slow)*Math.pow(badness,1.3),phz=Pu.hzGood+(Pu.hzBad-Pu.hzGood)*badness;
   if(!A.nextPulse)A.nextPulse=now+1;
   var quiet=now<(A.quietUntil||0);
+  var Fo=SOUND.fountain,frate=Fo.rate*(1+Fo.swell*Math.sin(now*2*Math.PI*Fo.swellHz))*(1-0.6*S.clog);
+  if(!A.nextDrop)A.nextDrop=now+0.2;
+  while(A.nextDrop<look){var big=Math.random()<Fo.big.p,dh=big?rnd(Fo.big.lo,Fo.big.hi):Fo.lo*Math.pow(Fo.hi/Fo.lo,Math.random());
+    tone(dh,big?Fo.big.ms:rnd(Fo.msLo,Fo.msHi),(big?Fo.big.gain:Fo.gain)*rnd(0.4,1),A.nextDrop,'sine',dh*Fo.rise);A.nextDrop+=-Math.log(1-Math.random())/Math.max(1,frate)}
   while(A.nextPulse<look){if(!quiet)tone(phz,Pu.ms,Pu.gain*(1+badness*0.6),A.nextPulse,'sine');A.nextPulse+=every}
   if(A.nextPulse>now+every+0.3)A.nextPulse=now+every; /* the rate sped up: don't wait out the old gap */
   while(A.nextBubble<look){var bh=R.bubbleHz*(1-R.clogDull*S.clog)*rnd(0.85,1.15);tone(bh,R.bubbleMs,R.bubbleGain*rnd(0.5,1),A.nextBubble,'sine',bh*R.bubbleRise);A.nextBubble+=tempo*rnd(0.85,1.15)}
