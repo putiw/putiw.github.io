@@ -1859,13 +1859,14 @@ function renderBuildPal(pal){var list=buildList(),cats=BCAT.filter(function(c){r
   if(!L.buildCat||!cats.some(function(c){return c.id===L.buildCat;}))L.buildCat=cats.length?cats[0].id:null;
   var items=list.filter(function(b){return b.cat===L.buildCat;});
   pal.innerHTML='<div class="bcats" role="tablist">'+cats.map(function(c){return '<button class="bcat" role="tab" data-cat="'+c.id+'" aria-pressed="'+(!L.removing&&!L.moving&&!L.colouring&&!L.making&&L.buildCat===c.id)+'">'+esc(c.name)+'</button>';}).join('')+
-    '<button class="bcat bmk" data-kmode aria-pressed="'+!!L.making+'">Make</button><button class="bcat bmv" data-mmode aria-pressed="'+!!L.moving+'">Move</button><button class="bcat bcl" data-cmode aria-pressed="'+!!L.colouring+'">Colors</button><button class="bcat brm" data-rmode aria-pressed="'+!!L.removing+'">Remove</button></div>'+
-    (L.making?mkPanelHtml():L.colouring?'<div class="bnote">One of a kind changes them all, the ones that came with the place too. Free.</div>':L.moving?'<div class="bnote">Tap a thing to pick it up, then tap where it goes. Moving is free.</div>':L.removing?'<div class="bnote">Tap something you built or painted to take it away. You get half back.</div>':
+    '<button class="bcat bmk" data-kmode aria-pressed="'+!!L.making+'">Make</button><button class="bcat bmv" data-mmode aria-pressed="'+!!L.moving+'">Move</button><button class="bcat bcl" data-cmode aria-pressed="'+!!L.colouring+'">Colors</button><button class="bcat brm" data-rmode aria-pressed="'+!!L.removing+'">Remove</button><button class="bcat bdone" data-done>Done</button></div><div class="bhint" id="lph">'+buildHint()+'</div>'+
+    (L.making?mkPanelHtml():L.colouring?'<div class="bnote">One of a kind changes them all, the ones that came with the place too.</div>':L.moving||L.removing?'':
     '<div class="bgrid" style="grid-template-columns:repeat('+gridCols(items.length)+',minmax(0,1fr))">'+items.map(function(b){return '<button data-item="'+b.id+'" aria-pressed="'+(L.buildSel===b.id)+'"><span class="pi"></span><b>'+esc(b.name)+'</b><small>'+fmtA(b.price)+(b.ground?' a tile':'')+'</small></button>';}).join('')+'</div>');
   pal.querySelectorAll('[data-cat]').forEach(function(bt){bt.onclick=function(){L.buildCat=bt.dataset.cat;L.removing=false;L.moving=false;L.colouring=false;L.making=false;L.moveObj=null;L.buildSel=null;sfx('click');renderBuildPal(pal);updateStat(true);L.hints=null;L.dirty=true;};});
   pal.querySelector('[data-cmode]').onclick=function(){closeCol();L.colouring=!L.colouring;L.making=false;L.moving=false;L.removing=false;L.moveObj=null;L.buildSel=null;L.hints=null;closeBub();sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
   pal.querySelector('[data-mmode]').onclick=function(){L.moving=!L.moving;L.removing=false;L.colouring=false;L.making=false;L.moveObj=null;L.buildSel=null;L.hints=null;sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
   pal.querySelector('[data-kmode]').onclick=function(){L.making=!L.making;L.colouring=false;L.moving=false;L.removing=false;L.moveObj=null;L.buildSel=null;L.hints=null;closeBub();sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
+  pal.querySelector('[data-done]').onclick=function(){sfx('click');setTool('walk');};
   if(L.making)mkPanelBind(pal);
   var rm=pal.querySelector('[data-rmode]');rm.onclick=function(){L.removing=!L.removing;L.moving=false;L.colouring=false;L.making=false;L.moveObj=null;L.buildSel=null;sfx('click');renderBuildPal(pal);updateStat(true);L.dirty=true;};
   pal.querySelectorAll('[data-item]').forEach(function(bt){var ic=bt.querySelector('.pi');try{ic.appendChild(itemIcon(BUILDI[bt.dataset.item]));}catch(e){}
@@ -1953,17 +1954,20 @@ function renderCard(){var nm=$('h-name');if(!nm)return;nm.textContent=STAGES[S.s
   if(!nx){mv.innerHTML='';mv.hidden=true;return;}mv.hidden=false;var sure=L.confirmMove>performance.now();
   var html='<span>Next: '+esc(nx.name)+'</span><button class="btn sm'+(sure?'':' primary')+'" id="h-go"'+(S.cash<nx.cost?' disabled':'')+'>'+(sure?'Tap again to move':'Move · '+fmtA(nx.cost))+'</button>';
   if(mv._h!==html){mv.innerHTML=html;mv._h=html;var b=$('h-go');if(b)b.onclick=function(){if(L.confirmMove>performance.now()){L.confirmMove=0;if(!spend(nx.cost,'the move'))return;landSetStage(S.stage+1);sfx('book');toast('You moved. '+STAGES[S.stage].name+'.');return;}L.confirmMove=performance.now()+3000;renderCard();setTimeout(renderCard,3100);};}}
+// Pass 254 (Puti 5 Nov): the line that says what the build tool does, shown inside the palette so it never covers the items
+function buildHint(){var b=L.buildSel&&BUILDI[L.buildSel];
+  if(L.moving)return L.moveObj?'Tap where the '+esc(((OBJ[L.moveObj.k]||{}).name||'thing').toLowerCase())+' goes. Tap it again to put it down.':'Tap anything to pick it up. Moving is free.';
+  if(L.making)return 'Draw your own things.';
+  if(L.colouring)return 'Tap a thing or the ground to change its colors. Free.';
+  if(L.removing)return 'Tap or drag over things you built to take them away. You get half back.';
+  if(b)return b.ground?esc(b.name)+': tap a tile, or drag to paint. '+fmtA(b.price)+' a tile.':'Tap where the '+esc(b.name.toLowerCase())+' goes. '+fmtA(b.price)+'.';
+  return 'Pick something to build. Drag the map to look around.';}
 function updateStat(force){var el=$('lstat');if(!el)return;var l=LS(),html='',eggsN=0,me=L.me;Object.keys(l.basket).forEach(function(k){eggsN+=l.basket[k];});
-  var f=L.fishing,b=L.tool==='build'&&L.buildSel&&BUILDI[L.buildSel];
+  var f=L.fishing;
   if(L.watch)html='Stay still while the ring fills.';
   else if(f&&(f.st==='wait'||f.st==='fly'))html='Wait for the float to go under, then tap.';
   else if(f&&f.st==='bite')html='<b>Now!</b> Tap.';
-  else if(L.tool==='build'&&L.moving)html=L.moveObj?'Tap where the '+esc(((OBJ[L.moveObj.k]||{}).name||'thing').toLowerCase())+' goes. Tap it again to put it down.':'Tap anything to pick it up.';
-  else if(L.tool==='build'&&L.making)html='Draw your own things.';
-  else if(L.tool==='build'&&L.colouring)html='Tap a thing or the ground to change its colors.';
-  else if(L.tool==='build'&&L.removing)html='Tap or drag over things you built to take them away.';
-  else if(b)html=b.ground?esc(b.name)+': tap a tile, or drag to paint. '+fmtA(b.price)+' a tile.':'Tap where the '+esc(b.name.toLowerCase())+' goes. '+fmtA(b.price)+'.';
-  else if(L.tool==='build')html='Pick something to build. Drag the map to look around.';
+  else if(L.tool==='build'){var ph=$('lph');if(ph)ph.innerHTML=buildHint();html='';}// Pass 254: the build hint lives in the palette, not over it
   else if(l.carry)html='<span>Carrying a '+esc(HEN[l.carry.kind].name.toLowerCase())+'. Tap the yard by the coop to put her down.</span>';
   else if(l.bucket.length)html='<span>Carrying '+plural(l.bucket.length,'fish','fish')+'. Tap your pond to let '+(l.bucket.length>1?'them':'it')+' in, or the stream to let '+(l.bucket.length>1?'them':'it')+' go.</span>';
   else if(eggsN)html='<span>Basket: '+plural(eggsN,'egg')+'</span><button class="btn sm" data-sell>Sell · '+fmtA(eggsN*EGG_AED)+'</button><button class="btn sm" data-gm>Give Grandma</button>';

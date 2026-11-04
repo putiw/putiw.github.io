@@ -17,7 +17,9 @@ function decorTop(k){if(TOPS[k])return TOPS[k];var im=decorImg(k);if(!im||!im.wi
 function seedMoss(T,item,n,grown){var top=decorTop(item.k);if(!top)return;var list=T.moss[item.id]=[];var r=mulberry32(item.id*31+7);
   for(var i=0;i<n;i++){var u=0.1+r()*0.8,ix=Math.floor(u*top.y.length);if(top.y[ix]<0)continue;var side=r()<0.25;list.push({u:u,a:side?(r()<0.5?-0.35:-Math.PI+0.35)+(r()-0.5)*0.6:-Math.PI/2+(r()-0.5)*1.4,len:grown?rnd(34,56):rnd(14,22),max:rnd(78,118),seed:Math.floor(r()*1e6)});}}
 function mossAnchor(item,m){var top=decorTop(item.k);var d=DECOR_SIZE[item.k];var ix=clamp(Math.floor(m.u*top.y.length),0,top.y.length-1),px=ix*top.step,py=top.y[ix]+2;
-  var w=d.w*item.s,h=d.h*item.s,lx=(item.f<0?(d.w-px):px)*item.s;return [item.x-w/2+lx,item.y-h+py*item.s];}
+  var w=d.w*item.s,h=d.h*item.s,lx=(item.f<0?(d.w-px):px)*item.s,ax=item.x-w/2+lx,ay=item.y-h+py*item.s;
+  if(item.r&&item.k!=='leaf'){var dx=ax-item.x,dy=ay-item.y,fl=item.f<0?-1:1,c=Math.cos(item.r),sn=Math.sin(item.r);dx*=fl;ax=item.x+fl*(dx*c-dy*sn);ay=item.y+(dx*sn+dy*c);}// Pass 254: moss turns with the wood
+  return [ax,ay];}
 function scapeNeedsMoss(T){T.scape.forEach(function(it){if(DECOR[it.k]&&DECOR[it.k].moss&&!T.moss[it.id])seedMoss(T,it,it.k==='wood'?16:it.k==='mossrock'?10:8,false);});}
 function hideScore(T){var h=0;T.scape.forEach(function(it){var d=DECOR[it.k];if(d)h+=d.hide*it.s;});var moss=0;for(var k in T.moss)T.moss[k].forEach(function(m){moss+=m.len;});h+=Math.min(0.3,moss/900);h+=Math.min(0.15,T.stems.length*0.02);return clamp(h,0,1);}
 function plantMass(T){var m=0;T.scape.forEach(function(it){var d=DECOR[it.k];if(d&&d.plant)m+=d.plant*it.s;});T.stems.forEach(function(st){m+=st.h/400;});for(var k in T.moss)T.moss[k].forEach(function(mm){m+=mm.len/600;});return m;}
@@ -72,8 +74,8 @@ function drawBg(x){var g=tvGeom(),W=TV.W,H=TV.H;if(ART_READY)x.drawImage(IMG.tbg
    for(var i=0;i<gr[1];i++){var bx=W*gr[0]+(i-gr[1]/2)*8.5*gr[2]*k,by=H*0.72+(i%3)*1.2,bh=H*(0.18+((i+gi)%6)*0.035)*gr[2],sw=Math.sin(i*0.74+gi)*10*gr[2]*k;
     x.strokeStyle='rgba('+gr[3]+','+gr[4]+')';x.lineWidth=Math.max(1,3.1*gr[2]*k);x.beginPath();x.moveTo(bx,by);x.quadraticCurveTo(bx+sw*0.28,by-bh*0.5,bx+sw,by-bh);x.stroke();}});}
 function drawItem(x,it,alpha){var im=decorImg(it.k),d=DECOR_SIZE[it.k];if(!im||!d)return;var g=tvGeom(),w=d.w*it.s*g.s,h=d.h*it.s*g.s,p=f2s(it.x,it.y);x.save();if(alpha!=null)x.globalAlpha=alpha;x.translate(p[0],p[1]);if(it.f<0)x.scale(-1,1);
-  if(it.k==='leaf'){x.rotate(it.r||0.2);x.drawImage(im,-w/2,-h*0.7,w,h);}else x.drawImage(im,-w/2,-h,w,h);x.restore();}
-function scapeKey(T){return T.scape.map(function(i){return i.k+i.x.toFixed(0)+i.y.toFixed(0)+i.s+i.f;}).join('|');}
+  if(it.k==='leaf'){x.rotate(it.r||0.2);x.drawImage(im,-w/2,-h*0.7,w,h);}else{if(it.r)x.rotate(it.r);x.drawImage(im,-w/2,-h,w,h);}x.restore();}// Pass 254: Rotate in Aquascape, any piece turns about its base
+function scapeKey(T){return T.scape.map(function(i){return i.k+i.x.toFixed(0)+i.y.toFixed(0)+i.s+i.f+(i.r?'r'+i.r.toFixed(2):'');}).join('|');}
 // moss: soft green puffs along a curve from the anchor, with a few dark ticks for texture
 var MOSS_C=['#6f9f4a','#7fae55','#5f8f3f','#8cbb62'];
 function drawMossStrand(x,a0,m,g,alpha){var r=mulberry32(m.seed),L=m.len*g.s,step=3.2,n=Math.max(1,Math.floor(L/step)),px=a0[0],py=a0[1],ang=m.a,bend=(r()-0.5)*0.09;

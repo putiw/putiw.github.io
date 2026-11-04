@@ -79,7 +79,11 @@ function decorSet(T,f){var D={wood:['wood'],plants:['sword','lotus'],moss:['moss
 function gamePest(g,was){var s=g.s>>>0,sn=g.k==='snail',glass=g.y<0.72;if(was&&was.k===(sn?'snail':'planaria')){was.bx=g.x;was.by=g.y;was.gs=s;was.glass=glass;return was;}
   return {id:'g'+g.s,k:sn?'snail':'planaria',kind:sn?(s%5?'bladder':'ramshorn'):'',x:g.x,y:g.y,bx:g.x,by:g.y,gs:s,glass:glass,a:(s%628)/100,sz:0.8+(s%41)/100};}
 function jobOpen(){return !!(TOY||$('sheet')&&!$('sheet').hidden);}
-function ownVals(T){var sn=0,pl=0;T.pests.forEach(function(p){if(p.k==='snail')sn++;else pl++;});return {mulm:mulmMean(T),flow:T.flow,og:overgrowth(T),sn:sn,pl:pl,no3:T.no3,wc:T.lastWC,dec:JSON.stringify(decorFlags(T))};}
+function ownVals(T){var sn=0,pl=0;T.pests.forEach(function(p){if(p.k==='snail')sn++;else pl++;});return {mulm:mulmMean(T),flow:T.flow,og:overgrowth(T),sn:sn,pl:pl,no3:T.no3,wc:T.lastWC,dec:JSON.stringify(decorFlags(T)),sck:scapeKey(T)+'|'+T.stems.length+'|'+Object.keys(T.moss).length};}
+// Pass 254 (Puti 5 Nov): the pieces as one picture for the company page, drawn at the art size with no shrimp or water
+function scapeImg(T){var W=TV.W,H=TV.H,D=TV.dpr,c=document.createElement('canvas');c.width=ART_W;c.height=ART_H;TV.W=ART_W;TV.H=ART_H;TV.dpr=1;TV.L={};
+  try{var x=c.getContext('2d');drawScapeAll(x,T,tvGeom());}catch(e){}TV.W=W;TV.H=H;TV.dpr=D;TV.L={};
+  var u='';try{u=c.toDataURL('image/webp',0.86);if(u.indexOf('data:image/webp')!==0)u=c.toDataURL('image/png');}catch(e){u='';}return u;}
 function applyOwn(T,d){var c=d.care;if(!c)return;var i;
   if(Array.isArray(d.mc)&&d.mc.length===MULM_N){for(i=0;i<MULM_N;i++)T.mulm[i]=clamp((+d.mc[i]||0)*MM_K,0,1);}
   else{var tg=clamp(c.mulm*MM_K,0,1),mm=mulmMean(T);if(Math.abs(mm-tg)>0.002){if(mm<0.002){var w=0;for(i=0;i<MULM_N;i++)w+=mulmWeight(T,i);for(i=0;i<MULM_N;i++)T.mulm[i]=clamp(tg*mulmWeight(T,i)*MULM_N/w,0,1);}else for(i=0;i<MULM_N;i++)T.mulm[i]=clamp(T.mulm[i]*tg/mm,0,1);}}
@@ -88,7 +92,7 @@ function applyOwn(T,d){var c=d.care;if(!c)return;var i;
   if(Array.isArray(d.pests)){var old={};T.pests.forEach(function(p){old[p.id]=p;});T.pests=d.pests.map(function(g){return gamePest(g,old['g'+g.s]);});}
   else [['snail',c.snail|0],['planaria',c.flat|0]].forEach(function(q){var have=T.pests.filter(function(p){return p.k===q[0];});if(have.length<q[1])addPests(T,q[0],Math.min(40,q[1]-have.length));else if(have.length>q[1]){var gone=have.slice(q[1]);T.pests=T.pests.filter(function(p){return gone.indexOf(p)<0;});}});
   if(d.no3!=null)T.no3=d.no3;if(d.nh!=null)T.nh=d.nh;
-  if(d.decor)decorSet(T,d.decor);
+  if(d.decor){if(T.scd){if(JSON.stringify(d.decor)!==JSON.stringify(decorFlags(T))){LAST=ownVals(T);report(1);return;}}else decorSet(T,d.decor);}// Pass 254: after an Aquascape here the land decides, the game follows
   if(c.cs!=null&&T.stems.length&&T.stSeed!==c.cs)stemSpread(T,c.cs|0,clamp(+c.grow||0,0,1));
   LAST=ownVals(T);if(!d.decor)report(1);}
 // what a job on the land changed, back to the game; first=1 also sends the land's decor once, it wins for old saves
@@ -100,7 +104,7 @@ function report(first){var T=ownT();if(!T||!LAST||TOY||$('sheet')&&!$('sheet').h
   if(GLD){m.gl=GLD;if(OWN)OWN.glass=GLD;GLD=null;any=1;}
   if(v.wc!==LAST.wc&&LAST.no3>0){m.wc=Math.round(clamp(1-v.no3/LAST.no3,0,0.9)*100);any=1;}
   if(any)m.job=1;
-  if(first||v.dec!==LAST.dec){m.decor=JSON.parse(v.dec);any=1;}
+  if(first||v.dec!==LAST.dec||v.sck!==LAST.sck||m.grow!=null){m.decor=JSON.parse(v.dec);m.sci=scapeImg(T);any=1;}
   if(!any)return false;m.seq=++SEQ;post(m);LAST=v;return true;}
 // the game's glass algae, drawn the same way on the land
 var GLC=null,GLK='';
@@ -120,7 +124,7 @@ function gameTime(day){if(day==null||!isFinite(day))return;window.GDAY=day;if(S.
 // after leaving Earth (the game sends voy) the back button goes to Space (Pass 170)
 function leftBack(){var b=$('tb-back');if(!b)return;b.innerHTML=LEFT?'<span aria-hidden="true">≡</span><i> Your years</i>':'<span aria-hidden="true">‹</span><i> '+(VOY?'Space':'Company')+'</i>';b.setAttribute('aria-label',LEFT?'Your years at the company, settings':VOY?'Back to Space':'Back to the company');}
 // a card waiting at the company, or frozen accounts
-function needBar(){var b=$('lneed');if(!NEED){if(b)b.remove();return;}if(!b){b=document.createElement('button');b.type='button';b.id='lneed';b.className='lneed';b.onclick=function(){try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};document.body.appendChild(b);}b.textContent=NEED+' Tap to go back.';}
+function needBar(){var b=$('lneed');if(!NEED){if(b)b.remove();return;}if(!b){b=document.createElement('button');b.type='button';b.id='lneed';b.className='lneed';b.onclick=function(){jobClose();try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};document.body.appendChild(b);}b.textContent=NEED+' Tap to go back.';}
 window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||!S)return;
   if(d.type==='cash'){S.cash=d.cash;FROZEN=d.frozen||'';if(!!d.left!==!!LEFT||!!d.voy!==!!VOY){LEFT=d.left?1:0;VOY=d.voy?1:0;window.GM_AWAY=!!VOY;leftBack();}var nd=d.need||'';if(nd!==NEED){NEED=nd;needBar();}gameTime(d.day);updateHeader();}
   if(d.type==='own')syncOwn(d);
@@ -140,12 +144,13 @@ if(typeof addToTank==='function'){var _add=addToTank;addToTank=function(T,list,f
 var _cull=cullShrimp;cullShrimp=function(T,i,died){var own=T===ownT(),ad=i.age>=ADULT_DAYS;_cull(T,i,died);if(own)post({type:'take',adults:ad?1:0,young:ad?0:1,seq:++SEQ});};
 var _sell=sellShrimp;sellShrimp=function(T,i){var own=T===ownT(),ad=i.age>=ADULT_DAYS;var p=_sell(T,i);if(own)post({type:'take',adults:ad?1:0,young:ad?0:1,seq:++SEQ});return p;};
 // care jobs count as caring for your tank in the game
-if(typeof toyEnd==='function'){var _end=toyEnd;toyEnd=function(){var was=!!TOY;var r=_end.apply(this,arguments);if(was)jobDone();return r;};}
+if(typeof toyEnd==='function'){var _end=toyEnd;toyEnd=function(){var was=!!TOY,sc=TOY&&TOY.id==='scape'&&TOY.T===ownT();var r=_end.apply(this,arguments);if(sc)ownT().scd=1;if(was)jobDone();return r;};}
 
 // ----- jobs on Your tank (Pass 179) -----
 // While a job is open the game's clock for Tank 1 holds (busy), and the result goes back against the values from when it started.
 // A job the company sent (a care button on its Tank tab) goes back to the company when it's done.
 var FROM_GAME=0,SPONGE_ON=0;
+function jobClose(){if(!TOY)return;FROM_GAME=0;try{if(TOY.finish)TOY.finish();else toyEnd();}catch(e){}}// Pass 254: Back with a job open ends the job first
 function jobBegin(T){if(T!==ownT())return;try{LAST=ownVals(T);}catch(e){}post({type:'busy',on:1});}
 function jobDone(){var did=false;try{did=report();}catch(e){}if(did)sfxDone();post({type:'busy',on:0,sc:ownT()?ownT().scape.length:null});GLS=null;if(FROM_GAME){FROM_GAME=0;setTimeout(function(){try{LAND.settle();}catch(e){}save(true);post({type:'back'});},350);}}
 var _ts=toyStart;toyStart=function(id){var T=S.tanks[S.sel];if(id==='glass'){if(TOY)toyEnd();if(T!==ownT()||!OWN||!OWN.glass)return;closeBubble();jobBegin(T);TOY=glassToy(T);TOY.id=id;TOY.T=T;hold();lockOn();TOY.start();tankMod.renderSide();return;}
@@ -177,7 +182,7 @@ function clock(){var d=new Date();return d.toLocaleDateString('en-GB',{weekday:'
 var _uh=updateHeader;updateHeader=function(){_uh();var b=$('b-date');if(b)b.textContent=clock();var lc=$('lclock');if(lc){lc.hidden=false;lc.textContent=clock();}var s=$('b-sub');if(s)s.textContent='';};
 function shell(){['tb-info'].forEach(function(id){var e=$(id);if(e)e.remove();});var tag=document.querySelector('.devtag');if(tag)tag.remove();var sp=$('speed');if(sp)sp.remove();
   document.querySelectorAll('.tabs [data-tab="book"],.tabs [data-tab="try"]').forEach(function(b){b.remove();});
-  var row=document.querySelector('.top .brand');if(row&&!$('tb-back')){var bb=document.createElement('button');bb.className='btn sm';bb.id='tb-back';bb.type='button';bb.innerHTML='<span aria-hidden="true">‹</span><i> Company</i>';bb.setAttribute('aria-label','Back to the company');bb.onclick=function(){try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:LEFT?'menu':'back'});};row.insertBefore(bb,row.firstChild);}
+  var row=document.querySelector('.top .brand');if(row&&!$('tb-back')){var bb=document.createElement('button');bb.className='btn sm';bb.id='tb-back';bb.type='button';bb.innerHTML='<span aria-hidden="true">‹</span><i> Company</i>';bb.setAttribute('aria-label','Back to the company');bb.onclick=function(){jobClose();try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:LEFT?'menu':'back'});};row.insertBefore(bb,row.firstChild);}
   // one header row: back, cash, the Home / Tank switch, sound (Puti, 28 Oct: the big bottom tabs took room from the map)
   if(row&&!$('lseg')){var mo=$('b-money');if(mo)row.insertBefore(mo,$('tb-mute'));var sg=document.createElement('div');sg.className='lseg';sg.id='lseg';sg.setAttribute('role','tablist');
     sg.innerHTML='<button type="button" data-seg="home">Home</button><button type="button" data-seg="tank">Tank</button>';row.insertBefore(sg,$('tb-mute'));

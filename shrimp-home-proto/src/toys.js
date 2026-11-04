@@ -200,7 +200,7 @@ function scapeToy(T){var A={sel:null,drag:null,spent:0};
   A.start=function(){A.bar();A.panel();};
   A.bar=function(){toyBar(barHtml(A.sel?'Drag to move it. Tap the water to let go.':'Tap a piece below to add it, or drag what’s there.',''));};
   A.panel=function(){var tp=$('toypanel');if(!tp)return;var h='<div class="card"><div class="palette" id="sc-pal">'+SCAPE_SHOP.map(function(s){var nm=s[0]==='stems'?'Stem plants':s[0]==='moss'?'Java moss':DECOR[s[0]].name;return '<button data-add="'+s[0]+'"><canvas data-th="'+s[0]+'" width="112" height="72"></canvas>'+nm+'<small>'+fmtA(s[1])+'</small></button>';}).join('')+'</div>';
-    if(A.sel){h+='<div class="btns" style="margin-top:4px"><button class="btn sm" data-sc="flip">Flip</button><button class="btn sm" data-sc="small">Smaller</button><button class="btn sm" data-sc="big">Bigger</button><button class="btn sm" data-sc="del">Remove</button></div>';}
+    if(A.sel){h+='<div class="btns" style="margin-top:4px"><button class="btn sm" data-sc="flip">Flip</button><button class="btn sm" data-sc="small">Smaller</button><button class="btn sm" data-sc="big">Bigger</button><button class="btn sm" data-sc="rot">Rotate</button><button class="btn sm" data-sc="del">Remove</button></div>';}
     var hs=hideScore(T),pm=plantMass(T),gz=0;T.scape.forEach(function(it){var d=DECOR[it.k];if(d&&d.graze)gz+=d.graze;});for(var k in T.moss)gz+=0.1;
     var dots=function(v){var n=Math.round(clamp(v,0,1)*5);return '●●●●●'.slice(0,n)+'<span style="color:var(--line)">'+'●●●●●'.slice(0,5-n)+'</span>';};
     h+='<div class="kv" style="margin-top:8px"><span>Hiding spots</span><b>'+dots(hs/0.7)+'</b><span>Plants</span><b>'+dots(pm/1.2)+'</b><span>Grazing</span><b>'+dots(gz/0.9)+'</b></div><p class="hint">More hiding spots, more babies make it. Plants soak up nitrate. Wood, leaves and moss grow the film shrimp graze on.</p></div>';
@@ -212,7 +212,7 @@ function scapeToy(T){var A={sel:null,drag:null,spent:0};
     if(k==='stems'){var cx=rnd(160,ART_W-160);defaultStems(T,cx,4);T.stems.slice(-4).forEach(function(s){s.h=rnd(40,70);});sfx('plop');A.panel();return;}
     var d=DECOR_SIZE[k],it2={id:uid(),k:k,x:rnd(250,ART_W-250),y:ART_H*0.86+rnd(-6,10),s:k==='leaf'?1:0.85,f:Math.random()<0.5?1:-1,r:k==='leaf'?rnd(-0.5,0.5):0};
     if(k==='leaf')it2.y=ART_H*0.9;T.scape.push(it2);scapeResort(T,it2);if(DECOR[k].moss)seedMoss(T,it2,k==='wood'?5:3,false);A.sel=it2;sfx('thud');A.bar();A.panel();};
-  A.edit=function(k){var it=A.sel;if(!it)return;if(k==='flip')it.f=-it.f;if(k==='small')it.s=Math.max(0.5,it.s-0.12);if(k==='big')it.s=Math.min(1.4,it.s+0.12);
+  A.edit=function(k){var it=A.sel;if(!it)return;if(k==='flip')it.f=-it.f;if(k==='small')it.s=Math.max(0.5,it.s-0.12);if(k==='big')it.s=Math.min(1.4,it.s+0.12);if(k==='rot'){it.r=((it.r||0)+Math.PI/12)%(Math.PI*2);}// Pass 254: 15° a tap
     if(k==='del'){T.scape.splice(T.scape.indexOf(it),1);delete T.moss[it.id];var back=Math.round((SCAPE_SHOP.find(function(s){return s[0]===it.k;})||[0,0])[1]/2);earn(back,'decor');A.sel=null;sfx('pop');}
     A.bar();A.panel();};
   A.hit=function(p){var g=tvGeom(),best=null;for(var i=T.scape.length-1;i>=0;i--){var it=T.scape[i],d=DECOR_SIZE[it.k];if(!d)continue;var w=d.w*it.s*g.s,h=d.h*it.s*g.s,sp=f2s(it.x,it.y);if(p[0]>sp[0]-w/2&&p[0]<sp[0]+w/2&&p[1]>sp[1]-h&&p[1]<sp[1]+4){best=it;break;}}return best;};
