@@ -32,7 +32,7 @@ function player(p,rich){
   if(rich&&/^hard_/.test(d.id)&&!p.first&&!pick){d.opts.forEach(o=>{const q=Object.assign({},o.push);if(o.slow)q.care=(q.care||0)-c.HARD_SLOW;c.trAdd(g,q);});return;}
   let best=d.opts[0];
   if(pick==='random')best=d.opts[Math.floor(rnd()*d.opts.length)];
-  else if(p.first&&/^(fork_|ev_|c_|pain_|bye_|dye|fight|wash|coin|hard_)/.test(d.id))best=d.opts[Math.floor(rnd()*d.opts.length)];// Pass 210: shown in a per-game order, so the top button is any of them
+  else if(p.first&&/^(fork_|ev_|c_|pain_|bye_|dye|fight|wash|coin|hard_|prop_)/.test(d.id))best=d.opts[Math.floor(rnd()*d.opts.length)];// Pass 210: shown in a per-game order, so the top button is any of them
   else if(pick==='fair'||pick==='cold'){let bv=-1e9;d.opts.forEach(o=>{const v=(pick==='fair'?1:-1)*(o.push.means||0)+0.1*rnd();if(v>bv){bv=v;best=o;}});}
   else if(pick==='kindbot')best=d.opts[0];else if(pick==='coldbot')best=d.opts[d.opts.length-1];
   else if(!p.first){let bv=-1e9;d.opts.forEach(o=>{const v=score(w,o.push)+0.3*gauss();if(v>bv){bv=v;best=o;}});}

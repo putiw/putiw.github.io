@@ -791,48 +791,72 @@ if(html.includes("hardSalesHTML")||!html.includes("'hard-give'")||!html.includes
 for(const src of ['Hutton and Varughese 2016','Financing Electricity Access in Africa','givewell.org','WHO/UNICEF JMP','Tracking SDG 7'])if(!html.includes(src))throw Error('Pass 166: ledger source missing in a comment: '+src);
 count++;console.log('PASS Pass 166 hard part additions in the page');
 for(const src of ['PRIO','UNHCR Global Trends 2024','Survival International','WHO/UNICEF JMP','Tracking SDG 7 2025','FAO SOFI 2025','IAPB Vision Atlas','World Prison Brief','UCDP 2025','Fearon 1995','Walter 2002','Forbes Real-Time Billionaires','Ceres2030'])if(!html.includes(src))throw Error('Pass 250: source missing in a comment: '+src);
-check('Pass 250: the routes (Aid, Science, Build, Policy, Keep), workarounds fade, one per group, the war ends once, the groups add up',`
+check('Pass 250 and 251: Aid, Science, Keep, proposals from people (arrive, fund, keep, stop, the levy, the class, the school), workarounds fade, one per group, the war ends once, the groups add up',`
 var sum=0;HARD.forEach(function(x){sum+=x.n;});if(Math.abs(sum-3.896e9)>2e6)throw Error('the ten add to 3,896M: '+sum);if(hardGroup('water').n!==2.1e9||hardGroup('hot').n!==2.5e8)throw Error('water 2.1B, hot 250M');
 var g=readyGame();g.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};g.money=1e12;g.day=0;g.fin=[];for(var i=0;i<7;i++)g.fin.push({kits:1e9,_inf:1e6});g.emp.inf=1e9;g.emp.infOn=1;
 operatingNet=function(){return 1e9;};capitalReserve=function(){return 1e9;};infIncome=function(){return 1e6;};
-var H=hardOf(g),A=hardAllocOf(H);if(A.aid||A.sci||A.build||A.pol||hardKeep(H)!==1)throw Error('all five start at 0, Keep is the rest');
-if(!hardAlloc(g,'build',.3)||!hardAlloc(g,'aid',.15)||!hardAlloc(g,'sci',.1)||!hardAlloc(g,'pol',.2)||Math.abs(hardKeep(H)-.25)>1e-9)throw Error('shares in 5% steps, Keep is what is left');
-hardAlloc(g,'aid',.9);if(Math.abs(A.aid-.4)>1e-9)throw Error('the sum is capped at 100%: '+A.aid);hardAlloc(g,'aid',.15);
+var H=hardOf(g),A=hardAllocOf(H);if(A.aid||A.sci||A.build!=null||A.pol!=null||hardKeep(H)!==1)throw Error('Aid and Science start at 0, Keep is the rest, no Build or Policy (Pass 251)');
+if(!hardAlloc(g,'aid',.15)||!hardAlloc(g,'sci',.1)||hardAlloc(g,'build',.3)||hardAlloc(g,'pol',.2)||Math.abs(hardKeep(H)-.75)>1e-9)throw Error('two shares in 5% steps, Keep is what is left');
+hardAlloc(g,'aid',.95);if(Math.abs(A.aid-.9)>1e-9)throw Error('the sum is capped at 100%: '+A.aid);hardAlloc(g,'aid',.15);
 var old=readyGame();old.emp.hard={open:1,goal:'home',picks:{},give:.5};if(hardAllocOf(old.emp.hard).aid!==.5||old.emp.hard.give!=null)throw Error('H.give migrates into Aid');
-// a year: money leaves, science clock moves, build reach grows, policy fills said no, the Times laughs
-var m0=g.money,h0=g.humans;for(var d=0;d<365;d++){g.day=d;hardDay(g);}
-if(!(H.sci.p>0&&H.sci.p<0.08&&H.sci.spent>0))throw Error('science clock: 15 years at 10%, paid: '+JSON.stringify(H.sci));
-if(!(H.bld.water.r>0&&H.bld.water.r<=0.07+1e-9&&H.bgv>0))throw Error('build reach grows, capped at 7% a year: '+JSON.stringify(H.bld.water));
-if(!(H.pol.r>0&&H.pol.r<=1/3+1e-9&&H.pol.given>0&&g.humans>h0))throw Error('policy reaches said no over 3 years at 20%, tanks put there: '+JSON.stringify(H.pol));
-if(!(H.gv>0))throw Error('aid goes out');if(!(m0-g.money>H.gv))throw Error('the routes cost money');
-if(!rip(g).log.some(function(x){return /same typo/.test(x.tx);}))throw Error('the Times on the tank law');
-// science: 25 years at a trickle, stopping pauses the clock, done boosts workarounds and build cost
+// Pass 251: old saves with Build and Policy money become running proposals at the reach they had
+var o2=readyGame();o2.emp.hard={open:1,goal:'home',picks:{},alloc:{aid:0,sci:0,build:.3,pol:.2},bld:{water:{r:.2,pot:0},hot:{r:0,pot:0}},pol:{r:.1,given:5e6,y:1},day:0};var A2=hardAllocOf(o2.emp.hard),R2=propOf(o2.emp.hard);
+if(A2.build!=null||A2.pol!=null||o2.emp.hard.bld||o2.emp.hard.pol||!R2.run.board||Math.abs(R2.run.board.r-.2)>1e-9||R2.run.solar||!R2.run.law||R2.run.law.given!==5e6||Math.abs(propReach(o2,'water')-.2)>1e-9)throw Error('Build and Policy migrate into a water board and a tank law: '+JSON.stringify(R2.run));
+// proposals: arrive 60 to 180 days apart, at most 3 open, none from a group that is reached, the cross-cutting ones once there is something to pay
+var R=propOf(H),d;for(d=0;d<1500;d++){g.day=d;hardDay(g);}
+if(!(R.open.length===PROP_MAX))throw Error('three proposals open after four years with none answered: '+R.open.length);if(R.t.levy||R.t.school||R.t.talks)throw Error('the levy, the school and the talks wait for a running program');
+var gaps=[];var pr=readyGame();pr.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};pr.humans=4.1e9;pr.money=1e12;pr.fin=g.fin;var PR=propOf(hardOf(pr)),last=null;for(d=0;d<3000;d++){pr.day=d;hardDay(pr);if(PR.open.length){var id=PR.open[0].id;if(last!=null)gaps.push(d-last);last=d;propDecline(pr,id);}}
+if(gaps.length<8||Math.min.apply(null,gaps)<PROP_GAP[0]||Math.max.apply(null,gaps)>PROP_GAP[1]+1)throw Error('a new proposal every 60 to 180 days: '+gaps.join(','));
+if(!PR.no.board&&!PR.no.solar)throw Error('declined ones are noted');var ids=Object.keys(PR.t);if(ids.length<6)throw Error('different people write in: '+ids);
+// fund one: build paid once, the crews a share of income, reach grows at their pace, 60 to 90% of the planned reach, the group's 7% a year cap
+var fb=readyGame();fb.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};fb.humans=4.1e9;fb.money=1e12;fb.fin=g.fin;var FH=hardOf(fb),FR=propOf(FH);FR.open.push({id:'board',day:0,alt:0,grad:0});FR.t.board=1;
+if(propDecline(fb,'nope'))throw Error('decline needs an open one');var m1=fb.money;if(!propFund(fb,'board'))throw Error('fund the water board');var p=FR.run.board;
+if(!(m1-fb.money>=30*1e9*0.99)||!fb.emp.dues.some(function(x){return x.k==='prop:board'&&Math.abs(x.f-.015)<1e-9;}))throw Error('30 days of income to build, 1.5% of income for the crews: '+(m1-fb.money)+' '+JSON.stringify(fb.emp.dues));
+if(!(p.full>=.12*.6-1e-9&&p.full<=.12*.9+1e-9))throw Error('60 to 90% of the planned reach arrives: '+p.full);if(FR.open.length)throw Error('funded leaves the open list');
+for(d=1;d<=365;d++){fb.day=d;hardDay(fb);}if(!(p.r>0&&p.r<=p.full/6+1e-9&&Math.abs(propReach(fb,'water')-p.r)<1e-9&&Math.abs(hardReach(fb,hardGroup('water'))-p.r)<1e-9))throw Error('a year of the board: a sixth of its reach, counted for the group: '+p.r+' '+p.full);
+for(d=366;d<=365*7;d++){fb.day=d;hardDay(fb);}if(Math.abs(p.r-p.full)>1e-9)throw Error('done in six years: '+p.r+' '+p.full);if(!rip(fb).log.some(function(x){return /work is done/.test(x.tx);}))throw Error('the Times says the work is done');
+if(!propOK(fb,FH,propDef('board'),fb.day))throw Error('a cousin brings the next board once this one is done');
+// stop paying the crews: reach falls 10% a year, the dues go, a news line, Grandma asks once
+var r0=p.r;if(!propStop(fb,'board'))throw Error('stop');if(fb.emp.dues.some(function(x){return x.k==='prop:board';}))throw Error('stopping removes the dues');for(d=365*7+1;d<=365*8;d++){fb.day=d;hardDay(fb);}
+if(!(p.r<r0&&Math.abs(p.r/r0-0.905)<0.01))throw Error('reach falls 10% a year after you stop: '+r0+' '+p.r);if(!rip(fb).log.some(function(x){return /mechanics went to the city/.test(x.tx);}))throw Error('she writes once');
+if(!fb.me.hist.some(function(x){return /who Esther Achieng is/.test(x);}))throw Error('Grandma asks who she is');
+// three in one group share the 7% a year cap
+var c3=readyGame();c3.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};c3.humans=4.1e9;c3.money=1e13;c3.fin=g.fin;var CR=propOf(hardOf(c3));['board','loan','desal'].forEach(function(k){CR.open.push({id:k,day:0,alt:0,grad:0});CR.t[k]=1;if(!propFund(c3,k))throw Error('fund '+k);});for(d=1;d<=365;d++){c3.day=d;hardDay(c3);}
+if(propReach(c3,'water')>BUILD_CAP+1e-9)throw Error('a group grows at most 7% a year: '+propReach(c3,'water'));if(!(rip(c3).log.some(function(x){return /desal plant opens/.test(x.tx);})))throw Error('the cold ones have their news');
+// the levy: needs crews, a country every 6 to 18 months, one in four drops it, at 12 the crews are paid from it
+var lv=readyGame();lv.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};lv.humans=4.1e9;lv.money=1e13;lv.fin=g.fin;lv.emp.inf=1e9;lv.emp.infOn=1;var LH=hardOf(lv),LR=propOf(LH);if(propOK(lv,LH,propDef('levy'),0))throw Error('the levy needs crews to pay');
+LR.open.push({id:'board',day:0,alt:0,grad:0});LR.t.board=1;propFund(lv,'board');if(!propOK(lv,LH,propDef('levy'),0))throw Error('the levy comes once there are crews');LR.open.push({id:'levy',day:0,alt:0,grad:0});LR.t.levy=1;var i0=lv.emp.inf;if(!propFund(lv,'levy'))throw Error('fund the levy');
+var sg=0,yrs=0;for(d=1;d<=365*25&&LR.lev.s<LEVY_N;d++){lv.day=d;hardDay(lv);}if(LR.lev.s<LEVY_N)throw Error('12 countries sign within 25 years: '+JSON.stringify(LR.lev));if(!(lv.emp.inf<i0))throw Error('the levy costs ✦');if(d/365<4||d/365>22)throw Error('the campaign takes years: '+(d/365));
+if(lv.emp.dues.some(function(x){return x.k==='prop:board';}))throw Error('at 12 countries the crews come off your dues');if(!propLevyOn(lv)||propKeep(lv,propDef('board'))[0]!==0)throw Error('new crews are paid by the levy');
+// the politics class: nothing for ten years, then a proposal a year from a graduate with the build a fifth cheaper; the maintenance school cuts the water crews' bill
+var cs=readyGame();cs.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};cs.humans=4.1e9;cs.money=1e13;cs.fin=g.fin;var CH=hardOf(cs),CSR=propOf(CH);CSR.open.push({id:'course',day:0,alt:0,grad:0});CSR.t.course=1;propFund(cs,'course');
+for(d=1;d<=365*12;d++){cs.day=d;hardDay(cs);if(CSR.open.length)CSR.open.forEach(function(x){propDecline(cs,x.id);});}if(!CSR.run.course.gok||CSR.grads<1||CSR.grads>3)throw Error('graduates bring one a year after ten years: '+CSR.grads+' '+JSON.stringify(CSR.run.course));
+var gx={id:'board',day:0,alt:1,grad:1};if(Math.abs(propBuild(cs,propDef('board'),1)/propBuild(cs,propDef('board'),0)-0.8)>1e-6)throw Error('a graduate’s build costs a fifth less');
+CSR.open.push({id:'board',day:0,alt:1,grad:0});CSR.t.board=2;propFund(cs,'board');if(propOK(cs,CH,propDef('school'),cs.day)!==true)throw Error('the school comes with a water program');CSR.open.push({id:'school',day:0,alt:0,grad:0});CSR.t.school=1;propFund(cs,'school');if(Math.abs(propKeep(cs,propDef('board'))[0]-.015*.7)>1e-9)throw Error('water crews cost 30% less with the school');
+// science: 25 years at a trickle, stopping pauses the clock, done boosts workarounds
 var sc=readyGame();sc.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};sc.money=1e12;sc.fin=g.fin;var HS=hardOf(sc);hardAlloc(sc,'sci',.05);for(d=0;d<365;d++){sc.day=d;sciDay(sc,HS,d,1e9);}if(!(HS.sci.p>1/26&&HS.sci.p<1/19))throw Error('5% is slower than 10%: '+HS.sci.p);
 hardAlloc(sc,'sci',0);var p0=HS.sci.p;for(d=365;d<730;d++){sc.day=d;sciDay(sc,HS,d,1e9);}if(HS.sci.p!==p0)throw Error('stopping pauses the clock');
-HS.sci.p=1;hardAlloc(sc,'sci',.1);sc.day=730;sciDay(sc,HS,730,1e9);if(!HS.sci.done)throw Error('done at 1');if(Math.abs(buildCost(sc,'water')-BUILD_USD.water*USD_AED/3)>1e-6||buildCost(sc,'far')!==BUILD_USD.far*USD_AED)throw Error('build costs a third in water, hot, poor once science is done');
+HS.sci.p=1;hardAlloc(sc,'sci',.1);sc.day=730;sciDay(sc,HS,730,1e9);if(!HS.sci.done)throw Error('done at 1');
 sc.day=730+1825;if(Math.abs(sciReach(sc,'water')-0.3)>1e-9||sciReach(sc,'far')!==0)throw Error('science alone reaches 30% of water, hot, poor');
-// build decay: stop paying and reach falls 10% a year
-hardAlloc(g,'build',0);var r0=H.bld.water.r;for(d=365;d<730;d++){g.day=d;hardDay(g);}if(!(H.bld.water.r<r0&&Math.abs(H.bld.water.r/r0-0.905)<0.01))throw Error('build reach decays 10% a year when the money stops: '+r0+' '+H.bld.water.r);
-if(!rip(g).log.some(function(x){return /pumps you stopped paying for/.test(x.tx);}))throw Error('the Times notices');
 // workarounds: climb, hold, fade to the floor; one per group at a time; a faded one can be bought again; build underneath holds it up
 var w=readyGame();w.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};w.money=1e12;w.fin=[{kits:1e9}];var WG=hardGroup('water'),WP=hardOf(w);
 if(!hardBuy(w,'water','trucks'))throw Error('buy trucks');if(hardBuy(w,'water','jar'))throw Error('one workaround per group while one is running');
 w.day=60;if(Math.abs(hardReach(w,WG)-0.15)>1e-9)throw Error('trucks reach 15%');w.day=60+365;if(Math.abs(hardReach(w,WG)-0.15)>1e-9)throw Error('held for a year');w.day=60+365+60;if(hardReach(w,WG)>1e-9)throw Error('faded to 0: '+hardReach(w,WG));
 if(!hardBuy(w,'water','trucks'))throw Error('a faded one can be bought again');if(!WP.picks.water.trucks.again||WP.picks.water.trucks.start!==w.day)throw Error('again');w.day+=60+365+60;if(!hardBuy(w,'water','jar'))throw Error('after the fade another workaround can start');
-var wb=readyGame();wb.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0,bld:{water:{r:.3,pot:0}}};wb.money=1e12;wb.fin=[{kits:1e9}];hardBuy(wb,'water','trucks');wb.day=60+365+200;if(Math.abs(hardReach(wb,WG)-0.45)>1e-9)throw Error('build underneath holds a workaround up: '+hardReach(wb,WG));
+var wb=readyGame();wb.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0,pr:{open:[],run:{board:{day:0,alt:0,r:.3,full:.3,given:0,paid:0,keep:.015,stop:null,grad:0}},no:{},t:{},next:null,n:1,lev:{s:0,f:0,next:0},grads:0,gnext:0}};wb.money=1e12;wb.fin=[{kits:1e9}];hardBuy(wb,'water','trucks');wb.day=60+365+200;if(Math.abs(hardReach(wb,WG)-0.45)>1e-9)throw Error('build underneath holds a workaround up: '+hardReach(wb,WG));
 var c=readyGame();c.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};c.money=1e12;c.fin=[{kits:1e9}];hardBuy(c,'hot','panel');c.day=120;hardBuy(c,'hot','gene');var cap=hardWorkReach(c,hardGroup('hot'));if(cap>WORK_CAP)throw Error('workarounds cap at half a group');
 // fading takes its tanks with it
 var f=readyGame();f.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};f.money=1e12;f.fin=[{kits:1e9}];f.humans=hardEasy(f)+2e8;f.day=0;hardDay(f);if(!(f.humans<hardEasy(f)+2e8))throw Error('people above the cap lose their tanks, 2% of the gap a day');
 // war: one ending option, work options stack under it, talks need Policy
 var v=readyGame();v.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};v.money=1e13;v.fin=[{kits:1e9}];var VG=hardGroup('war');
-if(hardBuy(v,'war','pay'))throw Error('talks need Policy');hardAlloc(v,'pol',.05);if(!hardBuy(v,'war','pay'))throw Error('talks with Policy');if(hardBuy(v,'war','out')||hardBuy(v,'war','fund'))throw Error('one ending option');
+if(hardBuy(v,'war','pay'))throw Error('the talks are a proposal now (Pass 251)');var VR=propOf(hardOf(v));if(propOK(v,hardOf(v),propDef('talks'),0))throw Error('the mediator waits for a running program');VR.run.board={day:0,alt:0,r:.01,full:.1,given:0,paid:0,keep:.015,stop:null,grad:0};if(!propOK(v,hardOf(v),propDef('talks'),0))throw Error('then the mediator writes');VR.open.push({id:'talks',day:0,alt:0,grad:0});VR.t.talks=1;if(!propFund(v,'talks'))throw Error('fund the talks');if(!(hardOf(v).picks.war.pay&&hardOf(v).picks.war.pay.start===0))throw Error('the talks take the war’s ending slot');if(hardBuy(v,'war','out')||hardBuy(v,'war','fund'))throw Error('one ending option');
 if(!hardBuy(v,'war','convoy'))throw Error('convoy stacks under it');v.day=600;if(Math.abs(hardReach(v,VG)-1)>1e-9)throw Error('talks reach all after 540 days');
 var x=readyGame();x.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};x.money=1e13;x.fin=[{kits:1e9}];hardBuy(x,'war','convoy');x.day=400;if(!hardBuy(x,'war','checkpoint'))throw Error('war work options stack');x.day=600;if(hardWorkReach(x,VG)>WAR_WORK_CAP)throw Error('to 0.8');
 VG.ops.forEach(function(o){if(o.k==='work'&&!o.life&&!o.old)throw Error('war work options have a life: '+o.id);});
 if(!/civil war/.test(VG.body))throw Error('the war sentence');['nour1','nour2','nour3','nour4','nour5','nour6'].forEach(function(k){var mm=MILESTONES[k],t=(mm.bodyFn?mm.bodyFn(v):mm.body)+(mm.opts?JSON.stringify(mm.opts(v)):'');if(/river|rice/.test(t))throw Error('Milo never mentions the river or rice water: '+k);});
 HARD.forEach(function(gg){gg.ops.forEach(function(o){if(/river war/.test(o.end||'')&&!o.old)throw Error('no river war in endings: '+o.id);});});
 if(!/one Musk/.test(muskPct(1e9)+' of one Musk')||muskPct(RICH_USD*USD_AED*0.001)!=='0.1%')throw Error('Musk units: '+muskPct(RICH_USD*USD_AED*0.001));
-var rl=routeLines(g);if(!rl.some(function(t){return /utilities reached/.test(t);})||!rl.some(function(t){return /membrane was/.test(t);}))throw Error('the ending reports the routes: '+rl.join(' | '));
+var rl=routeLines(fb).concat(routeLines(g));if(!rl.some(function(t){return /water board reached/.test(t)&&/stopped paying/.test(t);})||!rl.some(function(t){return /membrane was/.test(t);}))throw Error('the ending names the people and what you stopped paying for: '+rl.join(' | '));var rl2=routeLines(lv);if(!rl2.some(function(t){return /12 countries signed/.test(t);}))throw Error('the ending counts the levy: '+rl2.join(' | '));
 `);
 
 check('Pass 168: leaving Earth opens with the hard part and enough science, ends Earth, points buy the ship',`
