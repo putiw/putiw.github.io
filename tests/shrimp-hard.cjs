@@ -52,8 +52,18 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
    var st=document.querySelector('.hard-step'),rows=st.querySelectorAll('.item');return {gap:st.getBoundingClientRect().bottom-rows[rows.length-1].getBoundingClientRect().bottom,
     cut:[...document.querySelectorAll('.hg-k span')].filter(x=>x.scrollHeight>x.clientHeight+1||x.scrollWidth>x.clientWidth+1).map(x=>x.textContent)};},snaps[key]);
   if(r.gap>160||r.cut.length)throw Error(w+' px: gap under a one-option group '+Math.round(r.gap)+', cut legend names '+r.cut);ok(w+' px: gap under a one-option group '+Math.round(r.gap)+' px, legend names readable');await q.close();}
+ // Pass 250: the allocation panel keeps the card height, a slider move scrolls nothing, the Musk line is in the ledger ?, the key has "for now"
+ const al0=await p.evaluate(()=>{var c=document.getElementById('hard-card');window.scrollTo(0,c.getBoundingClientRect().top+scrollY-20);return {y:scrollY,h:c.offsetHeight,al:document.getElementById('hard-al').offsetHeight,n:document.querySelectorAll('#hard-al input[type=range]').length};});
+ await p.evaluate(()=>{var sl=document.querySelector('#hard-al input[data-al="build"]');sl.value=30;sl.dispatchEvent(new Event('input',{bubbles:true}));});await p.waitForTimeout(400);
+ const al1=await p.evaluate(()=>({y:scrollY,h:document.getElementById('hard-card').offsetHeight,al:document.getElementById('hard-al').offsetHeight,alloc:hardAllocOf(hardOf(G)).build,keep:document.querySelector('#hard-al .al-keep').textContent}));
+ if(al0.n!==4||al1.alloc!==.3||Math.abs(al1.y-al0.y)>1||al1.h!==al0.h||al1.al!==al0.al||!/Keep 70%/.test(al1.keep))throw Error('allocation panel '+JSON.stringify([al0,al1]));ok('four route sliders, a move keeps the card height and scrolls nothing, Keep 70%');
+ await p.evaluate(()=>{var sl=document.querySelector('#hard-al input[data-al="aid"]');sl.value=90;sl.dispatchEvent(new Event('input',{bubbles:true}));});await p.waitForTimeout(400);
+ const al2=await p.evaluate(()=>({aid:hardAllocOf(hardOf(G)).aid,v:document.querySelector('#hard-al input[data-al="aid"]').value,keep:document.querySelector('#hard-al .al-keep').textContent}));
+ if(al2.aid!==.7||al2.v!=='70'||!/Keep 0%/.test(al2.keep))throw Error('sum capped at 100%: '+JSON.stringify(al2));ok('the shares cap at 100%, the slider snaps back');
+ const led=await p.evaluate(()=>({t:document.querySelector('#hard-led .led-t').textContent,h:document.querySelector('#hard-led .qhelp').dataset.ht,key:document.getElementById('hg-key').textContent,slider:!!document.querySelector('#hard-led input')}));
+ if(!/richest person/.test(led.t)||!/0\.1% of that fortune/.test(led.h)||!/thousand lives/.test(led.h)||!/for now/.test(led.key)||led.slider)throw Error('ledger '+JSON.stringify(led));ok('the ledger reads in the richest person’s fortune, lives capped at what GiveWell can place, the key has "for now", the give slider lives in the panel');
  // after the win: grid and ledger stay, read-only
  const won=await p.evaluate(()=>{G.emp.won=Math.floor(G.day);render();return {hid:document.getElementById('hard-card').hidden,grid:document.getElementById('hg-cv').offsetHeight,dis:document.getElementById('hard-give').disabled,body:document.getElementById('hard-body').textContent.length,jar:document.getElementById('nour-jar').hidden};});
- if(won.hid||won.grid<100||!won.dis||won.body||!won.jar)throw Error('after the win '+JSON.stringify(won));ok('after the win the grid and a read-only ledger stay');
+ if(won.hid||won.grid<100||!won.dis||won.body||!won.jar)throw Error('after the win '+JSON.stringify(won));ok('after the win the grid, the panel and a read-only ledger stay');
  if(errs.length)throw Error('page errors: '+errs.join(' | '));ok('no page errors');
  await b.close();console.log(n+' hard part checks passed ('+key+')');})().catch(e=>{console.error(e);process.exit(1);});

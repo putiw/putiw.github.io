@@ -12,7 +12,7 @@ const W=390,H=844,TOL=1;
 // Disclosures open something below themselves on purpose (collapsible headers, show/hide toggles): their card may change height,
 // but the page must not scroll and the header must not change. One-off chapter starts change the card once; listed so they show.
 const DISCLOSE=/(^#\w[\w-]* div ")|data-act=(gt-check|earlier-equipment)|act=(gt-check|earlier-equipment)|^#tb-info|summary/;
-const ONEOFF={'rl-hire':'starting the lab turns the field pick into the lab','hard-goal':'picking the first goal opens the hard part','hard-keep':'keeping the goal opens the hard part','milestone-next':'closing a story card','sandbox':'Keep playing closes the win card','reset':'new game','fork':'answering a question card replaces it with what you picked'};
+const ONEOFF={'rl-hire':'starting the lab turns the field pick into the lab','hard-goal':'picking the first goal opens the hard part','hard-keep':'keeping the goal opens the hard part','hard-sel':'the first group tap opens its options under the grid (Pass 229: no empty slot before a pick; after a reload every tap is the first)','milestone-next':'closing a story card','sandbox':'Keep playing closes the win card','reset':'new game','fork':'answering a question card replaces it with what you picked'};
 const onlyStages=process.env.STABLE_STAGES?process.env.STABLE_STAGES.split(','):null;
 const onlyTabs=process.env.STABLE_TABS?process.env.STABLE_TABS.split(','):null;
 const MAX=+process.env.STABLE_MAX||200;
