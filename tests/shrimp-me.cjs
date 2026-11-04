@@ -388,4 +388,12 @@ var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;g.kits.sold=Math.max(1,g
 var at=p.wait.indexOf('gp_land'),inq=p.queue.indexOf('gp_land')>=0;if(!(at===0||inq))throw Error('gp_land first: '+p.wait.join(','));
 if(STORY_STILL(g,'nour2'))throw Error('no hard part, no Milo card');if(!STORY_STILL(g,'c_cash'))throw Error('a late card still holds before the win');g.emp.won=1;if(STORY_STILL(g,'c_cash'))throw Error('late cards skip after the win');
 `);
+check('Pass 256: late Tank 1 sickness moves by real time, a catch-up never crosses a stage, no crash without stage 4 held a minute',`
+var g=newGame();g.me.keep='self';g.ps=g.ps||{};g.ps.t=0;g.emp.healed=1;var T=g.tanks[0];T.had=1;T.vol=20;T.pop=[{age:100,n:4000,g:2}];T.chem.gh=7;startIll(g,T,'bact');T.ill.frac=0.3;T.ill.st=2;
+g.catchUp=1;for(var i=0;i<30;i++){g.day++;illDay(g,T,0);}g.catchUp=0;if(!T.ill||illStage(T)!==2)throw Error('catch-up stays at stage 2: '+illStage(T));
+for(i=0;i<30;i++){g.day++;illDay(g,T,0);}if(!T.ill||illStage(T)>2)throw Error('no real time, no new stage');
+g.ps.t+=120000;for(i=0;i<30;i++){g.day++;illDay(g,T,0);}if(!T.ill||illStage(T)!==3)throw Error('two minutes, one stage: '+illStage(T));
+g.ps.t+=120000;for(i=0;i<30;i++){g.day++;illDay(g,T,0);}if(!T.ill||illStage(T)!==4)throw Error('stage 4 after two more: '+(T.ill&&illStage(T)));if(T.crashed)throw Error('no crash before a minute at stage 4');
+g.ps.t+=60000;for(i=0;i<40&&T.ill;i++){g.day++;illDay(g,T,0);}if(!T.crashed&&T.ill)throw Error('stage 4 held a minute can crash');
+`);
 console.log(count+' free time, Grandma and ending checks passed');

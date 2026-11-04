@@ -1736,6 +1736,10 @@ var TREATS=[
 function illById(id){return ILLS.filter(function(x){return x.id===id;})[0];}
 // Illness spreads until treated: share of sick shrimp grows logistically (about 50 days from a few sick to a crash).
 // Sick adults lose color, deaths climb, breeding drops. A crash wipes the whole tank.
+// Pass 256 (Puti): from the farm on, Tank 1 sickness moves at most one stage per 2 real minutes whatever the clock, a crash needs stage 4 held a real minute, a catch-up never crosses a stage
+var ILL_STAGE_MS=120000,ILL_CRASH_MS=60000,ILL_BOUND=[0,0.15,0.5,0.85,1];
+function illSlow(G,T){return ownTank(G)&&T===G.tanks[0];}
+function illMs(G,T){var I=T.ill;if(I.stD==null){I.stD=td(G,T);I.stT=G.ps&&G.ps.t||0;}return tankClock(G)?(td(G,T)-I.stD)*2400:((G.ps&&G.ps.t||0)-I.stT);}
 var ILL_R=0.12,ILL_STAGES=['','A few sick','Spreading','Outbreak','About to crash'];
 function illFrac(T){return T&&T.ill?(T.ill.frac==null?0.05:T.ill.frac):0;}
 function illStage(T){var f=illFrac(T);return !T||!T.ill?0:f<0.15?1:f<0.5?2:f<0.85?3:4;}
@@ -1768,10 +1772,11 @@ function illDay(G,T,i){var c=T.chem,P=ppm(T),N=totalN(T);
   else{var first=!(G.emp.healed||0)&&!(G.stats.crashes||0);I.frac=Math.min(1,I.frac+ILL_R*(first?0.55:1)*I.frac*(1-I.frac)+0.002);
    // The first illness is a lesson, not a wipe-out: it tops out and passes after two months.
    if(first){I.frac=Math.min(I.frac,0.45);if(I.days>=60){log(G,'The sickness passed on its own. A health check would have saved more of them',T);T.ill=null;G.emp.healed=(G.emp.healed||0)+1;return;}}}
+  if(illSlow(G,T)){var cs=I.st||1;if(cs<4&&(G.catchUp||illMs(G,T)<ILL_STAGE_MS))I.frac=Math.min(I.frac,ILL_BOUND[cs]-0.001);}
   var f=I.frac,rate=0.003+0.03*f,die=0;
   T.pop.forEach(function(k){var d=k.n*rate;k.n-=d;die+=d;if(k.age>=20)k.g=Math.max(0,k.g-0.4*f);});G.stats.died+=die;T.dayDeaths+=die;T.cause.illness=(T.cause.illness||0)+die;
-  var st=illStage(T);if(st>(I.st||1)){I.st=st;if(st>=3)log(G,'Shrimp are dying fast',T);}
-  if(f>=0.95&&I.days>=40){T.pop=[];T.clutches=[];G.stats.died+=N;T.ill=null;T.fresh=null;T.crashed=(T.crashed||0)+1;G.stats.crashes=(G.stats.crashes||0)+1;log(G,T.name+' crashed, all '+Math.round(N)+' shrimp died. Restock from Trade',T);G.lastCrash={tank:T.name,n:Math.round(N),day:Math.floor(G.day)};var pq=ensureProgress(G);delete pq.seen.crash;}
+  var st=illStage(T);if(st>(I.st||1)){I.st=st;I.stD=td(G,T);I.stT=G.ps&&G.ps.t||0;if(st>=3)log(G,'Shrimp are dying fast',T);}else if(illSlow(G,T)&&st<(I.st||1)){I.st=st;I.stD=td(G,T);I.stT=G.ps&&G.ps.t||0;}
+  if(f>=0.95&&I.days>=40&&(!illSlow(G,T)||I.st===4&&!G.catchUp&&illMs(G,T)>=ILL_CRASH_MS)){T.pop=[];T.clutches=[];G.stats.died+=N;T.ill=null;T.fresh=null;T.crashed=(T.crashed||0)+1;G.stats.crashes=(G.stats.crashes||0)+1;log(G,T.name+' crashed, all '+Math.round(N)+' shrimp died. Restock from Trade',T);G.lastCrash={tank:T.name,n:Math.round(N),day:Math.floor(G.day)};var pq=ensureProgress(G);delete pq.seen.crash;}
   return;}
 }
 // Salt dip for new shrimp from Trade. bath: {ok, loss} from the salt bath minigame.
@@ -7600,7 +7605,7 @@ var TANK_DAY_MS=2400,TANK_CATCH=30;
 function ownHold(){return !!(TVLOCK||LAND.busy);}
 function ownClock(G,now){if(!G)return;if(!tankClock(G)||G.tAt==null||!(now>=G.tAt)||ownHold()){G.tAt=now;return;}
  var ms=Math.min(now-G.tAt,TANK_CATCH*TANK_DAY_MS);G.tAt=now;if(G.tday==null){G.tday=G.day;G.tstep=G.step||0;}G.tq=(G.tq||0)+ms/(TANK_DAY_MS/4);
- var k=0;while(G.tq>=1&&k++<TANK_CATCH*4+8){G.tq-=1;ownStep(G);}}
+ var k=0;G.catchUp=ms>TANK_DAY_MS*1.5;try{while(G.tq>=1&&k++<TANK_CATCH*4+8){G.tq-=1;ownStep(G);}}finally{G.catchUp=0;}}/* Pass 256: catch-up never crosses an illness stage */
 function applyPace(){var on=tankPace();document.querySelectorAll('#speed button').forEach(function(b){var off=on&&+b.dataset.speed>1;b.classList.toggle('pace',off);if(off){b.title=PACE_T;b.setAttribute('aria-disabled','true');}else if(b.classList.contains('pace')||b.title===PACE_T){b.removeAttribute('title');b.removeAttribute('aria-disabled');}});
  if(on&&speed>1){SPEED_WANT=speed;setSpeed(1);}else if(!on&&SPEED_WANT!=null){var w=SPEED_WANT;SPEED_WANT=null;if(speed===1)setSpeed(w);}}
 function setSpeed(v){
