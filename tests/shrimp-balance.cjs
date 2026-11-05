@@ -470,7 +470,7 @@ var h=readyGame();h.money=1e6;h.kits.sold=9999;if(treesOpen(h)||coinPlant(h,COIN
 var C=coinOf(h);C.trees=1000;for(var d=0;d<100;d++){h.day++;coinDay(h);}if(C.otrees<150||C.otrees>300||C.coins)throw Error('People copy what they see, about 0.2% a day, no coins before shrimpcoin: '+C.otrees);
 var o0=C.otrees;treesFromGala(h,4e6);if(C.otrees-o0!==1e6)throw Error('A mangrove gala pays for seedlings');
 `);
-if(!html.includes("$('legacy-equipment').hidden=hasFarm&&G.tanks.every(function(t){return t.feeder&&t.autoWC;})")||!html.includes("if(gc&&gc.closest('[hidden]:not(.panel)'))g=null;"))throw Error('Home gear stays until every tank runs itself, and the guide never points at a hidden card');
+if(!html.includes("lw2.hidden=hasFarm&&G.tanks.every(function(t){return t.feeder&&t.autoWC;})")||!html.includes("if(gc&&gc.closest('[hidden]:not(.panel)'))g=null;"))throw Error('Home gear stays until every tank runs itself, and the guide never points at a hidden card');
 if(!html.includes('data-act="hc-cull"')||!html.includes("a==='hc-cull'")||!html.includes('function openCull(i)')||!html.includes("careBack(v,x,T,t);"))throw Error('Cull is a choice in Check shrimp, and the care jobs live in the tank');
 check('traits read the balance of choices: a ruthless and a kind run end up apart on several axes',`
 function prof(cold){var g=readyGame();g.money=1e12;g.emp.inf=1e7;g.humans=1e7;g.kits.sold=1e6;g.emp.staff.pack=5;g.emp.staff.lines=1;g.me.sent=5e5;var x=function(a,b){return cold?a:b;};
@@ -1129,6 +1129,20 @@ if(!kitsStopped(g))throw Error('kits are stopped with no stock and no output');E
 g.money=1e10;E.stores={auh:5};if(!closeStores(g,'auh',5)||storeN(g,'auh')!==0||storeClosed(g,'auh')!==5)throw Error('close all five');
 if(!buyStores(g,'auh',5)||storeN(g,'auh')!==5||storeClosed(g,'auh')!==0)throw Error('reopen all five in one tap, got '+storeN(g,'auh'));
 `);
+check('Pass 262 (Puti, 5 Nov): from the hard part the Company tab, and the shop density picker: fewer stores less rent and less trust, closing refunds nothing, online shop plus drones keeps a trust floor',`
+var g=readyGame();var E=g.emp;E.kitsOpened=1;g.kits.sold=1e9;E.regions=REGIONS.map(function(r){return r.id;});E.stores={};REGIONS.forEach(function(r){E.stores[r.id]=storeGoal(r.id);});g.money=1e15;
+if(densOf(g)!=='m5'||setDens(g,'m10'))throw Error('no density before the hard part');
+E.hard={open:1,goal:'home',picks:{},day:0};var t5=trust(g),r5=storeDayCost(g),m0=g.money;
+if(Math.abs(t5-1)>1e-9)throw Error('full stores, full trust');
+if(!setDens(g,'m10'))throw Error('pick every 10th mall');if(g.money!==m0)throw Error('closing refunds nothing and costs nothing');
+REGIONS.forEach(function(r){if(storeN(g,r.id)!==Math.ceil(MALLS[r.id]/10))throw Error('m10 count in '+r.id+': '+storeN(g,r.id));});
+var t10=trust(g),r10=storeDayCost(g);if(!(t10<t5&&r10<r5))throw Error('fewer stores, less rent and less trust');
+var prev=2;DENS.forEach(function(D){var x=densTrust(g,D.id);if(x>prev+1e-9)throw Error('trust falls with density: '+D.id);prev=x;});
+setDens(g,'web');if(storeCount(g)!==0)throw Error('online only closes every store');if(trust(g)>0.62)throw Error('no online shop, no floor: '+trust(g));
+g.webShop=1;E.proj.drones=1;if(Math.abs(trust(g)-WEB_FLOOR)>0.001&&trust(g)<WEB_FLOOR)throw Error('online shop and drones floor: '+trust(g));
+setDens(g,'m5');if(storeFillN(g)!==mallsTotal(g))throw Error('fill counts every missing store');var c=storeFillCost(g);if(!storeFill(g)||g.money!==m0-c||storeCount(g)!==mallsTotal(g))throw Error('one tap fills back to the density');
+`);
+if(!html.includes("TAB_NAME.emp=co?'Company':'Kits'")||!html.includes("lp=co?$('p-tank'):$('p-up')")||!html.includes('id="c-mkt"'))throw Error('Company tab, home tank cards on Tank, Marketing card');
 console.log(count+' focused balance and migration checks passed');
 check('Pass 261 (Puti, 5 Nov): research people cost fixed USD at any size, the first grant letters carry the ear tank, funding it opens the tank and fills the Can’t see square',`
 var g=newGame();g.money=1e12;g.kits.sold=5000;academyOpen=function(){return true;};
