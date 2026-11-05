@@ -95,5 +95,9 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
  // after the win: grid and ledger stay, read-only
  const won=await p.evaluate(()=>{G.emp.won=Math.floor(G.day);render();return {hid:document.getElementById('hard-card').hidden,grid:document.getElementById('hg-cv').offsetHeight,dis:document.getElementById('hard-give').disabled,body:document.getElementById('hard-body').textContent.length,jar:document.getElementById('nour-jar').hidden};});
  if(won.hid||won.grid<100||!won.dis||won.body||!won.jar)throw Error('after the win '+JSON.stringify(won));ok('after the win the grid, the panel and a read-only ledger stay');
+ // Pass 267 (item 26): every grey group option says why on its line, with the money you have, or the button says Frozen
+ const why=await p.evaluate(()=>{var out=[];var H=hardOf(G);G.emp.won=0;H.goalOk=1;HARD_RE=false;G.money=5e9;G.emp.frozen=0;STEP_HOLD=0;selectTab('world');var c=document.getElementById('hard-card');if(c.classList.contains('shut'))c.querySelector('.hd').click();HARD.forEach(function(g){HARD_SEL=g.id;render();document.querySelectorAll('#hard-body .hard-ops .item').forEach(function(r){var b=r.querySelector('button[data-act="hard-buy"]');if(!b||!b.disabled)return;var sub=(r.querySelector('p')||{}).textContent||'';out.push({g:g.id,t:r.querySelector('h3').textContent,sub:sub,btn:b.textContent});});});return out;});
+ const bad=why.filter(x=>!(/^Needs |^Another |^The war /.test(x.sub)||x.btn==='Frozen'));if(bad.length||!why.length)throw Error('grey options without a reason: '+JSON.stringify(bad)+' of '+why.length);ok(why.length+' grey options, each with a reason ('+[...new Set(why.map(x=>x.sub.replace(/[0-9.]+[kMBT]?/g,'N')))].join(' / ')+')');
+ await p.evaluate(()=>{G.money=1e14;render();});
  if(errs.length)throw Error('page errors: '+errs.join(' | '));ok('no page errors');
  await b.close();console.log(n+' hard part checks passed ('+key+')');})().catch(e=>{console.error(e);process.exit(1);});
