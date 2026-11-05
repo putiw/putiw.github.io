@@ -1173,19 +1173,19 @@ h.emp.op.m=0.5;h.emp.movie.n=3;if(!(mediaReach(h)>r0*3.5))throw Error('films car
 h.stores={};if(marketingLevel(h)>STORE_MKT_MAX+50)throw Error('store cap');
 var f=readyGame();f.money=1e9;f.emp.proj.ministry=1;f.emp.proj.studio=1;f.emp.inf=1e9;if(!greenlight(f,0)||f.emp.movie.left!==365)throw Error('a film takes a year');
 `);
-check('Pass 264/269: shrimp video games: no credits, only while Make games is picked, Puti titles, sequels, ramps, caps, the 1B switch, the ledger, Grandma, Khalas',`
-function me(g){g.me.on=1;g.me.hrs=g.me.hrs||{};g.me.p2=['make'];return g;}
+check('Pass 264/269: shrimp video games: no credits, only while Video games is picked, Puti titles, sequels, ramps, caps, the 1B switch, the ledger, Grandma, Khalas',`
+function me(g){g.me.on=1;g.me.hrs=g.me.hrs||{};g.me.p2=['games'];return g;}
 var src=String(gamesDay)+String(gameStart)+String(gmOf)+String(gameKeep)+String(gameRelease);if(/credit/i.test(src))throw Error('no credits in the games code');
 if(typeof gameCredits!=='undefined'||typeof gameEarned!=='undefined')throw Error('credit functions gone');
 if(HOUR_STEPS.videos.map(function(x){return x[0];}).join()!=='100,400,1000')throw Error('video hour steps');
-if(!actById('make')||actById('make').k!=='grow')throw Error('Make games in Your day');
+if(actById('make')||!actById('games'))throw Error('one Video games option');
 // Puti's table
 if(GAMES.length!==13||GAMES[0].join('|').indexOf('Red Shrimp Redemption|action|One small shrimp in the wide wild word')!==0||GAME_GEN.length!==13)throw Error('table');
 // only while picked: no start, no days, no change while not picked
-var g=me(readyGame());g.me.p2=['tanks'];if(gameStart(g))throw Error('no start without Make games');g.me.p2=['make'];g.me.gm=null;delete g.me.gm;gmOf(g).dr.g='action';if(!gameStart(g))throw Error('start');var c=g.me.gm.cur;
+var g=me(readyGame());g.me.p2=['tanks'];if(gameStart(g))throw Error('no start without Video games');g.me.p2=['games'];g.me.gm=null;delete g.me.gm;gmOf(g).dr.g='action';if(!gameStart(g))throw Error('start');var c=g.me.gm.cur;
 if(c.t!=='Red Shrimp Redemption'||c.q!==0)throw Error('first action title '+c.t);if(gameStart(g))throw Error('one at a time');
 var d0=Math.floor(g.day);for(var i=1;i<=40;i++){g.day=d0+i;gamesDay(g);}var q40=c.q,w40=c.wd;g.me.p2=['tanks'];for(var i=41;i<=300;i++){g.day=d0+i;gamesDay(g);}
-if(c.q!==q40||c.wd!==w40||c.w)throw Error('paused while not picked');g.me.p2=['make'];
+if(c.q!==q40||c.wd!==w40||c.w)throw Error('paused while not picked');g.me.p2=['games'];
 var last=c.q;for(var i=301;i<=360;i++){g.day=d0+i;gamesDay(g);if(c.q-last>Math.ceil(c.qt/GAME_CHECK)+1)throw Error('start ramp jumps');last=c.q;}
 if(!c.w||c.q!==c.qt||c.qt<0||c.qt>50)throw Error('checkpoint after 100 days of making: '+c.wd+' '+c.q+' '+c.qt);
 for(var i=0;i<300;i++){g.day++;gamesDay(g);}if(!c.w||g.me.gm.cur!==c)throw Error('waits for the player');
@@ -1229,11 +1229,11 @@ if(!FIN_CATS.some(function(c){return c[0]==='games'&&c[2]===1;}))throw Error('Ga
 var L=me(readyGame());L.fin=[];for(var i=0;i<30;i++)L.fin.push({kits:1000});var on0=operatingNet(L),b0=gameBase(L);L.fin.forEach(function(r){r.games=500;});
 if(Math.abs(operatingNet(L)-on0-500)>1e-6)throw Error('operatingNet counts games');if(gameBase(L)!==b0)throw Error('the base does not');
 var m0=L.money;earn(L,123,'games');if(L.money-m0!==123||L.today.games!==123)throw Error('earn to Games');
-// Grandma's card: only at 500M, only if she never made a game; yes holds Make games 60 days, then the old plan; no changes nothing
+// Grandma's card: only at 500M, only if she never made a game; yes holds Video games 60 days, then the old plan; no changes nothing
 var y=me(readyGame());y.me.p2=['tanks','books'];y.kits.sold=4.9e8;if(milestoneConditions(y).gp_games)throw Error('not before 500M');y.kits.sold=5e8;if(!milestoneConditions(y).gp_games)throw Error('at 500M');
 var yy=JSON.parse(JSON.stringify(y));yy.me.gm={rel:[]};if(milestoneConditions(migrate(yy)).gp_games)throw Error('not after a game');
 var yn=migrate(JSON.parse(JSON.stringify(y)));if(!storyChoose(yn,'gp_games',1)||yn.me.vh||yn.me.p2.join()!=='tanks,books')throw Error('no changes nothing');
-if(!storyChoose(y,'gp_games',0)||!gameMaking(y)||!gameHolding(y))throw Error('yes holds Make games');if(setPick(y,'make'))throw Error('held');setPick(y,'exercise');if(!gameMaking(y))throw Error('a new pick keeps it');
+if(!storyChoose(y,'gp_games',0)||!gameMaking(y)||!gameHolding(y))throw Error('yes holds Video games');if(setPick(y,'games'))throw Error('held');setPick(y,'exercise');if(!gameMaking(y))throw Error('a new pick keeps it');
 var d1=Math.floor(y.day);for(var i=0;i<GAME_HOLD;i++){y.day=d1+i+1;y.me.ill=null;lifeDay(y);gamesDay(y);}if(gameHolding(y)||y.me.p2.join()!=='tanks,books')throw Error('old plan back: '+y.me.p2);
 `);
 check('Pass 266: salesWhy says why kit sales are what they are, one fixed phrase, never advice; the hard part at capacity reads as the market ending (item 19)',`

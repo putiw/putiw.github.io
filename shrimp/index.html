@@ -2691,7 +2691,7 @@ var ACTS=[
  {id:'cooking',name:'Cooking',ab:'Ck',col:'--c4',k:'rest',r:.35,d:'For you and whoever comes over. A bit healthier.'},
  {id:'books',name:'Books',ab:'Bk',col:'--c8',k:'rest',r:.4,d:'Takes strain off.'},
  {id:'tv',name:'TV',ab:'TV',col:'--c1',k:'rest',r:.25,d:'Takes a little strain off.'},
- {id:'games',sn:'Games',name:'Video games',ab:'G',col:'--c6',k:'rest',r:.35,d:'Takes strain off.'},
+ {id:'games',sn:'Games',name:'Video games',ab:'G',col:'--c6',k:'rest',r:.35,d:'Takes strain off, and you work on a game of your own.'},
  {id:'flat',name:'Lay flat',ab:'—',col:'--mid',k:'rest',d:'Nothing happens.'},
  {id:'shopping',name:'Shopping',ab:'Sh',col:'--c7',k:'rest',r:.4,d:'Takes strain off, costs a bit.'},
  {id:'mba',name:'Online MBA',ab:'MBA',col:'--c2',k:'grow',c:300,r:-.15,d:'Once done, staff and farm running costs are 3% lower.'},
@@ -2701,7 +2701,6 @@ var ACTS=[
  {id:'papers',sn:'Papers',name:'Read shrimp papers',ab:'P',col:'--c8',k:'grow',r:.2,d:'Real findings, one every few hundred hours. After 300 h your research finds come a bit sooner.'},
  {id:'design',sn:'Design',name:'Design tanks',ab:'D',col:'--c7',k:'grow',r:.2,d:'Your designs go into the kits.'},
  {id:'videos',sn:'Videos',name:'Shrimp videos',ab:'V',col:'--c6',k:'grow',r:.2,d:'Word of mouth grows a little.'},
- {id:'make',sn:'Make games',name:'Make games',ab:'Mg',col:'--c6',k:'grow',r:.2,d:'A shrimp game of your own, a bit every night.'},
  {id:'tanks',sn:'Your tanks',name:'Your own tanks',ab:'T',col:'--c3',k:'work',r:.3,d:'Hand care for your tanks.'},
  {id:'club',name:'Shrimp club',ab:'C',col:'--c9',k:'work',r:.3,d:'People who know people. ✦'},
  {id:'school',sn:'Mira’s school',name:'Mira’s school',ab:'S',col:'--c4',k:'work',r:.2,d:'You help her class with their tank.'},
@@ -2726,11 +2725,11 @@ function dayHours(G){var M=G.me,w=M.wh==null?8:M.wh;if(M.burnt>G.day)w=Math.min(
 function workCap(G){var M=G.me,C=M&&M.whCap;if(M&&M.burnt>G.day)return BURN_H;return C&&C.u>G.day?C.h:WORK_MAX;}// Pass 218: the doctor's year
 function setWork(G,n){var M=G.me;n=Math.round(n);if(!M||!M.on||!(n>=0&&n<=workCap(G)))return false;M.wh=n;M.day=layDay(dayHours(G));return true;}
 // Tapping a third thing drops the older pick. Tapping a picked one drops it, its hours go to rest.
-function setPick(G,id){var M=G.me;if(!M||!M.on||id==='work'||id==='sleep'||id==='nothing'||!actOk(G,id))return false;var p=dayPicks(G).slice(),i=p.indexOf(id);if(id==='make'&&gameHolding(G))return false;if(i>=0)p.splice(i,1);else{p.push(id);if(p.length>2)p.shift();if(gameHolding(G)&&p.indexOf('make')<0)p=[id,'make'];}M.p2=p;M.pickT=1;M.day=layDay(dayHours(G));return true;}
+function setPick(G,id){var M=G.me;if(!M||!M.on||id==='work'||id==='sleep'||id==='nothing'||!actOk(G,id))return false;var p=dayPicks(G).slice(),i=p.indexOf(id);if(id==='games'&&gameHolding(G))return false;if(i>=0)p.splice(i,1);else{p.push(id);if(p.length>2)p.shift();if(gameHolding(G)&&p.indexOf('games')<0)p=[id,'games'];}M.p2=p;M.pickT=1;M.day=layDay(dayHours(G));return true;}
 // Saves from the painted day: keep the work hours and the two biggest other things.
 function dayMigrate(M){if(M.p2)return;var c={};(M.day||[]).forEach(function(id){c[id]=(c[id]||0)+1;});M.wh=M.day?Math.min(WORK_MAX,c.work||0):8;var p=Object.keys(c).filter(function(id){return ['sleep','work','nothing','grandma'].indexOf(id)<0&&actById(id);}).sort(function(a,b){return c[b]-c[a];}).slice(0,2);M.p2=p.length?p:PICK_DEF.slice();}
 // Hours only count, not where they sit, so the day is laid out from the totals: wake at 7, sleep last.
-var DAY_ORDER=['exercise','hiking','tanks','work','dinners','mba','ai','videos','make','design','papers','club','school','house','fight','cookclass','hobby','cooking','friends','shopping','books','games','tv','flat','nothing'];
+var DAY_ORDER=['exercise','hiking','tanks','work','dinners','mba','ai','videos','design','papers','club','school','house','fight','cookclass','hobby','cooking','friends','shopping','books','games','tv','flat','nothing'];
 function layDay(h){var d=new Array(24),t=7;DAY_ORDER.forEach(function(id){for(var i=0;i<(h[id]||0);i++){d[t%24]=id;t++;}});for(var i=0;i<(h.sleep||0);i++){d[t%24]='sleep';t++;}for(var k=0;k<24;k++)if(!d[k])d[k]='nothing';return d;}
 function addHour(G,id,dir){var M=G.me;if(id!=='work'||!M)return false;return setWork(G,(M.wh==null?8:M.wh)+(dir>0?1:-1));}
 function sick(G){var M=G.me;return M&&M.ill&&M.ill.until>G.day?M.ill.kind:0;}
@@ -2765,7 +2764,7 @@ function hourNext(G,id){var st=HOUR_STEPS[id],M=G.me;if(!st)return null;var d=(M
 // Videos pay once the channel is big (Pass 154): from 400 h, a little a day, more with owners, under Overtime and side income.
 function videoDay(G){var M=G.me,h=M&&M.hrs&&M.hrs.videos||0;if(h<400||G.left)return;var a=Math.round(20*Math.pow(h/400,0.5)*Math.max(1,Math.pow(Math.max(1,G.humans)/1e4,0.5)));if(a>0)earn(G,a,'work');}
 // Pass 264: shrimp video games on the You page. Pass 269 (Chat 4 of claude/shrimp-handoff-30fixes-5nov.md): no credits. A game moves only while
-// Make games is in Your day; one game at a time, a decision every 100 days of making. Income is capped against the company's own operating income (gameBase).
+// Video games is in Your day; one game at a time, a decision every 100 days of making. Income is capped against the company's own operating income (gameBase).
 // GAMES is Puti's table (claude/shrimp-games.json), her words as written: [title, genre, blurb]. GAME_GEN comes from it; the best platform per genre is ours.
 var GAMES=[["Red Shrimp Redemption", "action", "One small shrimp in the wide wild word, you hunt, you travel, you fight, you do whatever it takes to survive."], ["World of Shrimpcraft", "online world", "Shrimps form groups with other shrimps to conquer dangerous dungeons and raids together for legendary claws and shells."], ["The Shrimp Alert", "horror", "The cherry shrimp and amano shrimp are in WARS. Build camp, train fighter shrimps, build defense, protect your shrimp tank at all cost!"], ["The Last of Shrimp", "story", "Parasite are coming for all of us.. the green hairy belly.. the thin white bugs.. they are everywhere!"], ["Tank Escape", "puzzle", "Collect clues and try to get back to the river where the grandma shrimp was from."], ["Universal Papershrimps", "idle / tycoon", "You start with one empty tank and try to breed shrimp and sell a shrimp tank to every single human on earth."], ["Shrimp One", "racing", "May the fastest shrimp wins."], ["ShrimPong", "sports", "Ping Pang, but with eight paddles and 4 balls."], ["ShrimpTank", "strategy", "Try to build the perfect self-sustaining shrimp tank that can last until end of universe."], ["This shrimp of mine", "survival", "Do whatever it takes to keep your one single pet shrimp alive during modern warfare in a destroyed city."], ["Super Smash Shrimps", "fighting", "The SSS, Super Smash Shrimps, you smash other shrimps or get smashed."], ["Shrimp Beat", "rhythm", "Playing guitar but with all 26 of your legs."], ["Lobster", "party game", "Find the lobster among the shrimps, every night, lobster eats one shrimp until there is no more shrimp."]];
 var GAME_BEST={"action": "console", "online world": "pc", "horror": "console", "story": "console", "puzzle": "phone", "idle / tycoon": "phone", "racing": "console", "sports": "console", "strategy": "pc", "survival": "pc", "fighting": "console", "rhythm": "phone", "party game": "console"};
@@ -2780,7 +2779,7 @@ var GAME_CHECK=100,GAME_K=0.012,GAME_HIT=3,GAME_FLOOR=200,GAME_CAP=.03,GAME_CAP2
 function gmOf(G){var M=G.me||(G.me=newMe());var g=M.gm||(M.gm={n:0,cur:null,rel:[],dr:{g:'puzzle',p:'phone',m:'paid',pr:40},fz:null,pay:0,v4:1});if(!g.rel)g.rel=[];if(!g.dr)g.dr={g:'puzzle',p:'phone',m:'paid',pr:40};
  if(!g.v4){g.v4=1;var now=Math.floor(G.day);if(GAME_GOLD[g.dr.g])g.dr.g=GAME_GOLD[g.dr.g];[g.cur].concat(g.rel).forEach(function(x){if(!x)return;var T=GAMES.filter(function(t){return t[0]===x.t;})[0];x.g=T?T[1]:GAME_GOLD[x.g]||x.g;if(!x.b)x.b=x.t;if(x.k==null)x.k=0;});
   var c=g.cur;if(c&&c.wd==null){c.q0=c.qt=c.q;c.wd=c.w?GAME_CHECK:clamp(GAME_CHECK-((c.next||now)-now),0,GAME_CHECK);}}return g;}
-function gameMaking(G){var M=G.me;return !!(M&&M.on&&!G.left&&!G.voyage&&dayPicks(G).indexOf('make')>=0);}
+function gameMaking(G){var M=G.me;return !!(M&&M.on&&!G.left&&!G.voyage&&dayPicks(G).indexOf('games')>=0);}
 function gameBlurb(b){var T=GAMES.filter(function(t){return t[0]===b;})[0];return T?T[2]:'';}
 function gameGen(id){return GAME_GEN.filter(function(x){return x[0]===id;})[0];}
 // The next title in a genre: a random unused original; with none left, a sequel of the best released game of that genre
@@ -2827,8 +2826,8 @@ function gamesDay(G){var M=G.me;if(!M||!M.on||G.left||G.voyage)return;var now=Ma
  if(!g.out&&!c&&g.rel.length>=GAME_GEN.length&&gameOut(G)){g.out=Math.max(1,now);var n0=nm(G);newsLine(G,(n0?n0+'’s game studio':'A shrimp game studio')+' is out of ideas and milking the past.');}
  if(!g.fz&&G.kits.sold>=GAME_AT3){var S=gameS(G,now),p0=gamePay(G,now);g.fz={u:S>0?p0/S:Math.max(gameBase(G),GAME_FLOOR),h:Math.max(1,G.humans),d:now};}
  var a=gamePay(G,now);g.pay=a;if(a>0)earn(G,a,'games');}
-// Grandma's card (gp_games): two months of Make games, then the old plan back.
-function gameHoldStart(G){var M=G.me,now=Math.floor(G.day),old=(M.p2||PICK_DEF).slice();M.vh={u:now+GAME_HOLD,p:old};var keep=old.filter(function(id){return id!=='make';});M.p2=keep.slice(-1).concat(['make']);M.day=layDay(dayHours(G));}
+// Grandma's card (gp_games): two months of Video games, then the old plan back.
+function gameHoldStart(G){var M=G.me,now=Math.floor(G.day),old=(M.p2||PICK_DEF).slice();M.vh={u:now+GAME_HOLD,p:old};var keep=old.filter(function(id){return id!=='games';});M.p2=keep.slice(-1).concat(['games']);M.day=layDay(dayHours(G));}
 function hoursDay(G){var M=G.me;M.hstep=M.hstep||{};videoDay(G);factDay(G);Object.keys(HOUR_STEPS).forEach(function(id){var st=HOUR_STEPS[id],h=(M.hrs&&M.hrs[id])||0;while((M.hstep[id]||0)<st.length&&h>=st[M.hstep[id]||0][0]){var x=st[M.hstep[id]||0];M.hstep[id]=(M.hstep[id]||0)+1;if(id==='videos'&&x[0]===400&&M.viral){continue;}if(x[2])x[2](G);dayLog(G,x[1]);var ch=HOUR_NOTE[id];if(ch==='news'||(id==='videos'&&x[0]>=400))newsLine(G,x[1]);else noteLine(G,ch||'day',x[1]);}});}
 var HOUR_NOTE={videos:'word',club:'day',exercise:'day',tanks:'day',school:'word',grandma:'grandma'};
 var DESIGN_STEPS=[[150,'Your tank layout goes into every kit. Kit survival +1 point.'],[500,'Your tank wins Tank of the Year at the national aquascaping show. AED 25,000 and a lot of new friends.'],[1200,'You win the world aquascaping championship with a shrimp tank. People who never cared about shrimp talk about it for a week.']];
@@ -3229,7 +3228,7 @@ function storyChoices(G,key){var m=MILESTONES[key];if(!m)return null;return m.op
 MILESTONES.me_intro={intro:1,title:'Your time',body:'The tank feeds itself and changes its own water now. For the first time in months you have time that isn’t the tank.\n\nHow you spend your day is under the little person at the top.',tab:'me'};
 MILESTONES.me_burnout={story:1,title:'Tired',body:'You fell asleep at your desk again. Grandma came by with soup and you didn’t hear the door. She left it on the step with a note, “Eat something{,name}.”',tab:'me',chf:function(G){return burnHard(G)?[['Rest','You can’t get out of bed this time. The company runs slower until you’re back.']]:[['Take time off','You sleep a lot. The company runs slower until you’re back.'],['Keep going','You eat the soup cold at midnight and answer emails. You get less done for a month, and your health takes a knock.']];},choices:[['Take time off','You sleep a lot. The company runs slower until you’re back.'],['Keep going','You eat the soup cold at midnight and answer emails. You get less done for a month, and your health takes a knock.']]};
 MILESTONES.gm_out={story:1,title:'Khalas',body:'Khalas. You have made enough games.',tab:'me'};
-MILESTONES.gp_games={story:1,title:'Grandma’s games',body:'Grandma wants to play video games with you.\n\nShe says the ones at the club have no shrimp in them.',tab:'me',choices:[['Make her one','Your day keeps three hours of making games for two months. Then it goes back to how it was.'],['No time','She plays the club ones.']]};
+MILESTONES.gp_games={story:1,title:'Grandma’s games',body:'Grandma wants to play video games with you.\n\nShe says the ones at the club have no shrimp in them.',tab:'me',choices:[['Play with her','Your day keeps three hours of video games for two months. Then it goes back to how it was.'],['No time','She plays the club ones.']]};
 MILESTONES.me_doctor={story:1,title:'The doctor',body:'Your check-up takes ten minutes. You sleep too little and you don’t move. “Sleep more and walk somewhere every day,” the doctor says.\n\nYou mention it to Grandma by accident. She calls every evening that week.',tab:'me'};
 MILESTONES.me_ill={story:1,title:'A year in bed',body:'A cough that wouldn’t go away, then a year in and out of hospital. The company runs without you, at half speed, and the bills take a big part of the cash.\n\nGrandma comes every day. She brings soup and tells the nurses about the shrimp.',tab:'me'};
 MILESTONES.crash={story:1,title:'The tank crashed',body:'',bodyFn:function(G){var c=G.lastCrash||{};return 'The illness ran its course in '+(c.tank||'your tank')+'. All '+(c.n||'the')+' shrimp died.\n\nThe water and the bacteria are still fine. Buy new shrimp in <b>Trade</b>, and next time tap the tank for a health check as soon as one looks pale or stops eating.';},tab:'tank'};
@@ -4604,7 +4603,7 @@ function trim(n,d){return String(+Number(n).toFixed(d));}
 (function(){var vv=window.visualViewport,fix=function(){var a=document.activeElement,typing=!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!/^(range|checkbox|radio|button)$/.test(a.type||''));document.body.classList.toggle('kbd',typing&&!!vv&&vv.height<window.innerHeight*0.8);var t=document.querySelector('.tabs');if(t&&t.style.transform)t.style.transform='';};if(vv){vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);}document.addEventListener('focusin',function(){setTimeout(fix,300);});document.addEventListener('focusout',function(){setTimeout(fix,50);setTimeout(fix,400);});})();
 // No browser feel: no pinch or double-tap zoom, no long-press menu outside text fields.
 (function(){var stop=function(e){e.preventDefault();};['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,stop,{passive:false});});document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea,[contenteditable]')))e.preventDefault();});})();
-var toastT=null,NF=null,BUILD='2026-11-06T02:40-p269a';
+var toastT=null,NF=null,BUILD='2026-11-06T02:10-p269b';
 function buildDate(){var m=BUILD.match(/^(\d{4})-(\d\d)-(\d\d)(?:T(\d\d:\d\d))?/);if(!m)return '';return 'Updated '+(+m[3])+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m[2]-1]+' '+m[1]+(m[4]?', '+m[4]+' UAE':'');}
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
