@@ -92,8 +92,8 @@ body.sheet-on .toast,body.on-home .toast{top:calc(env(safe-area-inset-top,0px) +
 /* the tank view (same look as the game) */
 .tv{position:relative;border-radius:11px;overflow:hidden;border:1px solid var(--line);background:var(--water);margin-bottom:8px;aspect-ratio:2.15/1;max-height:250px;width:100%;max-width:100%}/* Pass 258: the same frame as the company page (2.15/1), it was 1.75 and cut the sides */
 .tv canvas{display:block;width:100%;height:100%;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
-.tv-cap{position:absolute;left:8px;bottom:6px;font:500 11px var(--font-body);background:rgba(251,248,241,.88);color:var(--ink-2);padding:2px 8px;border-radius:999px;pointer-events:none;max-width:calc(100% - 16px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tv.locked{box-shadow:0 0 0 3px var(--accent)}.tv.locked canvas{touch-action:none}.tv.locked .tv-cap{display:none}
+.tv-cap{display:block;height:16px;line-height:16px;margin:-4px 2px 6px;font:500 11px var(--font-body);color:var(--ink-2);pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}/* Pass 268 (Puti, item 30): under the tank, not over the shrimp; a fixed line so a new caption moves nothing */
+.tv.locked{box-shadow:0 0 0 3px var(--accent)}.tv.locked canvas{touch-action:none}.tv.locked+.tv-cap{visibility:hidden}
 body.locked{overflow:hidden;overscroll-behavior:none}
 .lockdim{position:fixed;inset:0;z-index:40;background:var(--dim)}
 body.locked .lockzone{position:relative;z-index:41}

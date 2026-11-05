@@ -235,7 +235,7 @@ function netSpot(k){var b=netBox(),s=netRect().s,col=k%5,row=Math.floor(k/5)%3;r
 function inNet(p){var r=netRect();return p[0]>=r.x&&p[0]<=r.x+r.w&&p[1]>=r.y&&p[1]<=r.y+r.h;}
 function tvCap(t){var c=$('tv-cap');if(!c)return;c.textContent=t;TV.capUntil=performance.now()+2600;clearTimeout(TV.capT);TV.capT=setTimeout(capDefault,2650);}
 function capDefault(){var c=$('tv-cap'),T=S.tanks[S.sel];if(!c||!T||performance.now()<(TV.capUntil||0))return;var n=T.shrimp.length,shown=TV.T===T&&TV.look?Math.min(n,TV.ag.length+TV.fly.filter(function(f){return f.kind==='out';}).length):Math.min(n,SHOW_N);
-  c.textContent=T.name+' · '+(n>SHOW_N?shown+' of '+n+' out':n?plural(n,'shrimp','shrimp'):'empty')+(n?(!S.seen.netted?' · tap one to net it':!S.seen.tapShrimp?' · hold one to look closer':''):'');}
+  c.textContent=T.name+' · '+(n?plural(n,'shrimp','shrimp'):'empty')/* Pass 268 (Puti 6 Nov, item 30): no "27 of 42 out", that was only how many are drawn */+(n?(!S.seen.netted?' · tap one to net it':!S.seen.tapShrimp?' · hold one to look closer':''):'');}
 function agentAt(p){var base=tvBase(),best=null,bd=1e9;TV.ag.forEach(function(a){if(a.hidden)return;var L=base*a.sc,d=Math.hypot((p[0]-a.x)/(L*0.55),(p[1]-a.y)/(L*0.35));if(d<1.4&&d<bd){bd=d;best=a;}});return best;}
 function netAt(p){var N=netList(),best=-1,bd=1e9,r=tvBase()*netScale()*0.75;for(var k=N.length-1;k>=0;k--){var q=TV.netAg[N[k].ind.id];if(!q)continue;var d=Math.hypot(p[0]-q.x,(p[1]-q.y)*1.4);if(d<r&&d<bd){bd=d;best=k;}}return best;}
 function netCatch(a){var T=TV.T,i=a.ind;if(!T)return;
@@ -306,7 +306,7 @@ var tankMod={name:'tank',
  day:function(d){S.tanks.forEach(function(T){tankDay(T,d);});netDay();sickDay();if(activeTab==='tank'){tvSync();tankMod.renderSide();}var dot=$('tankdot');if(dot)dot.hidden=!(S.opt.toys==='need'&&anyNeeds());},
  show:function(){newLook();TV.capUntil=0;tankMod.render();tvStart();if(S.fromHome){S.fromHome=0;var tv=$('tv');if(tv){tv.classList.remove('fadein');void tv.offsetWidth;tv.classList.add('fadein');}}},
  hide:function(){tvStop();closeBubble();TV.hold=null;if(TOY)toyEnd();},
- render:function(){if(activeTab!=='tank')return;var el=$('p-tank');if(!el.querySelector('#tv-canvas')){el.innerHTML='<div class="tchips" id="tchips"></div><div class="lockzone" id="lockzone"><div class="tv" id="tv"><canvas id="tv-canvas"></canvas><span class="tv-cap" id="tv-cap"></span></div><div class="jobslot" id="jobslot"><div class="toys" id="toybtns"></div><p class="hint jobnone" id="jobnone" hidden>Nothing needs doing. The tank is fine for now.</p><div class="netbar" id="netbar" hidden></div><div class="lockbar" id="lockbar"></div></div><div id="toypanel"></div></div><div id="tankside"></div>';
+ render:function(){if(activeTab!=='tank')return;var el=$('p-tank');if(!el.querySelector('#tv-canvas')){el.innerHTML='<div class="tchips" id="tchips"></div><div class="lockzone" id="lockzone"><div class="tv" id="tv"><canvas id="tv-canvas"></canvas></div><span class="tv-cap" id="tv-cap"></span><div class="jobslot" id="jobslot"><div class="toys" id="toybtns"></div><p class="hint jobnone" id="jobnone" hidden>Nothing needs doing. The tank is fine for now.</p><div class="netbar" id="netbar" hidden></div><div class="lockbar" id="lockbar"></div></div><div id="toypanel"></div></div><div id="tankside"></div>';
    TV.cv=$('tv-canvas');TV.L={};bindTv();}
   if(!S.tanks[S.sel])S.sel=0;tvSize();tvSync(true);tankMod.renderSide();netBar();tvStart();},
  renderSide:function(){if(activeTab!=='tank'||!$('tankside'))return;var T=S.tanks[S.sel];
