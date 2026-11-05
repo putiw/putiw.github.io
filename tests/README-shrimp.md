@@ -2569,3 +2569,4 @@ Tests: balance 149 (new Pass 259 check; Pass 258 mailbox check needs 2 tree gaps
 - Spotlights already waited the gap (`spotNext` checks `introOK`); only the pause-button one (`now:1`) skips it. Urgent cards (`CARD_NOW`) still show at once, moment cards (`STORY_PROMPT`, the land call) still go first.
 - Still drops on purpose: narrative-only Mira and Grandma-net cards older than 60 days (`STORY_DROP`, Pass 190).
 Tests: balance 150 (new news-gap check, gap checks 10 to 35 s), me 53, academy 10, cardtap.
+- The lab parties are never missed (Puti): the first comes at day 90 and 500 shrimp whether Europe is open or not (before, opening Europe first skipped it for good); the second needs Europe, the You page and 180 days since the first. Both stay in `STORY_PROMPT` (first in line, never dropped). `shrimp-me` checks both.
