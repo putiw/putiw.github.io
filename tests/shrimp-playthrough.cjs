@@ -2,7 +2,7 @@ const fs=require('fs'),vm=require('vm'),path=require('path');
 const html=fs.readFileSync(process.env.SHRIMP_GAME_PATH||path.join(__dirname,'../shrimp/index.html'),'utf8');let seed=Number(process.env.REVIEW_SEED||7);const runSeed=seed;const math=Object.create(Math);math.random=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);
 const c=vm.createContext({console,Math:math});vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);
 vm.runInContext(require('./shrimp-bot-cards.cjs')(process.env.BOT_HEART==='kind'),c);
-vm.runInContext('var cache={},lastChips="",lastColSig="",lastChartKey="",lastAlerts="";function toast(){};function anyHad(){return G.tanks.some(t=>t.had||totalN(t)>=1);}'+html.split('function updateReveal(){')[1].split('function applyReveal(){')[0].replace(/^/, 'function updateReveal(){'),c);
+vm.runInContext('var document={addEventListener:function(){},querySelector:function(){return null;},getElementById:function(){return null;}};var cache={},lastChips="",lastColSig="",lastChartKey="",lastAlerts="";function toast(){};function anyHad(){return G.tanks.some(t=>t.had||totalN(t)>=1);}'+html.split('function updateReveal(){')[1].split('function applyReveal(){')[0].replace(/^/, 'function updateReveal(){'),c);
 vm.runInContext('var NOSTORES='+(process.env.NOSTORES==='1')+';',c);
 vm.runInContext(`
 var G=newGame(),events=[],snapshots={},last={};

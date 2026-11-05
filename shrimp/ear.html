@@ -389,6 +389,7 @@ function drain(){
   var k=0;while(evq.length&&k++<4){var e=evq.shift();(function(e){setTimeout(function(){if(A&&A.ctx.state==='running')playEv(e)},Math.random()*900)})(e)}
 }
 function sched(){ // every 100 ms
+  if(A)tankLevel(); /* Pass 258: the live tank comes back after Hear the tank or a ? sound (soloT ran out but nothing turned it back up) */
   if(PAUSED)return;
   if(!A||A.ctx.state!=='running'||!S||teachOn)return;
   var ctx=A.ctx,now=ctx.currentTime,look=now+0.25,R=SOUND.room;
@@ -477,7 +478,7 @@ var SOUNDS=[['drop','The filter','An air stone. It runs all the time, softer whe
 function helpHTML(){return SOUNDS.map(function(s){return '<button class="snd" data-k="'+s[0]+'"><b>'+s[1]+'</b><span>'+s[2]+'</span></button>'}).join('')}
 function wake(){var a=audio();if(!a)return null;if(a.ctx.state!=='running')a.ctx.resume();return a}
 function hear(k){if(!wake())return;if(k.indexOf('p:')===0)picPlay(k.slice(2));else demoKey(k)}
-function line(){if(!S)return;var n=S.shrimp.length;$('day').textContent='Day '+(Math.floor(S.day)+1)+', '+n+(n===1?' shrimp':' shrimp');$('again').hidden=n>0}
+function line(){if(!S)return;var n=S.shrimp.length;if(n===0){fresh();n=S.shrimp.length;speak('The tank crashed. The shop started it again, 5 shrimp in clean water.');} /* Pass 258: the shop restarts it */$('day').textContent='Day '+(Math.floor(S.day)+1)+', '+n+(n===1?' shrimp':' shrimp');$('again').hidden=n>0}
 function start(){
  if(!load())fresh();S.last=Date.now();lastReal=Date.now();line();
  $('help-list').innerHTML=helpHTML();

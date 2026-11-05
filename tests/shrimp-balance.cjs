@@ -802,11 +802,11 @@ var old=readyGame();old.emp.hard={open:1,goal:'home',picks:{},give:.5};if(hardAl
 // Pass 251: old saves with Build and Policy money become running proposals at the reach they had
 var o2=readyGame();o2.emp.hard={open:1,goal:'home',picks:{},alloc:{aid:0,sci:0,build:.3,pol:.2},bld:{water:{r:.2,pot:0},hot:{r:0,pot:0}},pol:{r:.1,given:5e6,y:1},day:0};var A2=hardAllocOf(o2.emp.hard),R2=propOf(o2.emp.hard);
 if(A2.build!=null||A2.pol!=null||o2.emp.hard.bld||o2.emp.hard.pol||!R2.run.board||Math.abs(R2.run.board.r-.2)>1e-9||R2.run.solar||!R2.run.law||R2.run.law.given!==5e6||Math.abs(propReach(o2,'water')-.2)>1e-9)throw Error('Build and Policy migrate into a water board and a tank law: '+JSON.stringify(R2.run));
-// proposals: arrive 60 to 180 days apart, at most 3 open, none from a group that is reached, the cross-cutting ones once there is something to pay
-var R=propOf(H),d;for(d=0;d<1500;d++){g.day=d;hardDay(g);}
+// proposals: arrive 10 to 50 days apart (Pass 258, letDay), at most 3 open, none from a group that is reached, the cross-cutting ones once there is something to pay
+var R=propOf(H),d;for(d=0;d<1500;d++){g.day=d;hardDay(g);letDay(g);}
 if(!(R.open.length===PROP_MAX))throw Error('three proposals open after four years with none answered: '+R.open.length);if(R.t.levy||R.t.school||R.t.talks)throw Error('the levy, the school and the talks wait for a running program');
-var gaps=[];var pr=readyGame();pr.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};pr.humans=4.1e9;pr.money=1e12;pr.fin=g.fin;var PR=propOf(hardOf(pr)),last=null;for(d=0;d<3000;d++){pr.day=d;hardDay(pr);if(PR.open.length){var id=PR.open[0].id;if(last!=null)gaps.push(d-last);last=d;propDecline(pr,id);}}
-if(gaps.length<8||Math.min.apply(null,gaps)<PROP_GAP[0]||Math.max.apply(null,gaps)>PROP_GAP[1]+1)throw Error('a new proposal every 60 to 180 days: '+gaps.join(','));
+var gaps=[];var pr=readyGame();pr.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};pr.humans=4.1e9;pr.money=1e12;pr.fin=g.fin;var PR=propOf(hardOf(pr)),last=null;for(d=0;d<3000;d++){pr.day=d;hardDay(pr);letDay(pr);if(PR.open.length){var id=PR.open[0].id;if(last!=null)gaps.push(d-last);last=d;propDecline(pr,id);}}
+if(gaps.length<8||Math.min.apply(null,gaps)<LET_GAP[0]||gaps.filter(function(x){return x>LET_GAP[1]+1;}).length>gaps.length*.25)/* longer only when nobody is left to write (declined ones come back 90 days to 3 years later) */throw Error('a new proposal every 10 to 50 days: '+gaps.join(','));
 if(!PR.no.board&&!PR.no.solar)throw Error('declined ones are noted');var ids=Object.keys(PR.t);if(ids.length<6)throw Error('different people write in: '+ids);
 // fund one: build paid once, the crews a share of income, reach grows at their pace, 60 to 90% of the planned reach, the group's 7% a year cap
 var fb=readyGame();fb.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};fb.humans=4.1e9;fb.money=1e12;fb.fin=g.fin;var FH=hardOf(fb),FR=propOf(FH);FR.open.push({id:'board',day:0,alt:0,grad:0});FR.t.board=1;
@@ -1089,11 +1089,21 @@ C.otrees=COIN_COAST*0.99;if(!(coastSlow(c)<0.001))throw Error('nearly full, othe
 var t=readyGame();t.me.keep='self';t.me.on=1;var T=t.tanks[0];T.had=1;T.cycledAt=0;for(var k=0;k<30;k++)T.pop.push({age:100,n:1,g:2});var K=careOf(T);K.mulm=0;K.vacD=t.day;careDay(t);if(K.mulm!==0)throw Error('no poop right after a vacuum');t.day+=CLEAN_HOLD+1;careDay(t);if(!(K.mulm>0))throw Error('poop again after the hold');
 T.glass=null;glassGrow(t,T);var g0=T.glass.reduce(function(a,b){return a+b;},0);T.wipeD=t.day;glassGrow(t,T);if(T.glass.reduce(function(a,b){return a+b;},0)!==g0)throw Error('no algae right after a wipe');
 `);
-check('Pass 257 (Puti): the tank you can hear is a blind-group research option that never fades, needs a find, and its care counts once a day',`
-var g=hardGroup('blind'),o=hardOp(g,'ear');if(!o||!o.req||o.life||o.floor)throw Error('ear option: needs req and no life/floor');
-var t=readyGame();t.academy.rl=t.academy.rl||{};if(o.req(t))throw Error('needs a find in automation and AI first');t.academy.rl.auto={found:1};if(!o.req(t))throw Error('a find opens it');
+check('Pass 257 (Puti): the tank you can hear is a blind-group research option that never fades, stays, and its care counts once a day',`
+var g=hardGroup('blind'),o=hardOp(g,'ear');if(!o||o.req||o.life||o.floor)throw Error('ear option (Pass 258): no req, no life/floor');if(hardOp(g,'touch'))throw Error('Pass 258: touch merged into ear');
+var t=readyGame();var m=JSON.parse(JSON.stringify(t));m.emp.hard=m.emp.hard||{picks:{}};m.emp.hard.picks=m.emp.hard.picks||{};m.emp.hard.picks.blind={touch:{day:3,start:5}};migrate(m);if(m.emp.hard.picks.blind.touch||!m.emp.hard.picks.blind.ear||m.emp.hard.picks.blind.ear.start!==5)throw Error('an old touch pick becomes the ear tank');
 var P={ear:{day:0,start:0},touch:{day:0,start:0}};if(hardFaded(t,o,P.ear,g))throw Error('never fades');t.day=99999;if(hardFaded(t,o,P.ear,g))throw Error('never fades, 270 years on');if(hardOpReach(t,o,P.ear,g)<o.f-1e-9)throw Error('keeps its reach');
 if(hardWorkLive(t,g,{ear:{day:t.day,start:t.day}}))throw Error('it does not block the group running workaround');
 var c0=t.stats.care||0;earCare(t);earCare(t);if((t.stats.care||0)-c0!==1)throw Error('care once a day');t.day+=1;earCare(t);if((t.stats.care||0)-c0!==2)throw Error('and again the next day');
+`);
+check('Pass 258 (Puti): one mailbox, at most 3 letters with the tree steps, tree letters 120+ days apart, two catch letters, aid says when it lands',`
+var g=readyGame();g.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};g.humans=4.1e9;g.money=1e12;g.emp.inf=1e12;g.emp.trees={rewild:1,lastmile:1,shop:1,lab:1};
+var tg=[],seen={},last=null,d,mx=0;for(d=0;d<4000;d++){g.day=d;hardDay(g);letDay(g);mx=Math.max(mx,letOpenN(g));if(letOpenN(g)>3)throw Error('more than 3 open: '+letOpenN(g));
+ if(d%7)continue;TREE_ORDER.forEach(function(k){var s=treeShow(g,k);if(k!=='island'&&s&&!seen[s.id]){seen[s.id]=1;if(last!=null)tg.push(d-last);last=d;treeDecline(g,s.id);}});
+ var R=propOf(g.emp.hard);R.open.slice().forEach(function(x){propDecline(g,x.id);});}
+if(tg.length<3||Math.min.apply(null,tg)<TLET_GAP[0])throw Error('tree letters too close or too few: '+tg.join(','));
+if(!propDef('orbit')||!propDef('chef')||!propDef('orbit').sink||!propDef('chef').sink)throw Error('catch letters');
+var c=readyGame();c.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};c.emp.trees={rewild:1};var s0=treeNext(c,'rewild');if(treeShow(c,'rewild'))throw Error('a tree step waits for its letter');c.emp.tlet={};c.emp.tlet[s0.id]=1;if(treeShow(c,'rewild')!==s0)throw Error('delivered, it shows');treeDecline(c,s0.id);if(c.emp.tlet[s0.id])throw Error('Not now needs a new letter');
+var h={gv:100,got:0,gq:[{a:100,due:400}]};c.day=35;if(!/nothing has arrived yet, the first batch lands in about 1[23] months/.test(aidArrTxt(c,h,fmtA)))throw Error('aid: '+aidArrTxt(c,h,fmtA));h.got=60;h.lost=40;if(!/^arrived /.test(aidArrTxt(c,h,fmtA)))throw Error('aid arrived');
 `);
 console.log(count+' focused balance and migration checks passed');
