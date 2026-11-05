@@ -1,3 +1,3 @@
 # Agent notes
 
-Working on the Universal Shrimp game (`shrimp/`, `tests/shrimp-*`)? Read `shrimp/AGENTS.md` first.
+Working on the Shrimp, Inc. game (`shrimp/`, `tests/shrimp-*`)? Read `shrimp/AGENTS.md` first.

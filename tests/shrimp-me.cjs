@@ -399,4 +399,13 @@ for(i=0;i<10;i++){g.day++;illDay(g,T,0);}if(!T.ill||illStage(T)>2)throw Error('n
 /* Pass 261: Tank 1 is on its own clock from the first farm, 2.4 s a tank day, so 50 days are two minutes */for(i=0;i<50;i++){g.day++;illDay(g,T,0);}if(!T.ill||illStage(T)!==4)throw Error('stage 4 after two more: '+(T.ill&&illStage(T)));if(T.crashed)throw Error('no crash before a minute at stage 4');
 for(i=0;i<40&&T.ill;i++){g.day++;illDay(g,T,0);}if(!T.crashed&&T.ill)throw Error('stage 4 held a minute can crash');
 `);
+check('Pass 267 (item 21): the Company tab set waits for the chapter card to be closed, old saves past the card count as introduced',`
+var g=newGame();g.money=1e12;g.humans=4e9;hardDay(g);if(!hardOpen(g))throw Error('open');detectMilestones(g);var p=g.progress;if(p.queue.indexOf('hardpart')<0&&p.wait.indexOf('hardpart')<0&&p.soon.indexOf('hardpart')<0)throw Error('card not queued');
+if(hardIntroDone(g))throw Error('introduced before the card');p.queue=['hardpart'];p.wait=[];p.soon=[];var k=acknowledgeMilestone(g);if(k!=='hardpart'||!hardIntroDone(g)||!g.emp.hard.intro)throw Error('introduced after the card');
+var h=newGame();h.money=1e12;h.humans=4e9;hardDay(h);h.progress.seen.hardpart=true;if(!hardIntroDone(h)||!h.emp.hard.intro)throw Error('old save past the card');
+`);
+check('Pass 267 (item 25): the ear tank intro card comes once the tank is ready, from the grant or the hard-part option after its ramp, a moment card with one Try option',`
+var g=newGame();g.money=1e12;g.humans=4e9;hardDay(g);if(milestoneConditions(g).ear_ready)throw Error('too early');var H=hardOf(g);H.picks.blind={ear:{start:Math.floor(g.day)}};if(milestoneConditions(g).ear_ready)throw Error('before the ramp');g.day+=365;if(!milestoneConditions(g).ear_ready)throw Error('after the ramp');
+var h=newGame();h.academy={gr:{ear:1}};if(!milestoneConditions(h).ear_ready)throw Error('from the grant');if(STORY_PROMPT.indexOf('ear_ready')<0)throw Error('a moment card');var ch=storyChoices(g,'ear_ready');if(!ch||ch.length!==1||ch[0][0]!=='Try')throw Error('one Try option');if(!storyChoose(g,'ear_ready',0))throw Error('Try picks');
+`);
 console.log(count+' free time, Grandma and ending checks passed');
