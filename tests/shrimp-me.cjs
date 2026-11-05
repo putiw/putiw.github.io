@@ -249,7 +249,7 @@ storyChoose(g,'ev_ai',0);if(g.money!==8e7||g.emp.aiCut!==0.02)throw Error('Paid 
 `);
 check('research lines: many people in many fields at once, finds are luck',`
 var g=newGame();g.kits.sold=ACADEMY_AT;g.money=1e8;grOf(g).ctr={energy:1,water:1,auto:1};['energy','water','auto'].forEach(function(id){rlHire(g,id,'phd');rlHire(g,id,'pi');});if(rlines(g).water.pi!==1||rlines(g).energy.phd!==1)throw Error('Hired in parallel');
-var y=rlYearAll(g);if(Math.abs(y-3*(40000+1500000)*USD)>1)throw Error('Yearly cost '+y);var m0=g.money;rlDay(g);if(Math.abs(m0-g.money-y/365)>1)throw Error('Paid daily');
+var y=rlYearAll(g);if(Math.abs(y-3*(30000+2000000/3)*USD)>1)throw Error('Yearly cost '+y);var m0=g.money;rlDay(g);if(Math.abs(m0-g.money-y/365)>1)throw Error('Paid daily');
 var f0=distributionCost(g);g.emp.farms.hatch=2;var u0=farmOverhead(g);var r=Math.random,sd=11;Math.random=function(){sd=(sd*16807)%2147483647;return sd/2147483647;};for(var d=0;d<4*365;d++)rlDay(g);Math.random=r;
 if(!(rlFound(g,'water')>=1&&rlFound(g,'energy')>=1))throw Error('Something found in four years '+rlFound(g,'water'));if(!(distributionCost(g)<f0)||!(farmOverhead(g)<u0))throw Error('Finds help');
 var h=newGame();h.kits.sold=ACADEMY_AT;h.money=10;grOf(h).ctr.genes=1;if(rlHire(h,'genes','pi'))throw Error('Needs cash');for(var i=0;i<20;i++){h.money=1e9;rlHire(h,'genes','phd');}if(rlines(h).genes.phd!==12)throw Error('Cap per field');
@@ -264,8 +264,8 @@ while(addHour(g,'work',1));var h=dayHours(g);if(h.work!==14||h.sleep!==7||h.noth
 if(!addHour(g,'work',-1)||dayHours(g).sleep!==5)throw Error('Minus');var n=0;g.me.day.forEach(function(x){n++;});if(n!==24)throw Error('24 hours');
 `);
 check('postdocs cost USD 50k, extra pay is not faster, papers come out steadily',`
-var g=newGame();g.money=1e9;g.kits.sold=5000;g.academy.level=1;grOf(g).ctr.genes=1;var o=null;academyOpen=function(){return true;};if(!rlHire(g,'genes','pd')||!rlHire(g,'genes','phd'))throw Error('Hire');if(Math.round(rlYear(g,'genes')/USD)!==90000)throw Error('Cost '+rlYear(g,'genes')/USD);
-var o1=rlOdds(g,'genes');setPdPay(g,2);if(Math.round(rlYear(g,'genes')/USD)!==115000)throw Error('Extra pay '+rlYear(g,'genes')/USD);if(rlOdds(g,'genes')!==o1)throw Error('Odds must not change');
+var g=newGame();g.money=1e9;g.kits.sold=5000;g.academy.level=1;grOf(g).ctr.genes=1;var o=null;academyOpen=function(){return true;};if(!rlHire(g,'genes','pd')||!rlHire(g,'genes','phd'))throw Error('Hire');if(Math.round(rlYear(g,'genes')/USD)!==80000)throw Error('Cost '+rlYear(g,'genes')/USD);
+var o1=rlOdds(g,'genes');setPdPay(g,2);if(Math.round(rlYear(g,'genes')/USD)!==105000)throw Error('Extra pay '+rlYear(g,'genes')/USD);if(rlOdds(g,'genes')!==o1)throw Error('Odds must not change');
 var r=Math.random;Math.random=function(){return 0.99;};for(var d=0;d<365*5;d++)rlDay(g);Math.random=r;var p=g.academy.rl.genes.papers;if(p<7||p>9)throw Error('Papers in 5 years '+p);
 `);
 check('one hand feeding covers two days, so the first weeks are not a clicking race',`
@@ -393,10 +393,10 @@ if(got==null||got>35000+250)throw Error('nour2 waited '+got+' ms, order '+order.
 `);
 check('Pass 256: late Tank 1 sickness moves by real time, a catch-up never crosses a stage, no crash without stage 4 held a minute',`
 var g=newGame();g.me.keep='self';g.ps=g.ps||{};g.ps.t=0;g.emp.healed=1;var T=g.tanks[0];T.had=1;T.vol=20;T.pop=[{age:100,n:4000,g:2}];T.chem.gh=7;startIll(g,T,'bact');T.ill.frac=0.3;T.ill.st=2;
-g.catchUp=1;for(var i=0;i<30;i++){g.day++;illDay(g,T,0);}g.catchUp=0;if(!T.ill||illStage(T)!==2)throw Error('catch-up stays at stage 2: '+illStage(T));
-for(i=0;i<30;i++){g.day++;illDay(g,T,0);}if(!T.ill||illStage(T)>2)throw Error('no real time, no new stage');
-g.ps.t+=120000;for(i=0;i<30;i++){g.day++;illDay(g,T,0);}if(!T.ill||illStage(T)!==3)throw Error('two minutes, one stage: '+illStage(T));
-g.ps.t+=120000;for(i=0;i<30;i++){g.day++;illDay(g,T,0);}if(!T.ill||illStage(T)!==4)throw Error('stage 4 after two more: '+(T.ill&&illStage(T)));if(T.crashed)throw Error('no crash before a minute at stage 4');
-g.ps.t+=60000;for(i=0;i<40&&T.ill;i++){g.day++;illDay(g,T,0);}if(!T.crashed&&T.ill)throw Error('stage 4 held a minute can crash');
+g.catchUp=1;for(var i=0;i<10;i++){g.day++;illDay(g,T,0);}g.catchUp=0;if(!T.ill||illStage(T)!==2)throw Error('catch-up stays at stage 2: '+illStage(T));
+for(i=0;i<10;i++){g.day++;illDay(g,T,0);}if(!T.ill||illStage(T)>2)throw Error('no real time, no new stage');
+/* Pass 261: Tank 1 is on its own clock from the first farm, 2.4 s a tank day, so 50 days are two minutes */for(i=0;i<50;i++){g.day++;illDay(g,T,0);}if(!T.ill||illStage(T)!==3)throw Error('two minutes, one stage: '+illStage(T));
+/* Pass 261: Tank 1 is on its own clock from the first farm, 2.4 s a tank day, so 50 days are two minutes */for(i=0;i<50;i++){g.day++;illDay(g,T,0);}if(!T.ill||illStage(T)!==4)throw Error('stage 4 after two more: '+(T.ill&&illStage(T)));if(T.crashed)throw Error('no crash before a minute at stage 4');
+for(i=0;i<40&&T.ill;i++){g.day++;illDay(g,T,0);}if(!T.crashed&&T.ill)throw Error('stage 4 held a minute can crash');
 `);
 console.log(count+' free time, Grandma and ending checks passed');

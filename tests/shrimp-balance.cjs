@@ -93,7 +93,7 @@ g.progress.queue=[];g.progress.sandbox=true;if(!stepGame(g))throw Error('Sandbox
 `);
 check('campaigns and films produce a persistent result',`
 var g=readyGame();g.money=1e8;g.emp.proj.ministry=1;g.emp.proj.studio=1;g.emp.inf=1e9;g.emp.op.offer=['calm'];if(!runCampaign(g,'calm'))throw Error('Campaign failed');
-if(!greenlight(g,0))throw Error('Film failed');for(var i=0;i<31;i++){g.day++;empireDay(g);}
+if(!greenlight(g,0))throw Error('Film failed');for(var i=0;i<366;i++){g.day++;empireDay(g);}
 if(!g.emp.op.recap||g.emp.op.recap.m<=0||!g.emp.filmRecap||g.emp.movie.n!==1)throw Error('Missing result');
 if(!g.emp.ripple.log.some(function(x){return x.tx&&/Shrimpfather/.test(x.tx);}))throw Error('Films get a Shrimp Times review');
 `);
@@ -353,7 +353,7 @@ g.kits.sold=Math.max(g.kits.sold,100);g.emp.later=[{d:Math.floor(g.day),t:'An al
 g.emp.proj.paperbuy=1;newsLine(g,'Something happened.');if(!/owner/.test(newsText(rip(g).log[rip(g).log.length-1])))throw Error('An owned paper flatters you');
 `);
 check('one public mood, honest and pushy campaigns, no Water or Fire left',`
-var g=readyGame();g.emp.proj.ministry=1;drawOffer(g);var o=g.emp.op.offer.map(id=>MSGS.find(m=>m.id===id));
+var g=readyGame();g.emp.proj.ministry=1;drawOffer(g);var o=g.emp.op.offer.map(id=>MSGS.find(m=>m.id===id)).filter(Boolean);
 if(!o.some(m=>(m.h||0)>=0)||!o.some(m=>(m.h||0)<0))throw Error('Offer mixes honest and pushy');
 if(g.emp.op.w||g.emp.op.f||typeof g.emp.op.m!=='number')throw Error('Single mood');
 var old=readyGame();old.emp.op={w:{s:0.5,i:0.6},f:{s:0.5,i:0.4},pend:[{w:.01,f:0,cv:0,left:3}],used:{},offer:null,n:0,run:null};old=migrate(JSON.parse(JSON.stringify(old)));if(Math.abs(old.emp.op.m-0.5)>1e-9||old.emp.op.pend.length)throw Error('Old two-faction saves migrate');
@@ -437,7 +437,7 @@ g.me=g.me||newMe();g.me.keep='self';var C=careOf(T),d;
 /* Pass 246 (Puti, 4 Nov): after a clean, poop is full in a random 4 to 10 min (100 to 250 tank days), glass 3 to 6 min (75 to 150), plants always 5 min (125) */
 var full=[];for(var r=0;r<40;r++){C.mulm=0;C.grow=0;careDay(g);for(d=1;d<400&&C.mulm<1;d++)careDay(g);full.push(d);}
 if(Math.min.apply(null,full)<99||Math.max.apply(null,full)>251||Math.max.apply(null,full)-Math.min.apply(null,full)<40)throw Error('Poop full in 100 to 250 tank days, random each clean: '+full);
-C.grow=0;for(d=0;d<125;d++)careDay(g);if(Math.abs(C.grow-1)>1e-6)throw Error('Plants full in exactly 125 tank days: '+C.grow);
+/* Pass 261 (Puti): every job holds a minute (CLEAN_HOLD) first, sponge and plants too */C.grow=1;g.tday=g.day=1000;careDay(g);C.grow=0;careDay(g);for(d=0;d<CLEAN_HOLD-3;d++){g.tday=++g.day;careDay(g);}if(C.grow>0.01)throw Error('Plants stay trimmed for a minute: '+C.grow);for(d=0;d<125+3;d++){g.tday=++g.day;careDay(g);}if(Math.abs(C.grow-1)>1e-6)throw Error('Plants full 125 tank days after the minute: '+C.grow);
 T.had=1;var gl=[];for(r=0;r<20;r++){T.glass=null;glassGrow(g,T);T.glass=T.glass.map(function(){return 0;});var gd=0;while(glassMean(T)<0.95&&gd<400){glassGrow(g,T);gd++;}gl.push(gd);}
 if(Math.min.apply(null,gl)<55||Math.max.apply(null,gl)>170)throw Error('Glass about full in 75 to 150 tank days: '+gl);
 T.pop=[];var m1=C.mulm=0.3;for(d=0;d<30;d++)careDay(g);if(C.mulm!==m1)throw Error('No new mulm in an empty tank, after a crash poop stops (Puti, 30 Oct)');
@@ -470,7 +470,7 @@ var h=readyGame();h.money=1e6;h.kits.sold=9999;if(treesOpen(h)||coinPlant(h,COIN
 var C=coinOf(h);C.trees=1000;for(var d=0;d<100;d++){h.day++;coinDay(h);}if(C.otrees<150||C.otrees>300||C.coins)throw Error('People copy what they see, about 0.2% a day, no coins before shrimpcoin: '+C.otrees);
 var o0=C.otrees;treesFromGala(h,4e6);if(C.otrees-o0!==1e6)throw Error('A mangrove gala pays for seedlings');
 `);
-if(!html.includes("$('legacy-equipment').hidden=hasFarm&&G.tanks.every(function(t){return t.feeder&&t.autoWC;})")||!html.includes("if(gc&&gc.closest('[hidden]:not(.panel)'))g=null;"))throw Error('Home gear stays until every tank runs itself, and the guide never points at a hidden card');
+if(!html.includes("lw2.hidden=hasFarm&&G.tanks.every(function(t){return t.feeder&&t.autoWC;})")||!html.includes("if(gc&&gc.closest('[hidden]:not(.panel)'))g=null;"))throw Error('Home gear stays until every tank runs itself, and the guide never points at a hidden card');
 if(!html.includes('data-act="hc-cull"')||!html.includes("a==='hc-cull'")||!html.includes('function openCull(i)')||!html.includes("careBack(v,x,T,t);"))throw Error('Cull is a choice in Check shrimp, and the care jobs live in the tank');
 check('traits read the balance of choices: a ruthless and a kind run end up apart on several axes',`
 function prof(cold){var g=readyGame();g.money=1e12;g.emp.inf=1e7;g.humans=1e7;g.kits.sold=1e6;g.emp.staff.pack=5;g.emp.staff.lines=1;g.me.sent=5e5;var x=function(a,b){return cold?a:b;};
@@ -710,7 +710,7 @@ const OWN_SETUP=`function ownGame(){var g=readyGame(),T=g.tanks[0];T.had=1;T.cyc
 function run(g,n,k){for(var i=0;i<n;i++){g.progress.queue=[];g.emp.ended=null;stepGame(g,k);}}`;
 check('Pass 161: tank clock, 40x elsewhere moves Tank 1 a day per 40, the land and old saves',OWN_SETUP+`
 var g=readyGame();delete g.tday;run(g,8);if(g.tday!==g.day)throw Error('Before the land the tank day is the company day');
-var f=ownGame();delete f.me.gplace;f.tday=f.day;var fd=f.day;run(f,4*40,1/40);if(f.tday-fd!==40)throw Error('Pass 163: with the farm but no land, Tank 1 moves with the company: '+(f.tday-fd));
+var f=ownGame();delete f.me.gplace;f.tday=f.day;var fd=f.day;run(f,4*40,1/40);if(f.tday-fd!==1)throw Error('Pass 261: with the farm but no land, Tank 1 moves by its own clock, not the company: '+(f.tday-fd));
 var h=ownGame();h.tday=h.day;var d0=h.day,t0=h.tday;run(h,4*40,1/40);if(h.day-d0!==40||Math.round(h.tday-t0)!==1)throw Error('At 40x the company moves 40 days, the tank one: '+(h.day-d0)+' '+(h.tday-t0));
 d0=h.day;t0=h.tday;run(h,4*3);if(h.day-d0!==3||h.tday-t0!==3)throw Error('On the land (real time) and at 1x both move together');
 var o=ownGame();o.day=900;delete o.tday;migrate(o);if(o.tday!==900)throw Error('Old saves start the tank clock at the company day');
@@ -759,7 +759,7 @@ var k=readyGame();k.stats.bornDay=1;k.day=40;k.kits.sold=1;k.tanks[0].pop=[{n:20
 var o=readyGame();o.stats.born=9;delete o.stats.bornDay;o.day=200;migrate(o);if(o.stats.bornDay!==200)throw Error('Old saves before kits get it a month from now');`);
 check('Pass 163: the land starts the tank clock and brings Two clocks',`
 if(CARD_NOW.indexOf('health')<0)throw Error('health card is urgent');
-var g=readyGame();g.me=g.me||newMe();g.me.keep='self';g.emp.farms.rack=1;if(tankClock(g))throw Error('farm alone does not split the clocks');
+var g=readyGame();g.me=g.me||newMe();g.me.keep='self';g.emp.farms.rack=1;if(!tankClock(g))throw Error('Pass 261: from the first farm Your tank is on its own clock');
 g.me.gplace={land:1};if(!tankClock(g)||!milestoneConditions(g).landtime)throw Error('land splits the clocks and brings Two clocks');`);
 [[/si=hcWait\?-1:/,'the sick guide waits for the health card'],[/var n=Math\.max\(1,Math\.min\(16,Math\.floor\(totalN\(T\)\)\)\)/,'health check shows the colony when under 16'],[/function tankPace\(\)\{return false;\}/,'the Tank tab does not slow the company']].forEach(function(r){if(!r[0].test(html))throw Error('Pass 163: '+r[1]);});
 if(/Tap the tank, then Check shrimp to find the sick ones/.test(html))throw Error('Pass 163: no extra Check shrimp spotlight after the health card');
@@ -1119,5 +1119,104 @@ if(tg.length<2||Math.min.apply(null,tg)<TLET_GAP[0])throw Error('tree letters to
 if(!propDef('orbit')||!propDef('chef')||!propDef('orbit').sink||!propDef('chef').sink)throw Error('catch letters');
 var c=readyGame();c.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};c.emp.trees={rewild:1};var s0=treeNext(c,'rewild');if(treeShow(c,'rewild'))throw Error('a tree step waits for its letter');c.emp.tlet={};c.emp.tlet[s0.id]=1;if(treeShow(c,'rewild')!==s0)throw Error('delivered, it shows');treeDecline(c,s0.id);if(c.emp.tlet[s0.id])throw Error('Not now needs a new letter');
 var h={gv:100,got:0,gq:[{a:100,due:400}]};c.day=35;if(!/nothing has arrived yet, the first batch lands in about 1[23] months/.test(aidArrTxt(c,h,fmtA)))throw Error('aid: '+aidArrTxt(c,h,fmtA));h.got=60;h.lost=40;if(!/^arrived /.test(aidArrTxt(c,h,fmtA)))throw Error('aid arrived');
+`);
+check('Pass 260 (Puti, 5 Nov): the feed restock bill is at most half the cash, the status line says the farms stopped, Close all and Reopen work in one tap each, the Shops card knows no kits are selling',`
+var g=readyGame();var E=g.emp;E.kitsOpened=1;E.farms={rack:3};g.kits.sold=30000;g.money=100;g.kits.stock=0;
+var r0=Math.random;Math.random=function(){return 0;};CARDS3.c_feed.ch[1][3](g);Math.random=r0;if(!E.nfeed||!E.nfeed.bad)throw Error('the gamble went bad');
+g.day+=15;var m0=g.money;laterDay(g);if(g.money<m0*0.5-1e-6)throw Error('the restock bill took more than half the cash: '+m0+' to '+g.money);
+E.nfeed={m:'r',s:g.day-20,bad:1};if(nfeedMul(g)!==0)throw Error('farms stopped');if(bnText(g).indexOf('not breeding on the new feed, 54 days left')<0)throw Error('status line: '+bnText(g));
+if(!kitsStopped(g))throw Error('kits are stopped with no stock and no output');E.nfeed=null;g.kits.stock=50;if(kitsStopped(g))throw Error('kits sell again');
+g.money=1e10;E.stores={auh:5};if(!closeStores(g,'auh',5)||storeN(g,'auh')!==0||storeClosed(g,'auh')!==5)throw Error('close all five');
+if(!buyStores(g,'auh',5)||storeN(g,'auh')!==5||storeClosed(g,'auh')!==0)throw Error('reopen all five in one tap, got '+storeN(g,'auh'));
+`);
+check('Pass 262 (Puti, 5 Nov): from the hard part the Company tab, and the shop density picker: fewer stores less rent and less trust, closing refunds nothing, online shop plus drones keeps a trust floor',`
+var g=readyGame();var E=g.emp;E.kitsOpened=1;g.kits.sold=1e9;E.regions=REGIONS.map(function(r){return r.id;});E.stores={};REGIONS.forEach(function(r){E.stores[r.id]=storeGoal(r.id);});g.money=1e15;
+if(densOf(g)!=='m5'||setDens(g,'m10'))throw Error('no density before the hard part');
+E.hard={open:1,goal:'home',picks:{},day:0};var t5=trust(g),r5=storeDayCost(g),m0=g.money;
+if(Math.abs(t5-1)>1e-9)throw Error('full stores, full trust');
+if(!setDens(g,'m10'))throw Error('pick every 10th mall');if(g.money!==m0)throw Error('closing refunds nothing and costs nothing');
+REGIONS.forEach(function(r){if(storeN(g,r.id)!==Math.ceil(MALLS[r.id]/10))throw Error('m10 count in '+r.id+': '+storeN(g,r.id));});
+var t10=trust(g),r10=storeDayCost(g);if(!(t10<t5&&r10<r5))throw Error('fewer stores, less rent and less trust');
+var prev=2;DENS.forEach(function(D){var x=densTrust(g,D.id);if(x>prev+1e-9)throw Error('trust falls with density: '+D.id);prev=x;});
+setDens(g,'web');if(storeCount(g)!==0)throw Error('online only closes every store');if(trust(g)>0.62)throw Error('no online shop, no floor: '+trust(g));
+g.webShop=1;E.proj.drones=1;if(Math.abs(trust(g)-WEB_FLOOR)>0.001&&trust(g)<WEB_FLOOR)throw Error('online shop and drones floor: '+trust(g));
+setDens(g,'m5');if(storeFillN(g)!==mallsTotal(g))throw Error('fill counts every missing store');var c=storeFillCost(g);if(!storeFill(g)||g.money!==m0-c||storeCount(g)!==mallsTotal(g))throw Error('one tap fills back to the density');
+`);
+if(!html.includes("TAB_NAME.emp=co?'Company':'Kits'")||!html.includes("lp=co?$('p-tank'):$('p-up')")||!html.includes('id="c-mkt"'))throw Error('Company tab, home tank cards on Tank, Marketing card');
+check('Pass 261 (Puti, 5 Nov): research people cost fixed USD at any size, the first grant letters carry the ear tank, funding it opens the tank and fills the Can’t see square',`
+var g=newGame();g.money=1e12;g.kits.sold=5000;academyOpen=function(){return true;};
+var by={};RPOS.forEach(function(p){by[p.id]=posAed(g,p)/USD;});
+if(Math.round(by.phd)!==30000||Math.round(by.pd)!==50000||Math.round(by.pi)!==666667)throw Error('PhD 2,500 a month, postdoc 50k, PI lab 2M over 3 years: '+JSON.stringify(by));
+g.day=5000;g.emp.farms.rack=1;var big=posAed(g,RPOS[0])/USD;if(big!==30000)throw Error('No share of income on top: '+big);
+grantDay(g);var gr=grOf(g);if(gr.c.length!==2||!gr.c.some(function(c){return c.ear;}))throw Error('The first letters hold the ear tank');
+if(earGrant(g)||hardReach(g,HARD.filter(function(x){return x.id==='blind';})[0])>=1)throw Error('Not before funding');
+var i=gr.c.findIndex(function(c){return c.ear;});if(!grPick(g,i,150)||!earGrant(g))throw Error('Funding it opens the ear tank');
+if(hardReach(g,HARD.filter(function(x){return x.id==='blind';})[0])!==1)throw Error('The Can’t see square is finished');
+g.day+=366;grantDay(g);if(grOf(g).c.some(function(c){return c.ear;}))throw Error('Offered once');
+var h=newGame();h.kits.sold=5000;grantDay(h);var gh=grOf(h);gh.c.forEach(function(c){c.x='s';});h.day+=366;grantDay(h);if(grOf(h).c.some(function(c){return c.ear;}))throw Error('Skipped once, it comes back in the hard part, not as a letter');
+`);
+check('Pass 263: one desk (messages, galas, ad pushes), mood sticks, media reach past a million, a film takes a year',`
+var g=readyGame();g.money=1e9;g.emp.proj.ministry=1;g.emp.inf=1e6;g.emp.infOn=1;g.emp.op.offer=null;drawOffer(g);var o=g.emp.op;
+if(o.offer.length!==3)throw Error('three offers');var ks=o.offer.map(function(id){return deskItem(id).k;});if(ks.filter(function(k){return k==='camp';}).length!==2||!ks.some(function(k){return k==='gala'||k==='push';}))throw Error('two messages and a gala or push: '+ks);
+o.offer=['calm','g_kids','p_bill'];var m0=g.money,i0=g.emp.inf;if(!deskRun(g,'p_bill'))throw Error('push runs');if(o.offer!==null||!o.run||o.run.left!==15)throw Error('the other two go');if(!(g.money<m0)||g.emp.inf!==i0)throw Error('a push costs money, not stars');
+if(deskRun(g,'calm'))throw Error('one slot');for(var i=0;i<15;i++){g.day++;empireDay(g);}if(o.run||!o.offer||o.offer.length!==3)throw Error('three new offers wait after it ends');
+var off=o.offer.slice();for(var i=0;i<30;i++){g.day++;empireDay(g);}if(JSON.stringify(off)!==JSON.stringify(o.offer)||o.run)throw Error('nothing is picked for you');
+o.offer=['calm','g_kids','p_bill'];var gl=g.emp.gala;if(!deskRun(g,'g_kids')||g.emp.gala!==gl+1||!(g.emp.galaFor.kids>0))throw Error('gala through the desk');
+if(buyProj(g,'gala','water'))throw Error('no gala outside the desk after the ministry');
+for(var i=0;i<10;i++){g.day++;empireDay(g);}o.offer=['calm','g_kids','p_bill'];g.emp.inf=1e8;var ip=campPrice(g);if(ip<1e7)throw Error('a message costs a tenth of the stars: '+ip);if(!deskRun(g,'calm')||g.emp.inf!==1e8-ip)throw Error('message costs stars');
+o.pend=[];o.m=0.8;for(var i=0;i<1000;i++)opinionDay(g);if(Math.abs(o.m-0.8)>1e-9)throw Error('a good mood sticks: '+o.m);o.m=0.2;for(var i=0;i<1000;i++)opinionDay(g);if(!(o.m>0.3&&o.m<0.5))throw Error('a bad mood slowly mends: '+o.m);
+var h=newGame();h.emp.op.m=0.5;h.humans=5e5;if(mediaReach(h)!==1)throw Error('no limit under a million');h.humans=1e9;var r0=mediaReach(h);if(!(r0>0.2&&r0<0.3))throw Error('no media at 1B: '+r0);h.emp.op.m=1;if(mediaReach(h)!==1)throw Error('full mood carries it: '+mediaReach(h));
+h.emp.op.m=0.5;h.emp.movie.n=3;if(!(mediaReach(h)>r0*3.5))throw Error('films carry it');h.emp.movie.n=0;h.emp.hard=h.emp.hard||{};h.emp.hard.open=1;if(mediaReach(h)!==1)throw Error('no limit in the hard part');
+h.stores={};if(marketingLevel(h)>STORE_MKT_MAX+50)throw Error('store cap');
+var f=readyGame();f.money=1e9;f.emp.proj.ministry=1;f.emp.proj.studio=1;f.emp.inf=1e9;if(!greenlight(f,0)||f.emp.movie.left!==365)throw Error('a film takes a year');
+`);
+check('Pass 264: shrimp video games, credits from video hours, Grandma’s card, quality, the 100-day wait, model and price, caps, the 1B switch, the ledger',`
+function me(g){g.me.on=1;g.me.hrs=g.me.hrs||{};return g;}
+// credits: one per 100 video hours, banked, derived from hours (an old save past 200 hours has two, no migration)
+var g=me(readyGame());g.me.hrs.videos=99;if(gameEarned(g)!==0||gameCredits(g)!==0)throw Error('none under 100');g.me.hrs.videos=100;if(gameCredits(g)!==1)throw Error('one at 100');
+var o=me(readyGame());o.me.hrs.videos=250;delete o.me.gm;o=migrate(JSON.parse(JSON.stringify(o)));if(gameCredits(o)!==2)throw Error('old save at 250 h has 2: '+gameCredits(o));
+if(!gameStart(o)||gameCredits(o)!==1)throw Error('start spends one');if(gameStart(o))throw Error('one game at a time');o.me.hrs.videos=420;if(gameCredits(o)!==3)throw Error('banked: '+gameCredits(o));
+if(GAME_TITLES.slice(0,4).join('|')!=='Red Shrimp Redemption|World of Shrimpcraft|The Shrimp Alert|The Last of Shrimp'||o.me.gm.cur.t!=='Red Shrimp Redemption')throw Error('Puti titles');
+// the old video effects stay
+if(HOUR_STEPS.videos.map(function(x){return x[0];}).join()!=='100,400,1000')throw Error('video hour steps');
+// quality: start 0-50, keep working +10..60% of the gap, at least 5, never over 100
+for(var s=0;s<200;s++){var q=me(readyGame());q.me.hrs.videos=100;gameStart(q);var c=q.me.gm.cur;if(c.q<0||c.q>50)throw Error('start q '+c.q);
+ for(var k=0;k<12;k++){c.w=1;var b=c.q;if(b>=100){if(gameKeep(q))throw Error('no keep at 100');break;}gameKeep(q);var d=c.q-b;if(c.q>100||d<Math.min(5,100-b)||d>Math.max(5,Math.ceil((100-b)*0.6)))throw Error('keep step '+b+' -> '+c.q);}}
+// the 100-day wait: it stops and waits however long, then continue or release
+var w=me(readyGame());w.me.hrs.videos=100;gameStart(w);var c=w.me.gm.cur,d0=c.d;
+for(var i=0;i<99;i++){w.day=d0+i+1;gamesDay(w);}if(c.w)throw Error('no stop before 100 days');w.day=d0+100;gamesDay(w);if(!c.w)throw Error('stops at 100');
+for(var i=0;i<500;i++){w.day++;gamesDay(w);}if(!c.w||w.me.gm.cur!==c)throw Error('waits for the player');if(gameRelease(readyGame()))throw Error('nothing to release');
+var qb=c.q;if(!gameKeep(w)||c.w||c.next!==Math.floor(w.day)+100||c.q<qb)throw Error('continue');if(gameRelease(w))throw Error('release only at a checkpoint');c.w=1;if(!gameRelease(w)||w.me.gm.cur||w.me.gm.rel.length!==1)throw Error('release');
+// price and model: each choice moves the score, the middle price beats both ends, ads on a console is weak, quality raises the odds of a hit
+var x={g:'puzzle',p:'phone',m:'paid',pr:40,q:70};var sc=function(o){return gameScore(Object.assign({},x,o));};
+if(!(sc({pr:40})>sc({pr:10})&&sc({pr:40})>sc({pr:100})))throw Error('paid price peak');if(!(sc({m:'sub',pr:15})>sc({m:'sub',pr:5})&&sc({m:'sub',pr:15})>sc({m:'sub',pr:30})))throw Error('sub price peak');
+if(!(sc({m:'ads',p:'console'})<sc({m:'ads',p:'phone'})*0.2))throw Error('ads on console');if(!(sc({g:'action',p:'console',m:'paid'})>sc({g:'puzzle',p:'console',m:'paid'})))throw Error('genre fit');
+if(!(sc({q:90})>sc({q:30})))throw Error('quality');if(!(sc({hit:1})===sc({})*GAME_HIT))throw Error('hit');if(!(gameHitP(100)>gameHitP(50)&&gameHitP(100)<1&&gameHitP(0)>0))throw Error('hit odds');
+var r={m:'paid',d:0,hit:0},rh={m:'paid',d:0,hit:1};if(!(gameFade(rh,300)>gameFade(r,300)&&gameFade(r,300)<1))throw Error('a hit fades slower');
+// caps on the whole portfolio: 3% under 500M, 5% from 500M, base without games, work or loans; zero base gives the floor
+var p=me(readyGame());p.fin=[];for(var i=0;i<30;i++)p.fin.push({kits:10000,games:5000,work:5000,loans:9e6});p.kits.sold=1e6;var b=gameBase(p);if(Math.abs(b-(10000-storeDayCost(p)-(shopCount(p)?(annualRent(p)+LICENSE)/365:0)))>1e-6)throw Error('base ignores games, work, loans: '+b);
+var gm=gmOf(p);for(var i=0;i<5;i++)gm.rel.push({t:'x',g:'puzzle',p:'phone',m:'sub',pr:15,q:100,hit:1,d:0,s0:0.05});p.day=0;
+if(Math.abs(gamePay(p,0)-0.03*b)>1e-6)throw Error('3% cap: '+gamePay(p,0));p.kits.sold=5e8;if(Math.abs(gamePay(p,0)-0.05*b)>1e-6)throw Error('5% cap');
+gm.rel=[{t:'x',g:'puzzle',p:'phone',m:'paid',pr:40,q:50,hit:0,d:0,s0:0.01}];if(Math.abs(gamePay(p,0)-0.01*b)>1e-6)throw Error('under the cap it earns its score');
+p.fin=[];for(var i=0;i<30;i++)p.fin.push({kits:0,staff:-50000});if(Math.abs(gamePay(p,0)-0.01*GAME_FLOOR)>1e-9)throw Error('loss: floor '+gamePay(p,0));
+// 1B switch keeps the rate, then soft ceiling at 10% of company income
+var z=me(readyGame());z.fin=[];for(var i=0;i<30;i++)z.fin.push({kits:1e6});z.kits.sold=9.9e8;z.humans=2e9;var zm=gmOf(z);for(var i=0;i<3;i++)zm.rel.push({t:'x',g:'puzzle',p:'phone',m:'sub',pr:15,q:90,hit:1,d:0,s0:0.03});z.day=0;
+gamesDay(z);var before=zm.pay;z.kits.sold=1e9;z.day=1;gamesDay(z);if(!zm.fz||Math.abs(zm.pay-before)>before*0.01)throw Error('no jump at 1B: '+before+' -> '+zm.pay);
+z.fin=[];for(var i=0;i<30;i++)z.fin.push({kits:2e6});var p1=gamePay(z,1);if(Math.abs(p1-zm.pay)>zm.pay*0.01)throw Error('after 1B not with company income: '+p1);
+for(var i=0;i<40;i++)zm.rel.push({t:'y',g:'puzzle',p:'phone',m:'sub',pr:15,q:100,hit:1,d:1,s0:0.05});var big=gamePay(z,1),C=GAME_SOFT*gameBase(z);if(!(big>zm.pay*1.5))throw Error('grows with releases');if(!(big<C*1.6))throw Error('soft ceiling: '+big+' vs '+C);
+// ledger: Games is its own income row, operatingNet and corporate tax count it, the base does not
+if(!FIN_CATS.some(function(c){return c[0]==='games'&&c[2]===1;}))throw Error('Games category');
+var L=me(readyGame());L.fin=[];for(var i=0;i<30;i++)L.fin.push({kits:1000});var on0=operatingNet(L),b0=gameBase(L);L.fin.forEach(function(r){r.games=500;});
+if(Math.abs(operatingNet(L)-on0-500)>1e-6)throw Error('operatingNet counts games');if(gameBase(L)!==b0)throw Error('the base does not');
+var m0=L.money;earn(L,123,'games');if(L.money-m0!==123||L.today.games!==123)throw Error('earn to Games');
+// Grandma's card: only at 500M, only with no credit, yes holds videos 60 days and gives the credit, then the old plan; no changes nothing; once
+var y=me(readyGame());y.me.p2=['tanks','books'];y.me.hrs={videos:20};y.kits.sold=4.9e8;if(milestoneConditions(y).gp_games)throw Error('not before 500M');y.kits.sold=5e8;if(!milestoneConditions(y).gp_games)throw Error('at 500M');
+var yy=JSON.parse(JSON.stringify(y));yy.me.hrs.videos=130;if(milestoneConditions(migrate(yy)).gp_games)throw Error('not with a credit');
+var pr=ensureProgress(y);pr.seen.gp_games=false;detectMilestones(y);var nq=['queue','soon','wait'].reduce(function(a,l){return a+(pr[l]||[]).filter(function(k){return k==='gp_games';}).length;},0);detectMilestones(y);
+var nq2=['queue','soon','wait'].reduce(function(a,l){return a+(pr[l]||[]).filter(function(k){return k==='gp_games';}).length;},0);if(nq!==1||nq2!==1||!pr.seen.gp_games)throw Error('queued once: '+nq+' '+nq2);
+var yn=JSON.parse(JSON.stringify(y));yn=migrate(yn);if(!storyChoose(yn,'gp_games',1)||yn.me.vh||yn.me.p2.join()!=='tanks,books')throw Error('no changes nothing');
+if(!storyChoose(y,'gp_games',0)||dayPicks(y).indexOf('videos')<0||!gameHolding(y))throw Error('yes holds videos');if(setPick(y,'videos'))throw Error('videos held');setPick(y,'exercise');if(dayPicks(y).indexOf('videos')<0)throw Error('a new pick keeps videos');
+var d1=Math.floor(y.day);for(var i=0;i<GAME_HOLD;i++){y.day=d1+i+1;y.me.ill=null;lifeDay(y);gamesDay(y);}if(gameEarned(y)<1)throw Error('60 days gives a credit: '+gameHrs(y));if(gameHolding(y)||y.me.p2.join()!=='tanks,books')throw Error('old plan back: '+y.me.p2);
+if(PICK_H*GAME_HOLD-20<GAME_HRS)throw Error('hold math');
 `);
 console.log(count+' focused balance and migration checks passed');

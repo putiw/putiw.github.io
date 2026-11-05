@@ -10,7 +10,7 @@
 //  - the open tab: gaps over 24 px between cards that hold nothing, anything overlapping #tankview;
 //  - one ? opened every ~10 s: the help must sit right under or right over its button (fail if more than 16 px away);
 //  - every card, note, news banner and spotlight shown, with the day. An intro or chapter card must not show before
-//    its condition (milestoneConditions) was ever true, and not more than 60 game days and 30 real seconds after;
+//    its condition (milestoneConditions) was ever true, and not more than 60 game days and 150 s of play after (Pass 265, the queue at the 10-35 s gap);
 //  - Puti's opening order: Ads not before 10 sales, kits not before tank 2's first baby, no speed hint on the speed
 //    you're already at.
 // Part 2: a text dump of everything shown (cards, ?, banners, toasts, button labels) with a state line, written to
@@ -33,7 +33,7 @@ const fails=[];const fail=(k,m)=>{fails.push(k+': '+m);};
  await p.addInitScript(r=>{try{localStorage.clear();localStorage.setItem('shrimp-music','0');}catch(e){}var raf=window.requestAnimationFrame.bind(window);window.requestAnimationFrame=function(cb){return raf(function(t){cb(t*r);});};},RATE);
  await p.goto(url);await p.waitForFunction(()=>window.G&&typeof render==='function');
  // install the player and the day hook
- await p.evaluate(src=>{window.BOTPROF=null;window.BOTKIND=true;window.NOSTORES=false;window.events=[];window.snapshots={};window.actions=[];window.visits=0;
+ await p.evaluate(src=>{window.BOTPROF=null;window.BOTKIND=true;window.NOSTORES=false;window.NOMEDIA=false;window.NEWBOT=true;window.MTR=false;window.events=[];window.snapshots={};window.actions=[];window.visits=0;
   window.note=function(){};window.last={};(0,eval)(src);
   window.H={days:{},cond:{},log:[],shown:{},tabs:{},real0:performance.now()};
   var _dr=dayRollover;window.dayRollover=function(g){var r=_dr.apply(this,arguments);if(g===G&&!H.stop){try{policy();}catch(e){H.err=String(e);}
@@ -59,7 +59,7 @@ const fails=[];const fail=(k,m)=>{fails.push(k+': '+m);};
   if(ui.card){await say('card '+ui.card.key,ui.card.text);
    const chk=await p.evaluate(k=>{if(H.shown[k])return null;var c=H.cond[k],now=performance.now();H.shown[k]={d:Math.floor(G.day),t:now};var cur=milestoneConditions(G)[k];return {c:c,cur:cur,d:Math.floor(G.day),t:now};},ui.card.key);
    if(chk&&ui.card.intro){if(!chk.c&&chk.cur===false)fail('card '+ui.card.key,'shown on day '+chk.d+' before its condition was ever true');
-    else if(chk.c&&chk.d-chk.c.d>60&&(chk.t-chk.c.t)*RATE/1000>30)fail('card '+ui.card.key,'shown '+(chk.d-chk.c.d)+' game days and '+Math.round((chk.t-chk.c.t)*RATE/1000)+' s of play after its cause (day '+chk.c.d+')');}
+    else if(chk.c&&chk.d-chk.c.d>60&&(chk.t-chk.c.t)*RATE/1000>150)/* Puti, 5 Nov: waiting behind 3 or 4 things at the 10-35 s gap is fine */fail('card '+ui.card.key,'shown '+(chk.d-chk.c.d)+' game days and '+Math.round((chk.t-chk.c.t)*RATE/1000)+' s of play after its cause (day '+chk.c.d+')');}
    const btn=await p.$('#milestone-card [data-act="story-choice"]:not([disabled])')||await p.$('#milestone-card [data-act="milestone-next"]:not([disabled])');
    await p.waitForTimeout(550);if(btn)await btn.click().catch(async e=>{fail('tap','the card button on '+ui.card.key+' is covered: '+String(e.message||e).split('\n').filter(l=>/intercepts/.test(l))[0]);await btn.evaluate(x=>x.click());});await p.waitForTimeout(300);}
   if(ui.ts){const tb=await p.$('#tsheet [data-act="ts-upg"]:not([disabled])')||await p.$('#tsheet [data-act="ts-close"]:not([disabled])')||await p.$('#tsheet [data-act="ts-later"]');if(tb)await tb.click().catch(()=>{});}
@@ -85,8 +85,8 @@ const fails=[];const fail=(k,m)=>{fails.push(k+': '+m);};
   if(look.sp>0&&look.pulseAt.some(s=>s<=look.sp))fail('order','speed hint pulses '+look.pulseAt.join(',')+'x while running at '+look.sp+'x, day '+look.day);
   for(const t of look.btns)await say('button',t);
   // one ? every ~10 s: it must open right by its button
-  if(Date.now()-lastQ>10000){lastQ=Date.now();const q=await p.evaluate(()=>{var qs=Array.from(document.querySelectorAll('section.panel:not([hidden]) .qhelp, header.top .qhelp')).filter(function(x){var r=x.getBoundingClientRect();return r.height>0&&r.top>90&&r.bottom<innerHeight-120;});if(!qs.length)return null;var x=qs[Math.floor(Math.random()*qs.length)];x.id=x.id||'hq'+Date.now();var rr=x.getBoundingClientRect();window.__qr={top:rr.top,bottom:rr.bottom};return '#'+x.id;});
-   if(q){await p.click(q).catch(()=>{});await p.waitForTimeout(350);const r=await p.evaluate(sel=>{var bt=document.querySelector(sel),hs=document.getElementById('helpsheet');if(!hs||hs.hidden)return null;var a=bt&&bt.getBoundingClientRect().height?bt.getBoundingClientRect():window.__qr,inn=hs.querySelector('.hs-in')||hs,h=inn.getBoundingClientRect();return {below:h.top-a.bottom,above:a.top-h.bottom,txt:inn.innerText,label:bt?bt.getAttribute('aria-label')||bt.textContent:sel,dbg:'btn '+Math.round(a.top)+'-'+Math.round(a.bottom)+', help '+Math.round(h.top)+'-'+Math.round(h.bottom)+', style top '+hs.style.top+' bottom '+hs.style.bottom};},q);
+  if(Date.now()-lastQ>10000){lastQ=Date.now();const q=await p.evaluate(()=>{var qs=Array.from(document.querySelectorAll('section.panel:not([hidden]) .qhelp, header.top .qhelp')).filter(function(x){var r=x.getBoundingClientRect();return r.height>0&&r.top>90&&r.bottom<innerHeight-120;});if(!qs.length)return null;var x=qs[Math.floor(Math.random()*qs.length)];x.id=x.id||'hq'+Date.now();var rr=x.getBoundingClientRect();window.__qr={top:rr.top,bottom:rr.bottom};window.__qk={h:x.dataset.help,l:x.getAttribute('aria-label')};return '#'+x.id;});
+   if(q){await p.click(q).catch(()=>{});await p.waitForTimeout(350);const r=await p.evaluate(sel=>{var bt=document.querySelector(sel),hs=document.getElementById('helpsheet');if(!bt&&window.__qk){/* a render rebuilt the ? and dropped our id: find it again as the game does (hsTrack) */var k=window.__qk;bt=k.h?document.querySelector('.qhelp[data-help="'+k.h+'"]'):null;bt=bt||Array.from(document.querySelectorAll('.qhelp')).filter(function(q){return k.l&&q.getAttribute('aria-label')===k.l;})[0]||null;}if(!hs||hs.hidden)return null;var a=bt&&bt.getBoundingClientRect().height?bt.getBoundingClientRect():window.__qr,inn=hs.querySelector('.hs-in')||hs,h=inn.getBoundingClientRect();return {below:h.top-a.bottom,above:a.top-h.bottom,txt:inn.innerText,label:bt?bt.getAttribute('aria-label')||bt.textContent:sel,dbg:'btn '+Math.round(a.top)+'-'+Math.round(a.bottom)+', help '+Math.round(h.top)+'-'+Math.round(h.bottom)+', style top '+hs.style.top+' bottom '+hs.style.bottom};},q);
     if(r){await say('? '+r.label,r.txt);const ok=(r.below>=-2&&r.below<=16)||(r.above>=-2&&r.above<=16);if(!ok)fail('help','? "'+r.label+'" opened '+Math.round(Math.min(Math.abs(r.below),Math.abs(r.above)))+' px from its button ('+r.dbg+')');}
     await p.click('#hs-x').catch(()=>{});}}
   if(ui.farm)break;

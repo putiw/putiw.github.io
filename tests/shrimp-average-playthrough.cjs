@@ -2,12 +2,13 @@
 // Default kit price; inexpensive starting shrimp; weekly early decisions and monthly business reviews, at most two
 // investments per visit; visible project choices; no perfect farm/cost optimizer.
 const fs=require('fs'),vm=require('vm'),path=require('path');
-const html=fs.readFileSync(path.join(__dirname,'../shrimp/index.html'),'utf8');
+const html=fs.readFileSync(process.env.SHRIMP_GAME_PATH||path.join(__dirname,'../shrimp/index.html'),'utf8');
 let seed=Number(process.env.REVIEW_SEED||7);const initialSeed=seed,M=Object.create(Math);M.random=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);
 const c=vm.createContext({Math:M,console});vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);
 vm.runInContext(require('./shrimp-bot-cards.cjs')(process.env.BOT_HEART!=='cold'),c);
 vm.runInContext('var document={addEventListener:function(){},querySelector:function(){return null;},getElementById:function(){return null;}};var cache={},lastChips="",lastColSig="",lastChartKey="",lastAlerts="";function toast(){};function big(n){return String(Math.round(n));};function anyHad(){return G.tanks.some(t=>t.had||totalN(t)>=1);}function updateReveal(){'+html.split('function updateReveal(){')[1].split('function applyReveal(){')[0],c);
 vm.runInContext(html.slice(html.indexOf('var PROJ_SHOW='),html.indexOf('var seenNew='))+html.slice(html.indexOf('function projectRank('),html.indexOf('var storySure=null;')),c);
+vm.runInContext('var MTR='+(process.env.MEDIA_TRACE==='1')+',NOMEDIA='+(process.env.NOMEDIA==='1')+';',c);
 vm.runInContext('var NOSTORES='+(process.env.NOSTORES==='1')+';',c);
 vm.runInContext(`
 var trace=[],G=newGame(),events=[],snapshots={},actions=[],seen={},minCash=G.money,waitingSeconds=0,visits=0;
@@ -53,8 +54,8 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,budget=2;function
    if(canSpend(pm(G,p))&&E.inf>=p.i)spend('project '+p.id,()=>buyProj(G,p.id));}
    // Choices: this player takes the kind answer when they can afford it (BOT_HEART=cold flips it).
    for(var fk in FORK_Q){if(forkDone(G,fk))continue;var opts=forkOpts(fk).filter(p=>p.req(G)).sort((a,b)=>(${process.env.BOT_HEART==='cold'}?a.h-b.h:b.h-a.h));if(BOTPROF)opts.sort((a,b)=>profFork(b)-profFork(a));var pk=opts[0];if(pk&&canSpend(pm(G,pk))&&E.inf>=pk.i)spend('choice '+pk.id,()=>buyProj(G,pk.id));}}
-   if(pd(G,'ministry')&&E.op.offer&&!E.op.run&&E.inf>campCost(E.op.n)*4){var cms=E.op.offer.map(function(id){return MSGS.find(function(m){return m.id===id;});}).filter(function(m){return !BOTKIND||(m.h||0)>=0;}).sort(function(a,b){return b.e-a.e;});if(cms[0])runCampaign(G,cms[0].id);}
- if(pd(G,'studio')&&!(E.movie.left>0)&&E.movie.n<MOVIES.length){var ct=CUTS[E.movie.n]||[];var ci=ct.length>1?(BOTKIND?((ct[1][1].h||0)>=(ct[0][1].h||0)?1:0):(ct[1][1].b>ct[0][1].b?1:0)):0;if(canSpend(movieBudget(E.movie.n)))greenlight(G,ci);}
+   if(!NOMEDIA&&pd(G,'ministry')&&E.op.offer&&!E.op.run){/* Pass 263: one desk, messages (✦), galas and ad pushes (money) */var dk=E.op.offer.filter(function(id){var d=deskItem(id);if(!d||!deskCan(G,id))return false;if(BOTKIND&&((d.m&&d.m.h)||0)<0)return false;if(d.k==='camp')return E.inf>campCost(E.op.n)*4;return canSpend(deskCost(G,id).money);}).map(function(id){var d=deskItem(id);return [id,d.k==='gala'?(E.inf<1000?99:(BOTKIND&&d.gk==='kids'?7:2)):d.m.e];}).sort(function(a,b){return b[1]-a[1];});if(dk[0])deskRun(G,dk[0][0]);}
+ if(!NOMEDIA&&pd(G,'studio')&&!(E.movie.left>0)&&E.movie.n<MOVIES.length){var ct=CUTS[E.movie.n]||[];var ci=ct.length>1?(BOTKIND?((ct[1][1].h||0)>=(ct[0][1].h||0)?1:0):(ct[1][1].b>ct[0][1].b?1:0)):0;if(canSpend(movieBudget(E.movie.n)))greenlight(G,ci);}
  if(academyOpen(G)&&G.academy.level){var RL=rlines(G);RLINES.forEach(function(l){if(!grOf(G).ctr[l.id])return;// Pass 206: fewer fields, so a centre gets a full team
   if(RL[l.id].pd<3&&canSpend(posAed(G,RPOS[1])*3))rlHire(G,l.id,'pd');if(RL[l.id].phd<4&&canSpend(posAed(G,RPOS[0])*6))rlHire(G,l.id,'phd');if(RL[l.id].pi<1&&canSpend(posAed(G,RPOS[2])*3))rlHire(G,l.id,'pi');});}
  if(coinOn(G)&&Math.floor(G.day)%90<30){var CC=coinOf(G);if(CC.price>coinBreakEven(G)*1.5&&canSpend(coinPlantCost(G)*30))coinPlant(G,coinPlantCost(G));if(CC.price>COIN_FAIR*1.3&&CC.treasury>0)coinSell(G,CC.treasury*0.25);else if(CC.price<COIN_FAIR*0.7&&canSpend(coinPlantCost(G)*3))coinBuy(G,coinPlantCost(G));}
@@ -69,7 +70,7 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,budget=2;function
   if(shopCount(G)&&!E.staff.mgr&&canSpend(5000))spend('hire manager',()=>hire(G,'mgr',1));
   if(G.kits.sold>=30&&!E.staff.sales&&!E.staff.aiSales&&canSpend(10000))spend('hire salesperson',()=>hire(G,'sales',1));
   if(pd(G,'drones')&&!E.staff.aiSales&&canSpend(3000))spend('AI sales',()=>goAI(G,'sales'));
-  if(E.inf<500&&G.money>galaCost(G)*20)spend('community gala',()=>buyProj(G,'gala'));
+  if(!NOMEDIA&&E.inf<500&&G.money>galaCost(G)*20)spend('community gala',()=>buyProj(G,'gala'));
  }
  if(academyOpen(G)){
   if(!A.level&&G.money>200000+capitalReserve(G))spend('first researcher',()=>rlStaff(G)?false:rlHire(G,'auto','pd'));
@@ -81,7 +82,8 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,budget=2;function
   }
  }
 }
-for(var day=0;day<8760;day++){
+function mtrace(){if(!MTR||Math.floor(G.day)%180!==0||G.mtl===Math.floor(G.day))return;G.mtl=Math.floor(G.day);var E=G.emp;console.log('MT',Math.floor(G.day),'own',Math.round(G.humans),'mood',Math.round(E.op.m*100),'wom',Math.round(wordOfMouth(G)*100),'ml',Math.round(marketingLevel(G)),'need',Math.round(mktNeed(G)),'med',typeof mediaK==='function'?mediaK(G).toFixed(2):'-','st',storeCount(G),'tr',Math.round(trust(G)*100),'film',E.movie.n,'camp',E.op.n,'gala',E.gala,'inf',Math.round(E.inf),'hard',hardOpen(G)?1:0);}
+for(var day=0;day<8760;day++){mtrace();
  care();if(G.day%(kitsOpen(G)?28:7)===0||G.day<35)visit();if(G.emp.won)break;
  waitingSeconds+=2.4/maxSpeed(G);for(var q=0;q<4;q++){while(G.progress.queue.length){note('milestone '+G.progress.queue[0]);acknowledgeMilestone(G);}if(G.me&&G.me.on&&!G.me.send&&G.money>2e5)G.me.send=1;if(G.me&&G.me.on&&!G.me.botDay){G.me.botDay=1;setPick(G,'papers');setPick(G,'club');}if(G.me&&G.me.on&&Math.floor(G.day)%20===0){gtCheck(G);gtOf(G).mail.slice().forEach(function(){gtCollect(G,0);});gtOf(G).q.slice().forEach(function(it){gtAnswer(G,it.key,0);});if(G.me.cur)momentAnswer(G,true);}if(G.emp.won)break;if(!stepGame(G))throw Error('Clock blocked at '+G.day);}
  minCash=Math.min(minCash,G.money);if(!Number.isFinite(G.money)||G.money<0)throw Error('Insolvent at '+G.day+' '+JSON.stringify(G.fin.slice(-3)));if(day%1000===0)console.log('progress',G.day,Math.round(G.money),Math.round(G.humans),farmCap(G),packCap(G));
