@@ -437,7 +437,7 @@ g.me=g.me||newMe();g.me.keep='self';var C=careOf(T),d;
 /* Pass 246 (Puti, 4 Nov): after a clean, poop is full in a random 4 to 10 min (100 to 250 tank days), glass 3 to 6 min (75 to 150), plants always 5 min (125) */
 var full=[];for(var r=0;r<40;r++){C.mulm=0;C.grow=0;careDay(g);for(d=1;d<400&&C.mulm<1;d++)careDay(g);full.push(d);}
 if(Math.min.apply(null,full)<99||Math.max.apply(null,full)>251||Math.max.apply(null,full)-Math.min.apply(null,full)<40)throw Error('Poop full in 100 to 250 tank days, random each clean: '+full);
-C.grow=0;for(d=0;d<125;d++)careDay(g);if(Math.abs(C.grow-1)>1e-6)throw Error('Plants full in exactly 125 tank days: '+C.grow);
+/* Pass 261 (Puti): every job holds a minute (CLEAN_HOLD) first, sponge and plants too */C.grow=1;g.tday=g.day=1000;careDay(g);C.grow=0;careDay(g);for(d=0;d<CLEAN_HOLD-3;d++){g.tday=++g.day;careDay(g);}if(C.grow>0.01)throw Error('Plants stay trimmed for a minute: '+C.grow);for(d=0;d<125+3;d++){g.tday=++g.day;careDay(g);}if(Math.abs(C.grow-1)>1e-6)throw Error('Plants full 125 tank days after the minute: '+C.grow);
 T.had=1;var gl=[];for(r=0;r<20;r++){T.glass=null;glassGrow(g,T);T.glass=T.glass.map(function(){return 0;});var gd=0;while(glassMean(T)<0.95&&gd<400){glassGrow(g,T);gd++;}gl.push(gd);}
 if(Math.min.apply(null,gl)<55||Math.max.apply(null,gl)>170)throw Error('Glass about full in 75 to 150 tank days: '+gl);
 T.pop=[];var m1=C.mulm=0.3;for(d=0;d<30;d++)careDay(g);if(C.mulm!==m1)throw Error('No new mulm in an empty tank, after a crash poop stops (Puti, 30 Oct)');
@@ -710,7 +710,7 @@ const OWN_SETUP=`function ownGame(){var g=readyGame(),T=g.tanks[0];T.had=1;T.cyc
 function run(g,n,k){for(var i=0;i<n;i++){g.progress.queue=[];g.emp.ended=null;stepGame(g,k);}}`;
 check('Pass 161: tank clock, 40x elsewhere moves Tank 1 a day per 40, the land and old saves',OWN_SETUP+`
 var g=readyGame();delete g.tday;run(g,8);if(g.tday!==g.day)throw Error('Before the land the tank day is the company day');
-var f=ownGame();delete f.me.gplace;f.tday=f.day;var fd=f.day;run(f,4*40,1/40);if(f.tday-fd!==40)throw Error('Pass 163: with the farm but no land, Tank 1 moves with the company: '+(f.tday-fd));
+var f=ownGame();delete f.me.gplace;f.tday=f.day;var fd=f.day;run(f,4*40,1/40);if(f.tday-fd!==1)throw Error('Pass 261: with the farm but no land, Tank 1 moves by its own clock, not the company: '+(f.tday-fd));
 var h=ownGame();h.tday=h.day;var d0=h.day,t0=h.tday;run(h,4*40,1/40);if(h.day-d0!==40||Math.round(h.tday-t0)!==1)throw Error('At 40x the company moves 40 days, the tank one: '+(h.day-d0)+' '+(h.tday-t0));
 d0=h.day;t0=h.tday;run(h,4*3);if(h.day-d0!==3||h.tday-t0!==3)throw Error('On the land (real time) and at 1x both move together');
 var o=ownGame();o.day=900;delete o.tday;migrate(o);if(o.tday!==900)throw Error('Old saves start the tank clock at the company day');
@@ -759,7 +759,7 @@ var k=readyGame();k.stats.bornDay=1;k.day=40;k.kits.sold=1;k.tanks[0].pop=[{n:20
 var o=readyGame();o.stats.born=9;delete o.stats.bornDay;o.day=200;migrate(o);if(o.stats.bornDay!==200)throw Error('Old saves before kits get it a month from now');`);
 check('Pass 163: the land starts the tank clock and brings Two clocks',`
 if(CARD_NOW.indexOf('health')<0)throw Error('health card is urgent');
-var g=readyGame();g.me=g.me||newMe();g.me.keep='self';g.emp.farms.rack=1;if(tankClock(g))throw Error('farm alone does not split the clocks');
+var g=readyGame();g.me=g.me||newMe();g.me.keep='self';g.emp.farms.rack=1;if(!tankClock(g))throw Error('Pass 261: from the first farm Your tank is on its own clock');
 g.me.gplace={land:1};if(!tankClock(g)||!milestoneConditions(g).landtime)throw Error('land splits the clocks and brings Two clocks');`);
 [[/si=hcWait\?-1:/,'the sick guide waits for the health card'],[/var n=Math\.max\(1,Math\.min\(16,Math\.floor\(totalN\(T\)\)\)\)/,'health check shows the colony when under 16'],[/function tankPace\(\)\{return false;\}/,'the Tank tab does not slow the company']].forEach(function(r){if(!r[0].test(html))throw Error('Pass 163: '+r[1]);});
 if(/Tap the tank, then Check shrimp to find the sick ones/.test(html))throw Error('Pass 163: no extra Check shrimp spotlight after the health card');
@@ -1130,3 +1130,15 @@ g.money=1e10;E.stores={auh:5};if(!closeStores(g,'auh',5)||storeN(g,'auh')!==0||s
 if(!buyStores(g,'auh',5)||storeN(g,'auh')!==5||storeClosed(g,'auh')!==0)throw Error('reopen all five in one tap, got '+storeN(g,'auh'));
 `);
 console.log(count+' focused balance and migration checks passed');
+check('Pass 261 (Puti, 5 Nov): research people cost fixed USD at any size, the first grant letters carry the ear tank, funding it opens the tank and fills the Can’t see square',`
+var g=newGame();g.money=1e12;g.kits.sold=5000;academyOpen=function(){return true;};
+var by={};RPOS.forEach(function(p){by[p.id]=posAed(g,p)/USD;});
+if(Math.round(by.phd)!==30000||Math.round(by.pd)!==50000||Math.round(by.pi)!==666667)throw Error('PhD 2,500 a month, postdoc 50k, PI lab 2M over 3 years: '+JSON.stringify(by));
+g.day=5000;g.emp.farms.rack=1;var big=posAed(g,RPOS[0])/USD;if(big!==30000)throw Error('No share of income on top: '+big);
+grantDay(g);var gr=grOf(g);if(gr.c.length!==2||!gr.c.some(function(c){return c.ear;}))throw Error('The first letters hold the ear tank');
+if(earGrant(g)||hardReach(g,HARD.filter(function(x){return x.id==='blind';})[0])>=1)throw Error('Not before funding');
+var i=gr.c.findIndex(function(c){return c.ear;});if(!grPick(g,i,150)||!earGrant(g))throw Error('Funding it opens the ear tank');
+if(hardReach(g,HARD.filter(function(x){return x.id==='blind';})[0])!==1)throw Error('The Can’t see square is finished');
+g.day+=366;grantDay(g);if(grOf(g).c.some(function(c){return c.ear;}))throw Error('Offered once');
+var h=newGame();h.kits.sold=5000;grantDay(h);var gh=grOf(h);gh.c.forEach(function(c){c.x='s';});h.day+=366;grantDay(h);if(grOf(h).c.some(function(c){return c.ear;}))throw Error('Skipped once, it comes back in the hard part, not as a letter');
+`);
