@@ -1120,4 +1120,13 @@ if(!propDef('orbit')||!propDef('chef')||!propDef('orbit').sink||!propDef('chef')
 var c=readyGame();c.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};c.emp.trees={rewild:1};var s0=treeNext(c,'rewild');if(treeShow(c,'rewild'))throw Error('a tree step waits for its letter');c.emp.tlet={};c.emp.tlet[s0.id]=1;if(treeShow(c,'rewild')!==s0)throw Error('delivered, it shows');treeDecline(c,s0.id);if(c.emp.tlet[s0.id])throw Error('Not now needs a new letter');
 var h={gv:100,got:0,gq:[{a:100,due:400}]};c.day=35;if(!/nothing has arrived yet, the first batch lands in about 1[23] months/.test(aidArrTxt(c,h,fmtA)))throw Error('aid: '+aidArrTxt(c,h,fmtA));h.got=60;h.lost=40;if(!/^arrived /.test(aidArrTxt(c,h,fmtA)))throw Error('aid arrived');
 `);
+check('Pass 260 (Puti, 5 Nov): the feed restock bill is at most half the cash, the status line says the farms stopped, Close all and Reopen work in one tap each, the Shops card knows no kits are selling',`
+var g=readyGame();var E=g.emp;E.kitsOpened=1;E.farms={rack:3};g.kits.sold=30000;g.money=100;g.kits.stock=0;
+var r0=Math.random;Math.random=function(){return 0;};CARDS3.c_feed.ch[1][3](g);Math.random=r0;if(!E.nfeed||!E.nfeed.bad)throw Error('the gamble went bad');
+g.day+=15;var m0=g.money;laterDay(g);if(g.money<m0*0.5-1e-6)throw Error('the restock bill took more than half the cash: '+m0+' to '+g.money);
+E.nfeed={m:'r',s:g.day-20,bad:1};if(nfeedMul(g)!==0)throw Error('farms stopped');if(bnText(g).indexOf('not breeding on the new feed, 54 days left')<0)throw Error('status line: '+bnText(g));
+if(!kitsStopped(g))throw Error('kits are stopped with no stock and no output');E.nfeed=null;g.kits.stock=50;if(kitsStopped(g))throw Error('kits sell again');
+g.money=1e10;E.stores={auh:5};if(!closeStores(g,'auh',5)||storeN(g,'auh')!==0||storeClosed(g,'auh')!==5)throw Error('close all five');
+if(!buyStores(g,'auh',5)||storeN(g,'auh')!==5||storeClosed(g,'auh')!==0)throw Error('reopen all five in one tap, got '+storeN(g,'auh'));
+`);
 console.log(count+' focused balance and migration checks passed');
