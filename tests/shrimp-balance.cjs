@@ -93,7 +93,7 @@ g.progress.queue=[];g.progress.sandbox=true;if(!stepGame(g))throw Error('Sandbox
 `);
 check('campaigns and films produce a persistent result',`
 var g=readyGame();g.money=1e8;g.emp.proj.ministry=1;g.emp.proj.studio=1;g.emp.inf=1e9;g.emp.op.offer=['calm'];if(!runCampaign(g,'calm'))throw Error('Campaign failed');
-if(!greenlight(g,0))throw Error('Film failed');for(var i=0;i<31;i++){g.day++;empireDay(g);}
+if(!greenlight(g,0))throw Error('Film failed');for(var i=0;i<366;i++){g.day++;empireDay(g);}
 if(!g.emp.op.recap||g.emp.op.recap.m<=0||!g.emp.filmRecap||g.emp.movie.n!==1)throw Error('Missing result');
 if(!g.emp.ripple.log.some(function(x){return x.tx&&/Shrimpfather/.test(x.tx);}))throw Error('Films get a Shrimp Times review');
 `);
@@ -353,7 +353,7 @@ g.kits.sold=Math.max(g.kits.sold,100);g.emp.later=[{d:Math.floor(g.day),t:'An al
 g.emp.proj.paperbuy=1;newsLine(g,'Something happened.');if(!/owner/.test(newsText(rip(g).log[rip(g).log.length-1])))throw Error('An owned paper flatters you');
 `);
 check('one public mood, honest and pushy campaigns, no Water or Fire left',`
-var g=readyGame();g.emp.proj.ministry=1;drawOffer(g);var o=g.emp.op.offer.map(id=>MSGS.find(m=>m.id===id));
+var g=readyGame();g.emp.proj.ministry=1;drawOffer(g);var o=g.emp.op.offer.map(id=>MSGS.find(m=>m.id===id)).filter(Boolean);
 if(!o.some(m=>(m.h||0)>=0)||!o.some(m=>(m.h||0)<0))throw Error('Offer mixes honest and pushy');
 if(g.emp.op.w||g.emp.op.f||typeof g.emp.op.m!=='number')throw Error('Single mood');
 var old=readyGame();old.emp.op={w:{s:0.5,i:0.6},f:{s:0.5,i:0.4},pend:[{w:.01,f:0,cv:0,left:3}],used:{},offer:null,n:0,run:null};old=migrate(JSON.parse(JSON.stringify(old)));if(Math.abs(old.emp.op.m-0.5)>1e-9||old.emp.op.pend.length)throw Error('Old two-faction saves migrate');
@@ -1143,7 +1143,6 @@ g.webShop=1;E.proj.drones=1;if(Math.abs(trust(g)-WEB_FLOOR)>0.001&&trust(g)<WEB_
 setDens(g,'m5');if(storeFillN(g)!==mallsTotal(g))throw Error('fill counts every missing store');var c=storeFillCost(g);if(!storeFill(g)||g.money!==m0-c||storeCount(g)!==mallsTotal(g))throw Error('one tap fills back to the density');
 `);
 if(!html.includes("TAB_NAME.emp=co?'Company':'Kits'")||!html.includes("lp=co?$('p-tank'):$('p-up')")||!html.includes('id="c-mkt"'))throw Error('Company tab, home tank cards on Tank, Marketing card');
-console.log(count+' focused balance and migration checks passed');
 check('Pass 261 (Puti, 5 Nov): research people cost fixed USD at any size, the first grant letters carry the ear tank, funding it opens the tank and fills the Can’t see square',`
 var g=newGame();g.money=1e12;g.kits.sold=5000;academyOpen=function(){return true;};
 var by={};RPOS.forEach(function(p){by[p.id]=posAed(g,p)/USD;});
@@ -1156,3 +1155,19 @@ if(hardReach(g,HARD.filter(function(x){return x.id==='blind';})[0])!==1)throw Er
 g.day+=366;grantDay(g);if(grOf(g).c.some(function(c){return c.ear;}))throw Error('Offered once');
 var h=newGame();h.kits.sold=5000;grantDay(h);var gh=grOf(h);gh.c.forEach(function(c){c.x='s';});h.day+=366;grantDay(h);if(grOf(h).c.some(function(c){return c.ear;}))throw Error('Skipped once, it comes back in the hard part, not as a letter');
 `);
+check('Pass 263: one desk (messages, galas, ad pushes), mood sticks, media reach past a million, a film takes a year',`
+var g=readyGame();g.money=1e9;g.emp.proj.ministry=1;g.emp.inf=1e6;g.emp.infOn=1;g.emp.op.offer=null;drawOffer(g);var o=g.emp.op;
+if(o.offer.length!==3)throw Error('three offers');var ks=o.offer.map(function(id){return deskItem(id).k;});if(ks.filter(function(k){return k==='camp';}).length!==2||!ks.some(function(k){return k==='gala'||k==='push';}))throw Error('two messages and a gala or push: '+ks);
+o.offer=['calm','g_kids','p_bill'];var m0=g.money,i0=g.emp.inf;if(!deskRun(g,'p_bill'))throw Error('push runs');if(o.offer!==null||!o.run||o.run.left!==15)throw Error('the other two go');if(!(g.money<m0)||g.emp.inf!==i0)throw Error('a push costs money, not stars');
+if(deskRun(g,'calm'))throw Error('one slot');for(var i=0;i<15;i++){g.day++;empireDay(g);}if(o.run||!o.offer||o.offer.length!==3)throw Error('three new offers wait after it ends');
+var off=o.offer.slice();for(var i=0;i<30;i++){g.day++;empireDay(g);}if(JSON.stringify(off)!==JSON.stringify(o.offer)||o.run)throw Error('nothing is picked for you');
+o.offer=['calm','g_kids','p_bill'];var gl=g.emp.gala;if(!deskRun(g,'g_kids')||g.emp.gala!==gl+1||!(g.emp.galaFor.kids>0))throw Error('gala through the desk');
+if(buyProj(g,'gala','water'))throw Error('no gala outside the desk after the ministry');
+for(var i=0;i<10;i++){g.day++;empireDay(g);}o.offer=['calm','g_kids','p_bill'];g.emp.inf=1e8;var ip=campPrice(g);if(ip<1e7)throw Error('a message costs a tenth of the stars: '+ip);if(!deskRun(g,'calm')||g.emp.inf!==1e8-ip)throw Error('message costs stars');
+o.pend=[];o.m=0.8;for(var i=0;i<1000;i++)opinionDay(g);if(Math.abs(o.m-0.8)>1e-9)throw Error('a good mood sticks: '+o.m);o.m=0.2;for(var i=0;i<1000;i++)opinionDay(g);if(!(o.m>0.3&&o.m<0.5))throw Error('a bad mood slowly mends: '+o.m);
+var h=newGame();h.emp.op.m=0.5;h.humans=5e5;if(mediaReach(h)!==1)throw Error('no limit under a million');h.humans=1e9;var r0=mediaReach(h);if(!(r0>0.2&&r0<0.3))throw Error('no media at 1B: '+r0);h.emp.op.m=1;if(mediaReach(h)!==1)throw Error('full mood carries it: '+mediaReach(h));
+h.emp.op.m=0.5;h.emp.movie.n=3;if(!(mediaReach(h)>r0*3.5))throw Error('films carry it');h.emp.movie.n=0;h.emp.hard=h.emp.hard||{};h.emp.hard.open=1;if(mediaReach(h)!==1)throw Error('no limit in the hard part');
+h.stores={};if(marketingLevel(h)>STORE_MKT_MAX+50)throw Error('store cap');
+var f=readyGame();f.money=1e9;f.emp.proj.ministry=1;f.emp.proj.studio=1;f.emp.inf=1e9;if(!greenlight(f,0)||f.emp.movie.left!==365)throw Error('a film takes a year');
+`);
+console.log(count+' focused balance and migration checks passed');
