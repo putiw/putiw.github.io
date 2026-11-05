@@ -2727,3 +2727,11 @@ Tests: `shrimp-balance` 161 (the Pass 264 check rewritten: no credit code, only 
 
 **Pass 269b (Puti, same night).** Make games merged into the old Video games option (`games`, Rest): picking it is what makes a game ("Takes strain off, and you work on a game of your own."). Grandma's card: she asks you to play video games with her, Play with her holds Video games in Your day for two months, then the old plan. Best platforms, the 15% sequel step, Khalas and the Times line agreed. Balance 161, me 55, academy 10, cardtap, browser 390/360 pass. BUILD p269b.
 
+
+## Pass 270 (6 Nov, pre-deploy run of Passes 266 to 269, tests only)
+
+Game unchanged. Added `tests/shrimp-monkey.cjs` (the Pass 129 script was never in the repo; random taps, tabs, folds, sliders on a new game and six snapshots at 390 and 360 px, page errors, NaN, sideways scroll) and a `shrimp-balance` check that `BUILD` is not in the future (Pass 269b said 02:10 at 02:07, Puti saw it in Settings). Stamp BUILD with `TZ=Asia/Dubai date +%Y-%m-%dT%H:%M` at commit.
+
+Run on 6ab0c32: balance 162, me 55, academy 10, cardtap pass. Bots seed 7: strong cold WIN 3,472 (empire_dictator), strong kind WIN 4,225 (question_lucky, 4,178 at Pass 265), average Earth 7,448 (network_life), no INSOLVENT. Spotlights 103, all good. Monkey 150 actions x 7 stages x 2 widths, pass. On the average run: projtabs 4, hard 24, tapnow 26 taps (story cards came up on some, not tapped), frozen 5 tabs, all pass.
+
+Stable, narrowed (average run, year 8 and year 16, tabs Ads/Company, Kits, World, You; plus a year-16 copy with Video games picked and a game at its 100-day decision): 24 buttons move something. The same sweep on main (Pass 265 deploy) gives the same 20, so 266-269 added none of those: the Close all N / Close N store buttons narrow on the first tap (Pass 260), Sell the company widens on Tap again, a bought kit extra or AI row leaves its list (Pass 180 leftovers). New ones: Letters Not now (3) takes the letter away and the next slides up, by design since Pass 259 (no held space, `letBusy` guard). Games Release: the card turns from the running game to the setup, 139 px taller below the tap, Start lands 67 px under where Release was; nothing above moves. Pass 269 item 1 chose no min-height, left for Puti.
