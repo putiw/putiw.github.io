@@ -1,4 +1,4 @@
-// Universal Shrimp offline (Pass 238, Puti 3 Nov): once opened online, the game, the land, the ship,
+// Shrimp, Inc. offline (Pass 238, Puti 3 Nov): once opened online, the game, the land, the ship,
 // sounds and icons are kept on the phone, so it plays offline from the Home Screen.
 // Pages (html) go network first, so a new BUILD still arrives when online (3 s, then the kept copy).
 // Everything else comes from the kept copy at once and is refreshed in the background.

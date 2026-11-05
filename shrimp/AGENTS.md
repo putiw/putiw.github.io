@@ -1,4 +1,4 @@
-# Universal Shrimp: notes for agents
+# Shrimp, Inc.: notes for agents
 
 Read this before you change anything in `shrimp/`. It covers what the game is, how the code is laid out, the owner's design rules, how to test, and the mistakes that have already cost time.
 
@@ -21,7 +21,7 @@ Puti is on a Max plan and one week of this project used most of a weekly limit b
 
 ## What the game is
 
-Universal Shrimp is a single-file HTML idle/sim game in the spirit of Universal Paperclips. You keep cherry shrimp in Abu Dhabi and sell them (prices in AED). Grandma gives you her old tank and a dream: a shrimp tank in every home on Earth, in about ten years.
+Shrimp, Inc.: A Tank in Every Home (was Universal Shrimp until 6 Nov, Pass 270; the save key `universal-shrimp-v2` and the `shrimp/` paths keep the old name, saves use them) is a single-file HTML idle/sim game in the spirit of Universal Paperclips. You keep cherry shrimp in Abu Dhabi and sell them (prices in AED). Grandma gives you her old tank and a dream: a shrimp tank in every home on Earth, in about ten years.
 
 - **Arc:** cycle a tank → breed and sell shrimp → hand-pack starter kits → automate → farms and regions → a million owners → the hard part → everyone (8.2B, or the goal you changed it to). With enough science, Leave Earth (from the hard part or after the win): pack a ship, Grandma sleeps, the player flies a planet search and brakes at one planet (Passes 168-169). Settling it is row 6, not built; the game stops at Preparing for settlement. The old Space chapter (search program, gene edits, seed ships) was removed in Pass 170.
 - **Feel:** a short sci-fi novel told through Grandma's letters, chapters and story events, with something to do at every stage. Small minigames (health checks, salt baths, QC rounds, hand packing) fill the slow parts.
@@ -533,7 +533,7 @@ Do not report a feature as finished just because its new path works once. Check 
 - Pass 266 (5 Nov): Chat 1 of `claude/shrimp-handoff-30fixes-5nov.md` done (items 6, 7, 8, 13, 17, 19). `tabLeave()` is what a tab change lets go, call it before `activeTab` changes. `salesWhy(G)` is the only sales-reason line, fixed phrases, no advice. Chats 2 to 4 of that handoff are open.
 - Pass 267 (6 Nov): Chat 2 of that handoff done (items 21 to 28). `coMode` needs `hardIntroDone(G)` (the Chapter 6 card closed). The group slot holds its last height until a scroll (`STEP_HOLD`, `stepHold()`), no tallest-group slot. `hardWhy` is the only grey-option reason line. `sciYears(sh)` is the one science clock, no years in the UI. `ASK_PERM`/`ASK_CAP` (30%, 85%) are the Said no conversion per ask. `ear_ready` is the ear tank's intro card (text for Puti to settle). Item 12 open: asked Puti whether the Rewilding she saw was the Done row in Running. Chats 3 and 4 open.
 - Pass 268 (6 Nov): Chat 3 of that handoff done (items 9, 10, 14, 15, 16, 20, 29, 30, 11) plus item 12 again. Rewilding, the last mile and the lab are letters only (`treeLetter`), no World card or story card before. A region with a story-card wait opens no stores (`regWaiting`, `regWaitWhy`). The Farms card's shrimp/d is `E.prodAvg`, a 30-day rolling figure. A grey fork option says its shortfall (`filmShort`, `em.short`). Ghaf and sidr plant from the start. A clean holds 2 real minutes too (`CLEAN_MS`, `CLEAN_SEEN`, not saved). Shopping is `shoppingCost` (0.5% of dayIncome x 30, AED 5 to 3,000). A `.qhelp` with a `data-act` is left to its own handler. The land's tank caption is under the tank (edit `shrimp-home-proto/src` on `shrimp-proto`, then build). Choices audit in `claude/shrimp-choices-audit.md` (tests/shrimp-choices-audit.cjs/.py), Puti decides. Open: `emp.q` above 0.97 is lowered by every `Math.min(0.97,q+..)` choice (found in the audit, not fixed). Chat 4 (video games) is next.
-- Pass 269 (6 Nov): Chat 4 of that handoff done (items 1 to 5 and 18, video games), not deployed. Puti (6 Nov): Make games merged into Video games; Grandma asks you to play, yes holds Video games 2 months; platforms, 15%, Khalas and the Times line agreed. Before deploy: bots, spotlight sweep, monkey, on her go-ahead.
+- Pass 269 (6 Nov): Chat 4 of that handoff done (items 1 to 5 and 18, video games), not deployed. Puti (6 Nov): Make games merged into Video games; Grandma asks you to play, yes holds Video games 2 months; platforms, 15%, Khalas and the Times line agreed. Pre-deploy run in Pass 270, deployed 6 Nov with the rename to Shrimp, Inc.: A Tank in Every Home.
 
 Planned and agreed with Puti, not built yet:
 
