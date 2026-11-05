@@ -10,7 +10,7 @@
 //  - the open tab: gaps over 24 px between cards that hold nothing, anything overlapping #tankview;
 //  - one ? opened every ~10 s: the help must sit right under or right over its button (fail if more than 16 px away);
 //  - every card, note, news banner and spotlight shown, with the day. An intro or chapter card must not show before
-//    its condition (milestoneConditions) was ever true, and not more than 60 game days and 30 real seconds after;
+//    its condition (milestoneConditions) was ever true, and not more than 60 game days and 150 s of play after (Pass 265, the queue at the 10-35 s gap);
 //  - Puti's opening order: Ads not before 10 sales, kits not before tank 2's first baby, no speed hint on the speed
 //    you're already at.
 // Part 2: a text dump of everything shown (cards, ?, banners, toasts, button labels) with a state line, written to
@@ -59,7 +59,7 @@ const fails=[];const fail=(k,m)=>{fails.push(k+': '+m);};
   if(ui.card){await say('card '+ui.card.key,ui.card.text);
    const chk=await p.evaluate(k=>{if(H.shown[k])return null;var c=H.cond[k],now=performance.now();H.shown[k]={d:Math.floor(G.day),t:now};var cur=milestoneConditions(G)[k];return {c:c,cur:cur,d:Math.floor(G.day),t:now};},ui.card.key);
    if(chk&&ui.card.intro){if(!chk.c&&chk.cur===false)fail('card '+ui.card.key,'shown on day '+chk.d+' before its condition was ever true');
-    else if(chk.c&&chk.d-chk.c.d>60&&(chk.t-chk.c.t)*RATE/1000>30)fail('card '+ui.card.key,'shown '+(chk.d-chk.c.d)+' game days and '+Math.round((chk.t-chk.c.t)*RATE/1000)+' s of play after its cause (day '+chk.c.d+')');}
+    else if(chk.c&&chk.d-chk.c.d>60&&(chk.t-chk.c.t)*RATE/1000>150)/* Puti, 5 Nov: waiting behind 3 or 4 things at the 10-35 s gap is fine */fail('card '+ui.card.key,'shown '+(chk.d-chk.c.d)+' game days and '+Math.round((chk.t-chk.c.t)*RATE/1000)+' s of play after its cause (day '+chk.c.d+')');}
    const btn=await p.$('#milestone-card [data-act="story-choice"]:not([disabled])')||await p.$('#milestone-card [data-act="milestone-next"]:not([disabled])');
    await p.waitForTimeout(550);if(btn)await btn.click().catch(async e=>{fail('tap','the card button on '+ui.card.key+' is covered: '+String(e.message||e).split('\n').filter(l=>/intercepts/.test(l))[0]);await btn.evaluate(x=>x.click());});await p.waitForTimeout(300);}
   if(ui.ts){const tb=await p.$('#tsheet [data-act="ts-upg"]:not([disabled])')||await p.$('#tsheet [data-act="ts-close"]:not([disabled])')||await p.$('#tsheet [data-act="ts-later"]');if(tb)await tb.click().catch(()=>{});}
