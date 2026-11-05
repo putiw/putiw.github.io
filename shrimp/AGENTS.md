@@ -472,6 +472,8 @@ Do not report a feature as finished just because its new path works once. Check 
 
 ## Mistakes already made
 
+- A new "on tab change" clear went into `selectTab`, but the tab bar's handler set `activeTab` first, so `selectTab` never saw a change on a real tap (Pass 266, items 13 and 17). Anything that must run when the tab changes goes in `tabLeave()`.
+
 **Editing**
 - **Unanchored replacements.** A regex meant for one text block hit the first match elsewhere and overwrote Grandma's letters. Assert that each replacement matches exactly once.
 - **Removing an element without a full search.** Dropping the pH chip left code that still read `wp-ph` and crashed `render()`. Search for every id you remove.
@@ -526,6 +528,8 @@ Do not report a feature as finished just because its new path works once. Check 
 - **Common sense with shrimp (Pass 243).** Not hyper-real, but nothing a shrimp keeper would laugh at. Weekly 20–30% water changes should be enough for a full tank, so KH alerts start under 1 and the technician's nitrate trigger is 40. Shrimp skip food on holiday, they don't need a feeder. Released cherries turn brown in a few generations, and a native-only reserve has no red shrimp.
 
 ## Open work
+
+- Pass 266 (5 Nov): Chat 1 of `claude/shrimp-handoff-30fixes-5nov.md` done (items 6, 7, 8, 13, 17, 19). `tabLeave()` is what a tab change lets go, call it before `activeTab` changes. `salesWhy(G)` is the only sales-reason line, fixed phrases, no advice. Chats 2 to 4 of that handoff are open.
 
 Planned and agreed with Puti, not built yet:
 
