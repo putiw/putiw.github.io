@@ -530,6 +530,7 @@ Do not report a feature as finished just because its new path works once. Check 
 ## Open work
 
 - Pass 266 (5 Nov): Chat 1 of `claude/shrimp-handoff-30fixes-5nov.md` done (items 6, 7, 8, 13, 17, 19). `tabLeave()` is what a tab change lets go, call it before `activeTab` changes. `salesWhy(G)` is the only sales-reason line, fixed phrases, no advice. Chats 2 to 4 of that handoff are open.
+- Pass 267 (6 Nov): Chat 2 of that handoff done (items 21 to 28). `coMode` needs `hardIntroDone(G)` (the Chapter 6 card closed). The group slot holds its last height until a scroll (`STEP_HOLD`, `stepHold()`), no tallest-group slot. `hardWhy` is the only grey-option reason line. `sciYears(sh)` is the one science clock, no years in the UI. `ASK_PERM`/`ASK_CAP` (30%, 85%) are the Said no conversion per ask. `ear_ready` is the ear tank's intro card (text for Puti to settle). Item 12 open: asked Puti whether the Rewilding she saw was the Done row in Running. Chats 3 and 4 open.
 
 Planned and agreed with Puti, not built yet:
 
