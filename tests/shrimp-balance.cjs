@@ -1238,4 +1238,11 @@ var g=readyGame();g.emp.trees={rewild:1,lastmile:1,lab:1,shop:1,island:1};var o=
 if(o.tree_rewild||o.tree_lastmile||o.tree_lab)throw Error('letter trees have no story card');if(!o.tree_shop||!o.tree_island)throw Error('shop and island keep theirs');
 if(!treeLetter('rewild')||treeLetter('shop')||treeLetter('island'))throw Error('treeLetter');
 `);
+check('Pass 268 item 9: Go with Grandma holds Europe stores until she is better, then they open',`
+var g=readyGame();var E=g.emp;E.kitsOpened=1;E.farms={rack:3};g.kits.sold=30000;g.money=1e10;E.regions=['auh','dxb','uae','gcc','eu'];E.regDay={eu:Math.floor(g.day)};g.me=g.me||{};g.me.on=1;
+if(!storeCanBuy(g,'eu',1))throw Error('eu stores buyable before the card');
+CARDS3.c_knee.ch[0][3](g);if(storeCanBuy(g,'eu',1)||buyStores(g,'eu',1))throw Error('eu stores held');if(regWaitWhy(g,'eu')!=='Waiting for Grandma')throw Error('why: '+regWaitWhy(g,'eu'));
+if(!storeCanBuy(g,'auh',1))throw Error('other regions still open');var f=storeFillN(g);E.regWait.eu=0;if(storeFillN(g)<=f)throw Error('fill skips the held region');
+E.regWait.eu=Math.floor(g.day)+182;g.day+=183;if(!buyStores(g,'eu',1)||regWaitWhy(g,'eu'))throw Error('eu opens after she is better');
+`);
 console.log(count+' focused balance and migration checks passed');
