@@ -1233,4 +1233,9 @@ hardOf(g).open=1;g.emp.op.m=1;g.humans=kitCap(g);if(kitDemand(g)!==0)throw Error
 g.emp.hard.open=0;g.humans=kitCap(g);if(salesWhy(g)!=='Everyone who wants a tank has one')throw Error('pre-hard cap line: '+salesWhy(g));
 var P=Object.keys(PAINS)[0];g.humans=1000;g.emp.pains=g.emp.pains||{};g.emp.pains[P]={until:g.day+10};if(painMult(g)>=1||!/part speed/.test(salesWhy(g)))throw Error('pain line: '+salesWhy(g));
 `);
+check('Pass 268 item 12: Rewilding, the last mile and the lab are letters only, no story card before; the shop and the island keep theirs',`
+var g=readyGame();g.emp.trees={rewild:1,lastmile:1,lab:1,shop:1,island:1};var o=cards3Cond(g);
+if(o.tree_rewild||o.tree_lastmile||o.tree_lab)throw Error('letter trees have no story card');if(!o.tree_shop||!o.tree_island)throw Error('shop and island keep theirs');
+if(!treeLetter('rewild')||treeLetter('shop')||treeLetter('island'))throw Error('treeLetter');
+`);
 console.log(count+' focused balance and migration checks passed');
