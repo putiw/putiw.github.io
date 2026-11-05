@@ -1219,4 +1219,15 @@ if(!storyChoose(y,'gp_games',0)||dayPicks(y).indexOf('videos')<0||!gameHolding(y
 var d1=Math.floor(y.day);for(var i=0;i<GAME_HOLD;i++){y.day=d1+i+1;y.me.ill=null;lifeDay(y);gamesDay(y);}if(gameEarned(y)<1)throw Error('60 days gives a credit: '+gameHrs(y));if(gameHolding(y)||y.me.p2.join()!=='tanks,books')throw Error('old plan back: '+y.me.p2);
 if(PICK_H*GAME_HOLD-20<GAME_HRS)throw Error('hold math');
 `);
+check('Pass 266: salesWhy says why kit sales are what they are, one fixed phrase, never advice; the hard part at capacity reads as the market ending (item 19)',`
+var g=readyGame();if(salesWhy(g)!=='')throw Error('nothing before kits open');
+g.emp.kitsOpened=1;g.humans=1000;g.stats.sold=500;g.kits.sold=50;g.money=1e9;
+var w0=salesWhy(g);if(!/Orders outrun|Selling as fast|Word of mouth|Everyone who wants/.test(w0))throw Error('plain reason: '+w0);
+if(/Ads|Kits|buy|Build|Add/.test(w0))throw Error('no advice in the line: '+w0);
+g.emp.nosale=Math.floor(g.day)+30;if(!/police/.test(salesWhy(g)))throw Error('police');g.emp.nosale=0;
+// the hard part: owners at kitCap means kitDemand 0 and the market-ending line, not a marketing one
+hardOf(g).open=1;g.emp.op.m=1;g.humans=kitCap(g);if(kitDemand(g)!==0)throw Error('demand 0 at the cap');if(salesWhy(g)!=='Everyone who can keep a tank has one')throw Error('cap line: '+salesWhy(g));
+g.emp.hard.open=0;g.humans=kitCap(g);if(salesWhy(g)!=='Everyone who wants a tank has one')throw Error('pre-hard cap line: '+salesWhy(g));
+var P=Object.keys(PAINS)[0];g.humans=1000;g.emp.pains=g.emp.pains||{};g.emp.pains[P]={until:g.day+10};if(painMult(g)>=1||!/part speed/.test(salesWhy(g)))throw Error('pain line: '+salesWhy(g));
+`);
 console.log(count+' focused balance and migration checks passed');
