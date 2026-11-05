@@ -4014,7 +4014,7 @@ function hardOwnDay(G,H){var own=H.own,fresh=!own;if(fresh)own=H.own={};var rows
 
 // ----- The routes (Pass 250): where the profit goes. Four shares of operatingNet, in 5% steps, the sum at most 100%, the rest is Keep. -----
 // Aid: giveDay as before (batches, 1 to 2 years, 40 to 90% arrives), lives and bills in the Times, fills no squares.
-// Science: Lucy's lab works on a membrane, a solar cell and drought crops. 25 years at a trickle, 15 at 10% or more, never under 15.
+// Science: Lucy's lab works on a membrane, a solar cell and drought crops. 25 years at a trickle, 15 at 10%, up to 25% faster above that (sciYears, Pass 267). Never printed in years.
 //   Stopping pauses the clock. Done: workarounds in water, hot and poor go 1.5x as far twice as fast, Build costs a third there,
 //   and on its own it reaches 30% of those groups over five years: a cheap membrane nobody installs.
 // Build: utilities, grids, clinics, roads. Money arrives 60 to 90%, reach grows at most 7% of a group a year (14% where Policy
@@ -4029,14 +4029,15 @@ function hardAlloc(G,k,v){var H=hardOf(G);if(!H.open||HARD_ROUTES.indexOf(k)<0||
  v=Math.min(v,Math.max(0,Math.round((1-rest)*20)/20));if(v===(A[k]||0))return false;var was=A[k]||0;A[k]=v;if(!was&&v)log(G,ROUTE_NAME[k]+': '+Math.round(v*100)+'% of profit');else if(!v)log(G,ROUTE_NAME[k]+': stopped');
  return true;}
 // Science
-var SCI_YEARS_LO=15,SCI_YEARS_HI=25,SCI_REACH=0.3,SCI_RAMP=1825;
+var SCI_YEARS_LO=15,SCI_YEARS_HI=25,SCI_REACH=0.3,SCI_RAMP=1825,SCI_EXTRA=0.25;/* Pass 267 (item 27): above a tenth of profit each extra share buys a little speed, up to 25% faster at all of it (12 years at the floor), nothing printed in years */
+function sciYears(sh){var yrs=SCI_YEARS_HI-(SCI_YEARS_HI-SCI_YEARS_LO)*clamp(sh/0.1,0,1);return yrs/(1+SCI_EXTRA*clamp((sh-0.1)/0.9,0,1));}
 function sciOf(H){return H.sci||(H.sci={p:0,done:0,y:0,mark:0,spent:0});}
 function sciDay(G,H,now,net){var A=hardAllocOf(H),sh=A.sci||0,S=sciOf(H);if(S.done||sh<=0||!hardLive(G))return;
  if(!frozen(G)){var a=Math.min(net*sh,Math.max(0,G.money-capitalReserve(G)));if(a>=1){pay(G,a,'research');S.spent+=a;}}
- var yrs=SCI_YEARS_HI-(SCI_YEARS_HI-SCI_YEARS_LO)*clamp(sh/0.1,0,1);S.p+=1/(365*yrs);S.y+=1/365;trAdd(G,{know:0.4*sh/365});
+ var yrs=sciYears(sh);S.p+=1/(365*yrs);S.y+=1/365;trAdd(G,{know:0.4*sh/365});
  if(S.p>=1){S.done=now;newsLine(G,'Lucy’s lab has a membrane that makes a cubic meter of drinking water for 20 cents, and a solar cell to run it. The paper is out. Nobody has ordered one.');return;}
  var m=Math.floor(S.y/5);if(m>S.mark){S.mark=m;newsLine(G,m===1?'Lucy’s lab says the membrane is ten years out. Last year it said eleven.':m===2?'The lab’s membrane is at 20 cents a cubic meter. Nobody has ordered one.':'The drought wheat from your lab grows in a greenhouse in Abu Dhabi. Outside it, not yet.');}}
-function sciYearsLeft(G){var S=hardOf(G).sci;if(!S)return null;if(S.done)return 0;var sh=hardAllocOf(hardOf(G)).sci||0;var yrs=SCI_YEARS_HI-(SCI_YEARS_HI-SCI_YEARS_LO)*clamp(sh/0.1,0,1);return Math.max(0,(1-S.p)*yrs);}
+function sciYearsLeft(G){var S=hardOf(G).sci;if(!S)return null;if(S.done)return 0;var sh=hardAllocOf(hardOf(G)).sci||0;return Math.max(0,(1-S.p)*sciYears(sh));}
 function sciReach(G,gid){if(!SCI_GROUPS[gid])return 0;var S=hardOf(G).sci;if(!S||!S.done)return 0;return SCI_REACH*clamp((G.day-S.done)/SCI_RAMP,0,1);}
 // ----- Proposals (Pass 251, Puti 4 Nov): the ideas come from other people, you fund them or you don't. -----
 // Build and Policy were sliders (Pass 250). Now people write in: a name, a place, one line in their words, a build part (days
@@ -4170,7 +4171,7 @@ function routeLines(G){var H=G.emp.hard;if(!H||!H.open)return [];var o=[],R=prop
  ks.forEach(function(k){var p=R.run[k],d=propDef(k);if(!d||!d.end||!d.g)return;var n=hardN(G,hardGroup(d.g))*(p.r||0);if(n<5e5&&!p.stop)return;o.push(propTxt(d,p.alt,d.end,n)+(p.stop?' You stopped paying in year '+Math.max(1,Math.round(p.stop/365))+'.':''));});
  if(R.lev.s>0)o.push(R.lev.s>=LEVY_N?LEVY_N+' countries signed the levy. The pump crews are paid from it.':R.lev.s+' of '+LEVY_N+' countries signed the levy.'+(R.lev.f?' '+R.lev.f+' dropped it.':''));
  if(R.run.course)o.push(R.grads>0?'The politics class sent you '+R.grads+' proposal'+(R.grads>1?'s':'')+'.':'The politics class had '+Math.max(0,Math.round((Math.floor(G.day)-R.run.course.day)/365))+' years. Nothing came of it yet.');
- var S=H.sci;if(S&&S.done)o.push('Lucy’s membrane was done. '+(propReach(G,'water')>0?'The water boards used it.':'Nobody ordered one.'));else if(S&&S.y>0){var yl=sciYearsLeft(G);o.push('The membrane was '+Math.max(1,Math.round(yl))+' years from done.');}
+ var S=H.sci;if(S&&S.done)o.push('Lucy’s membrane was done. '+(propReach(G,'water')>0?'The water boards used it.':'Nobody ordered one.'));else if(S&&S.y>0){o.push('The membrane was '+Math.round(S.p*100)+'% along, not done.');}/* Pass 267 (item 27): no years for science */
  return o;}
 function hardLines(G){var H=G.emp.hard;if(!H)return [];var o=[];HARD.forEach(function(g){var P=H.picks[g.id]||{};g.ops.forEach(function(x){var p=P[x.id];if(p&&(p.start!=null||!x.f)&&x.end)o.push(x.end);});});
  if(H.picks.never&&H.picks.never.deliver&&!H.picks.never.deliver.quiet)o.push('Mira read about the village in the forest. She stopped coming to the house.');
@@ -4570,7 +4571,7 @@ function trim(n,d){return String(+Number(n).toFixed(d));}
 (function(){var vv=window.visualViewport,fix=function(){var a=document.activeElement,typing=!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!/^(range|checkbox|radio|button)$/.test(a.type||''));document.body.classList.toggle('kbd',typing&&!!vv&&vv.height<window.innerHeight*0.8);var t=document.querySelector('.tabs');if(t&&t.style.transform)t.style.transform='';};if(vv){vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);}document.addEventListener('focusin',function(){setTimeout(fix,300);});document.addEventListener('focusout',function(){setTimeout(fix,50);setTimeout(fix,400);});})();
 // No browser feel: no pinch or double-tap zoom, no long-press menu outside text fields.
 (function(){var stop=function(e){e.preventDefault();};['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,stop,{passive:false});});document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea,[contenteditable]')))e.preventDefault();});})();
-var toastT=null,NF=null,BUILD='2026-11-06T01:10-p267d';
+var toastT=null,NF=null,BUILD='2026-11-06T01:10-p267e';
 function buildDate(){var m=BUILD.match(/^(\d{4})-(\d\d)-(\d\d)(?:T(\d\d:\d\d))?/);if(!m)return '';return 'Updated '+(+m[3])+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m[2]-1]+' '+m[1]+(m[4]?', '+m[4]+' UAE':'');}
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
@@ -7292,10 +7293,11 @@ function hardLedgerHTML(G,H,ro){var A=hardAllocOf(H),g=A.aid||0,net=Math.max(0,o
   '<p class="hint led-one">'+(H.gv>=1?'Given '+aed(H.gv)+', '+aidArrTxt(G,H,aed)+'.':'Aid goes out in batches, a third each to water, power and health, a year or two later.')+'</p>';}
 // Pass 250: the allocation panel. Four shares of profit, 5% steps, the sum at most 100%, the rest is Keep. Each route's state sits behind its name.
 var ROUTE_HELP={aid:function(G,H){var A=hardAllocOf(H);return 'Water, power and health programs, a third each. Batches go out every three months and land a year or two later, 40 to 90% arrives. Saves lives, fills no squares.'+((A.aid||0)>0?' At '+Math.round(A.aid*100)+'%, that is '+fmtA(Math.max(0,operatingNet(G)||0)*365*A.aid)+' a year, '+muskPct(Math.max(0,operatingNet(G)||0)*365*A.aid)+' of Elon Musk’s net worth in '+RICH_YEAR+'.':'')+(H.gv>=1?' Given so far '+fmtA(H.gv)+', '+aidArrTxt(G,H,fmtA)+'.':'');},
- sci:function(G,H){var S=H.sci,yl=sciYearsLeft(G);return 'Lucy’s lab: a membrane for cheap water, a solar cell to run it, crops for drought. 25 years at a trickle, 15 with a tenth of profit or more, never under 15. Stopping pauses the clock. When it’s done the quick fixes in water, heat and poverty reach further and the water crews cost a third. On its own it reaches a third of those people.'+(S&&S.done?' Done.':S&&S.y>0?' About '+Math.round(yl)+' years to go, '+(Math.round(S.y*10)/10)+' years in.':'');}};
+ sci:function(G,H){var S=H.sci,yl=sciYearsLeft(G);return 'Lucy’s lab: a membrane for cheap water, a solar cell to run it, crops for drought. Slow. A tenth of profit runs it at full pace, more than that buys a little speed. It can pay off much later, or not. Stopping pauses the clock. When it’s done the quick fixes in water, heat and poverty reach further and the water crews cost a third. On its own it reaches a third of those people.'+(S&&S.done?' Done.':S&&S.y>0?' '+Math.round(S.p*100)+'% along.':'');}};/* Pass 267 (item 27): no years */
+function sciLine(H){var S=H.sci,sh=hardAllocOf(H).sci||0;return S&&S.done?'Done. The membrane is out.':sh<=0?'Nothing goes to science.':sh<=0.1?'Science can pay off much later, or not.':'More money, a bit faster. It can pay off much later, or not.';}/* Pass 267 (item 27): the slider line in words, no years */
 function alV(v,net){return v+'%<small>'+aedS(net*365*v/100)+'/yr</small>';}// Pass 254 (Puti): each route shows its share and the AED a year it is now, in a fixed slot
 function hardAllocHTML(G,H,ro){var A=hardAllocOf(H),net=Math.max(0,operatingNet(G)||0),qa=function(x){return String(x).replace(/&/g,'&amp;').replace(/"/g,'&quot;');},h='<p class="coin-t">Where the profit goes</p>';
- HARD_ROUTES.forEach(function(k){var v=Math.round((A[k]||0)*100);h+='<div class="ctl hard-give"><label for="hard-al-'+k+'"><button type="button" class="qhelp qt" data-ht="'+qa(ROUTE_HELP[k](G,H))+'" data-htitle="'+ROUTE_NAME[k]+'">'+ROUTE_NAME[k]+'</button></label><input type="range" id="'+(k==='aid'?'hard-give':'hard-al-'+k)+'" data-al="'+k+'" min="0" max="100" step="5" value="'+v+'"'+(ro?' disabled':'')+'><span class="v">'+alV(v,net)+'</span></div>';});
+ HARD_ROUTES.forEach(function(k){var v=Math.round((A[k]||0)*100);h+='<div class="ctl hard-give"><label for="hard-al-'+k+'"><button type="button" class="qhelp qt" data-ht="'+qa(ROUTE_HELP[k](G,H))+'" data-htitle="'+ROUTE_NAME[k]+'">'+ROUTE_NAME[k]+'</button></label><input type="range" id="'+(k==='aid'?'hard-give':'hard-al-'+k)+'" data-al="'+k+'" min="0" max="100" step="5" value="'+v+'"'+(ro?' disabled':'')+'><span class="v">'+alV(v,net)+'</span></div>';if(k==='sci')h+='<p class="hint led-one al-sci">'+sciLine(H)+'</p>';});
  var keep=hardKeep(H);h+='<p class="hint led-one al-keep">Keep '+Math.round(keep*100)+'%, '+fmtA(net*365*keep)+' a year. The letters above are paid from it.</p>';return '<div class="hard-al">'+hardPropsHTML(G,H,ro)+h+'</div>';}/* Pass 267 (Puti, item 23): Letters, then Running, then the sliders */
 // Pass 251: proposals. Three fixed rows of people who wrote in (who and where on the title, their line and the costs behind it, Fund / Not now in the
 // 112 px column), then the Running list (one line each, Stop on the right, a closed fold past four). Every row keeps its size; a tap moves nothing.

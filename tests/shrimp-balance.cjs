@@ -837,6 +837,7 @@ CSR.open.push({id:'board',day:0,alt:1,grad:0});CSR.t.board=2;propFund(cs,'board'
 var sc=readyGame();sc.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};sc.money=1e12;sc.fin=g.fin;var HS=hardOf(sc);hardAlloc(sc,'sci',.05);for(d=0;d<365;d++){sc.day=d;sciDay(sc,HS,d,1e9);}if(!(HS.sci.p>1/26&&HS.sci.p<1/19))throw Error('5% is slower than 10%: '+HS.sci.p);
 hardAlloc(sc,'sci',0);var p0=HS.sci.p;for(d=365;d<730;d++){sc.day=d;sciDay(sc,HS,d,1e9);}if(HS.sci.p!==p0)throw Error('stopping pauses the clock');
 HS.sci.p=1;hardAlloc(sc,'sci',.1);sc.day=730;sciDay(sc,HS,730,1e9);if(!HS.sci.done)throw Error('done at 1');
+/* Pass 267 (item 27): above a tenth, money buys a little speed, 15 years at a tenth, 12 at all of it, never printed in years */if(Math.abs(sciYears(0.1)-15)>1e-9||Math.abs(sciYears(1)-12)>1e-9||!(sciYears(0.5)<15&&sciYears(0.5)>12)||Math.abs(sciYears(0)-25)>1e-9)throw Error('sciYears '+[sciYears(0),sciYears(0.1),sciYears(0.5),sciYears(1)]);
 sc.day=730+1825;if(Math.abs(sciReach(sc,'water')-0.3)>1e-9||sciReach(sc,'far')!==0)throw Error('science alone reaches 30% of water, hot, poor');
 // workarounds: climb, hold, fade to the floor; one per group at a time; a faded one can be bought again; build underneath holds it up
 var w=readyGame();w.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};w.money=1e12;w.fin=[{kits:1e9}];var WG=hardGroup('water'),WP=hardOf(w);
