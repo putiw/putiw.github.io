@@ -979,7 +979,7 @@ var mud=null,rock=null,water=null,wet=null,dry=null;for(var x=0;x<PL_W;x++)for(v
 if(!water||!mud||!rock||!wet||!dry)throw Error('The map has water, mud, rock, wet and dry soil');
 var C=coinOf(g),t0=C.trees,m0=g.money;if(plPlant(g,water[0],water[1],'m'))throw Error('No planting in water');
 if(!plPlant(g,mud[0],mud[1],'m'))throw Error('Plant mangroves on mud');if(C.trees-t0!==9||Math.round(m0-g.money)!==9*COIN_TREE)throw Error('9 seedlings a tap, AED 4 each, counted on the coast ('+(C.trees-t0)+')');
-if(plPlant(g,mud[0],mud[1],'m'))throw Error('One per spot');if(plPlant(g,wet[0],wet[1],'g'))throw Error('Ghaf waits for the mangroves');
+if(plPlant(g,mud[0],mud[1],'m'))throw Error('One per spot');if(!plPlant(g,wet[0],wet[1],'g'))throw Error('Pass 268: ghaf from the start');
 if(plOdds(g,rock[0],rock[1],'g')!==0||!(plOdds(g,wet[0],wet[1],'g')>plOdds(g,dry[0],dry[1],'g'))||plOdds(g,mud[0],mud[1],'m')!==COIN_SURV)throw Error('Rock dies, water helps, mangroves at the coin survival');
 var f=readyGame();f.kits.sold=TREES_AT;f.money=1e9;var F=coinOf(f);F.otrees=COIN_COAST;if(plPlant(f,mud[0],mud[1],'m'))throw Error('Full coasts are full on the map too');
 if(plFree(f,mud[0],mud[1])!==0)throw Error('Others fill the mud on the map');if(!plPlant(f,wet[0],wet[1],'g'))throw Error('Ghaf opens once the mangroves are done');
@@ -1086,7 +1086,7 @@ var c0=galaReach(g,hardGroup('care'));if(!buyProj(g,'gala','kids'))throw Error('
 if(!buyProj(g,'gala','pets')||!g.emp.galaPets)throw Error('pets gala');
 // coast soft cap: spread and the coin planters slow as it fills, your taps always plant, ghaf at half, sidr at three quarters
 var c=readyGame();c.kits.sold=1e5;var C=coinOf(c);C.trees=1e6;C.otrees=0;var s0=treeSpread(c);C.otrees=COIN_COAST*0.5-1e6;var sh=treeSpread(c)/(C.trees+C.otrees);if(!(Math.abs(sh/(s0/1e6)-0.25)<0.02))throw Error('spread at half the coast is a quarter of the pace: '+sh+' '+s0/1e6);
-if(!(plFill(c)>=0.5&&plKindOk(c,'g')&&!plKindOk(c,'s')))throw Error('ghaf opens at half, sidr not yet');C.otrees=COIN_COAST*0.75;if(!plKindOk(c,'s'))throw Error('sidr at three quarters');if(!(plFree(c,32,2)>0||plFree(c,10,2)>0||[0,1,2,3,4,5,6,7,8,9].some(function(x){return plGround(x*6,2)===3&&plFree(c,x*6,2)>0;})))throw Error('the hills take seedlings');
+C.otrees=0;if(!(plKindOk(c,'g')&&plKindOk(c,'s')))throw Error('Pass 268: ghaf and sidr from the start');C.otrees=COIN_COAST*0.75;if(!(plFree(c,32,2)>0||plFree(c,10,2)>0||[0,1,2,3,4,5,6,7,8,9].some(function(x){return plGround(x*6,2)===3&&plFree(c,x*6,2)>0;})))throw Error('the hills take seedlings');
 C.otrees=COIN_COAST*0.99;if(!(coastSlow(c)<0.001))throw Error('nearly full, others nearly stop');
 // the clean hold: no poop for 25 tank days after a vacuum, no algae after a wipe
 var t=readyGame();t.me.keep='self';t.me.on=1;var T=t.tanks[0];T.had=1;T.cycledAt=0;for(var k=0;k<30;k++)T.pop.push({age:100,n:1,g:2});var K=careOf(T);K.mulm=0;K.vacD=t.day;careDay(t);if(K.mulm!==0)throw Error('no poop right after a vacuum');t.day+=CLEAN_HOLD+1;careDay(t);if(!(K.mulm>0))throw Error('poop again after the hold');
