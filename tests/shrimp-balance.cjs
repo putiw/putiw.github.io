@@ -1170,4 +1170,53 @@ h.emp.op.m=0.5;h.emp.movie.n=3;if(!(mediaReach(h)>r0*3.5))throw Error('films car
 h.stores={};if(marketingLevel(h)>STORE_MKT_MAX+50)throw Error('store cap');
 var f=readyGame();f.money=1e9;f.emp.proj.ministry=1;f.emp.proj.studio=1;f.emp.inf=1e9;if(!greenlight(f,0)||f.emp.movie.left!==365)throw Error('a film takes a year');
 `);
+check('Pass 264: shrimp video games, credits from video hours, Grandma’s card, quality, the 100-day wait, model and price, caps, the 1B switch, the ledger',`
+function me(g){g.me.on=1;g.me.hrs=g.me.hrs||{};return g;}
+// credits: one per 100 video hours, banked, derived from hours (an old save past 200 hours has two, no migration)
+var g=me(readyGame());g.me.hrs.videos=99;if(gameEarned(g)!==0||gameCredits(g)!==0)throw Error('none under 100');g.me.hrs.videos=100;if(gameCredits(g)!==1)throw Error('one at 100');
+var o=me(readyGame());o.me.hrs.videos=250;delete o.me.gm;o=migrate(JSON.parse(JSON.stringify(o)));if(gameCredits(o)!==2)throw Error('old save at 250 h has 2: '+gameCredits(o));
+if(!gameStart(o)||gameCredits(o)!==1)throw Error('start spends one');if(gameStart(o))throw Error('one game at a time');o.me.hrs.videos=420;if(gameCredits(o)!==3)throw Error('banked: '+gameCredits(o));
+if(GAME_TITLES.slice(0,4).join('|')!=='Red Shrimp Redemption|World of Shrimpcraft|The Shrimp Alert|The Last of Shrimp'||o.me.gm.cur.t!=='Red Shrimp Redemption')throw Error('Puti titles');
+// the old video effects stay
+if(HOUR_STEPS.videos.map(function(x){return x[0];}).join()!=='100,400,1000')throw Error('video hour steps');
+// quality: start 0-50, keep working +10..60% of the gap, at least 5, never over 100
+for(var s=0;s<200;s++){var q=me(readyGame());q.me.hrs.videos=100;gameStart(q);var c=q.me.gm.cur;if(c.q<0||c.q>50)throw Error('start q '+c.q);
+ for(var k=0;k<12;k++){c.w=1;var b=c.q;if(b>=100){if(gameKeep(q))throw Error('no keep at 100');break;}gameKeep(q);var d=c.q-b;if(c.q>100||d<Math.min(5,100-b)||d>Math.max(5,Math.ceil((100-b)*0.6)))throw Error('keep step '+b+' -> '+c.q);}}
+// the 100-day wait: it stops and waits however long, then continue or release
+var w=me(readyGame());w.me.hrs.videos=100;gameStart(w);var c=w.me.gm.cur,d0=c.d;
+for(var i=0;i<99;i++){w.day=d0+i+1;gamesDay(w);}if(c.w)throw Error('no stop before 100 days');w.day=d0+100;gamesDay(w);if(!c.w)throw Error('stops at 100');
+for(var i=0;i<500;i++){w.day++;gamesDay(w);}if(!c.w||w.me.gm.cur!==c)throw Error('waits for the player');if(gameRelease(readyGame()))throw Error('nothing to release');
+var qb=c.q;if(!gameKeep(w)||c.w||c.next!==Math.floor(w.day)+100||c.q<qb)throw Error('continue');if(gameRelease(w))throw Error('release only at a checkpoint');c.w=1;if(!gameRelease(w)||w.me.gm.cur||w.me.gm.rel.length!==1)throw Error('release');
+// price and model: each choice moves the score, the middle price beats both ends, ads on a console is weak, quality raises the odds of a hit
+var x={g:'puzzle',p:'phone',m:'paid',pr:40,q:70};var sc=function(o){return gameScore(Object.assign({},x,o));};
+if(!(sc({pr:40})>sc({pr:10})&&sc({pr:40})>sc({pr:100})))throw Error('paid price peak');if(!(sc({m:'sub',pr:15})>sc({m:'sub',pr:5})&&sc({m:'sub',pr:15})>sc({m:'sub',pr:30})))throw Error('sub price peak');
+if(!(sc({m:'ads',p:'console'})<sc({m:'ads',p:'phone'})*0.2))throw Error('ads on console');if(!(sc({g:'action',p:'console',m:'paid'})>sc({g:'puzzle',p:'console',m:'paid'})))throw Error('genre fit');
+if(!(sc({q:90})>sc({q:30})))throw Error('quality');if(!(sc({hit:1})===sc({})*GAME_HIT))throw Error('hit');if(!(gameHitP(100)>gameHitP(50)&&gameHitP(100)<1&&gameHitP(0)>0))throw Error('hit odds');
+var r={m:'paid',d:0,hit:0},rh={m:'paid',d:0,hit:1};if(!(gameFade(rh,300)>gameFade(r,300)&&gameFade(r,300)<1))throw Error('a hit fades slower');
+// caps on the whole portfolio: 3% under 500M, 5% from 500M, base without games, work or loans; zero base gives the floor
+var p=me(readyGame());p.fin=[];for(var i=0;i<30;i++)p.fin.push({kits:10000,games:5000,work:5000,loans:9e6});p.kits.sold=1e6;var b=gameBase(p);if(Math.abs(b-(10000-storeDayCost(p)-(shopCount(p)?(annualRent(p)+LICENSE)/365:0)))>1e-6)throw Error('base ignores games, work, loans: '+b);
+var gm=gmOf(p);for(var i=0;i<5;i++)gm.rel.push({t:'x',g:'puzzle',p:'phone',m:'sub',pr:15,q:100,hit:1,d:0,s0:0.05});p.day=0;
+if(Math.abs(gamePay(p,0)-0.03*b)>1e-6)throw Error('3% cap: '+gamePay(p,0));p.kits.sold=5e8;if(Math.abs(gamePay(p,0)-0.05*b)>1e-6)throw Error('5% cap');
+gm.rel=[{t:'x',g:'puzzle',p:'phone',m:'paid',pr:40,q:50,hit:0,d:0,s0:0.01}];if(Math.abs(gamePay(p,0)-0.01*b)>1e-6)throw Error('under the cap it earns its score');
+p.fin=[];for(var i=0;i<30;i++)p.fin.push({kits:0,staff:-50000});if(Math.abs(gamePay(p,0)-0.01*GAME_FLOOR)>1e-9)throw Error('loss: floor '+gamePay(p,0));
+// 1B switch keeps the rate, then soft ceiling at 10% of company income
+var z=me(readyGame());z.fin=[];for(var i=0;i<30;i++)z.fin.push({kits:1e6});z.kits.sold=9.9e8;z.humans=2e9;var zm=gmOf(z);for(var i=0;i<3;i++)zm.rel.push({t:'x',g:'puzzle',p:'phone',m:'sub',pr:15,q:90,hit:1,d:0,s0:0.03});z.day=0;
+gamesDay(z);var before=zm.pay;z.kits.sold=1e9;z.day=1;gamesDay(z);if(!zm.fz||Math.abs(zm.pay-before)>before*0.01)throw Error('no jump at 1B: '+before+' -> '+zm.pay);
+z.fin=[];for(var i=0;i<30;i++)z.fin.push({kits:2e6});var p1=gamePay(z,1);if(Math.abs(p1-zm.pay)>zm.pay*0.01)throw Error('after 1B not with company income: '+p1);
+for(var i=0;i<40;i++)zm.rel.push({t:'y',g:'puzzle',p:'phone',m:'sub',pr:15,q:100,hit:1,d:1,s0:0.05});var big=gamePay(z,1),C=GAME_SOFT*gameBase(z);if(!(big>zm.pay*1.5))throw Error('grows with releases');if(!(big<C*1.6))throw Error('soft ceiling: '+big+' vs '+C);
+// ledger: Games is its own income row, operatingNet and corporate tax count it, the base does not
+if(!FIN_CATS.some(function(c){return c[0]==='games'&&c[2]===1;}))throw Error('Games category');
+var L=me(readyGame());L.fin=[];for(var i=0;i<30;i++)L.fin.push({kits:1000});var on0=operatingNet(L),b0=gameBase(L);L.fin.forEach(function(r){r.games=500;});
+if(Math.abs(operatingNet(L)-on0-500)>1e-6)throw Error('operatingNet counts games');if(gameBase(L)!==b0)throw Error('the base does not');
+var m0=L.money;earn(L,123,'games');if(L.money-m0!==123||L.today.games!==123)throw Error('earn to Games');
+// Grandma's card: only at 500M, only with no credit, yes holds videos 60 days and gives the credit, then the old plan; no changes nothing; once
+var y=me(readyGame());y.me.p2=['tanks','books'];y.me.hrs={videos:20};y.kits.sold=4.9e8;if(milestoneConditions(y).gp_games)throw Error('not before 500M');y.kits.sold=5e8;if(!milestoneConditions(y).gp_games)throw Error('at 500M');
+var yy=JSON.parse(JSON.stringify(y));yy.me.hrs.videos=130;if(milestoneConditions(migrate(yy)).gp_games)throw Error('not with a credit');
+var pr=ensureProgress(y);pr.seen.gp_games=false;detectMilestones(y);var nq=['queue','soon','wait'].reduce(function(a,l){return a+(pr[l]||[]).filter(function(k){return k==='gp_games';}).length;},0);detectMilestones(y);
+var nq2=['queue','soon','wait'].reduce(function(a,l){return a+(pr[l]||[]).filter(function(k){return k==='gp_games';}).length;},0);if(nq!==1||nq2!==1||!pr.seen.gp_games)throw Error('queued once: '+nq+' '+nq2);
+var yn=JSON.parse(JSON.stringify(y));yn=migrate(yn);if(!storyChoose(yn,'gp_games',1)||yn.me.vh||yn.me.p2.join()!=='tanks,books')throw Error('no changes nothing');
+if(!storyChoose(y,'gp_games',0)||dayPicks(y).indexOf('videos')<0||!gameHolding(y))throw Error('yes holds videos');if(setPick(y,'videos'))throw Error('videos held');setPick(y,'exercise');if(dayPicks(y).indexOf('videos')<0)throw Error('a new pick keeps videos');
+var d1=Math.floor(y.day);for(var i=0;i<GAME_HOLD;i++){y.day=d1+i+1;y.me.ill=null;lifeDay(y);gamesDay(y);}if(gameEarned(y)<1)throw Error('60 days gives a credit: '+gameHrs(y));if(gameHolding(y)||y.me.p2.join()!=='tanks,books')throw Error('old plan back: '+y.me.p2);
+if(PICK_H*GAME_HOLD-20<GAME_HRS)throw Error('hold math');
+`);
 console.log(count+' focused balance and migration checks passed');
