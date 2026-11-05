@@ -1257,4 +1257,8 @@ if(C.mulm>1e-9||C.grow>1e-9)throw Error('dirt came back inside 2 real minutes: '
 ms+=CLEAN_MS-80000+1;for(i=0;i<50;i++){ms+=200;g.tday=++g.day;careDay(g);}if(!(C.mulm>0&&C.grow>0))throw Error('dirt comes back after 2 minutes');
 var T2={},g2=readyGame();if(cleanHeld(g2,T2,g2.day-CLEAN_HOLD-1))throw Error('an old clean after a reload holds nothing');Date.now=D0;
 `);
+check('Pass 268 item 20: Shopping costs 0.5% of a month of income a day, AED 5 to 3,000',`
+var g=readyGame();g.fin=[];if(shoppingCost(g)!==5)throw Error('floor '+shoppingCost(g));g.fin=[{kits:2000}];if(shoppingCost(g)!==300)throw Error('2,000 a day: '+shoppingCost(g));g.fin=[{kits:5e9}];if(shoppingCost(g)!==3000)throw Error('cap '+shoppingCost(g));
+g.money=1e12;var m=g.money;shopDay(g);if(m-g.money!==3000)throw Error('paid '+(m-g.money));
+`);
 console.log(count+' focused balance and migration checks passed');
