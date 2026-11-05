@@ -12,6 +12,7 @@ p{margin:0 0 12px}.muted{color:var(--ink-3);font-size:14px}#st{min-height:1.4em;
 </style></head><body>
 <div class="top"><button id="b-back" aria-label="Back to the game">‹ Back</button><h1>The tank you can hear</h1><button id="b-help" aria-label="Every sound, tap to hear it" aria-expanded="false">?</button></div>
 <p id="day" class="muted" aria-live="off"></p>
+<button id="b-play" aria-pressed="false">Play</button>
 <button class="pri" id="b-feed">Feed</button>
 <button class="pri" id="b-water">Change water</button>
 <button id="b-hear">Hear the tank</button>
@@ -294,7 +295,7 @@ function placeSound(k,row,at){var C=SOUND.scan,h=C.row[row],g=C.gain;
 }
 /* per-sound mix: volume (×), softness (0 bright to 1 muffled, a low-pass), speed (how often for sounds that repeat, how fast for one-off sounds) */
 var RATE_K={drop:1,plop:1,beep:1,eatA:1,eatJ:1,eatB:1,idle:1,swimS:1,swimL:1},STRETCH_K={eggs:1,molt:1,moltfail:1,babies:1,deathB:1,deathA:1,feed:1,pour:1};
-var MIX={"molt":{"vol":0.55,"soft":0.75,"speed":1},"deathA":{"vol":2.7,"soft":0,"speed":0.35},"deathB":{"vol":0.9,"speed":0.45,"soft":0.2},"feed":{"vol":3,"soft":0.45},"pour":{"vol":2.1,"soft":0.4,"speed":0.85},"babies":{"vol":3,"speed":0.95},"swimS":{"speed":0.25,"soft":0.6},"swimL":{"speed":0.25,"soft":0.7},"beep":{"vol":0.8,"speed":0.35,"soft":0.7},"hiss":{"soft":0.65,"vol":3},"plop":{"vol":1.45,"soft":0.05,"speed":1.95},"drop":{"soft":0.95,"vol":1.95},"eatA":{"soft":0.45}};
+var MIX={"molt":{"vol":0.55,"soft":0.75,"speed":1},"deathA":{"vol":2.7,"soft":0,"speed":0.35},"deathB":{"vol":0.9,"speed":0.45,"soft":0.2},"feed":{"vol":6,"soft":0.2},"pour":{"vol":2.1,"soft":0.4,"speed":0.85},"babies":{"vol":3,"speed":0.95},"swimS":{"speed":0.25,"soft":0.6},"swimL":{"speed":0.25,"soft":0.7},"beep":{"vol":0.8,"speed":0.35,"soft":0.7},"hiss":{"soft":0.65,"vol":3},"plop":{"vol":1.45,"soft":0.05,"speed":1.95},"drop":{"soft":0.95,"vol":1.95},"eatA":{"soft":0.45}};
 function mixOf(k){var m=MIX[k]||{};return {vol:m.vol==null?1:m.vol,soft:m.soft==null?0:m.soft,speed:m.speed==null?1:m.speed}}
 function softHz(v){return 14000*Math.pow(350/14000,v)}
 function mixBuses(){var ctx=A.ctx;A.busT={};A.busD={};LIGHTS.forEach(function(l){var k=l[0];['T','D'].forEach(function(w){var g=ctx.createGain(),f=ctx.createBiquadFilter();f.type='lowpass';f.Q.value=0.5;g.connect(f);f.connect(w==='T'?A.tank:A.lp);(w==='T'?A.busT:A.busD)[k]={g:g,f:f}})});LIGHTS.forEach(function(l){applyMix(l[0])})}
@@ -429,7 +430,8 @@ function sched(){ // every 100 ms
   for(var id in A.voices)if(!S.shrimp.some(function(x){return x.id==id}))delete A.voices[id];
   drain();
 }
-var PAUSED=false,MUTED=false,buildScape=[],teachOn=false,SOLO=true,TANK=true,soloT=0;
+var PAUSED=false,MUTED=false,buildScape=[],teachOn=false,SOLO=true,TANK=false,soloT=0;/* Pass 259 (Puti): the live tank starts paused, a phone won't play sound before a tap, so Play says so */
+function setTank(on){if(on&&!wake())return;TANK=!!on;var b=document.getElementById('b-play');if(b){b.textContent=TANK?'Pause':'Play';b.setAttribute('aria-pressed',TANK)}tankLevel()}
 function setVol(v){vol=v;if(A)A.master.gain.setTargetAtTime(MUTED?0:SOUND.master*vol,A.ctx.currentTime,0.1)}
 function tankLevel(){if(!A)return;var now=A.ctx.currentTime;A.tank.gain.setTargetAtTime(!TANK||PAUSED||now<soloT?0:1,now,0.15)}
   var PICRUN=null;
@@ -483,8 +485,9 @@ function start(){
  if(!load())fresh();S.last=Date.now();lastReal=Date.now();line();
  $('help-list').innerHTML=helpHTML();
  document.body.addEventListener('pointerdown',wake);document.body.addEventListener('keydown',wake);
- $('b-feed').onclick=function(){wake();doJob('feed');save();speak('Fed.');post({type:'care',k:'feed'})};
- $('b-water').onclick=function(){wake();doJob('water');S.clog=0;save();speak('A third of the water changed, and the filter rinsed.');post({type:'care',k:'water'})};
+ $('b-play').onclick=function(){setTank(!TANK);speak(TANK?'Playing.':'Paused.')};
+ $('b-feed').onclick=function(){wake();if(!TANK)setTank(true);doJob('feed');save();speak('Fed.');post({type:'care',k:'feed'})};
+ $('b-water').onclick=function(){wake();if(!TANK)setTank(true);doJob('water');S.clog=0;save();speak('A third of the water changed, and the filter rinsed.');post({type:'care',k:'water'})};
  $('b-hear').onclick=function(){if(!wake())return;picPlay(null);speak('Left to right: wood is the bell, stones buzz, plants hum. High is the top of the tank.')};
  $('b-help').onclick=function(){var h=$('help'),on=h.hidden;h.hidden=!on;this.setAttribute('aria-expanded',on)};
  $('b-back').onclick=function(){save();if(A)A.ctx.suspend();post({type:'back'})};

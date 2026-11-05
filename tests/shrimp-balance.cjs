@@ -596,7 +596,7 @@ check('Pass 122: lab finds, funded studies and university news go to the Science
 var g=newGame();g.kits.sold=100;newsLine(g,'front');newsLine(g,'lab',1);var L=rip(g).log;if(L.length!==2||L[0].sci||!L[1].sci)throw Error('newsLine sci tag');
 g.emp.later=[{d:0,t:'study',sci:1}];g.day=1;laterDay(g);if(!rip(g).log[2].sci)throw Error('later study news keeps the tag');
 `);
-if(!html.includes('<div id="rp-sci" hidden><h3 class="track">Science</h3>')||!html.includes("+l.fx.slice(1)+'.',1);"))throw Error('Science section and research finds tagged');
+if(!html.includes('<div id="rp-sci" hidden><h3 class="track">Science</h3>')||!html.includes("+l.fx.slice(1)+'.':''),1);"))throw Error('Science section and research finds tagged');
 if(html.includes('People start buying mud')||!html.includes('var AI_MGR_DAY=40;')||!html.includes("only as spots open up in your reach")||html.includes('vv.offsetTop'))throw Error('Pass 125: carbon line, token bills, reach-limit orders line, no lifted tab bar');
 if(!/maximum-scale=1,user-scalable=no/.test(html)||!html.includes('gesturestart'))throw Error('Pass 125: no pinch zoom in the game');
 console.log('PASS Pass 125 feel and text fixes');
@@ -1096,12 +1096,22 @@ var P={ear:{day:0,start:0},touch:{day:0,start:0}};if(hardFaded(t,o,P.ear,g))thro
 if(hardWorkLive(t,g,{ear:{day:t.day,start:t.day}}))throw Error('it does not block the group running workaround');
 var c0=t.stats.care||0;earCare(t);earCare(t);if((t.stats.care||0)-c0!==1)throw Error('care once a day');t.day+=1;earCare(t);if((t.stats.care||0)-c0!==2)throw Error('and again the next day');
 `);
+check('Pass 259 (Puti): research never runs out, the letters open with people not three tree steps, the shop is not a letter, tree letters name a person',`
+var g=readyGame();var L=rlines(g);L.energy.found=5;var m5=rlM(g,'energy',0.05);L.energy.found=6;var m6=rlM(g,'energy',0.05);L.energy.found=40;var m40=rlM(g,'energy',0.05);
+if(Math.abs(m5-0.75)>1e-9||Math.abs(m6-0.675)>1e-9||!(m40>0&&m40<0.05))throw Error('10% off what is left after five: '+[m5,m6,m40]);
+grOf(g).ctr.energy=1;L.energy.found=5;L.energy.pd=1;if(!(rlOdds(g,'energy')>0))throw Error('a finished field still finds');if(rlFindTxt(RLINES[0],7).indexOf('10% off farm upkeep')<0)throw Error('find text');
+var h=g.emp;g.emp.hard={open:1,goal:'home',picks:{},goalOk:0,day:0};g.humans=4.1e9;g.money=1e12;h.inf=1e12;h.trees={rewild:1,lastmile:1,shop:1,lab:1};
+for(var d=0;d<30;d++){g.day=d;letDay(g);}g.emp.hard.goalOk=1;var t0=30,firstTree=null;
+for(d=30;d<500;d++){g.day=d;hardDay(g);letDay(g);if(firstTree==null&&TREE_ORDER.some(function(k){return k!=='island'&&treeShow(g,k);}))firstTree=d;if(treeShow(g,'shop'))throw Error('the shop is a letter');}
+if(firstTree!=null&&firstTree-t0<TLET_GAP[0])throw Error('a tree letter on day '+(firstTree-t0)+' of the letters');
+var w=treeWho('lastmile',TREES.lastmile.steps[0]);if(w.who!=='Hessa')throw Error('tree letter names a person');
+`);
 check('Pass 258 (Puti): one mailbox, at most 3 letters with the tree steps, tree letters 120+ days apart, two catch letters, aid says when it lands',`
 var g=readyGame();g.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};g.humans=4.1e9;g.money=1e12;g.emp.inf=1e12;g.emp.trees={rewild:1,lastmile:1,shop:1,lab:1};
 var tg=[],seen={},last=null,d,mx=0;for(d=0;d<4000;d++){g.day=d;hardDay(g);letDay(g);mx=Math.max(mx,letOpenN(g));if(letOpenN(g)>3)throw Error('more than 3 open: '+letOpenN(g));
  if(d%7)continue;TREE_ORDER.forEach(function(k){var s=treeShow(g,k);if(k!=='island'&&s&&!seen[s.id]){seen[s.id]=1;if(last!=null)tg.push(d-last);last=d;treeDecline(g,s.id);}});
  var R=propOf(g.emp.hard);R.open.slice().forEach(function(x){propDecline(g,x.id);});}
-if(tg.length<3||Math.min.apply(null,tg)<TLET_GAP[0])throw Error('tree letters too close or too few: '+tg.join(','));
+if(tg.length<2||Math.min.apply(null,tg)<TLET_GAP[0])throw Error('tree letters too close or too few: '+tg.join(','));/* Pass 259: the shop is out of the letters, three trees left */
 if(!propDef('orbit')||!propDef('chef')||!propDef('orbit').sink||!propDef('chef').sink)throw Error('catch letters');
 var c=readyGame();c.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};c.emp.trees={rewild:1};var s0=treeNext(c,'rewild');if(treeShow(c,'rewild'))throw Error('a tree step waits for its letter');c.emp.tlet={};c.emp.tlet[s0.id]=1;if(treeShow(c,'rewild')!==s0)throw Error('delivered, it shows');treeDecline(c,s0.id);if(c.emp.tlet[s0.id])throw Error('Not now needs a new letter');
 var h={gv:100,got:0,gq:[{a:100,due:400}]};c.day=35;if(!/nothing has arrived yet, the first batch lands in about 1[23] months/.test(aidArrTxt(c,h,fmtA)))throw Error('aid: '+aidArrTxt(c,h,fmtA));h.got=60;h.lost=40;if(!/^arrived /.test(aidArrTxt(c,h,fmtA)))throw Error('aid arrived');

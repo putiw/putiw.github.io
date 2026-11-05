@@ -2548,3 +2548,15 @@ Tests: balance 147, me 53, academy 10, hard 22 (fresh average run seed 7), yourt
 Bots: `shrimp-playthrough` and `shrimp-average-playthrough` now stub `document`; since Pass 257 the slice they load has `halPress`'s top-level listener and they crashed at load.
 
 Tests: balance 148 (new Pass 258 check, Pass 257 ear check and proposal timing updated), me 53, academy 10, ear 12, cardtap, yourtank, hard 22, frozen (fresh average run seed 7: Earth day 7,420, was 7,280). Not run: strong bot, spotlights, stable, monkey, layout (no deploy).
+
+## Pass 259 (5 Nov, Puti's list after Pass 258)
+
+1. **Research never ends.** A centre keeps its + and − buttons after the five named finds (the Pass 258 "Everything in this field is found" branch is gone, so people let go can be hired back). Finds go on: after five (`RL_NAMED`), each find takes 10% off what is left (`rlM` = linear part × 0.9 per extra find), so a cost never reaches zero. Odds keep falling (0.85 per find), so extra finds get rare. Genes moves kit survival 10% of the way to 0.97, packing's +6% stays at five. Basic science and Ecology: another paper. Text: `rlFindTxt`, each line's `more`, "Each find from here takes 10% off what is left of ...". Grants find on too.
+3. **No empty space under the letters.** The 4 s held height (`LET_H`, Pass 258) is gone, it came and went. "No letters this month." is one short line, not a row with hidden buttons. A second tap within 0.7 s of a Fund or Not now is ignored (`letBusy`), so it can't land on the letter that moved up.
+4. **Tree steps read like letters.** A person and a place, then the cost (`TREE_WHO`, `treeWho`, `treeHelp`): Mira, Tariq, Noa, Rafi for rewilding; Hessa (the nurse), Mr Okafor, Amina for the last mile; Lucy for the lab. Running: "Hessa, water filters". The step name and text are behind the title. The shop is not a letter (left for its own pass).
+5. **The first letters are people's.** When the letters start (`E.letOn`), tree steps seen as cards before are taken back and the first tree letter comes 120 to 360 days in.
+7. **Ear tank Play / Pause.** A phone won't play sound before a tap, so the live tank starts paused with a Play button (`setTank`, `TANK`); Feed and Change water start it too. Feeding is louder and brighter (`MIX.feed` vol 3 to 6, soft 0.45 to 0.2).
+
+Open: 6 (Grandma's tank on the land). Both frames measure 2.15/1 at 390 px (land 358×166, game 340×157) and draw shrimp at the same size; need Puti's screenshot to see what reads as zoomed.
+
+Tests: balance 149 (new Pass 259 check; Pass 258 mailbox check needs 2 tree gaps now, three trees left), me 53, academy 10, ear 14 (Play/Pause). Not run: bots, spotlights, stable, monkey (no deploy).

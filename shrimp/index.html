@@ -1140,7 +1140,7 @@ function lineTop(G){var t=G.emp.lineStage==null?-1:G.emp.lineStage;PACK_LINES.fo
 function lineSalvage(G,i){var n=lineCount(G,i);return n?Math.round(scaledCost(PACK_LINES[i].cost,n-1,1.2)*autoDisc(G)*0.5):0;}
 function lineSellAll(G,i){var n=lineCount(G,i),s=0;for(var k=n-1;k>=0;k--)s+=Math.round(scaledCost(PACK_LINES[i].cost,k,1.2)*autoDisc(G)*0.5);return s;}
 function sellLine(G,i,all){var l=PACK_LINES[i],E=G.emp;if(!l||lineCount(G,i)<1)return 0;E.lineStage=lineTop(G);var n=0,cash=0;do{var c=lineSalvage(G,i);if(!i)E.staff.lines--;else E.packLines[l.id]--;earn(G,c,'equipment');cash+=c;n++;}while(all&&lineCount(G,i)>0);log(G,'Sold '+(n>1?n+' × '+l.name.toLowerCase()+'s':'a '+l.name.toLowerCase())+' for AED '+Math.round(cash).toLocaleString('en-US'));return cash||1;}
-function packingMachineCap(G){var n=pd(G,'autopackm')&&!G.emp.machOff?20:0;PACK_LINES.forEach(function(l,i){n+=lineCount(G,i)*l.out;});return (n+(G.emp.legacyPacking||0))*automationFactor(G)*(1+0.06*rlFound(G,'auto'));}
+function packingMachineCap(G){var n=pd(G,'autopackm')&&!G.emp.machOff?20:0;PACK_LINES.forEach(function(l,i){n+=lineCount(G,i)*l.out;});return (n+(G.emp.legacyPacking||0))*automationFactor(G)*(1+0.06*Math.min(RL_NAMED,rlFound(G,'auto')));}
 function adReady(G,a){if(a.id==='fb')return true;if(a.id==='expo'&&G.kits.sold<100)return false;if(a.id==='yt'&&G.kits.sold<1000)return false;if(a.id==='web'&&G.kits.sold<10&&G.stats.sold<500)return false;var need={ig:10,shelf:30,web:60,reel:60,expo:100,yt:300};return G.stats.sold>=(need[a.id]||0)&&(!a.req||pd(G,a.req));}
 var FAST_PROFIT=3000;
 // Real-time pacing: about 30 min for a perfect run, 90 min for an average player, 2.5 h for a careful one.
@@ -2469,12 +2469,12 @@ function academyDay(G){var A=G.academy;if(!A.level)return;if(G.emp.acad&&Math.fl
 // ----- Research lines. Fund as many people as you like in each field, every year until you stop.
 // Finds are luck: more people and bigger labs raise the odds. Some years nothing comes out, some years two things do.
 var RLINES=[
- {id:'energy',name:'Energy for the farms',d:'Solar, wind and heat pumps for the hatcheries.',fx:'farm upkeep −5%',finds:['Solar cells that like humid farm roofs','A wind turbine small enough for a hatchery yard','Heat pumps that run on old tank water','Batteries made from used filter cartridges','A farm that sells its spare power back to the grid']},
- {id:'water',name:'Water',d:'Desalination, recycling and pipes for every region.',fx:'delivery and support −4%',finds:['A desalination membrane that clogs half as often','Rainwater tanks that fill a kit in a week','Water that plants keep clean on their own','Pipes that algae can’t grow in','A filter made from old shrimp shells']},
- {id:'auto',name:'Automation and AI',d:'Cameras, robots and software for packing and checks.',fx:'packing +6%, sick kits −5%',finds:['A camera that spots one sick shrimp in a crowd','A robot arm that bags shrimp without stressing them','An AI that plans every packing line overnight','Kit bags that seal themselves','A sorter that grades color by light']},
- {id:'genes',name:'Genes and breeding',d:'Hardier, healthier bloodlines.',fx:'kit survival +1 point',finds:['A red line that shrugs off bad water','Shrimp that handle a hot week','Babies that grow up twice as fast','A line that molts cleanly every time','A deeper red, no dye needed']},
- {id:'food',name:'Shrimp food',d:'Cheaper, better food that doesn’t come from the sea.',fx:'kit materials −4%',finds:['Algae food grown on sunlight','Insect protein pellets','Food from brewery leftovers','Slow-release food sticks for holidays','Mulberry leaves that keep for a year']},
- {id:'health',name:'Shrimp health',d:'Tests and cures for the things that kill colonies.',fx:'sick kits −8%',finds:['A five-minute flatworm test','A probiotic that keeps tanks stable','A gentle bath that protects babies','Why shrimp panic in a box, and how to stop it','A cure for muscle disease']},
+ {id:'energy',more:'farm upkeep',name:'Energy for the farms',d:'Solar, wind and heat pumps for the hatcheries.',fx:'farm upkeep −5%',finds:['Solar cells that like humid farm roofs','A wind turbine small enough for a hatchery yard','Heat pumps that run on old tank water','Batteries made from used filter cartridges','A farm that sells its spare power back to the grid']},
+ {id:'water',more:'delivery and support',name:'Water',d:'Desalination, recycling and pipes for every region.',fx:'delivery and support −4%',finds:['A desalination membrane that clogs half as often','Rainwater tanks that fill a kit in a week','Water that plants keep clean on their own','Pipes that algae can’t grow in','A filter made from old shrimp shells']},
+ {id:'auto',more:'sick kits',name:'Automation and AI',d:'Cameras, robots and software for packing and checks.',fx:'packing +6%, sick kits −5%',finds:['A camera that spots one sick shrimp in a crowd','A robot arm that bags shrimp without stressing them','An AI that plans every packing line overnight','Kit bags that seal themselves','A sorter that grades color by light']},
+ {id:'genes',more:'kits lost',name:'Genes and breeding',d:'Hardier, healthier bloodlines.',fx:'kit survival +1 point',finds:['A red line that shrugs off bad water','Shrimp that handle a hot week','Babies that grow up twice as fast','A line that molts cleanly every time','A deeper red, no dye needed']},
+ {id:'food',more:'kit materials',name:'Shrimp food',d:'Cheaper, better food that doesn’t come from the sea.',fx:'kit materials −4%',finds:['Algae food grown on sunlight','Insect protein pellets','Food from brewery leftovers','Slow-release food sticks for holidays','Mulberry leaves that keep for a year']},
+ {id:'health',more:'sick kits',name:'Shrimp health',d:'Tests and cures for the things that kill colonies.',fx:'sick kits −8%',finds:['A five-minute flatworm test','A probiotic that keeps tanks stable','A gentle bath that protects babies','Why shrimp panic in a box, and how to stop it','A cure for muscle disease']},
  {id:'basic',name:'Basic science',d:'How shrimp see, feel and molt. Nothing to sell.',fx:'nothing for the company',finds:['How shrimp see red','Shrimp feel pain, and how much','What sets off a molt','How a colony decides when to breed','Why shrimp hide the day before they molt']},
  {id:'eco',name:'Ecology',d:'Streams, wild shrimp and mangroves.',fx:'nothing for the company',finds:['Where wild shrimp still live','Which streams can take native shrimp back','How mangroves clean pond water','What farm water does to a river','How fast a coast comes back']}];
 var RPOS=[{id:'phd',name:'PhD student',few:'PhD student',many:'PhD students',usd:40000,inc:0.0005,pts:0.12,max:12,pap:0.6},{id:'pd',name:'Postdoc',few:'postdoc',many:'postdocs',usd:50000,inc:0.001,pts:0.25,max:6,pap:1},{id:'pi',name:'PI lab',few:'PI lab',many:'PI labs',usd:1500000,inc:0.005,pts:1.0,max:3,pap:5}];
@@ -2482,6 +2482,9 @@ var RPOS=[{id:'phd',name:'PhD student',few:'PhD student',many:'PhD students',usd
 function posAed(G,p){return Math.max(posUsd(G,p)*USD,(p.inc||0)*Math.max(0,incRef(G))*365);}
 function rlines(G){var A=G.academy;if(!A.rl)A.rl={};RLINES.forEach(function(l){if(!A.rl[l.id])A.rl[l.id]={phd:0,pd:0,pi:0,found:0,dud:0};});return A.rl;}
 function rlFound(G,id){var A=G.academy;return A&&A.rl&&A.rl[id]?A.rl[id].found:0;}
+/* Pass 259 (Puti 5 Nov): a field never runs out. After its five named finds, each find takes 10% off what is left (rlM), so a cost never reaches zero. */
+var RL_NAMED=5;
+function rlFindTxt(l,i){if(i<l.finds.length)return l.finds[i];return l.more?'Another 10% off '+l.more:'Another paper that changes how people think about shrimp';}
 // Postdoc pay on top of the USD 50k base. Paying more doesn't change the odds of a find, it's how you treat people.
 var PD_PAY=[0,0.2,0.5];
 function pdPay(G){return PD_PAY[(G.academy&&G.academy.pdPay)||0]||0;}
@@ -2492,16 +2495,16 @@ function rlPapers(G,id){var L=rlines(G)[id],t=0;RPOS.forEach(function(p){t+=L[p.
 function rlYearAll(G){var t=0;RLINES.forEach(function(l){t+=rlYear(G,l.id);});return t;}
 function rlPts(G,id){var L=rlines(G)[id],t=0;RPOS.forEach(function(p){t+=L[p.id]*p.pts;});return t*(1+0.1*Math.min(3,G.academy.level||0))*(G.me&&G.me.hrs&&G.me.hrs.papers>=300?1.15:1);}
 // chance of a find in a year, as a share
-function rlOdds(G,id){var l=RLINES.filter(function(x){return x.id===id;})[0],L=rlines(G)[id];if(!l||L.found>=l.finds.length)return 0;return 1-Math.exp(-rlPts(G,id)*Math.pow(0.85,L.found));}
+function rlOdds(G,id){var l=RLINES.filter(function(x){return x.id===id;})[0],L=rlines(G)[id];if(!l)return 0;return 1-Math.exp(-rlPts(G,id)*Math.pow(0.85,L.found));}
 function rlHire(G,id,pos){var L=rlines(G)[id],P=RPOS.filter(function(x){return x.id===pos;})[0];if(!academyOpen(G)||!L||!P||L[pos]>=P.max||frozen(G)||!grOf(G).ctr[id])return false;var first=posAed(G,P)/12;if(G.money<first+capitalReserve(G))return false;L[pos]++;if(!G.academy.level)G.academy.level=1;log(G,'Funded a '+P.name.toLowerCase()+' in '+RLINES.filter(function(x){return x.id===id;})[0].name.toLowerCase());return true;}
 function rlLet(G,id,pos){var L=rlines(G)[id];if(!L||!L[pos])return false;L[pos]--;return true;}
 function rlDay(G){var A=G.academy;if(!A.rl)return;var cost=rlYearAll(G)/365;if(cost<=0)return;if(G.money<cost){RLINES.forEach(function(l){var L=A.rl[l.id];if(L.pi){L.pi--;log(G,'Could not pay a PI lab in '+l.name.toLowerCase()+', it closed');}});return;}pay(G,cost,'research');
  RLINES.forEach(function(l){var L=A.rl[l.id],pp=rlPapers(G,l.id)/365;if(pp>0){L.pf=(L.pf||0)+pp;while(L.pf>=1){L.pf-=1;L.papers=(L.papers||0)+1;A.papers=(A.papers||0)+1;A.knowledge+=3;}}});
  RLINES.forEach(function(l){var L=A.rl[l.id],o=rlOdds(G,l.id);if(o<=0)return;var pDay=1-Math.pow(1-o,1/365);if(Math.random()>=pDay)return;
   if(Math.random()<0.25){L.dud++;A.knowledge+=20;newsLine(G,['A study you funded finds nothing at all. The paper is very honest about it.','Your '+l.name.toLowerCase()+' people publish a careful paper that changes nothing. Their families are proud anyway.','Three years of work in '+l.name.toLowerCase()+' end in one sentence: more research is needed.'][L.dud%3],1);return;}
-  var f=l.finds[L.found];L.found++;A.knowledge+=60;rlApply(G,l.id);newsLine(G,'Your '+l.name.toLowerCase()+' researchers found something: '+f.charAt(0).toLowerCase()+f.slice(1)+'. '+l.fx.charAt(0).toUpperCase()+l.fx.slice(1)+'.',1);});}
-function rlApply(G,id){var E=G.emp;if(id==='genes')E.q=Math.min(0.97,E.q+0.01);}
-function rlM(G,id,per){return Math.max(0.5,1-per*rlFound(G,id));}
+  var f=rlFindTxt(l,L.found),nm=L.found<l.finds.length;L.found++;A.knowledge+=60;rlApply(G,l.id);newsLine(G,'Your '+l.name.toLowerCase()+' researchers found something: '+f.charAt(0).toLowerCase()+f.slice(1)+'.'+(nm?' '+l.fx.charAt(0).toUpperCase()+l.fx.slice(1)+'.':''),1);});}
+function rlApply(G,id){var E=G.emp;if(id==='genes')E.q=rlFound(G,id)>RL_NAMED?E.q+(0.97-E.q)*0.1:Math.min(0.97,E.q+0.01);}
+function rlM(G,id,per){var f=rlFound(G,id);return Math.max(0.5,1-per*Math.min(RL_NAMED,f))*Math.pow(0.9,Math.max(0,f-RL_NAMED));}
 // ----- Research grants (Pass 206, plan Part 4). Replaces open access to the research lines.
 // Once a year two people apply for a 3-year postdoc grant, each in one direction. Pick one (the player sets the amount,
 // USD 150k to 240k, which only moves the fair trait) or skip the year. Up to 3 run at once. After 3 years: 3 papers, and a
@@ -2535,8 +2538,8 @@ function grantDay(G){if(!academyOpen(G)||G.left||G.voyage)return;var A=G.academy
  var cost=0;g.run.forEach(function(r){cost+=r.amt*1000*USD/(365*GR_YEARS);});if(cost>0)pay(G,Math.min(cost,Math.max(0,G.money)),'research');
  for(var i=g.run.length-1;i>=0;i--){var r=g.run[i];if(now<r.e)continue;g.run.splice(i,1);var L=rlines(G)[r.f],l=RLINES.filter(function(x){return x.id===r.f;})[0],res='papers';
   L.papers=(L.papers||0)+GR_YEARS;A.papers=(A.papers||0)+GR_YEARS;A.knowledge+=3*GR_YEARS;
-  var o=L.found>=l.finds.length?0:1-Math.exp(-0.75*Math.pow(0.85,L.found));
-  if(Math.random()<o){if(Math.random()<0.25){L.dud++;res='nothing';}else{L.found++;rlApply(G,r.f);res='find';newsLine(G,r.n+', on your grant, found something: '+l.finds[L.found-1].charAt(0).toLowerCase()+l.finds[L.found-1].slice(1)+'.',1);}}
+  var o=1-Math.exp(-0.75*Math.pow(0.85,L.found));
+  if(Math.random()<o){if(Math.random()<0.25){L.dud++;res='nothing';}else{L.found++;rlApply(G,r.f);res='find';newsLine(G,r.n+', on your grant, found something: '+(function(f){return f.charAt(0).toLowerCase()+f.slice(1);})(rlFindTxt(l,L.found-1))+'.',1);}}
   g.done.push({n:r.n,d:r.d,f:r.f,t:r.t,e:now,res:res});if(g.done.length>40)g.done.shift();
   log(G,'Grant ended: '+r.n+', '+GR_YEARS+' papers'+(res==='find'?' and a find':res==='nothing'?', the main result was nothing':''));}}
 // The old Space chapter is gone (after Pass 169). Old saves in it go back to their won company; the new voyage door opens with enough science.
@@ -3285,6 +3288,12 @@ var TREE_ORDER=['island','rewild','lastmile','lab','shop'];
 /* Pass 257 (Puti): a tree step takes time. Days, from the step's own text where it says (a year of surveys) */
 var TREE_T={isl_buy:90,isl_nation:365,isl_pass:180,isl_un:730,rw_stream:365,rw_reserve:180,rw_jar:240,rw_lib:90,lm_water:120,lm_med:180,lm_books:60,lm_seeds:120,lab_glow:365,lab_colour:365,lab_sterile:540,sh_shop:60,sh_art:14,sh_fest:120,sh_stay:7};
 TREE_ORDER.forEach(function(k){TREES[k].steps.forEach(function(s){s.t=TREE_T[s.id]||90;});});
+/* Pass 259 (Puti): a tree step reads like any other letter, a person and a place, then the cost. [who, where, short name for Running] */
+var TREE_WHO={rw_stream:['Mira','a stream up north','native shrimp'],rw_reserve:['Tariq','a valley nobody farms','the reserve'],rw_jar:['Noa','a school biology lab','sealed jars'],rw_lib:['Rafi','the shrimp liberation group','the reserves'],
+ lm_water:['Hessa','a clinic in a desert town','water filters'],lm_med:['Hessa','a clinic in a desert town','insulin'],lm_books:['Mr Okafor','a school at the end of the road','school books'],lm_seeds:['Amina','a town at the end of the road','seeds'],
+ lab_glow:['Lucy','your lab','glowing shrimp'],lab_colour:['Lucy','your lab','colour shrimp'],lab_sterile:['Lucy','your lab','sterile shrimp']};
+function treeWho(k,s){var w=TREE_WHO[s.id];return w?{who:w[0],where:w[1],t:w[2]}:{who:TREES[k].name,where:s.name,t:s.name};}
+function treeHelp(G,k,s){var T=TREES[k],w=treeWho(k,s),first=T.steps[0]===s;return (first?T.open+' ':'')+s.name+'. '+s.d+' '+w.who+', '+w.where+'.';}
 function treeFrac(G,s){var a=G.emp.tree&&G.emp.tree[s.id];if(!a)return 0;return Math.max(0,Math.min(1,(G.day-(a-1))/(s.t||1)));}
 function treeRun(G,k){var r=null;TREES[k].steps.forEach(function(s){if(!r&&G.emp.tree&&G.emp.tree[s.id]&&treeFrac(G,s)<1)r=s;});return r;}
 /* Pass 234: a step's cost; mD/iD are days of income (money, ✦), never under the fixed m/i */
@@ -3300,12 +3309,14 @@ function treeNext(G,k){var T=TREES[k],E=G.emp;if(!treeHas(G,k)||treeRun(G,k))ret
    tree letters (rewilding, the last mile, the shop, the lab) at least 120 to 360 days apart. In letter mode a tree step shows once it is delivered (E.tlet). */
 var LET_GAP=[10,50],TLET_GAP=[120,360];function letRint(a){return a[0]+Math.floor(Math.random()*(a[1]-a[0]+1));}
 function letMode(G){var E=G.emp;if(!hardOpen(G)||(E.ended&&!E.won))return false;return !!(E.won||E.hard.goalOk);}
-function treeShow(G,k){var nx=treeNext(G,k);if(!nx||k==='island'||!letMode(G))return nx;return G.emp.tlet&&G.emp.tlet[nx.id]?nx:null;}
-function treeCand(G,k){var nx=treeNext(G,k);return nx&&k!=='island'&&!(G.emp.tlet&&G.emp.tlet[nx.id])?nx:null;}
+function treeShow(G,k){var nx=treeNext(G,k);if(!nx||k==='island'||!letMode(G))return nx;if(k==='shop')return null;/* Pass 259 (Puti): the shop is not a letter */return G.emp.tlet&&G.emp.tlet[nx.id]?nx:null;}
+function treeCand(G,k){var nx=treeNext(G,k);return nx&&k!=='island'&&k!=='shop'&&!(G.emp.tlet&&G.emp.tlet[nx.id])?nx:null;}
 function letOpenN(G){var E=G.emp,n=E.hard&&E.hard.pr?E.hard.pr.open.length:0;if(letMode(G))TREE_ORDER.forEach(function(k){if(k!=='island'&&treeShow(G,k))n++;});return n;}
 function letDay(G){var E=G.emp,now=Math.floor(G.day);if(!E)return;var T=E.tlet||(E.tlet={}),lm=letMode(G);
  if(!lm)TREE_ORDER.forEach(function(k){var c=treeCand(G,k);if(c)T[c.id]=1;});/* shown as a card before the letters: counts as delivered */
  var hl=hardLive(G)&&hardOpen(G);if(!lm&&!hl)return;
+ /* Pass 259 (Puti): the first letters are people's letters, not three tree steps at once. Tree steps seen as cards before wait, the first tree letter comes 120 to 360 days in */
+ if(lm&&!E.letOn){E.letOn=1;TREE_ORDER.forEach(function(k){var nx=treeNext(G,k);if(nx&&k!=='island')delete T[nx.id];});E.tletNext=now+letRint(TLET_GAP);}
  if(E.letNext==null)E.letNext=now+letRint(LET_GAP);
  if(now<E.letNext||letOpenN(G)>=PROP_MAX||(typeof busyUI==='function'&&busyUI()))return;
  var tk=lm&&now>=(E.tletNext||0)?TREE_ORDER.filter(function(k){return !!treeCand(G,k);}):[],got=false;
@@ -4430,7 +4441,7 @@ function trim(n,d){return String(+Number(n).toFixed(d));}
 (function(){var vv=window.visualViewport,fix=function(){var a=document.activeElement,typing=!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!/^(range|checkbox|radio|button)$/.test(a.type||''));document.body.classList.toggle('kbd',typing&&!!vv&&vv.height<window.innerHeight*0.8);var t=document.querySelector('.tabs');if(t&&t.style.transform)t.style.transform='';};if(vv){vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);}document.addEventListener('focusin',function(){setTimeout(fix,300);});document.addEventListener('focusout',function(){setTimeout(fix,50);setTimeout(fix,400);});})();
 // No browser feel: no pinch or double-tap zoom, no long-press menu outside text fields.
 (function(){var stop=function(e){e.preventDefault();};['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,stop,{passive:false});});document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea,[contenteditable]')))e.preventDefault();});})();
-var toastT=null,NF=null,BUILD='2026-11-05T10:30-p258';
+var toastT=null,NF=null,BUILD='2026-11-05T11:30-p259';
 function buildDate(){var m=BUILD.match(/^(\d{4})-(\d\d)-(\d\d)(?:T(\d\d:\d\d))?/);if(!m)return '';return 'Updated '+(+m[3])+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m[2]-1]+' '+m[1]+(m[4]?', '+m[4]+' UAE':'');}
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
@@ -4935,7 +4946,8 @@ var HD_HOLD={};function hdHold(k,el,hide,both){var now=Date.now()-(typeof TAP_AT
 // Pass 232: a list row bought or turned down keeps its place, greyed, until the player scrolls or changes tab (FRZ: lists not rewritten meanwhile)
 /* Pass 257 (Puti): Fund takes the letter to Running at once; the Letters list keeps its height until the next scroll so nothing above moves.
    While a finger is down in the panel it isn't rebuilt, so the tap lands on the button it started on */
-var LET_H=0,LET_T=0,HAL_PTR=0;function letHold(){var hl=document.querySelector('#hard-al .hal-let');if(hl){LET_H=Math.max(Date.now()-LET_T>4000?0:LET_H,hl.offsetHeight);LET_T=Date.now();}}
+/* Pass 259 (Puti): no held space under the letters (it came and went). The list closes at once; a second tap within 0.7 s is ignored so it can't land on the letter that moved up */
+var LET_H=0,LET_T=0,HAL_PTR=0;function letHold(){LET_T=Date.now();}function letBusy(){return Date.now()-LET_T<700;}
 function halPress(){return HAL_PTR&&Date.now()-HAL_PTR<1500;}
 document.addEventListener('pointerdown',function(e){if(e.target.closest&&e.target.closest('#hard-al'))HAL_PTR=Date.now();},{passive:true,capture:true});
 ['pointerup','pointercancel'].forEach(function(ev){document.addEventListener(ev,function(){if(HAL_PTR)setTimeout(function(){HAL_PTR=0;},0);},{passive:true});});
@@ -6771,12 +6783,12 @@ function treesInHard(G){var E=G.emp;if(!hardOpen(G)||(E.ended&&!E.won))return fa
 function treeCostTxt(G,nx){if(nx.dues)return duesLabel(nx.dues[0],nx.dues[1]);var nc=treeCost(G,nx),t=[];if(nc[0])t.push(fmtA(nc[0]));if(nc[1])t.push(inf(nc[1]));return t.length?t.join(' and '):'no cost';}
 function treeBtnLabel(G,nx){if(nx.dues)return '<span class="c2">'+Math.round(nx.dues[0]*100)+'% of income</span><span class="c2">'+duesLabel(nx.dues[0],nx.dues[1]).replace(/^\d+% of income /,'')+'</span>';var nc=treeCost(G,nx);return costLabel(nc[0],nc[1]);}
 function treeRowsHTML(G,part){var E=G.emp,qa=function(x){return String(x).replace(/&/g,'&amp;').replace(/"/g,'&quot;');},rows='',run=[],done=[];
- TREE_ORDER.filter(function(k){return k!=='island'&&treeHas(G,k);}).forEach(function(k){var T=TREES[k],nx=treeShow(G,k),ru=treeRun(G,k),dn=[];T.steps.forEach(function(st){if(E.tree&&E.tree[st.id]&&treeFrac(G,st)>=1)dn.push(st.name);});
+ TREE_ORDER.filter(function(k){return k!=='island'&&k!=='shop'&&treeHas(G,k);}).forEach(function(k){var T=TREES[k],nx=treeShow(G,k),ru=treeRun(G,k),dn=[];T.steps.forEach(function(st){if(E.tree&&E.tree[st.id]&&treeFrac(G,st)>=1)dn.push(st.name);});
   var ttl='<button type="button" class="qhelp qt" data-ht="'+qa((ru?ru.name+'. '+ru.d:nx?nx.name+'. '+nx.d:T.open)+(dn.length?' Done: '+dn.join(', ')+'.':''))+'" data-htitle="'+qa(T.name)+'">'+T.name+'</button>';
   /* Pass 255 (Puti): each step is a letter in the Letters list, Fund with its cost, Not now */
-  if(nx){var nc=treeCost(G,nx),ok=G.money>=nc[0]&&E.inf>=nc[1]&&!frozen(G)&&(!nx.dues||G.money>=dayIncome(G)*nx.dues[0]*30);rows+='<div class="item ih pr-row"><div><h3>'+ttl+'</h3><p>'+nx.name+', '+treeCostTxt(G,nx)+'</p></div><div class="hb hbv"><button class="btn primary" data-act="tree-step" data-id="'+nx.id+'"'+(ok?'':' disabled')+'>Fund</button><button class="btn" data-act="tree-no" data-id="'+nx.id+'">Not now</button></div></div>';}
+  if(nx){var nc=treeCost(G,nx),ok=G.money>=nc[0]&&E.inf>=nc[1]&&!frozen(G)&&(!nx.dues||G.money>=dayIncome(G)*nx.dues[0]*30),w=treeWho(k,nx);rows+='<div class="item ih pr-row"><div><h3><button type="button" class="qhelp qt" data-ht="'+qa(treeHelp(G,k,nx))+'" data-htitle="'+qa(w.who)+'">'+w.who+', '+w.where+'</button></h3><p>'+treeCostTxt(G,nx)+'</p></div><div class="hb hbv"><button class="btn primary" data-act="tree-step" data-id="'+nx.id+'"'+(ok?'':' disabled')+'>Fund</button><button class="btn" data-act="tree-no" data-id="'+nx.id+'">Not now</button></div></div>';}
   /* Pass 257 (Puti): a funded step runs under Running with how far it is, the next step writes once it's done */
-  if(ru){var f=treeFrac(G,ru),left=Math.max(1,Math.ceil(ru.t*(1-f)));run.push('<div class="item ih pr-run"><div><h3>'+ttl+'</h3><p>'+ru.name+', '+Math.floor(f*100)+'% done</p><i class="pr-bar"><b style="width:'+Math.floor(f*100)+'%"></b></i></div><button class="btn" disabled>'+(left>=60?Math.round(left/30)+' months':left+' days')+'</button></div>');}
+  if(ru){var f=treeFrac(G,ru),left=Math.max(1,Math.ceil(ru.t*(1-f))),rw=treeWho(k,ru);run.push('<div class="item ih pr-run"><div><h3><button type="button" class="qhelp qt" data-ht="'+qa(treeHelp(G,k,ru))+'" data-htitle="'+qa(rw.who)+'">'+rw.who+', '+rw.t+'</button></h3><p>'+Math.floor(f*100)+'% done</p><i class="pr-bar"><b style="width:'+Math.floor(f*100)+'%"></b></i></div><button class="btn" disabled>'+(left>=60?Math.round(left/30)+' months':left+' days')+'</button></div>');}
   else if(!nx&&dn.length)done.push('<div class="item ih pr-run"><div><h3>'+ttl+'</h3><p>'+dn.length+' of '+T.steps.length+' done</p></div><button class="btn" disabled>Done</button></div>');
   if(k==='rewild'&&plOpen(G)&&!treesOpen(G)&&!(E.coin&&E.coin.on))run.push('<div class="item ih pr-run"><div><h3>Plant trees on the coast hills</h3><p>'+cnt(plLiving(G,true))+' of your trees living</p></div><button class="btn" data-act="pl-open">Go</button></div>');});
  return part==='letters'?rows:{run:run,done:done};}
@@ -6967,11 +6979,10 @@ function grantsHTML(){var g=grOf(G),A=G.academy,h='<h3 class="track">Grants</h3>
  return h;}
 function rlFieldsHTML(){var L=rlines(G),A=G.academy,h='',ctr=grOf(G).ctr;
  var payH='<div class="rl-pay"><span>Postdoc pay</span><div class="seg">'+PD_PAY.map(function(x,i){return '<button class="btn" data-act="pd-pay" data-i="'+i+'" aria-pressed="'+((A.pdPay||0)===i)+'">'+usd(50000*(1+x))+'</button>';}).join('')+'</div><small>The base is '+usd(50000)+' a year. Paying more doesn\u2019t make research faster.</small></div>';
- RLINES.forEach(function(l){var x=L[l.id],o=rlOdds(G,l.id),done=x.found>=l.finds.length,ppl=RPOS.map(function(p){return x[p.id]?x[p.id]+' '+(x[p.id]>1?p.many:p.few):'';}).filter(Boolean).join(', ');
+ RLINES.forEach(function(l){var x=L[l.id],o=rlOdds(G,l.id),nx=Math.max(0,x.found-l.finds.length),ppl=RPOS.map(function(p){return x[p.id]?x[p.id]+' '+(x[p.id]>1?p.many:p.few):'';}).filter(Boolean).join(', ');
   if(!ctr[l.id])return;
-  h+='<details class="rl-line"><summary class="rl-hd"><span>'+l.name+'</span><small>'+(ppl?ppl+' · ':'')+(x.found?x.found+(x.found===1?' find':' finds'):'nothing yet')+'</small></summary>'+(x.papers?'<p class="hint" style="margin:2px 0">'+x.papers+(x.papers===1?' paper':' papers')+' so far.</p>':'')+'<p class="hint" style="margin:2px 0 6px">'+l.d+' Each find: '+l.fx+'.'+(x.found?' Found: '+l.finds.slice(0,x.found).join(', ').toLowerCase()+'.':'')+'</p>';
-  if(done)h+='<p class="hint">Everything in this field is found.'+(ppl?' Still paid: '+aed(rlYear(G,l.id))+' a year.':'')+'</p>'+(ppl?'<div class="rl-btns">'+RPOS.filter(function(p){return x[p.id];}).map(function(p){return '<button class="btn" data-act="rl-let" data-l="'+l.id+'" data-p="'+p.id+'">Let one '+p.few+' go</button>';}).join('')+'<button class="btn" data-act="rl-letall" data-l="'+l.id+'">Let everyone go</button></div>':'')+'</details>';else{ /* Pass 258: a finished field still pays its people, so they can be let go */
-  h+='<p class="rl-now">'+(ppl?ppl+' · '+aed(rlYear(G,l.id))+' a year · about '+Math.round(o*100)+'% chance of a find this year':'Nobody working on this yet.')+'</p><div class="rl-btns">'+RPOS.map(function(p){var full=x[p.id]>=p.max,ok=!full&&G.money>=posAed(G,p)/12+capitalReserve(G)&&!frozen(G);return '<span class="rl-pos"><button class="btn" data-act="rl-hire" data-l="'+l.id+'" data-p="'+p.id+'"'+(ok?'':' disabled')+'>+\u00a0'+p.name+'<small>'+(posAed(G,p)>posUsd(G,p)*USD*1.01?aedS(posAed(G,p)):usd(posUsd(G,p)))+'/yr</small></button>'+(x[p.id]?'<button class="btn rl-x" data-act="rl-let" data-l="'+l.id+'" data-p="'+p.id+'" aria-label="Stop funding one '+p.name+'">−</button>':'')+'</span>';}).join('')+'</div></details>';}});
+  h+='<details class="rl-line"><summary class="rl-hd"><span>'+l.name+'</span><small>'+(ppl?ppl+' · ':'')+(x.found?x.found+(x.found===1?' find':' finds'):'nothing yet')+'</small></summary>'+(x.papers?'<p class="hint" style="margin:2px 0">'+x.papers+(x.papers===1?' paper':' papers')+' so far.</p>':'')+'<p class="hint" style="margin:2px 0 6px">'+l.d+' Each find: '+l.fx+'.'+(x.found?' Found: '+l.finds.slice(0,x.found).join(', ').toLowerCase()+'.':'')+(x.found>=l.finds.length?(l.more?' Each find from here takes 10% off what is left of '+l.more+'.':' Each find from here is another paper.')+(nx?' '+nx+' so far.':''):'')+'</p>';
+  h+='<p class="rl-now">'+(ppl?ppl+' · '+aed(rlYear(G,l.id))+' a year · about '+Math.round(o*100)+'% chance of a find this year':'Nobody working on this yet.')+'</p><div class="rl-btns">'+RPOS.map(function(p){var full=x[p.id]>=p.max,ok=!full&&G.money>=posAed(G,p)/12+capitalReserve(G)&&!frozen(G);return '<span class="rl-pos"><button class="btn" data-act="rl-hire" data-l="'+l.id+'" data-p="'+p.id+'"'+(ok?'':' disabled')+'>+\u00a0'+p.name+'<small>'+(posAed(G,p)>posUsd(G,p)*USD*1.01?aedS(posAed(G,p)):usd(posUsd(G,p)))+'/yr</small></button>'+(x[p.id]?'<button class="btn rl-x" data-act="rl-let" data-l="'+l.id+'" data-p="'+p.id+'" aria-label="Stop funding one '+p.name+'">−</button>':'')+'</span>';}).join('')+'</div></details>';});
  return h+'<details class="lab-pay"><summary>Postdoc pay · '+usd(50000*(1+pdPay(G)))+'</summary>'+payH+'</details>';}
 var HARD_SURE=null,HARD_SEL=null;
 // ----- The hard part as things you watch (Pass 183) -----
@@ -7059,7 +7070,7 @@ function renderHard(){var c=$('hard-card');if(!c)return;var E=G.emp,won=!!E.won,
  else if(pick){var h0='<p class="hard-one">'+(H.goalOk?'What does “everyone” mean now?':'First decide what “everyone” means. You can change it later.')+'</p>'+hardGoalsHTML(true);hb.mhtml=h0;slotMin(hb,'hb',[h0]);}
  else{hb.style.minHeight='';var tapL='<p class="hard-one">Tap a group.</p>',sh='<div class="hard-step">'+(sel?hardGroupHTML(hardGroup(sel)):tapL)+'</div>';hb.mhtml=sh;
   var stp=hb.querySelector('.hard-step');if(stp){if(sel)slotMin(stp,'hs',HARD.map(function(x){return hardGroupHTML(x);}));else{stp.style.minHeight='';}}}/* Pass 229 (Puti): no empty slot before a group is picked */// Pass 190: no Next, any group any time, the slot is the tallest group so a tap moves nothing below
- if(!FRZ['hard-al']&&!halPress())$('hard-al').mhtml=pick?'':hardAllocHTML(G,H,ro);var hl=$('hard-al').querySelector('.hal-let');if(hl){if(LET_H&&Date.now()-LET_T>4000)LET_H=0;hl.style.minHeight=LET_H?LET_H+'px':'';}/* Pass 258 (Puti): the space a funded letter leaves holds 4 s so the tap moves nothing, then it closes, no empty space under the letters */if(!pick){nourJar(ro);$('hard-led').mhtml=hardLedgerHTML(G,H,ro);}
+ if(!FRZ['hard-al']&&!halPress())$('hard-al').mhtml=pick?'':hardAllocHTML(G,H,ro);/* Pass 258 (Puti): the space a funded letter leaves holds 4 s so the tap moves nothing, then it closes, no empty space under the letters */if(!pick){nourJar(ro);$('hard-led').mhtml=hardLedgerHTML(G,H,ro);}
  $('hard-re').mhtml='';}
 // Pass 253 (Puti, item 7): once the hard part card shows, Shaping the world (the world tracks, the forks, the gala) sits
 // inside it in a closed fold under Running, the same rows and handlers moved as they are; its own card hides on World.
@@ -7103,7 +7114,7 @@ function propHelp(G,o,x){var g=o.g&&hardGroup(o.g),nm=propName(o,x.alt),h='“'+
  if(o.cold)h+=' The Times will notice.';return h;}
 function hardPropsHTML(G,H,ro){var R=propOf(H),qa=function(x){return String(x).replace(/&/g,'&amp;').replace(/"/g,'&quot;');},h='<p class="coin-t">Letters</p>';
  var tlet=treesInHard(G)?treeRowsHTML(G,'letters'):'';h+='<div class="hal-let">';
- for(var i=0;i<Math.max(tlet?0:1,R.open.length);i++){var x=R.open[i],o=x&&propDef(x.id);if(!o){h+='<div class="item ih pr-row"><div><h3>No letters this month.</h3><p></p></div><div class="hb hbv" style="visibility:hidden"><button class="btn">Fund</button><button class="btn">Not now</button></div></div>';continue;}
+ for(var i=0;i<Math.max(tlet?0:1,R.open.length);i++){var x=R.open[i],o=x&&propDef(x.id);if(!o){h+='<p class="hint pr-none">No letters this month.</p>';continue;}
   var nm=propName(o,x.alt),ok=!ro&&propCan(G,o,x),dis=false;
   h+='<div class="item ih pr-row"><div><h3><button type="button" class="qhelp qt" data-ht="'+qa(propHelp(G,o,x))+'" data-htitle="'+qa(nm.who)+'">'+nm.who+', '+nm.where+'</button></h3><p>'+propCostTxt(G,o,x)+'</p></div><div class="hb hbv"><button class="btn primary" data-act="prop-fund" data-id="'+x.id+'"'+(ok&&!dis?'':' disabled')+'>Fund</button><button class="btn" data-act="prop-no" data-id="'+x.id+'"'+(ro||dis?' disabled':'')+'>Not now</button></div></div>';}
  var ks=Object.keys(R.run),tr={run:[],done:[]},dl=[];if(treesInHard(G)){h+=tlet;tr=treeRowsHTML(G,'running');}h+='</div>';/* Pass 257 (Puti): one Running list, letters and trees the same shape, done ones in a fold at the end */{var rows=ks.map(function(k){var p=R.run[k],o=propDef(k);if(!o)return '';var nm=propName(o,p.alt),g=o.g&&hardGroup(o.g),st;
@@ -7545,8 +7556,8 @@ function initControls(){
     if(a==='coin-sell'){var cs=coinOf(G),got=coinSell(G,Math.max(1,cs.treasury*(+b.dataset.f)));if(got)toast('Sold for '+aed(got));render();return;}
     if(a==='coin-honest'){coinOf(G).honest=1;render();return;}
     if(a==='proj-no'){if(projDecline(G,b.dataset.id)){if(b.closest('#e-proj'))frzTap('e-proj',b);render();}return;}
-    if(a==='prop-fund'){if(propFund(G,b.dataset.id)){letHold();render();save();}else toast('Not enough spare cash or ✦, or not possible yet.');return;}
-    if(a==='prop-no'){if(propDecline(G,b.dataset.id)){letHold();render();save();}return;}
+    if(a==='prop-fund'){if(letBusy())return;if(propFund(G,b.dataset.id)){letHold();render();save();}else toast('Not enough spare cash or ✦, or not possible yet.');return;}
+    if(a==='prop-no'){if(letBusy())return;if(propDecline(G,b.dataset.id)){letHold();render();save();}return;}
     if(a==='prop-stop'){if(propStop(G,b.dataset.id)){render();save();}return;}
     if(a==='prop-start'){if(propStart(G,b.dataset.id)){render();save();}return;}
     if(a==='hard-buy'){var hg=hardGroup(b.dataset.g),ho=hg&&hardOp(hg,b.dataset.o);if(hardBuy(G,b.dataset.g,b.dataset.o)){render();}else toast('Not enough spare cash, or not possible yet.');return;}
@@ -7591,8 +7602,8 @@ function initControls(){
     if(a==='ts-upg'){if(TS&&buyUpgrade(G,G.tanks[TS.i],b.dataset.id)){toast('Installed on '+G.tanks[TS.i].name);cache.upsig=null;renderTankSheet();}return;}
     if(a==='treat-unlock'){if(unlockTreat(G,b.dataset.id)){var tu=TREATS.filter(function(x){return x.id===b.dataset.id;})[0];toast(tu.name+' unlocked. Pick it under Feeding.');cache={};render();}return;}
     if(a==='fw-feed'){var F0=fwOf(G);F0.f=clamp(+b.dataset.i|0,0,FW_FEED.length-1);if(F0.f===3){var V0=G.emp.evil||(G.emp.evil={});if(!V0.culls){V0.culls=1;trAdd(G,{kin:-1});}}cache.efarm=null;render();return;}
-    if(a==='tree-step'){if(buyTreeStep(G,b.dataset.id)){if(b.closest('#hard-al'))letHold();$('treecard').dataset.h='';render();save();}else toast(treeWhy(G,b.dataset.id));return;}// Pass 256: the row greys in place (the panel holds still until a scroll, so the old step stayed tappable), and the toast says why
-    if(a==='tree-no'){if(treeDecline(G,b.dataset.id)){letHold();$('treecard').dataset.h='';render();save();}return;}
+    if(a==='tree-step'){if(letBusy())return;if(buyTreeStep(G,b.dataset.id)){if(b.closest('#hard-al'))letHold();$('treecard').dataset.h='';render();save();}else toast(treeWhy(G,b.dataset.id));return;}// Pass 256: the row greys in place (the panel holds still until a scroll, so the old step stayed tappable), and the toast says why
+    if(a==='tree-no'){if(letBusy())return;if(treeDecline(G,b.dataset.id)){letHold();$('treecard').dataset.h='';render();save();}return;}
     if(a==='gplace'&&gplaceNext(G)&&gplaceNext(G).id==='land'&&landOld()&&!GP_ASK){GP_ASK=true;$('me-gplace').dataset.h='';render();return;}
     if(a==='land-hi'){$('land-hi').hidden=true;return;}
     if(a==='gplace-new')a='gplace';

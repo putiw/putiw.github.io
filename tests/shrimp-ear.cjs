@@ -9,9 +9,11 @@ const srv=http.createServer((q,r)=>{const f=path.join(root,decodeURIComponent(q.
  ok(await p.evaluate(()=>__msgs.includes('ready')),'posts ready');
  ok(await p.evaluate(()=>S.shrimp.length===5&&S.shrimp.filter(x=>x.sex==='f').length===3&&S.no3<1),'a clean tank, 5 shrimp, 3 females, nitrate about 0');
  const sw=await p.evaluate(()=>document.documentElement.scrollWidth);ok(sw<=360,'no sideways scroll at 360 px ('+sw+')');
- const btns=await p.evaluate(()=>[...document.querySelectorAll('body>button:not([hidden])')].map(x=>x.textContent));ok(btns.join('|')==='Feed|Change water|Hear the tank'&&await p.evaluate(()=>!document.getElementById('again').offsetHeight),'three big buttons: '+btns.join('|'));
+ const btns=await p.evaluate(()=>[...document.querySelectorAll('body>button:not([hidden])')].map(x=>x.textContent));ok(btns.join('|')==='Play|Feed|Change water|Hear the tank'&&await p.evaluate(()=>!document.getElementById('again').offsetHeight),'three big buttons: '+btns.join('|'));
  await p.click('#b-feed');await p.click('#b-water');await p.waitForTimeout(300);
  const st=await p.evaluate(()=>({m:__msgs.slice(),wc:(S.wc||[]).length,food:S.food,clog:S.clog,ctx:A&&A.ctx.state}));ok(st.m.includes('care:feed')&&st.m.includes('care:water')&&st.wc===1&&st.ctx==='running','Feed and Change water work, post care, sound runs: '+JSON.stringify(st));
+ ok(await p.evaluate(()=>TANK&&document.getElementById('b-play').textContent==='Pause'),'Feed starts the live tank, the button reads Pause');
+ await p.click('#b-play');ok(await p.evaluate(()=>!TANK&&document.getElementById('b-play').textContent==='Play'),'Pause stops it, the button reads Play');await p.click('#b-play');
  const d0=await p.evaluate(()=>S.day);await p.waitForTimeout(2600);const d1=await p.evaluate(()=>S.day);ok(d1-d0>0.4&&d1-d0<0.7,'a day in 5 s ('+(d1-d0).toFixed(2)+' days in 2.6 s)');
  await p.click('#b-help');const rows=await p.$$eval('#help-list [data-k]',x=>x.map(e=>e.dataset.k));ok(rows.length===20,rows.length+' sounds in the list');
  for(const k of rows){await p.evaluate(k=>{hear(k);},k);await p.waitForTimeout(60);}
