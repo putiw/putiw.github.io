@@ -253,7 +253,7 @@ var m1=kitMaterials(g);setQCStrict(g,2);if(!(kitMaterials(g)>m1))throw Error('St
 `);
 if(html.includes("needs '+big(nextLine.sold)")||html.includes('show up once your first three tanks')||html.includes('Bacteria starter unlocks when'))throw Error('Unlock rules should not be shown');
 if(!html.includes("bar.hidden=true;\n  if(!g)return;")||!html.includes("$('ideas-now').hidden=!soft"))throw Error('Guide lines belong in the ? popup, never a bar over the game (Puti, 28 Oct)');
-if(!html.includes("if(SPOT||SPOTQ.length||!introOK())return;")||!html.includes("if(!s.now&&!introOK(s.gap))"))throw Error('One spotlight at a time');
+if(!html.includes("if(SPOT||SPOTQ.length||!introOK())return;")||!html.includes("if(!s.now&&(!introOK(s.gap)||momentWait(G)>=0))"))throw Error('One spotlight at a time');
 check('story cards about a moment go first, narrative ones go stale after 60 days (Pass 190)',`
 var g=readyGame();var p=ensureProgress(g);p.seen.ev_mira=true;g.story.choices={ev_mira:0};g.day=1200;p.wait=['ev_paper','ev_rival'];p.at={ev_paper:1100,ev_rival:1100};p.queue=[];p.soon=[];
 detectMilestones(g);var w=p.wait.concat(p.queue);if(w.indexOf('mira_teen')<0||p.queue.indexOf('mira_teen')<0&&p.wait[0]!=='mira_teen')throw Error('Mira at eleven goes first '+JSON.stringify(w));
@@ -596,7 +596,7 @@ check('Pass 122: lab finds, funded studies and university news go to the Science
 var g=newGame();g.kits.sold=100;newsLine(g,'front');newsLine(g,'lab',1);var L=rip(g).log;if(L.length!==2||L[0].sci||!L[1].sci)throw Error('newsLine sci tag');
 g.emp.later=[{d:0,t:'study',sci:1}];g.day=1;laterDay(g);if(!rip(g).log[2].sci)throw Error('later study news keeps the tag');
 `);
-if(!html.includes('<div id="rp-sci" hidden><h3 class="track">Science</h3>')||!html.includes("+l.fx.slice(1)+'.',1);"))throw Error('Science section and research finds tagged');
+if(!html.includes('<div id="rp-sci" hidden><h3 class="track">Science</h3>')||!html.includes("+l.fx.slice(1)+'.':''),1);"))throw Error('Science section and research finds tagged');
 if(html.includes('People start buying mud')||!html.includes('var AI_MGR_DAY=40;')||!html.includes("only as spots open up in your reach")||html.includes('vv.offsetTop'))throw Error('Pass 125: carbon line, token bills, reach-limit orders line, no lifted tab bar');
 if(!/maximum-scale=1,user-scalable=no/.test(html)||!html.includes('gesturestart'))throw Error('Pass 125: no pinch zoom in the game');
 console.log('PASS Pass 125 feel and text fixes');
@@ -636,7 +636,7 @@ g.money=0;if(kitHold(g)[0]!==0)throw Error('No cash, no hold');var k=newGame();i
 check('Pass 132: cards wait 15 s of play after the last one, urgent ones do not',`
 var g=newGame();acknowledgeMilestone(g);g.progress.lastAck=null;g.ps={t:100000};g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;detectMilestones(g);if(g.progress.queue[0]!=='sale')throw Error('First card now');
 acknowledgeMilestone(g);g.ps.t+=5000;detectMilestones(g);if(g.progress.queue.length||g.progress.soon[0]!=='kits')throw Error('Second card waits');
-if(!(g.progress.gap>=10000&&g.progress.gap<=20000))throw Error('Gap 10 to 20 s');g.ps.t+=15000;detectMilestones(g);if(g.progress.queue[0]!=='kits')throw Error('Second card after 20 s');acknowledgeMilestone(g);
+if(!(g.progress.gap>=10000&&g.progress.gap<=35000))throw Error('Gap 10 to 35 s');g.ps.t+=Math.max(0,g.progress.gap-5000);detectMilestones(g);if(g.progress.queue[0]!=='kits')throw Error('Second card after 20 s');acknowledgeMilestone(g);
 g.ps.t+=1000;g.money=-1e6;g.emp.broke=1;var p=g.progress;p.seen.gameover=false;if(CARD_NOW.indexOf('broke')<0||CARD_NOW.indexOf('gameover')<0)throw Error('Urgent cards skip the gap');
 `);
 if(!html.includes('The babies can be sold at 60 days old'))throw Error('Pass 132: waiting note on the Babies card');
@@ -678,7 +678,7 @@ count++;console.log('PASS land: real time, game-day clock, adult at 75, frozen, 
 check('Pass 154: late costs scale, the fast answer pays later, leaving for the land, permits',`
 var g=readyGame();g.humans=6e9;g.money=1e11;g.fin=[];for(var i=0;i<7;i++)g.fin.push({kits:2e9,_inf:3e6});g.emp.inf=4e8;g.emp.infOn=1;
 var m0=g.money,f0=g.emp.inf;if(!card3Choose(g,'c_power',1))throw Error('engineers');if(Math.abs(m0-g.money-4e10)>1||Math.abs(f0-g.emp.inf-9e7)>1)throw Error('20 days of income and 30 days of ✦: '+(m0-g.money)+' '+(f0-g.emp.inf));
-var h=readyGame();h.humans=6e9;h.money=2e10;h.fin=g.fin;card3Choose(h,'c_power',2);if(!(h.emp.ceil>0))throw Error('leave it pays now');if(!(h.emp.later&&h.emp.later.length))throw Error('and bills later');h.emp.later[0].d=0;laterDay(h);if(hardN(h,hardGroup('hot'))!==1.2e9)throw Error('too hot grows: '+hardN(h,hardGroup('hot')));
+var h=readyGame();h.humans=6e9;h.money=2e10;h.fin=g.fin;card3Choose(h,'c_power',2);if(!(h.emp.ceil>0))throw Error('leave it pays now');if(!(h.emp.later&&h.emp.later.length))throw Error('and bills later');h.emp.later[0].d=0;laterDay(h);if(Math.abs(hardN(h,hardGroup('hot'))-hardGroup('hot').n*1.2)>1)throw Error('too hot grows: '+hardN(h,hardGroup('hot')));
 var q=readyGame();q.fin=g.fin;q.humans=6e9;q.money=2e10;card3Choose(q,'c_rivers',0);if(Math.abs(slowMult(q)-0.85)>1e-9)throw Error('shops: 15% fewer kits');
 var s7=readyGame();s7.fin=[];for(var j=0;j<7;j++)s7.fin.push({kits:1e6});for(var j=0;j<83;j++)s7.fin.unshift({kits:1e8});if(incRef(s7)<1e8*0.9)throw Error('a quiet week does not lower the price: '+incRef(s7));
 var L=readyGame();L.me.on=1;L.me.gplace={land:1};L.emp.hard={open:1,picks:{},goal:'home'};L.money=1e9;L.fin=g.fin;if(!canLeave(L))throw Error('can leave from the hard part');var tr0=(L.tr||{}).drive||0;if(!leaveCompany(L))throw Error('leave');if(!(L.left&&L.emp.ended&&L.emp.ended.kind==='left'))throw Error('left state');if(!(((L.tr||{}).drive||0)<tr0))throw Error('leaving is easy-going');stepGame(L);if(L.progress.queue[0]!=='left')throw Error('review card first');acknowledgeMilestone(L);if(progressionBlocked(L))throw Error('clock runs on the land');var d0=L.day;for(var k=0;k<40;k++)stepGame(L);if(!(L.day>d0))throw Error('days pass on the land');
@@ -768,7 +768,7 @@ check('Pass 166: the ledger gives late and partly, Nour writes six times, the sa
 var g=readyGame();g.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};g.money=1e10;g.day=0;
 operatingNet=function(){return 1e8;};capitalReserve=function(){return 1e9;};
 var H=hardOf(g);for(var d=0;d<30;d++){g.day=d;giveDay(g,H,d);}if(H.gv)throw Error('Nothing is given at 0%');
-H.give=.5;var m0=g.money;for(d=30;d<130;d++){g.day=d;giveDay(g,H,d);}
+hardAlloc(g,'aid',.5);if(hardAllocOf(H).aid!==.5)throw Error('Aid is a share (Pass 250)');var m0=g.money;for(d=30;d<130;d++){g.day=d;giveDay(g,H,d);}
 if(!(Math.abs(H.gv-100*5e7)<1))throw Error('Half the profit a day: '+H.gv);if(Math.abs(m0-g.money-H.gv)>1)throw Error('Giving comes out of cash');
 if(!(H.gq.length===1&&H.gq[0].due>=121+365&&H.gq[0].due<121+730))throw Error('A batch lands a year or two later: '+JSON.stringify(H.gq));
 g.money=1e9+3e7;for(d=130;d<140;d++){g.day=d;giveDay(g,H,d);}if(g.money<1e9-1)throw Error('Giving never eats the cash the company needs');
@@ -787,9 +787,78 @@ ensureProgress(n).seen.nour6=1;if(!/water engineering/.test(nourLines(n)[0]))thr
 var txt=['nour1','nour2','nour3','nour4','nour5','nour6'].map(function(k){var m=MILESTONES[k];return (m.bodyFn?m.bodyFn(n):m.body)+(m.opts?JSON.stringify(m.opts(n)):'');}).join(' ')+GIVE_LOSS.join(' ');
 if(/—/.test(txt))throw Error('No em-dashes');
 `);
-if(html.includes("hardSalesHTML")||!html.includes('id="hard-give"')||!html.includes('Sources: WHO and UNICEF 2025'))throw Error('Pass 166: sales line, give slider and sources in the hard part');
+if(html.includes("hardSalesHTML")||!html.includes("'hard-give'")||!html.includes('Sources: WHO and UNICEF 2025'))throw Error('Pass 166: sales line, give slider and sources in the hard part');
 for(const src of ['Hutton and Varughese 2016','Financing Electricity Access in Africa','givewell.org','WHO/UNICEF JMP','Tracking SDG 7'])if(!html.includes(src))throw Error('Pass 166: ledger source missing in a comment: '+src);
 count++;console.log('PASS Pass 166 hard part additions in the page');
+for(const src of ['PRIO','UNHCR Global Trends 2024','Survival International','WHO/UNICEF JMP','Tracking SDG 7 2025','FAO SOFI 2025','IAPB Vision Atlas','World Prison Brief','UCDP 2025','Fearon 1995','Walter 2002','Forbes Real-Time Billionaires','Ceres2030'])if(!html.includes(src))throw Error('Pass 250: source missing in a comment: '+src);
+check('Pass 250 and 251: Aid, Science, Keep, proposals from people (arrive, fund, keep, stop, the levy, the class, the school), workarounds fade, one per group, the war ends once, the groups add up',`
+var sum=0;HARD.forEach(function(x){sum+=x.n;});if(Math.abs(sum-3.896e9)>2e6)throw Error('the ten add to 3,896M: '+sum);if(hardGroup('water').n!==2.1e9||hardGroup('hot').n!==2.5e8)throw Error('water 2.1B, hot 250M');
+var g=readyGame();g.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};g.money=1e12;g.day=0;g.fin=[];for(var i=0;i<7;i++)g.fin.push({kits:1e9,_inf:1e6});g.emp.inf=1e9;g.emp.infOn=1;
+operatingNet=function(){return 1e9;};capitalReserve=function(){return 1e9;};infIncome=function(){return 1e6;};
+var H=hardOf(g),A=hardAllocOf(H);if(A.aid||A.sci||A.build!=null||A.pol!=null||hardKeep(H)!==1)throw Error('Aid and Science start at 0, Keep is the rest, no Build or Policy (Pass 251)');
+if(!hardAlloc(g,'aid',.15)||!hardAlloc(g,'sci',.1)||hardAlloc(g,'build',.3)||hardAlloc(g,'pol',.2)||Math.abs(hardKeep(H)-.75)>1e-9)throw Error('two shares in 5% steps, Keep is what is left');
+hardAlloc(g,'aid',.95);if(Math.abs(A.aid-.9)>1e-9)throw Error('the sum is capped at 100%: '+A.aid);hardAlloc(g,'aid',.15);
+var old=readyGame();old.emp.hard={open:1,goal:'home',picks:{},give:.5};if(hardAllocOf(old.emp.hard).aid!==.5||old.emp.hard.give!=null)throw Error('H.give migrates into Aid');
+// Pass 251: old saves with Build and Policy money become running proposals at the reach they had
+var o2=readyGame();o2.emp.hard={open:1,goal:'home',picks:{},alloc:{aid:0,sci:0,build:.3,pol:.2},bld:{water:{r:.2,pot:0},hot:{r:0,pot:0}},pol:{r:.1,given:5e6,y:1},day:0};var A2=hardAllocOf(o2.emp.hard),R2=propOf(o2.emp.hard);
+if(A2.build!=null||A2.pol!=null||o2.emp.hard.bld||o2.emp.hard.pol||!R2.run.board||Math.abs(R2.run.board.r-.2)>1e-9||R2.run.solar||!R2.run.law||R2.run.law.given!==5e6||Math.abs(propReach(o2,'water')-.2)>1e-9)throw Error('Build and Policy migrate into a water board and a tank law: '+JSON.stringify(R2.run));
+// proposals: arrive 10 to 50 days apart (Pass 258, letDay), at most 3 open, none from a group that is reached, the cross-cutting ones once there is something to pay
+var R=propOf(H),d;for(d=0;d<1500;d++){g.day=d;hardDay(g);letDay(g);}
+if(!(R.open.length===PROP_MAX))throw Error('three proposals open after four years with none answered: '+R.open.length);if(R.t.levy||R.t.school||R.t.talks)throw Error('the levy, the school and the talks wait for a running program');
+var gaps=[];var pr=readyGame();pr.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};pr.humans=4.1e9;pr.money=1e12;pr.fin=g.fin;var PR=propOf(hardOf(pr)),last=null;for(d=0;d<3000;d++){pr.day=d;hardDay(pr);letDay(pr);if(PR.open.length){var id=PR.open[0].id;if(last!=null)gaps.push(d-last);last=d;propDecline(pr,id);}}
+if(gaps.length<8||Math.min.apply(null,gaps)<LET_GAP[0]||gaps.filter(function(x){return x>LET_GAP[1]+1;}).length>gaps.length*.25)/* longer only when nobody is left to write (declined ones come back 90 days to 3 years later) */throw Error('a new proposal every 10 to 50 days: '+gaps.join(','));
+if(!PR.no.board&&!PR.no.solar)throw Error('declined ones are noted');var ids=Object.keys(PR.t);if(ids.length<6)throw Error('different people write in: '+ids);
+// fund one: build paid once, the crews a share of income, reach grows at their pace, 60 to 90% of the planned reach, the group's 7% a year cap
+var fb=readyGame();fb.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};fb.humans=4.1e9;fb.money=1e12;fb.fin=g.fin;var FH=hardOf(fb),FR=propOf(FH);FR.open.push({id:'board',day:0,alt:0,grad:0});FR.t.board=1;
+if(propDecline(fb,'nope'))throw Error('decline needs an open one');var m1=fb.money;if(!propFund(fb,'board'))throw Error('fund the water board');var p=FR.run.board;
+if(!(m1-fb.money>=30*1e9*0.99)||!fb.emp.dues.some(function(x){return x.k==='prop:board'&&Math.abs(x.f-.015)<1e-9;}))throw Error('30 days of income to build, 1.5% of income for the crews: '+(m1-fb.money)+' '+JSON.stringify(fb.emp.dues));
+if(!(p.full>=.12*.6-1e-9&&p.full<=.12*.9+1e-9))throw Error('60 to 90% of the planned reach arrives: '+p.full);if(FR.open.length)throw Error('funded leaves the open list');
+for(d=1;d<=365;d++){fb.day=d;hardDay(fb);}if(!(p.r>0&&p.r<=p.full/6+1e-9&&Math.abs(propReach(fb,'water')-p.r)<1e-9&&Math.abs(hardReach(fb,hardGroup('water'))-p.r)<1e-9))throw Error('a year of the board: a sixth of its reach, counted for the group: '+p.r+' '+p.full);
+for(d=366;d<=365*7;d++){fb.day=d;hardDay(fb);}if(Math.abs(p.r-p.full)>1e-9)throw Error('done in six years: '+p.r+' '+p.full);if(!rip(fb).log.some(function(x){return /work is done/.test(x.tx);}))throw Error('the Times says the work is done');
+if(!propOK(fb,FH,propDef('board'),fb.day))throw Error('a cousin brings the next board once this one is done');
+// stop paying the crews: reach falls 10% a year, the dues go, a news line, Grandma asks once
+var r0=p.r;if(!propStop(fb,'board'))throw Error('stop');if(fb.emp.dues.some(function(x){return x.k==='prop:board';}))throw Error('stopping removes the dues');for(d=365*7+1;d<=365*8;d++){fb.day=d;hardDay(fb);}
+if(!(p.r<r0&&Math.abs(p.r/r0-0.905)<0.01))throw Error('reach falls 10% a year after you stop: '+r0+' '+p.r);if(!rip(fb).log.some(function(x){return /mechanics went to the city/.test(x.tx);}))throw Error('she writes once');
+if(!fb.me.hist.some(function(x){return /who Lana is/.test(x);}))throw Error('Grandma asks who she is');
+// three in one group share the 7% a year cap
+var c3=readyGame();c3.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};c3.humans=4.1e9;c3.money=1e13;c3.fin=g.fin;var CR=propOf(hardOf(c3));['board','loan','desal'].forEach(function(k){CR.open.push({id:k,day:0,alt:0,grad:0});CR.t[k]=1;if(!propFund(c3,k))throw Error('fund '+k);});for(d=1;d<=365;d++){c3.day=d;hardDay(c3);}
+if(propReach(c3,'water')>BUILD_CAP+1e-9)throw Error('a group grows at most 7% a year: '+propReach(c3,'water'));if(!(rip(c3).log.some(function(x){return /desal plant opens/.test(x.tx);})))throw Error('the cold ones have their news');
+// the levy: needs crews, a country every 6 to 18 months, one in four drops it, at 12 the crews are paid from it
+var lv=readyGame();lv.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};lv.humans=4.1e9;lv.money=1e13;lv.fin=g.fin;lv.emp.inf=1e9;lv.emp.infOn=1;var LH=hardOf(lv),LR=propOf(LH);if(propOK(lv,LH,propDef('levy'),0))throw Error('the levy needs crews to pay');
+LR.open.push({id:'board',day:0,alt:0,grad:0});LR.t.board=1;propFund(lv,'board');if(!propOK(lv,LH,propDef('levy'),0))throw Error('the levy comes once there are crews');LR.open.push({id:'levy',day:0,alt:0,grad:0});LR.t.levy=1;var i0=lv.emp.inf;if(!propFund(lv,'levy'))throw Error('fund the levy');
+var sg=0,yrs=0;for(d=1;d<=365*25&&LR.lev.s<LEVY_N;d++){lv.day=d;hardDay(lv);}if(LR.lev.s<LEVY_N)throw Error('12 countries sign within 25 years: '+JSON.stringify(LR.lev));if(!(lv.emp.inf<i0))throw Error('the levy costs ✦');if(d/365<4||d/365>22)throw Error('the campaign takes years: '+(d/365));
+if(lv.emp.dues.some(function(x){return x.k==='prop:board';}))throw Error('at 12 countries the crews come off your dues');if(!propLevyOn(lv)||propKeep(lv,propDef('board'))[0]!==0)throw Error('new crews are paid by the levy');
+// the politics class: nothing for ten years, then a proposal a year from a graduate with the build a fifth cheaper; the maintenance school cuts the water crews' bill
+var cs=readyGame();cs.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};cs.humans=4.1e9;cs.money=1e13;cs.fin=g.fin;var CH=hardOf(cs),CSR=propOf(CH);CSR.open.push({id:'course',day:0,alt:0,grad:0});CSR.t.course=1;propFund(cs,'course');
+for(d=1;d<=365*12;d++){cs.day=d;hardDay(cs);if(CSR.open.length)CSR.open.forEach(function(x){propDecline(cs,x.id);});}if(!CSR.run.course.gok||CSR.grads<1||CSR.grads>3)throw Error('graduates bring one a year after ten years: '+CSR.grads+' '+JSON.stringify(CSR.run.course));
+var gx={id:'board',day:0,alt:1,grad:1};if(Math.abs(propBuild(cs,propDef('board'),1)/propBuild(cs,propDef('board'),0)-0.8)>1e-6)throw Error('a graduate’s build costs a fifth less');
+CSR.open.push({id:'board',day:0,alt:1,grad:0});CSR.t.board=2;propFund(cs,'board');if(propOK(cs,CH,propDef('school'),cs.day)!==true)throw Error('the school comes with a water program');CSR.open.push({id:'school',day:0,alt:0,grad:0});CSR.t.school=1;propFund(cs,'school');if(Math.abs(propKeep(cs,propDef('board'))[0]-.015*.7)>1e-9)throw Error('water crews cost 30% less with the school');
+// science: 25 years at a trickle, stopping pauses the clock, done boosts workarounds
+var sc=readyGame();sc.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};sc.money=1e12;sc.fin=g.fin;var HS=hardOf(sc);hardAlloc(sc,'sci',.05);for(d=0;d<365;d++){sc.day=d;sciDay(sc,HS,d,1e9);}if(!(HS.sci.p>1/26&&HS.sci.p<1/19))throw Error('5% is slower than 10%: '+HS.sci.p);
+hardAlloc(sc,'sci',0);var p0=HS.sci.p;for(d=365;d<730;d++){sc.day=d;sciDay(sc,HS,d,1e9);}if(HS.sci.p!==p0)throw Error('stopping pauses the clock');
+HS.sci.p=1;hardAlloc(sc,'sci',.1);sc.day=730;sciDay(sc,HS,730,1e9);if(!HS.sci.done)throw Error('done at 1');
+sc.day=730+1825;if(Math.abs(sciReach(sc,'water')-0.3)>1e-9||sciReach(sc,'far')!==0)throw Error('science alone reaches 30% of water, hot, poor');
+// workarounds: climb, hold, fade to the floor; one per group at a time; a faded one can be bought again; build underneath holds it up
+var w=readyGame();w.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};w.money=1e12;w.fin=[{kits:1e9}];var WG=hardGroup('water'),WP=hardOf(w);
+if(!hardBuy(w,'water','trucks'))throw Error('buy trucks');if(hardBuy(w,'water','jar'))throw Error('one workaround per group while one is running');
+w.day=60;if(Math.abs(hardReach(w,WG)-0.15)>1e-9)throw Error('trucks reach 15%');w.day=60+365;if(Math.abs(hardReach(w,WG)-0.15)>1e-9)throw Error('held for a year');w.day=60+365+60;if(hardReach(w,WG)>1e-9)throw Error('faded to 0: '+hardReach(w,WG));
+if(!hardBuy(w,'water','trucks'))throw Error('a faded one can be bought again');if(!WP.picks.water.trucks.again||WP.picks.water.trucks.start!==w.day)throw Error('again');w.day+=60+365+60;if(!hardBuy(w,'water','jar'))throw Error('after the fade another workaround can start');
+var wb=readyGame();wb.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0,pr:{open:[],run:{board:{day:0,alt:0,r:.3,full:.3,given:0,paid:0,keep:.015,stop:null,grad:0}},no:{},t:{},next:null,n:1,lev:{s:0,f:0,next:0},grads:0,gnext:0}};wb.money=1e12;wb.fin=[{kits:1e9}];hardBuy(wb,'water','trucks');wb.day=60+365+200;if(Math.abs(hardReach(wb,WG)-0.45)>1e-9)throw Error('build underneath holds a workaround up: '+hardReach(wb,WG));
+var c=readyGame();c.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};c.money=1e12;c.fin=[{kits:1e9}];hardBuy(c,'hot','panel');c.day=120;hardBuy(c,'hot','gene');var cap=hardWorkReach(c,hardGroup('hot'));if(cap>WORK_CAP)throw Error('workarounds cap at half a group');
+// fading takes its tanks with it
+var f=readyGame();f.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};f.money=1e12;f.fin=[{kits:1e9}];f.humans=hardEasy(f)+2e8;f.day=0;hardDay(f);if(!(f.humans<hardEasy(f)+2e8))throw Error('people above the cap lose their tanks, 2% of the gap a day');
+// war: one ending option, work options stack under it, talks need Policy
+var v=readyGame();v.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};v.money=1e13;v.fin=[{kits:1e9}];var VG=hardGroup('war');
+if(hardBuy(v,'war','pay'))throw Error('the talks are a proposal now (Pass 251)');var VR=propOf(hardOf(v));if(propOK(v,hardOf(v),propDef('talks'),0))throw Error('the mediator waits for a running program');VR.run.board={day:0,alt:0,r:.01,full:.1,given:0,paid:0,keep:.015,stop:null,grad:0};if(!propOK(v,hardOf(v),propDef('talks'),0))throw Error('then the mediator writes');VR.open.push({id:'talks',day:0,alt:0,grad:0});VR.t.talks=1;if(!propFund(v,'talks'))throw Error('fund the talks');if(!(hardOf(v).picks.war.pay&&hardOf(v).picks.war.pay.start===0))throw Error('the talks take the war’s ending slot');if(hardBuy(v,'war','out')||hardBuy(v,'war','fund'))throw Error('one ending option');
+if(!hardBuy(v,'war','convoy'))throw Error('convoy stacks under it');v.day=600;if(Math.abs(hardReach(v,VG)-1)>1e-9)throw Error('talks reach all after 540 days');
+var x=readyGame();x.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};x.money=1e13;x.fin=[{kits:1e9}];hardBuy(x,'war','convoy');x.day=400;if(!hardBuy(x,'war','checkpoint'))throw Error('war work options stack');x.day=600;if(hardWorkReach(x,VG)>WAR_WORK_CAP)throw Error('to 0.8');
+VG.ops.forEach(function(o){if(o.k==='work'&&!o.life&&!o.old)throw Error('war work options have a life: '+o.id);});
+if(!/civil war/.test(VG.body))throw Error('the war sentence');['nour1','nour2','nour3','nour4','nour5','nour6'].forEach(function(k){var mm=MILESTONES[k],t=(mm.bodyFn?mm.bodyFn(v):mm.body)+(mm.opts?JSON.stringify(mm.opts(v)):'');if(/river|rice/.test(t))throw Error('Milo never mentions the river or rice water: '+k);});
+HARD.forEach(function(gg){gg.ops.forEach(function(o){if(/river war/.test(o.end||'')&&!o.old)throw Error('no river war in endings: '+o.id);});});
+if(!/one Musk/.test(muskPct(1e9)+' of one Musk')||muskPct(RICH_USD*USD_AED*0.001)!=='0.1%')throw Error('Musk units: '+muskPct(RICH_USD*USD_AED*0.001));
+var rl=routeLines(fb).concat(routeLines(g));if(!rl.some(function(t){return /water board reached/.test(t)&&/stopped paying/.test(t);})||!rl.some(function(t){return /membrane was/.test(t);}))throw Error('the ending names the people and what you stopped paying for: '+rl.join(' | '));var rl2=routeLines(lv);if(!rl2.some(function(t){return /12 countries signed/.test(t);}))throw Error('the ending counts the levy: '+rl2.join(' | '));
+`);
+
 check('Pass 168: leaving Earth opens with the hard part and enough science, ends Earth, points buy the ship',`
 var g=readyGame();g.money=2e10;g.kits.sold=3e9;g.humans=4e9;
 if(voyageOpen(g))throw Error('Shut before the hard part');
@@ -869,7 +938,7 @@ count++;console.log('PASS Pass 181 land banner, no wind, one mute');}
 check('Pass 183: the hard part is things you watch (orders chart removed in Pass 190), one-line groups, short Nour cards',`
 var g=readyGame();g.humans=4.1e9;g.day=3000;var H=hardOf(g);hardDay(g);if(!H.open)throw Error('opens at 4B');
 for(var i=0;i<30;i++){g.day++;hardDay(g);}if(H.oh)throw Error('no orders history any more (Pass 190)');
-HARD.forEach(function(x){if(x.body.split('. ').length>1||x.body.length>95)throw Error('one sentence per group: '+x.name);});
+HARD.forEach(function(x){if(x.body.split('. ').length>2||x.body.length>110)throw Error('one or two short sentences per group (Pass 250, the war line is hers): '+x.name);});
 var n=readyGame();n.story.miraDay=1;n.emp.hard={open:1,goal:'home',picks:{},day:0};n.day=2000;
 ['nour1','nour2','nour3','nour4','nour5','nour6'].forEach(function(k){var m=MILESTONES[k],t=m.bodyFn?m.bodyFn(n):m.body;if(t.length>230||/\\n/.test(t))throw Error(k+' is longer than two lines: '+t.length);});
 `);
@@ -959,7 +1028,7 @@ var f=newGame();f.me.on=1;f.me.hp=80;f.me.bo=0;f.me.hrs={papers:0};f.me.wh=8;f.m
 var F=f.me.fx;if(!F||!F.n)throw Error('facts come');if(F.n>Math.ceil(9000/200))throw Error('not more than one per 200 h');if(new Set(F.seen).size!==F.seen.length)throw Error('no repeats');
 var f2=newGame();f2.me.on=1;f2.me.hp=80;f2.me.bo=0;f2.me.hrs={papers:5000};f2.me.fx={seen:[],next:0,at:null};f2.ps={t:1000};factDay(f2);f2.me.fx.next=0;f2.ps.t=100000;factDay(f2);if(f2.me.fx.n!==1)throw Error('3 minutes between facts');
 if(FACTS.some(function(x){return /!|colour|behaviour/.test(x[0])||!/[0-9][0-9][0-9][0-9][)][.]$/.test(x[0]);}))throw Error('facts: American spelling, no exclamation, citation in text');
-var c=newGame();introStamp(c);if(!(c.progress.gap>=10000&&c.progress.gap<=20000))throw Error('gap 10 to 20 s');
+var c=newGame();introStamp(c);if(!(c.progress.gap>=10000&&c.progress.gap<=35000))throw Error('gap 10 to 35 s');
 `);
 check('Pass 219 (Puti): rest and getting better, courses finish once and pay, hours held move the traits',`
 var g=newGame();g.me.on=1;g.me.hp=80;g.me.bo=0;g.me.hrs={mba:299};g.me.p2=['mba','hiking'];g.emp.staff.pack=3;var c0=staffCost(g);g.me.hrs.mba=300;lifeDay(g);
@@ -999,4 +1068,56 @@ if(JSON.stringify(GP_STORY).indexOf('Maryam')>=0||JSON.stringify(GT_EV).indexOf(
 if(!html.includes("if(!E.sharkTook)E.sharkTook={day:now,what:'the '+tk.what}")||!html.includes("his men took '+tk.what+' at night")||html.includes('They smashed the first farm in October'))throw Error('Pass 248: the loan shark ending says what happened (Puti)');
 if(!html.includes('function fmtH(t)')||!/r\{color:var\(--shrimp\)\}g\{color:var\(--good\)\}/.test(html))throw Error('Pass 248: <b> <i> <r> <g> in game text');
 console.log('PASS Pass 248 static checks');
+check('Pass 255 (Puti): a stopped letter restarts, tree steps are letters with Not now, gala causes do something, the coast soft cap, the clean hold',`
+var g=readyGame();g.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};g.humans=4.1e9;g.money=1e13;g.fin=g.fin||[];var R=propOf(hardOf(g));R.open.push({id:'board',day:0,alt:0,grad:0});R.t.board=1;if(!propFund(g,'board'))throw Error('fund');
+var d;for(d=1;d<=365;d++){g.day=d;hardDay(g);}var p=R.run.board,r1=p.r;if(!propStop(g,'board'))throw Error('stop');for(d=366;d<=730;d++){g.day=d;hardDay(g);}var r2=p.r;if(!(r2<r1))throw Error('falls while stopped');
+if(!propStart(g,'board'))throw Error('restart');if(p.stop||!g.emp.dues.some(function(x){return x.k==='prop:board';}))throw Error('restart brings the dues back');for(d=731;d<=1095;d++){g.day=d;hardDay(g);}if(!(p.r>r2))throw Error('reach climbs again after a restart: '+r2+' '+p.r);
+// tree steps (Pass 256): Not now holds the tree, the same step writes again 90 days to 3 years later
+g.emp.trees={rewild:1};var s1=treeNext(g,'rewild');if(!s1||s1.id!=='rw_stream')throw Error('first step');var d0=g.day;if(!treeDecline(g,'rw_stream'))throw Error('decline');var bk=g.emp.treeBack.rw_stream;if(!(bk-d0>=90&&bk-d0<=1095))throw Error('roll '+(bk-d0));if(treeNext(g,'rewild'))throw Error('tree waits while a step is away');if(buyTreeStep(g,'rw_stream'))throw Error('a step away cannot be bought');if(treeWhy(g,'rw_stream')!=='Not the next step yet')throw Error('why');
+g.day=bk-1;if(treeNext(g,'rewild'))throw Error('not back a day early');g.day=bk;var s3=treeNext(g,'rewild');if(!s3||s3.id!=='rw_stream')throw Error('the same step comes back');
+g.emp.inf=1e9;var k0=g.tr.kin||0;treeDecline(g,'rw_stream');var k1=g.tr.kin||0;g.day=g.emp.treeBack.rw_stream;treeDecline(g,'rw_stream');var k2=g.tr.kin||0;if(!(Math.abs(k2-k1)<Math.abs(k1-k0)+1e-9))throw Error('second no pushes less: '+[k0,k1,k2]);g.day=g.emp.treeBack.rw_stream;if(!buyTreeStep(g,'rw_stream'))throw Error('buy after it came back');g.day=d0;
+var R2=propOf(hardOf(g));R2.open.push({id:'board',day:g.day,alt:0,grad:0});var dd=Math.floor(g.day);if(!propDecline(g,'board'))throw Error('prop decline');var pb=R2.back.board;if(!(pb-dd>=90&&pb-dd<=1095))throw Error('letter roll '+(pb-dd));if(propOK(g,hardOf(g),propDef('board'),pb-1,0))throw Error('letter not back early');
+// galas: water queues an Aid batch, kids reach a little of Can't do it alone, pets bring the vet card sooner
+var H=hardOf(g);g.emp.inf=1e9;g.emp.infOn=1;if(!buyProj(g,'gala','water'))throw Error('water gala');if(!(H.gq&&H.gq.length&&H.gv>0))throw Error('the water gala queues an Aid batch');
+var c0=galaReach(g,hardGroup('care'));if(!buyProj(g,'gala','kids'))throw Error('kids gala');if(!(galaReach(g,hardGroup('care'))>c0&&hardReach(g,hardGroup('care'))>=GALA_CARE-1e-9))throw Error('the kids gala reaches the group');for(var i=0;i<20;i++)buyProj(g,'gala','kids');if(H.galaCare>GALA_CARE_MAX+1e-9)throw Error('capped');
+if(!buyProj(g,'gala','pets')||!g.emp.galaPets)throw Error('pets gala');
+// coast soft cap: spread and the coin planters slow as it fills, your taps always plant, ghaf at half, sidr at three quarters
+var c=readyGame();c.kits.sold=1e5;var C=coinOf(c);C.trees=1e6;C.otrees=0;var s0=treeSpread(c);C.otrees=COIN_COAST*0.5-1e6;var sh=treeSpread(c)/(C.trees+C.otrees);if(!(Math.abs(sh/(s0/1e6)-0.25)<0.02))throw Error('spread at half the coast is a quarter of the pace: '+sh+' '+s0/1e6);
+if(!(plFill(c)>=0.5&&plKindOk(c,'g')&&!plKindOk(c,'s')))throw Error('ghaf opens at half, sidr not yet');C.otrees=COIN_COAST*0.75;if(!plKindOk(c,'s'))throw Error('sidr at three quarters');if(!(plFree(c,32,2)>0||plFree(c,10,2)>0||[0,1,2,3,4,5,6,7,8,9].some(function(x){return plGround(x*6,2)===3&&plFree(c,x*6,2)>0;})))throw Error('the hills take seedlings');
+C.otrees=COIN_COAST*0.99;if(!(coastSlow(c)<0.001))throw Error('nearly full, others nearly stop');
+// the clean hold: no poop for 25 tank days after a vacuum, no algae after a wipe
+var t=readyGame();t.me.keep='self';t.me.on=1;var T=t.tanks[0];T.had=1;T.cycledAt=0;for(var k=0;k<30;k++)T.pop.push({age:100,n:1,g:2});var K=careOf(T);K.mulm=0;K.vacD=t.day;careDay(t);if(K.mulm!==0)throw Error('no poop right after a vacuum');t.day+=CLEAN_HOLD+1;careDay(t);if(!(K.mulm>0))throw Error('poop again after the hold');
+T.glass=null;glassGrow(t,T);var g0=T.glass.reduce(function(a,b){return a+b;},0);T.wipeD=t.day;glassGrow(t,T);if(T.glass.reduce(function(a,b){return a+b;},0)!==g0)throw Error('no algae right after a wipe');
+`);
+check('Pass 257 (Puti): the tank you can hear is a blind-group research option that never fades, stays, and its care counts once a day',`
+var g=hardGroup('blind'),o=hardOp(g,'ear');if(!o||o.req||o.life||o.floor)throw Error('ear option (Pass 258): no req, no life/floor');if(hardOp(g,'touch'))throw Error('Pass 258: touch merged into ear');
+var t=readyGame();var m=JSON.parse(JSON.stringify(t));m.emp.hard=m.emp.hard||{picks:{}};m.emp.hard.picks=m.emp.hard.picks||{};m.emp.hard.picks.blind={touch:{day:3,start:5}};migrate(m);if(m.emp.hard.picks.blind.touch||!m.emp.hard.picks.blind.ear||m.emp.hard.picks.blind.ear.start!==5)throw Error('an old touch pick becomes the ear tank');
+var P={ear:{day:0,start:0},touch:{day:0,start:0}};if(hardFaded(t,o,P.ear,g))throw Error('never fades');t.day=99999;if(hardFaded(t,o,P.ear,g))throw Error('never fades, 270 years on');if(hardOpReach(t,o,P.ear,g)<o.f-1e-9)throw Error('keeps its reach');
+if(hardWorkLive(t,g,{ear:{day:t.day,start:t.day}}))throw Error('it does not block the group running workaround');
+var c0=t.stats.care||0;earCare(t);earCare(t);if((t.stats.care||0)-c0!==1)throw Error('care once a day');t.day+=1;earCare(t);if((t.stats.care||0)-c0!==2)throw Error('and again the next day');
+`);
+check('Pass 259 (Puti): research never runs out, the letters open with people not three tree steps, the shop is not a letter, tree letters name a person',`
+var g=readyGame();var L=rlines(g);L.energy.found=5;var m5=rlM(g,'energy',0.05);L.energy.found=6;var m6=rlM(g,'energy',0.05);L.energy.found=40;var m40=rlM(g,'energy',0.05);
+if(Math.abs(m5-0.75)>1e-9||Math.abs(m6-0.675)>1e-9||!(m40>0&&m40<0.05))throw Error('10% off what is left after five: '+[m5,m6,m40]);
+grOf(g).ctr.energy=1;L.energy.found=5;L.energy.pd=1;if(!(rlOdds(g,'energy')>0))throw Error('a finished field still finds');if(rlFindTxt(RLINES[0],7).indexOf('10% off farm upkeep')<0)throw Error('find text');
+var h=g.emp;g.emp.hard={open:1,goal:'home',picks:{},goalOk:0,day:0};g.humans=4.1e9;g.money=1e12;h.inf=1e12;h.trees={rewild:1,lastmile:1,shop:1,lab:1};
+for(var d=0;d<30;d++){g.day=d;letDay(g);}g.emp.hard.goalOk=1;var t0=30,firstTree=null;
+for(d=30;d<500;d++){g.day=d;hardDay(g);letDay(g);if(firstTree==null&&TREE_ORDER.some(function(k){return k!=='island'&&treeShow(g,k);}))firstTree=d;if(treeShow(g,'shop'))throw Error('the shop is a letter');}
+if(firstTree!=null&&firstTree-t0<TLET_GAP[0])throw Error('a tree letter on day '+(firstTree-t0)+' of the letters');
+var w=treeWho('lastmile',TREES.lastmile.steps[0]);if(w.who!=='Lasha')throw Error('tree letter names a person');
+`);
+check('Pass 259 (Puti): news waits the same 10 to 35 s gap after any pop-up closed',`
+var g=readyGame();g.ps={t:500000};var p=ensureProgress(g);p.queue=[];p.wait=[];p.soon=[];p.lastStory=null;var R=rip(g);R.pend=[{t:'A test story.'}];R.nextAt=0;introStamp(g);var n0=R.log.length;
+g.ps.t+=p.gap-1000;newsTick(g);if(R.log.length!==n0)throw Error('news inside the gap');g.ps.t+=1500;newsTick(g);if(R.log.length!==n0+1)throw Error('news after the gap');
+`);
+check('Pass 258 (Puti): one mailbox, at most 3 letters with the tree steps, tree letters 120+ days apart, two catch letters, aid says when it lands',`
+var g=readyGame();g.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};g.humans=4.1e9;g.money=1e12;g.emp.inf=1e12;g.emp.trees={rewild:1,lastmile:1,shop:1,lab:1};
+var tg=[],seen={},last=null,d,mx=0;for(d=0;d<4000;d++){g.day=d;hardDay(g);letDay(g);mx=Math.max(mx,letOpenN(g));if(letOpenN(g)>3)throw Error('more than 3 open: '+letOpenN(g));
+ if(d%7)continue;TREE_ORDER.forEach(function(k){var s=treeShow(g,k);if(k!=='island'&&s&&!seen[s.id]){seen[s.id]=1;if(last!=null)tg.push(d-last);last=d;treeDecline(g,s.id);}});
+ var R=propOf(g.emp.hard);R.open.slice().forEach(function(x){propDecline(g,x.id);});}
+if(tg.length<2||Math.min.apply(null,tg)<TLET_GAP[0])throw Error('tree letters too close or too few: '+tg.join(','));/* Pass 259: the shop is out of the letters, three trees left */
+if(!propDef('orbit')||!propDef('chef')||!propDef('orbit').sink||!propDef('chef').sink)throw Error('catch letters');
+var c=readyGame();c.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};c.emp.trees={rewild:1};var s0=treeNext(c,'rewild');if(treeShow(c,'rewild'))throw Error('a tree step waits for its letter');c.emp.tlet={};c.emp.tlet[s0.id]=1;if(treeShow(c,'rewild')!==s0)throw Error('delivered, it shows');treeDecline(c,s0.id);if(c.emp.tlet[s0.id])throw Error('Not now needs a new letter');
+var h={gv:100,got:0,gq:[{a:100,due:400}]};c.day=35;if(!/nothing has arrived yet, the first batch lands in about 1[23] months/.test(aidArrTxt(c,h,fmtA)))throw Error('aid: '+aidArrTxt(c,h,fmtA));h.got=60;h.lost=40;if(!/^arrived /.test(aidArrTxt(c,h,fmtA)))throw Error('aid arrived');
+`);
 console.log(count+' focused balance and migration checks passed');

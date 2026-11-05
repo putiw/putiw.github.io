@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ear tank</title>
+<meta name="description" content="A shrimp tank you keep by listening. A prototype.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#efe9dc;--surface:#fbf8f1;--surface-2:#f2ecdf;--ink:#22201b;--ink-2:#524c3d;--ink-3:#716a57;--line:#dcd2be;--accent:#2d6a4f;--accent-ink:#fff;--shrimp:#bf3a2b;--off:#e4ddcf;--off-ink:#8a8270;--zone-ok:#cfe0cc;--zone-warn:#efdcaa;--zone-bad:#efc3b9;color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "Inter",system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%}
+body{padding:14px 14px calc(24px + env(safe-area-inset-bottom));max-width:480px;margin:0 auto;overflow-x:hidden}
+h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:17px;margin:14px 0 8px}
+p{margin:0 0 10px}
+.muted{color:var(--ink-3);font-size:14px}
+.screen{display:none}.screen.on{display:block}
+button{font:inherit;font-weight:600;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;min-height:64px;padding:12px 14px;width:100%;text-align:left;margin:0 0 10px;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:space-between;gap:10px}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+button.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.sm{min-height:48px;padding:8px 12px;font-weight:500}
+button[disabled]{background:var(--off);color:var(--off-ink);border-color:var(--off);cursor:default}
+button .sub{font-weight:400;font-size:13px;color:inherit;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}.row button{margin:0;min-width:0}
+.row{margin-bottom:10px}
+#status{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-height:72px;margin:0 0 12px;font-size:15px}
+#status b{display:block;font-weight:600;margin-bottom:2px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 12px}
+.grid button{margin:0;min-height:72px;justify-content:center;text-align:center;font-size:14px;padding:6px}
+.grid button.sel{outline:3px solid var(--accent);outline-offset:-3px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.top .q{width:44px;min-height:44px;margin:0;padding:0;justify-content:center;border-radius:22px}
+#help{display:none;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 12px;font-size:14px}
+#help.on{display:block}
+#help ol{padding-left:20px;margin:6px 0}
+.sr{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.bar{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.bar input{flex:1}
+#stats{font-size:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 12px;line-height:1.5}#strip{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 12px;font-size:13px}#strip .t{display:grid;grid-template-columns:70px 1fr 66px;font-size:12px;gap:8px;align-items:center;margin:4px 0}#strip .tr{position:relative;height:12px;border-radius:6px;background:linear-gradient(90deg,var(--zone-ok) 0 var(--a),var(--zone-warn) var(--a) var(--b),var(--zone-bad) var(--b) 100%)}#strip .m{position:absolute;top:-3px;width:4px;height:18px;margin-left:-2px;background:var(--ink);border-radius:2px}#strip .v{text-align:right;font-variant-numeric:tabular-nums}#lights{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 12px}#lights span{font-size:11px;line-height:1.2;text-align:center;padding:7px 2px;border-radius:8px;background:var(--surface);border:1px solid var(--line);color:var(--ink-3);transition:background .35s,color .35s;min-height:40px;display:flex;align-items:center;justify-content:center}#lights span.on{background:var(--accent);color:#fff;border-color:var(--accent);transition:none}#lights span.warm{background:var(--zone-bad);color:var(--ink)}#stats{overflow-x:auto}.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 12px;font-size:14px}.panel .sl{display:grid;grid-template-columns:86px 1fr 46px;gap:8px;align-items:center;margin:6px 0}.panel .sl span:last-child{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-3)}.panel input[type=range]{width:100%}.panel .row{margin:8px 0 0}#lights span{cursor:pointer}#lights span.sel{outline:2px solid var(--ink);outline-offset:-2px}.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}.chips button{width:auto;min-height:40px;margin:0;padding:6px 12px;font-size:14px;font-weight:500;border-radius:20px}.chips button.on{background:var(--accent);color:#fff;border-color:var(--accent)}.chips button.try{border-style:dashed}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 10px}.grid4 button{margin:0;min-height:56px;justify-content:center;text-align:center;font-size:13px;padding:4px}.grid4 button.now{outline:3px solid var(--accent);outline-offset:-3px}#stats table{border-collapse:collapse;width:100%;margin-top:6px}#stats td,#stats th{text-align:left;padding:1px 4px;font-weight:400;white-space:nowrap}#stats th{color:var(--ink-3);font-size:11px}#stats tr.hit td{background:#e6f0e3}#stats .b{display:inline-block;height:8px;background:var(--accent);vertical-align:middle;border-radius:2px}#stats .w{display:inline-block;width:40px;height:8px;background:var(--off);vertical-align:middle;border-radius:2px;overflow:hidden}
+.state{font-size:13px;color:var(--ink-3);margin:0 0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1 id="title">Ear tank</h1>
+  <button class="q" id="btn-help" aria-label="Help and what to test" aria-expanded="false">?</button>
+</div>
+<div id="help" aria-label="Help">
+  <p>A tank you keep by ear. Phone speaker is fine, mono. Tap anything to start the sound.</p>
+  <p><b>What to test, eyes closed</b></p>
+  <ol>
+    <li>Feed, then skip two days. Can you tell fed from hungry?</li>
+    <li>Run a fortnight at a week a minute. Can you hear the water getting old, and the change fixing it?</li>
+    <li>6 shrimp, 14, 30. Can you tell roughly how many?</li>
+    <li>A molt, a berried female, babies, one death. Do you notice them without being told?</li>
+    <li>Leave it on 20 minutes. Do you want to turn it off?</li>
+    <li>A tank you built and one you adopted. Do they sound different?</li>
+  </ol>
+  <p><b>The sounds</b></p>
+  <p class="muted">Bubbles are the filter. Each tick is a shrimp, high is small, low is big. Hungry ticks are thin and quick. A rustle is moss, a knock is wood, a clink is rock. A slide down is a molt. A double tick is a female with eggs. A thin hiss is bad water, change it. When everything goes dull the water is old. One low tap is a death.</p>
+</div>
+
+<div id="status" role="status" aria-live="polite"><b id="st-head">Tap to start</b><span id="st-body">Tap anywhere to turn the sound on.</span></div>
+<p class="state sr" id="stateline" aria-hidden="true"></p>
+<div id="stats" aria-hidden="true"></div>
+
+<section id="s-start" class="screen on" aria-label="Start">
+  <button class="pri" id="btn-adopt">Adopt a tank<span class="sub">one that exists, with its history</span></button>
+  <button id="btn-build">Build one<span class="sub">at the store, by hand</span></button>
+</section>
+
+<section id="s-adopt" class="screen" aria-label="Adopt a tank">
+  <div id="adopt-list"></div>
+  <div class="row"><button class="pri" id="btn-keep" disabled>Keep this one</button><button id="btn-adopt-back">Back</button></div>
+</section>
+
+<section id="s-build" class="screen" aria-label="Build a tank">
+  <p class="muted" id="build-hint">Twelve places, front row to back. Pick a place, then what goes there.</p>
+  <div class="grid" id="places" role="group" aria-label="Places in the tank"></div>
+  <div class="grid" id="things" role="group" aria-label="What goes there"></div>
+  <h2>How many shrimp</h2>
+  <div class="row" id="counts"><button class="sm" data-n="6">6</button><button class="sm" data-n="10">10</button><button class="sm" data-n="14">14</button></div>
+  <div class="row"><button class="pri" id="btn-build-done">Done</button><button id="btn-build-back">Back</button></div>
+</section>
+
+<section id="s-play" class="screen" aria-label="Play">
+  <div id="strip" aria-hidden="true"></div>
+  <p class="muted" style="margin:0 0 6px">Tap a sound to change its volume, softness and speed.</p>
+  <div id="lights"></div>
+  <div id="mixp" class="panel" hidden></div>
+  <div class="row"><button class="pri" id="p-feed">Feed</button><button class="pri" id="p-water">Change water</button></div>
+  <div class="row"><button class="sm" id="p-pause" aria-pressed="false">Pause<span class="sub">time and tank sound</span></button><button class="sm" id="p-mute" aria-pressed="false">Sound off<span class="sub">time runs</span></button></div>
+  <div class="row"><button class="sm" id="p-speed">Speed<span class="sub" id="p-speed-sub"></span></button><button class="sm" id="p-new">New tank, 5 shrimp</button></div>
+
+  <h2>Feeding sound</h2>
+  <p class="muted">Layers stack. Turn each on or off, set when it starts and how it sounds.</p>
+  <div class="row"><button class="pri" id="fd-play">Play feeding</button><button class="sm" id="fd-reset">Reset all</button></div>
+  <div id="fdl"></div>
+  <h2>Filter sound</h2>
+  <div class="chips" id="c-fount"><button data-v="trickle">Trickle</button><button data-v="brook">Brook</button><button data-v="bubbler">Air stone</button><button data-v="drip">Dripping</button><button data-v="rain">Rain on water</button><button data-v="glug">Glugs</button><button data-v="drops">Drops (old)</button><button data-v="off">Off</button></div>
+  <div id="fpanel" class="panel"></div>
+  <h2>Monitor beep</h2>
+  <div class="chips" id="c-bstyle"><button data-v="soft">Soft</button><button data-v="monitor">Monitor</button><button data-v="heart">Heartbeat</button><button data-v="bell">Bell</button><button data-v="off">Off</button></div>
+  <div class="chips" id="c-bpitch"><button data-v="0.7">Lower</button><button data-v="1">Middle</button><button data-v="1.4">Higher</button></div>
+  <div class="chips" id="c-bvol"><button data-v="0.5">Quiet</button><button data-v="1">Normal</button><button data-v="1.8">Loud</button><button id="b-try" class="try">Hear green → red (20 s)</button></div>
+  <h2>The tank, by ear</h2>
+  <p class="muted">Tap a place to change what's there. Listen plays the tank left to right, back row high, front row low. Rock clinks, wood knocks, moss rustles, a plant rises.</p>
+  <div class="grid4" id="scape" role="group" aria-label="The tank, back row first"></div>
+  <button class="pri" id="b-scan">Listen to the tank</button>
+  <h2>The tank picture, by ear</h2>
+  <p class="muted">The game's default tank, decor only. Each piece counts 0.2 where it is, so where pieces overlap it's louder. Slices play left to right, high in the tank is a high note, low is a low note. Wood, stones and plants each have their own sound.</p>
+  <canvas id="pic" width="310" height="143" style="width:100%;height:auto;border-radius:10px;background:#000;display:block;margin:0 0 8px"></canvas>
+  <div class="row"><button class="pri" id="b-pic">Hear the picture</button><button class="sm" id="b-picstop">Stop</button></div>
+  <div class="panel" id="picset"></div>
+  <div class="panel" id="pictypes"></div>
+  <h2>Your settings</h2>
+  <div class="row"><button class="sm" id="p-export">Copy my settings</button><button class="sm" id="p-import">Paste settings</button></div>
+  <textarea id="p-exp" rows="5" style="width:100%;font:12px/1.3 ui-monospace,monospace;border:1px solid var(--line);border-radius:10px;padding:8px;margin:0 0 12px" placeholder="Your settings show here. Copy them into the chat."></textarea>
+  <button class="sm" id="p-bench">Sound bench<span class="sub">compare tanks, single sounds</span></button>
+</section>
+<section id="s-home" class="screen" aria-label="Your tank">
+  <button class="sm" id="btn-play">Back to play</button>
+  <h2>Tanks to compare</h2>
+  <div class="row"><button class="sm" data-prof="happy5">Happy, 5 shrimp</button><button class="sm" data-prof="happy30">Happy, 30 shrimp</button></div>
+  <div class="row"><button class="sm" data-prof="old">Old water, nitrate 90</button><button class="sm" data-prof="hungry">Hungry, no food</button></div>
+  <div class="row"><button class="sm" data-prof="dying">Dying, ammonia high</button><button class="sm" data-prof="quick">Quick tank, 10</button></div>
+  <h2>Play one sound</h2>
+  <div class="row"><button class="sm" data-play="molt">Molt</button><button class="sm" data-play="berried">Eggs (double tick)</button></div>
+  <div class="row"><button class="sm" data-play="babies">Babies</button><button class="sm" data-play="death">Death, adult</button></div>
+  <div class="row"><button class="sm" data-play="eatA">Adult eating</button><button class="sm" data-play="eatB">Baby eating</button></div>
+  <div class="row"><button class="sm" data-play="idle">Stationary flick</button><button class="sm" data-play="swim">Swimming (adult)</button></div>
+  <div class="row"><button class="sm" data-play="swimB">Swimming (baby)</button><button class="sm" data-play="feed">Feeding (sound only)</button></div>
+  <div class="row"><button class="sm" data-play="moltfail">Failed molt</button><button class="sm" data-play="swimL">Swimming, long</button></div>
+  <div class="row"><button class="sm" data-play="pulse">Monitor beep, good → bad</button><button class="sm" data-play="babiesQ">Babies (quiet)</button></div>
+  <div class="row"><button class="sm" data-play="deathB">Death, baby</button><button class="sm" data-play="hissLoud">Hiss, bad water</button></div>
+  <div class="row"><button class="sm" data-play="pour">Water change (sound only)</button><button class="sm" data-play="hiss">Hiss 5 s</button></div>
+  <div class="row"><button class="sm" data-play="bubbles">Bubbles 4 s</button><button class="sm" data-play="flow">Fountain 6 s</button></div><div class="row"><button class="sm" id="btn-solo" aria-pressed="true">Solo<span class="sub" id="solo-sub">tank quiet while it plays</span></button></div>
+  <button class="sm" id="btn-tank" aria-pressed="true">Tank sound<span class="sub" id="tank-sub">on</span></button>
+  <h2>Keep it</h2>
+  <button class="pri" id="btn-how">How are they</button>
+  <div class="row"><button id="btn-feed">Feed</button><button id="btn-less" aria-pressed="false">Feed less</button></div>
+  <div class="row"><button id="btn-water">Change water</button><button id="btn-filter">Clean the filter</button></div>
+  <div class="row"><button id="btn-moss">Add moss</button><button id="btn-add">Add 5 shrimp</button></div>
+  <div class="row"><button id="btn-speed">Speed<span class="sub" id="speed-sub">real time</span></button><button id="btn-log">Log</button></div>
+  <button class="sm" id="btn-settings">Settings</button>
+</section>
+
+<section id="s-settings" class="screen" aria-label="Settings">
+  <div class="bar"><label for="vol">Volume</label><input id="vol" type="range" min="0" max="100" value="60"></div>
+  <button id="btn-voice" aria-pressed="true">Voice<span class="sub" id="voice-sub">on</span></button>
+  <button id="btn-teach">Teach the sounds again</button>
+  <button id="btn-reset">Reset the tank<span class="sub">starts over</span></button>
+  <button class="pri" id="btn-settings-back">Back</button>
+</section>
+
+<script>
+'use strict';
+/* ---------- SOUND: every number you may want to tune by ear ---------- */
+var SOUND={
+  master:0.6,
+  /* the water pulse: one soft low beep, slow when the water is fine, faster as any reading goes bad */
+  /* the monitor: a soft beep that follows nitrite and nitrate. Slow and low when fine, faster and higher as it goes bad. */
+  /* the monitor style: a beat every 1.1 s when fine, every 0.4 s when bad (like a heart rate going from 55 to 150) */
+  /* water zone z: 0 perfect, 1 the start of amber, 2 the start of red (the test strip's lines). A beep every 8 s at 0, every 1 s at 1, nonstop at 2, straight lines between. */
+  monitor:{lo:880,hi:1250,ms:110,gain:0.6,at0:8,at1:1,at2:0.14},
+  pulse:{gain:0.05,ms:140, hzGood:520,hzBad:1050, slow:6,fast:0.55},
+  /* the filter: a soft water flow all the time (pink noise, low-passed, slowly breathing) plus a trickle where the outflow hits the surface */
+  flow:{gain:0,lo:220,hi:900,breathe:0.08,depth:0.35, trickle:{gain:0,hz:1400,q:0.9,rate:0.31,depth:0.6}}, /* off: it sounded like wind */
+  /* the filter as a small fountain: many tiny droplets, each a short sine that rises in pitch (that's how a drop rings), at random times.
+     rate a second, a slow swell in rate so it isn't a machine; a clogged filter drips less. */
+  /* other filter sounds to pick from (Filter sound on the Play screen) */
+  trickle:{rate:3.5,cLo:2,cHi:7,lo:900,hi:3200,riseLo:1.6,riseHi:3,msLo:10,msHi:28,gain:0.05,bed:0.08},
+  bubbler:{rate:30,lo:260,hi:720,rise:1.5,msLo:20,msHi:45,gain:0.035,bed:0.07},
+  brook:{gain:0.8,voices:[[520,380,10],[900,600,14],[1500,900,18]],q:9,modHz:11},
+  fountain:{rate:16,swell:0.35,swellHz:0.05,gain:0.05,lo:550,hi:2400,rise:1.9,msLo:14,msHi:45, big:{p:0.06,lo:320,hi:520,ms:70,gain:0.03}},
+  room:{noiseGain:0.0,noiseLo:350,noiseHi:1200, bubbleGain:0.05,bubbleHz:700,bubbleRise:1.6,bubbleMs:45, bubbleEvery:0.55, tempSpan:0.18, clogSlow:0.8,clogDull:0.45},
+  /* eating: a short munch, 2 to 4 scrapes. Babies high and quick, adults low wooden. Every shrimp has its own pace (rate). */
+  eat:{gain:0.16, baby:{hz:1700,n:3,gap:0.055,ms:18,type:'sine'}, juv:{hz:1000,n:3,gap:0.08,ms:30,type:'triangle'}, adult:{hz:560,n:3,gap:0.11,ms:50,type:'triangle'}, jitter:0.08, every:2.2, rateLo:0.6,rateHi:1.6, surface:0.06, stressMs:14},
+  /* stationary: a faint antenna flick now and then. Fades in as the eating fades out. */
+  idle:{gain:0.035,hz:2600,ms:16,every:9},
+  /* swimming: a dart through the water, a soft whoosh that rises then falls. Babies shorter and higher. More darting right after feeding, when they move toward the food. */
+  swim:{gain:0.045,lo:450,hi:1300, short:{s:0.22},long:{s:0.9,wob:5}, longP:0.3, every:28,feedMul:0.25},
+  tick:{gain:0.11,baby:1500,juv:950,adult:620,jitter:0.06},
+  molt:{gain:0.16,from:1400,to:420,s:0.7, fail:{s:0.45,wob:9,knock:220,knockMs:380,gain:0.26}},
+  berried:{gapMs:130},
+  babies:{gain:0.03,hz:2300,n:7,span:0.9},
+  feed:{gain:0.09,hz:1300,n:7,span:1.0,ms:70,bloop:{hz:380,ms:160,gain:0.07},clusterS:60,clusterMul:0.3, delay:0.9,
+    /* the shaker: three soft shakes, each a spray of tiny grains */
+    game:0.5,
+    shake:{nLo:3,nHi:8,gapLo:0.3,gapHi:0.55,grLo:8,grHi:22,lenLo:0.07,lenHi:0.16,hzLo:4200,hzHi:8000,gain:0.06}},
+  /* ammonia: from barely there at 0.1 ppm to hard to ignore past 1.5 */
+  hiss:{gain:0.01,max:0.22,hz:5000,q:0.7,full:1.5},
+  dull:{clearHz:9000,oldHz:1700,oldAt:80},
+  /* water change: a soft drain (low gurgle, 2 s) then a refill (a trickle, 3 s), both filtered noise with slow fades */
+  /* water change, four to pick from on the Play screen (WC). A: filtered-noise trickle. B: bubbly pour, many rising sine pops over a soft noise. C: droplets, falling plips that get dense then thin. D: glugs, low wobbling tones then a smooth pour. */
+  pour:{drain:{gain:0.05,hz:520,q:0.9,s:2.0,wob:4}, fill:{gain:0.055,hz:1600,q:0.6,s:3.0,wob:7}},
+  pourB:{n:60,s:3.5,hz:600,rise:2.2,ms:60,gain:0.045,bed:0.02},
+  pourC:{n:40,s:3.5,hz:1500,ms:80,gain:0.05,bedHz:700,bed:0.015},
+  pourD:{glugs:6,hz:240,ms:220,gain:0.06,s:1.6,fill:{gain:0.035,hz:1200,q:0.5,s:2.6,wob:9}},
+  /* the water change: the old water glugs out, then a tap runs (pink noise, two bands, a fast flutter) */
+  tap:{glugsLo:7,glugsHi:12,hz:260,ms:230,gain:0.09,gapLo:0.18,gapHi:0.4, run:{s:3.2,gain:0.07,lo:900,hi:2600,flutter:13}},
+  /* death: babies a small high tap, adults a low knock with a long tail, louder */
+  death:{baby:{gain:0.06,hz:900,ms:60},adult:{gain:0.3,hz:240,ms:420}},
+  minGapS:1.4
+};
+/* ---------- model ---------- */
+var KEY='eartank-v1', SPEEDS=[['real time',1/3600],['a day every 2 minutes',24/120],['a day a minute',24/60],['a day in 5 seconds',24/5]];
+var THINGS=['nothing','rock','driftwood','moss','a plant'];
+var S=null, UI={}, A=null, speaking=false, vol=0.6, lastReal=0, speedIx=3, playMode=true, cluster=0, evq=[], lastEv=0, teachOn=false;
+function $(id){return document.getElementById(id)}
+function rnd(a,b){return a+Math.random()*(b-a)}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function mkShrimp(age,sex){var id=++S.nid;return {id:id,age:age,rate:rnd(SOUND.eat.rateLo,SOUND.eat.rateHi),sex:sex||(Math.random()<0.5?'f':'m'),hunger:rnd(0.1,0.5),berried:0,moltIn:age<75?rnd(2,12):rnd(8,45)}}
+function newState(scape,n,history){
+  S={v:1,h:0,day:0,nid:0,scape:scape,shrimp:[],food:0,nh3:0,no2:0,no3:10,temp:24,clog:0,moss:0,ration:1,jobs:[],log:[],seen:{},history:history||'',last:Date.now(),speed:0,voice:true,vol:60,taught:false};
+  for(var i=0;i<scape.length;i++)if(scape[i]===3)S.moss+=0.25;
+  S.moss=Math.min(1,S.moss);
+  for(i=0;i<n;i++)S.shrimp.push(mkShrimp(rnd(60,300)));
+  save();
+}
+function save(){S.last=Date.now();S.speed=speedIx;S.voice=speaking;S.vol=Math.round(vol*100);try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function load(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===1){S=s;speedIx=s.speed==null?3:s.speed;speaking=s.voice===true;vol=(s.vol==null?60:s.vol)/100;return true}}catch(e){}return false}
+function sizeOf(s){return s.age<30?'baby':s.age<75?'juv':'adult'}
+function adults(){return S.shrimp.filter(function(s){return s.age>=75})}
+function logit(t){S.log.unshift('Day '+Math.floor(S.day)+', '+t);if(S.log.length>30)S.log.length=30}
+function ev(k,d){evq.push({k:k,d:d||{}})}
+/* one hour at most per call */
+function step(h){
+  var n=S.shrimp.length, i, s;
+  S.h+=h; S.day=S.h/24;
+  // jobs the store does
+  for(i=S.jobs.length-1;i>=0;i--){var j=S.jobs[i];if(S.h>=j.at){S.jobs.splice(i,1);doJob(j.k)}}
+  // temperature: slow drift round 24, the store keeps a heater on
+  S.temp+= (24-S.temp)*0.02*h + rnd(-0.08,0.08)*h; S.temp=Math.max(20,Math.min(30,S.temp));
+  // filter clogs over a month
+  S.clog=Math.min(1,S.clog+h/720);
+  var bact=(0.025+n*0.002)*(1-0.6*S.clog); // ppm an hour the filter can take
+  // eating
+  var eaters=S.shrimp.filter(function(x){return x.hunger>0.1}).length;
+  var eat=Math.min(S.food, eaters*0.01*h);
+  S.food-=eat;
+  for(i=0;i<n;i++){s=S.shrimp[i];s.hunger=Math.min(1,s.hunger+h/72);}
+  if(eat>0){var share=eat/Math.max(1,eaters);for(i=0;i<n;i++){s=S.shrimp[i];if(s.hunger>0.1)s.hunger=Math.max(0,s.hunger-share*25);}}
+  // moss and biofilm feed them a little
+  for(i=0;i<n;i++){s=S.shrimp[i];s.hunger=Math.max(0,s.hunger-(0.004+0.006*S.moss)*h);}
+  // leftover food rots
+  var rot=S.food*0.03*h; S.food-=rot; S.nh3+=rot*0.8 + n*0.0005*h;
+  var c1=Math.min(S.nh3,bact*h); S.nh3-=c1; S.no2+=c1;
+  var c2=Math.min(S.no2,bact*0.9*h); S.no2-=c2; S.no3+=c2*3;
+  S.no3+= (0.01 + n*0.0005)*h; // with the nitrite that turns, about 5 ppm a week for a small colony
+  S.no3-= S.moss*0.004*h; S.no3=Math.max(0,S.no3);
+  var bad=S.nh3+S.no2*0.7;
+  // each shrimp
+  for(i=n-1;i>=0;i--){
+    s=S.shrimp[i]; s.age+=h/24; s.moltIn-=h/24;
+    var die=0;
+    if(bad>0.3)die+= (bad-0.3)*0.004*h;
+    if(S.temp>28.5)die+= (S.temp-28.5)*0.003*h;
+    if(s.age>600)die+= (s.age-600)/900*0.004*h;
+    if(s.age<30)die+= 0.00028*h; // about 60% of babies make it
+    if(n>40)die+= (n-40)/40*0.0006*h; // crowding: a soft cap around 50
+    if(s.moltIn<=0){
+      s.moltIn=s.age<75?rnd(3,12):rnd(15,45);
+      var wc7=(S.wc||[]).filter(function(d){return S.day-d<7}).length; /* water changed more than twice in a week: molts fail (the game's too-much-new-water rule) */
+      var fail=0.02+S.no3/400+bad*0.1+Math.max(0,wc7-2)*0.25;
+      if(Math.random()<fail){die=1}else ev('molt',{id:s.id})
+    }
+    if(Math.random()<die){S.shrimp.splice(i,1);logit(die===1?'a molt failed':sizeOf(s)==='baby'?'a baby died':'a shrimp died');if(die!==1)ev('death',{id:s.id,age:s.age});else ev('moltfail',{id:s.id,age:s.age});continue}
+    if(s.berried>0){s.berried-=h/24;if(s.berried<=0){s.berried=0;var k=Math.floor(rnd(5,12));for(var b=0;b<k;b++)S.shrimp.push(mkShrimp(0));logit(k+' babies');ev('babies',{n:k})}}
+    else if(s.sex==='f'&&s.age>=75&&s.hunger<0.6&&bad<0.15&&S.no3<60&&Math.random()<h/(24*18)*Math.max(0,1-n/60)){s.berried=rnd(22,28);logit('a female is carrying eggs');ev('berried',{id:s.id})}
+  }
+}
+function doJob(k){
+  if(k==='feed'){S.food+= (S.ration*0.5)*Math.max(1,S.shrimp.length/10)*0.6; ev('feed');logit('fed')}
+  else if(k==='water'){S.nh3*=0.7;S.no2*=0.7;S.no3*=0.7;S.wc=(S.wc||[]).filter(function(d){return S.day-d<7});S.wc.push(S.day);ev('pour');logit('water changed, 30%')}
+  else if(k==='filter'){S.clog=0;logit('filter cleaned')}
+  else if(k==='moss'){S.moss=Math.min(1,S.moss+0.25);logit('moss added')}
+  else if(k==='add'){for(var i=0;i<5;i++)S.shrimp.push(mkShrimp(rnd(60,120)));logit('5 shrimp added')}
+}
+function advance(hours){var guard=0;while(hours>0&&guard++<20000){var h=Math.min(1,hours);step(h);hours-=h}}
+function job(k,delayH,say){S.jobs.push({at:S.h+delayH,k:k});save();speak(say)}
+/* ---------- speech ---------- */
+function speak(t,head){
+  $('st-head').textContent=head||'';$('st-body').textContent=t;
+  if(!speaking)return;
+  if(!('speechSynthesis'in window)){chime();return}
+  try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=0.95;speechSynthesis.speak(u)}catch(e){}
+}
+function howText(){
+  var n=S.shrimp.length, b=S.shrimp.filter(function(s){return s.berried>0}).length, babies=S.shrimp.filter(function(s){return s.age<30}).length;
+  var a=[], w=[];
+  if(n===0)a.push('No shrimp left.');
+  else{a.push(n+(n===1?' shrimp':' shrimp')+(b?', '+(b===1?'one carrying eggs':b+' carrying eggs'):'')+(babies?', '+babies+' babies':'')+'.');}
+  var hungry=S.shrimp.filter(function(s){return s.hunger>0.6}).length;
+  var bad=S.nh3+S.no2*0.7;
+  if(bad>0.5)w.push('The water is bad, change some today.');
+  else if(bad>0.2)w.push('The water is off, change some.');
+  else if(S.no3>60)w.push('The water is old, change some this week.');
+  else if(S.no3>40)w.push('The water is getting old.');
+  if(S.clog>0.8)w.push('The filter is slow, clean it.');
+  if(n&&hungry>n/2)w.push('They are hungry.');
+  else if(n&&S.food>1.5)w.push('There is food left on the floor, skip a day.');
+  if(S.temp>28)w.push('It is warm in there.');
+  if(!w.length)w.push(n?'They are fine.':'');
+  return a.concat(w.slice(0,2)).join(' ');
+}
+/* ---------- audio ---------- */
+function audio(){
+  if(A)return A;
+  var C=window.AudioContext||window.webkitAudioContext; if(!C)return null;
+  var ctx=new C();
+  A={ctx:ctx};
+  A.master=ctx.createGain();A.master.gain.value=SOUND.master*vol;
+  A.lp=ctx.createBiquadFilter();A.lp.type='lowpass';A.lp.frequency.value=SOUND.dull.clearHz;A.lp.Q.value=0.5;
+  A.comp=ctx.createDynamicsCompressor();A.comp.threshold.value=-18;A.comp.ratio.value=4;
+  A.lp.connect(A.comp);A.comp.connect(A.master);A.master.connect(ctx.destination);
+  A.tank=ctx.createGain();A.tank.gain.value=1;A.tank.connect(A.lp);mixBuses(); /* everything the tank makes goes through here, one-sound buttons bypass it */
+  // noise buffer
+  var len=ctx.sampleRate*2, buf=ctx.createBuffer(1,len,ctx.sampleRate), d=buf.getChannelData(0);
+  for(var i=0;i<len;i++)d[i]=Math.random()*2-1;
+  A.noise=buf;
+  // pink noise, 6 s, ends matched so the loop has no click
+  var pl=ctx.sampleRate*6,pb=ctx.createBuffer(1,pl,ctx.sampleRate),pd=pb.getChannelData(0),b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+  for(i=0;i<pl;i++){var w=Math.random()*2-1;b0=0.99886*b0+w*0.0555179;b1=0.99332*b1+w*0.0750759;b2=0.969*b2+w*0.153852;b3=0.8665*b3+w*0.3104856;b4=0.55*b4+w*0.5329522;b5=-0.7616*b5-w*0.016898;pd[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)*0.11;b6=w*0.115926}
+  var fadeN=ctx.sampleRate*0.5;for(i=0;i<fadeN;i++){var a=i/fadeN;pd[i]=pd[i]*a+pd[pl-fadeN+i]*(1-a)}
+  pb=(function(){var nb=ctx.createBuffer(1,pl-fadeN,ctx.sampleRate);nb.getChannelData(0).set(pd.subarray(0,pl-fadeN));return nb})();
+  A.pink=pb;
+  // the filter: flow plus trickle, each breathing slowly
+  var F=SOUND.flow;
+  function loopSrc(){var x=ctx.createBufferSource();x.buffer=A.pink;x.loop=true;x.loopStart=0;x.loopEnd=A.pink.duration;return x}
+  var fs=loopSrc(),fhp=ctx.createBiquadFilter(),flp=ctx.createBiquadFilter();fhp.type='highpass';fhp.frequency.value=F.lo;flp.type='lowpass';flp.frequency.value=F.hi;flp.Q.value=0.3;
+  A.flowG=ctx.createGain();A.flowG.gain.value=0;var fl=ctx.createOscillator(),flg=ctx.createGain();fl.frequency.value=F.breathe;flg.gain.value=F.gain*F.depth;fl.connect(flg);flg.connect(A.flowG.gain);fl.start();
+  fs.connect(fhp);fhp.connect(flp);flp.connect(A.flowG);A.flowG.connect(A.tank);fs.start(0,Math.random()*3);
+  var T2=F.trickle,ts=loopSrc(),tb=ctx.createBiquadFilter();tb.type='bandpass';tb.frequency.value=T2.hz;tb.Q.value=T2.q;
+  A.trickG=ctx.createGain();A.trickG.gain.value=0;var tl=ctx.createOscillator(),tlg=ctx.createGain();tl.frequency.value=T2.rate;tlg.gain.value=T2.gain*T2.depth;tl.connect(tlg);tlg.connect(A.trickG.gain);tl.start();
+  var tl2=ctx.createOscillator(),tlg2=ctx.createGain();tl2.frequency.value=T2.rate*2.7;tlg2.gain.value=T2.gain*T2.depth*0.5;tl2.connect(tlg2);tlg2.connect(A.trickG.gain);tl2.start();
+  ts.connect(tb);tb.connect(A.trickG);A.trickG.connect(A.tank);ts.start(0,1.5+Math.random()*3);
+  /* a soft bed under the trickle and the bubbler: pink noise low-passed at 600 Hz */
+  var bs=loopSrc(),blp=ctx.createBiquadFilter(),bhp=ctx.createBiquadFilter();blp.type='lowpass';blp.frequency.value=600;bhp.type='highpass';bhp.frequency.value=200;A.bedG=ctx.createGain();A.bedG.gain.value=0;bs.connect(bhp);bhp.connect(blp);blp.connect(A.bedG);A.bedG.connect(A.busT.drop.g);bs.start(0,Math.random()*4);
+  /* the brook: noise through narrow bandpasses whose centre is pushed around by slow noise, the classic procedural water */
+  A.brookG=ctx.createGain();A.brookG.gain.value=0;A.brookG.connect(A.busT.drop.g);A.brookBP=[];A.brookMod=[];
+  SOUND.brook.voices.forEach(function(v){var src2=loopSrc(),bp2=ctx.createBiquadFilter();bp2.type='bandpass';bp2.frequency.value=v[0];bp2.Q.value=SOUND.brook.q;
+    var mod=ctx.createBufferSource();mod.buffer=A.noise;mod.loop=true;var mlp=ctx.createBiquadFilter();mlp.type='lowpass';mlp.frequency.value=v[2];A.brookBP.push([bp2,v]);A.brookMod.push([mlp,v]);var mg=ctx.createGain();mg.gain.value=v[1]*6;mod.connect(mlp);mlp.connect(mg);mg.connect(bp2.frequency);
+    var vg=ctx.createGain();vg.gain.value=1/SOUND.brook.voices.length;src2.connect(bp2);bp2.connect(vg);vg.connect(A.brookG);src2.start(0,Math.random()*4);mod.start(0,Math.random()*1.5)});
+  A.roomG=ctx.createGain();
+  // ammonia hiss
+  var hs=ctx.createBufferSource();hs.buffer=buf;hs.loop=true;
+  var hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=SOUND.hiss.hz;hp.Q.value=SOUND.hiss.q;
+  A.hissG=ctx.createGain();A.hissG.gain.value=0;
+  hs.connect(hp);hp.connect(A.hissG);A.hissG.connect(A.busT.hiss.g);hs.start();
+  A.nextBubble=ctx.currentTime+0.3;
+  A.voices={};
+  return A;
+}
+var LIGHTS=[['drop','Fountain'],['plop','Fountain plop'],['beep','Monitor beep'],['hiss','Hiss'],['eatA','Adult eating'],['eatJ','Young eating'],['eatB','Baby eating'],['idle','Sitting still'],['swimS','Swim, short'],['swimL','Swim, long'],['eggs','Eggs (double)'],['molt','Molt'],['moltfail','Failed molt'],['babies','Babies hatch'],['deathB','Death, baby'],['deathA','Death, adult'],['feed','Feeding'],['pour','Water change']],LEL={};
+function lit(k,at,dur){var el=LEL[k];if(!el)return;var d=Math.max(0,((at||0)-(A?A.ctx.currentTime:0))*1000);setTimeout(function(){el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('on')},Math.max(160,(dur||0)*1000))},d)}
+/* the filter sounds; each event at a random time (Poisson), rate × Density. Pitch and Size scale every drop. */
+var FRATE={trickle:3.5,bubbler:30,drip:0.7,rain:45,glug:1.3};
+var FPD={dens:1,pitch:1,size:1,bed:1},FPS={};try{FPS=JSON.parse(localStorage.getItem('eartank-fp')||'{}')||{}}catch(e){}
+function fpOf(m){return Object.assign({},FPD,FPS[m]||{})}
+function filterEvent(m,at,P){var Fo=SOUND.fountain,i,t;
+  if(m==='drops'){var big=Math.random()<Fo.big.p,dh=(big?rnd(Fo.big.lo,Fo.big.hi):Fo.lo*Math.pow(Fo.hi/Fo.lo,Math.random()))*P.pitch;if(big){as('plop',at,function(){tone(dh,Fo.big.ms*P.size,Fo.big.gain*rnd(0.4,1),at,'sine',dh*Fo.rise)});lit('plop',at,0.15)}else{tone(dh,rnd(Fo.msLo,Fo.msHi)*P.size,Fo.gain*rnd(0.4,1),at,'sine',dh*Fo.rise);if(Math.random()<0.25)lit('drop',at,0.12)}}
+  else if(m==='trickle'){var Tr=SOUND.trickle,cn=Math.round(rnd(Tr.cLo,Tr.cHi));t=at;for(i=0;i<cn;i++){var f0=rnd(Tr.lo,Tr.hi)*P.pitch;tone(f0,rnd(Tr.msLo,Tr.msHi)*P.size,Tr.gain*rnd(0.3,1),t,'sine',f0*rnd(Tr.riseLo,Tr.riseHi));t+=rnd(0.008,0.04)*P.size}if(Math.random()<0.3)lit('drop',at,0.12)}
+  else if(m==='bubbler'){var Bb=SOUND.bubbler,b0=rnd(Bb.lo,Bb.hi)*P.pitch;tone(b0,rnd(Bb.msLo,Bb.msHi)*P.size,Bb.gain*rnd(0.3,1),at,'sine',b0*Bb.rise);if(Math.random()<0.1)lit('drop',at,0.12)}
+  else if(m==='drip'){/* one drop, a ring and a soft echo off the glass */var d0=rnd(800,1500)*P.pitch,g0=rnd(0.08,0.13);tone(d0,60*P.size,g0,at,'sine',d0*2.3);tone(d0*1.02,60*P.size,g0*0.35,at+0.09*P.size,'sine',d0*2.2);if(Math.random()<0.3){var pl=rnd(300,450)*P.pitch;as('plop',at,function(){tone(pl,90*P.size,0.03,at+0.02,'sine',pl*1.6)});lit('plop',at,0.15)}lit('drop',at,0.2)}
+  else if(m==='rain'){var r0=rnd(1800,5200)*P.pitch;tone(r0,rnd(5,12)*P.size,rnd(0.006,0.02),at,'sine',r0*1.5);if(Math.random()<0.05)lit('drop',at,0.1)}
+  else if(m==='glug'){var gn=Math.round(rnd(2,4));t=at;for(i=0;i<gn;i++){var gh=rnd(150,300)*P.pitch;tone(gh,rnd(90,160)*P.size,rnd(0.07,0.12),t,'sine',gh*1.8);t+=rnd(0.08,0.18)*P.size}lit('drop',at,0.3)}
+}
+var FOUNT='trickle',BEEP={style:'monitor',pitch:1,vol:1};try{FOUNT=localStorage.getItem('eartank-fount')||'trickle';var bj=JSON.parse(localStorage.getItem('eartank-beep')||'null');if(bj)BEEP=bj;if(BEEP.v!==2){BEEP.style='monitor';BEEP.v=2;localStorage.setItem('eartank-beep',JSON.stringify(BEEP))}}catch(e){}
+function beepAt(hz,at,gain,bz){as('beep',at,function(){beepAt0(hz,at,gain,bz)})}
+/* the game's own Feed sound (shrimp/sfx/feed_drop_002.wav, Kenney, CC0), embedded */
+var FEED_WAV='data:audio/wav;base64,UklGRvglAABXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACABAAZGF0YdQlAAAAAAIAEgA7AIcA9QB/ARsCwAJhA/UDbgTDBOgE1QSEBPADGQMBAq8ALf+F/cn7Cvpb+M/2efVs9LbzZfOA8wz0CfVw9jf4Ufqq/Cz/vgFHBKwG0wihCgIM4gwwDeUM+Qs5CvwHWAVnAkf/F/z1+AL2WvMW8U3vEO5p7V/t8e0Y78nw8vJ/9Vf4Xvt6/owBeQQkB3UJWAu+DJoN5w2kDdMMfgu0CYYHCwVbApH/xvwT+pT3X/WJ8yPyO/HZ8AHxsvHl8o/0ovYJ+a77e/5SARwEvwYfCSkLxwzrDYoOnw4oDisNsAvICYMH+QRDAn3/v/wm+sz3yfUv9A7zcvJg8tjy1fNM9S73Z/nh+4P+MwHYA1kGnQiPChwMNg3SDeoNfQ2SDDILbAlTB/oEeQLq/2P9/vrS+Pb2efVs9NfzwfMo9An1WvYN+BH6Ufy4/isBlgPfBfAHtQkcCxkMoQyxDEcMaAsfCnYIgAZQBPsBm/9D/Q77D/lc9wT2FvWY9JH0APXg9Sf3yfi0+tT8FP9dAZgDsAWQByQJXgozC5kLjQsQCyYK2gg3B08FNQP/AMT+mvyX+tD4V/c69oX1PfVk9ff18fZF+Ob5xPvJ/eT//AH/A9cFcwfDCLkJTAp3CjkKlQmSCDsHnwXOA9sB2v/e/fz7R/rO+KD3yfZQ9jr2h/Yz9zf4ifka+9v8uv6jAIUCSwTkBUEHVQgTCXYJeQkdCWUIWAcABm0ErALRAO/+GP1f+9j5kPiX9/X2sfbP9kz3I/hM+bn6Xfwm/gAA2gGfAz0FogbBB4wI/QgOCcAIFQgWB84FSgSbAtQAB/9G/aT7M/oA+Rn4hvdM92/37Pe9+Nr5NvvD/HD+KgDgAX8D9wQ3BjMH4Qc7CD4I6gdDB1IGIAW7AzECkgDx/lz95fub+ov5wfhE+Bj4Qfi6+ID5ifrL+zj9wP5TAOEBWQOsBMwFrAZFB5AHiQczB5EGqgWIBDgDyAFIAMj+V/0E/N367/lC+d34xPj3+HX5N/o1+2X8uv0m/5gAAgJWA4UEggVDBsAG9QbfBoEG3gX9BOkDrAJVAfL/kP4//Q38Bfs0+qL5VPlO+Y/5FfrZ+tX7/PxC/pr/9ABDAnoDigRpBQ0GcAaNBmMG9QVGBV8ESQMQAsEAbP8e/uT8zvvn+jj6yfmf+bv5HPq8+pb7n/zM/Q//WQCeAdAC4QPFBHQF5QUWBgMGrwUdBVUEXgNFAhQB2/+k/n79dfyV++X6b/o2+jz6gvoE+7v7ofyq/c3++/8nAUYCTAMrBNwEVwWVBZYFWQXgBDEEVANTAjkBEQDs/tL90/z4+0v71fqZ+pv62vpS+/771/zS/eX+AAAbASgCGwPpA4oE9wQsBSYF5wRxBMoD+gIJAgMB8//l/uP9+/w1/Jz7NPsD+wz7TPvC+2j8Nf0i/iL/KgAwASYCAwO7A0gEowTJBLgEcgT6A1UDiwKmAa8As/+7/tL9BP1Z/Nj7h/tp+4D7yftC/OT8qf2I/nf/aQBXATUC+QKbAxIEWwRxBFUEBwSKA+YCIQJEAVoAbf+H/rL9+fxk/Pn7vPuy+9j7L/yy/Fr9IP78/uL/yAClAW4CGgOhA/0DKwQoBPYDlQMLA18CmAG/AOD/Av8w/nT91/xf/BL88/sD/EL8rPw9/e79tf6L/2QAOQH+AasCOQOgA90D7QPPA4UDEgN8AsoBAwEwAF3/kf7X/Tb9t/xf/DL8Mvxf/Lf8Nf3T/Yv+U/8iAO8AsAFcAuwCWAOdA7YDowNlA/8CdQLQARUBTgCG/8P+Ef52/fr8o/x1/HH8l/zm/Fr97P2X/lH/EgDRAIYBJwKuAhMDUwNqA1kDHwPBAkICqQH+AEgAkP/e/jr+rf08/ez8wvy//OP8Lf2Y/R/+vP5o/xkAyQBuAQECewLXAg8DIgMPA9cCfQIGAncB1gAtAIP/3v5J/sn9ZP0g/f/8A/0r/XX93v1h/vb+l/88AN0AcwH3AWICrwLbAuQCygKNAjICvQEyAZoA/f9f/8r+Rf7W/YL9Tf05/Uf9d/3F/S7+rf47/9L/agD8AIIB9QFPAo0CqwKoAoQCQgLlAXAB6wBaAMf/N/+x/jv+3P2X/XD9av2D/bv9D/57/vn+g/8SAKEAJwGeAQECSgJ3AoUCcwJDAvcBkwEcAZgADQCD//7+h/4j/tf9pf2S/Zz9xP0I/mX+1f5T/9n/YADiAFkBvgENAkMCWwJWAjQC9gGfATUBuwA5ALb/Nv/B/lz+DP7V/br9u/3a/RP+ZP7J/j3/uv85ALYAKQGMAdsBEwIwAjECFgLhAZQBNAHFAEwA0v9Z/+r+if46/gP+5v3j/fv9Lf52/tL+Pf+w/ycAnAAIAWcBswHpAQYCCgLzAcMBfQElAb4ATgDb/2r/Af+m/lz+KP4M/gn+H/5O/pL+6P5M/7j/JwCUAPkAUQGXAcgB4gHkAc0BnwFcAQgBpwA+ANP/a/8K/7b+dP5G/i/+L/5I/nb+uP4L/2n/z/82AJoA9gBFAYMBrAHAAbwBogFzATEB4ACEACEAv/9f/wj/v/6G/mH+Uf5X/nP+pP7m/jb/kP/v/04AqQD7AEABdAGUAaABlgF4AUYBBAG0AFwAAACk/03/AP/A/pH+df5u/nz+nf7R/hT/Y/+6/xMAbAC/AAcBQgFrAYIBhAFzAU4BGAHTAIQALwDY/4P/NP/x/rz+mP6H/or+oP7J/gH/R/+W/+r/PgCQANkAFwFGAWQBbwFnAUwBHwHkAJ0ATgD9/6v/Xf8Z/+H+uf6h/p3+q/7L/vv+Of+B/8//HwBtALYA9QAmAUgBWAFWAUIBHQHoAKgAYAASAMX/e/84///+1f67/rL+u/7V/v/+N/95/8H/DABXAJ0A2gALAS4BQQFCATIBEgHjAKkAZQAdANT/jf9N/xf/7f7S/sf+zv7k/gr/Pf96/77/BABKAI0AxwD2ABgBKwEtAR8BAgHYAKEAYwAfANv/mP9c/yj/Af/n/t3+4v73/hr/Sf+C/8H/AwBFAIMAuQDlAAUBFgEYAQsB8ADHAJQAWgAbANv/nf9l/zX/Ef/6/vH+9/4M/y3/Wv+Q/8v/CQBGAH8AsQDZAPQAAwEDAfUA2QCyAIEASgAPANT/m/9n/z3/Hv8L/wX/Dv8k/0b/cv+l/97/FwBPAIMArwDRAOgA8QDtANwAvwCYAGgAMgD7/8T/kP9j/z7/Jf8Y/xj/Jf8+/2H/jv/A//b/LABfAI0AswDPAN8A4gDZAMQAowB6AEoAFgDi/6//gf9a/zz/Kv8k/yr/PP9Z/3//rP/e/xEAQwByAJoAuQDNANYA0wDEAKoAhwBcACwA+//J/5v/cv9S/zz/MP8x/z3/VP91/53/y//7/ysAWQCCAKMAuwDIAMoAwACsAI4AaAA8AA0A3/+x/4n/Z/9O/0D/PP9D/1X/cf+V/77/7P8ZAEUAbQCPAKkAuAC9ALgApwCOAGwARAAZAO3/wv+a/3n/X/9P/0n/Tv9c/3T/lP+6/+T/DgA5AF8AgACaAKoAsQCtAJ8AiABqAEUAHQD0/8v/pf+F/2z/XP9V/1n/Zv98/5n/vf/k/wsAMwBYAHcAjwCfAKUAogCVAIAAYwBBABsA9f/O/6v/jf91/2b/YP9k/3H/hv+i/8P/6P8NADIAVABxAIcAlQCaAJYAigB1AFkAOQAVAPH/zf+t/5H/fP9v/2v/b/99/5H/rP/M/+//EgA0AFQAbgCBAI0AkACLAH0AaQBOAC4ADQDr/8r/rP+T/4H/d/91/3v/if+e/7n/1//4/xkAOQBVAGwAfACFAIcAfwBxAFwAQQAjAAIA4//F/6r/lf+G/37/fv+H/5b/q//G/+T/AgAiAD8AWABrAHkAfwB9AHQAYwBNADMAFQD4/9r/vv+n/5X/if+F/4j/k/+k/7r/1f/y/w8ALABGAFsAawB1AHcAcgBmAFQAPQAjAAYA6v/P/7b/o/+V/43/jf+U/6H/tP/M/+b/AQAdADcATgBfAGsAcABuAGUAVgBCACoAEAD2/9v/w/+v/5//lv+U/5j/ov+y/8f/3//5/xMALABCAFQAYQBoAGgAYgBWAEQALwAXAP7/5f/N/7n/qf+f/5v/nf+l/7P/xf/b//P/CwAjADkASwBZAGEAYgBeAFQARAAxABoAAgDr/9X/wf+x/6b/of+i/6j/tP/F/9r/8P8HAB4AMwBFAFIAWgBdAFoAUQBDADEAHAAFAO//2v/G/7f/rP+n/6f/rP+3/8f/2v/v/wQAGgAuAD8ATQBVAFcAVQBNAEAALwAbAAYA8f/d/8v/vP+y/6z/rP+y/7z/y//c//D/BAAYACsAOwBHAE8AUQBOAEcAOwArABgABADx/97/zv/A/7f/sv+z/7j/wv/Q/+H/8/8GABkAKgA4AEMASQBLAEgAQAA0ACUAEwABAO//3v/P/8P/u/+4/7n/v//J/9f/5//4/wkAGwAqADcAQABEAEUAQAA4ACwAHQANAP3/7P/c/8//xf+//77/wP/H/9L/3//u////DwAeACwANgA9AEAAPwA5ADAAJAAVAAUA9v/n/9n/zv/G/8L/w//H/8//2v/o//f/BgAVACMALgA3ADsAPAA5ADIAKAAbAA0A///v/+L/1v/N/8f/xf/H/83/1v/i//D///8NABsAJwAwADcAOQA4ADQAKwAgABMABQD3/+n/3f/T/8z/yP/J/8z/1P/e/+r/+P8FABMAIAAqADIANgA3ADQALQAkABgACwD+//D/5P/Z/9H/zP/L/83/0//c/+f/8/8AAA0AGgAkAC0AMgA0ADIALQAlABoADgABAPX/6f/e/9X/0P/O/8//1P/b/+X/8f/+/wkAFgAgACkALgAxADAAKwAkABsADwADAPf/7P/h/9n/0//R/9H/1f/c/+X/8P/8/wgAEwAeACYALAAuAC4AKgAjABoADwAEAPn/7f/j/9v/1f/T/9P/1//e/+b/8f/8/wcAEgAcACQAKgAsACwAKAAiABkADwAEAPn/7v/l/93/2P/V/9b/2f/f/+f/8f/8/wcAEQAbACIAKAAqACkAJgAgABgADgADAPr/7//m/9//2v/X/9j/2//h/+n/8//9/wcAEQAaACEAJQAnACcAIwAdABUADAACAPn/7//n/+D/3P/a/9v/3v/k/+z/9f///wgAEQAZAB8AIwAlACQAIAAaABMACgAAAPf/7//n/+H/3f/c/97/4f/n/+//+P8AAAkAEgAZAB8AIgAjACEAHQAXAA8ABgD+//X/7f/n/+L/3//e/+D/5f/r//P/+/8DAAwAEwAaAB4AIAAgAB4AGQATAAsAAwD7//P/7P/m/+L/4P/h/+T/6f/v//f///8GAA4AFQAaAB4AHwAeABoAFQAPAAcAAAD4//D/6v/l/+P/4v/k/+f/7f/z//v/AgAKABEAFgAbAB0AHQAbABcAEQAKAAMA/P/1/+7/6f/l/+T/5P/n/+v/8f/4////BgANABMAGAAaABsAGgAXABIADAAGAAAA+P/y/+z/6P/m/+b/5//r//D/9v/9/wMACQAPABQAGAAZABkAFwATAA4ABwABAPv/9f/v/+v/6f/o/+n/6//w//X/+/8BAAcADQASABUAFwAXABYAEgAOAAgAAgD9//f/8f/t/+r/6f/q/+z/8P/1//v/AAAGAAsAEAAUABYAFgAVABIADgAIAAMA/v/4//P/7//s/+v/6//t//D/9f/6/wAABQAKAA8AEgAUABUAFAARAA0ACAADAP7/+f/0//D/7f/s/+3/7v/x//b/+/8AAAQACQAOABEAEwATABIAEAAMAAgAAwD///n/9f/x/+//7v/u/+//8v/2//v/AAAEAAkADQAQABIAEgARAA8ACwAHAAIA/v/6//X/8v/w/+7/7//x//P/9//8/wAABAAJAAwADwARABEAEAAOAAoABgACAP7/+f/1//L/8P/v//D/8f/0//j//P8AAAUACQAMAA8AEAAQAA8ADQAJAAUAAQD9//n/9f/y//H/8P/x//P/9f/5//3/AQAFAAkADAAOAA8ADwAOAAsACAAEAAAA/f/5//X/8//x//H/8v/0//f/+////wIABgAJAAwADgAOAA4ADAAKAAYAAwAAAPz/+P/1//P/8v/y//T/9v/5//z/AAADAAcACgAMAA0ADQAMAAoACAAEAAEA/v/6//f/9f/z//P/8//1//j/+//+/wEABAAHAAoADAAMAAwACwAJAAYAAgAAAP3/+f/3//X/9P/0//X/9//6//3/AAADAAYACAAKAAsADAALAAkABwAEAAEA/v/7//j/9v/1//X/9f/3//n//P///wEABAAHAAkACwALAAsACQAHAAUAAgD///z/+v/3//b/9f/1//f/+P/7//7/AAADAAYACAAKAAsACwAJAAgABQACAAAA/f/7//j/9v/2//X/9v/4//r//f8AAAIABQAHAAkACgAKAAkACAAGAAMAAAD+//v/+f/3//b/9v/3//j/+v/9/wAAAgAEAAcACAAJAAoACQAIAAYAAwABAP///P/6//j/9//3//f/+f/6//3///8BAAQABgAIAAkACQAIAAcABQADAAEA///9//r/+f/4//j/+P/5//v//f///wEAAwAFAAcACAAIAAgABwAFAAMAAQD///3/+//5//n/+P/5//r/+//9/wAAAQADAAUABgAHAAcABwAGAAUAAwABAP///f/7//r/+f/5//n/+v/8//7/AAABAAMABAAGAAcABwAGAAUABAACAAAA///9//z/+v/6//r/+v/7//z//v8AAAEAAwAEAAUABgAGAAYABQADAAIAAAD///3//P/7//r/+v/7//z//f///wAAAQADAAQABQAGAAYABQAEAAMAAQAAAP///f/8//v/+v/7//v//P/9////AAABAAMABAAFAAUABQAEAAMAAgABAAAA/v/9//z/+//7//v//P/9//7/AAAAAAIAAwAEAAUABQAFAAQAAwABAAAA///+//3//P/7//v//P/8//7///8AAAEAAgADAAQABQAFAAQAAwACAAEAAAD///7//f/8//z//P/8//3//v///wAAAQACAAMABAAEAAQABAADAAEAAAAAAP///f/9//z//P/8//3//v///wAAAAACAAMAAwAEAAQABAADAAIAAQAAAP///v/9//3//P/8//3//f/+/wAAAAABAAIAAwADAAQAAwADAAIAAQAAAAAA///+//3//f/9//3//f/+////AAAAAAEAAgADAAMAAwADAAIAAQABAAAA///+//7//f/9//3//f/+////AAAAAAEAAgACAAMAAwADAAIAAgABAAAAAAD///7//f/9//3//v/+////AAAAAAEAAQACAAMAAwADAAIAAQABAAAAAAD///7//v/9//3//v/+////AAAAAAAAAQACAAIAAgACAAIAAgABAAAAAAD//////v/+//7//v/+////AAAAAAAAAQACAAIAAgACAAIAAQABAAAAAAD//////v/+//7//v/+////AAAAAAAAAQABAAIAAgACAAIAAQABAAAAAAAAAP///v/+//7//v/+////AAAAAAAAAQABAAIAAgACAAIAAQABAAAAAAAAAP/////+//7//v//////AAAAAAAAAQABAAIAAgACAAIAAQABAAAAAAAAAP/////+//7//v//////AAAAAAAAAQABAAEAAgACAAEAAQABAAAAAAAAAP//////////////////AAAAAAAAAAABAAEAAQABAAEAAQAAAAAAAAAAAP///////////////wAAAAAAAAAAAAABAAEAAQABAAEAAQAAAAAAAAAAAP///////////////wAAAAAAAAAAAQABAAEAAQABAAEAAAAAAAAAAAAAAP////////////8AAAAAAAAAAAAAAQABAAEAAQABAAEAAAAAAAAAAAAAAP////////////8AAAAAAAAAAAAAAQABAAEAAQABAAAAAAAAAAAAAAAAAP//////////AAAAAAAAAAAAAAAAAQABAAEAAQAAAAAAAAAAAAAAAAAAAP///////wAAAAAAAAAAAAAAAAAAAAABAAEAAAAAAAAAAAAAAAAAAAAAAP////8AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAP//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=',FEEDBUF=null;
+/* the feeding sound as stacked layers. Each has: on, vol, delay (s from the tap), pitch (×), count, spread (s), vary (0 even to 1 random), soft (0 bright to 1 muffled) */
+var FEEDL=[
+  ['shake','Salt shake','shakes of tiny grains, count is how many shakes, spread is the gap between them',{on:1,vol:1,delay:0,pitch:1,count:5,spread:0.42,vary:0.6,soft:0}],
+  ['drop','Game feed sound','the game\'s own Feed sound, count repeats it',{on:1,vol:1,delay:0,pitch:1,count:1,spread:0.3,vary:0,soft:0}],
+  ['plink','Pellets plink','pellets landing, a little falling note each',{on:1,vol:1,delay:1.9,pitch:1,count:7,spread:1,vary:0.5,soft:0}],
+  ['bloop','Low bloop','a low round bloop as the food goes under',{on:1,vol:1,delay:2.1,pitch:1,count:1,spread:0.4,vary:0.3,soft:0}],
+  ['sprinkle','Sprinkle','very small high taps on the surface',{on:0,vol:1,delay:1.7,pitch:1,count:20,spread:0.8,vary:0.7,soft:0}],
+  ['plop','Plop','water drop plops',{on:0,vol:1,delay:1.8,pitch:1,count:4,spread:0.7,vary:0.6,soft:0}],
+  ['bubble','Bubbles','small bubbles rising after the food sinks',{on:0,vol:1,delay:2.6,pitch:1,count:6,spread:1.4,vary:0.6,soft:0}],
+  ['patter','Patter','soft low taps, food hitting the gravel',{on:0,vol:1,delay:2.4,pitch:1,count:8,spread:1.2,vary:0.7,soft:0}]];
+var FEEDS={};try{FEEDS=JSON.parse(localStorage.getItem('eartank-feed')||'{}')||{}}catch(e){}
+function feedOf(id){var d=FEEDL.filter(function(l){return l[0]===id})[0][3];return Object.assign({},d,FEEDS[id]||{})}
+function vr(x,v){return x*(1+(Math.random()*2-1)*v)}
+function feedLayer(id,t0,P){var ctx=A.ctx,out=ctx.createBiquadFilter(),g=ctx.createGain();out.type='lowpass';out.frequency.value=softHz(P.soft);out.Q.value=0.5;g.gain.value=P.vol;out.connect(g);g.connect(dest());
+  var pd=DESTO;DESTO=out;try{var t=t0+P.delay,n=Math.max(1,Math.round(vr(P.count,P.vary*0.5))),i,j,at;
+  if(id==='shake'){var Sh=SOUND.feed.shake;for(i=0;i<n;i++){var gr=Math.round(rnd(Sh.grLo,Sh.grHi)),ln=rnd(Sh.lenLo,Sh.lenHi),shz=vr(rnd(Sh.hzLo,Sh.hzHi),P.vary*0.3)*P.pitch,sg=Sh.gain*rnd(0.5,1.1);for(j=0;j<gr;j++)burst(shz*rnd(0.8,1.25),3,6,sg*rnd(0.3,1),t+Math.pow(Math.random(),1.5)*ln,'bandpass');t+=Math.max(0.05,vr(P.spread,P.vary*0.5))}}
+  else if(id==='drop'){for(i=0;i<n;i++)gameFeed(t+i*P.spread+(Math.random()*P.vary*P.spread),P.pitch*vr(1,P.vary*0.1),SOUND.feed.game,out)}
+  else{for(i=0;i<n;i++){at=t+(n>1?(P.vary>0.05?Math.random():i/(n-1)):0)*P.spread;var q=P.pitch*vr(1,P.vary*0.25);
+    if(id==='plink'){var fh=SOUND.feed.hz*q*rnd(0.85,1.2);tone(fh,SOUND.feed.ms,SOUND.feed.gain*rnd(0.6,1),at,'sine',fh*0.55)}
+    else if(id==='bloop'){var bh=SOUND.feed.bloop.hz*q;tone(bh,SOUND.feed.bloop.ms,SOUND.feed.bloop.gain,at,'sine',bh*1.5)}
+    else if(id==='sprinkle'){var sh=rnd(3000,5500)*q;tone(sh,rnd(6,14),rnd(0.01,0.03),at,'sine',sh*1.3)}
+    else if(id==='plop'){var ph=rnd(500,900)*q;tone(ph,70,rnd(0.05,0.09),at,'sine',ph*2.2)}
+    else if(id==='bubble'){var uh=rnd(350,800)*q;tone(uh,rnd(35,70),rnd(0.03,0.06),at,'sine',uh*1.7)}
+    else if(id==='patter'){var th=rnd(180,320)*q;tone(th,40,rnd(0.04,0.08),at,'triangle',th*0.8)}}}
+  }finally{DESTO=pd}}
+function feedSound(t,only){FEEDL.forEach(function(l){var P=feedOf(l[0]);if(only?l[0]===only:P.on)feedLayer(l[0],t,P)})}
+function gameFeed(at,rate,gain,dst){if(!A)return;dst=dst||dest();function go(){var x=A.ctx.createBufferSource(),g=A.ctx.createGain();x.buffer=FEEDBUF;x.playbackRate.value=rate||1;g.gain.value=gain==null?SOUND.feed.game:gain;x.connect(g);g.connect(dst);x.start(Math.max(A.ctx.currentTime,at))}
+  if(FEEDBUF)return go();fetch(FEED_WAV).then(function(r){return r.arrayBuffer()}).then(function(b){return new Promise(function(ok,no){A.ctx.decodeAudioData(b,ok,no)})}).then(function(d){FEEDBUF=d;go()}).catch(function(){})}
+/* the worst reading on the strip as a zone: 0..1 green, 1..2 amber, 2 red */
+function zoneOf(v,a,r){return v<=a?v/a:v<=r?1+(v-a)/(r-a):2}
+function waterZone(){if(!S)return 0;return Math.max(zoneOf(S.nh3,0.1,0.3),zoneOf(S.no2,0.1,0.3),zoneOf(S.no3,20,40))}
+function zoneGap(z){var M=SOUND.monitor;return z<=1?M.at0+(M.at1-M.at0)*z:z<2?M.at1+(M.at2-M.at1)*(z-1):M.at2}
+function flat(hz,ms,gain,at){var ctx=A.ctx,t=at||ctx.currentTime,o=ctx.createOscillator(),f=ctx.createBiquadFilter(),g=ctx.createGain();o.type='square';o.frequency.value=hz;f.type='lowpass';f.frequency.value=hz*2.2;f.Q.value=0.7;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.004);g.gain.setValueAtTime(gain,t+ms/1000-0.015);g.gain.linearRampToValueAtTime(0,t+ms/1000);o.connect(f);f.connect(g);g.connect(dest());o.start(t);o.stop(t+ms/1000+0.02)}
+function beepAt0(hz,at,gain,bz){var P=SOUND.pulse,h=hz*BEEP.pitch,g=gain*BEEP.vol;
+  if(BEEP.style==='soft')tone(h,P.ms,g,at,'sine');
+  else if(BEEP.style==='monitor'){/* a bedside monitor's pulse tone: a flat square beep, quick on and off, pitch climbs as it goes bad; past 0.75 every third beat is the three-note alarm */
+    var M=SOUND.monitor,mh=(M.lo+(M.hi-M.lo)*bz)*BEEP.pitch;flat(mh,M.ms,g*M.gain,at);
+}
+  else if(BEEP.style==='heart'){tone(h*0.55,110,g*1.3,at,'triangle',h*0.45);tone(h*0.5,110,g*0.9,at+0.22,'triangle',h*0.4)}
+  else if(BEEP.style==='bell'){tone(h,700,g*0.9,at,'sine');tone(h*2.76,350,g*0.25,at,'sine')}
+}
+/* the default tank (wood, plants, mossy rocks, sword plant from the game's tank art), decor only, gray, cut into 10 columns by 24 rows; each cell is its mean brightness, top row first, scaled so the brightest cell is 1 */
+/* the default tank's decor as masks, 233 by 108, one bit a pixel (alpha over half), from the game's tank art layers */
+var PIC_W=233,PIC_H=108,PIC_MASK={"twood": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAADwAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAHgAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAAAAAAAAOAAAAAAAAAAAAAAAAAAAAAAAAAAAPgAAAAAAAAA8AAAAAAAAAAAAAAAAAAAAAAAAAAAfwAAAAAAAAB4AAAAAAAAAAAAAAAAAAAAAAAAAAA/gHAAAAAAADwAAAAAAAAAAAAAAAAAAAAAAAAAAA/gPgAAAAAAPPAAAAAAAAAAAAAAAAAAAAAAAAAAB/AfgAAAAAAe+AAAAAAAAAAAAAAAAAAAAAAAAAAD/A/gAAAAAB/8AAAAAAAAAAAAAAAAAAAAAAAAAAH/D+AAAAAAD/4AAAAAAAAAAAAAAAAAAAAAAAAAAP+H+AAAAAAP/gAAAAAAAAAAAAAAAAAAAAAAAAAAP+P8AAAAAAf+AAAAAAAAAAAAAAAAAAAAAAAAAAAf8f4AAAAAA/4AAAAAAAAAAAAAAAAAAAAAAAAAAA/8/wAAAAAD/gAAAAAAAAAAAAAAAAAAAAAAAAAAA/5/gAAAAAH+AB//8AAAAAAAAAAAAAAAAAAAAAAB/7/AAAAAAf8A///4AAAAAAAAAAAAAAAAAAAAAAD///AAAAAA/wP///AAAAAAAAAAAAAAAAAAAAAAAD//+AAAAAD/g///8AAAAAAAAAAAAAAAAAAAAAAAH//8AAAAAP/H///AAAAAAAAAAAAAAAAAAAAAAAAP//4AAAAAf8f//4AAAAAAAAAAAAAAAAAAAAAAAAP//4AAAAB/7//+AAAAAAAAAAAAAAAAAAAAAAAAAf//4AAAAH////wAAAAAAAAAAAAAAAAAAAAAAAAAf//4AAAAf///+AAAAAAAAAAAAAAAAAAAAAAAAAAf//4AAAB////8AAAAAAAAAAAAAAAAAAAAAAAH/g///8AAAH////wAAAAAAAAAAAAAAAAAAAAAAB///////AAAf////gAAAAAAAAAAAAAAAAAAAAAAH///////+AB/////AAAAAAAAAAAAAAAAAAAAAAAf///////////////gAAAAAAAAAAAAAAAAAAAAAA////////////////gAAAAAAAAAAAAAAAAAAAAAD////////////////wAAAAAAAAAAAAAAAAAAAAAH////////////////wAAAAAAAAAAAAAAAAAAAAAP////////////////wAAAAAAAAAAAAAAAAAAAAAf////////////////wAAAAAAAAAAAAAAAAAAAAA/////////////////wAAAAAAAAAAAAAAAAAAAAB/////////////////gAAAAAAAAAAAAAAAAAAAAB/////////////////gAAAAAAAAAAAAAAAAAAAAB/////////////////wAAAAAAAAAAAAAAAAAAAAAf////////////////4AAAAAAAAAAAAAAAAAAAAAH////////////////4AAAAAAAAAAAAAAAAAAAAAAH///////////////4AAAAAAAAAAAAAAAAAAAAAAD////+D/////////wAAAAAAAAAAAAAAAAAAAAAAA////gADgD8Af///wAAAAAAAAAAAAAAAAAAAAAAAH//8AAAAAAAH///AAAAAAAAAAAAAAAAAAAAAAAAAAfAAAAAAAAADgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=", "trocks": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/4BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQP/8KP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIBg//8d/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQzD//8//+AAAAAAAAAAAAAAAAAAABwEAAAAAAAAxkP//8//8AAAAAAAAAAHgAAAAAAAPwIAAAAAAfAzI//////8AAAAAAAAAA/gAAAAAAA/4eAAAAAP/xmz//////8QAAAAAAAAH/wAAAAAAH///AAAAD//xtv//////+gAAAAAAAAf/wAAAAAAf///AAAAf//zb////////wAAAAAAAB//wAAAAAB////AAAH///y3////////gAAAAAAAD//gAA1gAH///+AAA////3/////////AAAAAAAAH//AAH/8AP///+AAD////3////////0AAAAAAAAH/+AA//+A////8AAP////v///////wAAAAAAAAAD/wAP///B////4AB///////////n8AAAAAAAAAAAAAAf///B////gAH///////////HAAAAAAAAAAAAAAA////D///+AAP/////+D///8AAAAAAAAAAAAAAAD///+D///AAA//////gB///wAAAAAAAAAAAAAAAH///8H//wAAF//////gAP/8AAAAAAAAAAAAAAAAP///4f//6AA///////AAAAAAAAAAAAAAAAAAAAAf///w///8AE///////AAAAAAAAAAAAAAAAAAAAB////j///4AN///////AAAAAAAAAAAAAAAAAAAAD///+H///wAf//////+wAAAAAAAAAAAAAAAAAAAD///+P///wAf///////oAAAAAAAAAAAAAAAAAAAD///4f///gAf///////wAAAAAAAAAAAAAAAAAAAAAD+Af//8AAH///////gAAAAAAAAAAAAAAAAAAAAAAAAf//wAAA///////AAAAAAAAAAAAAAAAAAAAAAAAAP/8AAAAB/////+AAAAAAAAAAAAAAAAAAAAAAAAAA+AAAAAAL////4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH//8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=", "tplants": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgAOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMHgAeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/PgB8AAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAH+cAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAD4AAAB/+JAPAAAAAAAAAAAAAAAAAAAAAAAAAAAAD7gAAf/4fAeAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/gAH//z8B8EAAAAAAAAAAAAAAAAAAAAAAAAAAAB/gAf//j8HAcAAAAAAAAAAAAAAAAAAAAAAAAAAAB/8B//+EgHg4AAAAAAAAAAAAAAAAAAAAAAAAAAAA/+H//4DwOHwAAAAAAAAAAAAAAAAAAAAAAAAAAAA/g///wHwzOAAAAAAAAAAAAAAAAAAAAAAAAAAAAADD//+A/nucAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//4B8P/4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///gNOf/AAAAAAAAAAAAAAAAAAAAAAAAAAAAABB/42B5+ZPIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/gIBx8We4AAAAAAAAAAAAAAAAAAAAAAAAAAAACOeQABHjvhgAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAwgADBP/DAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPgACAHnvvEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwAAAPPv84AAAAAAAAAAAAAAAAAAAAAAAAAAAAAf4AQAMfXj4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAf4BAAP+vjwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwDAAOT/GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPi8AAdn+YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/gAAPrxwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf9AAAfTDwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC+wAAA+mHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJIAAAdM8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEXAAAA+ZwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4AAAAczwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJwAAAAZngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAA/MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAegAAAA+wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAAB/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4AAAAD8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAD4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgAAAAHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAdgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=", "tsword": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB4eAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADw8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHz4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPn4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfPwQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/fhgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/+MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/8QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/4gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+P/GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/feIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP+8RAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH8wmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH5hcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6D4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP8HgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf4fAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfw+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/z8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/nwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/vgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="};
+var PIC_TYPES=[['wood','Wood',['twood']],['stone','Stones',['trocks']],['plant','Plants',['tplants','tsword']]];
+var PIC_SOUNDS=[['off','Off'],['sine','Sine'],['tri','Soft'],['square','Buzzy'],['hum','Hum'],['pluck','Pluck'],['chime','Chime'],['knock','Knock'],['bell','Bell']];
+var PICD={cols:10,secs:10,rows:24,lo:300,hi:3200,tick:1,types:{wood:{snd:'knock',oct:0.5,vol:1},stone:{snd:'chime',oct:1,vol:1},plant:{snd:'hum',oct:2,vol:1}}};
+var PICS=JSON.parse(JSON.stringify(PICD));try{var pj=JSON.parse(localStorage.getItem('eartank-pic')||'null');if(pj){PICS=Object.assign(PICS,pj);PICS.types=Object.assign(JSON.parse(JSON.stringify(PICD.types)),pj.types||{})}}catch(e){}
+var PIC_BITS={};(function(){for(var k in PIC_MASK){var b=atob(PIC_MASK[k]),a=new Uint8Array(PIC_W*PIC_H);for(var i=0;i<a.length;i++)a[i]=(b.charCodeAt(i>>3)>>(7-(i&7)))&1;PIC_BITS[k]=a}})();
+/* cell value per type: mean over the cell of 0.2 per layer that covers the pixel */
+function picGrid(){var C=PICS.cols,R=PICS.rows,out={};PIC_TYPES.forEach(function(T){var g=[];for(var c=0;c<C;c++){var col=[];var x0=Math.floor(c*PIC_W/C),x1=Math.floor((c+1)*PIC_W/C);for(var r=0;r<R;r++){var y0=Math.floor(r*PIC_H/R),y1=Math.max(y0+1,Math.floor((r+1)*PIC_H/R)),sum=0,n=0;for(var y=y0;y<y1;y++)for(var x=x0;x<x1;x++){n++;T[2].forEach(function(L){sum+=0.2*PIC_BITS[L][y*PIC_W+x]})}col.push(n?sum/n:0)}g.push(col)}out[T[0]]=g});return out}
+SOUND.pic={gain:0.22,tick:0.02};
+SOUND.scan={step:0.55,stagger:0.07,tick:2000,tickGain:0.03,row:[330,520,820],gain:0.12};
+/* what each thing sounds like when the scan passes it; row sets the pitch (front low, back high) */
+function placeSound(k,row,at){var C=SOUND.scan,h=C.row[row],g=C.gain;
+  if(k===1){tone(h*2,45,g,at,'triangle');tone(h*3.1,30,g*0.5,at+0.01,'sine')}
+  else if(k===2){tone(h,160,g*1.2,at,'triangle',h*0.8);tone(h*0.5,180,g*0.5,at,'sine')}
+  else if(k===3){for(var i=0;i<5;i++)tone(h*1.5*rnd(0.94,1.06),40,g*0.35,at+i*0.045,'sine')}
+  else if(k===4){tone(h,320,g*0.8,at,'sine',h*1.7)}
+}
+/* per-sound mix: volume (×), softness (0 bright to 1 muffled, a low-pass), speed (how often for sounds that repeat, how fast for one-off sounds) */
+var RATE_K={drop:1,plop:1,beep:1,eatA:1,eatJ:1,eatB:1,idle:1,swimS:1,swimL:1},STRETCH_K={eggs:1,molt:1,moltfail:1,babies:1,deathB:1,deathA:1,feed:1,pour:1};
+var MIX={};try{MIX=JSON.parse(localStorage.getItem('eartank-mix')||'{}')||{}}catch(e){}
+function mixOf(k){var m=MIX[k]||{};return {vol:m.vol==null?1:m.vol,soft:m.soft==null?0:m.soft,speed:m.speed==null?1:m.speed}}
+function softHz(v){return 14000*Math.pow(350/14000,v)}
+function mixBuses(){var ctx=A.ctx;A.busT={};A.busD={};LIGHTS.forEach(function(l){var k=l[0];['T','D'].forEach(function(w){var g=ctx.createGain(),f=ctx.createBiquadFilter();f.type='lowpass';f.Q.value=0.5;g.connect(f);f.connect(w==='T'?A.tank:A.lp);(w==='T'?A.busT:A.busD)[k]={g:g,f:f}})});LIGHTS.forEach(function(l){applyMix(l[0])})}
+function applyMix(k){if(!A||!A.busT)return;var m=mixOf(k),now=A.ctx.currentTime;[A.busT[k],A.busD[k]].forEach(function(b){if(!b)return;b.g.gain.setTargetAtTime(m.vol,now,0.05);b.f.frequency.setTargetAtTime(softHz(m.soft),now,0.05)})}
+function saveMix(){try{localStorage.setItem('eartank-mix',JSON.stringify(MIX))}catch(e){}}
+var CUR=null,T0=0;function as(k,t,fn){var pc=CUR,pt=T0;CUR=k;T0=t;try{fn()}finally{CUR=pc;T0=pt}}
+function sp(k){return mixOf(k).speed}
+var DESTO=null;var DEMO=false;function dest(){if(DESTO)return DESTO;if(CUR&&A.busT){var b=(DEMO?A.busD:A.busT)[CUR];if(b)return b.g}return DEMO?A.lp:A.tank}
+function stretch(t,ms){if(CUR&&STRETCH_K[CUR]){var v=sp(CUR);return [T0+(t-T0)/v,ms/v]}return [t,ms]}
+function burst(hz,q,ms,gain,at,type){ // short filtered noise
+  var ctx=A.ctx,t=at||ctx.currentTime,st_=stretch(t,ms);t=st_[0];ms=st_[1];var s=ctx.createBufferSource();s.buffer=A.noise;s.loop=true;
+  var f=ctx.createBiquadFilter();f.type=type||'bandpass';f.frequency.value=hz;f.Q.value=q;
+  var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.012);g.gain.exponentialRampToValueAtTime(0.0005,t+ms/1000+0.012);
+  s.connect(f);f.connect(g);g.connect(dest());s.start(t);s.stop(t+ms/1000+0.04);
+}
+function tone(hz,ms,gain,at,type,to){
+  var ctx=A.ctx,t=at||ctx.currentTime,st_=stretch(t,ms);t=st_[0];ms=st_[1];var o=ctx.createOscillator();o.type=type||'triangle';o.frequency.setValueAtTime(hz,t);if(to)o.frequency.exponentialRampToValueAtTime(to,t+ms/1000);
+  var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.003);g.gain.exponentialRampToValueAtTime(0.0005,t+ms/1000);
+  o.connect(g);g.connect(dest());o.start(t);o.stop(t+ms/1000+0.02);
+}
+function sweep(from,to,sec,gain,at,q){var ctx=A.ctx,t=at||ctx.currentTime,s=ctx.createBufferSource();s.buffer=A.noise;s.loop=true;var f=ctx.createBiquadFilter();f.type='bandpass';f.Q.value=q||1;f.frequency.setValueAtTime(from,t);f.frequency.exponentialRampToValueAtTime(to,t+sec);var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.15);g.gain.linearRampToValueAtTime(0,t+sec);s.connect(f);f.connect(g);g.connect(dest());s.start(t);s.stop(t+sec+0.05)}
+function water(W,at,dir){ /* soft filtered noise with a slow wobble; dir -1 pitch sinks (drain), +1 rises (refill) */
+  var ctx=A.ctx,t=at||ctx.currentTime,s=ctx.createBufferSource();s.buffer=A.noise;s.loop=true;
+  var f=ctx.createBiquadFilter();f.type='bandpass';f.Q.value=W.q;f.frequency.setValueAtTime(W.hz*(dir<0?1.3:0.8),t);f.frequency.exponentialRampToValueAtTime(W.hz*(dir<0?0.8:1.3),t+W.s);
+  var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(W.gain,t+0.5);g.gain.setValueAtTime(W.gain,t+W.s-0.6);g.gain.linearRampToValueAtTime(0,t+W.s);
+  var lfo=ctx.createOscillator(),lg=ctx.createGain();lfo.frequency.value=W.wob;lg.gain.value=W.gain*0.5;lfo.connect(lg);lg.connect(g.gain);lfo.start(t);lfo.stop(t+W.s);
+  s.connect(f);f.connect(g);g.connect(dest());s.start(t);s.stop(t+W.s+0.05)}
+var WC='T';
+function pourSound(kind,t){var ctx=A.ctx,i;t=t||ctx.currentTime+0.05;
+  if(kind==='T'){/* the old water glugs out, nothing else */var P=SOUND.tap,gn=Math.round(rnd(P.glugsLo,P.glugsHi)),gt=t;for(i=0;i<gn;i++){var gh=P.hz*rnd(0.75,1.3),gg=P.gain*rnd(0.6,1)*(i>gn-3?0.6:1);tone(gh,P.ms*rnd(0.8,1.3),gg,gt,'sine',gh*rnd(1.4,1.8));if(Math.random()<0.4)tone(gh*1.5,P.ms*0.6,gg*0.4,gt+0.03,'sine',gh*2.2);gt+=rnd(P.gapLo,P.gapHi)}return}
+  if(kind==='A'){var Pp=SOUND.pour;water(Pp.drain,t,-1);water(Pp.fill,t+Pp.drain.s+0.2,1)}
+  else if(kind==='B'){var B=SOUND.pourB;water({gain:B.bed,hz:900,q:0.5,s:B.s,wob:6},t,1);for(i=0;i<B.n;i++){var u=i/B.n,bh=B.hz*rnd(0.7,1.4);tone(bh,B.ms,B.gain*Math.sin(u*Math.PI)*rnd(0.5,1),t+u*B.s+rnd(0,0.05),'sine',bh*B.rise)}}
+  else if(kind==='C'){var Cc=SOUND.pourC;water({gain:Cc.bed,hz:Cc.bedHz,q:0.7,s:Cc.s,wob:3},t,1);for(i=0;i<Cc.n;i++){var u=Math.pow(Math.random(),0.7),ch=Cc.hz*rnd(0.7,1.3);tone(ch,Cc.ms,Cc.gain*Math.sin(u*Math.PI)*rnd(0.5,1),t+u*Cc.s,'sine',ch*0.5)}}
+  else{var D=SOUND.pourD;for(i=0;i<D.glugs;i++){var gh=D.hz*rnd(0.8,1.2);tone(gh,D.ms,D.gain,t+i*D.s/D.glugs,'sine',gh*1.5)}water(D.fill,t+D.s,1)}
+}
+function chime(){if(audio())tone(880,120,0.05)}
+function tankSt(){return S||{nh3:0,no2:0,scape:buildScape,moss:0}}
+function surfaces(){var st=tankSt(),c={rock:0,wood:0,moss:0,plant:0},i;for(i=0;i<st.scape.length;i++){var k=st.scape[i];if(k===1)c.rock++;else if(k===2)c.wood++;else if(k===3)c.moss++;else if(k===4)c.plant++}c.moss+=st.moss*2;return c}
+function pickSurface(){var c=surfaces(),tot=c.rock+c.wood+c.moss+c.plant+1,r=Math.random()*tot;if((r-=c.rock)<0)return 'rock';if((r-=c.wood)<0)return 'wood';if((r-=c.moss)<0)return 'moss';if((r-=c.plant)<0)return 'plant';return 'glass'}
+var HIT={};
+function shrimpHz(s,base){return base*(1+(((s.id*7919)%100)/100-0.5)*2*SOUND.eat.jitter)}
+/* activity 0..1: how much this shrimp is eating right now. Food on the floor: 1. No food: biofilm only, fades as it gets hungry. */
+function activity(s){var st=tankSt();if(st.food>0.02)return 1;return Math.max(0,0.35-s.hunger*0.6)}
+function eatSound(s,at,force){var z=sizeOf(s);as(z==='adult'?'eatA':z==='juv'?'eatJ':'eatB',at||A.ctx.currentTime,function(){eatSound0(s,at,force)})}
+function eatSound0(s,at,force){HIT[s.id]=Date.now();
+  var E=SOUND.eat,sz=sizeOf(s),P=E[sz],st=tankSt(),bad=st.nh3+st.no2*0.7,ctx=A.ctx,t=at||ctx.currentTime,hz=shrimpHz(s,P.hz);lit(sz==='adult'?'eatA':sz==='juv'?'eatJ':'eatB',t,0.3);
+  var ms=bad>0.3?Math.min(P.ms,E.stressMs):P.ms, n=force?P.n:Math.max(2,Math.round(P.n*(0.6+Math.random()*0.8)));
+  var gap=P.gap/ (s.rate||1);
+  for(var i=0;i<n;i++)tone(hz*rnd(0.97,1.03),ms,E.gain*(sz==='baby'?0.55:sz==='juv'?0.8:1)*(1-i*0.12),t+i*gap,P.type);
+  var sf=pickSurface();
+  if(sf==='wood')tone(330,55,E.surface*1.3,t,'triangle',260);
+  else if(sf==='moss'){tone(hz*0.5,40,E.surface*0.6,t,'sine');tone(hz*0.5,40,E.surface*0.5,t+0.05,'sine')}
+  else if(sf==='rock')tone(hz*2.4,25,E.surface*0.8,t,'sine');
+  if(s.berried>0){as('eggs',t,function(){tone(hz,ms,E.gain*0.8,t+n*gap+SOUND.berried.gapMs/1000,'triangle')});lit('eggs',t,0.4)}
+}
+function idleSound(s,at,gain){HIT[s.id]=Date.now();lit('idle',at,0.2);var I=SOUND.idle;var hz=I.hz*(sizeOf(s)==='baby'?1.4:1);as('idle',at,function(){tone(hz,I.ms,(gain==null?1:gain)*I.gain,at,'sine',hz*0.8)})}
+function swimSound(s,at,kind){HIT[s.id]=Date.now();var W=SOUND.swim,sz=sizeOf(s),k=sz==='baby'?1.8:sz==='juv'?1.3:1,ctx=A.ctx,t=at||ctx.currentTime;
+  var long=kind==='long'||(kind==null&&Math.random()<W.longP),sec=(long?W.long.s:W.short.s)/(sz==='baby'?1.6:1);lit(long?'swimL':'swimS',t,sec);
+  var n=ctx.createBufferSource();n.buffer=A.noise;n.loop=true;var f=ctx.createBiquadFilter();f.type='bandpass';f.Q.value=1.2;
+  f.frequency.setValueAtTime(W.lo*k,t);f.frequency.exponentialRampToValueAtTime(W.hi*k,t+sec*0.35);f.frequency.exponentialRampToValueAtTime(W.lo*k*0.8,t+sec);
+  var g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(W.gain*(sz==='baby'?0.5:1),t+sec*0.25);g.gain.linearRampToValueAtTime(0,t+sec);
+  if(long){var lfo=ctx.createOscillator(),lg=ctx.createGain();lfo.frequency.value=W.long.wob;lg.gain.value=W.gain*0.4;lfo.connect(lg);lg.connect(g.gain);lfo.start(t);lfo.stop(t+sec)}
+  as(long?'swimL':'swimS',t,function(){n.connect(f);f.connect(g);g.connect(dest())});n.start(t);n.stop(t+sec+0.05)}
+function shrimpTick(s,at){eatSound(s,at,true)}
+function evKey(e){return e.k==='death'?((e.d.age==null||e.d.age>=60)?'deathA':'deathB'):e.k==='berried'?'eggs':e.k}
+function playEv(e){var t=A.ctx.currentTime+0.05,k=evKey(e);lit(k,t,(e.k==='pour'?4:e.k==='feed'?1.6:e.k==='babies'?1:0.8)/(STRETCH_K[k]?sp(k):1));as(k,t,function(){playEv0(e,t)})}
+function playEv0(e,t){
+  var ctx=A.ctx,i;
+  if(e.k==='molt'){tone(SOUND.molt.from,SOUND.molt.s*1000,SOUND.molt.gain,t,'sine',SOUND.molt.to)}
+  else if(e.k==='moltfail'){var Mf=Object.assign({},SOUND.molt.fail),mfv=sp('moltfail');Mf.s/=mfv;var ctx2=A.ctx,o=ctx2.createOscillator(),og=ctx2.createGain(),lf=ctx2.createOscillator(),lfg=ctx2.createGain();
+    /* the slide starts, shakes and stops halfway, then a heavy knock */
+    o.type='sine';o.frequency.setValueAtTime(SOUND.molt.from,t);o.frequency.exponentialRampToValueAtTime(SOUND.molt.from*0.6,t+Mf.s);lf.frequency.value=Mf.wob;lfg.gain.value=60;lf.connect(lfg);lfg.connect(o.frequency);
+    og.gain.setValueAtTime(0,t);og.gain.linearRampToValueAtTime(Mf.gain,t+0.02);og.gain.setValueAtTime(Mf.gain,t+Mf.s-0.05);og.gain.linearRampToValueAtTime(0,t+Mf.s);o.connect(og);og.connect(dest());o.start(t);o.stop(t+Mf.s+0.02);lf.start(t);lf.stop(t+Mf.s+0.02);
+    tone(Mf.knock,Mf.knockMs,Mf.gain,t+Mf.s*mfv+0.15*mfv,'triangle',Mf.knock*0.7);tone(Mf.knock*0.5,Mf.knockMs*1.2,Mf.gain*0.5,t+Mf.s*mfv+0.16*mfv,'sine')}
+  else if(e.k==='babies'){for(i=0;i<SOUND.babies.n;i++)tone(SOUND.babies.hz*rnd(0.9,1.15),30,SOUND.babies.gain,t+Math.random()*SOUND.babies.span,'sine')}
+  else if(e.k==='feed'){feedSound(t);cluster=ctx.currentTime+SOUND.feed.clusterS}
+  else if(e.k==='pour'){pourSound(WC,t)}
+  else if(e.k==='death'){var Dd=SOUND.death,ag=Math.min(1,Math.max(0,((e.d.age==null?200:e.d.age)-10)/90)),dg=Dd.baby.gain+(Dd.adult.gain-Dd.baby.gain)*ag,dh=Dd.baby.hz*Math.pow(Dd.adult.hz/Dd.baby.hz,ag),dm=Dd.baby.ms+(Dd.adult.ms-Dd.baby.ms)*ag;
+    tone(dh,dm,dg,t,'triangle',dh*0.75);if(ag>0.5)tone(dh*0.5,dm*1.3,dg*0.5,t+0.02,'sine',dh*0.4)}
+  else if(e.k==='berried'){var sh=S.shrimp.filter(function(x){return x.id===e.d.id})[0];if(sh)shrimpTick(sh,t)}
+  // name it once in speech the first time
+  var names={moltfail:'That broken slide and knock is a failed molt.',molt:'That slide is a molt.',babies:'Those high ticks are babies.',berried:'That double tick is a female carrying eggs.',death:'That low tap is a death.',feed:'That is food going in.',pour:'That is the water change.'};
+  if(names[e.k]&&!S.seen[e.k]){S.seen[e.k]=1;save();setTimeout(function(){speak(names[e.k])},700)}
+}
+function drain(){
+  if(!A||A.ctx.state!=='running'||teachOn)return;
+  var now=A.ctx.currentTime;
+  if(evq.length>12){ // a catch-up pile: one death tap, one summary, drop the rest
+    var deaths=evq.filter(function(e){return e.k==='death'}).length;
+    evq=[];if(deaths)evq.push({k:'death',d:{}});
+  }
+  var k=0;while(evq.length&&k++<4){var e=evq.shift();(function(e){setTimeout(function(){if(A&&A.ctx.state==='running')playEv(e)},Math.random()*900)})(e)}
+}
+function sched(){ // every 100 ms
+  if(PAUSED)return;
+  if(!A||A.ctx.state!=='running'||!S||teachOn)return;
+  var ctx=A.ctx,now=ctx.currentTime,look=now+0.25,R=SOUND.room;
+  // room tone follows the model
+  var tempo=R.bubbleEvery*(1-R.tempSpan*(S.temp-24)/4)*(1+R.clogSlow*S.clog);
+  A.flowG.gain.setTargetAtTime(SOUND.flow.gain*(1-0.5*S.clog),now,0.8);A.trickG.gain.setTargetAtTime(SOUND.flow.trickle.gain*(1-0.6*S.clog),now,0.8);
+  /* the water pulse */
+  var Pu=SOUND.pulse,wz=waterZone(),badness=wz/2,every=zoneGap(wz),phz=Pu.hzGood+(Pu.hzBad-Pu.hzGood)*badness;
+  if(!A.nextPulse)A.nextPulse=now+1;
+  var quiet=now<(A.quietUntil||0);
+  var Fo=SOUND.fountain,FP=fpOf(FOUNT),frate=Fo.rate*(1+Fo.swell*Math.sin(now*2*Math.PI*Fo.swellHz))*(1-0.6*S.clog),dsp=sp('drop');
+  if(!A.nextDrop)A.nextDrop=now+0.2;if(FOUNT==='off'||FOUNT==='brook'){A.nextDrop=look+0.05}
+  while(A.nextDrop<look){var at=A.nextDrop;as('drop',at,function(){filterEvent(FOUNT,at,FP)});
+    A.nextDrop+=-Math.log(1-Math.random())/Math.max(0.2,(FRATE[FOUNT]||frate)*FP.dens*dsp*(1-0.5*S.clog))}
+  if(FOUNT==='brook'){if(Math.random()<0.1)lit('drop',now,0.12);A.brookBP.forEach(function(x){x[0].frequency.setTargetAtTime(x[1][0]*FP.pitch,now,0.2);x[0].Q.setTargetAtTime(SOUND.brook.q/FP.size,now,0.2)});A.brookMod.forEach(function(x){x[0].frequency.setTargetAtTime(x[1][2]*FP.dens*dsp,now,0.2)})}
+  var bedL={trickle:SOUND.trickle.bed,bubbler:SOUND.bubbler.bed,rain:0.07,drip:0.03}[FOUNT]||0;A.bedG.gain.setTargetAtTime(bedL*FP.bed*(1-0.5*S.clog),now,0.5);A.brookG.gain.setTargetAtTime(FOUNT==='brook'?SOUND.brook.gain*FP.bed*(1-0.5*S.clog):0,now,0.5);
+  while(A.nextPulse<look){if(!quiet&&BEEP.style!=='off'){lit('beep',A.nextPulse,0.25);beepAt(phz,A.nextPulse,Pu.gain*(1+badness*0.6),badness)}A.nextPulse+=every/sp('beep')}
+  if(A.nextPulse>now+every+0.3)A.nextPulse=now+every; /* the rate sped up: don't wait out the old gap */
+  while(A.nextBubble<look){var bh=R.bubbleHz*(1-R.clogDull*S.clog)*rnd(0.85,1.15);tone(bh,R.bubbleMs,R.bubbleGain*rnd(0.5,1),A.nextBubble,'sine',bh*R.bubbleRise);A.nextBubble+=tempo*rnd(0.85,1.15)}
+  var bad=Math.min(1,S.nh3+S.no2*0.7);
+  var Hs=SOUND.hiss,amm=S.nh3+S.no2*0.5;if(LEL.hiss){var hon=amm>=0.08&&!quiet;LEL.hiss.classList.toggle('warm',hon);LEL.hiss.style.opacity=hon?Math.min(1,0.45+amm):'';}A.hissG.gain.setTargetAtTime(amm<0.08||quiet?0:Hs.gain+(Hs.max-Hs.gain)*Math.pow(Math.min(1,(amm-0.08)/Hs.full),1.2),now,1);
+  A.lp.frequency.setTargetAtTime(SOUND.dull.clearHz-(SOUND.dull.clearHz-SOUND.dull.oldHz)*Math.min(1,S.no3/SOUND.dull.oldAt),now,1.5);
+  // shrimp voices
+  var E=SOUND.eat,mul=now<cluster?SOUND.feed.clusterMul:1,i,s;
+  var NV=quiet?0:Math.min(50,S.shrimp.length); /* at most 50 voices */
+  for(i=0;i<NV;i++){
+    s=S.shrimp[i];var v=A.voices[s.id];
+    if(!v){v=A.voices[s.id]={at:now+Math.random()*E.every,idle:now+Math.random()*SOUND.idle.every,swim:now+Math.random()*SOUND.swim.every}}
+    var act=activity(s);
+    /* eating: at the shrimp's own pace, more often with food down; a quiet shrimp skips turns */
+    while(v.at<look){if(Math.random()<act)eatSound(s,v.at);var zk=sizeOf(s),every=E.every/(s.rate||1)*mul/sp(zk==='adult'?'eatA':zk==='juv'?'eatJ':'eatB');v.at+=every*rnd(0.5,1.6)}
+    /* stationary: a faint flick, more of them as the eating goes */
+    while(v.idle<look){idleSound(s,v.idle,1-act*0.7);v.idle+=SOUND.idle.every*rnd(0.5,1.8)/sp('idle')}
+    /* swimming: a dart now and then, a lot more in the minute after feeding */
+    while(v.swim<look){swimSound(s,v.swim);v.swim+=SOUND.swim.every*(now<cluster?SOUND.swim.feedMul:1)*rnd(0.4,1.8)*2/(sp('swimS')+sp('swimL'))}
+  }
+  for(var id in A.voices)if(!S.shrimp.some(function(x){return x.id==id}))delete A.voices[id];
+  drain();
+}
+var PAUSED=false,MUTED=false;
+function setVol(v){vol=v;if(A)A.master.gain.setTargetAtTime(MUTED?0:SOUND.master*vol,A.ctx.currentTime,0.1)}
+/* ---------- teach ---------- */
+function teach(done){
+  if(!audio()){done&&done();return}
+  teachOn=true;var ctx=A.ctx,steps=[
+    ['A shrimp.',function(){var s={id:1,age:120,hunger:0.2,berried:0};for(var i=0;i<4;i++)shrimpTick(s,ctx.currentTime+0.1+i*0.9,false)}],
+    ['A hungry shrimp.',function(){var s={id:2,age:120,hunger:0.9,berried:0};for(var i=0;i<6;i++)shrimpTick(s,ctx.currentTime+0.1+i*0.45,true)}],
+    ['The water getting old. Everything goes dull.',function(){A.lp.frequency.setValueAtTime(SOUND.dull.clearHz,ctx.currentTime);A.lp.frequency.exponentialRampToValueAtTime(SOUND.dull.oldHz,ctx.currentTime+2.5);var s={id:3,age:120,hunger:0.2,berried:0};for(var i=0;i<5;i++)shrimpTick(s,ctx.currentTime+0.1+i*0.7,false);setTimeout(function(){A.lp.frequency.setTargetAtTime(SOUND.dull.clearHz,ctx.currentTime,0.5)},3200)}],
+    ['A molt.',function(){tone(SOUND.molt.from,SOUND.molt.s*1000,SOUND.molt.gain,ctx.currentTime+0.1,'sine',SOUND.molt.to)}],
+    ['Feeding.',function(){var t=ctx.currentTime+0.1;for(var i=0;i<SOUND.feed.n;i++)burst(SOUND.feed.hz,2,25,SOUND.feed.gain,t+i*0.09,'highpass')}]
+  ],i=0;
+  speak('Five sounds, one at a time. Tap anywhere to skip.','Learning the sounds');
+  var skip=function(){i=99};document.body.addEventListener('pointerdown',skip,{once:true});
+  function next(){
+    if(i>=steps.length){teachOn=false;document.body.removeEventListener('pointerdown',skip);if(S){S.taught=true;save()}done&&done();return}
+    var st=steps[i++];speak(st[0],'Learning the sounds');setTimeout(function(){if(i<99)st[1]()},900);setTimeout(next,4200);
+  }
+  setTimeout(next,2600);
+}
+/* ---------- screens ---------- */
+function show(id){document.querySelectorAll('.screen').forEach(function(e){e.classList.toggle('on',e.id===id)});var h=document.querySelector('#'+id+' button');if(h)h.focus({preventScroll:true})}
+var ADOPT=[
+  {name:'Tank 4',h:'Tank 4, two years old, twenty shrimp, the owner moved to Oman.',n:20,scape:[2,0,1,0,3,3,0,1,4,0,2,4],no3:45,clog:0.6},
+  {name:'Tank 9',h:'Tank 9, six months old, eight shrimp, mostly rock, a student set it up and stopped coming.',n:8,scape:[1,1,0,1,0,0,1,1,0,1,0,0],no3:25,clog:0.3},
+  {name:'Tank 2',h:'Tank 2, four years old, thirty shrimp, moss everywhere, the owner died.',n:30,scape:[3,3,3,2,3,0,3,3,4,3,2,3],no3:70,clog:0.9}
+];
+var adoptPick=-1,buildScape=[],buildPlace=-1,buildN=10,previewTank=null,prevTimer=0;
+function preview(a){
+  // play the adopted tank for ten seconds, through the normal scheduler
+  var keep=S; S={v:1,h:0,day:0,nid:0,scape:a.scape,shrimp:[],food:0,nh3:0,no2:0,no3:a.no3,temp:24,clog:a.clog,moss:0,ration:1,jobs:[],log:[],seen:{}};
+  for(var i=0;i<a.n;i++)S.shrimp.push(mkShrimp(rnd(60,400)));
+  previewTank=S; if(A)A.voices={};
+  clearTimeout(prevTimer);prevTimer=setTimeout(function(){if(S===previewTank){S=keep||null;if(A)A.voices={}}},10000);
+}
+function renderAdopt(){
+  var el=$('adopt-list');el.innerHTML='';
+  ADOPT.forEach(function(a,i){var b=document.createElement('button');b.textContent=a.name;var s=document.createElement('span');s.className='sub';s.textContent=a.n+' shrimp';b.appendChild(s);
+    b.onclick=function(){adoptPick=i;$('btn-keep').disabled=false;speak(a.h+' Listen.',a.name);preview(a)};el.appendChild(b)});
+}
+function renderBuild(){
+  var p=$('places');p.innerHTML='';
+  for(var i=0;i<12;i++)(function(i){var b=document.createElement('button');b.className=i===buildPlace?'sel':'';b.setAttribute('aria-pressed',i===buildPlace);var row=i<4?'front':i<8?'middle':'back';b.textContent=THINGS[buildScape[i]]==='nothing'?'·':THINGS[buildScape[i]];b.setAttribute('aria-label','Place '+(i+1)+', '+row+' row, '+THINGS[buildScape[i]]);
+    b.onclick=function(){buildPlace=i;speak('Place '+(i+1)+', '+row+' row, '+THINGS[buildScape[i]]+'. Now pick what goes there.');renderBuild()};p.appendChild(b)})(i);
+  var t=$('things');t.innerHTML='';
+  THINGS.forEach(function(name,k){var b=document.createElement('button');b.textContent=name;b.disabled=buildPlace<0;
+    b.onclick=function(){buildScape[buildPlace]=k;thingSound(k);speak(name+(k?' at place '+(buildPlace+1):' at place '+(buildPlace+1)+', empty')+'.');renderBuild()};t.appendChild(b)});
+  document.querySelectorAll('#counts button').forEach(function(b){b.setAttribute('aria-pressed',+b.dataset.n===buildN);b.className='sm'+(+b.dataset.n===buildN?' pri':'')});
+}
+function thingSound(k){if(!audio())return;var t=A.ctx.currentTime+0.05,i;
+  if(k===1)for(i=0;i<3;i++)tone(1500,25,0.05,t+i*0.5,'sine');
+  else if(k===2)for(i=0;i<3;i++)burst(420,4,45,0.07,t+i*0.5);
+  else if(k===3)for(i=0;i<3;i++)burst(4000,0.6,80,0.04,t+i*0.5,'highpass');
+  else if(k===4)for(i=0;i<3;i++)burst(2500,1.5,40,0.03,t+i*0.5);
+}
+function densitySound(n){if(!audio())return;var t=A.ctx.currentTime;for(var i=0;i<n;i++){var s={id:100+i,age:rnd(60,300),hunger:0.2,berried:0};for(var j=0;j<3;j++)shrimpTick(s,t+0.1+Math.random()*4,false)}}
+function statsHTML(){
+  if(!S)return'';var R=SOUND.room,bad=Math.min(1,S.nh3+S.no2*0.7),now=Date.now();
+  var tempo=R.bubbleEvery*(1-R.tempSpan*(S.temp-24)/4)*(1+R.clogSlow*S.clog);
+  var lp=SOUND.dull.clearHz-(SOUND.dull.clearHz-SOUND.dull.oldHz)*Math.min(1,S.no3/SOUND.dull.oldAt);
+  function bar(v){return '<span class="w"><span class="b" style="width:'+Math.round(Math.max(0,Math.min(1,v))*40)+'px"></span></span>'}
+  var h='<b>Day '+Math.floor(S.day)+'</b> · '+SPEEDS[speedIx][0]+' · '+S.shrimp.length+' shrimp'
+  +'<br>Ammonia+nitrite '+(S.nh3+S.no2).toFixed(2)+' ppm → hiss '+(bad<0.08?'off':Math.round(Math.min(1,bad)*100)+'%')
+  +'<br>Nitrate '+Math.round(S.no3)+' ppm → low-pass '+Math.round(lp)+' Hz (clear 9000, old 1700)'
+  +'<br>Filter clog '+Math.round(S.clog*100)+'% · temp '+S.temp.toFixed(1)+'° → bubble every '+tempo.toFixed(2)+' s'
+  +'<br>Food on the floor '+S.food.toFixed(2)+' · moss '+Math.round(S.moss*100)+'% · ration '+(S.ration<1?'half':'full')+' · water changes this week '+((S.wc||[]).filter(function(d){return S.day-d<7}).length)+(S.jobs.length?' · store job in '+Math.max(0,S.jobs[0].at-S.h).toFixed(1)+' h':'')
+  +'<table><tr><th>#</th><th>size</th><th>age d</th><th>hunger</th><th>eating</th><th>state</th><th>molt in</th></tr>';
+  S.shrimp.forEach(function(x){h+='<tr'+(now-(HIT[x.id]||0)<300?' class="hit"':'')+'><td>'+x.id+'</td><td>'+sizeOf(x)+'</td><td>'+Math.round(x.age)+'</td><td>'+bar(x.hunger)+(x.hunger>0.6?' hungry':'')+'</td><td>'+bar(activity(x))+' ×'+(x.rate||1).toFixed(1)+'</td><td>'+(x.berried>0?'eggs '+Math.ceil(x.berried)+' d':x.sex)+'</td><td>'+Math.ceil(x.moltIn)+'</td></tr>'});
+  return h+'</table>';
+}
+function stripHTML(){
+  if(!S)return'';
+  function row(name,v,max,a,b,unit){var p=Math.min(1,v/max)*100;return '<div class="t"><span>'+name+'</span><span class="tr" style="--a:'+(a/max*100)+'%;--b:'+(b/max*100)+'%"><span class="m" style="left:'+p+'%"></span></span><span class="v">'+(unit==='%'?Math.round(v*100)+'%':v.toFixed(v<1?2:0)+' '+unit)+'</span></div>'}
+  var n=S.shrimp.length,hg=n?S.shrimp.reduce(function(a,x){return a+x.hunger},0)/n:0,bab=S.shrimp.filter(function(x){return x.age<30}).length,eg=S.shrimp.filter(function(x){return x.berried>0}).length;
+  return '<b>Day '+Math.floor(S.day)+'</b> · '+n+' shrimp'+(bab?', '+bab+' babies':'')+(eg?', '+eg+' with eggs':'')+' · '+SPEEDS[speedIx][0]
+  +row('Ammonia',S.nh3,1,0.1,0.3,'ppm')+row('Nitrite',S.no2,1,0.1,0.3,'ppm')+row('Nitrate',S.no3,100,20,40,'ppm')+row('Hunger',hg,1,0.4,0.7,'%')+row('Food left',S.food,1,0.4,0.7,'')
+  +'<div class="muted" style="font-size:12px;margin-top:4px">Green is fine, amber means act this week, red means act today. Hiss follows ammonia and nitrite, dullness follows nitrate, munching follows food and hunger.</div>';
+}
+function stateLine(){if(!S)return'';return 'Day '+Math.floor(S.day)+' · '+S.shrimp.length+' shrimp · ammonia '+S.nh3.toFixed(2)+' · nitrate '+Math.round(S.no3)+' · filter '+Math.round(S.clog*100)+'% · food '+S.food.toFixed(1)+' · '+S.temp.toFixed(1)+'°'}
+/* ---------- wiring ---------- */
+function home(){show('s-home');$('speed-sub').textContent=SPEEDS[speedIx][0];$('btn-less').setAttribute('aria-pressed',S.ration<1);$('btn-less').textContent=S.ration<1?'Feed more':'Feed less';if(A)A.voices={};lastReal=Date.now()}
+function start(){
+  var started=false;
+  function go(){if(started)return;var a=audio();if(!a){speak('No sound on this browser.','No sound');started=true;return}a.ctx.resume().then(function(){started=true;if(S&&!S.taught&&!teachOn&&speaking)teach(function(){speak(howText(),'Your tank')});else if(S)speak(howText(),'Your tank');else speak('Adopt a tank that exists, or build one at the store.','Ear tank')})}
+  document.body.addEventListener('pointerdown',go);document.body.addEventListener('keydown',go);
+  $('btn-help').onclick=function(){var h=$('help');h.classList.toggle('on');this.setAttribute('aria-expanded',h.classList.contains('on'))};
+  $('btn-adopt').onclick=function(){renderAdopt();show('s-adopt');speak('Three tanks. Tap one to hear it for ten seconds.','Adopt')};
+  $('btn-build').onclick=function(){buildScape=[0,0,0,0,0,0,0,0,0,0,0,0];buildPlace=-1;buildN=10;renderBuild();show('s-build');speak('Twelve places, front row to back. Pick a place, then what goes there. Then how many shrimp.','Build')};
+  $('btn-adopt-back').onclick=function(){S=null;previewTank=null;clearTimeout(prevTimer);adoptPick=-1;$('btn-keep').disabled=true;if(A)A.voices={};show('s-start');speak('Adopt a tank, or build one.')};
+  $('btn-keep').onclick=function(){var a=ADOPT[adoptPick];previewTank=null;clearTimeout(prevTimer);newState(a.scape,a.n,a.h);S.no3=a.no3;S.clog=a.clog;S.taught=false;save();if(A)A.voices={};home();speak(a.name+' is yours. It plays from now.','Your tank');setTimeout(function(){if(!S.taught&&speaking&&A&&A.ctx.state==='running')teach(function(){speak(howText(),'Your tank')})},3000)};
+  $('btn-build-back').onclick=function(){show('s-start');speak('Adopt a tank, or build one.')};
+  document.querySelectorAll('#counts button').forEach(function(b){b.onclick=function(){buildN=+b.dataset.n;renderBuild();speak(buildN+' shrimp. Listen.');densitySound(buildN)}});
+  $('btn-build-done').onclick=function(){newState(buildScape.slice(),buildN,'Built by you.');S.taught=false;save();if(A)A.voices={};home();speak('Done, the store sets it up, come back tomorrow. The filter is cycled.','Your tank');setTimeout(function(){if(!S.taught&&speaking&&A&&A.ctx.state==='running')teach(function(){speak(howText(),'Your tank')})},4000)};
+  var PROF={
+    happy5:function(){newState([2,0,1,0,3,0,0,1,4,0,0,3],5,'Happy, 5');S.food=0.4},
+    happy30:function(){newState([2,0,1,0,3,3,0,1,4,0,2,3],0,'Happy, 30');for(var i=0;i<16;i++)S.shrimp.push(mkShrimp(rnd(80,400)));for(i=0;i<8;i++)S.shrimp.push(mkShrimp(rnd(32,70)));for(i=0;i<6;i++)S.shrimp.push(mkShrimp(rnd(5,25)));S.shrimp[0].sex='f';S.shrimp[0].berried=12;S.food=0.8},
+    old:function(){newState([2,0,1,0,3,0,0,1,4,0,0,3],12,'Old water');S.no3=90;S.clog=0.8;S.food=0.2},
+    hungry:function(){newState([2,0,1,0,3,0,0,1,4,0,0,3],12,'Hungry');S.food=0;S.moss=0;S.shrimp.forEach(function(x){x.hunger=0.95})},
+    dying:function(){newState([2,0,1,0,3,0,0,1,4,0,0,3],12,'Dying');S.nh3=1.5;S.no2=0.5;S.food=0.1},
+    quick:function(){newState([2,0,1,0,3,0,0,1,4,0,0,3],10,'Quick start, 10 shrimp.');S.food=0.3}
+  };
+  document.querySelectorAll('[data-prof]').forEach(function(b){b.onclick=function(){PROF[b.dataset.prof]();S.taught=true;S.temp=24;save();if(A)A.voices={};evq=[];home();speak(b.textContent+'.','Tank')}});
+  var SOLO=true,TANK=true,soloT=0;
+  function tankLevel(){if(!A)return;var now=A.ctx.currentTime;A.tank.gain.setTargetAtTime(!TANK||PAUSED||now<soloT?0:1,now,0.15)}
+  $('btn-solo').onclick=function(){SOLO=!SOLO;this.setAttribute('aria-pressed',SOLO);$('solo-sub').textContent=SOLO?'tank quiet while it plays':'tank keeps playing'};
+  $('btn-tank').onclick=function(){TANK=!TANK;this.setAttribute('aria-pressed',TANK);$('tank-sub').textContent=TANK?'on':'off';tankLevel()};
+  setInterval(tankLevel,200);
+  document.querySelectorAll('[data-play]').forEach(function(b){b.onclick=function(){if(!audio())return;var k=b.dataset.play,t=A.ctx.currentTime+0.05;
+    if(SOLO){soloT=t+(k==='hiss'||k==='hissLoud'||k==='bubbles'?6:k==='pulse'?16:k==='pour'?6:3.5);tankLevel()}
+    DEMO=true;
+    if(k==='flow'){A.tank.gain.cancelScheduledValues(t);soloT=0;var keepT=TANK;TANK=true;var R0=SOUND.room;setTimeout(function(){TANK=keepT},6000);/* tank on, everything but the flow and bubbles muted would need its own bus; play the tank for 6 s with shrimp quiet */A.quietUntil=A.ctx.currentTime+6;var hv=A.hissG.gain.value;A.hissG.gain.setValueAtTime(0,t)}
+    else if(k==='bubbles'){var R=SOUND.room;for(var i=0,tb=t;tb<t+4;i++){var bh=R.bubbleHz*rnd(0.85,1.15);tone(bh,R.bubbleMs,R.bubbleGain*rnd(0.5,1),tb,'sine',bh*R.bubbleRise);tb+=R.bubbleEvery*rnd(0.85,1.15)}}
+    else
+    if(k==='eatA')eatSound({id:901,age:200,hunger:0.2,berried:0,rate:1},t,true);
+    else if(k==='eatB')eatSound({id:902,age:10,hunger:0.2,berried:0,rate:1},t,true);
+    else if(k==='idle')idleSound({id:903,age:200},t,1);
+    else if(k==='swim'){swimSound({id:905,age:200},t,'short');swimSound({id:905,age:200},t+1.2,'short')}
+    else if(k==='swimL'){swimSound({id:907,age:200},t,'long');swimSound({id:907,age:200},t+1.6,'long')}
+    else if(k==='pulse'){var Pu=SOUND.pulse;for(var pi=0,pt=t;pi<16;pi++){var bz=pi/15;beepAt(Pu.hzGood+(Pu.hzBad-Pu.hzGood)*bz,pt,Pu.gain*(1+bz*0.6),bz);pt+=Math.max(Pu.fast,2.2-(2.2-Pu.fast)*Math.pow(bz,1.3))}}
+    else if(k==='hissLoud'){var hs2=A.ctx.createBufferSource();hs2.buffer=A.noise;hs2.loop=true;var hp2=A.ctx.createBiquadFilter();hp2.type='highpass';hp2.frequency.value=SOUND.hiss.hz;hp2.Q.value=SOUND.hiss.q;var hg2=A.ctx.createGain();hg2.gain.setValueAtTime(0,t);hg2.gain.linearRampToValueAtTime(SOUND.hiss.max,t+1);hg2.gain.setValueAtTime(SOUND.hiss.max,t+4);hg2.gain.linearRampToValueAtTime(0,t+5);hs2.connect(hp2);hp2.connect(hg2);hg2.connect(A.lp);hs2.start(t);hs2.stop(t+5.1)}
+    else if(k==='babiesQ'){playEv({k:'babies',d:{}})}
+    else if(k==='deathB'){playEv({k:'death',d:{age:5}})}
+    else if(k==='death'){playEv({k:'death',d:{age:200}})}
+    else if(k==='swimB'){swimSound({id:906,age:10},t);swimSound({id:906,age:10},t+0.9)}
+    else if(k==='berried')eatSound({id:904,age:200,hunger:0.2,berried:10,rate:1},t,true);
+    else if(k==='hiss'){var hs=A.ctx.createBufferSource();hs.buffer=A.noise;hs.loop=true;var hp=A.ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=SOUND.hiss.hz;hp.Q.value=SOUND.hiss.q;var hg=A.ctx.createGain();hg.gain.setValueAtTime(0,t);hg.gain.linearRampToValueAtTime(SOUND.hiss.gain,t+0.8);hg.gain.setValueAtTime(SOUND.hiss.gain,t+4);hg.gain.linearRampToValueAtTime(0,t+5);hs.connect(hp);hp.connect(hg);hg.connect(A.lp);hs.start(t);hs.stop(t+5.1)}
+    else{var seen=S?S.seen:null;if(S)S.seen=Object.assign({},S.seen,{molt:1,moltfail:1,babies:1,death:1,feed:1,pour:1});var cl=cluster;playEv({k:k,d:{}});if(k==='feed')cluster=cl;if(S)S.seen=seen}
+    DEMO=false;speak(b.textContent+'.','Sound')}});
+  $('lights').innerHTML=LIGHTS.map(function(l){return '<span role="button" tabindex="0" data-l="'+l[0]+'">'+l[1]+'</span>'}).join('');
+  var MSEL=null;
+  function sliderHTML(id,label,min,max,step,val,fmt){return '<label class="sl"><span>'+label+'</span><input type="range" id="'+id+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"><span id="'+id+'-v">'+fmt(val)+'</span></label>'}
+  var pct=function(v){return Math.round(v*100)+'%'},xx=function(v){return (+v).toFixed(2)+'×'};
+  function demoKey(k){if(!audio())return;var t=A.ctx.currentTime+0.05;
+    if(k==='drop'||k==='plop'||k==='hiss'){soloT=0;A.quietUntil=A.ctx.currentTime+5;tankLevel();if(k==='hiss'){var hs=A.ctx.createBufferSource();hs.buffer=A.noise;hs.loop=true;var hp=A.ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=SOUND.hiss.hz;hp.Q.value=SOUND.hiss.q;var hg=A.ctx.createGain();hg.gain.setValueAtTime(0,t);hg.gain.linearRampToValueAtTime(SOUND.hiss.max*0.6,t+0.6);hg.gain.setValueAtTime(SOUND.hiss.max*0.6,t+3);hg.gain.linearRampToValueAtTime(0,t+3.6);hs.connect(hp);hp.connect(hg);hg.connect(A.busD.hiss.g);hs.start(t);hs.stop(t+3.7)}return}
+    soloT=t+3.5;tankLevel();DEMO=true;
+    var fake={eatA:200,eatJ:50,eatB:10,idle:200,swimS:200,swimL:200,eggs:200};
+    if(k==='eatA'||k==='eatJ'||k==='eatB'){eatSound({id:950,age:fake[k],hunger:0.2,berried:0,rate:1},t,true);eatSound({id:950,age:fake[k],hunger:0.2,berried:0,rate:1},t+0.9,true)}
+    else if(k==='eggs')eatSound({id:951,age:200,hunger:0.2,berried:10,rate:1},t,true);
+    else if(k==='idle'){idleSound({id:952,age:200},t,1);idleSound({id:952,age:200},t+0.7,1)}
+    else if(k==='swimS'||k==='swimL'){swimSound({id:953,age:200},t,k==='swimL'?'long':'short');swimSound({id:953,age:200},t+1.3,k==='swimL'?'long':'short')}
+    else if(k==='beep'){for(var i=0;i<4;i++)beepAt(SOUND.pulse.hzGood,t+i*1.2/sp('beep'),SOUND.pulse.gain,0)}
+    else{var seen=S?S.seen:null;if(S)S.seen=Object.assign({},S.seen,{molt:1,moltfail:1,babies:1,death:1,feed:1,pour:1});var cl=cluster,ek={deathA:['death',{age:200}],deathB:['death',{age:5}],eggs:['berried',{}]}[k]||[k,{}];playEv({k:ek[0],d:ek[1]});cluster=cl;if(S)S.seen=seen}
+    DEMO=false}
+  function openMix(k){MSEL=k;document.querySelectorAll('#lights span').forEach(function(e){e.classList.toggle('sel',e.dataset.l===k)});var m=mixOf(k),name=LIGHTS.filter(function(l){return l[0]===k})[0][1],box=$('mixp');box.hidden=false;
+    box.innerHTML='<b>'+name+'</b>'+sliderHTML('mx-vol','Volume',0,3,0.05,m.vol,pct)+sliderHTML('mx-soft','Softness',0,1,0.05,m.soft,pct)+(k==='hiss'?'':sliderHTML('mx-sp',RATE_K[k]?'How often':'Speed',0.25,3,0.05,m.speed,xx))+'<div class="row"><button class="sm pri" id="mx-play">Play it</button><button class="sm" id="mx-reset">Reset</button></div><div class="row"><button class="sm" id="mx-close">Close</button></div>';
+    function bind(id,key,fmt){var el=$(id);if(!el)return;el.oninput=function(){MIX[k]=MIX[k]||{};MIX[k][key]=+el.value;$(id+'-v').textContent=fmt(el.value);applyMix(k);saveMix()};el.onchange=function(){demoKey(k)}}
+    bind('mx-vol','vol',pct);bind('mx-soft','soft',pct);bind('mx-sp','speed',xx);
+    $('mx-play').onclick=function(){demoKey(k)};$('mx-reset').onclick=function(){delete MIX[k];saveMix();applyMix(k);openMix(k)};$('mx-close').onclick=function(){MSEL=null;box.hidden=true;document.querySelectorAll('#lights span').forEach(function(e){e.classList.remove('sel')})}}
+  document.querySelectorAll('#lights span').forEach(function(e){e.onclick=function(){if(MSEL===e.dataset.l){$('mx-close').onclick()}else openMix(e.dataset.l)};e.onkeydown=function(ev){if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();e.onclick()}}});
+  function renderFP(){var P=fpOf(FOUNT),box=$('fpanel'),m=mixOf('drop');if(FOUNT==='off'){box.innerHTML='<span class="muted">Filter is off.</span>';return}
+    box.innerHTML=sliderHTML('fp-dens',FOUNT==='brook'?'Movement':'Density',0.2,3,0.05,P.dens,xx)+sliderHTML('fp-pitch','Pitch',0.5,2,0.05,P.pitch,xx)+sliderHTML('fp-size',FOUNT==='brook'?'Width':'Drop size',0.4,2.5,0.05,P.size,xx)+(FOUNT==='brook'||FOUNT==='trickle'||FOUNT==='bubbler'||FOUNT==='rain'||FOUNT==='drip'?sliderHTML('fp-bed',FOUNT==='brook'?'Level':'Background',0,3,0.05,P.bed,pct):'')+sliderHTML('fp-vol','Volume',0,3,0.05,m.vol,pct)+sliderHTML('fp-soft','Softness',0,1,0.05,m.soft,pct)+'<div class="row"><button class="sm" id="fp-reset">Reset this sound</button></div>';
+    ['dens','pitch','size','bed'].forEach(function(key){var el=$('fp-'+key);if(!el)return;el.oninput=function(){FPS[FOUNT]=FPS[FOUNT]||{};FPS[FOUNT][key]=+el.value;$('fp-'+key+'-v').textContent=(key==='bed'?pct:xx)(el.value);try{localStorage.setItem('eartank-fp',JSON.stringify(FPS))}catch(e){}if(A)A.nextDrop=0}});
+    [['vol','vol',pct],['soft','soft',pct]].forEach(function(q){var el=$('fp-'+q[0]);el.oninput=function(){MIX.drop=MIX.drop||{};MIX.drop[q[1]]=+el.value;$('fp-'+q[0]+'-v').textContent=q[2](el.value);applyMix('drop');saveMix()}});
+    $('fp-reset').onclick=function(){delete FPS[FOUNT];delete MIX.drop;try{localStorage.setItem('eartank-fp',JSON.stringify(FPS))}catch(e){}saveMix();applyMix('drop');renderFP()}}LIGHTS.forEach(function(l){LEL[l[0]]=document.querySelector('#lights [data-l="'+l[0]+'"]')});
+  function play(){show('s-play');$('p-speed-sub').textContent=SPEEDS[speedIx][0];lastReal=Date.now();if(S)renderScape()}
+  function playTank(){newState([2,0,1,0,3,0,0,1,4,0,0,3],5,'Play tank, 5 shrimp.');S.shrimp.forEach(function(x,i){x.sex=i<3?'f':'m';x.age=rnd(90,200)});S.food=0.3;S.taught=true;save();if(A)A.voices={};evq=[]}
+  $('p-feed').onclick=function(){doJob('feed');save();speak('Fed.')};
+  $('p-water').onclick=function(){doJob('water');save();speak('A third of the water changed.')};
+  $('p-speed').onclick=function(){speedIx=(speedIx+1)%SPEEDS.length;save();play()};
+  function pmMark(){var p=$('p-pause'),m=$('p-mute');p.firstChild.textContent=PAUSED?'Play':'Pause';p.classList.toggle('pri',PAUSED);p.setAttribute('aria-pressed',PAUSED);m.firstChild.textContent=MUTED?'Sound on':'Sound off';m.classList.toggle('pri',MUTED);m.setAttribute('aria-pressed',MUTED)}
+  $('p-pause').onclick=function(){PAUSED=!PAUSED;if(A){A.ctx.resume();tankLevel()}lastReal=Date.now();pmMark();$('st-head').textContent=PAUSED?'Paused':'Your tank';$('st-body').textContent=PAUSED?'Tank stopped. Single sounds still play.':howText()};
+  $('p-mute').onclick=function(){MUTED=!MUTED;setVol(vol);pmMark()};
+  $('p-new').onclick=function(){playTank();play();speak('New tank, 5 shrimp.')};
+  $('p-bench').onclick=function(){home()};
+  function chips(id,get,set){var box=$(id);function mark(){box.querySelectorAll('button[data-v]').forEach(function(b){b.classList.toggle('on',String(get())===b.dataset.v)})}box.querySelectorAll('button[data-v]').forEach(function(b){b.onclick=function(){set(b.dataset.v);mark()}});mark()}
+  function saveB(){try{localStorage.setItem('eartank-beep',JSON.stringify(BEEP))}catch(e){}}
+  chips('c-fount',function(){return FOUNT},function(v){FOUNT=v;try{localStorage.setItem('eartank-fount',v)}catch(e){}if(A)A.nextDrop=0;renderFP()});renderFP();
+  function tryBeep(){if(!audio())return;var t=A.ctx.currentTime+0.05;DEMO=true;beepAt(SOUND.pulse.hzGood,t,SOUND.pulse.gain,0);DEMO=false}
+  chips('c-bstyle',function(){return BEEP.style},function(v){BEEP.style=v;saveB();tryBeep()});
+  chips('c-bpitch',function(){return BEEP.pitch},function(v){BEEP.pitch=+v;saveB();tryBeep()});
+  chips('c-bvol',function(){return BEEP.vol},function(v){BEEP.vol=+v;saveB();tryBeep()});
+  $('b-try').onclick=function(){if(!audio())return;var t=A.ctx.currentTime+0.05,Pu=SOUND.pulse,T=20;soloT=t+T+0.5;tankLevel();DEMO=true;/* the zone climbs from 0 to past red over 20 s, beeps at the rate each zone gets */for(var pt=0;pt<T;){var z=Math.min(2.2,2.2*pt/(T-3));beepAt(Pu.hzGood+(Pu.hzBad-Pu.hzGood)*Math.min(1,z/2),t+pt,Pu.gain*(1+Math.min(1,z/2)*0.6),Math.min(1,z/2));pt+=zoneGap(z)}DEMO=false};
+  /* the tank by ear: 12 places, back row on top */
+  var ORDER=[8,9,10,11,4,5,6,7,0,1,2,3],ROWN=['front','middle','back'];
+  function renderScape(){if(!S)return;var g=$('scape');g.innerHTML='';ORDER.forEach(function(ix){var b=document.createElement('button'),k=S.scape[ix]||0;b.textContent=k?THINGS[k]:'·';b.dataset.ix=ix;b.setAttribute('aria-label',ROWN[Math.floor(ix/4)]+' row, place '+(ix%4+1)+', '+THINGS[k]);
+    b.onclick=function(){S.scape[ix]=((S.scape[ix]||0)+1)%THINGS.length;save();renderScape();if(audio()){DEMO=true;placeSound(S.scape[ix],Math.floor(ix/4),A.ctx.currentTime+0.05);DEMO=false}};g.appendChild(b)})}
+  $('b-scan').onclick=function(){if(!audio())return;var t=A.ctx.currentTime+0.15,SC=SOUND.scan;soloT=t+SC.step*4+1;tankLevel();DEMO=true;
+    tone(SC.tick,30,SC.tickGain,t-0.1,'sine');
+    for(var col=0;col<4;col++){for(var row=0;row<3;row++){var ix=row*4+col,k=S.scape[ix]||0;if(k)placeSound(k,row,t+col*SC.step+(2-row)*SC.stagger)}
+      (function(c,at){setTimeout(function(){document.querySelectorAll('#scape button').forEach(function(b){b.classList.toggle('now',+b.dataset.ix%4===c)})},Math.max(0,(at-A.ctx.currentTime)*1000))})(col,t+col*SC.step)}
+    tone(SC.tick,30,SC.tickGain,t+SC.step*4,'sine');DEMO=false;
+    setTimeout(function(){document.querySelectorAll('#scape button').forEach(function(b){b.classList.remove('now')})},(SC.step*4+0.4)*1000)};
+  renderScape();window.renderScape=renderScape;
+  function picSave(){try{localStorage.setItem('eartank-pic',JSON.stringify(PICS))}catch(e){}}
+  function drawPic(c){var cv=$('pic'),x=cv.getContext('2d'),W=cv.width,H=cv.height,im=x.createImageData(PIC_W,PIC_H);
+    for(var i=0;i<PIC_W*PIC_H;i++){var v=0;PIC_TYPES.forEach(function(T){T[2].forEach(function(L){v+=0.2*PIC_BITS[L][i]})});var g=Math.min(255,Math.round(v*255*2.2));im.data[i*4]=im.data[i*4+1]=im.data[i*4+2]=g;im.data[i*4+3]=255}
+    var off=document.createElement('canvas');off.width=PIC_W;off.height=PIC_H;off.getContext('2d').putImageData(im,0,0);x.imageSmoothingEnabled=false;x.drawImage(off,0,0,W,H);
+    var C=PICS.cols,R=PICS.rows;x.strokeStyle='rgba(255,255,255,.22)';x.lineWidth=1;for(var k=1;k<C;k++){x.beginPath();x.moveTo(Math.round(k*W/C)+0.5,0);x.lineTo(Math.round(k*W/C)+0.5,H);x.stroke()}
+    x.strokeStyle='rgba(255,255,255,.08)';for(var r=1;r<R;r++){x.beginPath();x.moveTo(0,Math.round(r*H/R)+0.5);x.lineTo(W,Math.round(r*H/R)+0.5);x.stroke()}
+    if(c>=0){x.fillStyle='rgba(45,106,79,.35)';x.fillRect(c*W/C,0,W/C,H);x.strokeStyle='#7fd1a6';x.lineWidth=2;x.strokeRect(c*W/C+1,1,W/C-2,H-2);x.lineWidth=1}}
+  var PICRUN=null;
+  function picStop(){if(!PICRUN)return;var now=A.ctx.currentTime;PICRUN.osc.forEach(function(o){try{o[1].gain.cancelScheduledValues(now);o[1].gain.setTargetAtTime(0,now,0.03);o[0].stop(now+0.3)}catch(e){}});PICRUN.nodes.forEach(function(n){try{n.disconnect()}catch(e){}});PICRUN.timers.forEach(clearTimeout);PICRUN=null;soloT=0;tankLevel();drawPic(-1)}
+  $('b-picstop').onclick=picStop;
+  /* one cell's sound for a struck timbre */
+  function picHit(snd,hz,g,at,dur,out){var ctx=A.ctx,o=ctx.createOscillator(),e=ctx.createGain();o.connect(e);e.connect(out);
+    if(snd==='pluck'){o.type='triangle';o.frequency.value=hz;e.gain.setValueAtTime(0,at);e.gain.linearRampToValueAtTime(g*1.6,at+0.004);e.gain.exponentialRampToValueAtTime(0.0005,at+Math.min(dur,0.6));o.start(at);o.stop(at+Math.min(dur,0.6)+0.02)}
+    else if(snd==='chime'){o.type='sine';o.frequency.value=hz;e.gain.setValueAtTime(0,at);e.gain.linearRampToValueAtTime(g*1.4,at+0.003);e.gain.exponentialRampToValueAtTime(0.0005,at+Math.min(dur,0.9));o.start(at);o.stop(at+Math.min(dur,0.9)+0.02);var o2=ctx.createOscillator(),e2=ctx.createGain();o2.frequency.value=hz*2.76;e2.gain.setValueAtTime(0,at);e2.gain.linearRampToValueAtTime(g*0.4,at+0.003);e2.gain.exponentialRampToValueAtTime(0.0005,at+Math.min(dur,0.4));o2.connect(e2);e2.connect(out);o2.start(at);o2.stop(at+Math.min(dur,0.4)+0.02)}
+    else if(snd==='bell'){o.type='sine';o.frequency.value=hz;e.gain.setValueAtTime(0,at);e.gain.linearRampToValueAtTime(g*1.2,at+0.002);e.gain.exponentialRampToValueAtTime(0.0005,at+Math.max(dur,0.8));o.start(at);o.stop(at+Math.max(dur,0.8)+0.02);var o3=ctx.createOscillator(),e3=ctx.createGain();o3.frequency.value=hz*2.0;e3.gain.setValueAtTime(0,at);e3.gain.linearRampToValueAtTime(g*0.5,at+0.002);e3.gain.exponentialRampToValueAtTime(0.0005,at+0.5);o3.connect(e3);e3.connect(out);o3.start(at);o3.stop(at+0.52)}
+    else if(snd==='knock'){o.disconnect();var n=Math.max(1,Math.round(dur/0.2));for(var i=0;i<n;i++){var ok=ctx.createOscillator(),ek=ctx.createGain(),tk=at+i*dur/n;ok.type='triangle';ok.frequency.setValueAtTime(hz,tk);ok.frequency.exponentialRampToValueAtTime(hz*0.8,tk+0.06);ek.gain.setValueAtTime(0,tk);ek.gain.linearRampToValueAtTime(g*1.5,tk+0.003);ek.gain.exponentialRampToValueAtTime(0.0005,tk+0.07);ok.connect(ek);ek.connect(out);ok.start(tk);ok.stop(tk+0.09)}}}
+  /* play the picture: only one type when solo is given */
+  function picPlay(solo){if(!audio())return;picStop();var ctx=A.ctx,P=SOUND.pic,G=picGrid(),C=PICS.cols,R=PICS.rows,dur=PICS.secs/C,t=ctx.currentTime+0.12,run={osc:[],timers:[],nodes:[]},end=t+PICS.secs;PICRUN=run;soloT=end+0.6;tankLevel();
+    var bus=ctx.createGain();bus.gain.value=1;bus.connect(A.lp);run.nodes.push(bus);
+    PIC_TYPES.forEach(function(T){var k=T[0],st=PICS.types[k];if(!st||st.snd==='off'||(solo&&solo!==k))return;var tg=ctx.createGain();tg.gain.value=st.vol;tg.connect(bus);run.nodes.push(tg);
+      for(var r=0;r<R;r++){var hz=PICS.lo*Math.pow(PICS.hi/PICS.lo,R>1?(R-1-r)/(R-1):0.5)*st.oct;if(hz>9000)continue;
+        if(st.snd==='sine'||st.snd==='tri'||st.snd==='square'||st.snd==='hum'){var o=ctx.createOscillator(),g=ctx.createGain(),out=g;o.type=st.snd==='tri'?'triangle':st.snd==='square'?'square':'sine';o.frequency.value=hz;
+            if(st.snd==='square'){var lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=Math.min(8000,hz*3);g.connect(lp);lp.connect(tg);run.nodes.push(lp)}else g.connect(tg);
+            if(st.snd==='hum'){var v=ctx.createOscillator(),vg=ctx.createGain();v.frequency.value=5+r%3;vg.gain.value=hz*0.012;v.connect(vg);vg.connect(o.frequency);v.start(t);v.stop(end+0.3);run.osc.push([v,vg])}
+            g.gain.value=0;o.connect(g);o.start(t);o.stop(end+0.3);run.osc.push([o,g]);var any=false;
+            for(var c=0;c<C;c++){var val=G[k][c][r];g.gain.setTargetAtTime(val*P.gain,t+c*dur,0.015);if(val>0)any=true}g.gain.setTargetAtTime(0,end,0.03);if(!any){try{o.stop()}catch(e){}}}
+        else{for(var c2=0;c2<C;c2++){var v2=G[k][c2][r];if(v2>0.002)picHit(st.snd,hz,v2*P.gain,t+c2*dur,dur,tg)}}}});
+    for(var c3=0;c3<C;c3++){if(PICS.tick){DEMO=true;tone(2400,12,P.tick,t+c3*dur,'sine');DEMO=false}(function(c){run.timers.push(setTimeout(function(){if(PICRUN===run)drawPic(c)},Math.max(0,(t+c*dur-ctx.currentTime)*1000)))})(c3)}
+    run.timers.push(setTimeout(function(){if(PICRUN===run){PICRUN=null;drawPic(-1)}},(PICS.secs+0.4)*1000))}
+  $('b-pic').onclick=function(){picPlay(null)};
+  function renderPicSet(){var b=$('picset'),num=function(v){return String(+v)},sec=function(v){return (+v).toFixed(1)+' s'},hz=function(v){return Math.round(v)+' Hz'};
+    b.innerHTML='<b>How it plays</b>'+sliderHTML('pc-cols','Slices',2,40,1,PICS.cols,num)+sliderHTML('pc-secs','Length',2,30,0.5,PICS.secs,sec)+sliderHTML('pc-rows','Pitch rows',4,48,1,PICS.rows,num)+sliderHTML('pc-lo','Lowest',150,1000,10,PICS.lo,hz)+sliderHTML('pc-hi','Highest',800,6000,50,PICS.hi,hz)+'<div class="chips" style="margin-top:6px"><button id="pc-tick" class="'+(PICS.tick?'on':'')+'">Tick each slice</button><button id="pc-reset">Reset</button></div><div class="muted" id="pc-note"></div>';
+    function note(){$('pc-note').textContent=PICS.cols+' slices of '+(PICS.secs/PICS.cols).toFixed(2)+' s, each slice '+Math.round(PIC_W/PICS.cols*4)+' px of the tank wide.'}note();
+    [['cols',num],['secs',sec],['rows',num],['lo',hz],['hi',hz]].forEach(function(q){var el=$('pc-'+q[0]);el.oninput=function(){PICS[q[0]]=+el.value;$('pc-'+q[0]+'-v').textContent=q[1](el.value);picSave();note();drawPic(-1)}});
+    $('pc-tick').onclick=function(){PICS.tick=PICS.tick?0:1;picSave();renderPicSet()};$('pc-reset').onclick=function(){var ty=PICS.types;PICS=JSON.parse(JSON.stringify(PICD));PICS.types=ty;picSave();renderPicSet();drawPic(-1)}}
+  function renderPicTypes(){var b=$('pictypes'),h='<b>Sound for each kind of decor</b>';
+    PIC_TYPES.forEach(function(T){var k=T[0],st=PICS.types[k];h+='<div style="margin-top:10px"><b style="font-weight:600">'+T[1]+'</b><div class="chips" data-ty="'+k+'">'+PIC_SOUNDS.map(function(o){return '<button data-snd="'+o[0]+'" class="'+(st.snd===o[0]?'on':'')+'">'+o[1]+'</button>'}).join('')+'</div><div class="chips" data-oc="'+k+'">'+[[0.25,'Lowest'],[0.5,'Low'],[1,'Middle'],[2,'High']].map(function(o){return '<button data-o="'+o[0]+'" class="'+(st.oct===o[0]?'on':'')+'">'+o[1]+'</button>'}).join('')+'</div>'+sliderHTML('pt-vol-'+k,'Volume',0,3,0.05,st.vol,pct)+'<div class="row"><button class="sm" data-only="'+k+'">Hear only '+T[1].toLowerCase()+'</button><button class="sm" data-one="'+k+'">One note</button></div></div>'});
+    b.innerHTML=h;
+    b.querySelectorAll('[data-ty] button').forEach(function(x){x.onclick=function(){var k=x.parentNode.dataset.ty;PICS.types[k].snd=x.dataset.snd;picSave();renderPicTypes();oneNote(k)}});
+    b.querySelectorAll('[data-oc] button').forEach(function(x){x.onclick=function(){var k=x.parentNode.dataset.oc;PICS.types[k].oct=+x.dataset.o;picSave();renderPicTypes();oneNote(k)}});
+    PIC_TYPES.forEach(function(T){var el=$('pt-vol-'+T[0]);el.oninput=function(){PICS.types[T[0]].vol=+el.value;$('pt-vol-'+T[0]+'-v').textContent=pct(el.value);picSave()};el.onchange=function(){oneNote(T[0])}});
+    b.querySelectorAll('[data-only]').forEach(function(x){x.onclick=function(){picPlay(x.dataset.only)}});b.querySelectorAll('[data-one]').forEach(function(x){x.onclick=function(){oneNote(x.dataset.one)}})}
+  /* one second of that kind's sound at the middle row */
+  function oneNote(k){if(!audio())return;var st=PICS.types[k];if(st.snd==='off')return;var ctx=A.ctx,t=ctx.currentTime+0.05,hz=Math.sqrt(PICS.lo*PICS.hi)*st.oct,g=SOUND.pic.gain*0.2*st.vol,out=ctx.createGain();out.connect(A.lp);soloT=t+1.4;tankLevel();
+    if(st.snd==='sine'||st.snd==='tri'||st.snd==='square'||st.snd==='hum'){var o=ctx.createOscillator(),e=ctx.createGain();o.type=st.snd==='tri'?'triangle':st.snd==='square'?'square':'sine';o.frequency.value=hz;if(st.snd==='hum'){var v=ctx.createOscillator(),vg=ctx.createGain();v.frequency.value=5;vg.gain.value=hz*0.012;v.connect(vg);vg.connect(o.frequency);v.start(t);v.stop(t+1.1)}
+      e.gain.setValueAtTime(0,t);e.gain.linearRampToValueAtTime(g,t+0.03);e.gain.setValueAtTime(g,t+0.95);e.gain.linearRampToValueAtTime(0,t+1);if(st.snd==='square'){var lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=hz*3;o.connect(lp);lp.connect(e)}else o.connect(e);e.connect(out);o.start(t);o.stop(t+1.05)}
+    else picHit(st.snd,hz,g,t,1,out)}
+  renderPicSet();renderPicTypes();drawPic(-1);
+  function feedSave(){try{localStorage.setItem('eartank-feed',JSON.stringify(FEEDS))}catch(e){}}
+  function feedDemo(only){if(!audio())return;var t=A.ctx.currentTime+0.05;soloT=t+5;tankLevel();DEMO=true;as('feed',t,function(){feedSound(t,only)});DEMO=false;lit('feed',t,2)}
+  function renderFeed(){var box=$('fdl'),h='',sec=function(v){return (+v).toFixed(2)+' s'},num=function(v){return String(Math.round(v))};
+    FEEDL.forEach(function(l){var id=l[0],P=feedOf(id);h+='<details class="panel" '+(P.on?'open':'')+'><summary style="display:flex;align-items:center;gap:8px;cursor:pointer;list-style:none"><b style="flex:1">'+l[1]+'</b><span class="chips" style="margin:0"><button data-fon="'+id+'" class="'+(P.on?'on':'')+'">'+(P.on?'On':'Off')+'</button><button data-fpl="'+id+'">Play</button></span></summary><div class="muted" style="font-size:13px">'+l[2]+'</div>'+
+      sliderHTML('fd-'+id+'-vol','Volume',0,3,0.05,P.vol,pct)+sliderHTML('fd-'+id+'-delay','Starts at',0,5,0.05,P.delay,sec)+sliderHTML('fd-'+id+'-pitch','Pitch',0.25,3,0.05,P.pitch,xx)+sliderHTML('fd-'+id+'-count','Count',1,40,1,P.count,num)+sliderHTML('fd-'+id+'-spread',id==='shake'?'Gap':'Spread',0.02,4,0.02,P.spread,sec)+sliderHTML('fd-'+id+'-vary','Randomness',0,1,0.05,P.vary,pct)+sliderHTML('fd-'+id+'-soft','Softness',0,1,0.05,P.soft,pct)+'<div class="chips" style="margin-top:6px"><button data-frs="'+id+'">Reset this layer</button></div></details>'});
+    box.innerHTML=h;
+    box.querySelectorAll('[data-fon]').forEach(function(b){b.onclick=function(ev){ev.preventDefault();var id=b.dataset.fon;FEEDS[id]=FEEDS[id]||{};FEEDS[id].on=feedOf(id).on?0:1;feedSave();b.classList.toggle('on',!!FEEDS[id].on);b.textContent=FEEDS[id].on?'On':'Off'}});
+    box.querySelectorAll('[data-fpl]').forEach(function(b){b.onclick=function(ev){ev.preventDefault();feedDemo(b.dataset.fpl)}});
+    box.querySelectorAll('[data-frs]').forEach(function(b){b.onclick=function(){delete FEEDS[b.dataset.frs];feedSave();renderFeed()}});
+    FEEDL.forEach(function(l){['vol','delay','pitch','count','spread','vary','soft'].forEach(function(k){var el=$('fd-'+l[0]+'-'+k);el.oninput=function(){FEEDS[l[0]]=FEEDS[l[0]]||{};FEEDS[l[0]][k]=+el.value;$('fd-'+l[0]+'-'+k+'-v').textContent=(k==='vol'||k==='vary'||k==='soft'?pct:k==='pitch'?xx:k==='count'?num:sec)(el.value);feedSave()};el.onchange=function(){feedDemo(l[0])}})})}
+  $('fd-play').onclick=function(){feedDemo(null)};$('fd-reset').onclick=function(){FEEDS={};feedSave();renderFeed()};
+  renderFeed();
+  var EXPK=['eartank-mix','eartank-feed','eartank-pic','eartank-fp','eartank-fount','eartank-beep'];
+  $('p-export').onclick=function(){var o={};EXPK.forEach(function(k){try{var v=localStorage.getItem(k);if(v!=null)o[k]=v}catch(e){}});var txt=JSON.stringify(o);$('p-exp').value=txt;$('p-exp').select();try{navigator.clipboard.writeText(txt).then(function(){speak('Copied.','Settings')},function(){speak('Select the text and copy it.','Settings')})}catch(e){speak('Select the text and copy it.','Settings')}};
+  $('p-import').onclick=function(){try{var o=JSON.parse($('p-exp').value);EXPK.forEach(function(k){if(o[k]!=null)localStorage.setItem(k,o[k])});location.reload()}catch(e){speak('That text is not settings.','Settings')}};
+  function wcMark(){document.querySelectorAll('[data-wc]').forEach(function(b){b.className='sm'+(b.dataset.wc===WC?' pri':'')})}
+  document.querySelectorAll('[data-wc]').forEach(function(b){b.onclick=function(){WC=b.dataset.wc;try{localStorage.setItem('eartank-wc',WC)}catch(e){}wcMark();if(audio()){DEMO=true;pourSound(WC);DEMO=false}}});
+  wcMark();
+  $('btn-play').onclick=play;
+  $('btn-how').onclick=function(){speak(howText(),'Your tank')};
+  $('btn-feed').onclick=function(){doJob('feed');save();speak('Fed.')};
+  $('btn-less').onclick=function(){S.ration=S.ration<1?1:0.5;save();home();speak(S.ration<1?'Half rations from now.':'Full rations from now.')};
+  $('btn-water').onclick=function(){doJob('water');save();speak('A third of the water changed.')};
+  $('btn-filter').onclick=function(){job('filter',3,'The filter gets a rinse this afternoon.')};
+  $('btn-moss').onclick=function(){job('moss',3,'More moss goes in this afternoon.')};
+  $('btn-add').onclick=function(){job('add',3,'Five shrimp come this afternoon.')};
+  $('btn-speed').onclick=function(){speedIx=(speedIx+1)%SPEEDS.length;save();home();speak(SPEEDS[speedIx][0]+'.','Speed')};
+  $('btn-log').onclick=function(){speak(S.log.length?S.log.slice(0,5).join('. ')+'.':'Nothing yet.','Log')};
+  $('btn-settings').onclick=function(){show('s-settings');$('vol').value=Math.round(vol*100);speak('Settings. Volume, voice, teach, reset.','Settings')};
+  $('btn-settings-back').onclick=home;
+  $('vol').oninput=function(){setVol(+this.value/100);save()};
+  $('btn-voice').onclick=function(){speaking=!speaking;this.setAttribute('aria-pressed',speaking);$('voice-sub').textContent=speaking?'on':'off';save();speak(speaking?'Voice on.':'Voice off.');if(!speaking&&'speechSynthesis'in window)speechSynthesis.cancel()};
+  $('btn-teach').onclick=function(){teach(function(){speak('Done.','Settings')})};
+  $('btn-reset').onclick=function(){if(!confirm('Start over? The tank is gone.'))return;S=null;try{localStorage.removeItem(KEY)}catch(e){}if(A)A.voices={};evq=[];show('s-start');speak('Gone. Adopt a tank, or build one.','Ear tank')};
+  $('btn-voice').setAttribute('aria-pressed',speaking);$('voice-sub').textContent=speaking?'on':'off';
+  // model clock
+  setInterval(function(){
+    if(PAUSED){lastReal=Date.now();return}
+    if(!S||S===previewTank)return;
+    var now=Date.now(), dt=(now-lastReal)/1000; lastReal=now;
+    if(dt<0||dt>120)dt=1;
+    advance(dt*SPEEDS[speedIx][1]);
+    $('stateline').textContent=stateLine();
+    if(Math.random()<0.1)save();
+  },1000);
+  setInterval(sched,100);
+  setInterval(function(){var el=$('stats');var h=statsHTML();if(el.innerHTML!==h)el.innerHTML=h;var st=$('strip'),sh=stripHTML();if(st.innerHTML!==sh)st.innerHTML=sh},250);
+  document.addEventListener('visibilitychange',function(){if(!A)return;if(document.hidden){A.ctx.suspend();if(S)save()}else{lastReal=Date.now();A.ctx.resume()}});
+  // load
+  if(load()){
+    var gone=Math.min(30*24,(Date.now()-S.last)/3600000); if(gone>0.02){advance(gone);evq=[];}
+    $('vol').value=Math.round(vol*100);$('btn-voice').setAttribute('aria-pressed',speaking);$('voice-sub').textContent=speaking?'on':'off';
+    play();$('st-head').textContent='Tap to start';$('st-body').textContent='Tap anywhere to turn the sound on. '+(gone>1?Math.round(gone/24*10)/10+' days passed.':'');
+  }else if(/quick=0/.test(location.search)){show('s-start')}else{playTank();play();$('st-head').textContent='Tap to start';$('st-body').textContent='Tap anywhere to turn the sound on. 5 shrimp, a day every 2 minutes. Feed them, change the water, listen.'}
+  $('stateline').textContent=stateLine();
+}
+start();
+</script>
+</body>
+</html>

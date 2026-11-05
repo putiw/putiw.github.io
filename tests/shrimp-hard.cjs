@@ -17,7 +17,7 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
  const g0=await p.evaluate(()=>{var c=document.getElementById('hg-cv'),r=c.getBoundingClientRect(),x=c.getContext('2d').getImageData(0,0,c.width,c.height).data,on=0;for(var i=3;i<x.length;i+=4)if(x[i])on++;return {w:r.width,h:r.height,on:on,key:HGK};});
  if(g0.h<120||g0.h>480||g0.on<1000)throw Error('grid not drawn: '+JSON.stringify(g0));ok('grid drawn, '+Math.round(g0.w)+'x'+Math.round(g0.h)+' px');
  // legend tap: select the first group; the card keeps its height and nothing scrolls
- await p.evaluate(()=>{var c=document.getElementById('hard-card');window.scrollTo(0,c.getBoundingClientRect().top+scrollY-60);});await p.waitForTimeout(200);
+ await p.evaluate(()=>{var c=document.getElementById('hg-lab');window.scrollTo(0,c.getBoundingClientRect().top+scrollY-120);});await p.waitForTimeout(200);/* Pass 251: the panel above the grid is taller, scroll the legend into view (Playwright scrolls a covered target by itself) */
  const before=await p.evaluate(()=>({y:scrollY,h:document.getElementById('hard-card').offsetHeight,k:[...document.getElementById('hard-card').children].map(x=>x.offsetHeight).join(',')}));
  const tap0=await p.evaluate(()=>({next:!!document.querySelector('[data-act="hard-next"]'),txt:document.querySelector('#hard-body .hard-step').textContent}));if(tap0.next||!/Tap a group/.test(tap0.txt))throw Error('no step order, nothing picked at first: '+JSON.stringify(tap0));ok('no Next, Tap a group at first (Pass 190)');
  await p.click('#hg-lab [data-g="hot"]');await p.waitForTimeout(300);
@@ -44,7 +44,7 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
  if(typeof fund==='string'||fund.k0===fund.k1||!(fund.way>1e8)||fund.after)throw Error('funding did not outline: '+JSON.stringify(fund));ok('funding outlines the squares it will reach, no popup');
  // Nour's jar
  const jar=await p.evaluate(()=>({hid:document.getElementById('nour-jar').hidden,cap:document.getElementById('nour-cap').textContent,h:document.getElementById('nour-cv').getBoundingClientRect().height}));
- if(jar.hid||!/^\d+ shrimp/.test(jar.cap)||jar.h<100)throw Error('jar '+JSON.stringify(jar));ok('Milo’s jar: '+jar.cap);
+ if(jar.hid||!/^\d+ shrimp/.test(jar.cap)||jar.h<80||jar.h>120)throw Error('jar '+JSON.stringify(jar));ok('Milo’s jar: '+jar.cap);
  // Pass 184: a one-option group leaves no big gap, and every legend name is readable at 360 px
  for(const w of [360,390]){const q=await b.newPage({viewport:{width:w,height:844}});await q.setContent('<body>'+html+'</body>');await q.waitForTimeout(300);
   const r=await q.evaluate(s=>{G=s;migrate(G);G.progress.queue=[];window.spotlight=function(){};speed=0;var H=hardOf(G);H.goalOk=1;H.at=HARD.length-1;HARD_SEL='never';ensureProgress(G).seen.nour1=1;nourOf(G);selectTab('world');render();
@@ -52,8 +52,42 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
    var st=document.querySelector('.hard-step'),rows=st.querySelectorAll('.item');return {gap:st.getBoundingClientRect().bottom-rows[rows.length-1].getBoundingClientRect().bottom,
     cut:[...document.querySelectorAll('.hg-k span')].filter(x=>x.scrollHeight>x.clientHeight+1||x.scrollWidth>x.clientWidth+1).map(x=>x.textContent)};},snaps[key]);
   if(r.gap>160||r.cut.length)throw Error(w+' px: gap under a one-option group '+Math.round(r.gap)+', cut legend names '+r.cut);ok(w+' px: gap under a one-option group '+Math.round(r.gap)+' px, legend names readable');await q.close();}
+ // Pass 250: the allocation panel keeps the card height, a slider move scrolls nothing, the Musk line is in the ledger ?, the key has "for now"
+ const al0=await p.evaluate(()=>{var c=document.getElementById('hard-card');window.scrollTo(0,c.getBoundingClientRect().top+scrollY-20);return {y:scrollY,h:c.offsetHeight,al:document.getElementById('hard-al').offsetHeight,n:document.querySelectorAll('#hard-al input[type=range]').length};});
+ await p.evaluate(()=>{var sl=document.querySelector('#hard-al input[data-al="sci"]');sl.value=30;sl.dispatchEvent(new Event('input',{bubbles:true}));});await p.waitForTimeout(400);
+ const al1=await p.evaluate(()=>({y:scrollY,h:document.getElementById('hard-card').offsetHeight,al:document.getElementById('hard-al').offsetHeight,alloc:hardAllocOf(hardOf(G)).sci,keep:document.querySelector('#hard-al .al-keep').textContent}));
+ if(al0.n!==2||al1.alloc!==.3||Math.abs(al1.y-al0.y)>1||al1.h!==al0.h||al1.al!==al0.al||!/Keep 70%/.test(al1.keep))throw Error('allocation panel '+JSON.stringify([al0,al1]));ok('two route sliders (Pass 251), a move keeps the card height and scrolls nothing, Keep 70%');
+ await p.evaluate(()=>{var sl=document.querySelector('#hard-al input[data-al="aid"]');sl.value=90;sl.dispatchEvent(new Event('input',{bubbles:true}));});await p.waitForTimeout(400);
+ const al2=await p.evaluate(()=>({aid:hardAllocOf(hardOf(G)).aid,v:document.querySelector('#hard-al input[data-al="aid"]').value,keep:document.querySelector('#hard-al .al-keep').textContent}));
+ if(al2.aid!==.7||al2.v!=='70'||!/Keep 0%/.test(al2.keep))throw Error('sum capped at 100%: '+JSON.stringify(al2));ok('the shares cap at 100%, the slider snaps back');
+ // Pass 251: proposals. Three fixed rows, Fund keeps the panel's height and scrolls nothing, the Running list shows the funded one, Stop works
+ const pr0=await p.evaluate(()=>{var R=propOf(hardOf(G));R.open=[];propArrive(G,hardOf(G),Math.floor(G.day));G.money=Math.max(G.money,1e13);render();var rows=[...document.querySelectorAll('#hard-al .pr-row')].filter(x=>!x.querySelector('[data-act="tree-step"]'));/* Pass 255: tree letters sit in the same list */var b=document.querySelector('#hard-al .pr-row button[data-act="prop-fund"]');return {rows:rows.length,open:propOf(hardOf(G)).open.length,hs:[...rows].map(x=>x.offsetHeight),y:scrollY,h:document.getElementById('hard-card').offsetHeight,al:document.getElementById('hard-al').offsetHeight,dis:b&&b.disabled,id:b&&b.dataset.id,help:document.querySelector('#hard-al .pr-row .qhelp').dataset.ht};});
+ if(pr0.rows<1||pr0.rows>3||pr0.rows!==Math.max(1,pr0.open)||Math.max(...pr0.hs)-Math.min(...pr0.hs)>1||pr0.dis||!/a person|years|income|to build/.test(pr0.help))throw Error('proposal rows '+JSON.stringify(pr0));ok('one proposal row per letter, one height, the help has the cost');
+ const top0=await p.evaluate(()=>{var hl=document.querySelector('#hard-al .hal-let');return {lh:hl.offsetHeight,top:hl.getBoundingClientRect().top};});
+ await p.evaluate(()=>{document.querySelector('#hard-al .pr-row button[data-act="prop-fund"]').click();});await p.waitForTimeout(400);
+ const pr1=await p.evaluate((id)=>{var hl=document.querySelector('#hard-al .hal-let');return {y:scrollY,lh:hl.offsetHeight,top:hl.getBoundingClientRect().top,run:Object.keys(propOf(hardOf(G)).run),still:!!document.querySelector('#hard-al .pr-row button[data-act="prop-fund"][data-id="'+id+'"]'),inRun:[...document.querySelectorAll('#hard-al .pr-run')].some(r=>!!r.querySelector('[data-id="'+id+'"]'))};},pr0.id);
+ if(Math.abs(pr1.y-pr0.y)>1||Math.abs(pr1.lh-top0.lh)>1||Math.abs(pr1.top-top0.top)>1||pr1.run.indexOf(pr0.id)<0||pr1.still||!pr1.inRun)throw Error('fund '+JSON.stringify([pr0,top0,pr1]));ok('Pass 257: Fund takes the letter to Running at once, the Letters list keeps its height, nothing above moves');
+ const tap=await p.evaluate(()=>{var R=propOf(hardOf(G));R.open=[];propArrive(G,hardOf(G),Math.floor(G.day));G.money=Math.max(G.money,1e13);render();var b=document.querySelector('#hard-al .pr-row button[data-act="prop-fund"]');b.scrollIntoView({block:'center'});window.__ri=setInterval(function(){G.money+=1e6;render();},60);var r=b.getBoundingClientRect();return {id:b.dataset.id,x:r.left+r.width/2,y:r.top+r.height/2};});
+ await p.waitForTimeout(100);await p.mouse.move(tap.x,tap.y);await p.mouse.down();await p.waitForTimeout(90);await p.mouse.up();await p.waitForTimeout(150);
+ const tapOk=await p.evaluate((id)=>{clearInterval(window.__ri);return !!propOf(hardOf(G)).run[id];},tap.id);if(!tapOk)throw Error('one tap on Fund 100 ms after a render did not fund');ok('Pass 257: one tap on Fund lands while the panel re-renders');
+ await p.evaluate(()=>{hdFree();render();});
+ await p.evaluate(()=>{FRZ={};render();});const pr2=await p.evaluate(()=>{var r=[...document.querySelectorAll('#hard-al .pr-run')].filter(x=>x.querySelector('button[data-act="prop-stop"]'))[0];return {run:!!r,t:r&&r.textContent,stop:!!(r&&r.querySelector('button[data-act="prop-stop"]'))};});
+ if(!pr2.run||!/people|paid|done|years|countries|running/.test(pr2.t))throw Error('running list '+JSON.stringify(pr2));ok('the Running list has the funded one with its state');
+ // Pass 253: trees as Running rows, Shaping the world inside the card
+ const tr0=await p.evaluate(()=>{G.emp.trees=G.emp.trees||{};G.emp.trees.rewild=1;G.emp.trees.lastmile=1;G.money=Math.max(G.money,1e13);G.emp.inf=Math.max(G.emp.inf,1e12);FRZ={};render();
+  var rows=[...document.querySelectorAll('#hard-al .pr-row')].filter(x=>x.querySelector('button[data-act="tree-step"]'));var tc=document.getElementById('treecard');
+  return {n:rows.length,t:rows.map(x=>x.textContent),cardHidden:tc.hidden||!tc.innerHTML.match(/Rewilding|The last mile/),y:scrollY,h:document.getElementById('hard-card').offsetHeight,
+   desk:!document.getElementById('hard-desk').hidden,deskIn:!!document.querySelector('#hard-desk-in #e-proj'),cproj:document.getElementById('c-proj').hidden};});
+ if(tr0.n<2||!tr0.cardHidden||!tr0.desk||!tr0.deskIn||!tr0.cproj)throw Error('trees in the hard part '+JSON.stringify(tr0));ok('Rewilding and The last mile write letters (Pass 255), their cards are gone, Shaping the world sits in the card');
+ await p.evaluate(()=>{[...document.querySelectorAll('#hard-al button[data-act="tree-step"]')][0].click();});await p.waitForTimeout(400);
+ const tr1=await p.evaluate(()=>{var hl=document.querySelector('#hard-al .hal-let');return {y:scrollY,lh:hl.offsetHeight,run:[...document.querySelectorAll('#hard-al .pr-run')].map(x=>x.textContent).join('|')};});
+ if(Math.abs(tr1.y-tr0.y)>1||!/% done/.test(tr1.run))throw Error('tree step '+JSON.stringify([tr0,tr1]));ok('Pass 257: a funded tree step goes under Running with how far it is, nothing scrolls');
+ const tr2=await p.evaluate(()=>{hdFree();var k=Object.keys(TREES).filter(k=>treeHas(G,k)&&treeRun(G,k))[0],s=treeRun(G,k),nx0=treeNext(G,k);G.day+=s.t+1;render();return {nx0:!!nx0,nx1:!!treeNext(G,k),run:!!treeRun(G,k)};});
+ if(tr2.nx0||!tr2.nx1||tr2.run)throw Error('tree timing '+JSON.stringify(tr2));ok('Pass 257: the next tree step writes only once the last one is done');
+ const led=await p.evaluate(()=>({t:document.querySelector('#hard-led .led-t').textContent,h:document.querySelector('#hard-led .qhelp').dataset.ht,key:document.getElementById('hg-key').textContent,slider:!!document.querySelector('#hard-led input')}));
+ if(!/Elon Musk/.test(led.t)||!/0\.1% of his net worth/.test(led.h)||!/thousand lives/.test(led.h)||!/for now/.test(led.key)||led.slider)throw Error('ledger '+JSON.stringify(led));ok('the ledger reads in the richest person’s fortune, lives capped at what GiveWell can place, the key has "for now", the give slider lives in the panel');
  // after the win: grid and ledger stay, read-only
  const won=await p.evaluate(()=>{G.emp.won=Math.floor(G.day);render();return {hid:document.getElementById('hard-card').hidden,grid:document.getElementById('hg-cv').offsetHeight,dis:document.getElementById('hard-give').disabled,body:document.getElementById('hard-body').textContent.length,jar:document.getElementById('nour-jar').hidden};});
- if(won.hid||won.grid<100||!won.dis||won.body||!won.jar)throw Error('after the win '+JSON.stringify(won));ok('after the win the grid and a read-only ledger stay');
+ if(won.hid||won.grid<100||!won.dis||won.body||!won.jar)throw Error('after the win '+JSON.stringify(won));ok('after the win the grid, the panel and a read-only ledger stay');
  if(errs.length)throw Error('page errors: '+errs.join(' | '));ok('no page errors');
  await b.close();console.log(n+' hard part checks passed ('+key+')');})().catch(e=>{console.error(e);process.exit(1);});

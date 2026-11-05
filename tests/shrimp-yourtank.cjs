@@ -47,7 +47,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  const lt=await f.evaluate(()=>Array.from(document.querySelectorAll('#toybtns .btn')).map(b=>({n:b.childNodes[1]?b.childNodes[1].textContent.trim():b.textContent,s:(b.querySelector('small')||{}).textContent})));
  const gl=await p.evaluate(()=>{var L=ownLines(G);return L;});
  ok(lt.map(x=>x.n).join(',')==='Vacuum,Sponge,Trim,Pests,Aquascape,Glass','land tiles: '+lt.map(x=>x.n).join(', '));
- ok(['vac','sponge','trim','pests','glass'].every((k,i)=>lt[[0,1,2,3,5][i]].s===gl[k]),'land state lines match the game ('+lt.map(x=>x.s).join(' / ')+')');
+ ok(['vac','sponge','trim','pests','glass'].every((k,i)=>lt[[0,1,2,3,5][i]].s===gl[k]),'land state lines match the game ('+lt.map(x=>x.s).join(' / ')+' vs '+['vac','sponge','trim','pests','glass'].map(k=>gl[k]).join(' / ')+')');
  const lc=await f.evaluate(()=>Array.from(document.querySelectorAll('#tankside .card h2')).map(h=>h.textContent));
  ok(lc.slice(0,3).join(',')==='Wellbeing,Food and water,Colony','land cards: '+lc.join(', '));
  const wbL=await f.evaluate(()=>document.querySelector('#tankside [data-k="wb"] small').textContent),wbG=await p.evaluate(()=>$('wb-sum').textContent);
@@ -59,5 +59,43 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  ok(await p.evaluate(()=>G.tanks[0].set.autoRation===150),'the auto feed slider on the land sets the game\'s auto feed');
  await f.evaluate(()=>scrollTo(0,0));await p.screenshot({path:path.join(os.tmpdir(),'yt-land-'+W+'.png'),fullPage:false});
  await f.evaluate(()=>{var s=document.querySelector('#tankside [data-k="fw"]');if(s)s.scrollIntoView();});await p.screenshot({path:path.join(os.tmpdir(),'yt-land2-'+W+'.png')});
+ // Pass 254 (Puti 5 Nov): the Aquascape sticks. Take the driftwood out, add a rock pile, turn it, finish: the game's flags, the
+ // piece list it draws (T.scp, Pass 257; was a picture) and the land's pieces all keep the edit after Back, a reload and the next visit.
+ await f.evaluate(()=>{var T=S.tanks[0];T.scape=T.scape.filter(i=>i.k!=='wood');toyStart('scape');});await wait(400);
+ await f.evaluate(()=>{var el=[...document.querySelectorAll('[data-add]')].find(b=>b.dataset.add==='rockpile');el.click();TOY.edit('rot');TOY.edit('rot');});await wait(200);
+ const pieces=()=>f.evaluate(()=>S.tanks[0].scape.map(i=>i.k+(i.r?'r'+i.r.toFixed(2):'')).sort().join(','));
+ const before=await pieces();await f.evaluate(()=>TOY.finish());await wait(2500);
+ const g1=await p.evaluate(()=>{var P=G.tanks[0].scp;return {w:G.tanks[0].wood,n:P&&P.s.length,len:P?JSON.stringify(P).length:0,img:!!G.opt.scImg,on:scpOn(G.tanks[0]),k:P&&P.s.map(i=>i[0]+(i[5]?'r'+(+i[5]).toFixed(2):'')).sort().join(',')};});
+ ok(g1.w===0&&g1.n>0&&g1.len<20000&&!g1.img&&g1.on,'after the job the game has no driftwood and the land\'s piece list ('+g1.len+' chars, no picture)');
+ ok(g1.k===before,'the game\'s list has the same pieces as the land: '+g1.k);
+ // the same pieces drawn on both pages at the art size: same pixels, give or take antialiasing
+ const pxl=async(fr,fn)=>fr.evaluate(fn);
+ const landPx=await pxl(f,()=>{var c=document.createElement('canvas');c.width=932;c.height=430;var W=TV.W,H=TV.H,D=TV.dpr;TV.W=932;TV.H=430;TV.dpr=1;TV.L={};try{drawScapeAll(c.getContext('2d'),S.tanks[0],tvGeom());}finally{TV.W=W;TV.H=H;TV.dpr=D;TV.L={};}return Array.from(c.getContext('2d').getImageData(0,0,932,430).data.filter((v,i)=>i%4===3&&(i>>2)%7===0));});
+ const gamePx=await pxl(p,()=>{var c=document.createElement('canvas');c.width=932;c.height=430;scpDraw(c.getContext('2d'),G.tanks[0].scp);return Array.from(c.getContext('2d').getImageData(0,0,932,430).data.filter((v,i)=>i%4===3&&(i>>2)%7===0));});
+ let dif=0,on=0;for(let i=0;i<landPx.length;i++){if(landPx[i]>40)on++;if(Math.abs(landPx[i]-gamePx[i])>60)dif++;}
+ ok(on>2000&&dif/on<0.03,'the company page draws the same scape as the land ('+dif+' of '+on+' covered pixels differ)');
+ ok(before.indexOf('rockpiler')>=0,'a rotated rock pile is in the pieces: '+before);
+ await f.evaluate(()=>$('tb-back').click());await wait(600);ok(await p.evaluate(()=>!LAND.on),'Back leaves the land');
+ await p.evaluate(()=>landShow());await wait(2500);
+ ok((await pieces())===before&&(await p.evaluate(()=>G.tanks[0].wood))===0,'the next visit keeps the pieces and the game keeps the flags');
+ await p.reload();await p.waitForFunction(()=>window.G&&G.tanks&&G.me);await p.evaluate(()=>{window.spotlight=function(){};landShow();});f=null;for(let i=0;i<100&&!f;i++){f=p.frames().find(x=>x.url().includes('home.html'));await wait(100);}
+ await f.waitForFunction(()=>window.S&&S.tanks&&S.tanks[0]);await wait(2500);
+ ok((await pieces())===before,'after a reload the land still has them: '+(await pieces()));
+ ok(await p.evaluate(()=>G.tanks[0].wood===0&&G.tanks[0].scp&&G.tanks[0].scp.s.length>0&&scpOn(G.tanks[0])),'after a reload the game draws the list');
+ // Pass 257: an old save with a picture and no list still draws the picture, until a list comes
+ const mig=await p.evaluate(()=>{var T=G.tanks[0],keep=T.scp;delete T.scp;var c=document.createElement('canvas');c.width=93;c.height=43;G.opt.scImg=c.toDataURL('image/png');scImgLoad();return new Promise(r=>setTimeout(()=>{var a=scImgOn(T);landTank(G,{scp:keep});r({pic:a,after:scImgOn(T),gone:!G.opt.scImg,list:scpOn(T)});},500));});
+ ok(mig.pic&&!mig.after&&mig.gone&&mig.list,'an old picture is drawn until the land sends a list, then dropped: '+JSON.stringify(mig));
+ // Back with the job open: the job is ended and reported first
+ await f.evaluate(()=>{toyStart('scape');var el=[...document.querySelectorAll('[data-add]')].find(b=>b.dataset.add==='wood');el.click();$('tb-back').click();});await wait(2500);
+ ok(await f.evaluate(()=>!TOY)&&await p.evaluate(()=>G.tanks[0].wood===1),'Back with Aquascape open finishes it and the game gets the driftwood');
+ // Pass 257: the tank you can hear, a row under Your tank once the blind group's research is found, ear.html over the game
+ await p.evaluate(()=>{landHide&&LAND.on&&landHide();var H=hardOf(G);H.picks.blind={ear:{day:G.day,start:G.day}};G.sel=0;selectTab('tank');render();});await wait(300);
+ const er=await p.evaluate(()=>{var c=document.getElementById('earcard');return {vis:!c.hidden&&c.offsetHeight>0,btn:!!c.querySelector('[data-act="ear-go"]'),y:scrollY};});ok(er.vis&&er.btn,'Try the tank you can hear sits under Your tank');
+ await p.evaluate(()=>document.querySelector('#earcard [data-act="ear-go"]').click());let ef=null;for(let i=0;i<50&&!ef;i++){ef=p.frames().find(x=>x.url().includes('ear.html'));await wait(100);}
+ await ef.waitForFunction(()=>window.S&&S.shrimp);await wait(300);
+ const eo=await p.evaluate(()=>({on:EAR.on,busy:busyUI(),ov:!document.getElementById('ear-ov').hidden,y:scrollY}));ok(eo.on&&eo.busy&&eo.ov&&Math.abs(eo.y-er.y)<2,'it opens full screen, nothing new comes while it is open, the page under it stays put');
+ const n0=await p.evaluate(()=>G.stats.care||0);await ef.evaluate(()=>{document.getElementById('b-feed').click();document.getElementById('b-water').click();});await wait(400);
+ const n1=await p.evaluate(()=>({care:G.stats.care||0,ear:G.stats.earN||0}));ok(n1.care-n0===1&&n1.ear===1,'a feed and a water change there count as care on Your tank, once: '+JSON.stringify(n1));
+ await ef.evaluate(()=>document.getElementById('b-back').click());await wait(400);ok(await p.evaluate(()=>!EAR.on&&document.getElementById('ear-ov').hidden),'Back returns to the game');
  ok(!errs.length,'no page errors'+(errs.length?': '+errs.slice(0,3).join(' | '):''));
  await b.close();srv.close();console.log(fails?fails+' FAILED':'all passed');process.exit(fails?1:0);})();

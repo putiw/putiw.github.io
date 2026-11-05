@@ -4,7 +4,7 @@
 // Everything else comes from the kept copy at once and is refreshed in the background.
 // Query strings (?v=BUILD, ?v=2) are ignored when matching. Bump CACHE only to drop old files.
 var CACHE='shrimp-v1';
-var FILES=['./','index.html','home.html','space.html','taps.js','manifest.webmanifest','favicon.ico','icon-32.png','icon-180.png','icon-192.png','icon-512.png',
+var FILES=['./','index.html','home.html','space.html','ear.html','taps.js','manifest.webmanifest','favicon.ico','icon-32.png','icon-180.png','icon-192.png','icon-512.png',
  'music.mp3','water.mp3','catch-shrimp-1.mp3','catch-shrimp-2.mp3',
  'sfx/feed_drop_002.wav','sfx/sell_coins_chime_b.wav','sfx/tap_blip.wav','sfx/tap_felt.wav','sfx/tap_pillow.wav','sfx/tap_pop.wav','sfx/tap_tip.wav','sfx/tap_tok.wav','sfx/water_double.wav'];
 self.addEventListener('install',function(e){e.waitUntil(caches.open(CACHE).then(function(c){return Promise.all(FILES.map(function(f){return c.add(new Request(f,{cache:'reload'})).catch(function(){});}));}).then(function(){return self.skipWaiting();}));});

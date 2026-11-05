@@ -72,7 +72,7 @@ const HOOK=()=>{window.__src=[];var P=(window.AudioContext||window.webkitAudioCo
  ok(await p.evaluate(()=>!!document.getElementById('t-btnsfx')&&!!document.getElementById('t-taps')&&document.getElementById('t-music').parentNode.nextElementSibling.querySelector('#t-btnsfx')),'Button sounds and Taps you can feel sit under the music switch');
 
  // the land
- await p.evaluate(()=>{G.me=newMe();G.me.on=1;G.me.gplace={balcony:1,house:1,land:1};G.money=1e6;G.day=G.tday=400;landShow();});
+ await p.evaluate(()=>{G.me=newMe();G.me.on=1;G.me.gplace={balcony:1,house:1,land:1};G.me.landHi=1;G.money=1e6;G.day=G.tday=400;landShow();});
  await p.waitForFunction(()=>LAND.ready);await wait(1500);
  const fr=p.frame({url:/home\.html/});
  ok(await fr.evaluate(()=>typeof TAPS!=='undefined'&&!/navigator\.vibrate/.test(document.documentElement.innerHTML)),'land has taps.js, no vibrate');
