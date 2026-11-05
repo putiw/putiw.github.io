@@ -2588,3 +2588,7 @@ Scratch copies of the Pass 259 game with rent paused, or stores closed, while fa
 Tests: balance 151 (new Pass 260 check). Browser check of the Shops card at 390 and 360 px: the outage line is one line, Close all (two taps) and Reopen work, no console errors.
 
 **For the next agent.** One seed is noise; the cold bot's timing of `c_feed` moves with anything that changes story pacing. Use `shrimp-bot-sweep.cjs` over 6 to 8 seeds and read the cause of each failure. The bots do not play the tree letters, the planting sheet or the ear tank (not checked whether that changes any result).
+
+## Pass 261 (5 Nov, dev link only)
+
+`?dev=hard&ear=1` picks the ear tank in the jump save as soon as the hard part opens (`devStart`), so Try shows without funding it. Dev-only, same as `?dev=hard`. BUILD p261.
