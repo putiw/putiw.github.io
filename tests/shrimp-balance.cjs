@@ -1245,4 +1245,9 @@ CARDS3.c_knee.ch[0][3](g);if(storeCanBuy(g,'eu',1)||buyStores(g,'eu',1))throw Er
 if(!storeCanBuy(g,'auh',1))throw Error('other regions still open');var f=storeFillN(g);E.regWait.eu=0;if(storeFillN(g)<=f)throw Error('fill skips the held region');
 E.regWait.eu=Math.floor(g.day)+182;g.day+=183;if(!buyStores(g,'eu',1)||regWaitWhy(g,'eu'))throw Error('eu opens after she is better');
 `);
+check('Pass 268 item 10: the farms run in bursts (full until 60 days of orders are in stock, then nothing), the card figure is a 30-day rolling value, so it never drops from a lot to 0 in a day',`
+var h=readyGame();h.stats.sold=KIT_UNLOCK;h.emp.kitsOpened=1;h.emp.farms.mhatch=3;h.humans=2e6;h.emp.regions=['uae','gcc'];h.money=1e9;h.emp.staff.tier=2;h.emp.staff.pack=10;var kd=Math.max(1,kitDemand(h));h.kits.stock=Math.ceil(kd*(STOCK_FULL-3));
+var zero=0,made=0,prev=null,worst=1;for(var i=0;i<150;i++){h.day=Math.floor(h.day)+1;empireDay(h);if(h.emp.prod<1)zero++;else made++;if(prev>0)worst=Math.min(worst,h.emp.prodAvg/prev);prev=h.emp.prodAvg;}
+if(!zero||!made)throw Error('expected burst days and idle days: '+made+' '+zero);if(worst<0.95)throw Error('figure fell '+Math.round((1-worst)*100)+'% in a day');
+`);
 console.log(count+' focused balance and migration checks passed');
