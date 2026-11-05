@@ -2560,3 +2560,12 @@ Tests: balance 148 (new Pass 258 check, Pass 257 ear check and proposal timing u
 Open: 6 (Grandma's tank on the land). Both frames measure 2.15/1 at 390 px (land 358×166, game 340×157) and draw shrimp at the same size; need Puti's screenshot to see what reads as zoomed.
 
 Tests: balance 149 (new Pass 259 check; Pass 258 mailbox check needs 2 tree gaps now, three trees left), me 53, academy 10, ear 14 (Play/Pause). Not run: bots, spotlights, stable, monkey (no deploy).
+
+### Pass 259 (2): event timing (Puti 5 Nov)
+- The gap between pop-ups is a random 10 to 35 s of play (was 10 to 20), counted from when the last one closed (`introStamp`). Paused time and time with a card or the what-happened popup open don't count.
+- News waits for the same gap (`newsTick` checks `lastAck`). Before, a headline came 10 s after a card was shown and ignored spotlights and notes.
+- News banners are never dropped: one fresh story at a time, only when nothing else is on screen and the gap has passed (`newsCanShow`, `R.seenL` moves one at a time). Before, a banner during the land, a tank job or the ear tank was lost, and a backlog showed only its last line.
+- Notes: no backlog trim (the newest-3 cut is gone); the Your day backlog still keeps only its newest (Pass 253, her ask).
+- Spotlights already waited the gap (`spotNext` checks `introOK`); only the pause-button one (`now:1`) skips it. Urgent cards (`CARD_NOW`) still show at once, moment cards (`STORY_PROMPT`, the land call) still go first.
+- Still drops on purpose: narrative-only Mira and Grandma-net cards older than 60 days (`STORY_DROP`, Pass 190).
+Tests: balance 150 (new news-gap check, gap checks 10 to 35 s), me 53, academy 10, cardtap.

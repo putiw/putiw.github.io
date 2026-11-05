@@ -636,7 +636,7 @@ g.money=0;if(kitHold(g)[0]!==0)throw Error('No cash, no hold');var k=newGame();i
 check('Pass 132: cards wait 15 s of play after the last one, urgent ones do not',`
 var g=newGame();acknowledgeMilestone(g);g.progress.lastAck=null;g.ps={t:100000};g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;detectMilestones(g);if(g.progress.queue[0]!=='sale')throw Error('First card now');
 acknowledgeMilestone(g);g.ps.t+=5000;detectMilestones(g);if(g.progress.queue.length||g.progress.soon[0]!=='kits')throw Error('Second card waits');
-if(!(g.progress.gap>=10000&&g.progress.gap<=20000))throw Error('Gap 10 to 20 s');g.ps.t+=15000;detectMilestones(g);if(g.progress.queue[0]!=='kits')throw Error('Second card after 20 s');acknowledgeMilestone(g);
+if(!(g.progress.gap>=10000&&g.progress.gap<=35000))throw Error('Gap 10 to 35 s');g.ps.t+=Math.max(0,g.progress.gap-5000);detectMilestones(g);if(g.progress.queue[0]!=='kits')throw Error('Second card after 20 s');acknowledgeMilestone(g);
 g.ps.t+=1000;g.money=-1e6;g.emp.broke=1;var p=g.progress;p.seen.gameover=false;if(CARD_NOW.indexOf('broke')<0||CARD_NOW.indexOf('gameover')<0)throw Error('Urgent cards skip the gap');
 `);
 if(!html.includes('The babies can be sold at 60 days old'))throw Error('Pass 132: waiting note on the Babies card');
@@ -1028,7 +1028,7 @@ var f=newGame();f.me.on=1;f.me.hp=80;f.me.bo=0;f.me.hrs={papers:0};f.me.wh=8;f.m
 var F=f.me.fx;if(!F||!F.n)throw Error('facts come');if(F.n>Math.ceil(9000/200))throw Error('not more than one per 200 h');if(new Set(F.seen).size!==F.seen.length)throw Error('no repeats');
 var f2=newGame();f2.me.on=1;f2.me.hp=80;f2.me.bo=0;f2.me.hrs={papers:5000};f2.me.fx={seen:[],next:0,at:null};f2.ps={t:1000};factDay(f2);f2.me.fx.next=0;f2.ps.t=100000;factDay(f2);if(f2.me.fx.n!==1)throw Error('3 minutes between facts');
 if(FACTS.some(function(x){return /!|colour|behaviour/.test(x[0])||!/[0-9][0-9][0-9][0-9][)][.]$/.test(x[0]);}))throw Error('facts: American spelling, no exclamation, citation in text');
-var c=newGame();introStamp(c);if(!(c.progress.gap>=10000&&c.progress.gap<=20000))throw Error('gap 10 to 20 s');
+var c=newGame();introStamp(c);if(!(c.progress.gap>=10000&&c.progress.gap<=35000))throw Error('gap 10 to 35 s');
 `);
 check('Pass 219 (Puti): rest and getting better, courses finish once and pay, hours held move the traits',`
 var g=newGame();g.me.on=1;g.me.hp=80;g.me.bo=0;g.me.hrs={mba:299};g.me.p2=['mba','hiking'];g.emp.staff.pack=3;var c0=staffCost(g);g.me.hrs.mba=300;lifeDay(g);
@@ -1105,6 +1105,10 @@ for(var d=0;d<30;d++){g.day=d;letDay(g);}g.emp.hard.goalOk=1;var t0=30,firstTree
 for(d=30;d<500;d++){g.day=d;hardDay(g);letDay(g);if(firstTree==null&&TREE_ORDER.some(function(k){return k!=='island'&&treeShow(g,k);}))firstTree=d;if(treeShow(g,'shop'))throw Error('the shop is a letter');}
 if(firstTree!=null&&firstTree-t0<TLET_GAP[0])throw Error('a tree letter on day '+(firstTree-t0)+' of the letters');
 var w=treeWho('lastmile',TREES.lastmile.steps[0]);if(w.who!=='Lasha')throw Error('tree letter names a person');
+`);
+check('Pass 259 (Puti): news waits the same 10 to 35 s gap after any pop-up closed',`
+var g=readyGame();g.ps={t:500000};var p=ensureProgress(g);p.queue=[];p.wait=[];p.soon=[];p.lastStory=null;var R=rip(g);R.pend=[{t:'A test story.'}];R.nextAt=0;introStamp(g);var n0=R.log.length;
+g.ps.t+=p.gap-1000;newsTick(g);if(R.log.length!==n0)throw Error('news inside the gap');g.ps.t+=1500;newsTick(g);if(R.log.length!==n0+1)throw Error('news after the gap');
 `);
 check('Pass 258 (Puti): one mailbox, at most 3 letters with the tree steps, tree letters 120+ days apart, two catch letters, aid says when it lands',`
 var g=readyGame();g.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};g.humans=4.1e9;g.money=1e12;g.emp.inf=1e12;g.emp.trees={rewild:1,lastmile:1,shop:1,lab:1};
