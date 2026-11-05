@@ -1104,7 +1104,7 @@ var h=g.emp;g.emp.hard={open:1,goal:'home',picks:{},goalOk:0,day:0};g.humans=4.1
 for(var d=0;d<30;d++){g.day=d;letDay(g);}g.emp.hard.goalOk=1;var t0=30,firstTree=null;
 for(d=30;d<500;d++){g.day=d;hardDay(g);letDay(g);if(firstTree==null&&TREE_ORDER.some(function(k){return k!=='island'&&treeShow(g,k);}))firstTree=d;if(treeShow(g,'shop'))throw Error('the shop is a letter');}
 if(firstTree!=null&&firstTree-t0<TLET_GAP[0])throw Error('a tree letter on day '+(firstTree-t0)+' of the letters');
-var w=treeWho('lastmile',TREES.lastmile.steps[0]);if(w.who!=='Hessa')throw Error('tree letter names a person');
+var w=treeWho('lastmile',TREES.lastmile.steps[0]);if(w.who!=='Lasha')throw Error('tree letter names a person');
 `);
 check('Pass 258 (Puti): one mailbox, at most 3 letters with the tree steps, tree letters 120+ days apart, two catch letters, aid says when it lands',`
 var g=readyGame();g.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};g.humans=4.1e9;g.money=1e12;g.emp.inf=1e12;g.emp.trees={rewild:1,lastmile:1,shop:1,lab:1};
