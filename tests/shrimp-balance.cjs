@@ -1275,4 +1275,8 @@ check('Pass 268 item 20: Shopping costs 0.5% of a month of income a day, AED 5 t
 var g=readyGame();g.fin=[];if(shoppingCost(g)!==5)throw Error('floor '+shoppingCost(g));g.fin=[{kits:2000}];if(shoppingCost(g)!==300)throw Error('2,000 a day: '+shoppingCost(g));g.fin=[{kits:5e9}];if(shoppingCost(g)!==3000)throw Error('cap '+shoppingCost(g));
 g.money=1e12;var m=g.money;shopDay(g);if(m-g.money!==3000)throw Error('paid '+(m-g.money));
 `);
+{/* Pass 270: BUILD is the real commit time in Abu Dhabi, never a guess in the future (Puti, 6 Nov: Settings showed a time not reached yet) */
+const b=html.match(/BUILD='(\d{4}-\d\d-\d\dT\d\d:\d\d)/);if(!b)throw Error('BUILD needs YYYY-MM-DDTHH:MM');
+const t=Date.parse(b[1]+':00+04:00');if(!(t<=Date.now()))throw Error('BUILD '+b[1]+' UAE is in the future, stamp it with: TZ=Asia/Dubai date +%Y-%m-%dT%H:%M');
+count++;console.log('PASS Pass 270: BUILD is not in the future');}
 console.log(count+' focused balance and migration checks passed');
