@@ -437,7 +437,7 @@ g.me=g.me||newMe();g.me.keep='self';var C=careOf(T),d;
 /* Pass 246 (Puti, 4 Nov): after a clean, poop is full in a random 4 to 10 min (100 to 250 tank days), glass 3 to 6 min (75 to 150), plants always 5 min (125) */
 var full=[];for(var r=0;r<40;r++){C.mulm=0;C.grow=0;careDay(g);for(d=1;d<400&&C.mulm<1;d++)careDay(g);full.push(d);}
 if(Math.min.apply(null,full)<99||Math.max.apply(null,full)>251||Math.max.apply(null,full)-Math.min.apply(null,full)<40)throw Error('Poop full in 100 to 250 tank days, random each clean: '+full);
-/* Pass 261 (Puti): every job holds a minute (CLEAN_HOLD) first, sponge and plants too */C.grow=1;g.tday=g.day=1000;careDay(g);C.grow=0;careDay(g);for(d=0;d<CLEAN_HOLD-3;d++){g.tday=++g.day;careDay(g);}if(C.grow>0.01)throw Error('Plants stay trimmed for a minute: '+C.grow);for(d=0;d<125+3;d++){g.tday=++g.day;careDay(g);}if(Math.abs(C.grow-1)>1e-6)throw Error('Plants full 125 tank days after the minute: '+C.grow);
+/* Pass 261 (Puti): every job holds a minute (CLEAN_HOLD) first, sponge and plants too; Pass 268 real-time hold off here, checked on its own */var CS0=CLEAN_SEEN;CLEAN_SEEN=null;C.grow=1;g.tday=g.day=1000;careDay(g);C.grow=0;careDay(g);for(d=0;d<CLEAN_HOLD-3;d++){g.tday=++g.day;careDay(g);}if(C.grow>0.01)throw Error('Plants stay trimmed for a minute: '+C.grow);for(d=0;d<125+3;d++){g.tday=++g.day;careDay(g);}if(Math.abs(C.grow-1)>1e-6)throw Error('Plants full 125 tank days after the minute: '+C.grow);
 T.had=1;var gl=[];for(r=0;r<20;r++){T.glass=null;glassGrow(g,T);T.glass=T.glass.map(function(){return 0;});var gd=0;while(glassMean(T)<0.95&&gd<400){glassGrow(g,T);gd++;}gl.push(gd);}
 if(Math.min.apply(null,gl)<55||Math.max.apply(null,gl)>170)throw Error('Glass about full in 75 to 150 tank days: '+gl);
 T.pop=[];var m1=C.mulm=0.3;for(d=0;d<30;d++)careDay(g);if(C.mulm!==m1)throw Error('No new mulm in an empty tank, after a crash poop stops (Puti, 30 Oct)');
@@ -1089,7 +1089,7 @@ var c=readyGame();c.kits.sold=1e5;var C=coinOf(c);C.trees=1e6;C.otrees=0;var s0=
 C.otrees=0;if(!(plKindOk(c,'g')&&plKindOk(c,'s')))throw Error('Pass 268: ghaf and sidr from the start');C.otrees=COIN_COAST*0.75;if(!(plFree(c,32,2)>0||plFree(c,10,2)>0||[0,1,2,3,4,5,6,7,8,9].some(function(x){return plGround(x*6,2)===3&&plFree(c,x*6,2)>0;})))throw Error('the hills take seedlings');
 C.otrees=COIN_COAST*0.99;if(!(coastSlow(c)<0.001))throw Error('nearly full, others nearly stop');
 // the clean hold: no poop for 25 tank days after a vacuum, no algae after a wipe
-var t=readyGame();t.me.keep='self';t.me.on=1;var T=t.tanks[0];T.had=1;T.cycledAt=0;for(var k=0;k<30;k++)T.pop.push({age:100,n:1,g:2});var K=careOf(T);K.mulm=0;K.vacD=t.day;careDay(t);if(K.mulm!==0)throw Error('no poop right after a vacuum');t.day+=CLEAN_HOLD+1;careDay(t);if(!(K.mulm>0))throw Error('poop again after the hold');
+var t=readyGame();t.me.keep='self';t.me.on=1;var T=t.tanks[0];T.had=1;T.cycledAt=0;for(var k=0;k<30;k++)T.pop.push({age:100,n:1,g:2});var K=careOf(T);K.mulm=0;K.vacD=t.day;careDay(t);if(K.mulm!==0)throw Error('no poop right after a vacuum');t.day+=CLEAN_HOLD+1;var D1=Date.now,n1=D1();Date.now=function(){return n1+CLEAN_MS+1;};careDay(t);Date.now=D1;if(!(K.mulm>0))throw Error('poop again after the hold');
 T.glass=null;glassGrow(t,T);var g0=T.glass.reduce(function(a,b){return a+b;},0);T.wipeD=t.day;glassGrow(t,T);if(T.glass.reduce(function(a,b){return a+b;},0)!==g0)throw Error('no algae right after a wipe');
 `);
 check('Pass 257 (Puti): the tank you can hear is a blind-group research option that never fades, stays, and its care counts once a day',`
@@ -1249,5 +1249,12 @@ check('Pass 268 item 10: the farms run in bursts (full until 60 days of orders a
 var h=readyGame();h.stats.sold=KIT_UNLOCK;h.emp.kitsOpened=1;h.emp.farms.mhatch=3;h.humans=2e6;h.emp.regions=['uae','gcc'];h.money=1e9;h.emp.staff.tier=2;h.emp.staff.pack=10;var kd=Math.max(1,kitDemand(h));h.kits.stock=Math.ceil(kd*(STOCK_FULL-3));
 var zero=0,made=0,prev=null,worst=1;for(var i=0;i<150;i++){h.day=Math.floor(h.day)+1;empireDay(h);if(h.emp.prod<1)zero++;else made++;if(prev>0)worst=Math.min(worst,h.emp.prodAvg/prev);prev=h.emp.prodAvg;}
 if(!zero||!made)throw Error('expected burst days and idle days: '+made+' '+zero);if(worst<0.95)throw Error('figure fell '+Math.round((1-worst)*100)+'% in a day');
+`);
+check('Pass 268 item 16: after a clean the tank stays clean 2 real minutes, at any speed, then dirt comes back',`
+var g=readyGame(),T=g.tanks[0];T.pop=[{n:20,age:120,g:90}];g.me=g.me||newMe();g.me.keep='self';var C=careOf(T),ms=1e9,D0=Date.now;Date.now=function(){return ms;};
+C.mulm=0;C.grow=0;g.tday=g.day=1000;C.vacD=td(g,T);C.grD=C.vacD;for(var i=0;i<400;i++){ms+=200;g.tday=++g.day;careDay(g);}/* 400 tank days in 80 s, as at high speed */
+if(C.mulm>1e-9||C.grow>1e-9)throw Error('dirt came back inside 2 real minutes: '+C.mulm+' '+C.grow);
+ms+=CLEAN_MS-80000+1;for(i=0;i<50;i++){ms+=200;g.tday=++g.day;careDay(g);}if(!(C.mulm>0&&C.grow>0))throw Error('dirt comes back after 2 minutes');
+var T2={},g2=readyGame();if(cleanHeld(g2,T2,g2.day-CLEAN_HOLD-1))throw Error('an old clean after a reload holds nothing');Date.now=D0;
 `);
 console.log(count+' focused balance and migration checks passed');
