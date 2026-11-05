@@ -33,7 +33,7 @@ const fails=[];const fail=(k,m)=>{fails.push(k+': '+m);};
  await p.addInitScript(r=>{try{localStorage.clear();localStorage.setItem('shrimp-music','0');}catch(e){}var raf=window.requestAnimationFrame.bind(window);window.requestAnimationFrame=function(cb){return raf(function(t){cb(t*r);});};},RATE);
  await p.goto(url);await p.waitForFunction(()=>window.G&&typeof render==='function');
  // install the player and the day hook
- await p.evaluate(src=>{window.BOTPROF=null;window.BOTKIND=true;window.NOSTORES=false;window.events=[];window.snapshots={};window.actions=[];window.visits=0;
+ await p.evaluate(src=>{window.BOTPROF=null;window.BOTKIND=true;window.NOSTORES=false;window.NOMEDIA=false;window.NEWBOT=true;window.MTR=false;window.events=[];window.snapshots={};window.actions=[];window.visits=0;
   window.note=function(){};window.last={};(0,eval)(src);
   window.H={days:{},cond:{},log:[],shown:{},tabs:{},real0:performance.now()};
   var _dr=dayRollover;window.dayRollover=function(g){var r=_dr.apply(this,arguments);if(g===G&&!H.stop){try{policy();}catch(e){H.err=String(e);}
