@@ -1333,7 +1333,7 @@ var J2=bgJ1(2028);g.day=J2-1;bgDay(g);if(bgNow(g))throw Error('May');g.day=J2;bg
 if(bgCanNever(g))throw Error('no Never in the first year');
 g.money=50000;var lv=bgEnter(g,'gomoku');if(lv!=='balanced'||bgHold(g))throw Error('enter');if(bgEnter(g,'gomoku')!==null)throw Error('enter twice');
 var m0=g.money,r=bgEnd(g,'gomoku','win');if(r.prize!==10000||g.money!==m0+10000)throw Error('capped prize '+r.prize);if(bgEnd(g,'gomoku','win')!==null)throw Error('second prize');
-g.money=4001;bgEnter(g,'reversi');r=bgEnd(g,'reversi','win');if(r.prize!==2001||g.money!==6002)throw Error('half prize '+r.prize);
+if(bgPrize({money:4001})!==2001)throw Error('half prize');/* Pass 281: the year's prize is set when its first game starts, so the card can say it */g.money=4001;bgEnter(g,'reversi');r=bgEnd(g,'reversi','win');if(r.prize!==10000||g.money!==14001)throw Error('locked prize '+r.prize);
 if(B.lv!=='hard')throw Error('two wins make it hard');if(bgLeft(g).length)throw Error('both played');
 g.money=-500;if(bgPrize(g)!==1000)throw Error('minimum');g.money=1;if(bgPrize(g)!==1000)throw Error('min small');
 g.day=J2+30;bgDay(g);if(bgNow(g))throw Error('July closes it');
