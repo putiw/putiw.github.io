@@ -92,7 +92,7 @@ if(!g.progress.queue.includes('win')||g.money!==money||g.day!==0)throw Error('Wi
 g.progress.queue=[];g.progress.sandbox=true;if(!stepGame(g))throw Error('Sandbox blocked');
 `);
 check('campaigns and films produce a persistent result',`
-var g=readyGame();g.money=1e8;g.emp.proj.ministry=1;g.emp.proj.studio=1;g.emp.inf=1e9;g.emp.op.offer=['calm'];if(!runCampaign(g,'calm'))throw Error('Campaign failed');
+var g=readyGame();g.kits.sold=MKT_AT;g.money=1e8;g.emp.proj.ministry=1;g.emp.proj.studio=1;g.emp.inf=1e9;g.emp.op.offer=['calm'];if(!runCampaign(g,'calm'))throw Error('Campaign failed');
 if(!greenlight(g,0))throw Error('Film failed');for(var i=0;i<366;i++){g.day++;empireDay(g);}
 if(!g.emp.op.recap||g.emp.op.recap.m<=0||!g.emp.filmRecap||g.emp.movie.n!==1)throw Error('Missing result');
 if(!g.emp.ripple.log.some(function(x){return x.tx&&/Shrimpfather/.test(x.tx);}))throw Error('Films get a Shrimp Times review');
@@ -573,7 +573,7 @@ var h=newGame(),D=coinOf(h);D.on=1;D.honest=1;D.otrees=2e6;D.ocohorts=[{day:0,n:
 count++;console.log('PASS Pass 118 shrimpcoin launch supply');
 // Pass 119: card headers have no arrow and show the ? only when open; Money sheet behind the header cash
 if(/h2::before\{content:'(▾|)'/.test(html)||!html.includes(".card>.hd h2::before,.card>summary h2::before{content:none!important")||!html.includes("details.card:not([open])>summary>.qhelp{display:none}"))throw Error('Card headers: no arrow, ? only on open cards');
-if(!/<div id="fs-body">\s*<details class="card" id="consultcard"/.test(html)||!html.includes('<details class="card" id="operations-card"')||html.indexOf('id="operations-card"')<html.indexOf('id="finsheet"')||!html.includes('id="wagecard"'))throw Error('Consultants, Operating controls and Wages live in the Money sheet, not Kits');
+if(!/<div id="fs-body">\s*(<div class="card" id="excelcard"[\s\S]*?<\/div><\/div>\s*)?<details class="card" id="consultcard"/.test(html)||!html.includes('<details class="card" id="operations-card"')||html.indexOf('id="operations-card"')<html.indexOf('id="finsheet"')||!html.includes('id="wagecard"'))throw Error('Consultants, Operating controls and Wages live in the Money sheet, not Kits');
 if(html.includes("$('business-strip').mhtml")||html.includes("Consultants in Kits"))throw Error('No growth strip, no consultants in Kits');
 count++;console.log('PASS Pass 119 card headers and Money sheet');
 // Pass 120: Kits tab is three cards: Kits, Making kits (packing + quality checks), Kit development; sales staff have their own card in Ads
@@ -596,7 +596,7 @@ check('Pass 122: lab finds, funded studies and university news go to the Science
 var g=newGame();g.kits.sold=100;newsLine(g,'front');newsLine(g,'lab',1);var L=rip(g).log;if(L.length!==2||L[0].sci||!L[1].sci)throw Error('newsLine sci tag');
 g.emp.later=[{d:0,t:'study',sci:1}];g.day=1;laterDay(g);if(!rip(g).log[2].sci)throw Error('later study news keeps the tag');
 `);
-if(!html.includes('<div id="rp-sci" hidden><h3 class="track">Science</h3>')||!html.includes("+l.fx.slice(1)+'.':''),1);"))throw Error('Science section and research finds tagged');
+if(!html.includes('<div class="card coll" data-k="sci" id="scicard"')||!html.includes("+l.fx.slice(1)+'.':''),1);"))throw Error('Science card (Puti 6 Nov: its own card under the Times) and research finds tagged');
 if(html.includes('People start buying mud')||!html.includes('var AI_MGR_DAY=40;')||!html.includes("only as spots open up in your reach")||html.includes('vv.offsetTop'))throw Error('Pass 125: carbon line, token bills, reach-limit orders line, no lifted tab bar');
 if(!/maximum-scale=1,user-scalable=no/.test(html)||!html.includes('gesturestart'))throw Error('Pass 125: no pinch zoom in the game');
 console.log('PASS Pass 125 feel and text fixes');
@@ -691,8 +691,10 @@ if(!buyUpgrade(g,T,'feeder')||!buyUpgrade(g,T,'autoWC'))throw Error('gear');if(T
 var m=newGame();m.me=newMe();m.me.hrs={exercise:200};hoursDay(m);if(!(m.me.dlog&&m.me.dlog.length===1))throw Error('your day log');`);
 if(!html.includes("if(a==='ts-close'){if(TS&&gearDone(G.tanks[TS.i]))closeTankSheet();return;}"))throw Error('Puti: Got it waits for both, I will buy them later is the other way out');
 if(!html.includes("lite||(!!T.feeder&&(id==='f-ration'||id==='h-ration'))"))throw Error('Puti: no Ration slider once the tank has an auto feeder');
-if(!html.includes("if(a&&c.parentNode!==$('p-up'))$('autocard').after(c);"))throw Error('Puti: Water care moves under Automation once the tank changes its own water');
-if(!html.includes('<section class="panel" id="p-me" hidden><div class="card" id="me-gplace" hidden></div>'))throw Error('Puti: Grandma\'s place first on the You page');
+if(html.includes("$('autocard').after(c)"))throw Error('Puti 6 Nov (replaces Pass 155): all tank care stays on Tank, Gear only sells things');
+if(!html.includes("data-act=\"treat-unlock\" data-id=\"'+x.id+'\" title=")||html.includes("Treats, for every tank</h3>"))throw Error('Puti 6 Nov: treats are unlocked and picked in Feeding, not in Gear');
+if(!/id:'chiller'/.test(html)||!html.includes("if(id==='chiller')return T.heater<2?HEAT_COST[2]:null;"))throw Error('Puti 6 Nov: the thermostat chiller is on offer as soon as the heater is, not after it');
+if(!html.includes('<section class="panel" id="p-me" hidden><div class="card coll" data-k="megp" id="me-gp"><div class="hd"><h2>Grandma</h2><small id="me-gsum"></small></div><div id="me-gplace"'))throw Error('Puti 6 Nov: one Grandma card on top of the You page, her place first inside it');
 if(!html.includes("hh=GT_OPEN&&(lg.length||un)")||!html.includes("if(activeTab!=='me'){GT_OPEN=0;return;}"))throw Error('Puti: Grandma shows nothing until Check on Grandma, closed each visit');
 check('30 Oct: the home tank goes back to 20 L when the farm takes over, and slows its breeding near 50',`
 var g=readyGame(),T=g.tanks[0];T.volTier=4;T.vol=320;T.pop=[{n:200,age:120,g:80}];ownTankNow(g);if(T.vol!==20||Math.round(totalN(T))!==20)throw Error('20 L, 20 shrimp: '+T.vol+' '+totalN(T));g.money=1e6;if(upgradeCost(g,T,'tank')!=null||buyUpgrade(g,T,'tank'))throw Error('the home tank can not be made bigger again');
@@ -1081,7 +1083,7 @@ g.day=bk-1;if(treeNext(g,'rewild'))throw Error('not back a day early');g.day=bk;
 g.emp.inf=1e9;var k0=g.tr.kin||0;treeDecline(g,'rw_stream');var k1=g.tr.kin||0;g.day=g.emp.treeBack.rw_stream;treeDecline(g,'rw_stream');var k2=g.tr.kin||0;if(!(Math.abs(k2-k1)<Math.abs(k1-k0)+1e-9))throw Error('second no pushes less: '+[k0,k1,k2]);g.day=g.emp.treeBack.rw_stream;if(!buyTreeStep(g,'rw_stream'))throw Error('buy after it came back');g.day=d0;
 var R2=propOf(hardOf(g));R2.open.push({id:'board',day:g.day,alt:0,grad:0});var dd=Math.floor(g.day);if(!propDecline(g,'board'))throw Error('prop decline');var pb=R2.back.board;if(!(pb-dd>=90&&pb-dd<=1095))throw Error('letter roll '+(pb-dd));if(propOK(g,hardOf(g),propDef('board'),pb-1,0))throw Error('letter not back early');
 // galas: water queues an Aid batch, kids reach a little of Can't do it alone, pets bring the vet card sooner
-var H=hardOf(g);g.emp.inf=1e9;g.emp.infOn=1;if(!buyProj(g,'gala','water'))throw Error('water gala');if(!(H.gq&&H.gq.length&&H.gv>0))throw Error('the water gala queues an Aid batch');
+var H=hardOf(g);g.emp.inf=1e9;g.emp.infOn=1;var ks0=g.kits.sold;g.kits.sold=0;if(buyProj(g,'gala','water'))throw Error('no gala before MKT_AT kits');g.kits.sold=Math.max(ks0,MKT_AT);if(!buyProj(g,'gala','water'))throw Error('water gala');if(!(H.gq&&H.gq.length&&H.gv>0))throw Error('the water gala queues an Aid batch');
 var c0=galaReach(g,hardGroup('care'));if(!buyProj(g,'gala','kids'))throw Error('kids gala');if(!(galaReach(g,hardGroup('care'))>c0&&hardReach(g,hardGroup('care'))>=GALA_CARE-1e-9))throw Error('the kids gala reaches the group');for(var i=0;i<20;i++)buyProj(g,'gala','kids');if(H.galaCare>GALA_CARE_MAX+1e-9)throw Error('capped');
 if(!buyProj(g,'gala','pets')||!g.emp.galaPets)throw Error('pets gala');
 // coast soft cap: spread and the coin planters slow as it fills, your taps always plant, ghaf at half, sidr at three quarters
@@ -1145,7 +1147,7 @@ setDens(g,'web');if(storeCount(g)!==0)throw Error('online only closes every stor
 g.webShop=1;E.proj.drones=1;if(Math.abs(trust(g)-WEB_FLOOR)>0.001&&trust(g)<WEB_FLOOR)throw Error('online shop and drones floor: '+trust(g));
 setDens(g,'m5');if(storeFillN(g)!==mallsTotal(g))throw Error('fill counts every missing store');var c=storeFillCost(g);if(!storeFill(g)||g.money!==m0-c||storeCount(g)!==mallsTotal(g))throw Error('one tap fills back to the density');
 `);
-if(!html.includes("TAB_NAME.emp=co?'Company':'Kits'")||!html.includes("lp=co?$('p-tank'):$('p-up')")||!html.includes('id="c-mkt"'))throw Error('Company tab, home tank cards on Tank, Marketing card');
+if(!html.includes("TAB_NAME.emp=lay?'Company':'Kits'")||!html.includes("lp=lay?$('p-tank'):$('p-up')")||!html.includes('id="c-mkt"')||!html.includes('id="tab-hard"')||!html.includes("TAB_NAME.promote=co?'Company':mk?'Market':'Ads'"))throw Error('Company tab, home tank cards on Tank, Marketing card');
 check('Pass 261 (Puti, 5 Nov): research people cost fixed USD at any size, the first grant letters carry the ear tank, funding it opens the tank and fills the Can’t see square',`
 var g=newGame();g.money=1e12;g.kits.sold=5000;academyOpen=function(){return true;};
 var by={};RPOS.forEach(function(p){by[p.id]=posAed(g,p)/USD;});
@@ -1159,7 +1161,7 @@ g.day+=366;grantDay(g);if(grOf(g).c.some(function(c){return c.ear;}))throw Error
 var h=newGame();h.kits.sold=5000;grantDay(h);var gh=grOf(h);gh.c.forEach(function(c){c.x='s';});h.day+=366;grantDay(h);if(grOf(h).c.some(function(c){return c.ear;}))throw Error('Skipped once, it comes back in the hard part, not as a letter');
 `);
 check('Pass 263: one desk (messages, galas, ad pushes), mood sticks, media reach past a million, a film takes a year',`
-var g=readyGame();g.money=1e9;g.emp.proj.ministry=1;g.emp.inf=1e6;g.emp.infOn=1;g.emp.op.offer=null;drawOffer(g);var o=g.emp.op;
+var g=readyGame();g.kits.sold=MKT_AT;g.money=1e9;g.emp.proj.ministry=1;g.emp.inf=1e6;g.emp.infOn=1;g.emp.op.offer=null;drawOffer(g);var o=g.emp.op;
 if(o.offer.length!==3)throw Error('three offers');var ks=o.offer.map(function(id){return deskItem(id).k;});if(ks.filter(function(k){return k==='camp';}).length!==2||!ks.some(function(k){return k==='gala'||k==='push';}))throw Error('two messages and a gala or push: '+ks);
 o.offer=['calm','g_kids','p_bill'];var m0=g.money,i0=g.emp.inf;if(!deskRun(g,'p_bill'))throw Error('push runs');if(o.offer!==null||!o.run||o.run.left!==15)throw Error('the other two go');if(!(g.money<m0)||g.emp.inf!==i0)throw Error('a push costs money, not stars');
 if(deskRun(g,'calm'))throw Error('one slot');for(var i=0;i<15;i++){g.day++;empireDay(g);}if(o.run||!o.offer||o.offer.length!==3)throw Error('three new offers wait after it ends');
@@ -1171,7 +1173,7 @@ o.pend=[];o.m=0.8;for(var i=0;i<1000;i++)opinionDay(g);if(Math.abs(o.m-0.8)>1e-9
 var h=newGame();h.emp.op.m=0.5;h.humans=5e5;if(mediaReach(h)!==1)throw Error('no limit under a million');h.humans=1e9;var r0=mediaReach(h);if(!(r0>0.2&&r0<0.3))throw Error('no media at 1B: '+r0);h.emp.op.m=1;if(mediaReach(h)!==1)throw Error('full mood carries it: '+mediaReach(h));
 h.emp.op.m=0.5;h.emp.movie.n=3;if(!(mediaReach(h)>r0*3.5))throw Error('films carry it');h.emp.movie.n=0;h.emp.hard=h.emp.hard||{};h.emp.hard.open=1;if(mediaReach(h)!==1)throw Error('no limit in the hard part');
 h.stores={};if(marketingLevel(h)>STORE_MKT_MAX+50)throw Error('store cap');
-var f=readyGame();f.money=1e9;f.emp.proj.ministry=1;f.emp.proj.studio=1;f.emp.inf=1e9;if(!greenlight(f,0)||f.emp.movie.left!==365)throw Error('a film takes a year');
+var f=readyGame();f.kits.sold=MKT_AT;f.money=1e9;f.emp.proj.ministry=1;f.emp.proj.studio=1;f.emp.inf=1e9;if(!greenlight(f,0)||f.emp.movie.left!==365)throw Error('a film takes a year');
 `);
 check('Pass 264/269: shrimp video games: no credits, only while Video games is picked, Puti titles, sequels, ramps, caps, the 1B switch, the ledger, Grandma, Khalas',`
 function me(g){g.me.on=1;g.me.hrs=g.me.hrs||{};g.me.p2=['games'];return g;}
@@ -1279,4 +1281,15 @@ g.money=1e12;var m=g.money;shopDay(g);if(m-g.money!==3000)throw Error('paid '+(m
 const b=html.match(/BUILD='(\d{4}-\d\d-\d\dT\d\d:\d\d)/);if(!b)throw Error('BUILD needs YYYY-MM-DDTHH:MM');
 const t=Date.parse(b[1]+':00+04:00');if(!(t<=Date.now()))throw Error('BUILD '+b[1]+' UAE is in the future, stamp it with: TZ=Asia/Dubai date +%Y-%m-%dT%H:%M');
 count++;console.log('PASS Pass 270: BUILD is not in the future');}
+check('UI/UX chat 2: films, campaigns, galas and the Media track open at MKT_AT kits sold; an old save keeps what runs',`
+var g=readyGame();g.money=1e12;g.emp.inf=1e12;g.emp.infOn=1;g.humans=5e5;g.emp.proj.refer=1;g.emp.proj.high=1;g.kits.sold=MKT_AT-1;
+var media=projAvail(g).filter(function(p){return MKT_LATE[p.id];});if(media.length)throw Error('media before MKT_AT: '+media.map(function(p){return p.id;}));
+if(buyProj(g,'ministry'))throw Error('ministry before MKT_AT');
+g.emp.proj.ministry=1;g.emp.proj.studio=1;g.emp.op.offer=null;opinionDay(g);if(g.emp.op.offer)throw Error('desk offer before MKT_AT');
+g.emp.op.offer=['calm'];if(runCampaign(g,'calm'))throw Error('campaign before MKT_AT');if(greenlight(g,0))throw Error('film before MKT_AT');
+g.emp.op.run={id:'calm',left:2,before:.5};opinionDay(g);opinionDay(g);if(g.emp.op.run||g.emp.op.offer)throw Error('a running campaign ends, no new offers yet');
+g.kits.sold=MKT_AT;delete g.emp.proj.ministry;delete g.emp.proj.studio;if(!projAvail(g).some(function(p){return p.id==='ministry';}))throw Error('ministry at MKT_AT');
+g.emp.proj.ministry=1;opinionDay(g);if(!g.emp.op.offer)throw Error('desk offers at MKT_AT');
+if(!milestoneConditions(g).market)throw Error('the Company/Market card at MKT_AT');
+`);
 console.log(count+' focused balance and migration checks passed');

@@ -1,4 +1,7 @@
-// Stable screen (Part 2, Pass 180): pressing a button must not move the screen.
+// Stable screen (Part 2, Pass 180; anchor rewrite UI/UX chat 1, 6 Nov): pressing a button must not move what you pressed.
+// The game may scroll to correct a change (the tap anchor), so scrollY is free; the pressed button (or its row, the next row,
+// the card, as anchorLive picks) must stay within 1 px on screen, and the header must not change. Also 3 s of play per tab:
+// the thing at 45% of the screen stays within 1 px.
 // 390x844, snapshots from a strong bot run (ACADEMY_RUN or STABLE_RUN, default /tmp/shrimp-tests/run-7.json).
 // For every visible enabled button on every tab: fresh page, record scrollY, the button's rect, its card's height
 // and the header height, click, wait 400 ms, check none moved more than 1 px (care buttons: also #tankview).
@@ -50,27 +53,33 @@ async function fresh(b,snap,tab){
    const keys=await p1.evaluate(()=>{var seen={};return window.__btns().map(window.__bkey).filter(function(k){if(seen[k])return false;seen[k]=1;return !/^#tab-|data-speed|^nav|^#tb-me|^#earthline/.test(k);});});
    await p1.close();
    for(const k of keys.slice(0,MAX))jobs.push([sk,tab,k]);
+   jobs.push([sk,tab,'@play']);
   }
  }
 
  const one=async([sk,tab,k])=>{
     const p=await fresh(b,snaps[sk],tab);n++;
+    if(k==='@play'){// 3 s of play: whatever sits at 45% of the screen stays put, the header doesn't change
+     await p.evaluate(()=>{scrollTo(0,Math.max(0,(document.documentElement.scrollHeight-innerHeight)/2));});await p.waitForTimeout(100);
+     const a0=await p.evaluate(()=>{var e=document.elementFromPoint(innerWidth/2,innerHeight*.45);e=e&&e.closest('main .item,main .card,main details');if(!e)return null;window.__pe=e;try{setSpeed(1);}catch(x){}return {t:e.getBoundingClientRect().top,h:document.querySelector('header.top').getBoundingClientRect().height};});
+     if(a0){await p.waitForTimeout(3000);const a1=await p.evaluate(()=>{var e=window.__pe;return {ok:e.isConnected&&!!e.getClientRects().length,t:e.getBoundingClientRect().top,h:document.querySelector('header.top').getBoundingClientRect().height,cls:(e.id||e.className||'').toString().slice(0,24),ov:!!document.querySelector('#milestone-card:not([hidden]),#spot:not([hidden])')};});
+      if(a1.ok&&!a1.ov&&Math.abs(a1.t-a0.t)>TOL)add('3 s play ('+a1.cls+')',sk+' / '+tab,'moved '+Math.round(a1.t-a0.t)+' px');
+      if(!a1.ov&&Math.abs(a1.h-a0.h)>TOL)add('3 s play header',sk+' / '+tab,'header h '+Math.round(a0.h)+'→'+Math.round(a1.h));}
+     await p.close();return;}
     const before=await p.evaluate(k=>{var el=window.__find(k);if(!el)return null;var r=el.getBoundingClientRect();if(r.top<120||r.bottom>innerHeight-80)scrollTo(0,Math.max(0,scrollY+r.top-innerHeight/2));return true;},k);
     if(!before){await p.close();return;}
     await p.waitForTimeout(60);
-    const m0=await p.evaluate(k=>{var el=window.__find(k);window.__el=el;window.__c0=window.__card(el);return window.__m(el);},k);
+    const m0=await p.evaluate(k=>{var el=window.__find(k);window.__el=el;window.__c0=window.__card(el);var a={el:el,top:el.getBoundingClientRect().top,alt:anchorAlts(el)};window.__a=a;return window.__m(el);},k);
     await p.evaluate(()=>{try{window.__el.click();}catch(e){}});
     await p.waitForTimeout(400);
     const m1=await p.evaluate(()=>{var el=window.__el;if(!el.isConnected){var k=window.__bkey(el);el=window.__find(k)||el;}var m=window.__m(el);var c=window.__c0;if(c&&!c.isConnected&&c.id)c=document.getElementById(c.id);m.c=c&&window.__vis(c)?c.getBoundingClientRect().height:null;
-     m.nav=!window.__vis(el)||!c||!window.__vis(c);m.overlay=!![].slice.call(document.querySelectorAll('.sheet,.fs,#finsheet,#settings,#after,.modal,[role=dialog]')).filter(window.__vis).length;return m;});
+     var o=anchorLive(window.__a);m.ad=o?o.el.getBoundingClientRect().top-o.top:null;m.aw=o?(o.el===window.__a.el?'button':(o.el.className||o.el.tagName).toString().slice(0,20)):'';m.nav=!window.__vis(el)||!c||!window.__vis(c);m.overlay=!![].slice.call(document.querySelectorAll('.sheet,.fs,#finsheet,#settings,#after,.modal,[role=dialog]')).filter(window.__vis).length;return m;});
     const where=sk+' / '+tab;const bad=[];
-    if(Math.abs(m1.y-m0.y)>TOL)bad.push('scrollY '+Math.round(m0.y)+'→'+Math.round(m1.y));
     if(Math.abs(m1.h-m0.h)>TOL)bad.push('header h '+Math.round(m0.h)+'→'+Math.round(m1.h));
     const disc=DISCLOSE.test(k),one=k.indexOf('fork ')===0?'fork':Object.keys(ONEOFF).find(a=>k.indexOf('act='+a)>=0);
-    if(!m1.nav&&!disc){
-     if(m0.b&&m1.b&&(Math.abs(m1.b.x-m0.b.x)>TOL||Math.abs(m1.b.y-m0.b.y)>TOL||Math.abs(m1.b.width-m0.b.width)>TOL||Math.abs(m1.b.height-m0.b.height)>TOL))bad.push('button '+[m0.b.x,m0.b.y,m0.b.width,m0.b.height].map(Math.round)+'→'+[m1.b.x,m1.b.y,m1.b.width,m1.b.height].map(Math.round));
-     if(m0.c!=null&&m1.c!=null&&Math.abs(m1.c-m0.c)>TOL)bad.push('card('+String(m0.cid).slice(0,20)+') h '+Math.round(m0.c)+'→'+Math.round(m1.c));
-    }
+    // at the very top of the page there is nothing above to scroll into: a row that gets a line shorter moves its button up a few px; listed, not failed
+    if(!m1.nav&&!m1.overlay&&m1.ad!=null&&Math.abs(m1.ad)>TOL){if(m0.y<1&&m1.y<1&&m1.ad<0&&m1.ad>=-16)allowed[k]='top of page, nothing above to scroll: anchor moved '+Math.round(m1.ad)+' px';else bad.push('anchor('+m1.aw+') moved '+Math.round(m1.ad)+' px');}
+    if(!m1.nav&&!disc&&m0.b&&m1.b&&Math.abs(m1.b.x-m0.b.x)>TOL)bad.push('button x '+Math.round(m0.b.x)+'→'+Math.round(m1.b.x));
     if(m0.tv&&m1.tv&&(Math.abs(m1.tv.y-m0.tv.y)>TOL||Math.abs(m1.tv.height-m0.tv.height)>TOL))bad.push('tankview y/h '+Math.round(m0.tv.y)+'/'+Math.round(m0.tv.height)+'→'+Math.round(m1.tv.y)+'/'+Math.round(m1.tv.height));
     if(bad.length){if(one){allowed[k]=ONEOFF[one]+': '+bad.join('; ');}else add(k,where,bad.join('; '));}
     await p.close();
