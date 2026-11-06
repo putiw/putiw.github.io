@@ -3,6 +3,10 @@
 // before the bot moves and Undo leaves the bot's turn unplayed, three questions a game at most, "don't tell me" is saved.
 // Reversi: Grandma stays quiet on most random moves. Touch emulation, 390 px.
 const {chromium}=require('playwright');const path=require('path');
+// Pass 285: iOS Safari sized the absolute grid SVG from its viewBox (width:auto ignores left/right), so the lines sat a half cell off
+// and the stones looked to be in the squares. The SVG must have an explicit size: 1/30 inset, 14/15 wide and tall.
+{const bg=require('fs').readFileSync(path.join(__dirname,'../shrimp/boardgames.js'),'utf8'),r=(bg.match(/\.grid-lines\{[^}]*\}/)||[''])[0];
+ if(!/left:3\.33+%/.test(r)||!/top:3\.33+%/.test(r)||!/width:93\.33+%/.test(r)||!/height:93\.33+%/.test(r)||/width:auto|height:auto/.test(r))throw Error('grid-lines needs an explicit size: '+r);}
 (async()=>{const b=await chromium.launch();const ctx=await b.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});const p=await ctx.newPage();
  const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>d.dismiss());
  await p.goto('file://'+path.join(__dirname,'../shrimp/index.html'));await p.waitForTimeout(500);

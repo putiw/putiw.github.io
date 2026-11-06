@@ -2945,3 +2945,9 @@ Ported from Codex's `kit-packing-preview` (feature diff against its Pass 264 bas
 Tests: balance 168, academy 10, me 55, cardtap, kitpack (new: five steps with art, Seal its own, a tap plays, five taps pack, fifth tool brings the loop and Pack, the loop moves, Pack packs one, four extras in one row with icons and none cut, Moss toggles and the cost line follows, no sideways scroll, no errors) at 390 and 360. Bots, spotlight sweep and monkey skipped on Puti's word: no sim change.
 
 Deploy 7 Nov (Passes 283-284): balance 168, academy 10, me 55, cardtap, boardgames, kitpack at 390 and 360. Bots, spotlight sweep and monkey skipped on Puti's word (no sim change).
+
+## Pass 285: Gomoku lines on iPhone (7 Nov)
+
+- Puti's iPhone screenshot: the lines started at the board edge and ran off the right and bottom, so the stones sat in the squares. Cause: the grid SVG was absolute with `inset` and `width:auto;height:auto`; Chromium stretches it, iOS Safari sizes an SVG from its viewBox and keeps only left/top. It now has `left/top:3.333333%;width/height:93.333333%`, so the lines run through the cell centers everywhere. One component, so this covers Grandma's games and the competition, on the company page and over the land. `boardgames.js?v=p285`.
+
+Tests: boardgames (new source check on the grid size), Chromium geometry at 390 and 360 (lines on the stone centers). WebKit isn't installable here, so the iPhone itself is the check. Deployed.
