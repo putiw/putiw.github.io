@@ -2838,3 +2838,14 @@ Call 1 comes the day before the top (`PUMP_SPIKE-1`): "She calls. It's at N time
 
 Pre-deploy run (seed 7): strong cold WIN 3,714 empire_dictator, strong kind 4,285 question_lucky, average Earth 7,280; no INSOLVENT or STUCK. Balance 166, me 55, academy 10, cardtap, endcards 50, hard 24, frozen 5 tabs, tight 0 findings, monkey (150 actions, 7 stages, 390 and 360) pass, spotlights 143 checked all good. Browser: the coin card at 360 and 390 after a pump exit and a sale. Deployed 6 Nov with Passes 274-276.
 
+
+## Pass 277 (6 Nov, Codex handoff: Gomoku and Reversi, board game day, Grandma's advice)
+
+From Codex's component (`shrimp-board-games-component.js`, `INTEGRATION.md`). Changes agreed with Puti before building: the competition is locked (no Undo, restart, switching, Grandma; Give up or a save left mid-game is a loss), the clock stops while a board or the 1 June card is open, the component's own text, its match log panel and its localStorage log are gone, it uses the game's mute.
+- `shrimp/boardgames.js`: the `<shrimp-board-games>` element. Same rules, bots, look and sound. New: `start()`, events `bg-end`/`bg-quiet`/`bg-level`, Grandma's question with Undo/Continue, a comp mode. Text: "Five in a row wins. You go first.", "Grandma is thinking.", "Five in a row. You win.", "You win, 34 to 30.", "Grandma can't move. Your turn again."
+- Grandma: Play a game next to Check on Grandma (You tab) and in her bubble on the land (shrimp-proto `src/land.js`, rebuilt; the fresh build matched the game's home.html before the change).
+- Board game day: the 1 June card from the first June after the first farm; the June card on the You tab; prize half the cash, AED 1,000 to 10,000, per win; Balanced, Hard after two wins in a row, back after two losses; Never show this again from the second year. Saved in `G.me.bg`.
+- sw.js caches boardgames.js.
+
+Tests: balance 167 (new: opens the first June after the farm only, May/July closed, one prize a game, capped and half prizes, minimum, level streak, Never only from year two, forfeit on load, old farm saves), me 55, academy 10, cardtap, land-life. New `tests/shrimp-boardgames.cjs` (browser, 390 px): the card holds the clock, the competition board is locked, Give up is a loss, a win pays half, Grandma's question on a missed five and on a missed block, Undo restores and the bot hasn't moved, no fourth question, no question on the winning move, "don't tell me" saved, Reversi asks on 41 of 350 random moves, Never then next June has the You tab card and no pop-up. Land: the bubble's message opens the board over the land. Screenshots at 390 px of the card, the competition board, the question and the You tab. One average bot ran to the end with no errors. Bots, spotlight sweep and monkey not run (before a deploy).
+Limits: the bot still thinks on the main thread (Codex's note), Reversi's question search adds a little time after your move.

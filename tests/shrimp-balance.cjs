@@ -1326,4 +1326,21 @@ var g=readyGame();g.humans=1e9;g.money=1e12;var C=coinOf(g);C.on=1;C.coins=1e8;C
 C.price=20;var got=coinSell(g,q/2);b=coinBook(g);if(!b.sold||Math.abs(b.real-(got-b.avg*Math.floor(q/2)))>1)throw Error('realized '+b.real);if(Math.abs(b.all-(got+C.treasury*C.price-1e6))>1)throw Error('all time');
 var h=readyGame();h.progress.seen.c_bonus=true;if(CARDS3.c_bonus.cond(h))throw Error('bonus again after seen');var k=readyGame();k.story.bird={bonus:2};if(CARDS3.c_bonus.cond(k))throw Error('bonus again after pick');
 `);
+check('Pass 277: board game day opens the first June after the first farm, one game each a year, prize rule, level streak, forfeit',`
+var g=newGame();g.money=50000;var J1=bgJ1(2027);var dj=bgDate(J1);if(dj.getMonth()!==5||dj.getDate()!==1)throw Error('J1 '+dj);
+g.day=J1;bgDay(g);if(bgNow(g)||bgHold(g))throw Error('no farm, no competition');
+g.emp.farms={t:1};g.day=J1+1;bgDay(g);if(bgNow(g))throw Error('farm built in June: wait for next year');
+var J2=bgJ1(2028);g.day=J2-1;bgDay(g);if(bgNow(g))throw Error('May');g.day=J2;bgDay(g);var B=bgOf(g);if(!bgNow(g)||B.pop!==2028||!bgHold(g)||B.first!==2028)throw Error('opens 1 June 2028');
+if(bgCanNever(g))throw Error('no Never in the first year');
+g.money=50000;var lv=bgEnter(g,'gomoku');if(lv!=='balanced'||bgHold(g))throw Error('enter');if(bgEnter(g,'gomoku')!==null)throw Error('enter twice');
+var m0=g.money,r=bgEnd(g,'gomoku','win');if(r.prize!==10000||g.money!==m0+10000)throw Error('capped prize '+r.prize);if(bgEnd(g,'gomoku','win')!==null)throw Error('second prize');
+g.money=4001;bgEnter(g,'reversi');r=bgEnd(g,'reversi','win');if(r.prize!==2001||g.money!==6002)throw Error('half prize '+r.prize);
+if(B.lv!=='hard')throw Error('two wins make it hard');if(bgLeft(g).length)throw Error('both played');
+g.money=-500;if(bgPrize(g)!==1000)throw Error('minimum');g.money=1;if(bgPrize(g)!==1000)throw Error('min small');
+g.day=J2+30;bgDay(g);if(bgNow(g))throw Error('July closes it');
+var J3=bgJ1(2029);g.day=J3;bgDay(g);if(!bgNow(g)||B.pop!==2029)throw Error('2029');if(!bgCanNever(g))throw Error('Never from year two');bgNoCard(g,1);if(!B.never||bgHold(g))throw Error('never');
+bgEnter(g,'gomoku');bgEnd(g,'gomoku','loss');bgEnter(g,'reversi');var s=JSON.parse(JSON.stringify(g));migrate(s);if(s.me.bg.y[2029].reversi!=='loss')throw Error('open game in a save is a loss');if(s.me.bg.lv!=='balanced')throw Error('two losses back to balanced '+s.me.bg.lv);
+var J4=bgJ1(2030);s.day=J4;bgDay(s);if(!bgNow(s)||bgHold(s))throw Error('never: open without the card');
+var o=newGame();o.emp.farms={t:1};delete o.me.bg;migrate(o);if(bgOf(o).f!==0)throw Error('old farm save');
+`);
 console.log(count+' focused balance and migration checks passed');
