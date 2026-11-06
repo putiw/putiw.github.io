@@ -2951,3 +2951,22 @@ Deploy 7 Nov (Passes 283-284): balance 168, academy 10, me 55, cardtap, boardgam
 - Puti's iPhone screenshot: the lines started at the board edge and ran off the right and bottom, so the stones sat in the squares. Cause: the grid SVG was absolute with `inset` and `width:auto;height:auto`; Chromium stretches it, iOS Safari sizes an SVG from its viewBox and keeps only left/top. It now has `left/top:3.333333%;width/height:93.333333%`, so the lines run through the cell centers everywhere. One component, so this covers Grandma's games and the competition, on the company page and over the land. `boardgames.js?v=p285`.
 
 Tests: boardgames (new source check on the grid size), Chromium geometry at 390 and 360 (lines on the stone centers). WebKit isn't installable here, so the iPhone itself is the check. Deployed.
+
+## Pass 286: Puti's 7 Nov list (cards, health check, treats, gear, board games, kits)
+
+- Card chime: plays two frames after the card is shown (`requestAnimationFrame` twice), so it no longer rings before a heavy frame paints the card. The first-baby and first-kit chime moved from the moment (`sfxWatch`) onto their cards (hatch, kit, sale), so sound and card come together.
+- Card timing review: intro and chapter cards (`p.soon`) were first in, first out, each 10-35 s of play apart, so "Your first shrimp sale" could come minutes after the sale. Now `SOON_NOW` (sale, kit, bulk, hatch) go to the front and wait only 4 s after the last card. `introStill` drops a tutorial card whose reason has gone at show time (bulk: no open offer; health: no sick tank; tools: station done) and unsees it so it fires again next time. Chapters and other intros keep the gap.
+- The Shrimp Times: its intro card waited on 25 kits while the first issue was still pending, so World opened empty, then the first issue got its own spotlight later. Now the card needs the first issue out (`R.log`), closing it counts as the first issue's notice (`rippleIntro`, `seenL`), and the World tab shows only with an issue, the paper or regions.
+- Health check: "Got it · show me" spotlights Check shrimp under the tank (or the tank, if the buttons aren't open), selecting the sick tank first; it used to mark the Care card seen and point nowhere. Done looking with nothing picked and sick shrimp: one nudge line, a second Done shows "You didn't pick any. N of them are sick, marked below." Field guide: one column, sprite left (72 px, smooth) and text right.
+- Weekly treats: no "Working now" line; a 3 px bar on the bottom edge of each running treat runs down to the refill (white on a picked button, green otherwise).
+- Gear, tank 2: couldn't reproduce driftwood setting plants in code (buy is per tank). Likely a ghost tap: the bought row left for Done and Live plants slid under the finger. A bought row now stays in place as Done until you leave the tab (`UPG_KEEP`).
+- Gomoku/Reversi: think time from `thinkD` (0..1): forced win, block or single move quick, corners quick, close middle game slower, opening quick, harder bots a bit slower; 350 ms to 4.2 s with ±30% spread.
+- Board game day waits for free time (`bgFree`: Your day on and its card closed). Was from the second June for everyone (Pass 278).
+- Grandma's business lesson call is gone (old saves cleared in `migrate` and weekly). The You button doesn't ring while Grandma is away.
+- Shops ?: shorter help and explain.
+- Making kits with packing machines: the capacity line sits beside the packing art (`#auto-pack-cap`) instead of an empty art row plus a line; Sell 1 sits under the line's Buy button.
+- Video games: the first 100 days land at 20 to 50 quality (was 0 to 50, so 1 was possible).
+- Item 17: the Company/Market tabs are there; they open at 100,000 kits sold (Pass 272). Item 5 was cut off in the message.
+
+Tests: balance 168 (board game test now needs free time first), academy 10, me 55 (lesson check flipped), boardgames, cardtap, sound. Browser 390: field guide, zero-pick nudge and text, treat bar, Making kits with a robotic line. Not deployed.
+

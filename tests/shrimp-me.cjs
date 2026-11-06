@@ -320,10 +320,10 @@ check('farms and shops climb one kind at a time',`
 var g=newGame();g.money=1e9;g.emp.proj.farmlic=1;g.emp.kitsOpened=1;g.kits.sold=500;if(!buyFarm(g,'rack')||!buyFarm(g,'barn'))throw Error('Rack then barn');if(buyFarm(g,'rack'))throw Error('No more racks once you build barns');if(!buyFarm(g,'barn')||!buyFarm(g,'shed'))throw Error('Barns until the next kind');if(buyFarm(g,'barn'))throw Error('Barns close after the first warehouse');
 var h=newGame();h.money=1e8;h.emp.kitsOpened=1;h.kits.sold=2000;if(!buyShop(h,'stall')||!buyShop(h,'pet'))throw Error('Stall then pet corner');if(buyShop(h,'stall'))throw Error('Stalls close');buyShop(h,'bout');if(!storesOn(h)||!buyStores(h,'auh',1))throw Error('Boutique opens mall stores');if(buyShop(h,'bout'))throw Error('Small shops close once mall stores run');
 `);
-check('hours count: work moves orders, hour milestones happen, Grandma calls with a lesson at three kits a day',`
+check('hours count: work moves orders, hour milestones happen, no business lesson call (Pass 286)',`
 var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;g.kits.sold=Math.max(1,g.kits.sold);personalDay(g);g.me.on=1;var w8=workMult(g);for(var i=0;i<2;i++)addHour(g,'work',1);if(Math.abs(workMult(g)-w8-0.1)>1e-9)throw Error('Two more hours early on: +10% '+workMult(g));
 g.me.hp=80;g.me.bo=0;g.me.hrs={videos:99};g.me.hstep={};var b0=g.emp.beta;g.me.p2=['videos'];lifeDay(g);if(!(g.emp.beta>b0)||g.me.hstep.videos!==1)throw Error('100 video hours do something');
-var k=newGame();k.tanks[0].feeder=1;k.tanks[0].autoWC=1;k.kits.sold=Math.max(1,k.kits.sold);personalDay(k);k.me.on=1;k.emp.kitsOpened=1;k.kits.sold=30;k.kitPrice=280;k.fin=[];for(var i=0;i<7;i++)k.fin.push({kits:900});personalWeek(k);if(k.me.call!=='lesson')throw Error('Grandma calls');
+var k=newGame();k.tanks[0].feeder=1;k.tanks[0].autoWC=1;k.kits.sold=Math.max(1,k.kits.sold);personalDay(k);k.me.on=1;k.emp.kitsOpened=1;k.kits.sold=30;k.kitPrice=280;k.fin=[];for(var i=0;i<7;i++)k.fin.push({kits:900});personalWeek(k);if(k.me.call==='lesson')throw Error('Pass 286: no business lesson call');
 var o=newGame();o.me={on:1,hrs:{videos:500,club:600}};migrate(o);if(o.me.hstep.videos!==2||o.me.hstep.club!==2)throw Error('Old saves skip milestones already passed');
 `);
 check('quiet spells: a long stretch with nothing happening brings an event',`
