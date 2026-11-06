@@ -480,6 +480,9 @@ Do not report a feature as finished just because its new path works once. Check 
 
 ## Mistakes already made
 
+- **A row button that ends in "..."** (Chat 3, 6 Nov): `.srow .btn` is 112 px with an ellipsis, so "Open 1 · AED 150k" lost its price. Put the price in a `<small>` second line; `shrimp-tight` checks it (`btncut`).
+- **A log card that shows every entry** (Chat 3): long lists show the newest few and fold the rest under "Earlier (n)", like the Times and Science.
+
 - **Reserving space instead of anchoring the view** (UI/UX chat 1, 6 Nov). These reserves left blank bands all over and were dropped once the tap anchor existed, don't add them back: `.item.ih p` min-height 2.9em (and the project-row 92 px row and 2.9em/1.45em text), `.me-pl` and `.me-note` two-line holds (Pass 199), `.hard-gp`/`.hard-one` min-height, the 62 px `.sellsum` box ("Nothing ready"), `.me-sendrow` hint height, `FLOOR` held until a tab change (now `floorTrim`), `slotMin` (order and bulk-order text, the hard-part goal slot), `STEP_HOLD`/`stepHold` (hard-part group slot), `DESK_HOLD`/`DESK_H` (campaign desk). The functions are left as no-ops so old call sites don't break.
 
 - A new "on tab change" clear went into `selectTab`, but the tab bar's handler set `activeTab` first, so `selectTab` never saw a change on a real tap (Pass 266, items 13 and 17). Anything that must run when the tab changes goes in `tabLeave()`.
@@ -546,6 +549,7 @@ Do not report a feature as finished just because its new path works once. Check 
 
 - Pass 271 (6 Nov): UI/UX Chat 1 done (tap anchor, reserves dropped, `shrimp-tight`, fixes outside Kits/Ads, Puti's answers: care on Tank, treats in Feeding, chiller with the heater, Excel course from the cash, one Grandma card with her place first). Not deployed. Chat 2 done in Pass 272.
 - Pass 272 (6 Nov): UI/UX Chat 2 done (100k gate, Company/Market/Hard part tabs, Kits and Ads items C1-C9). Not deployed. Puti OK'd the Company and Market card text and put memes behind the gate (Pass 272b). Next: Chat 3, the deploy review, project doc `claude/shrimp-handoff-uiux-chat3-6nov.md`.
+- Pass 273 (6 Nov): UI/UX Chat 3, the deploy review. Full pre-deploy run passed after three fixes: Start over from a save past 100k kits threw (`legacy-equipment` sits on Tank there), What happened on You shows the newest three with an Earlier fold (6,400 px in the hard part before), mall store buttons put the price on a second line (it was cut to "Open 1 · AED..."). `shrimp-tight` now flags a row button cut with an ellipsis (`btncut`). Waiting on Puti's play-through and "deploy".
 - UI/UX cleanup (6 Nov, review `claude/shrimp-uiux-review-6nov.md`, handoff `claude/shrimp-handoff-uiux-6nov.md`): three chats. Chat 1 no jumps (extend `anchorGet`/`anchorFix` to taps, then drop text reserves), tight layout, fixes outside Kits/Ads; Chat 2 Company/Market tabs at 100k kits sold (media, desk, gala open then), Hard part tab replaces Market in `coMode`; Chat 3 deploy review. Targets stay. Science gets its own card.
 
 Planned and agreed with Puti, not built yet:

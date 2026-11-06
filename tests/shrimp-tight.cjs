@@ -1,5 +1,6 @@
 // Tight and aligned (UI/UX chat 1, 6 Nov). Every tab at seven stages, 360 and 390 px:
 //  gap   a vertical gap over 20 px between two visible neighbours inside a card (or under a card's last child)
+//  btncut a row button cut with ... (the price is hidden)
 //  cut   an .item.ih description cut off (scrollHeight > clientHeight), prints the text
 //  empty a card with a title and nothing visible under it (when not collapsed)
 //  align row buttons in one card whose right edges don't line up
@@ -23,6 +24,7 @@ const SCAN=`(function(GAP){var out=[];function vis(e){if(!e.getClientRects().len
   // empty card
   var hd=c.querySelector(':scope>.hd,:scope>summary,:scope>h2');if(hd){var body=kids.filter(function(k){return k!==hd&&!k.matches('.hd,summary,h2,.qhelp');});if(!body.length)out.push(['empty',cid,'title only: '+nm(hd)]);}
   // cut descriptions
+  c.querySelectorAll('.srow .btn,.item>.btn').forEach(function(b){if(vis(b)&&b.closest('.card')===c&&getComputedStyle(b).textOverflow==='ellipsis'&&b.scrollWidth>b.clientWidth+1)out.push(['btncut',cid,(b.textContent||'').trim().slice(0,60)]);});/* Chat 3: a button whose label ends in ... hides its price */
   c.querySelectorAll('.item.ih>div:first-child>p').forEach(function(p){if(vis(p)&&p.scrollHeight>p.clientHeight+2)out.push(['cut',cid,(p.textContent||'').trim().slice(0,140)]);});
   // right edges of row buttons
   var rs={};c.querySelectorAll('.item:not(.fork)>.btn:not(.fopt),.item:not(.fork)>.hb').forEach(function(b){if(!vis(b))return;if(b.closest('.card')!==c)return;var r=Math.round(b.getBoundingClientRect().right);rs[r]=(rs[r]||0)+1;});var ks=Object.keys(rs).map(Number).sort(function(x,y){return x-y;});if(ks.length>1&&ks[ks.length-1]-ks[0]>2)out.push(['align',cid,'row button right edges '+ks.join(', ')]);
