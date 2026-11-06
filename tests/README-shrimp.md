@@ -2852,5 +2852,5 @@ Limits: the bot still thinks on the main thread (Codex's note), Reversi's questi
 
 ## Pass 278 (6 Nov): board game day from the second June
 
-Puti: no farm or You tab needed, it should come on the game's second 1 June so some players get early cash. `BG_FROM=2028`: the 1 June card and the June card on the You tab open from 1 June 2028 for everyone (the farm gate and the migrate line for old farm saves are gone). Never show this again from the next year (2029). `G.me.bg.n` counts finished games (Grandma's and the competition's) for the "touched grass" ending line.
+Puti: no farm or You tab needed, it should come on the game's second 1 June so some players get early cash. `BG_FROM`, the second 1 June counted from the game's start day (20 Oct 2026 now, so 2028; the game calendar is fixed, it does not follow the real date): the 1 June card and the June card on the You tab open from 1 June 2028 for everyone (the farm gate and the migrate line for old farm saves are gone). Never show this again from the next year (2029). `G.me.bg.n` counts finished games (Grandma's and the competition's) for the "touched grass" ending line.
 Tests: balance 167 (the board game check rewritten: not in June 2027, opens 1 June 2028 with no farm, opens on a later June day too), me 55, academy 10, `shrimp-boardgames` (dates moved a year, counter check).
