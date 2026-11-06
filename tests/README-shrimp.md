@@ -2889,3 +2889,13 @@ Puti, after reviewing the Pass 279 text: the hard part options are about making 
 Bots (seed 7 unless said): evil 10 seeds Every home day 2,324 to 2,420, mean 2,379 (6.5 y), AED 0.14T to 0.83T at the win; crisis income about AED 1.07B a day at the win (seed 7: datagov 600M, data 120M, diesel 119M, speaker 118M, taps 96M, boat 13M) against AED 3.5B total. Strong cold 2,695 (was 2,575), kind 4,285 unchanged. Pass 279 evil (lump plus catches) was mean 2,661, AED 0.59T to 3.92T.
 Tests: balance 168 (Pass 279 check rewritten: daily income from both lid buyers, no catches), me 55, land-life (Grandma off the land while unreachable, at 360 and 390).
 Pre-deploy on 279b: spotlight sweep all good, monkey passed at 390 and 360, hard 24, boardgames passed.
+
+## Pass 280 (6 Nov): the world map in the Regions card
+
+- The region-map-demo playtest is in the game. `shrimp/region-map.js` holds its embedded art (Puti's Aseprite sprite with the new ocean, ten region masks), country points, pulse periods and sea lanes unchanged, and the drawing code; it is in `sw.js` `FILES`. No outside requests.
+- `#rmap` sits in `#c-reg` under the header, beside `#e-regions`, which still rebuilds. `renderRegMap(G)` (in `updateEmpire`) hides it until `regOpen(G,'uae')`, then shows it flush with the card edges (`margin:0 -12px`) and sets overlays, routes and sea lanes from `G.emp.regions`. Mounted once, ordinary renders change only classes, so pulses and dashes keep their phase.
+- Kept from the demo: the hub dot, pulse 0.52 to 1.48 s by density, one white dashed route per country (#F4F4F4 to #FFFFFF by country code, per-country dash speed), the blue sea lanes with the same gates and speed. Left out: title bar, UAE label, legend, fake unlock, Previous step, Restart, Pause motion.
+- A save shows everything at once; only a region bought in the game on screen draws in (`RM_G===G`). Reduced motion stops all loops and shows the open regions at a fixed faint tint. Loops pause while the map is off screen (folded card, other tab) or the page is hidden (`.rm.paused`, play state, so nothing restarts).
+- Purchase rows, unlock rules, costs and order unchanged.
+
+Tests: balance 168, academy 10, me 55, cardtap pass. Browser at 390 px (`?dev=hard`, regions set by hand, the next region bought with the real button): no map and no gap before Rest of the UAE, map appears on the purchase, The Gulf to Southeast Asia draws in and the `entering` classes clear after 1.4 s, 20 ticks keep the same nodes, a reload of a nine-region save shows 7 masks, 119 routes and 11 lanes with nothing drawing in, all twelve open matches Puti's screenshot, no sideways scroll, only console errors are Google Fonts (blocked in the test box). Reduced motion and pause on another tab checked.
