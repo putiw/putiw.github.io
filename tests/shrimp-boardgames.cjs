@@ -6,8 +6,8 @@ const {chromium}=require('playwright');const path=require('path');
 (async()=>{const b=await chromium.launch();const ctx=await b.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});const p=await ctx.newPage();
  const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>d.dismiss());
  await p.goto('file://'+path.join(__dirname,'../shrimp/index.html'));await p.waitForTimeout(500);
- await p.evaluate(()=>{localStorage.clear();G=newGame();G.name='Test';G.progress.seen.intro=true;G.progress.queue=[];G.tanks[0].had=1;G.tanks[0].cycledAt=0;G.money=30000;G.emp.farms={t:1};window.spotlight=function(){};G.me.on=1;
-  Object.keys(MILESTONES).forEach(function(k){G.progress.seen[k]=true;});G.progress.wait=[];G.progress.soon=[];bgOf(G).f=0;G.day=bgJ1(2027)-0.5;G.progress.v2=G.progress.v3=1;render();});
+ await p.evaluate(()=>{localStorage.clear();G=newGame();G.name='Test';G.progress.seen.intro=true;G.progress.queue=[];G.tanks[0].had=1;G.tanks[0].cycledAt=0;G.money=30000;window.spotlight=function(){};G.me.on=1;
+  Object.keys(MILESTONES).forEach(function(k){G.progress.seen[k]=true;});G.progress.wait=[];G.progress.soon=[];bgOf(G).f=0;G.day=bgJ1(2028)-0.5;G.progress.v2=G.progress.v3=1;render();});
  // reach 1 June: the card shows and the clock stops
  await p.evaluate(()=>{for(var i=0;i<4&&!bgHold(G);i++)stepGame(G,0);render();});
  let st=await p.evaluate(()=>({hold:bgHold(G),card:!document.getElementById('bg-card').hidden,never:!!document.querySelector('[data-v="never"]'),day:G.day}));
@@ -58,7 +58,8 @@ const {chromium}=require('playwright');const path=require('path');
  console.log('reversi random moves questioned',rs.asked,'of',rs.moves);if(rs.asked>rs.moves*0.35||rs.asked<1)throw Error('reversi question rate '+JSON.stringify(rs));
  await p.click('#bg-x');
  // second year: Never show this again; next June has no card but the You tab row
- st=await p.evaluate(()=>{G.day=bgJ1(2028)-0.5;for(var i=0;i<4&&!bgHold(G);i++)stepGame(G,0);render();var nv=!!document.querySelector('[data-v="never"]');document.querySelector('[data-v="never"]')&&document.querySelector('[data-v="never"]').click();G.day=bgJ1(2029)-0.5;for(var j=0;j<4;j++)stepGame(G,0);render();return {nv,never:bgOf(G).never,hold:bgHold(G),row:!document.getElementById('me-bgc').hidden,card:!document.getElementById('bg-card').hidden};});
+ st=await p.evaluate(()=>{G.day=bgJ1(2029)-0.5;for(var i=0;i<4&&!bgHold(G);i++)stepGame(G,0);render();var nv=!!document.querySelector('[data-v="never"]');document.querySelector('[data-v="never"]')&&document.querySelector('[data-v="never"]').click();G.day=bgJ1(2030)-0.5;for(var j=0;j<4;j++)stepGame(G,0);render();return {nv,never:bgOf(G).never,hold:bgHold(G),row:!document.getElementById('me-bgc').hidden,card:!document.getElementById('bg-card').hidden};});
  if(!st.nv||!st.never||st.hold||!st.row||st.card)throw Error('never '+JSON.stringify(st));
+ if(!(await p.evaluate(()=>bgOf(G).n>=2)))throw Error('finished games not counted');
  if(errs.length)throw Error(errs[0]);
  console.log('board game checks passed');await b.close();})().catch(e=>{console.error(e.message);process.exit(1);});
