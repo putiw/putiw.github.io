@@ -9,7 +9,7 @@ vm.runInContext('var NOSTORES='+(process.env.NOSTORES==='1')+';',c);
 vm.runInContext('var NEWBOT='+(process.env.BOT_OLD!=='1')+';',c);
 vm.runInContext(`
 var G=newGame(),events=[],snapshots={},last={};
-function note(k){detectMilestones(G);updateReveal();if(kitsOpen(G))G.emp.shownEmp=1;if(!last[k]){last[k]=1;events.push({event:k,day:G.day,money:Math.round(G.money),shrimp:Math.round(allN(G)),sold:G.stats.sold,kits:G.kits.sold,owners:Math.round(G.humans),inf:Math.round(G.emp.inf)});snapshots[k]=JSON.parse(JSON.stringify(G));}}
+function note(k){detectMilestones(G);updateReveal();if(kitsOpen(G))G.emp.shownEmp=1;if(!last[k]){last[k]=1;events.push({event:k,day:G.day,money:Math.round(G.money),shrimp:Math.round(allN(G)),sold:G.stats.sold,kits:G.kits.sold,owners:Math.round(G.humans),inf:Math.round(G.emp.inf)});snapshots[k]=JSON.parse(JSON.stringify(G));}if(!last['100k kits']&&G.kits.sold>=1e5&&G.progress.seen.market&&!['queue','wait','soon'].some(function(q){return (G.progress[q]||[]).indexOf('market')>=0;})){last['100k kits']=1;snapshots['100k kits']=JSON.parse(JSON.stringify(G));}/* UI/UX chat 2: a Market stage, no extra sim calls */}
 function extraTanks(buy){if(!G.tanks[0].had)return;var T0=G.tanks[0];
  if(buy&&G.stats.sold>=1&&G.tanks.length<MAX_TANKS&&!(G.tanks.some(function(t){return !t.had;}))&&G.money>NEW_TANK_COST[G.tanks.length]+Math.max(300,capitalReserve(G)))addTank(G);
  for(var i=1;i<G.tanks.length;i++){var t=G.tanks[i],P=ppm(t);t.set.sellAge=T0.set.sellAge;t.set.keepL=T0.set.keepL;

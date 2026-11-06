@@ -289,7 +289,7 @@ g.money=-100;if(brokeOpts(g).some(function(x){return x[2]==='save';}))throw Erro
 var h=newGame();h.tanks[0].feeder=1;h.tanks[0].autoWC=1;h.kits.sold=Math.max(1,h.kits.sold);personalDay(h);h.me.on=1;h.me.sent=5e5;h.money=2e6;h.me.gplace={balcony:1,house:1};storyChoose(h,'gp_land',1);if(frozen(h))throw Error('No means no trip');h.day=h.me.tour;if(!milestoneConditions(h).gp_scam)throw Error('The scam call');h.emp.infOn=1;var i0=h.emp.inf,m0=h.money;storyChoose(h,'gp_scam',0);if(h.emp.inf!==i0||Math.abs(m0-h.money-5e5)>1)throw Error('Paid back, no gala');if(gpLines(h).join().indexOf('paid back')<0)throw Error('Scam line');
 `);
 check('galas raise money for a cause you pick, and it shows up in the ending',`
-var g=newGame();g.money=1e7;g.emp.infOn=1;if(!buyProj(g,'gala','kids'))throw Error('Gala');if(!(g.emp.galaFor.kids>0))throw Error('Cause recorded');var i0=g.emp.inf;buyProj(g,'gala','own');if(!(g.emp.galaFor.own<g.emp.galaFor.kids))throw Error('Own foundation keeps most');if(gpLines(g).join().indexOf('children')<0)throw Error('Ending line '+gpLines(g).join('|'));
+var g=newGame();g.kits.sold=MKT_AT;g.money=1e7;g.emp.infOn=1;if(!buyProj(g,'gala','kids'))throw Error('Gala');if(!(g.emp.galaFor.kids>0))throw Error('Cause recorded');var i0=g.emp.inf;buyProj(g,'gala','own');if(!(g.emp.galaFor.own<g.emp.galaFor.kids))throw Error('Own foundation keeps most');if(gpLines(g).join().indexOf('children')<0)throw Error('Ending line '+gpLines(g).join('|'));
 `);
 check('growing pains slow orders and breeding until you pick a fix and it is in place',`
 var g=newGame();g.emp.kitsOpened=1;g.kits.sold=3000;g.humans=9000;g.money=1e6;g.emp.farms.barn=3;g.emp.proj.farmlic=1;

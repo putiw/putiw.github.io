@@ -8,7 +8,7 @@
 const {chromium}=require('playwright');const fs=require('fs'),path=require('path');
 const snaps=JSON.parse(fs.readFileSync(process.env.TIGHT_RUN||process.env.ACADEMY_RUN,'utf8')).snapshots;
 const Ws=(process.env.TIGHT_W||'360,390').split(',').map(Number);
-const stages=(process.env.ST||'first shrimp,first sale,kits unlocked,first farm,10k owners,million owners,win').split(',');
+const stages=(process.env.ST||'first shrimp,first sale,kits unlocked,first farm,10k owners,100k kits,million owners,win').split(',');
 const only=process.env.TIGHT_TABS?process.env.TIGHT_TABS.split(','):null;
 const GAP=20;
 const SCAN=`(function(GAP){var out=[];function vis(e){if(!e.getClientRects().length)return false;var cs=getComputedStyle(e);if(cs.visibility==='hidden'||cs.position==='fixed'||cs.position==='absolute')return false;var r=e.getBoundingClientRect();return r.height>0.5&&r.width>0.5;}
@@ -27,7 +27,7 @@ const SCAN=`(function(GAP){var out=[];function vis(e){if(!e.getClientRects().len
   // right edges of row buttons
   var rs={};c.querySelectorAll('.item:not(.fork)>.btn:not(.fopt),.item:not(.fork)>.hb').forEach(function(b){if(!vis(b))return;if(b.closest('.card')!==c)return;var r=Math.round(b.getBoundingClientRect().right);rs[r]=(rs[r]||0)+1;});var ks=Object.keys(rs).map(Number).sort(function(x,y){return x-y;});if(ks.length>1&&ks[ks.length-1]-ks[0]>2)out.push(['align',cid,'row button right edges '+ks.join(', ')]);
   // wrapping values and chips
-  c.querySelectorAll('.ctl .v,.btn.chip,.seg .btn,.fw-b b').forEach(function(v){if(!vis(v)||v.querySelector('small,br,.c2'))return;/* a label over a price is two lines on purpose */var lh=parseFloat(getComputedStyle(v).lineHeight)||parseFloat(getComputedStyle(v).fontSize)*1.3;var inner=v.getBoundingClientRect().height-(parseFloat(getComputedStyle(v).paddingTop)||0)-(parseFloat(getComputedStyle(v).paddingBottom)||0);if(inner>lh*1.6||v.scrollWidth>v.clientWidth+1)out.push(['wrap',cid,nm(v)]);});
+  c.querySelectorAll('.ctl .v,.btn.chip,.seg .btn,.fw-b b').forEach(function(v){if(!vis(v)||v.querySelector('small,br,.c2'))return;/* a label over a price is two lines on purpose */var rg=document.createRange();rg.selectNodeContents(v);var tops=[...rg.getClientRects()].filter(function(r){return r.width>0;}).map(function(r){return Math.round(r.top);}),lines=new Set(tops).size;/* UI/UX chat 2: count text lines, not the button's min-height */if(lines>1||v.scrollWidth>v.clientWidth+1)out.push(['wrap',cid,nm(v)]);});
  });
  return out;})`;
 (async()=>{const b=await chromium.launch();let all=[];
@@ -43,6 +43,6 @@ const SCAN=`(function(GAP){var out=[];function vis(e){if(!e.getClientRects().len
  // one line per distinct finding, with where it shows
  const m={};all.forEach(([k,sk,W,t,msg])=>{const key=k+' '+t+' '+msg;(m[key]=m[key]||[]).push(sk+'@'+W);});
  // Known and handed to UI/UX Chat 2 (Kits card and the hard part move there). Remove a line once it's fixed.
- const KNOWN=[/^empty emp c-kits: /,/^cut world hard-card: /];
- const keys=Object.keys(m).sort(),bad=keys.filter(k=>!KNOWN.some(r=>r.test(k)));keys.forEach(k=>console.log((bad.includes(k)?'':'known (Chat 2): ')+k+'  ['+[...new Set(m[k])].slice(0,4).join(', ')+(m[k].length>4?' …':'')+']'));
+ const KNOWN=[];/* UI/UX chat 2 fixed the two Chat 1 left */
+ const keys=Object.keys(m).sort(),bad=keys.filter(k=>!KNOWN.some(r=>r.test(k)));keys.forEach(k=>console.log((bad.includes(k)?'':'known: ')+k+'  ['+[...new Set(m[k])].slice(0,4).join(', ')+(m[k].length>4?' …':'')+']'));
  console.log(bad.length+' findings'+(keys.length>bad.length?', '+(keys.length-bad.length)+' known':''));process.exit(bad.length?1:0);})();
