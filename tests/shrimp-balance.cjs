@@ -573,7 +573,7 @@ var h=newGame(),D=coinOf(h);D.on=1;D.honest=1;D.otrees=2e6;D.ocohorts=[{day:0,n:
 count++;console.log('PASS Pass 118 shrimpcoin launch supply');
 // Pass 119: card headers have no arrow and show the ? only when open; Money sheet behind the header cash
 if(/h2::before\{content:'(▾|)'/.test(html)||!html.includes(".card>.hd h2::before,.card>summary h2::before{content:none!important")||!html.includes("details.card:not([open])>summary>.qhelp{display:none}"))throw Error('Card headers: no arrow, ? only on open cards');
-if(!/<div id="fs-body">\s*<details class="card" id="consultcard"/.test(html)||!html.includes('<details class="card" id="operations-card"')||html.indexOf('id="operations-card"')<html.indexOf('id="finsheet"')||!html.includes('id="wagecard"'))throw Error('Consultants, Operating controls and Wages live in the Money sheet, not Kits');
+if(!/<div id="fs-body">\s*(<div class="card" id="excelcard"[\s\S]*?<\/div><\/div>\s*)?<details class="card" id="consultcard"/.test(html)||!html.includes('<details class="card" id="operations-card"')||html.indexOf('id="operations-card"')<html.indexOf('id="finsheet"')||!html.includes('id="wagecard"'))throw Error('Consultants, Operating controls and Wages live in the Money sheet, not Kits');
 if(html.includes("$('business-strip').mhtml")||html.includes("Consultants in Kits"))throw Error('No growth strip, no consultants in Kits');
 count++;console.log('PASS Pass 119 card headers and Money sheet');
 // Pass 120: Kits tab is three cards: Kits, Making kits (packing + quality checks), Kit development; sales staff have their own card in Ads
@@ -596,7 +596,7 @@ check('Pass 122: lab finds, funded studies and university news go to the Science
 var g=newGame();g.kits.sold=100;newsLine(g,'front');newsLine(g,'lab',1);var L=rip(g).log;if(L.length!==2||L[0].sci||!L[1].sci)throw Error('newsLine sci tag');
 g.emp.later=[{d:0,t:'study',sci:1}];g.day=1;laterDay(g);if(!rip(g).log[2].sci)throw Error('later study news keeps the tag');
 `);
-if(!html.includes('<div id="rp-sci" hidden><h3 class="track">Science</h3>')||!html.includes("+l.fx.slice(1)+'.':''),1);"))throw Error('Science section and research finds tagged');
+if(!html.includes('<div class="card coll" data-k="sci" id="scicard"')||!html.includes("+l.fx.slice(1)+'.':''),1);"))throw Error('Science card (Puti 6 Nov: its own card under the Times) and research finds tagged');
 if(html.includes('People start buying mud')||!html.includes('var AI_MGR_DAY=40;')||!html.includes("only as spots open up in your reach")||html.includes('vv.offsetTop'))throw Error('Pass 125: carbon line, token bills, reach-limit orders line, no lifted tab bar');
 if(!/maximum-scale=1,user-scalable=no/.test(html)||!html.includes('gesturestart'))throw Error('Pass 125: no pinch zoom in the game');
 console.log('PASS Pass 125 feel and text fixes');
@@ -691,8 +691,10 @@ if(!buyUpgrade(g,T,'feeder')||!buyUpgrade(g,T,'autoWC'))throw Error('gear');if(T
 var m=newGame();m.me=newMe();m.me.hrs={exercise:200};hoursDay(m);if(!(m.me.dlog&&m.me.dlog.length===1))throw Error('your day log');`);
 if(!html.includes("if(a==='ts-close'){if(TS&&gearDone(G.tanks[TS.i]))closeTankSheet();return;}"))throw Error('Puti: Got it waits for both, I will buy them later is the other way out');
 if(!html.includes("lite||(!!T.feeder&&(id==='f-ration'||id==='h-ration'))"))throw Error('Puti: no Ration slider once the tank has an auto feeder');
-if(!html.includes("if(a&&c.parentNode!==$('p-up'))$('autocard').after(c);"))throw Error('Puti: Water care moves under Automation once the tank changes its own water');
-if(!html.includes('<section class="panel" id="p-me" hidden><div class="card" id="me-gplace" hidden></div>'))throw Error('Puti: Grandma\'s place first on the You page');
+if(html.includes("$('autocard').after(c)"))throw Error('Puti 6 Nov (replaces Pass 155): all tank care stays on Tank, Gear only sells things');
+if(!html.includes("data-act=\"treat-unlock\" data-id=\"'+x.id+'\" title=")||html.includes("Treats, for every tank</h3>"))throw Error('Puti 6 Nov: treats are unlocked and picked in Feeding, not in Gear');
+if(!/id:'chiller'/.test(html)||!html.includes("if(id==='chiller')return T.heater<2?HEAT_COST[2]:null;"))throw Error('Puti 6 Nov: the thermostat chiller is on offer as soon as the heater is, not after it');
+if(!html.includes('<section class="panel" id="p-me" hidden><div class="card coll" data-k="megp" id="me-gp"><div class="hd"><h2>Grandma</h2><small id="me-gsum"></small></div><div id="me-gplace"'))throw Error('Puti 6 Nov: one Grandma card on top of the You page, her place first inside it');
 if(!html.includes("hh=GT_OPEN&&(lg.length||un)")||!html.includes("if(activeTab!=='me'){GT_OPEN=0;return;}"))throw Error('Puti: Grandma shows nothing until Check on Grandma, closed each visit');
 check('30 Oct: the home tank goes back to 20 L when the farm takes over, and slows its breeding near 50',`
 var g=readyGame(),T=g.tanks[0];T.volTier=4;T.vol=320;T.pop=[{n:200,age:120,g:80}];ownTankNow(g);if(T.vol!==20||Math.round(totalN(T))!==20)throw Error('20 L, 20 shrimp: '+T.vol+' '+totalN(T));g.money=1e6;if(upgradeCost(g,T,'tank')!=null||buyUpgrade(g,T,'tank'))throw Error('the home tank can not be made bigger again');

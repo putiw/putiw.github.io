@@ -27,9 +27,10 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
  const pt=await p.evaluate(()=>{var q=HGR.find(r=>r.id==='water'),c=document.getElementById('hg-cv').getBoundingClientRect();return q?{x:c.left+(q.x0+q.x1)/2,y:c.top+(q.y0+q.y1)/2}:null;});
  await p.mouse.click(pt.x,pt.y);await p.waitForTimeout(300);
  const lab2=await p.evaluate(()=>document.querySelector('#hard-body .hard-now .scope-label').textContent),h2=await p.evaluate(()=>document.getElementById('hard-card').offsetHeight);if(!/No water/.test(lab2))throw Error('block tap did not select: '+lab2);if(h2<after.h-1)throw Error('switching groups shrank the card '+after.h+' '+h2);ok('tapping a block selects it, switching groups never shrinks the card (Pass 267: the slot is the group\'s own height, held until a scroll)');
- // Pass 267 (item 24): no slot for the tallest group. Picking a short group after a tall one keeps the tall height until a scroll, then the slot is the group's own height
+ // Pass 267 (item 24): no slot for the tallest group. Pass 271: no hold either
  const sh=await p.evaluate(()=>{STEP_HOLD=0;HARD_SEL='hot';render();var st=document.querySelector('#hard-body .hard-step'),tall=st.offsetHeight;stepHold();HARD_SEL='never';render();var held=st.offsetHeight,own=st.scrollHeight;hdFree();render();var after=document.querySelector('#hard-body .hard-step').offsetHeight;return {tall,held,after,hold:STEP_HOLD};});
- if(sh.held<sh.tall-1||sh.after>=sh.tall-20||sh.hold)throw Error('group slot hold '+JSON.stringify(sh));ok('a shorter group keeps the last height until a scroll, then the slot is its own height ('+sh.tall+' -> '+sh.after+' px)');
+ // UI/UX chat 1 (Pass 271): no hold any more, the tap anchor keeps the tapped group in place, so the slot is the group's own height at once
+ if(sh.held>=sh.tall-20||sh.after>=sh.tall-20||sh.hold)throw Error('group slot hold '+JSON.stringify(sh));ok('a shorter group is its own height at once, no hold (Pass 271: '+sh.tall+' -> '+sh.held+' px)');
  await p.evaluate(()=>{HARD_SEL='water';STEP_HOLD=0;render();});
  // before a goal is picked the groups are grey and can't be picked; goal buttons: none filled, the current one has a check
  const pre=await p.evaluate(()=>{var H=hardOf(G);H.goalOk=0;HARD_SEL=null;HGK='';render();var cv=document.getElementById('hg-cv');
@@ -87,7 +88,7 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
  await p.waitForTimeout(750);/* letBusy, as above */
  await p.evaluate(()=>{[...document.querySelectorAll('#hard-al button[data-act="tree-step"]')][0].click();});await p.waitForTimeout(400);
  const tr1=await p.evaluate(()=>{var hl=document.querySelector('#hard-al .hal-let');return {y:scrollY,lh:hl.offsetHeight,run:[...document.querySelectorAll('#hard-al .pr-run')].map(x=>x.textContent).join('|')};});
- if(Math.abs(tr1.y-tr0.y)>1||!/% done/.test(tr1.run))throw Error('tree step '+JSON.stringify([tr0,tr1]));ok('Pass 257: a funded tree step goes under Running with how far it is, nothing scrolls');
+ if(!/% done/.test(tr1.run))throw Error('tree step '+JSON.stringify([tr0,tr1]));ok('Pass 257: a funded tree step goes under Running with how far it is (Pass 271: the page may scroll, the tap anchor keeps the view; shrimp-stable checks that)');
  const tr2=await p.evaluate(()=>{hdFree();var k=Object.keys(TREES).filter(k=>treeHas(G,k)&&treeRun(G,k))[0],s=treeRun(G,k),nx0=treeNext(G,k);G.day+=s.t+1;render();return {nx0:!!nx0,nx1:!!treeNext(G,k),run:!!treeRun(G,k)};});
  if(tr2.nx0||!tr2.nx1||tr2.run)throw Error('tree timing '+JSON.stringify(tr2));ok('Pass 257: the next tree step writes only once the last one is done');
  const led=await p.evaluate(()=>({t:document.querySelector('#hard-led .led-t').textContent,h:document.querySelector('#hard-led .qhelp').dataset.ht,key:document.getElementById('hg-key').textContent,slider:!!document.querySelector('#hard-led input')}));
