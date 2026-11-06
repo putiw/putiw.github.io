@@ -11,7 +11,7 @@ SAVE_KEY='shrimp-land-v1';
 var P=window.parent!==window?window.parent:(window.TEST_PARENT||null);   // the test page stands in for the company in the same page
 function post(m){if(!P)return;m.land=1;try{P.postMessage(m,'*');}catch(e){}}
 window.LAND_POST=post;// Pass 213: the land closure posts harvests and walks through this
-setInterval(function(){if(document.hidden||!window.LAND_ACT)return;var a='';try{a=window.LAND_ACT();}catch(e){}post({type:'act',a:a});},1000);// Pass 218: what you do on the land, once a second
+setInterval(function(){if(document.hidden||!window.LAND_ACT)return;var a='';try{a=window.LAND_ACT();}catch(e){}var st=null;try{st=window.LAND_STATS?window.LAND_STATS():null;}catch(e){}post({type:'act',a:a,st:st});},1000);/* Pass 279: fish, birds and hens ride along for the ending */// Pass 218: what you do on the land, once a second
 window.GAME_POST=post;
 // no browser feel inside the game: no pinch zoom, no long-press menu (Puti, 28 Oct)
 ['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,function(e){e.preventDefault();},{passive:false});});
