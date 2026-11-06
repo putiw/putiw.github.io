@@ -2899,3 +2899,28 @@ Pre-deploy on 279b: spotlight sweep all good, monkey passed at 390 and 360, hard
 - Purchase rows, unlock rules, costs and order unchanged.
 
 Tests: balance 168, academy 10, me 55, cardtap pass. Browser at 390 px (`?dev=hard`, regions set by hand, the next region bought with the real button): no map and no gap before Rest of the UAE, map appears on the purchase, The Gulf to Southeast Asia draws in and the `entering` classes clear after 1.4 s, 20 ticks keep the same nodes, a reload of a nine-region save shows 7 masks, 119 routes and 11 lanes with nothing drawing in, all twelve open matches Puti's screenshot, no sideways scroll, only console errors are Google Fonts (blocked in the test box). Reduced motion and pause on another tab checked.
+
+## Pass 281: board game fixes, Grandma's face, health field guide (6 Nov)
+
+Puti's list on the board games, then the approved Grandma and health preview (UI only; the preview file wasn't in this workspace, built from the brief).
+
+- Card: "Grandma used to participate the board game day competition when she was young. She's asking if you would like to participate this year." plus the real prize ("each win pays AED 10,000"). No "1 June", no "half your cash" anywhere (card, board line, You tab). Buttons Play Gomoku, Play Reversi, Play both, Not this year, none green, same size.
+- The prize is set when the year's first game starts (`e.pz`, `bgPrizeNow`), so what the card says is what both wins pay. A win shows a + AED pop that goes after 2.7 s (`bgPop`); losses and draws keep the toast.
+- No June card once 40x is open (the win or the hard part); the You tab row and Grandma's games stay.
+- No story card, news or note for 10 s after a board closes (`BG.t` in `busyUI`), and the intro gap restarts.
+- Grandma's games: no level picker, Balanced to start, two wins in a row make her Hard, two losses in a row bring Balanced back (`bgGmEnd`). No Undo button, Undo only when Grandma asks. Her question now also comes when you leave the bot an open four or a double four that one stone would have stopped (`forkCells`); before, it came only when the bot could make five next, which in practice is rare. It still never comes in competition games, and stays off for good after "Grandma, don't tell me this anymore" (`B.q`).
+- A game with Grandma opened on her land keeps the land's real-time clock; on the company page the clock still stops.
+- Board: Inter (was Courier), stones sit on the points with no square hover, focus or frame (the bot's last stone gets a red dot), smaller stones, no stone count in Gomoku, − / + zoom to 2.6x with pan by scrolling, the bot's stone is scrolled into view when zoomed.
+- Grandma's face: the head of her knitting sprite from home.html (`.gma-face`, one embedded 44 px PNG) on the opening Grandma's tank card and on Grandma's note banners.
+- Field guide: folded above the live tank in a health check (and QC look), and replacing the text list in the cure step. Four shrimp from `tvBody`: healthy, pale ring behind the head, milky body, white threads, each with the old guide's line. Inspection flow and cures unchanged.
+
+Tests: balance 168 (locked-prize check replaces the half-cash one), academy 10, me 55, cardtap, boardgames (new: card text and buttons, no card at 40x, Grandma's streak, no Undo or level, zoom and pan, Inter, open-three question, 10 s hold, win pop). Browser 390 and 360: card, board, zoom, intro card, note banner, field guide open, a tap on the live tank still picks a shrimp with the guide open, no sideways scroll. Not run: bots, spotlight sweep, monkey, stable, tight (before deploy).
+
+## Pass 282: tanks in the Tanks card, Reversi question (6 Nov)
+
+- Gear: the 40 L and 80 L Bigger tank rows sat in Room and filter and the 160 L one moved to the Tanks card once it showed. Now every Bigger tank row is in the Tanks card from the first (same room reveal), the card shows whenever it has a row. Room and filter is gone; Better filter sits in Equipment with the auto feeder and auto water changer (was Runs itself), behind the same reveal as before.
+- Reversi, Grandma's question: also when the search's best move is a corner and you played elsewhere (10+ worse), or one move clearly stands out (next best 60+ worse) and you played one 60+ worse. Close or tied moves never get asked. Random moves get asked about 37% of the time (was 12%), still at most 3 a game; the test bound is 45%.
+
+Tests: balance 168, academy 10, me 55, cardtap, boardgames (new: corner on offer, play elsewhere asks, take it doesn't). Browser 390: Tanks card with 20, 40, 80 L tanks shows the Bigger tank row, groups Equipment, Temperature, Decor and plants.
+
+Deploy 6 Nov (Passes 281-282): strong cold WIN 7 day 2695 (empire_dictator), strong kind WIN 7 day 4285 (question_lucky), average Earth day 7280 (19.95 years, waiting 42 min, min cash 184), spotlight sweep 144 all good, monkey 150 actions on 7 stages at 390 and 360 px pass.
