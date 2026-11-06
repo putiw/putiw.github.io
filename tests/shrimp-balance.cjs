@@ -1341,18 +1341,16 @@ var J3=bgJ1(2029);g.day=J3+3;bgDay(g);if(!bgNow(g)||B.pop!==2029)throw Error('20
 bgEnter(g,'gomoku');bgEnd(g,'gomoku','loss');bgEnter(g,'reversi');var s=JSON.parse(JSON.stringify(g));migrate(s);if(s.me.bg.y[2029].reversi!=='loss')throw Error('open game in a save is a loss');if(s.me.bg.lv!=='balanced')throw Error('two losses back to balanced '+s.me.bg.lv);
 var J4=bgJ1(2030);s.day=J4;bgDay(s);if(!bgNow(s)||bgHold(s))throw Error('never: open without the card');
 `);
-check('Pass 279: the evil route, fund ends the war, a catch holds forced deliveries, Grandma unreachable, the two ending lines',`
-var g=readyGame();g.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0,cq:{}};g.humans=4.1e9;g.money=1e15;g.day=2000;
-['water:taps','hot:diesel','poor:data','far:post','blind:speaker'].forEach(function(k){var a=k.split(':'),o=hardOp(hardGroup(a[0]),a[1]);if(!o||o.k!=='dark'||!o.direct||o.ramp!==420||o.pay!==1.5||o.earn!==60||!o.cq||!o.cl||!o.end||!(o.h<0))throw Error('option '+k);if(!Object.keys(o.tr).some(function(t){return t!=='means';}))throw Error('a trait other than means '+k);});
+check('Pass 279: crisis options earn every day, fund ends the war, Grandma unreachable, the two ending lines',`
+var g=readyGame();g.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};g.humans=4.1e9;g.money=1e15;g.day=2000;
+['water:taps','hot:diesel','poor:data','far:post','blind:speaker'].forEach(function(k){var a=k.split(':'),o=hardOp(hardGroup(a[0]),a[1]);if(!o||o.k!=='dark'||!o.direct||o.ramp!==420||o.earn||o.cq||!(o.incP>0)||!o.end||!(o.h<0))throw Error('option '+k);if(!Object.keys(o.tr).some(function(t){return t!=='means';}))throw Error('a trait other than means '+k);});
+if(hardOp(hardGroup('poor'),'data').pay!==0)throw Error('free kits pay no kit money');var dg=hardOp(hardGroup('poor'),'datagov');if(dg.f||dg.req(g))throw Error('government buyer adds no one and needs the lids first');
 if(!hardBuy(g,'war','fund'))throw Error('fund');var wg=hardGroup('war');if(hardWorkK(hardOp(wg,'fund')))throw Error('fund is an ending option');g.day+=181;if(Math.abs(hardReach(g,wg)-1)>1e-9)throw Error('fund reaches the whole war group '+hardReach(g,wg));
 if(hardWorkK(hardOp(wg,'out'))||hardWorkK(hardOp(wg,'pay')))throw Error('out and pay unchanged');
-var m0=g.money;if(!hardBuy(g,'water','taps'))throw Error('taps');if(!(g.money>m0-hardCost(g,hardOp(hardGroup('water'),'taps'))))throw Error('side money on buy');
-var H=hardOf(g),P=H.picks.water.taps,wo=hardOp(hardGroup('water'),'taps');g.day+=100;var r0=hardOpReach(g,wo,P);
-H.cq={'water:taps':Math.floor(g.day),'war:fund':-1};var R=Math.random;Math.random=function(){return 0;};hardDay(g);Math.random=R;
-if(!H.inqL||H.inqL[0]!=='water:taps'||H.inq!==Math.floor(g.day)+180||H.cq['water:taps']!==-1)throw Error('caught '+JSON.stringify([H.inq,H.inqL]));
-for(var i=0;i<50;i++){g.day+=1;hardDay(g);}if(Math.abs(hardOpReach(g,wo,P)-r0)>0.003)throw Error('held '+r0+' '+hardOpReach(g,wo,P));if(hardInqLeft(g)!==130)throw Error('left '+hardInqLeft(g));
-for(i=0;i<140;i++){g.day+=1;hardDay(g);}if(hardInqLeft(g)||(H.inqL||[]).length)throw Error('closes');if(!(hardOpReach(g,wo,P)>r0+0.01))throw Error('released');
-if(JSON.stringify(g.log).indexOf('The inquiry closes')<0)throw Error('close logged');
+if(!hardBuy(g,'poor','data'))throw Error('data');if(!dg.req(g)||!hardBuy(g,'poor','datagov'))throw Error('government buyer');var H=hardOf(g),P=H.picks.poor;g.humans=4.1e9;
+for(var i=0;i<200;i++){g.day+=1;hardDay(g);}var r0=hardOpReach(g,hardOp(hardGroup('poor'),'data'),P.data);if(!(P.data.given>0))throw Error('lids reach homes');
+var m1=g.money;g.day+=1;hardDay(g);var got=g.money-m1;if(!(got>=P.data.given*2.4*0.9))throw Error('both buyers pay daily, AED 0.4 + 2 a person: '+got+' for '+P.data.given);
+if(typeof hardCatch!=='undefined'||/inquiry/i.test(JSON.stringify(g.log)))throw Error('no catches in the hard part');
 // Grandma: a new dark act greys Check out for 30 to 90 days, her windows keep closing
 var q=readyGame();q.me.on=1;q.day=900;gpAwayDay(q);if(q.emp.evilSeen!==0)throw Error('seen default');q.emp.fight=1;gpAwayDay(q);var aw=q.me.away-900;if(!(aw>=30&&aw<=90)||!gpAway(q))throw Error('away '+aw);if(gtCheck(q))throw Error('check grey');
 var T=gtOf(q);T.q.push({key:'x',k:'x',due:800,d0:0,r0:0});var ms=T.missed||0;gtDay(q);if(!((T.missed||0)>ms)&&T.q.some(function(it){return it.key==='x';}))throw Error('windows close while away');
@@ -1364,7 +1362,6 @@ if(!lateKind(e).ok)throw Error('late kind '+JSON.stringify(lateKind(e)));
 delete kr.hot;if(lateKind(e).ok)throw Error('one kind short');
 var b=readyGame();b.me.bg={n:4};b.me.ls={f:3,b:3,h:2};b.stats.cleans=11;if(!grassOk(b))throw Error('line B');
 ['bg','f','b','h','c'].forEach(function(k){var c=JSON.parse(JSON.stringify(b));if(k==='bg')c.me.bg.n=3;else if(k==='c')c.stats.cleans=10;else c.me.ls[k]--;if(grassOk(c))throw Error('one short '+k);});
-var hg=readyGame();hg.emp.hard={open:1,goal:'home',picks:{hot:{diesel:{day:0,start:0}}},goalOk:1,day:0,cq:{'hot:diesel':-1}};hg.humans=4.1e9;hg.money=1e15;var n0=hardN(hg,hardGroup('hot'));for(var d=0;d<1200;d++){hg.day=d;hardDay(hg);}var gr=hardN(hg,hardGroup('hot'))/n0;if(Math.abs(gr-1.3)>1e-6)throw Error('generators: Too hot grows to 30% '+gr);
 var v=readyGame();careDone(v,'vac');careDone(v,'feed');if(v.stats.cleans!==1)throw Error('cleans count');
 `);
 if(!/if\(lateKind\(G\)\.ok\)who\+=' '\+END_LATEKIND;if\(grassOk\(G\)\)who\+=' '\+END_GRASS;/.test(html))throw Error('endText adds the two lines');
