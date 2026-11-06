@@ -34,6 +34,10 @@ let fails=0;const ok=(c,m)=>{console.log((c?'ok   ':'FAIL ')+m);if(!c)fails++;};
  // a walk
  await fr().evaluate(()=>{var H=LAND.life,L=H.L(),dg=L.dog;L.walk={t:130,idle:0};dg.bound=false;H.walkTick(0.1);});await wait(400);
  const wk=await p.evaluate(()=>[G.me.walks,G.me.walkMin]);ok(wk[0]===1&&wk[1]===2,W+' a walk counts '+wk);
+ // Pass 279: fish, birds and hens ride the act message into G for the ending; a caught hen counts
+ await fr().evaluate(()=>{var st=LAND.life.LS().stats;st.fish=3;st.birds=4;st.hens=2;});await wait(2300);
+ const ls=await p.evaluate(()=>JSON.stringify(G.me.ls||null));ok(/"f":3/.test(ls)&&/"b":4/.test(ls)&&/"h":2/.test(ls),W+' land stats reach the game '+ls);
+ ok(/LS\(\)\.stats\.hens=\(LS\(\)\.stats\.hens\|\|0\)\+1;[^\n]{0,80}toast\('You caught a '/.test(fs.readFileSync(path.join(ROOT,'home.html'),'utf8')),W+' a caught hen counts');
  // the log opens and fits
  const lg=await fr().evaluate(()=>{document.getElementById('lz-log').click();var s=document.getElementById('sheet');return {open:!s.hidden,txt:s.textContent.slice(0,120),sw:document.documentElement.scrollWidth,W:innerWidth};});
  ok(lg.open&&/Birds/.test(lg.txt)&&lg.sw<=lg.W,W+' log opens, no sideways scroll');
