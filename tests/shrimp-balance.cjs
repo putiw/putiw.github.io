@@ -1309,7 +1309,7 @@ var PG=bp.g,PP=pumpOf(PG);if(!PP||!coinOn(PG)||Math.abs(PP.a-bp.a)>1)throw Error
 var sv=JSON.parse(JSON.stringify(PG));migrate(sv);if(sv.story.bird.bonus!==2||!pumpOf(sv))throw Error('pump lost in save');
 var x10=null;for(var t=1;t<=PUMP_END;t++){var b=pumpBase(t);if(t>PUMP_SPIKE&&b<10&&x10==null)x10=t;}if(x10!==PUMP_X10+1)throw Error('ten times line at '+x10);
 if(pumpBase(PUMP_SPIKE)!==20||pumpBase(PUMP_SPIKE-1)>15||pumpBase(PUMP_SPIKE+1)>15||pumpBase(PUMP_END)>0.05)throw Error('pump shape');
-var m1=PG.money;for(var d=0;d<PUMP_SPIKE;d++){PG.day+=1;coinDay(PG);}var mc=milestoneConditions(PG);if(!mc.pump_call1)throw Error('first call on the top day');
+var m1=PG.money;for(var d=0;d<PUMP_SPIKE-1;d++){PG.day+=1;coinDay(PG);}var mc=milestoneConditions(PG);if(!mc.pump_call1||!/selling tomorrow/.test(MILESTONES.pump_call1.bodyFn(PG)))throw Error('first call the day before the top');PG.day+=1;coinDay(PG);
 var got=pumpExit(PG);if(got<19.9*PP.a||got>20.1*PP.a||PG.money-m1<got-1)throw Error('exit at the top pays 20x, got '+got/PP.a);if(pumpExit(PG))throw Error('exit twice');if(milestoneConditions(PG).pump_call2)throw Error('second call after exit');
 var H=JSON.parse(JSON.stringify(sv));for(var d2=0;d2<PUMP_X10-7;d2++){H.day+=1;coinDay(H);}if(!milestoneConditions(H).pump_call2)throw Error('second call a week before ten times');
 for(var d3=0;d3<300;d3++){H.day+=1;coinDay(H);}if(!pumpOf(H).done||!pumpOf(H).lost||pumpExit(H))throw Error('pump ends, held coins lost');

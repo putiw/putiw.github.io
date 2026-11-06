@@ -2825,3 +2825,7 @@ The label said AED 10.3B and the cost AED 1.59B: the label used a month of incom
 
 Tests: balance 165 (pump shape, both calls, 20× exit, lost when held, save; buys never sell out and push the price; nobody plants over the limit; the gala test queues), me 55, academy 10, cardtap, endcards 50, hard 24. Browser 360/390: the call card and The pump, no cut buttons, no errors. Bots seed 7: strong cold 3,714 (unchanged, took the pump and held it to the win), strong kind 4,285 (unchanged), average Earth 7,308 → 7,280; no INSOLVENT or STUCK. Trees at the end: strong 3.9B others and ponds (was 8B incl. 6.4B bot coinPlant), average 5.6B (was 8B).
 
+## Pass 275b (6 Nov, Puti on call 1)
+
+Call 1 comes the day before the top (`PUMP_SPIKE-1`): "She calls. It's at N times what you paid. You can wait more if you want, I'm selling tomorrow. Don't blink." (N is the day's multiple, about 12 to 14). The 20× day is the next day only. Balance 165, me 55, cardtap; browser 360/390 checked.
+
