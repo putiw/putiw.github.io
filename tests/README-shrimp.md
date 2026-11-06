@@ -2829,3 +2829,12 @@ Tests: balance 165 (pump shape, both calls, 20× exit, lost when held, save; buy
 
 Call 1 comes the day before the top (`PUMP_SPIKE-1`): "She calls. It's at N times what you paid. You can wait more if you want, I'm selling tomorrow. Don't blink." (N is the day's multiple, about 12 to 14). The 20× day is the next day only. Balance 165, me 55, cardtap; browser 360/390 checked.
 
+## Pass 276 (6 Nov, Puti: OK on the bird and pump lines, A good year once, coin profit, deploy)
+
+- Puti OK'd the Pass 274-275b lines.
+- A good year shows once a game: its cond also checks `progress.seen.c_bonus`, `G.story.bird.bonus` and a pump already run.
+- Shrimpcoin card: Average bought price (market buys plus the pump stake), All time profit (sold + held today − bought) and All time profit, % (two rows, one wrapped at 360); a small line at the bottom once anything was sold: "Profit you took out of Shrimpcoin so far: ±AED x" (sales minus the average buy price of the coins sold). `coinBook`.
+- A buy or sell while the pump runs moves the pump's price (`coinPx`); before it snapped the header back to the normal price for a day.
+
+Pre-deploy run (seed 7): strong cold WIN 3,714 empire_dictator, strong kind 4,285 question_lucky, average Earth 7,280; no INSOLVENT or STUCK. Balance 166, me 55, academy 10, cardtap, endcards 50, hard 24, frozen 5 tabs, tight 0 findings, monkey (150 actions, 7 stages, 390 and 360) pass, spotlights 143 checked all good. Browser: the coin card at 360 and 390 after a pump exit and a sale. Deployed 6 Nov with Passes 274-276.
+

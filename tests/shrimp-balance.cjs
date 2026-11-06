@@ -1321,4 +1321,9 @@ var g=readyGame();g.humans=1e9;g.kits.sold=2e6;g.money=1e15;var C=coinOf(g);C.on
 var h=readyGame();h.humans=4e9;h.kits.sold=2e6;var D=coinOf(h);D.trees=1e9;D.otrees=1e9;h.money=1e14;treesFromGala(h,4e10);var o0=D.otrees+(D.ptrees||0);h.day+=1;treesDay(h);if(D.otrees+(D.ptrees||0)-o0>PLANT_DAY+1)throw Error('more than PLANT_DAY in a day');if(!(D.gq>0))throw Error('gala queue');
 if(coinPlant(h,4e10)>PLANT_DAY)throw Error('coinPlant over the cap');
 `);
+check('Pass 276: A good year shows once; coinBook adds up buys, the pump and sales',`
+var g=readyGame();g.humans=1e9;g.money=1e12;var C=coinOf(g);C.on=1;C.coins=1e8;C.treasury=0;C.price=10;C.x=Math.log(10/12);var q=coinBuy(g,1e6);var b=coinBook(g);if(Math.abs(b.avg-1e6/q)>1e-6||Math.abs(b.ba-1e6)>1)throw Error('avg '+b.avg);
+C.price=20;var got=coinSell(g,q/2);b=coinBook(g);if(!b.sold||Math.abs(b.real-(got-b.avg*Math.floor(q/2)))>1)throw Error('realized '+b.real);if(Math.abs(b.all-(got+C.treasury*C.price-1e6))>1)throw Error('all time');
+var h=readyGame();h.progress.seen.c_bonus=true;if(CARDS3.c_bonus.cond(h))throw Error('bonus again after seen');var k=readyGame();k.story.bird={bonus:2};if(CARDS3.c_bonus.cond(k))throw Error('bonus again after pick');
+`);
 console.log(count+' focused balance and migration checks passed');
