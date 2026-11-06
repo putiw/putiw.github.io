@@ -2924,3 +2924,9 @@ Tests: balance 168 (locked-prize check replaces the half-cash one), academy 10, 
 Tests: balance 168, academy 10, me 55, cardtap, boardgames (new: corner on offer, play elsewhere asks, take it doesn't). Browser 390: Tanks card with 20, 40, 80 L tanks shows the Bigger tank row, groups Equipment, Temperature, Decor and plants.
 
 Deploy 6 Nov (Passes 281-282): strong cold WIN 7 day 2695 (empire_dictator), strong kind WIN 7 day 4285 (question_lucky), average Earth day 7280 (19.95 years, waiting 42 min, min cash 184), spotlight sweep 144 all good, monkey 150 actions on 7 stages at 390 and 360 px pass.
+
+## Pass 283: three genres per game (7 Nov)
+
+- Shrimp games: the genre list (all 13 in a select) is gone. Each new game offers 3 random genres that still have a title, as chips under "A new game" (no label, full width so Idle / tycoon fits at 360 px). The three stay until Start, then the next game rolls new ones. Fewer than 3 left shows what's left. Only an offered genre can be picked (`gameOpts`, `dr.o`).
+
+Tests: balance 168 (new in the games check: 3 distinct offers, they stay, an unoffered genre is refused, rerolled after Start, random across rolls, 2 left shows 2), academy 10, me 55. Browser 390 and 360: three chips, none cut, a tap picks.
