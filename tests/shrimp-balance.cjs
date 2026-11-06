@@ -579,7 +579,7 @@ count++;console.log('PASS Pass 119 card headers and Money sheet');
 // Pass 120: Kits tab is three cards: Kits, Making kits (packing + quality checks), Kit development; sales staff have their own card in Ads
 {const kitsSec=html.slice(html.indexOf('<section class="panel" id="p-emp"'),html.indexOf('<section class="panel" id="p-world"'));
  const make=kitsSec.slice(kitsSec.indexOf('id="c-staff"'),kitsSec.indexOf('id="c-sales"'));
- if(!make.includes('<h2>Making kits</h2>')||!make.includes('id="kit-steps"')||make.includes('id="qccard"')||!make.includes('id="kit-packrow"')||!kitsSec.includes('class="card coll" data-k="qc" id="qccard"'))throw Error('Making kits holds packing, quality checks are their own optional card (Pass 135)');
+ if(!make.includes('<h2>Making kits</h2>')||!make.includes('id="kit-steps"')||make.includes('id="qccard"')||!make.includes('id="auto-pack-loop"')||!kitsSec.includes('class="card coll" data-k="qc" id="qccard"'))throw Error('Making kits holds packing, quality checks are their own optional card (Pass 135)');
  if(!kitsSec.includes('<h2>Kits</h2>')||!html.includes('id="c-sales"')||html.includes("activeTab==='promote'?'Sales staff'"))throw Error('Kits card renamed, sales staff in their own card');
  if(html.includes("['Adoption ceiling',")||html.includes("['Packed yesterday',"))throw Error('Ceiling lives with Regions, packing numbers with Making kits');}
 count++;console.log('PASS Pass 120 Kits tab in three cards');
