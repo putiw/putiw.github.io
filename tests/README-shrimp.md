@@ -2797,3 +2797,7 @@ Fixes found by the review:
 - `shrimp-tight` flags a `.srow`/`.item` button cut with an ellipsis (`btncut`); it finds the two store buttons on the old build.
 
 Run (seed 7): strong cold WIN 3,714 empire_dictator, strong kind 4,285 question_lucky, average Earth 7,308, no INSOLVENT, no STUCK (same as 272b; the snapshot run with REVIEW_ACADEMY=1 REVIEW_KIT_PRICE=250 wins on 4,006 / 5,062). Balance 163, academy 10, me 55, cardtap, space-search 6, tank1, yourtank, land-audio, endcards 50, frozen 5 tabs, hard 24, spotlights 143 all good, monkey 150 x 7 stages pass, Space continuation pass, tight 0 (strong eight stages and average 100k kits, nour2, year 18, Earth complete, 360 and 390), layout 3 small overflows (hard card "0% AED 0/yr" +14 px at 320, a 2 px World chart text at 360/390), human 390 and 360 all ok, effects 15, fresh all ok after the fix, sound, taps. Stable: the full sweep was on pace for 90 min, so per Puti's rule it ran on Company, Market, You at 100k kits, million owners, win: 380 clicks, 0 moved. Tabshots at 360 and 390 for the eight stages plus the hard part (average nour2), looked at; contact sheets sent to Puti.
+
+## Pass 273b (6 Nov, Puti)
+
+You, What happened is hidden until it has an entry (no "Nothing yet." card). shrimp-me 55.
