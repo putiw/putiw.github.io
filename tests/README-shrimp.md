@@ -2943,3 +2943,5 @@ Ported from Codex's `kit-packing-preview` (feature diff against its Pass 264 bas
 - sw.js: scripts are network first like pages. A phone kept an old boardgames.js from the cache, which is likely the Gomoku board Puti saw (the branch board puts stones on the crosses at 360 and 390, checked).
 
 Tests: balance 168, academy 10, me 55, cardtap, kitpack (new: five steps with art, Seal its own, a tap plays, five taps pack, fifth tool brings the loop and Pack, the loop moves, Pack packs one, four extras in one row with icons and none cut, Moss toggles and the cost line follows, no sideways scroll, no errors) at 390 and 360. Bots, spotlight sweep and monkey skipped on Puti's word: no sim change.
+
+Deploy 7 Nov (Passes 283-284): balance 168, academy 10, me 55, cardtap, boardgames, kitpack at 390 and 360. Bots, spotlight sweep and monkey skipped on Puti's word (no sim change).
