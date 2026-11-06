@@ -4292,7 +4292,7 @@ function leftBack(){var b=$('tb-back');if(!b)return;b.innerHTML=LEFT?'<span aria
 // a card waiting at the company, or frozen accounts
 function needBar(){var b=$('lneed');if(!NEED){if(b)b.remove();return;}if(!b){b=document.createElement('button');b.type='button';b.id='lneed';b.className='lneed';b.onclick=function(){jobClose();try{LAND.settle();}catch(e){}save(true);sfx('click');post({type:'back'});};document.body.appendChild(b);}b.textContent=NEED+' Tap to go back.';}
 window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||!S)return;
-  if(d.type==='cash'){S.cash=d.cash;FROZEN=d.frozen||'';if(!!d.left!==!!LEFT||!!d.voy!==!!VOY){LEFT=d.left?1:0;VOY=d.voy?1:0;window.GM_AWAY=!!VOY;leftBack();}var nd=d.need||'';if(nd!==NEED){NEED=nd;needBar();}gameTime(d.day);updateHeader();}
+  if(d.type==='cash'){S.cash=d.cash;FROZEN=d.frozen||'';if(!!d.left!==!!LEFT||!!d.voy!==!!VOY){LEFT=d.left?1:0;VOY=d.voy?1:0;window.GM_AWAY=!!VOY;leftBack();}window.GM_AWAY=!!VOY||!!d.gpa;/* Pass 279: Grandma is off the land while she can't be reached */var nd=d.need||'';if(nd!==NEED){NEED=nd;needBar();}gameTime(d.day);updateHeader();}
   if(d.type==='own')syncOwn(d);
   if(d.type==='job')jobFromGame(d.id);
   if(d.type==='vis')landVis(!!d.on);
