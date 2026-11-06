@@ -78,6 +78,7 @@ function finishReversi(){let b=0,w=0;for(const row of board)for(const v of row){
 // Gomoku: you had five and didn't take it, or the bot can make five next and one stone would have stopped it.
 // Reversi: the move lets the bot take a corner the best move didn't give, and the search scores it 100+ worse;
 // near the end (8 or fewer empty squares, searched to the last move) a swing of 10+ discs, or a win turned into a loss.
+const OB=60;
 function winCells(b,p){return candidatesG(b).filter(m=>gomokuAt(b,m.r,m.c,p)>=100000000)}
 // a point where p makes an open four or two fours at once: five follows whatever the other side does
 function forkCells(b,p){return candidatesG(b).filter(m=>{if(b[m.r][m.c])return false;b[m.r][m.c]=p;let open4=false,fours=0;for(const[dr,dc]of dirs){const v=runScore(b,m.r,m.c,p,dr,dc);if(v>=120000)open4=true;else if(v>=18000)fours++}b[m.r][m.c]=0;return open4||fours>=2})}
@@ -86,9 +87,12 @@ function mistake(pre,r,c){if(game==='gomoku'){if(wins(board,r,c,HUMAN))return fa
  const ms=legalMoves(pre,HUMAN);if(ms.length<2||gameEnded())return false;const empties=pre.flat().filter(v=>!v).length,exact=empties<=8,d=exact?64:3;
  const val=m=>{const nb=pre.map(row=>row.slice());applyMove(nb,m.r,m.c,HUMAN);return {b:nb,v:revSearch(nb,d,-Infinity,Infinity,AI,false)}};
  const corner=b=>legalMoves(b,AI).some(m=>(m.r===0||m.r===7)&&(m.c===0||m.c===7));
- let best=null,mine=null;for(const m of ms){const x=val(m);if(!best||x.v<best.v)best=x;if(m.r===r&&m.c===c)mine=x}if(!mine||mine===best)return false;
+ let best=null,mine=null;const vals=[];for(const m of ms){const x=val(m);vals.push(x);if(!best||x.v<best.v)best=x;if(m.r===r&&m.c===c)mine=x}if(!mine||mine===best||mine.v===best.v)return false;
  if(exact){const a=mine.v/10000,z=best.v/10000;return a-z>=10||(z<0&&a>0)}
- return corner(mine.b)&&!corner(best.b)&&mine.v-best.v>=100}
+ if(corner(mine.b)&&!corner(best.b)&&mine.v-best.v>=100)return true;
+ // Pass 282 (Puti): one move clearly stands out (the next best is OB worse) and you played something else that much worse too. Ties or close calls: no question.
+ const isC=m=>(m.r===0||m.r===7)&&(m.c===0||m.c===7),bestM=ms[vals.indexOf(best)];if(isC(bestM)&&!isC({r,c})&&mine.v-best.v>=10)return true;// the search's pick is a corner and you didn't take one
+ let second=Infinity;for(const x of vals)if(x!==best&&x.v<second)second=x.v;return second-best.v>=OB&&mine.v-best.v>=OB}
 function showAdvice(){$('adv1').hidden=false;$('adv2').hidden=true;$('advice').hidden=false;setStatus('Grandma looks at the board.');setTurn('Grandma · watching')}
 function hideAdvice(){$('advice').hidden=true}
 function step2(){$('adv1').hidden=true;$('adv2').hidden=false}

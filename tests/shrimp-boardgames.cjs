@@ -57,7 +57,7 @@ const {chromium}=require('playwright');const path=require('path');
  const rs=await p.evaluate(()=>{var t=document.getElementById('bg-el')._t;document.getElementById('bg-el').start({mode:'gm',game:'reversi',advice:true,sound:()=>false});var asked=0,moves=0,seed=3;var rnd=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);
   for(var gI=0;gI<12;gI++){var b=Array.from({length:8},()=>Array(8).fill(0));b[3][3]=2;b[3][4]=1;b[4][3]=1;b[4][4]=2;for(var ply=0;ply<60;ply++){var who=ply%2?2:1;var ms=who===1?t.legal(b):(function(){var x=[];for(var r=0;r<8;r++)for(var c=0;c<8;c++){var bb=b.map(q=>q.slice());if(!bb[r][c]&&t.apply(bb,r,c,2))x.push({r,c});}return x;})();if(!ms.length)continue;var m=ms[Math.floor(rnd()*ms.length)];
    if(who===1&&ms.length>1){var pre=b.map(q=>q.slice()),nb=b.map(q=>q.slice());t.apply(nb,m.r,m.c,1);moves++;if(t.mistake(pre,m.r,m.c,nb))asked++;}t.apply(b,m.r,m.c,who);}}return {asked,moves};});
- console.log('reversi random moves questioned',rs.asked,'of',rs.moves);if(rs.asked>rs.moves*0.35||rs.asked<1)throw Error('reversi question rate '+JSON.stringify(rs));
+ console.log('reversi random moves questioned',rs.asked,'of',rs.moves);if(rs.asked>rs.moves*0.45||rs.asked<1)/* Pass 282: random play misses corners a lot, a missed corner is asked */throw Error('reversi question rate '+JSON.stringify(rs));
  await p.click('#bg-x');
  // second year: Never show this again; next June has no card but the You tab row
  st=await p.evaluate(()=>{G.day=bgJ1(2029)-0.5;for(var i=0;i<4&&!bgHold(G);i++)stepGame(G,0);render();var nv=!!document.querySelector('[data-v="never"]');document.querySelector('[data-v="never"]')&&document.querySelector('[data-v="never"]').click();G.day=bgJ1(2030)-0.5;for(var j=0;j<4;j++)stepGame(G,0);render();return {nv,never:bgOf(G).never,hold:bgHold(G),row:!document.getElementById('me-bgc').hidden,card:!document.getElementById('bg-card').hidden};});
@@ -77,5 +77,10 @@ const {chromium}=require('playwright');const path=require('path');
  st=await p.evaluate(()=>{var el=document.getElementById('bg-el'),b=Array.from({length:15},()=>Array(15).fill(0));b[7][6]=b[7][7]=b[7][8]=2;b[0][0]=b[0][1]=b[14][14]=1;var pre=b.map(r=>r.slice()),post=b.map(r=>r.slice());post[3][3]=1;var bad=el._t.mistake(pre,3,3,post);var ok=b.map(r=>r.slice());ok[7][5]=1;return {bad:bad,ok:el._t.mistake(pre,7,5,ok)};});
  if(!st.bad||st.ok)throw Error('open three question '+JSON.stringify(st));
  st=await p.evaluate(()=>{bgClose();return {busy:busyUI(),t:Date.now()-BG.t};});if(!st.busy)throw Error('story card right after a game');
+ // Pass 282: Reversi, one move clearly best (the corner) and you play elsewhere, Grandma asks; play the corner, she doesn't
+ st=await p.evaluate(()=>{var el=document.getElementById('bg-el');bgOpen('gm','reversi');var b=Array.from({length:8},()=>Array(8).fill(0));b[3][3]=b[4][4]=2;b[3][4]=b[4][3]=1;b[0][1]=b[0][2]=2;b[0][3]=1;
+  var ms=el._t.legal(b),other=ms.filter(m=>!(m.r===0&&m.c===0))[0];var post=b.map(r=>r.slice());el._t.apply(post,other.r,other.c,1);var bad=el._t.mistake(b,other.r,other.c,post);
+  var post2=b.map(r=>r.slice());el._t.apply(post2,0,0,1);var good=el._t.mistake(b,0,0,post2);bgClose();return {bad:bad,good:good,n:ms.length};});
+ if(!st.bad||st.good)throw Error('reversi obvious move '+JSON.stringify(st));
  if(errs.length)throw Error(errs[0]);
  console.log('board game checks passed');await b.close();})().catch(e=>{console.error(e.message);process.exit(1);});

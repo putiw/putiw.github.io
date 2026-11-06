@@ -2915,3 +2915,10 @@ Puti's list on the board games, then the approved Grandma and health preview (UI
 - Field guide: folded above the live tank in a health check (and QC look), and replacing the text list in the cure step. Four shrimp from `tvBody`: healthy, pale ring behind the head, milky body, white threads, each with the old guide's line. Inspection flow and cures unchanged.
 
 Tests: balance 168 (locked-prize check replaces the half-cash one), academy 10, me 55, cardtap, boardgames (new: card text and buttons, no card at 40x, Grandma's streak, no Undo or level, zoom and pan, Inter, open-three question, 10 s hold, win pop). Browser 390 and 360: card, board, zoom, intro card, note banner, field guide open, a tap on the live tank still picks a shrimp with the guide open, no sideways scroll. Not run: bots, spotlight sweep, monkey, stable, tight (before deploy).
+
+## Pass 282: tanks in the Tanks card, Reversi question (6 Nov)
+
+- Gear: the 40 L and 80 L Bigger tank rows sat in Room and filter and the 160 L one moved to the Tanks card once it showed. Now every Bigger tank row is in the Tanks card from the first (same room reveal), the card shows whenever it has a row. Room and filter is gone; Better filter sits in Equipment with the auto feeder and auto water changer (was Runs itself), behind the same reveal as before.
+- Reversi, Grandma's question: also when the search's best move is a corner and you played elsewhere (10+ worse), or one move clearly stands out (next best 60+ worse) and you played one 60+ worse. Close or tied moves never get asked. Random moves get asked about 37% of the time (was 12%), still at most 3 a game; the test bound is 45%.
+
+Tests: balance 168, academy 10, me 55, cardtap, boardgames (new: corner on offer, play elsewhere asks, take it doesn't). Browser 390: Tanks card with 20, 40, 80 L tanks shows the Bigger tank row, groups Equipment, Temperature, Decor and plants.

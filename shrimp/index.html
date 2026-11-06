@@ -718,7 +718,7 @@ h1,h2,h3,h4,summary,button,.btn,label,th,.scope-label{text-wrap:balance}p,li,sma
 <button role="tab" data-tab="hard" id="tab-hard" aria-selected="false" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2.5 16 8 6.5l3 5 2-3 4.5 7.5z"/><path d="M6.6 9 8 10l1.3-1"/></svg><span class="tl">Hard part</span></button>
 <button role="tab" data-tab="world" id="tab-world" aria-selected="false" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M3 10h14M10 3c2.4 2.6 2.4 11.4 0 14M10 3c-2.4 2.6-2.4 11.4 0 14"/></svg><span class="tl">World</span></button><button role="tab" data-tab="research" id="tab-research" aria-selected="false" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3h4M8.8 3v5L4.5 15a1.3 1.3 0 0 0 1.1 2h8.8a1.3 1.3 0 0 0 1.1-2L11.2 8V3"/><path d="M6.3 12h7.4"/></svg><span class="tl"><span class="tl-l">Lab</span><span class="tl-s">Lab</span></span></button><button role="tab" data-tab="space" id="tab-space" aria-selected="false" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="4.3"/><path d="M3.2 13.6c-1-1.8 3.3-4.6 7.3-6s7.6-1.4 6.3.8"/></svg><span class="tl">Space</span></button><button role="tab" data-tab="land" id="tab-land" aria-selected="false" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 15c3-2 5-2 8 0s5 2 8 0"/><path d="M5 12V8l3-3 3 3v4"/></svg><span class="tl">Grandma’s land</span></button></div></nav>
 
-<script src="taps.js?v=p234"></script><script src="boardgames.js?v=p281"></script><script src="region-map.js?v=p280" async></script>
+<script src="taps.js?v=p234"></script><script src="boardgames.js?v=p282"></script><script src="region-map.js?v=p280" async></script>
 <script>
 // ==SIM-START==
 var DT=0.25, DREAM_DAYS=3650;
@@ -4709,7 +4709,7 @@ function trim(n,d){return String(+Number(n).toFixed(d));}
 (function(){var vv=window.visualViewport,fix=function(){var a=document.activeElement,typing=!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!/^(range|checkbox|radio|button)$/.test(a.type||''));document.body.classList.toggle('kbd',typing&&!!vv&&vv.height<window.innerHeight*0.8);var t=document.querySelector('.tabs');if(t&&t.style.transform)t.style.transform='';};if(vv){vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);}document.addEventListener('focusin',function(){setTimeout(fix,300);});document.addEventListener('focusout',function(){setTimeout(fix,50);setTimeout(fix,400);});})();
 // No browser feel: no pinch or double-tap zoom, no long-press menu outside text fields.
 (function(){var stop=function(e){e.preventDefault();};['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,stop,{passive:false});});document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea,[contenteditable]')))e.preventDefault();});})();
-var toastT=null,NF=null,BUILD='2026-11-06T22:43-p281';
+var toastT=null,NF=null,BUILD='2026-11-06T22:51-p282';
 function buildDate(){var m=BUILD.match(/^(\d{4})-(\d\d)-(\d\d)(?:T(\d\d:\d\d))?/);if(!m)return '';return 'Updated '+(+m[3])+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m[2]-1]+' '+m[1]+(m[4]?', '+m[4]+' UAE':'');}
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
@@ -6723,7 +6723,8 @@ function endingHTML(G){var id=endingPick(G),X=ENDINGS[id]||ENDINGS.drift_shop,WL
 function upHas(ts){var L=[['filter','better filter',function(t){return (t.filter||0)>0;}],['heater','heater',function(t){return t.heater;}],['fan','fan',function(t){return t.fan;}],['feeder','auto feeder',function(t){return t.feeder;}],['autoWC','water changer',function(t){return t.autoWC;}],['moss','moss',function(t){return t.moss;}],['wood','driftwood',function(t){return t.wood;}],['leaves','almond leaves',function(t){return t.leaves;}],['plants','plants',function(t){return t.plants;}]];
  var fm=Math.min.apply(null,ts.map(function(t){return t.filter||0;}));L[0][1]=(FILT_NAME[fm]||'filter').toLowerCase();var h=L.filter(function(x){return ts.every(function(t){return !!x[2](t);});}).map(function(x){return x[1];});return h.length?(ts.length>1?'All have: ':'Has: ')+h.join(', ')+'.':(ts.length>1?'Nothing bought for every tank yet.':'Nothing bought for this tank yet.');}
 function updateUpgrades(){
-  var T=TK();$('tankscard').hidden=!tankRoomOpen(G)||ownTank(G);
+  var T=TK();
+  if(ownTank(G))$('tankscard').hidden=true;
   var sig='up'+Math.round(G.money)+'|'+G.sel+'|'+!!G.opt.upAll+'|'+G.tanks.length+'|'+RV()+'|'+JSON.stringify(G.tanks.map(function(t){return[t.volTier,t.filter,t.heater,t.fan,t.feeder,t.autoWC,t.moss,t.wood,t.leaves,t.plants];}));
   if(sig===cache.upsig)return;cache.upsig=sig;
   var nc=NEW_TANK_COST[G.tanks.length];
@@ -6739,19 +6740,20 @@ function updateUpgrades(){
   setT('u-for',all?G.tanks.length+' tanks':T.name);
   // Pass 190: one row of tank chips (Tank 1, Tank 2 ... All), then one line of what that tank already has
   var uph=multi?'<div class="up-chips">'+G.tanks.map(function(t,i){return '<button class="tchip" data-act="upchip" data-v="'+i+'" aria-pressed="'+(!all&&G.sel===i)+'">'+t.name+'</button>';}).join('')+'<button class="tchip" data-act="upchip" data-v="all" aria-pressed="'+all+'">All</button></div><p class="up-has">'+upHas(all?G.tanks:[T])+'</p>':'';
-  var GROUPS={feeder:'Runs itself',autoWC:'Runs itself',fan:'Temperature',heater:'Temperature',chiller:'Temperature',tank:'Room and filter',filter:'Room and filter',moss:'Decor and plants',wood:'Decor and plants',leaves:'Decor and plants',plants:'Decor and plants'},grp={},gord=[];
-  var doneN=[],bigRow='',tcOn=!$('tankscard').hidden;// Pass 190: bought items sit in a closed Done (n) fold at the bottom, no Show completed
+  /* Pass 282 (Puti, 6 Nov): every bigger tank sits in the Tanks card from the first one, the filter with the other equipment, no Room and filter group */
+  var GROUPS={feeder:'Equipment',autoWC:'Equipment',filter:'Equipment',fan:'Temperature',heater:'Temperature',chiller:'Temperature',tank:'Tanks',moss:'Decor and plants',wood:'Decor and plants',leaves:'Decor and plants',plants:'Decor and plants'},grp={},gord=[];
+  var doneN=[],bigRow='',tcOn=!ownTank(G);// Pass 190: bought items sit in a closed Done (n) fold at the bottom, no Show completed
   UPG.forEach(function(u){
     var cost=upgradeCost(G,T,u.id),tot=0,cnt=0;
     if(all){G.tanks.forEach(function(t){var c=upgradeCost(G,t,u.id);if(c!=null){tot+=c;cnt++;}});if(!cnt){doneN.push(u.name(T));return;}}
     else if(cost==null){doneN.push(u.name(T));return;}
-    var gname=GROUPS[u.id]||'Other';if(!gearGroupOpen(gname)&&cost!=null)return;
+    var gname=GROUPS[u.id]||'Other';if(!gearGroupOpen(u.id==='filter'?'Tanks':gname)&&cost!=null)return;
     var btn=all?(cnt?'<button class="btn primary" data-act="upgall" data-id="'+u.id+'"'+(G.money<tot?' disabled':'')+'>'+aed(tot)+(cnt<G.tanks.length?'<small> · '+cnt+' tanks</small>':'')+'</button>':'<button class="btn" disabled>Done</button>'):
       cost==null?'<button class="btn" disabled>Done</button>':'<button class="btn primary" data-act="upg" data-id="'+u.id+'"'+(G.money<cost?' disabled':'')+'>'+aed(cost)+'</button>';
     var nd=all?(cnt&&G.money<tot?tot:0):(cost!=null&&G.money<cost?cost:0);
     if(u.id==='tank'&&tcOn){bigRow=itemHTML(u.name(T)+(multi&&!all?' · '+T.name:''),u.desc(T),btn,nd?loanRow(nd):'');return;}/* UI/UX chat 1 (E2): the bigger tank sits first in the Tanks card */
     if(!grp[gname]){grp[gname]='';gord.push(gname);}grp[gname]+=itemHTML(u.name(T),u.desc(T),btn,nd?loanRow(nd):'');
-  });$('bigtank').mhtml=bigRow;
+  });$('bigtank').mhtml=bigRow;$('tankscard').hidden=ownTank(G)||(!bigRow&&!tankRoomOpen(G));
   var uph0=uph;uph='';// Pass 180: the show/hide toggle sits above the list, so what it opens appears below it
   gord.forEach(function(gn){uph+='<div class="ugroup"><h3 class="track">'+gn+'</h3>'+grp[gn]+'</div>';});
   /* UI/UX chat 1 (E1, Puti 6 Nov): treats are unlocked and picked in Feeding */
@@ -6760,7 +6762,7 @@ function updateUpgrades(){
   $('auto-feed').hidden=!T.feeder;$('auto-wc1').hidden=!T.autoWC;$('auto-wc2').hidden=!T.autoWC;
 }
 // Gear groups open when they matter: temperature once the water runs warm or cold, room once a tank gets crowded, decor and treats with the first babies.
-function gearGroupOpen(g){if(G.opt.all||kitsOpen(G))return true;if(g==='Temperature')return rv('temp');if(g==='Room and filter')return rv('room');if(g==='Decor and plants'||g==='Treats')return G.stats.born>0;return true;}
+function gearGroupOpen(g){if(G.opt.all||kitsOpen(G))return true;if(g==='Temperature')return rv('temp');if(g==='Tanks')return rv('room');if(g==='Decor and plants'||g==='Treats')return G.stats.born>0;return true;}
 function updateHeader(){
   var np=headNet(G),noInc=headNoInc(G);$('b-net').title=noInc&&np<0?'Tank bills: electricity for the filter and lights, plus food when you feed them':'';setT('b-net',np==null||!anyHad()?'':noInc&&np<0?'bills '+(-np>=1e4?hN(-np):Math.round(-np))+'/d':(np>=0?'+':'−')+hN(Math.abs(np))+'/d');$('b-net').style.color=np==null?'':noInc&&np<0?'var(--ink-3)':np>=0?'var(--good)':'var(--bad)';
   setT('b-money',Math.abs(G.money)>=1e4?(G.money<0?'-':'')+'AED '+hN(Math.abs(G.money)):aed(G.money));$('b-money').classList.toggle('neg',G.money<0);
