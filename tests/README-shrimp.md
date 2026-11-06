@@ -2924,3 +2924,22 @@ Tests: balance 168 (locked-prize check replaces the half-cash one), academy 10, 
 Tests: balance 168, academy 10, me 55, cardtap, boardgames (new: corner on offer, play elsewhere asks, take it doesn't). Browser 390: Tanks card with 20, 40, 80 L tanks shows the Bigger tank row, groups Equipment, Temperature, Decor and plants.
 
 Deploy 6 Nov (Passes 281-282): strong cold WIN 7 day 2695 (empire_dictator), strong kind WIN 7 day 4285 (question_lucky), average Earth day 7280 (19.95 years, waiting 42 min, min cash 184), spotlight sweep 144 all good, monkey 150 actions on 7 stages at 390 and 360 px pass.
+
+## Pass 283: three genres per game (7 Nov)
+
+- Shrimp games: the genre list (all 13 in a select) is gone. Each new game offers 3 random genres that still have a title, as chips under "A new game" (no label, full width so Idle / tycoon fits at 360 px). The three stay until Start, then the next game rolls new ones. Fewer than 3 left shows what's left. Only an offered genre can be picked (`gameOpts`, `dr.o`).
+
+Tests: balance 168 (new in the games check: 3 distinct offers, they stay, an unoffered genre is refused, rerolled after Start, random across rolls, 2 left shows 2), academy 10, me 55. Browser 390 and 360: three chips, none cut, a tap picks.
+
+## Pass 284: kit packing art from the preview, scripts network first (7 Nov)
+
+Ported from Codex's `kit-packing-preview` (feature diff against its Pass 264 base, none of its demo start, money or URL flags):
+- Packing table: each of the five steps has its own pixel art, Seal included; the tapped step plays its 8 frames. The button says the materials price, then Next, then Finish (the step name is its aria label).
+- After the fifth tool: one sprite loops through all five steps next to the ready line, the cost (AED and 8 shrimp) and one Pack button. Pack 10 and the hidden Market price button are gone. The loop stops off screen, on a hidden page and with reduced motion (bounding rect, not IntersectionObserver).
+- Kit extras: one row with icons, "Extra AED per kit" on the right of the heading, in Kits and in the Company Kits card (Added stays there).
+- Kits stats show from stage 2 (no Owners line in the early card). The ready line is shorter: "94 ready · 10 kept to breed" or "94 spare shrimp".
+- PNGs in `shrimp/` (bag, catch, oxygen, seal, box, extra-moss, extra-snail, extra-wood, extra-planted), added to sw.js.
+- Grandma's face and the field guide were already in from Pass 281 (folded by default), not ported again.
+- sw.js: scripts are network first like pages. A phone kept an old boardgames.js from the cache, which is likely the Gomoku board Puti saw (the branch board puts stones on the crosses at 360 and 390, checked).
+
+Tests: balance 168, academy 10, me 55, cardtap, kitpack (new: five steps with art, Seal its own, a tap plays, five taps pack, fifth tool brings the loop and Pack, the loop moves, Pack packs one, four extras in one row with icons and none cut, Moss toggles and the cost line follows, no sideways scroll, no errors) at 390 and 360. Bots, spotlight sweep and monkey skipped on Puti's word: no sim change.

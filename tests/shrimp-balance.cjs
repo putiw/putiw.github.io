@@ -579,7 +579,7 @@ count++;console.log('PASS Pass 119 card headers and Money sheet');
 // Pass 120: Kits tab is three cards: Kits, Making kits (packing + quality checks), Kit development; sales staff have their own card in Ads
 {const kitsSec=html.slice(html.indexOf('<section class="panel" id="p-emp"'),html.indexOf('<section class="panel" id="p-world"'));
  const make=kitsSec.slice(kitsSec.indexOf('id="c-staff"'),kitsSec.indexOf('id="c-sales"'));
- if(!make.includes('<h2>Making kits</h2>')||!make.includes('id="kit-steps"')||make.includes('id="qccard"')||!make.includes('id="kit-packrow"')||!kitsSec.includes('class="card coll" data-k="qc" id="qccard"'))throw Error('Making kits holds packing, quality checks are their own optional card (Pass 135)');
+ if(!make.includes('<h2>Making kits</h2>')||!make.includes('id="kit-steps"')||make.includes('id="qccard"')||!make.includes('id="auto-pack-loop"')||!kitsSec.includes('class="card coll" data-k="qc" id="qccard"'))throw Error('Making kits holds packing, quality checks are their own optional card (Pass 135)');
  if(!kitsSec.includes('<h2>Kits</h2>')||!html.includes('id="c-sales"')||html.includes("activeTab==='promote'?'Sales staff'"))throw Error('Kits card renamed, sales staff in their own card');
  if(html.includes("['Adoption ceiling',")||html.includes("['Packed yesterday',"))throw Error('Ceiling lives with Regions, packing numbers with Making kits');}
 count++;console.log('PASS Pass 120 Kits tab in three cards');
@@ -1201,6 +1201,12 @@ if(gameRelease(readyGame()))throw Error('nothing to release');var x0=c;if(!gameR
 if(R.t!=='Red Shrimp Redemption'||!R.rp)throw Error('released');var full=R.s0;if(!(R.s0*gameFade(R,R.d+1)<full*0.01))throw Error('day 1 under 1%');
 if(Math.abs(gameFade(R,R.d+365)-1)>1e-9)throw Error('day 365 at the formula');if(!(gameFade(R,R.d+182)<0.55&&gameFade(R,R.d+182)>0.45))throw Error('half way');if(!(gameFade(R,R.d+800)<1))throw Error('fades after');
 // sequels: originals first, never repeated; then 2, 3, Definitive, Extended, Retold, Return of the best one; each 15% under the one before
+// Pass 283: 3 random genres per new game, kept until Start, rerolled after; only offered ones can be set; fewer when fewer are left
+var go=me(readyGame());go.me.p2=['games'];var GO=gmOf(go),o1=gameOpts(go);if(o1.length!==3||new Set(o1).size!==3||o1.indexOf(GO.dr.g)<0)throw Error('3 genres '+o1);if(gameOpts(go).join()!==o1.join())throw Error('offers stay');
+var off=GAME_GEN.map(function(x){return x[0];}).filter(function(x){return o1.indexOf(x)<0;})[0];if(gameSet(go,'g',off))throw Error('unoffered genre set');if(!gameSet(go,'g',o1[2])||GO.dr.g!==o1[2])throw Error('offered genre set');
+var rr={};for(var n=0;n<12;n++){GO.cur=null;GO.dr.o=null;rr[gameOpts(go).join()]=1;}if(Object.keys(rr).length<4)throw Error('offers not random');
+GO.cur=null;gameOpts(go);if(!gameStart(go)||GO.dr.o)throw Error('reroll after start');GO.cur=null;
+GO.rel=GAMES.filter(function(t){return ['action','horror'].indexOf(t[1])<0;}).map(function(t){return {t:t[0],b:t[0],k:GAME_SEQ.length,g:t[1],p:'pc',m:'paid',pr:40,q:50,d:0,s0:0};});GO.dr.o=null;var o2=gameOpts(go).slice().sort().join();if(o2!=='action,horror')throw Error('fewer left '+o2);
 var h=me(readyGame());var H=gmOf(h);H.dr.g='action';var seen={},names=[];for(var n=0;n<7;n++){if(!gameStart(h))throw Error('start '+n);var cu=H.cur;names.push(cu.t);if(seen[cu.t])throw Error('repeat '+cu.t);seen[cu.t]=1;cu.w=1;cu.q=50;gameRelease(h);}
 if(names.join('|')!=='Red Shrimp Redemption|Red Shrimp Redemption 2|Red Shrimp Redemption 3|Red Shrimp Redemption: Definitive Edition|Red Shrimp Redemption: Extended Edition|Red Shrimp Redemption: Retold|Red Shrimp Redemption: Return')throw Error('sequel order '+names);
 if(gameNext(h,'action'))throw Error('action is out');var e0=gameScore(H.rel[0]);for(var n=1;n<7;n++){var r=H.rel[n];if(Math.abs(r.s0-gameScore(r)*Math.pow(0.85,n))>1e-12||Math.abs(r.s0/H.rel[n-1].s0-(r.hit===H.rel[n-1].hit?0.85:r.hit?0.85*GAME_HIT:0.85/GAME_HIT))>1e-9)throw Error('15% step '+n);}
