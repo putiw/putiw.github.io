@@ -2922,3 +2922,5 @@ Tests: balance 168 (locked-prize check replaces the half-cash one), academy 10, 
 - Reversi, Grandma's question: also when the search's best move is a corner and you played elsewhere (10+ worse), or one move clearly stands out (next best 60+ worse) and you played one 60+ worse. Close or tied moves never get asked. Random moves get asked about 37% of the time (was 12%), still at most 3 a game; the test bound is 45%.
 
 Tests: balance 168, academy 10, me 55, cardtap, boardgames (new: corner on offer, play elsewhere asks, take it doesn't). Browser 390: Tanks card with 20, 40, 80 L tanks shows the Bigger tank row, groups Equipment, Temperature, Decor and plants.
+
+Deploy 6 Nov (Passes 281-282): strong cold WIN 7 day 2695 (empire_dictator), strong kind WIN 7 day 4285 (question_lucky), average Earth day 7280 (19.95 years, waiting 42 min, min cash 184), spotlight sweep 144 all good, monkey 150 actions on 7 stages at 390 and 360 px pass.
