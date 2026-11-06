@@ -2801,3 +2801,40 @@ Run (seed 7): strong cold WIN 3,714 empire_dictator, strong kind 4,285 question_
 ## Pass 273b (6 Nov, Puti)
 
 You, What happened is hidden until it has an entry (no "Nothing yet." card). shrimp-me 55.
+
+## Pass 274 (6 Nov, the little bird, project doc `claude/shrimp-handoff-littlebird-6nov.md`)
+
+Passes 271-273b deployed first (Puti said deploy). Then two cards ask the same question, take dirty money if you won't be caught:
+- `pain_payout` (1.5M owners, the bad moment): 4th option "A man covers the held money in cash, you don't ask from where", `{c:.5,min:5e4,d:3}`, no shell, no mood or heart cost, nothing later. History: "For five months a man you never asked about paid your bills."
+- `c_bonus` (hard part, a good year): 3rd option "Keep it in a company on an island, no tax, AED x", the month stays and `BIRD_KEEP` 25% more is earned as 'deals'. History: "A month of a good year sits on an island, under a name that isn't yours."
+- Card flag `bird` shows `BIRD_NOTE` "Random event. A little bird whispered in your ear: you will not be caught." above the choices (`.hint.story-bird`, `#milestone-actions` wraps only then). The pick goes to `G.story.bird={payout,bonus}` in the PUSH wrapper after a successful pick. PUSH: `{means:-.6,care:-.3}` and `{means:-.6,care:-.5}`.
+- Choice descriptions don't show on story cards (`storyShowDesc`), so the first draft label "Take the man's offer" said nothing; the label carries the offer now.
+
+Tests: `shrimp-balance` 164 (new: both options exist with the flag, PUSH lengths, the bird pays at least as much and is as fast as every other option, schedules nothing, no shell, no freeze, recorded, survives migrate). `shrimp-me` 55, `shrimp-academy` 10, `shrimp-cardtap`, `shrimp-endcards` 50. Browser: both cards from the average run at 360 and 390, no cut buttons, no page errors. Choices audit regenerated (project doc). Bots seed 7 unchanged: strong cold WIN 3,714 (takes the shell processors, then the island), strong kind 4,285, average Earth 7,308 (both take the first options).
+
+## Pass 274b (6 Nov, Puti on A good year)
+
+The label said AED 10.3B and the cost AED 1.59B: the label used a month of income, the cost was capped at cash (a snapshot below the card's own cash rule). `bonusAmt` is now one number for both, so the Costs line drops. Options: "Donate it to the Aid, AED x. All of it goes out, no tax on it." / "Share it with family and friends, AED x. About 30% of it goes to tax." (70% projects, 30% tax) / "Help a congresswoman pump a meme stock with it, AED x. 3 to 10 times back in a month." (replaces the island; pays x now, `later` 30 days pays x × 3 to 10 as deals, Times line "A meme stock nobody had heard of went up for three weeks, then to nothing."). Body adds "Then a congresswoman calls. She has a meme stock and needs a company with money to buy in first." This card's note: "...you will never be caught doing this." (`birdNote`). Balance 164 (rewritten bonus check: cost equals the label amount, donate untaxed, share 30% tax, pump schedules one payout of 3 to 10 times, nothing left after, survives migrate), me 55, academy 10, cardtap. Browser 360/390 no cuts. Strong cold seed 7 WIN 3,714 (unchanged, takes the pump at ×8.1).
+
+## Pass 275 (6 Nov, Puti: the Shrimpcoin pump, no sold out, slower planting)
+
+- A good year, the bird: "Pump Shrimpcoin with a congresswoman, AED x. About 10 to 20 times back in three months." (no coin yet: "Launch Shrimpcoin and pump it with a congresswoman", which launches it honest). Body: "A congresswoman calls. She wants to pump Shrimpcoin. / She wants you to launch Shrimpcoin so she can pump it. You buy first, quietly, she talks it up, you sell to everyone who comes after." Replaces the 274b meme stock and its `later`.
+- The pump (`C.pump`, `pumpDay` replaces the coin's daily price while it runs): up to about 12× by day 80, 12 to 14× to day 95, 20× on day 96 only, 15× then down to 10× on day 131, a year down to 0.03× at day 400; ±5% daily noise except the top day. Day 96 call: "She says sell, today. It's at twenty times what you paid and it won't be tomorrow." Day 123 call: "She calls again. It goes under ten times what you paid next week, she says. She got out a month ago." Both Exit / Hold (risk ∓.3). Day 300 Times: "Shrimpcoin went to the moon for three months and crashed to nothing on its way to Mars. A lot of people lost their retirement savings." Held to day 400, the stake is lost. The coin card shows The pump (chart titled with the multiple, put in, worth today, Exit) instead of the normal chart while it runs. The crash takes the price under break-even, so the coin planters stop.
+- `coinBuy`: no Nobody is selling. Cost of q coins from a float F is q·P·e^(q/2D)·F/(F−q), so the last coins cost without limit; the price rises by q/D − ln(1 − q/F). Daily drift can't push x over 3, a buy can push it to 5 (`COIN_XMAX`), drift brings it back.
+- `PLANT_DAY` 2M trees a day for everyone but your hand (`plantRoom`, `othersPlant`): galas queue (`C.gq`), ponds, spread, coin planters and `coinPlant` share it.
+
+Tests: balance 165 (pump shape, both calls, 20× exit, lost when held, save; buys never sell out and push the price; nobody plants over the limit; the gala test queues), me 55, academy 10, cardtap, endcards 50, hard 24. Browser 360/390: the call card and The pump, no cut buttons, no errors. Bots seed 7: strong cold 3,714 (unchanged, took the pump and held it to the win), strong kind 4,285 (unchanged), average Earth 7,308 → 7,280; no INSOLVENT or STUCK. Trees at the end: strong 3.9B others and ponds (was 8B incl. 6.4B bot coinPlant), average 5.6B (was 8B).
+
+## Pass 275b (6 Nov, Puti on call 1)
+
+Call 1 comes the day before the top (`PUMP_SPIKE-1`): "She calls. It's at N times what you paid. You can wait more if you want, I'm selling tomorrow. Don't blink." (N is the day's multiple, about 12 to 14). The 20× day is the next day only. Balance 165, me 55, cardtap; browser 360/390 checked.
+
+## Pass 276 (6 Nov, Puti: OK on the bird and pump lines, A good year once, coin profit, deploy)
+
+- Puti OK'd the Pass 274-275b lines.
+- A good year shows once a game: its cond also checks `progress.seen.c_bonus`, `G.story.bird.bonus` and a pump already run.
+- Shrimpcoin card: Average bought price (market buys plus the pump stake), All time profit (sold + held today − bought) and All time profit, % (two rows, one wrapped at 360); a small line at the bottom once anything was sold: "Profit you took out of Shrimpcoin so far: ±AED x" (sales minus the average buy price of the coins sold). `coinBook`.
+- A buy or sell while the pump runs moves the pump's price (`coinPx`); before it snapped the header back to the normal price for a day.
+
+Pre-deploy run (seed 7): strong cold WIN 3,714 empire_dictator, strong kind 4,285 question_lucky, average Earth 7,280; no INSOLVENT or STUCK. Balance 166, me 55, academy 10, cardtap, endcards 50, hard 24, frozen 5 tabs, tight 0 findings, monkey (150 actions, 7 stages, 390 and 360) pass, spotlights 143 checked all good. Browser: the coin card at 360 and 390 after a pump exit and a sale. Deployed 6 Nov with Passes 274-276.
+

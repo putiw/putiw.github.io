@@ -468,7 +468,7 @@ var g=readyGame();g.emp.farms={rack:3};g.emp.farmPaid={rack:[2000,2200,2400]};g.
 if(g.emp.farms.rack!==1||Object.keys(g.emp.pausedFarms).length||!(g.money>m0))throw Error('Two mothballed racks sold, one keeps running: '+g.emp.farms.rack);
 var h=readyGame();h.money=1e6;h.kits.sold=9999;if(treesOpen(h)||coinPlant(h,COIN_TREE))throw Error('Mangroves wait for 10,000 kits');h.kits.sold=1e4;if(!treesOpen(h)||coinPlant(h,coinPlantBatch(h))!==1)throw Error('Then one tree a tap, before any coin');
 var C=coinOf(h);C.trees=1000;for(var d=0;d<100;d++){h.day++;coinDay(h);}if(C.otrees<150||C.otrees>300||C.coins)throw Error('People copy what they see, about 0.2% a day, no coins before shrimpcoin: '+C.otrees);
-var o0=C.otrees;treesFromGala(h,4e6);if(C.otrees-o0!==1e6)throw Error('A mangrove gala pays for seedlings');
+var o0=C.otrees;treesFromGala(h,4e6);if(C.otrees!==o0||C.gq!==1e6)throw Error('A mangrove gala queues its seedlings');h.day+=1;treesDay(h);if(C.otrees-o0<1e6)throw Error('A mangrove gala pays for seedlings');
 `);
 if(!html.includes("lw2.hidden=hasFarm&&G.tanks.every(function(t){return t.feeder&&t.autoWC;})")||!html.includes("if(gc&&gc.closest('[hidden]:not(.panel)'))g=null;"))throw Error('Home gear stays until every tank runs itself, and the guide never points at a hidden card');
 if(!html.includes('data-act="hc-cull"')||!html.includes("a==='hc-cull'")||!html.includes('function openCull(i)')||!html.includes("careBack(v,x,T,t);"))throw Error('Cull is a choice in Check shrimp, and the care jobs live in the tank');
@@ -1291,5 +1291,39 @@ g.emp.op.run={id:'calm',left:2,before:.5};opinionDay(g);opinionDay(g);if(g.emp.o
 g.kits.sold=MKT_AT;delete g.emp.proj.ministry;delete g.emp.proj.studio;if(!projAvail(g).some(function(p){return p.id==='ministry';}))throw Error('ministry at MKT_AT');
 g.emp.proj.ministry=1;opinionDay(g);if(!g.emp.op.offer)throw Error('desk offers at MKT_AT');
 if(!milestoneConditions(g).market)throw Error('the Company/Market card at MKT_AT');
+`);
+check('Pass 274: the little bird options exist, carry the flag, pay more than the rest; the good year amount is the cost',`
+if(MILESTONES.pain_payout.bird!=='payout'||MILESTONES.c_bonus.bird!=='bonus')throw Error('bird flag missing');
+if(PAINS.pain_payout.ch.length!==4||CARDS3.c_bonus.ch.length!==3)throw Error('bird option missing');
+if(PUSH.pain_payout.length!==4||PUSH.c_bonus.length!==3||(PUSH.pain_payout[3].means||0)>=0||(PUSH.c_bonus[2].means||0)>=0)throw Error('bird PUSH');
+function pg(){var g=newGame();g.emp.kitsOpened=1;g.humans=1.6e6;g.money=1e7;g.fin=[];for(var i=0;i<7;i++)g.fin.push({kits:9e4});return g;}
+var res=[0,1,2,3].map(function(i){var g=pg(),m0=g.money,l0=(g.emp.later||[]).length,h0=g.emp.heart||0;if(!storyChoose(g,'pain_payout',i))throw Error('payout '+i);return {dm:g.money-m0,d:g.emp.pains.pain_payout.until-g.day,later:(g.emp.later||[]).length-l0,shell:!!g.emp.shell,g:g};});
+var b=res[3];if(b.shell||b.later||b.g.emp.frozen)throw Error('bird payout schedules something');if(b.g.story.bird.payout!==3)throw Error('bird payout not recorded');
+res.slice(0,3).forEach(function(r,i){if(!(b.dm>=r.dm&&b.d<=r.d))throw Error('bird payout not the best money option vs '+i);});
+var cg=function(){var g=pg();g.emp.hard={};hardOf(g);g.emp.hard.picks=g.emp.hard.picks||{};return g;};
+var bres=[0,1,2].map(function(i){var g=cg(),m0=g.money,l0=(g.emp.later||[]).length,lab=CARDS3.c_bonus.lab(g,i),a=bonusAmt(g);if(!storyChoose(g,'c_bonus',i))throw Error('bonus '+i);var f=g.today||{};return {dm:g.money-m0,a:a,lab:lab,tax:-(f.tax||0),later:(g.emp.later||[]).length-l0,g:g};});
+bres.forEach(function(r,i){if(Math.abs(-r.dm-r.a)>1)throw Error('bonus '+i+' costs '+(-r.dm)+' not the label amount '+r.a);if(r.lab.indexOf(fmtA(r.a))<0)throw Error('bonus label amount '+r.lab);});
+if(bres[0].tax>0||bres[0].later||!/^Donate/.test(bres[0].lab))throw Error('donate');if(Math.abs(bres[1].tax-0.3*bres[1].a)>1)throw Error('share tax 30%');
+var bp=bres[2];if(bp.later||!/congresswoman/.test(bp.lab))throw Error('pump label or later');if(bp.g.story.bird.bonus!==2)throw Error('bird bonus not recorded');
+var PG=bp.g,PP=pumpOf(PG);if(!PP||!coinOn(PG)||Math.abs(PP.a-bp.a)>1)throw Error('pump starts and launches the coin');if(!/launch Shrimpcoin/.test(MILESTONES.c_bonus.bodyFn(cg())))throw Error('body asks to launch');
+var sv=JSON.parse(JSON.stringify(PG));migrate(sv);if(sv.story.bird.bonus!==2||!pumpOf(sv))throw Error('pump lost in save');
+var x10=null;for(var t=1;t<=PUMP_END;t++){var b=pumpBase(t);if(t>PUMP_SPIKE&&b<10&&x10==null)x10=t;}if(x10!==PUMP_X10+1)throw Error('ten times line at '+x10);
+if(pumpBase(PUMP_SPIKE)!==20||pumpBase(PUMP_SPIKE-1)>15||pumpBase(PUMP_SPIKE+1)>15||pumpBase(PUMP_END)>0.05)throw Error('pump shape');
+var m1=PG.money;for(var d=0;d<PUMP_SPIKE-1;d++){PG.day+=1;coinDay(PG);}var mc=milestoneConditions(PG);if(!mc.pump_call1||!/selling tomorrow/.test(MILESTONES.pump_call1.bodyFn(PG)))throw Error('first call the day before the top');PG.day+=1;coinDay(PG);
+var got=pumpExit(PG);if(got<19.9*PP.a||got>20.1*PP.a||PG.money-m1<got-1)throw Error('exit at the top pays 20x, got '+got/PP.a);if(pumpExit(PG))throw Error('exit twice');if(milestoneConditions(PG).pump_call2)throw Error('second call after exit');
+var H=JSON.parse(JSON.stringify(sv));for(var d2=0;d2<PUMP_X10-7;d2++){H.day+=1;coinDay(H);}if(!milestoneConditions(H).pump_call2)throw Error('second call a week before ten times');
+for(var d3=0;d3<300;d3++){H.day+=1;coinDay(H);}if(!pumpOf(H).done||!pumpOf(H).lost||pumpExit(H))throw Error('pump ends, held coins lost');
+if(!/never be caught doing this/.test(MILESTONES.c_bonus.birdNote))throw Error('bonus bird note');
+var o=newGame();delete o.story.bird;migrate(o);
+`);
+check('Pass 275: coins never sell out, more money pumps the price; nobody plants more than PLANT_DAY a day',`
+var g=readyGame();g.humans=1e9;g.kits.sold=2e6;g.money=1e15;var C=coinOf(g);C.on=1;C.coins=1e6;C.treasury=0;var p0=C.price,q=coinBuy(g,1e8);if(!(q>0&&q<1e6))throw Error('buy '+q);var q2=coinBuy(g,1e12);if(!(q2>0)||C.treasury>=1e6)throw Error('second buy '+q2);if(!(C.price>p0))throw Error('price not pumped');
+var h=readyGame();h.humans=4e9;h.kits.sold=2e6;var D=coinOf(h);D.trees=1e9;D.otrees=1e9;h.money=1e14;treesFromGala(h,4e10);var o0=D.otrees+(D.ptrees||0);h.day+=1;treesDay(h);if(D.otrees+(D.ptrees||0)-o0>PLANT_DAY+1)throw Error('more than PLANT_DAY in a day');if(!(D.gq>0))throw Error('gala queue');
+if(coinPlant(h,4e10)>PLANT_DAY)throw Error('coinPlant over the cap');
+`);
+check('Pass 276: A good year shows once; coinBook adds up buys, the pump and sales',`
+var g=readyGame();g.humans=1e9;g.money=1e12;var C=coinOf(g);C.on=1;C.coins=1e8;C.treasury=0;C.price=10;C.x=Math.log(10/12);var q=coinBuy(g,1e6);var b=coinBook(g);if(Math.abs(b.avg-1e6/q)>1e-6||Math.abs(b.ba-1e6)>1)throw Error('avg '+b.avg);
+C.price=20;var got=coinSell(g,q/2);b=coinBook(g);if(!b.sold||Math.abs(b.real-(got-b.avg*Math.floor(q/2)))>1)throw Error('realized '+b.real);if(Math.abs(b.all-(got+C.treasury*C.price-1e6))>1)throw Error('all time');
+var h=readyGame();h.progress.seen.c_bonus=true;if(CARDS3.c_bonus.cond(h))throw Error('bonus again after seen');var k=readyGame();k.story.bird={bonus:2};if(CARDS3.c_bonus.cond(k))throw Error('bonus again after pick');
 `);
 console.log(count+' focused balance and migration checks passed');
