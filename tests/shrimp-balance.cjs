@@ -1292,7 +1292,7 @@ g.kits.sold=MKT_AT;delete g.emp.proj.ministry;delete g.emp.proj.studio;if(!projA
 g.emp.proj.ministry=1;opinionDay(g);if(!g.emp.op.offer)throw Error('desk offers at MKT_AT');
 if(!milestoneConditions(g).market)throw Error('the Company/Market card at MKT_AT');
 `);
-check('Pass 274: the little bird options exist, carry the flag, pay more than the rest, schedule nothing',`
+check('Pass 274: the little bird options exist, carry the flag, pay more than the rest; the good year amount is the cost',`
 if(MILESTONES.pain_payout.bird!=='payout'||MILESTONES.c_bonus.bird!=='bonus')throw Error('bird flag missing');
 if(PAINS.pain_payout.ch.length!==4||CARDS3.c_bonus.ch.length!==3)throw Error('bird option missing');
 if(PUSH.pain_payout.length!==4||PUSH.c_bonus.length!==3||(PUSH.pain_payout[3].means||0)>=0||(PUSH.c_bonus[2].means||0)>=0)throw Error('bird PUSH');
@@ -1301,11 +1301,14 @@ var res=[0,1,2,3].map(function(i){var g=pg(),m0=g.money,l0=(g.emp.later||[]).len
 var b=res[3];if(b.shell||b.later||b.g.emp.frozen)throw Error('bird payout schedules something');if(b.g.story.bird.payout!==3)throw Error('bird payout not recorded');
 res.slice(0,3).forEach(function(r,i){if(!(b.dm>=r.dm&&b.d<=r.d))throw Error('bird payout not the best money option vs '+i);});
 var cg=function(){var g=pg();g.emp.hard={};return g;};
-var bres=[0,1,2].map(function(i){var g=cg(),m0=g.money,l0=(g.emp.later||[]).length;if(!storyChoose(g,'c_bonus',i))throw Error('bonus '+i);return {dm:g.money-m0,later:(g.emp.later||[]).length-l0,g:g};});
-if(!(bres[2].dm>0&&bres[2].dm>bres[0].dm&&bres[2].dm>bres[1].dm))throw Error('bird bonus pays less');if(bres[2].later)throw Error('bird bonus schedules something');
-if(bres[2].g.story.bird.bonus!==2)throw Error('bird bonus not recorded');
-var lb=CARDS3.c_bonus.lab(cg(),2);if(!/island, no tax, AED/.test(lb))throw Error('bonus label '+lb);
-var s=JSON.parse(JSON.stringify(bres[2].g));migrate(s);if(s.story.bird.bonus!==2)throw Error('bird lost in save');
+var bres=[0,1,2].map(function(i){var g=cg(),m0=g.money,l0=(g.emp.later||[]).length,lab=CARDS3.c_bonus.lab(g,i),a=bonusAmt(g);if(!storyChoose(g,'c_bonus',i))throw Error('bonus '+i);var f=g.today||{};return {dm:g.money-m0,a:a,lab:lab,tax:-(f.tax||0),later:(g.emp.later||[]).length-l0,g:g};});
+bres.forEach(function(r,i){if(Math.abs(-r.dm-r.a)>1)throw Error('bonus '+i+' costs '+(-r.dm)+' not the label amount '+r.a);if(r.lab.indexOf(fmtA(r.a))<0)throw Error('bonus label amount '+r.lab);});
+if(bres[0].tax>0||bres[0].later||!/^Donate/.test(bres[0].lab))throw Error('donate');if(Math.abs(bres[1].tax-0.3*bres[1].a)>1)throw Error('share tax 30%');
+var bp=bres[2];if(bp.later!==1||!/congresswoman/.test(bp.lab))throw Error('pump should schedule one payout');if(bp.g.story.bird.bonus!==2)throw Error('bird bonus not recorded');
+var sv=JSON.parse(JSON.stringify(bp.g));migrate(sv);if(sv.story.bird.bonus!==2)throw Error('bird lost in save');
+var m1=sv.money,h1=sv.emp.heart||0;sv.day+=31;laterDay(sv);var back=sv.money-m1;if(back<3*bp.a-1||back>10*bp.a+1)throw Error('pump back '+back/bp.a);if((sv.emp.later||[]).length||sv.emp.frozen)throw Error('pump leaves something behind');
+var cl=cg();cl.money=1e5;var la=CARDS3.c_bonus.lab(cl,0);if(la.indexOf(fmtA(bonusAmt(cl)))<0||bonusAmt(cl)>1e5)throw Error('bonus label above cash');
+if(!/never be caught doing this/.test(MILESTONES.c_bonus.birdNote))throw Error('bonus bird note');
 var o=newGame();delete o.story.bird;migrate(o);
 `);
 console.log(count+' focused balance and migration checks passed');
