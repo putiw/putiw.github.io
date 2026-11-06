@@ -2801,3 +2801,14 @@ Run (seed 7): strong cold WIN 3,714 empire_dictator, strong kind 4,285 question_
 ## Pass 273b (6 Nov, Puti)
 
 You, What happened is hidden until it has an entry (no "Nothing yet." card). shrimp-me 55.
+
+## Pass 274 (6 Nov, the little bird, project doc `claude/shrimp-handoff-littlebird-6nov.md`)
+
+Passes 271-273b deployed first (Puti said deploy). Then two cards ask the same question, take dirty money if you won't be caught:
+- `pain_payout` (1.5M owners, the bad moment): 4th option "A man covers the held money in cash, you don't ask from where", `{c:.5,min:5e4,d:3}`, no shell, no mood or heart cost, nothing later. History: "For five months a man you never asked about paid your bills."
+- `c_bonus` (hard part, a good year): 3rd option "Keep it in a company on an island, no tax, AED x", the month stays and `BIRD_KEEP` 25% more is earned as 'deals'. History: "A month of a good year sits on an island, under a name that isn't yours."
+- Card flag `bird` shows `BIRD_NOTE` "Random event. A little bird whispered in your ear: you will not be caught." above the choices (`.hint.story-bird`, `#milestone-actions` wraps only then). The pick goes to `G.story.bird={payout,bonus}` in the PUSH wrapper after a successful pick. PUSH: `{means:-.6,care:-.3}` and `{means:-.6,care:-.5}`.
+- Choice descriptions don't show on story cards (`storyShowDesc`), so the first draft label "Take the man's offer" said nothing; the label carries the offer now.
+
+Tests: `shrimp-balance` 164 (new: both options exist with the flag, PUSH lengths, the bird pays at least as much and is as fast as every other option, schedules nothing, no shell, no freeze, recorded, survives migrate). `shrimp-me` 55, `shrimp-academy` 10, `shrimp-cardtap`, `shrimp-endcards` 50. Browser: both cards from the average run at 360 and 390, no cut buttons, no page errors. Choices audit regenerated (project doc). Bots seed 7 unchanged: strong cold WIN 3,714 (takes the shell processors, then the island), strong kind 4,285, average Earth 7,308 (both take the first options).
+

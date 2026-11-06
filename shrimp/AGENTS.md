@@ -359,6 +359,7 @@ Run this before every push. Each line is something Puti asked for. If a line fai
 
 **Before friends play, Oct 26 (check these stay true)**
 - Coming back after closing or backgrounding the app catches up to 30 days, and stops early if a tank gets sicker or shrimp are dying.
+- The little bird (Pass 274): two cards ask if you take dirty money when promised you won't be caught, `pain_payout` (a 4th option, a man covers the held money, cheapest and fastest, no `shell`, nothing later) and `c_bonus` (a 3rd, keep the month on an island plus `BIRD_KEEP` 25% as 'deals', nothing later). The card flag `bird:'payout'|'bonus'` shows `BIRD_NOTE` above the choices (`.story-bird`, the actions row wraps) and records the pick in `G.story.bird` (created on the pick, old saves fine). Traits only in `PUSH` (means -0.6, care -0.3 / -0.5). Story choice descriptions don't show on these cards, so the label carries the offer.
 - Nothing saves while the page is hidden. Sound starts on the first tap on an iPhone. Start over is a migrated new game. Every pain card has a choice you can take with no money.
 
 **Play-test fixes, Oct 23 (check these stay true)**
@@ -550,6 +551,7 @@ Do not report a feature as finished just because its new path works once. Check 
 - Pass 271 (6 Nov): UI/UX Chat 1 done (tap anchor, reserves dropped, `shrimp-tight`, fixes outside Kits/Ads, Puti's answers: care on Tank, treats in Feeding, chiller with the heater, Excel course from the cash, one Grandma card with her place first). Not deployed. Chat 2 done in Pass 272.
 - Pass 272 (6 Nov): UI/UX Chat 2 done (100k gate, Company/Market/Hard part tabs, Kits and Ads items C1-C9). Not deployed. Puti OK'd the Company and Market card text and put memes behind the gate (Pass 272b). Next: Chat 3, the deploy review, project doc `claude/shrimp-handoff-uiux-chat3-6nov.md`.
 - Pass 273 (6 Nov): UI/UX Chat 3, the deploy review. Full pre-deploy run passed after three fixes: Start over from a save past 100k kits threw (`legacy-equipment` sits on Tank there), What happened on You shows the newest three with an Earlier fold (6,400 px in the hard part before), mall store buttons put the price on a second line (it was cut to "Open 1 · AED..."). `shrimp-tight` now flags a row button cut with an ellipsis (`btncut`). Waiting on Puti's play-through and "deploy".
+- Passes 271-273b deployed 6 Nov (Puti's "deploy"). Pass 274 (6 Nov): the little bird options on `pain_payout` and `c_bonus`, not deployed. Waiting on Puti to OK the three new lines and the note.
 - UI/UX cleanup (6 Nov, review `claude/shrimp-uiux-review-6nov.md`, handoff `claude/shrimp-handoff-uiux-6nov.md`): three chats. Chat 1 no jumps (extend `anchorGet`/`anchorFix` to taps, then drop text reserves), tight layout, fixes outside Kits/Ads; Chat 2 Company/Market tabs at 100k kits sold (media, desk, gala open then), Hard part tab replaces Market in `coMode`; Chat 3 deploy review. Targets stay. Science gets its own card.
 
 Planned and agreed with Puti, not built yet:
