@@ -27,7 +27,7 @@ p{margin:0 0 12px}.muted{color:var(--ink-3);font-size:14px}#st{min-height:1.4em;
 <div class="acts"><button id="b-play" aria-pressed="false">Play</button><button class="pri" id="b-feed">Feed</button><button class="pri" id="b-water">Change water</button><button id="b-hear">Hear the tank</button></div>
 <div id="lights" aria-label="Every sound, tap to hear it"></div>
 <label class="vol" for="feedvol">Feed volume<input type="range" id="feedvol" min="0" max="40" step="1"><span id="feedvol-v"></span></label>
-<p class="hint">Soft ticks are shrimp eating. If it hisses or the beep gets fast, feed less and change some water.</p>
+<p class="hint">Soft ticks are shrimp eating. If Ammonia lights up or the Nitrate beep gets fast, feed less and change some water.</p>
 <p id="st" role="status" aria-live="polite"></p>
 <button id="again" hidden>Start a new tank</button>
 <script>
@@ -225,8 +225,9 @@ function audio(){
   return A;
 }
 var LIGHTS=[['drop','Fountain'],['plop','Fountain plop'],['beep','Monitor beep'],['hiss','Hiss'],['eatA','Adult eating'],['eatJ','Young eating'],['eatB','Baby eating'],['idle','Sitting still'],['swimS','Swim, short'],['swimL','Swim, long'],['eggs','Eggs (double)'],['molt','Molt'],['moltfail','Failed molt'],['babies','Babies hatch'],['deathB','Death, baby'],['deathA','Death, adult'],['feed','Feeding'],['pour','Water change']],LEL={};
-var SHORT={drop:'Filter',beep:'Beep',hiss:'Hiss',feed:'Feeding',pour:'Water change',eatA:'Adult eats',eatJ:'Young eats',eatB:'Baby eats',idle:'Sitting',swimS:'Short swim',swimL:'Long swim',eggs:'Eggs',molt:'Molt',moltfail:'Failed molt',babies:'Babies hatch',deathB:'Baby dies',deathA:'Adult dies','p:wood':'Wood','p:stone':'Stones','p:plant':'Plants'},LORDER=['drop','beep','hiss','feed','pour','eatA','eatJ','eatB','idle','swimS','swimL','eggs','molt','moltfail','babies','deathB','deathA','p:wood','p:stone','p:plant'];/* Pass 295 (Puti): every sound a button on the page, lit while it plays */
-function lit(k,at,dur){if(k==='plop')k='drop';var el=LEL[k];if(!el)return;var d=Math.max(0,((at||0)-(A?A.ctx.currentTime:0))*1000);setTimeout(function(){el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('on')},Math.max(160,(dur||0)*1000))},d)}
+var SHORT={drop:'Filter',beep:'Nitrate',hiss:'Ammonia',feed:'Feeding',pour:'Water change',eatA:'Adult eats',eatJ:'Young eats',eatB:'Baby eats',idle:'Sitting',swimS:'Short swim',swimL:'Long swim',eggs:'Eggs',molt:'Molt',moltfail:'Failed molt',babies:'Babies hatch',deathB:'Baby dies',deathA:'Adult dies','p:wood':'Wood','p:stone':'Stones','p:plant':'Plants'},LORDER=['drop','beep','hiss','feed','pour','eatA','eatJ','eatB','idle','swimS','swimL','eggs','molt','moltfail','babies','deathB','deathA','p:wood','p:stone','p:plant'];/* Pass 295 (Puti): every sound a button on the page, lit while it plays */
+var LIT_FREE=0;/* Pass 295c (Puti): paused, the tank's own sounds don't light; a tap or Hear the tank still does */
+function lit(k,at,dur){if(k==='plop')k='drop';var el=LEL[k];if(!el)return;if(!TANK&&!PICRUN&&Date.now()>LIT_FREE)return;var d=Math.max(0,((at||0)-(A?A.ctx.currentTime:0))*1000);setTimeout(function(){el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('on')},Math.max(160,(dur||0)*1000))},d)}
 /* the filter sounds; each event at a random time (Poisson), rate × Density. Pitch and Size scale every drop. */
 var FRATE={trickle:3.5,bubbler:30,drip:0.7,rain:45,glug:1.3};
 var FPD={dens:1,pitch:1,size:1,bed:1},FPS={"bubbler":{"dens":1.2,"pitch":1.05,"size":1.35,"bed":0.5}};/* Puti's settings, 5 Nov */
@@ -501,7 +502,7 @@ function start(){
  if(!load())fresh();S.last=Date.now();lastReal=Date.now();line();
  var lg=$('lights');lg.innerHTML=LORDER.map(function(k){return '<button type="button" data-k="'+k+'">'+SHORT[k]+'</button>'}).join('');lg.querySelectorAll('[data-k]').forEach(function(b){LEL[b.dataset.k]=b});drawPic(-1);
  var fv=$('feedvol'),fvSet=function(v){MIX.feed=MIX.feed||{};MIX.feed.vol=v;fv.value=v;$('feedvol-v').textContent=Math.round(v/16*100)+'%';applyMix('feed')};var fv0=16;try{var sv=localStorage.getItem('ear-feedvol');if(sv!=null&&!isNaN(+sv))fv0=+sv}catch(e){}fvSet(fv0);/* Pass 295b (Puti): feed louder, and a bar to set it; 100% is the new default */
- fv.oninput=function(){fvSet(+fv.value);try{localStorage.setItem('ear-feedvol',fv.value)}catch(e){}};fv.onchange=function(){wake();hear('feed')};
+ fv.oninput=function(){fvSet(+fv.value);try{localStorage.setItem('ear-feedvol',fv.value)}catch(e){}};fv.onchange=function(){wake();LIT_FREE=Date.now()+1500;hear('feed')};
  document.body.addEventListener('pointerdown',wake);document.body.addEventListener('keydown',wake);
  $('b-play').onclick=function(){setTank(!TANK);speak(TANK?'Playing.':'Paused.')};
  $('b-feed').onclick=function(){wake();if(!TANK)setTank(true);doJob('feed');save();speak('Fed.');post({type:'care',k:'feed'})};
@@ -509,7 +510,7 @@ function start(){
  $('b-hear').onclick=function(){if(!wake())return;picPlay(null);speak('Left to right: wood is the bell, stones buzz, plants hum. High is the top of the tank.')};
  $('b-back').onclick=function(){save();if(A)A.ctx.suspend();post({type:'back'})};
  $('again').onclick=function(){fresh();line();speak('A new tank, 5 shrimp.')};
- $('lights').onclick=function(e){var b=e.target.closest('[data-k]');if(b){lit(b.dataset.k,0,0.5);hear(b.dataset.k)}};
+ $('lights').onclick=function(e){var b=e.target.closest('[data-k]');if(b){LIT_FREE=Date.now()+1500;lit(b.dataset.k,0,0.5);hear(b.dataset.k)}};
  setInterval(function(){if(document.hidden||PAUSED){lastReal=Date.now();return}var now=Date.now(),dt=(now-lastReal)/1000;lastReal=now;if(dt<0||dt>5)dt=0.25;advance(dt*24/DAY_S);line();if(Math.random()<0.05)save()},250);
  setInterval(sched,100);
  document.addEventListener('visibilitychange',function(){if(document.hidden){if(A)A.ctx.suspend();if(S)save()}else{lastReal=Date.now();if(A&&!PAUSED)A.ctx.resume()}});
