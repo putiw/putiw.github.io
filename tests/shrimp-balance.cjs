@@ -1335,7 +1335,7 @@ var h=readyGame();h.progress.seen.c_bonus=true;if(CARDS3.c_bonus.cond(h))throw E
 check('Pass 277/278: board game day opens 1 June 2028 (no farm needed), one game each a year, prize rule, level streak, forfeit',`
 if(BG_FROM!==2028)throw Error('second June from a 20 Oct 2026 start is 2028, got '+BG_FROM);var g=newGame();g.money=50000;var J1=bgJ1(2027);var dj=bgDate(J1);if(dj.getMonth()!==5||dj.getDate()!==1)throw Error('J1 '+dj);
 g.day=J1;bgDay(g);if(bgNow(g)||bgHold(g))throw Error('not in the first June');
-var J2=bgJ1(2028);g.day=J2-1;bgDay(g);if(bgNow(g))throw Error('May');g.day=J2;bgDay(g);var B=bgOf(g);if(farmBuilt(g)||!bgNow(g)||B.pop!==2028||!bgHold(g)||B.first!==2028)throw Error('opens 1 June 2028 without a farm');
+var J2=bgJ1(2028);g.day=J2;bgDay(g);if(bgNow(g))throw Error('Pass 286: waits for free time');g.me.on=1;g.progress.seen.me_intro=true;g.progress.soon=[];g.progress.wait=[];g.progress.queue=[];g.me.bg=null;g.day=J2-1;bgDay(g);if(bgNow(g))throw Error('May');g.day=J2;bgDay(g);var B=bgOf(g);if(farmBuilt(g)||!bgNow(g)||B.pop!==2028||!bgHold(g)||B.first!==2028)throw Error('opens 1 June 2028 without a farm');
 if(bgCanNever(g))throw Error('no Never in the first year');
 g.money=50000;var lv=bgEnter(g,'gomoku');if(lv!=='balanced'||bgHold(g))throw Error('enter');if(bgEnter(g,'gomoku')!==null)throw Error('enter twice');
 var m0=g.money,r=bgEnd(g,'gomoku','win');if(r.prize!==10000||g.money!==m0+10000)throw Error('capped prize '+r.prize);if(bgEnd(g,'gomoku','win')!==null)throw Error('second prize');
