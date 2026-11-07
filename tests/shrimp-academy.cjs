@@ -34,7 +34,7 @@ check('legacy saves acquire an empty lab without fabricated credentials, and no 
 var g=newGame();delete g.academy;g.space={v:1,started:false,colonies:{},surveys:{}};delete g.emp.trees;g.day=4000;g.kits.sold=100000;g.emp.won=3900;migrate(g);if(g.academy.level||g.academy.phds||g.space||!academyOpen(g))throw Error('Migration');
 `);
 check('research purchases protect live Earth working capital',`
-var g=newGame();g.kits.sold=ACADEMY_AT;g.emp.farms.barn=1;g.money=Math.round(50000*USD);var cash=g.money;if(fundAcademy(g)||g.money!==cash)throw Error('Spent reserve');g.money=Math.round(50000*USD)+capitalReserve(g);if(!fundAcademy(g))throw Error('Safe grant rejected');
+var g=newGame();g.kits.sold=ACADEMY_AT;g.emp.farms.barn=1;g.money=Math.round(50000*USD);var cash=g.money;g.emp.reserveDays=14;/* Pass 294: only when the player sets a reserve */if(fundAcademy(g)||g.money!==cash)throw Error('Spent reserve');g.money=Math.round(50000*USD)+capitalReserve(g);if(!fundAcademy(g))throw Error('Safe grant rejected');
 `);
 check('keep observing repeats observing, and no study is Space only',`
 var g=newGame();g.day=3650;g.emp.won=3650;acknowledgeMilestone(g);g.money=1e10;g.academy.level=2;g.academy.funded=999;g.academy.done.materials=1;g.academy.done.observe=1;g.academy.repeat=true;

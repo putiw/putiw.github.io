@@ -18,5 +18,9 @@ const M=require('../lib/moment.cjs');
    const r=await g.js(()=>{var it=[...document.querySelectorAll('main .card:not([hidden]) .item.ih')].find(x=>/Second packing table/.test(x.innerText));if(!it)return null;var p=it.querySelector(':scope>div:first-child>p'),q=it.querySelector('.qhelp');return {cut:p.scrollHeight>p.clientHeight+2,txt:p.innerText,full:q?(q.dataset.ht||''):''};});
    if(!r){M.skip('packing table '+w,'row not shown');continue;}M.check('second packing table row not cut at '+w+' (Pass 290)',!r.cut,r.txt);M.check('second packing table: full text behind the title at '+w,/nobody waits on anyone/.test(r.full),r.full.slice(0,80));}
   await g.page.setViewportSize({width:390,height:844});}else M.skip('fork breeder','no moment');}
+ // Pass 294 (Puti): two racks gave "10 shrimp/d" next to "1 kit/d" rows. Header in kits a day, a new rack counts the same day; the Shrimp a rack label opens its tip
+ {const m=M.snap('strong','first farm');if(m){await g.load(m,{wait:60});await g.js(()=>{G.money=1e6;G.emp.farms.rack=1;G.emp.prodAvg=8;G.emp.farms.rack=2;G.emp.fw={s:1,f:0};G.kits.stock=0;cache={};render();});
+   if(await g.tab('up')!==false){await g.tick(1);await g.js(()=>{cache={};render();});const hd=await g.text('#e-farmsum')||'';M.check('Farms header in kits a day, 2 racks at 100% = 2 kits/d (Pass 294)',/\b2 kits\/d\b/.test(hd)&&!/shrimp\/d/.test(hd),hd);
+    if(await g.rect('label[for="s-fwS"]')){await g.page.click('label[for="s-fwS"]');await g.page.waitForTimeout(150);const tp=await g.js(()=>{var t=document.getElementById('param-tooltip');return t&&!t.hidden?t.innerText:'';});M.check('Shrimp a rack label opens its tip (Pass 294)',/How full each rack is/.test(tp),tp);}else M.skip('fwS tip','label not shown');}}else M.skip('farm header','no first farm snapshot');}
  M.check('no page errors',!g.errs.length,g.errs.slice(0,3).join(' | '));
  await g.close();M.done('kits');})().catch(e=>{console.error('FAIL',e.message);process.exit(1);});

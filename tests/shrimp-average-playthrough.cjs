@@ -15,15 +15,15 @@ vm.runInContext(`
 var trace=[],G=newGame(),events=[],snapshots={},actions=[],seen={},minCash=G.money,waitingSeconds=0,visits=0;
 function note(name){if(seen[name])return;seen[name]=1;events.push({event:name,day:G.day,years:+(G.day/365).toFixed(2),money:Math.round(G.money),owners:Math.round(G.humans)});snapshots[name]=JSON.parse(JSON.stringify(G));}
 function act(name,fn){var ok=fn();if(ok){actions.push({day:G.day,name:name});return true;}return false;}
-function canSpend(cost){return G.money>=cost+Math.max(200,capitalReserve(G)*1.25);}
+function canSpend(cost){return G.money>=cost+Math.max(200,capitalReserve(G,1)*1.25);}
 function extraTanks(buy){if(!G.tanks[0].had)return;var T0=G.tanks[0];
- if(buy&&G.stats.sold>=1&&G.tanks.length<MAX_TANKS&&!(G.tanks.some(function(t){return !t.had;}))&&G.money>NEW_TANK_COST[G.tanks.length]+Math.max(300,capitalReserve(G)))addTank(G);
+ if(buy&&G.stats.sold>=1&&G.tanks.length<MAX_TANKS&&!(G.tanks.some(function(t){return !t.had;}))&&G.money>NEW_TANK_COST[G.tanks.length]+Math.max(300,capitalReserve(G,1)))addTank(G);
  for(var i=1;i<G.tanks.length;i++){var t=G.tanks[i],P=ppm(t);t.set.sellAge=T0.set.sellAge;t.set.keepL=T0.set.keepL;
   if(!t.had){if(t.cycledAt==null&&P.nh<.2&&P.no2<1){if(G.ob.doses<=0&&G.money>=40){pay(G,40,'supplies');G.ob.doses+=10;}addAmmonia(G,t);}if(t.chem.kh<2||P.no3>20)waterChange(G,t,50);
    if(safeToStock(G,t)&&totalN(T0)>=30)moveShrimp(G,T0,t,totalN(T0)/3);}
   else{if(!t.feeder)feed(G,t,.8);if(P.no3>18||t.chem.kh<2.5||t.chem.gh<5||(!t.autoWC&&G.day%7===0))waterChange(G,t,30);
-   if(!t.feeder&&G.stats.born>0&&G.money>90+150+capitalReserve(G))buyUpgrade(G,t,'feeder');if(!t.fan&&G.money>60+150+capitalReserve(G))buyUpgrade(G,t,'fan');if(t.feeder&&!t.autoWC&&G.money>220+150+capitalReserve(G))buyUpgrade(G,t,'autoWC');}}}
-function care(){extraTanks(false);var T=G.tanks[0],P=ppm(T);if(kitsOpen(G)&&G.kits.sold>=3&&(qc(G).last==null||G.day-qc(G).last>=40))qcRound(G,{water:0.8,look:0.7,dip:G.day%3?1:0.4});var nq=nextQC(G);if(nq&&G.money>nq.cost*6+capitalReserve(G)+500)buyQC(G,nq.id);G.tanks.forEach(function(t,i){if(t.fresh&&G.day%2===0)dipFresh(G,i,{ok:G.day%3>0,loss:0.03});if(t.ill&&t.ill.days>=6)treatIll(G,i,illById(t.ill.type).cure,0.75,{ok:G.day%4>0,loss:0.05});});while(G.progress.queue.length){var key=G.progress.queue[0];note('milestone '+key);acknowledgeMilestone(G);}updateReveal();
+   if(!t.feeder&&G.stats.born>0&&G.money>90+150+capitalReserve(G,1))buyUpgrade(G,t,'feeder');if(!t.fan&&G.money>60+150+capitalReserve(G,1))buyUpgrade(G,t,'fan');if(t.feeder&&!t.autoWC&&G.money>220+150+capitalReserve(G,1))buyUpgrade(G,t,'autoWC');}}}
+function care(){extraTanks(false);var T=G.tanks[0],P=ppm(T);if(kitsOpen(G)&&G.kits.sold>=3&&(qc(G).last==null||G.day-qc(G).last>=40))qcRound(G,{water:0.8,look:0.7,dip:G.day%3?1:0.4});var nq=nextQC(G);if(nq&&G.money>nq.cost*6+capitalReserve(G,1)+500)buyQC(G,nq.id);G.tanks.forEach(function(t,i){if(t.fresh&&G.day%2===0)dipFresh(G,i,{ok:G.day%3>0,loss:0.03});if(t.ill&&t.ill.days>=6)treatIll(G,i,illById(t.ill.type).cure,0.75,{ok:G.day%4>0,loss:0.05});});while(G.progress.queue.length){var key=G.progress.queue[0];note('milestone '+key);acknowledgeMilestone(G);}updateReveal();
  if(!G.ob.kit){pay(G,120,'supplies');G.ob.kit=1;}
  if(!G.ob.bottle){pay(G,40,'supplies');G.ob.bottle=1;G.ob.doses=10;}
  if(!T.had){if(T.cycledAt==null&&P.nh<.1){if(G.ob.doses<=0&&G.money>=40){pay(G,40,'supplies');G.ob.doses+=10;}addAmmonia(G,T);}if(T.chem.kh<2||P.no3>20)waterChange(G,T,50);if(safeToStock(G,T)&&buyPack(G,T,0))note('first shrimp');}
@@ -74,7 +74,7 @@ function visit(){visits++;var T=G.tanks[0],E=G.emp,A=G.academy,budget=2;function
   if(!NOMEDIA&&E.inf<500&&G.money>galaCost(G)*20)spend('community gala',()=>buyProj(G,'gala'));
  }
  if(academyOpen(G)){
-  if(!A.level&&G.money>200000+capitalReserve(G))spend('first researcher',()=>rlStaff(G)?false:rlHire(G,'auto','pd'));
+  if(!A.level&&G.money>200000+capitalReserve(G,1))spend('first researcher',()=>rlStaff(G)?false:rlHire(G,'auto','pd'));
   if(A.level){A.autoFund=true;A.repeat=true;if(A.level===1&&uniqueStudies(G)&&canSpend(1000000))spend('university lab',()=>academyUpgrade(G,'lab'));
    if(A.phds&&!A.postdocs&&canSpend(500000))spend('postdoc',()=>academyUpgrade(G,'postdoc'));
    if(A.postdocs&&A.level<3&&canSpend(1000000))spend('independent group',()=>academyUpgrade(G,'group'));

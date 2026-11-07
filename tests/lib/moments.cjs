@@ -31,7 +31,7 @@ function momDaily(G0){var d=Math.floor(G0.day);if(d===MOM_DAY)return;MOM_DAY=d;
  try{
   projAvail(G0).forEach(function(p){if(p.fk&&!MOM['fork '+p.fk])momTake(G0,'fork '+p.fk,{kind:'fork',id:p.fk,tab:projectArea(p),media:p.t==='media'?1:0});});
   if(landOpen(G0))momTake(G0,'land open',{kind:'land',tab:'tank'});
-  else if(G0.me&&G0.me.on&&!MOM['land open']&&!MOM.landTried&&G0.money>3e5+capitalReserve(G0)){MOM.landTried=1;momLand(G0);}
+  else if(G0.me&&G0.me.on&&!MOM['land open']&&!MOM.landTried&&G0.money>3e5+capitalReserve(G0,1)){MOM.landTried=1;momLand(G0);}
   if(G0.me&&G0.me.on&&G0.progress.seen&&G0.progress.seen.me_intro&&!['queue','soon','wait'].some(function(q){return (G0.progress[q]||[]).indexOf('me_intro')>=0;})&&!MOM['game draft']&&!MOM.gameTried){MOM.gameTried=1;momGames(G0);}
   if(G0.emp.movie&&G0.emp.movie.left>0)momTake(G0,'film',{kind:'film',tab:'promote'});
   if(hardOpen(G0)){var H=hardOf(G0);momTake(G0,'hard open',{kind:'hard',tab:'hard'});if(H.goal)momTake(G0,'hard goal',{kind:'hard',tab:'hard'});

@@ -67,7 +67,8 @@ if(hire(g,'sales',1))throw Error('Unsafe hire');g.money=10000;if(!hire(g,'sales'
 `);
 check('construction reserves, mothball, restart and sale are consistent',`
 var g=readyGame(),f=FARMS.find(x=>x.id==='rack');g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.emp.proj.farmlic=1;g.money=f.cost;
-if(buyFarm(g,'rack'))throw Error('Spent working capital');g.money=10000;if(!buyFarm(g,'rack'))throw Error('Build failed');
+var g0=JSON.parse(JSON.stringify(g));if(!buyFarm(g0,'rack')||g0.money!==0)throw Error('Pass 294 (Puti): reserve off, AED 1,200 buys a 1,200 rack');g.emp.reserveDays=14;
+if(buyFarm(g,'rack'))throw Error('Spent working capital with a reserve set');g.money=10000;if(!buyFarm(g,'rack'))throw Error('Build failed');
 if(farmCap(g)!==1)throw Error('Wrong capacity');if(changeFarm(g,'rack','pause'))throw Error('No pausing farms');var cash=g.money;changeFarm(g,'rack','sell');
 if(g.money<=cash||farmCap(g)||g.emp.farms.rack)throw Error('Sale inconsistent');
 `);
@@ -1149,16 +1150,20 @@ g.webShop=1;E.proj.drones=1;if(Math.abs(trust(g)-WEB_FLOOR)>0.001&&trust(g)<WEB_
 setDens(g,'m5');if(storeFillN(g)!==mallsTotal(g))throw Error('fill counts every missing store');var c=storeFillCost(g);if(!storeFill(g)||g.money!==m0-c||storeCount(g)!==mallsTotal(g))throw Error('one tap fills back to the density');
 `);
 if(!html.includes("TAB_NAME.emp=lay?'Company':'Kits'")||!html.includes("lp=lay?$('p-tank'):$('p-up')")||!html.includes('id="c-mkt"')||!html.includes('id="tab-hard"')||!html.includes("TAB_NAME.promote=co?'Company':mk?'Market':'Ads'"))throw Error('Company tab, home tank cards on Tank, Marketing card');
-check('Pass 261 (Puti, 5 Nov): research people cost fixed USD at any size, the first grant letters carry the ear tank, funding it opens the tank and fills the Can’t see square',`
+check('Pass 261 (Puti, 5 Nov): research people cost fixed USD at any size, the first grant letters carry the ear tank, funding it opens the tank after the 3-year grant (Pass 294) and fills the Can’t see square',`
 var g=newGame();g.money=1e12;g.kits.sold=5000;academyOpen=function(){return true;};
 var by={};RPOS.forEach(function(p){by[p.id]=posAed(g,p)/USD;});
 if(Math.round(by.phd)!==30000||Math.round(by.pd)!==50000||Math.round(by.pi)!==666667)throw Error('PhD 2,500 a month, postdoc 50k, PI lab 2M over 3 years: '+JSON.stringify(by));
 g.day=5000;g.emp.farms.rack=1;var big=posAed(g,RPOS[0])/USD;if(big!==30000)throw Error('No share of income on top: '+big);
 grantDay(g);var gr=grOf(g);if(gr.c.length!==2||!gr.c.some(function(c){return c.ear;}))throw Error('The first letters hold the ear tank');
 if(earGrant(g)||hardReach(g,HARD.filter(function(x){return x.id==='blind';})[0])>=1)throw Error('Not before funding');
-var i=gr.c.findIndex(function(c){return c.ear;});if(!grPick(g,i,150)||!earGrant(g))throw Error('Funding it opens the ear tank');
+var i=gr.c.findIndex(function(c){return c.ear;});if(!grPick(g,i,150)||earGrant(g)||earReady(g)||milestoneConditions(g).ear_ready)throw Error('Pass 294: funding it does not open the ear tank at once');
+if(hardReach(g,HARD.filter(function(x){return x.id==='blind';})[0])>=1)throw Error('Pass 294: the Can’t see square waits for the grant');
+var g2=JSON.parse(JSON.stringify(g));migrate(g2);if(earGrant(g2))throw Error('Pass 294: a new save with the grant running is not marked done on load');
+g.day+=365*GR_YEARS-1;if(earGrant(g))throw Error('Pass 294: not a day early');g.day+=1;if(!earGrant(g)||!earReady(g))throw Error('Pass 294: ready when the 3-year grant ends');
 if(hardReach(g,HARD.filter(function(x){return x.id==='blind';})[0])!==1)throw Error('The Can’t see square is finished');
-g.day+=366;grantDay(g);if(grOf(g).c.some(function(c){return c.ear;}))throw Error('Offered once');
+var g3=JSON.parse(JSON.stringify(g2));delete g3.academy.gr.earV;migrate(g3);if(!earGrant(g3))throw Error('Pass 294: an old save that had the ear tank keeps it');
+g.day-=365*GR_YEARS-366;grantDay(g);if(grOf(g).c.some(function(c){return c.ear;}))throw Error('Offered once');
 var h=newGame();h.kits.sold=5000;grantDay(h);var gh=grOf(h);gh.c.forEach(function(c){c.x='s';});h.day+=366;grantDay(h);if(grOf(h).c.some(function(c){return c.ear;}))throw Error('Skipped once, it comes back in the hard part, not as a letter');
 `);
 check('Pass 263: one desk (messages, galas, ad pushes), mood sticks, media reach past a million, a film takes a year',`
@@ -1372,4 +1377,29 @@ var b=readyGame();b.me.bg={n:4};b.me.ls={f:3,b:3,h:2};b.stats.cleans=11;if(!gras
 var v=readyGame();careDone(v,'vac');careDone(v,'feed');if(v.stats.cleans!==1)throw Error('cleans count');
 `);
 if(!/if\(lateKind\(G\)\.ok\)who\+=' '\+END_LATEKIND;if\(grassOk\(G\)\)who\+=' '\+END_GRASS;/.test(html))throw Error('endText adds the two lines');
+check('Pass 294 (Puti): 1.6 kits a day of farm capacity makes 1.6 a day, not 1, and a new rack shows the same day',`
+var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.emp.farms.rack=2;g.money=1e6;g.kits.stock=0;g.emp.fw={s:0.8,f:0};var sh=0;
+for(var d=0;d<10;d++){g.kits.stock=0;g.emp.rawShrimp=0;empireDay(g);sh+=g.emp.prod;}
+if(Math.abs(sh/10/KIT_SHRIMP-1.6)>0.11)throw Error('2 racks at 80% should make 1.6 kits a day, made '+(sh/10/KIT_SHRIMP));
+var h=readyGame();h.stats.sold=KIT_UNLOCK;h.emp.kitsOpened=1;h.emp.farms.rack=1;h.money=1e6;h.emp.prodAvg=8;h.emp.farms.rack=2;h.kits.stock=0;h.emp.rawShrimp=0;empireDay(h);
+if(Math.round(h.emp.prodAvg)!==16)throw Error('the second rack shows at once when running full: '+h.emp.prodAvg);
+`);
+check('Pass 294 (Puti): the cash reserve is off, 31k buys a 30k item; old saves on the 14-day default go off, a 7 or 30 they chose stays',`
+var g=newGame();if(g.emp.reserveDays!==0||capitalReserve(g)!==0)throw Error('new game: off');
+g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.emp.farms.barn=3;g.money=31000;if(capitalReserve(g)!==0||farmWorkingCapital(g,FARMS[1])!==0)throw Error('off with farms too');
+if(!(capitalReserve(g,1)>0))throw Error('automatic spends still keep a cushion');
+g.emp.reserveDays=14;if(!(capitalReserve(g)>0))throw Error('set under Money, it holds buys');
+var o=newGame();o.emp.reserveDays=14;delete o.emp.rsvV;migrate(o);if(o.emp.reserveDays!==0)throw Error('old default goes off');
+var o2=newGame();o2.emp.reserveDays=30;delete o2.emp.rsvV;migrate(o2);if(o2.emp.reserveDays!==30)throw Error('a 30 they chose stays');
+var o3=newGame();o3.emp.reserveDays=14;migrate(o3);if(o3.emp.reserveDays!==14)throw Error('a 14 set after Pass 294 stays');
+`);
+check('Pass 294 (Puti): The packing room card only when packing is the limit',`
+var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;g.humans=20000;g.emp.rawShrimp=0;
+if(painOpen(g,'pain_pack')||milestoneConditions(g).pain_pack)throw Error('no shrimp waiting, packing is not the limit');
+if(painMult(g)<1&&!PAINS.pain_heat)throw Error('no packing penalty either');
+g.emp.rawShrimp=1e7;if(!(packCap(g)<kitDemand(g)*0.95))throw Error('test setup: demand above packing '+packCap(g)+' '+kitDemand(g));
+if(!painOpen(g,'pain_pack'))throw Error('orders above packing and shrimp waiting: the card');
+if(!introStill(g,'pain_pack'))throw Error('still true');g.emp.rawShrimp=0;if(introStill(g,'pain_pack'))throw Error('dropped if it stops being true before it shows');
+`);
+{const tips=','+html.split('var CTL_TIPS={')[1].slice(0,12000);const ids=[...html.matchAll(/<div class="ctl"><label for="s-([A-Za-z0-9]+)"/g)].map(m=>m[1]);const miss=ids.filter(k=>!new RegExp('[,\\s]'+k+":'").test(tips));if(miss.length)throw Error('Pass 294 (Puti): a slider label with a dotted line opens nothing: '+miss.join(','));if(!/<select id="reserve-days"><option value="0">Off<\/option>/.test(html))throw Error('Pass 294: the reserve select has Off');console.log('PASS Pass 294: every slider label ('+ids.length+') has a CTL_TIPS line');count++;}
 console.log(count+' focused balance and migration checks passed');
