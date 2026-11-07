@@ -14,15 +14,15 @@ vm.runInContext(`
 var G=newGame(),events=[],snapshots={},last={};
 function note(k){detectMilestones(G);updateReveal();if(kitsOpen(G))G.emp.shownEmp=1;if(!last[k]){last[k]=1;events.push({event:k,day:G.day,money:Math.round(G.money),shrimp:Math.round(allN(G)),sold:G.stats.sold,kits:G.kits.sold,owners:Math.round(G.humans),inf:Math.round(G.emp.inf)});snapshots[k]=JSON.parse(JSON.stringify(G));}if(!last['100k kits']&&G.kits.sold>=1e5&&G.progress.seen.market&&!['queue','wait','soon'].some(function(q){return (G.progress[q]||[]).indexOf('market')>=0;})){last['100k kits']=1;snapshots['100k kits']=JSON.parse(JSON.stringify(G));}/* UI/UX chat 2: a Market stage, no extra sim calls */}
 function extraTanks(buy){if(!G.tanks[0].had)return;var T0=G.tanks[0];
- if(buy&&G.stats.sold>=1&&G.tanks.length<MAX_TANKS&&!(G.tanks.some(function(t){return !t.had;}))&&G.money>NEW_TANK_COST[G.tanks.length]+Math.max(300,capitalReserve(G)))addTank(G);
+ if(buy&&G.stats.sold>=1&&G.tanks.length<MAX_TANKS&&!(G.tanks.some(function(t){return !t.had;}))&&G.money>NEW_TANK_COST[G.tanks.length]+Math.max(300,capitalReserve(G,1)))addTank(G);
  for(var i=1;i<G.tanks.length;i++){var t=G.tanks[i],P=ppm(t);t.set.sellAge=T0.set.sellAge;t.set.keepL=T0.set.keepL;
   if(!t.had){if(t.cycledAt==null&&P.nh<.2&&P.no2<1){if(G.ob.doses<=0&&G.money>=40){pay(G,40,'supplies');G.ob.doses+=10;}addAmmonia(G,t);}if(t.chem.kh<2||P.no3>20)waterChange(G,t,50);
    if(safeToStock(G,t)&&totalN(T0)>=30)moveShrimp(G,T0,t,totalN(T0)/3);}
   else{if(!t.feeder)feed(G,t,.8);if(P.no3>18||t.chem.kh<2.5||t.chem.gh<5||(!t.autoWC&&G.day%7===0))waterChange(G,t,30);
-   if(!t.feeder&&G.stats.born>0&&G.money>90+150+capitalReserve(G))buyUpgrade(G,t,'feeder');if(!t.fan&&G.money>60+150+capitalReserve(G))buyUpgrade(G,t,'fan');if(t.feeder&&!t.autoWC&&G.money>220+150+capitalReserve(G))buyUpgrade(G,t,'autoWC');}}}
-function afford(c){return G.money>c+Math.max(40,staffCost(G)*14);}
+   if(!t.feeder&&G.stats.born>0&&G.money>90+150+capitalReserve(G,1))buyUpgrade(G,t,'feeder');if(!t.fan&&G.money>60+150+capitalReserve(G,1))buyUpgrade(G,t,'fan');if(t.feeder&&!t.autoWC&&G.money>220+150+capitalReserve(G,1))buyUpgrade(G,t,'autoWC');}}}
+function afford(c){return G.money>c+Math.max(40,staffCost(G)*14,capitalReserve(G,1));}/* Pass 294: the game no longer holds a reserve, the bot keeps the old cushion */
 function policy(){
-while(G.progress.queue.length)acknowledgeMilestone(G);updateReveal();var T=G.tanks[0],P=ppm(T),E=G.emp;if(qcDue(G))qcRound(G,{water:1,look:0.95,dip:1});var nq=nextQC(G);if(nq&&G.money>nq.cost*3+capitalReserve(G)+300)buyQC(G,nq.id);if(farmBuilt(G)&&qc(G).strict!==2)setQCStrict(G,2);G.tanks.forEach(function(t,i){if(t.fresh)dipFresh(G,i);if(t.ill&&t.ill.days>=1)treatIll(G,i,illById(t.ill.type).cure,0.9);});
+while(G.progress.queue.length)acknowledgeMilestone(G);updateReveal();var T=G.tanks[0],P=ppm(T),E=G.emp;if(qcDue(G))qcRound(G,{water:1,look:0.95,dip:1});var nq=nextQC(G);if(nq&&G.money>nq.cost*3+capitalReserve(G,1)+300)buyQC(G,nq.id);if(farmBuilt(G)&&qc(G).strict!==2)setQCStrict(G,2);G.tanks.forEach(function(t,i){if(t.fresh)dipFresh(G,i);if(t.ill&&t.ill.days>=1)treatIll(G,i,illById(t.ill.type).cure,0.9);});
 if(!G.ob.kit&&G.money>=120){pay(G,120,'supplies');G.ob.kit=1;}
 if(!G.ob.bottle&&G.money>=40){pay(G,40,'supplies');G.ob.bottle=1;G.ob.doses=10;}
 if(!T.had){
@@ -58,7 +58,7 @@ if(kitsOpen(G)){
  for(var id of ['guide','refer','precycle','farmlic','bulk','aicam','autopackm','app','brand','retention','partners','globalbrand','factory','hotline','ocean','recycle','arco']){var p=PROJ.find(x=>x.id===id);if(!pd(G,id)&&p.req(G)&&afford(pm(G,p)))buyProj(G,id);}
  if(G.kits.sold>=1)note('first kit');if(pd(G,'farmlic'))note('farm license');
  if(pd(G,'farmlic')){
-  var fc=farmCap(G),d=kitDemand(G);var best=FARMS.filter(f=>farmBuyable(G,f)&&G.money>farmCost(G,f)+Math.max(2000,E.mat*Math.min(f.out,d*20)+f.up*60)).sort((a,b)=>farmCost(G,a)/a.out-farmCost(G,b)/b.out)[0];
+  var fc=farmCap(G),d=kitDemand(G);var best=FARMS.filter(f=>farmBuyable(G,f)&&G.money>farmCost(G,f)+farmWorkingCapital(G,f,1)&&G.money>farmCost(G,f)+Math.max(2000,E.mat*Math.min(f.out,d*20)+f.up*60)).sort((a,b)=>farmCost(G,a)/a.out-farmCost(G,b)/b.out)[0];
   if(best&&(!fc||fc<d*1.5))buyFarm(G,best.id);
   if(fc)note('first farm');
  }
@@ -70,7 +70,7 @@ if(kitsOpen(G)){
  if(academyOpen(G)&&G.academy.level){var RL=rlines(G);RLINES.forEach(function(l){if(RL[l.id].pd<1&&afford(posUsd(G,RPOS[1])*USD*3))rlHire(G,l.id,'pd');if(RL[l.id].phd<2&&afford(posUsd(G,RPOS[0])*USD*6))rlHire(G,l.id,'phd');});}
  if(coinOn(G)&&Math.floor(G.day)%90<30){var CC=coinOf(G);if(CC.price>coinBreakEven(G)*1.5&&afford(coinPlantCost(G)*30))coinPlant(G,coinPlantCost(G));if(CC.price>COIN_FAIR*1.3&&CC.treasury>0)coinSell(G,CC.treasury*0.25);else if(CC.price<COIN_FAIR*0.7&&afford(coinPlantCost(G)*3))coinBuy(G,coinPlantCost(G));}
  if(NEWBOT&&typeof kitsStopped==='function'){if(kitsStopped(G)&&storeCount(G)>0){REGIONS.forEach(function(r){if(storeN(G,r.id)>0)closeStores(G,r.id,storeN(G,r.id));});}else if(!kitsStopped(G)&&storeClosedAll(G)>0&&Math.floor(G.day)%7===0){REGIONS.forEach(function(r){var cl=storeClosed(G,r.id);if(cl>0&&regOpen(G,r.id)&&storeCanBuy(G,r.id,cl)&&afford(storeBatchCost(G,r.id,cl)*4))buyStores(G,r.id,cl);});}}
- if(typeof storesOn==='function'&&storesOn(G)&&!NOSTORES&&Math.floor(G.day)%7===0){var sr=null,sw=0;REGIONS.forEach(function(r){if(!regOpen(G,r.id)||storeN(G,r.id)>=storeGoal(r.id))return;var w=r.pop*(1-regTrust(G,r.id));if(w>sw){sw=w;sr=r.id;}});if(sr){var sb=[1000,100,10,1].filter(function(b){return b<=storeBatchMax(G)&&storeCanBuy(G,sr,b)&&(operatingNet(G)||0)>storeBatchN(G,sr,b)*storeDay(G,sr)*10&&afford(storeBatchCost(G,sr,b)*6)&&(!NEWBOT||G.money>capitalReserve(G)+(storeDayCost(G)+storeBatchN(G,sr,b)*storeDay(G,sr))*60);});if(sb.length)buyStores(G,sr,sb[0]);}}
+ if(typeof storesOn==='function'&&storesOn(G)&&!NOSTORES&&Math.floor(G.day)%7===0){var sr=null,sw=0;REGIONS.forEach(function(r){if(!regOpen(G,r.id)||storeN(G,r.id)>=storeGoal(r.id))return;var w=r.pop*(1-regTrust(G,r.id));if(w>sw){sw=w;sr=r.id;}});if(sr){var sb=[1000,100,10,1].filter(function(b){return b<=storeBatchMax(G)&&storeCanBuy(G,sr,b)&&(operatingNet(G)||0)>storeBatchN(G,sr,b)*storeDay(G,sr)*10&&afford(storeBatchCost(G,sr,b)*6)&&(!NEWBOT||G.money>capitalReserve(G,1)+(storeDayCost(G)+storeBatchN(G,sr,b)*storeDay(G,sr))*60);});if(sb.length)buyStores(G,sr,sb[0]);}}
  if(G.ob.eshops&&Math.floor(G.day)%30===0){var nsh=SHOPS.filter(function(x){return shopBuyable(G,x);}).sort(function(a,b){return a.cost-b.cost;}).find(function(x){return afford(x.cost*100)&&(G.emp.shops[x.id]||0)<3;});if(nsh)buyShop(G,nsh.id);if(shopCount(G)&&!E.staff.mgr&&!E.staff.aiMgr&&afford(5000))hire(G,'mgr',1);}
  if(hardOpen(G)&&!E.won){if(BOTKIND&&hardOf(G).goal!=='want')hardSetGoal(G,'want');/* Pass 250: the routes. Kind: Aid 15%, Build 30%, Science 10%, workarounds first to last, stays out of the war. Cold: Policy 20%, Keep the rest, dark options last to first, funds one side. */var AL=hardAllocOf(hardOf(G));if(!EVILBOT&&Math.floor(G.day)-(hardOf(G).day||0)>=1825)hardSetGoal(G,'none');/* after five years in the hard part a player stops counting (Pass 250: the long routes don't finish inside the game) */if(BOTKIND){if(!AL.aid)hardAlloc(G,'aid',.15);if(!AL.sci)hardAlloc(G,'sci',.1);}
   /* Pass 251: proposals. Kind funds every one that isn't cold as it arrives; cold funds the cold ones (the loan, the desal) and the tank laws and turns the rest down. */propOf(hardOf(G)).open.slice().forEach(function(x){var o=propDef(x.id);if(!o)return;var want=BOTKIND?!o.cold:(o.cold||o.id==='law');if(want){if(propCan(G,o,x))propFund(G,x.id);}else propDecline(G,x.id);});
@@ -80,11 +80,11 @@ if(kitsOpen(G)){
  G.kitPrice=farmCap(G)?${process.env.REVIEW_KIT_PRICE==='market'?'bestKitPrice(G)':Number(process.env.REVIEW_KIT_PRICE||600)}:250;
  if(G.humans>=100)note('100 owners');if(G.humans>=10000)note('10k owners');if(G.humans>=1e6)note('million owners');if(pd(G,'ministry'))note('ministry');if(pd(G,'last'))note('last holdouts');
  if(${process.env.REVIEW_ACADEMY==='1'?'true':'false'}&&academyOpen(G)){
-  var A=G.academy;if(G.money>10000000+capitalReserve(G)&&!rlStaff(G))rlHire(G,'auto','pd');
-  if(A.level){note('first research grant');if(A.level===1&&uniqueStudies(G)&&G.money>10000000+capitalReserve(G))academyUpgrade(G,'lab');
+  var A=G.academy;if(G.money>10000000+capitalReserve(G,1)&&!rlStaff(G))rlHire(G,'auto','pd');
+  if(A.level){note('first research grant');if(A.level===1&&uniqueStudies(G)&&G.money>10000000+capitalReserve(G,1))academyUpgrade(G,'lab');
    if(!A.active){var study=STUDIES.find(x=>x.id!=='observe'&&x.req(G)&&!rd(G,x.id));startStudy(G,study?study.id:'observe');}
-   if(A.phds&&!A.postdocs&&G.money>10000000+capitalReserve(G))academyUpgrade(G,'postdoc');
-   if(A.postdocs&&A.level<3&&G.money>10000000+capitalReserve(G))academyUpgrade(G,'group');
+   if(A.phds&&!A.postdocs&&G.money>10000000+capitalReserve(G,1))academyUpgrade(G,'postdoc');
+   if(A.postdocs&&A.level<3&&G.money>10000000+capitalReserve(G,1))academyUpgrade(G,'group');
    if(A.professors)for(var course of COURSES)openCourse(G,course.id);
    if(A.phds)note('PhD graduates');if(A.professors)note('first professor');if(uniqueStudies(G)>=6)note('Earth research complete');
   }
