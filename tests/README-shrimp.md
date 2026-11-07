@@ -3267,3 +3267,45 @@ Tests (feature, cec2321 + this pass, 2026-11-07 14:38 UTC, 11.0 min, 2 at once):
 | land-life | ok | 16 | all passed |
 | taps | ok | 12 | all ok |
 | ear | ok | 6 | 14 ear tank checks passed |
+
+## Pass 292 (7 Nov): tapall closes story cards, SETTLE checked, land flow on each tank day
+
+From the project doc `claude/shrimp-handoff-tapall-settle-flow-7nov.md`. BUILD `2026-11-07T17:00-p292`.
+
+**1. tapall year 5 and hard open.** A story card came up within the 800 ms play on every key, so both stages tapped nothing. Now, once per stage, tapall plays, lets the cards come, closes them like a player (waits out SETTLE, taps the first plain button, a choice or Next, never "show me"; then Go on on What happened), plays again until a play brings none (4 rounds at most) and taps from that save. A card that still comes on a key is closed the same way, and the button and the save signature are taken again after it. `TAP_TIME=1`, year 5 + hard open alone:
+
+| | year 5 | hard open |
+|---|---|---|
+| before | 15.5 s, 0 taps (cut after 3 cards) | 5.1 s, 0 taps |
+| after | 88.5 s, 35 taps | 55.5 s, 18 taps |
+
+**2. SETTLE on revfake and shipwarm.** I logged each button's page top over 3 s of play on both runs' fork saves: it doesn't move (394, 480). Not a game bug. What I did find in the test: `load` hid the sheets a tap opened but left `TS` (tank sheet) set, and `renderMilestone` holds every card while `TS`/`HC`/`QCR` is set, so at strong fork ship the game sat paused with c_saturday in the queue and nothing on screen. load clears them now. Also the first tab tap after a load sometimes got a pointerdown and no click (year 5 world listed 9 promote keys as world's); load checks `activeTab` and taps again (22 times in a full sweep, cause not found). Two full tapall sweeps at once (the feature run's load): 157 and 158 taps, all passed, no SETTLE swallow.
+
+**3.** owntank then farm, two reaction cards: kept, off the list.
+
+**4. yourtank flow 91% vs 90%.** The land shows the lines the game sends, once a second (`landSend` interval); a tank day is 2.4 s, so the land could show the day before for up to 1 s. `ownClock` now sends to the land on every new tank day. The test reads the game's tank day before and after the land read and reads again if it changed (the check itself is the same). yourtank-360 4 of 4 passed.
+
+Not done: tapall still skips cards at fork careplan and fork data (closeCards finds no button to tap there, not looked at). The repeated tab tap. tapall is slower: 720 s in `changed` (383 s in Pass 291), the card closing and 19 more taps. `feature` not run this pass.
+
+Tests (changed, this pass):
+
+| suite | result | s | note |
+|---|---|---|---|
+| avg | ok | - | cached, game unchanged: earth 7420 |
+| kind | ok | 35 | WIN 4209 question_lucky |
+| strong | ok | - | cached, game unchanged: WIN 2695 |
+| balance | ok | 7 | 168 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 1 | 55 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 6 | 2668 gate checks on 237 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| land-life | ok | 15 | all passed |
+| land-audio | ok | 13 | all passed |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| tapall | ok | 720 | PASS 158 taps 100 ms after a render all changed the save (262 repeats skipped) (46 stages: |
+| yourtank | ok | 22 | all passed |
+| yourtank-360 | ok | 22 | all passed |
