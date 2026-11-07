@@ -4,7 +4,7 @@
 //   node tests/run.cjs deploy     feature + spotlights, monkey, human, stable (full), tabshots. Hours. Before "deploy".
 //   node tests/run.cjs <name>...  one or more suites by name (the names in SUITES), bots regenerated if stale.
 //   --fresh re-runs the bots even if index.html hasn't changed. --list prints the suites and tiers.
-//   --jobs=N (or SHRIMP_JOBS) suites at once, default 4 (Pass 289); --jobs=1 is the old one-after-another run.
+//   --jobs=N (or SHRIMP_JOBS) suites at once, default 4 or the core count if fewer (Pass 289); --jobs=1 is the old one-after-another run.
 // Bot runs live in tests/.runs/{strong,kind,avg}/run-7.json (gitignored) and are rebuilt when shrimp/index.html,
 // space.html or the bot scripts change (hash in tests/.runs/stamp.json). The table is also written to
 // tests/.runs/last.md: paste that into the changelog, don't retype it.
@@ -12,7 +12,7 @@ const {spawn}=require('child_process'),fs=require('fs'),path=require('path'),cry
 const T=__dirname,ROOT=path.join(T,'..'),RUNS=path.join(T,'.runs');
 const R={strong:path.join(RUNS,'strong','run-7.json'),kind:path.join(RUNS,'kind','run-7.json'),avg:path.join(RUNS,'avg','run-7.json')};
 const WIDE=process.argv.includes('--wide');
-const JA=process.argv.find(a=>a.startsWith('--jobs='));const JOBS=Math.max(1,+(JA?JA.slice(7):process.env.SHRIMP_JOBS||4));
+const JA=process.argv.find(a=>a.startsWith('--jobs='));const JOBS=Math.max(1,+(JA?JA.slice(7):process.env.SHRIMP_JOBS||Math.min(4,require('os').cpus().length)));/* timing suites flake when jobs outnumber cores */
 // name: [script, env, needs (bot runs), tiers, options]. 'bad' is a regex on the output that means failure when the exit code is 0.
 const SUITES={
   balance:['shrimp-balance.cjs',{},[],'fast'],
@@ -39,7 +39,7 @@ const SUITES={
   // Pass 288 sweeps (claude/shrimp-test-workflow-7nov.md 4C.1 and 4C.2)
   cardlag:['shrimp-cardlag.cjs',{CARDLAG_RUNS:[R.strong,R.kind,R.avg].join(',')},['strong','kind','avg'],'feature'],
   greyreason:['shrimp-greyreason.cjs',{GREY_RUNS:[R.strong,R.avg].join(','),GREY_STAGES:'^strong |^avg year',GREY_MOMENTS:'.'},['strong','avg'],'feature'],
-  tapall:['shrimp-tapnow.cjs',{HARD_RUN:R.avg,TAP_TABS:'tank,up,market,emp,promote,hard,world,research',TAP_ACTS:'all',TAP_STAGES:'kits unlocked,year 2,year 5,year 12',TAP_PLAY:'800',TAP_ONCE:'1',TAP_MOMENTS:'^(fork|campaign|film|land|hard)',TAP_MRUNS:R.strong},['avg','strong'],'feature'],
+  tapall:['shrimp-tapnow.cjs',{HARD_RUN:R.avg,TAP_TABS:'tank,up,market,emp,promote,hard,world,research',TAP_ACTS:'all',TAP_STAGES:'kits unlocked,year 2,year 5,year 12',TAP_PLAY:'800',TAP_ONCE:'1',TAP_MOMENTS:'^(fork|land|hard (open|goal|option))',TAP_MRUNS:R.strong},['avg','strong'],'feature'],
   // Pass 289 moment tests (tests/moments/<area>.cjs, helper tests/lib/moment.cjs), on the bots' MOMENTS
   'm-cards':['moments/cards.cjs',{},['strong','kind','avg'],'feature'],
   'm-health':['moments/health.cjs',{},['strong','kind','avg'],'feature'],

@@ -38,7 +38,8 @@ const SCAN=`(function(GAP){var out=[];function vis(e){if(!e.getClientRects().len
  });
  return out;})`;
 (async()=>{const b=await chromium.launch();let all=[];
- for(const W of Ws)for(const sk of stages){if(!snaps[sk])continue;const p=await b.newPage({viewport:{width:W,height:844}});p.on('dialog',d=>d.dismiss());p.on('pageerror',e=>all.push(['error',sk,W,'',e.message]));
+ const MW=+(process.env.TIGHT_MW||390);/* moments at one width, 390 (Puti's phone) */
+ for(const W of Ws)for(const sk of stages){if(!snaps[sk])continue;if(MTAB[sk]&&W!==MW)continue;const p=await b.newPage({viewport:{width:W,height:844}});p.on('dialog',d=>d.dismiss());p.on('pageerror',e=>all.push(['error',sk,W,'',e.message]));
   await p.goto('file://'+path.resolve(__dirname,'../shrimp/index.html'));await p.waitForTimeout(300);
   await p.evaluate(s=>{G=s;migrate(G);G.progress.queue=[];window.spotlight=function(){};window.spotWatch=function(){};try{setSpeed(0)}catch(e){};render();},snaps[sk]);
   let tabs=await p.evaluate(()=>[...document.querySelectorAll('.tabs [data-tab]')].filter(t=>!t.hidden&&t.offsetParent).map(t=>t.dataset.tab).concat(['me']));

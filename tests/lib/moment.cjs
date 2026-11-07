@@ -26,7 +26,7 @@ async function open(o={}){const b=await chromium.launch();const p=await b.newPag
  const unspot=()=>p.evaluate(()=>{if(typeof SPOT!=='undefined'&&SPOT){SPOT.ready=1;spotClose();SPOT=null;}var s=$('spot');if(s)s.hidden=true;});
  const g={page:p,errs,
   async load(m,opt={}){if(!m)throw Error('no moment');const keep=opt.card!=null?opt.card:m.kind==='card';
-   await p.evaluate(([s,keep,spots])=>{G=JSON.parse(s);migrate(G);if(!keep)G.progress.queue=[];if(!spots)window.spotlight=function(){};speed=0;FRZ={};$('after').hidden=true;AFTER_HOLD=null;$('helpsheet').hidden=true;render();},[JSON.stringify(m.snap),keep,!!opt.spots]);
+   await p.evaluate(([s,keep,spots])=>{G=JSON.parse(s);migrate(G);if(!keep)G.progress.queue=[];if(!spots)window.spotlight=function(){};speed=0;FRZ={};document.querySelectorAll('[role=dialog]:not(#bg-card):not(#milestone-card)').forEach(function(d){d.hidden=true;});$('after').hidden=true;AFTER_HOLD=null;$('helpsheet').hidden=true;render();},[JSON.stringify(m.snap),keep,!!opt.spots]);
    if(!opt.spots)await unspot();await p.waitForTimeout(opt.wait||200);return g;},
   async tab(t){const ok=await p.evaluate(t=>{if(t==='me'){var mb=$('tb-me');if(!mb||mb.hidden)return false;if(activeTab!=='me')mb.click();return 'me';}var m=typeof tabMap==='function'?tabMap(t):t,b=document.querySelector('.tabs [data-tab="'+m+'"]');if(!b||b.hidden||!b.getClientRects().length)return false;b.click();return m;},t);await p.waitForTimeout(150);await unspot();return ok;},
   async tick(days){await p.evaluate(n=>{for(var i=0;i<n*4;i++){stepGame(G,0);}render();},days);await p.waitForTimeout(100);return g;},

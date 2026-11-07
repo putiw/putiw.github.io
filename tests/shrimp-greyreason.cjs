@@ -18,7 +18,7 @@ const grey={},dots={},dotSeen=new Set();let nb=0,ns=0,nd=0;
   const list=Object.keys(snaps).filter(st=>!ONLY||ONLY.test(name+' '+st)).map(st=>[st,snaps[st],null]);
   if(MRE)for(const [k,v] of Object.entries(rj.moments||{}))if(v&&v.snap&&MRE.test(k))list.push(['moment '+k,v.snap,v]);
   for(const [st,snap,mo] of list){ns++;const card=!!(mo&&mo.kind==='card');
-   await p.evaluate(([s,card])=>{G=JSON.parse(s);migrate(G);if(!card)G.progress.queue=[];window.spotlight=function(){};speed=0;FRZ={};$('after').hidden=true;AFTER_HOLD=null;$('helpsheet').hidden=true;render();},[JSON.stringify(snap),card]);
+   await p.evaluate(([s,card])=>{G=JSON.parse(s);migrate(G);if(!card)G.progress.queue=[];window.spotlight=function(){};speed=0;FRZ={};document.querySelectorAll('[role=dialog]:not(#bg-card):not(#milestone-card)').forEach(function(d){d.hidden=true;});$('after').hidden=true;AFTER_HOLD=null;$('helpsheet').hidden=true;render();},[JSON.stringify(snap),card]);
    if(card){await p.waitForTimeout(120);const r=await p.evaluate(()=>{const out=[];let n=0;const c=$('milestone-card');if(!c||c.hidden)return {n,out,none:1};
      c.querySelectorAll('button').forEach(b=>{if(!(b.disabled||b.classList.contains('off'))||!b.checkVisibility())return;n++;const tx=(b.innerText||'').replace(/\s+/g,' ').trim(),row=(b.parentElement.innerText||'').replace(/\s+/g,' ').trim();
       if(!/Needs|Waiting|until|left|\d|✦|\?/i.test(tx+' '+row))out.push('milestone-card: "'+tx.slice(0,50)+'"');});return {n,out};});
@@ -36,16 +36,18 @@ const grey={},dots={},dotSeen=new Set();let nb=0,ns=0,nd=0;
     nb+=r.n;r.out.forEach(x=>{(grey[t+' · '+x]=grey[t+' · '+x]||[]).push(name+' '+st);});
     // dotted titles: tap each distinct one once
     const qts=await p.evaluate(()=>[...document.querySelectorAll('main .card:not([hidden]) .qhelp.qt')].filter(e=>e.checkVisibility()).map((e,i)=>{e.dataset.qti=i;return [i,(e.innerText||'').trim().slice(0,40)];}));
-    if(await p.evaluate(()=>!!G.emp.won&&!G.progress.sandbox))qts.length=0;/* the win save has the ending page over everything */
-    for(const [i,tt] of qts){const key=t+' · '+tt;if(dotSeen.has(key))continue;dotSeen.add(key);nd++;
+    if(await p.evaluate(()=>!!G.emp.won&&!G.progress.sandbox||($('bg-card')&&!$('bg-card').hidden)))qts.length=0;/* Pass 289: nor under the June board game card, which waits for an answer *//* the win save has the ending page over everything */
+    for(const [i,tt] of qts){const key=t+' · '+tt,sk=(mo?'m ':'')+key;/* moments keep their own seen list, so a title tapped in a moment is still tapped in the snapshots as before */if(dotSeen.has(sk))continue;dotSeen.add(sk);nd++;
      /* find it fresh and tap its middle like a finger: a render can swap the node, a held handle goes stale */
      const pt=await p.evaluate(tt=>{if(SPOT)SPOT.ready=1;spotClose();SPOT=null;$('spot').hidden=true;var e=[...document.querySelectorAll('main .card:not([hidden]) .qhelp.qt')].find(x=>x.checkVisibility()&&(x.innerText||'').trim().slice(0,40)===tt);if(!e)return null;e.scrollIntoView({block:'center'});var r=e.getBoundingClientRect(),x=r.x+Math.min(r.width/2,30),y=r.y+r.height/2,h=document.elementFromPoint(x,y);return {x,y,cov:h&&!(h===e||e.contains(h))?h.tagName+'#'+h.id+'.'+h.className:''};},tt);
      if(!pt)continue;
+     /* Pass 289: the anchor can move the page back after scrollIntoView, so wait and find it again before the tap */
+     await p.waitForTimeout(120);const p2=await p.evaluate(tt=>{var e=[...document.querySelectorAll('main .card:not([hidden]) .qhelp.qt')].find(x=>x.checkVisibility()&&(x.innerText||'').trim().slice(0,40)===tt);if(!e)return null;var r=e.getBoundingClientRect();return {x:r.x+Math.min(r.width/2,30),y:r.y+r.height/2};},tt);if(p2){pt.x=p2.x;pt.y=p2.y;}
      const before=await p.evaluate(()=>document.body.innerText.length+'|'+[...document.querySelectorAll('.sheet,#helpsheet,#after,[role=dialog]')].filter(x=>!x.hidden&&x.checkVisibility()).length);
      await p.mouse.click(pt.x,pt.y);await p.waitForTimeout(150);
      const after=await p.evaluate(()=>({hs:!$('helpsheet').hidden,sig:document.body.innerText.length+'|'+[...document.querySelectorAll('.sheet,#helpsheet,#after,[role=dialog]')].filter(x=>!x.hidden&&x.checkVisibility()).length}));
      if(!after.hs&&after.sig===before)(dots[key+(pt.cov?' (covered by '+pt.cov+')':'')]=dots[key]||[]).push(name+' '+st);
-     await p.evaluate(()=>{$('helpsheet').hidden=true;if($('after'))$('after').hidden=true;});}
+     await p.evaluate(()=>{/* Pass 289: close it the game's way; hidden=true left hsFor set, so the next tap on that same node (morph keeps nodes across loads) closed instead of opening */if(!$('helpsheet').hidden)$('hs-x').click();$('helpsheet').hidden=true;if($('after'))$('after').hidden=true;});}
    }}}
  const gk=Object.keys(grey),dk=Object.keys(dots);
  if(errs.length)gk.push('page errors: '+[...new Set(errs)].slice(0,5).join(' | '));

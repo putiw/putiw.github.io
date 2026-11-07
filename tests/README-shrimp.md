@@ -3058,3 +3058,75 @@ Tests (greyreason tapall tapnow, b219227, 2026-11-07 10:24 UTC, 9 min): 5 suites
 | greyreason | FAIL | 78 | FAIL 1 grey buttons with no reason (of 217 grey seen), 1 dotted titles that open nothing ( |
 | tapall | FAIL | 312 | FAIL 5 of 89 taps did nothing: |
 | tapnow | ok | 137 | PASS 31 taps 100 ms after a render all changed the save (year 5, year 8, year 12, emp prom |
+
+## Pass 289 (7 Nov): faster feature tier, gate check, MOMENTS snapshots, moment tests
+
+Tests only, game unchanged, no BUILD bump. From the project doc `claude/shrimp-handoff-tests-step3-7nov.md`.
+
+**Task A, the feature tier.**
+- `tests/run.cjs` runs suites in a pool (`spawn`), a suite starts once the bots it needs are done, bots first, the table in the old order. `--jobs=N` or `SHRIMP_JOBS`; default 4, or the core count when there are fewer (on this 2-core box 4 at once made tapnow, tapall and greyreason flaky: taps landed late). `--jobs=1` is the old run.
+- tapall: `TAP_ONCE=1` taps each button key once per tab, a key that answered at an earlier stage is skipped, a failed one is tried again. tapnow is out of feature (tier `name`, `node tests/run.cjs tapnow`), tapall covers Kits and Ads.
+- `tests/shrimp-gates.cjs` (suite `gates`, fast tier): on every bot save already in `tests/.runs` (snapshots and moments, one a game week per run, 347 saves), every project `projAvail` shows and every desk offer `deskCan` allows buys on a copy (`buyProj`/`deskRun` true), as saved where affordable and with cash and ✦ topped up. 3,782 checks, 11 to 14 s. Mutation check: a `buyProj` that refuses `careplanfree` fails it. No runs yet: a note, passes.
+- Time, this cloud box (2 cores): feature before 1,016 s (16.9 min, serial, tapall 318 s, tapnow 140 s). After 795 s (13.3 min, 2 at once), and that now includes the moment stages in tapall (588 s, 106 taps on 23 stages against 89 on 4), tight (183 s, was 31) and greyreason (189 s, was 82), plus the five `m-*` suites. tapall is the long pole; on a machine with 4 or more cores expect about 10 min.
+
+**Task B, step 3.**
+- `tests/lib/moments.cjs`, loaded in both bots before cardlag: the run json gets `moments`, a save per event, first time only: `card <key>` (before the bot closes it, so it opens with the card up), `fork <fk>`, `campaign <desk id>`, `film`, `hard open`, `hard goal`, `hard <group>` (first letter for that group), `hard option <id>` (a req that turns true). Bots never buy the land or make games, so `land open` (flat, house, land card answered No, land) and `game draft` / `game checkpoint` (Video games picked once the You page is open, a game started, run to the 100-day decision) are side branches on a copy with their own random numbers (`branch:1`). Bots unchanged: strong WIN 2531, kind 4285, average Earth 7280. About 125 moments a run, run jsons 29 to 60 MB (gitignored).
+- tight (`TIGHT_MOMENTS`, at 390 only), tapall (`TAP_MOMENTS` forks, land, hard open/goal/option; strong's too via `TAP_MRUNS`) and greyreason (`GREY_MOMENTS`, all; a card moment checks every grey choice on the card) read them, each non-card moment on its own tab (`tabMap`).
+- `tests/lib/moment.cjs`: `open({w})`, `load(moment)`, `find(name)`, `tab` (`'me'` is the You page), `tick(days)`, `play`, `text`, `rect`, `rects`, `tapText` (waits past `TAP_AT`/`SETTLE`, finds the target again), `check`, `done`.
+- `tests/moments/` from the Pass 286 list: `cards` (sale, kit, bulk, hatch are SOON_NOW and on screen at the top; bulk only with an open offer, `introStill` false once it's gone; the Shrimp Times card only with the first issue out; all 247 card moments show at the top with buttons inside 390 px, the cycle card under the tank by `msPlace`), `health` (show me selects the sick tank and spotlights Check shrimp or the tank; field guide four rows, one column, 72 px sprites on the left; Done with nothing picked twice says You didn't pick any), `games` (three genres offered; the first pass lands at 20 to 50 and the card shows Waiting, Release, Keep working with the save's quality), `kits` (with packing machines the capacity line sits beside the art, every strong and average snapshot), `you` (no lesson call and no June card without free time in any moment; Check on Grandma without Her years; land open: Tank 1 has the decor and the Grandma's land row with Go). Suites `m-cards`, `m-health`, `m-games`, `m-kits`, `m-you` in feature.
+
+**Pass 288 findings that were the tests.**
+- 5, Minister Souna's dotted title opening nothing: greyreason tapped a point taken right after `scrollIntoView`, and the anchor moved the page back. It now waits 120 ms and finds the title again: 0 of 112 dotted titles open nothing. Also closes help with `#hs-x`, not `hidden=true` (that left `hsFor` set, and a second tap on the same node closed it).
+- 6, the Quality checks half (`qc-strict`, `qc-buy water` covered by `P.mono`): a QC water sheet opened by an earlier tap stayed in the DOM across save loads. tapnow now hides `[role=dialog]` before each render (state-driven sheets come back). With and without `TAP_ONCE` on kits unlocked and year 2, all Company taps answer. Also skips a key while the June board game card is up, like a story card.
+- Still open: 1 to 4, and Tank `food i=1` and `i=2` doing nothing (kits unlocked and year 2).
+
+**New findings from the MOMENTS snapshots** (not fixed, in AGENTS.md Open work Pass 289 as 7 to 9):
+- greyreason: story choices grey with only "Not possible right now" (`dye_offer` "Feed them color food for three weeks", `c_permit` "Hire a firm that knows people"); a fork row whose button says only "Frozen" (the `fish` fork).
+- tight: the four hard part goal descriptions cut at `hard open`/`hard goal` (390), proposal rows "AED 137B to build, 2% of income for 15 years, pays back" cut (Too hot, No water, Can't see letters, 360), the second packing table row cut at the `breeder` fork.
+- tapall: none on the moment stages.
+
+`yourtank` (390 or 360, either one) fails now and then on this box with "flow 91% vs 90%, 8 pieces": it also failed in the serial baseline before any change here, so it isn't the pool. Not looked into.
+
+Tests (feature, 0dcdb13, 2026-11-07 11:53 UTC, 13.3 min, 2 at once): 39 suites, 5 failed, 1 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | - | cached, game unchanged: WIN 2531 |
+| kind | ok | - | cached, game unchanged: WIN 4285 |
+| avg | ok | - | cached, game unchanged: earth 7280 |
+| balance | ok | 11 | 168 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 3 | 55 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 2 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 14 | 3782 gate checks on 347 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| space | ok | 23 | PASS Leave Earth, launch, search and land after Earth |
+| bot-cards | ok | 0 |  |
+| tight | FAIL | 183 | 5 findings |
+| layout | warn | 113 | 3 things overflow |
+| projtabs | ok | 13 | 4 project tab checks passed |
+| cardlag | FAIL | 3 | FAIL card lag over 247 cards in 3 runs: |
+| greyreason | FAIL | 189 | FAIL 5 grey buttons with no reason (of 539 grey seen), 0 dotted titles that open nothing ( |
+| tapall | FAIL | 588 | FAIL 4 of 106 taps did nothing: |
+| m-cards | ok | 44 | PASS 19 cards moment checks |
+| m-health | ok | 9 | PASS 10 health moment checks |
+| m-games | ok | 6 | PASS 22 games moment checks |
+| m-kits | ok | 46 | PASS 283 kits moment checks |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| frozen | ok | 4 | frozen buttons checked on 5 tabs |
+| hard | ok | 15 | 24 hard part checks passed (milestone hardpart) |
+| endcards | ok | 24 | 50 ending card checks passed |
+| fresh | ok | 4 | all ok |
+| effects | ok | 1 | 15 action checks passed |
+| tank1 | ok | 30 | all tank 1 checks passed |
+| yourtank | ok | 24 | all passed |
+| yourtank-360 | FAIL | 24 | FAIL land state lines match the game (Gravel due / flow 91% / Trim due / 1 snail / 8 piece |
+| kitpack | ok | 6 | kit packing checks passed |
+| boardgames | ok | 25 | board game checks passed |
+| land-audio | ok | 13 | all passed |
+| land-life | ok | 16 | all passed |
+| taps | ok | 13 | all ok |
+| ear | ok | 6 | 14 ear tank checks passed |
