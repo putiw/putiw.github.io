@@ -3309,3 +3309,5 @@ Tests (changed, this pass):
 | tapall | ok | 720 | PASS 158 taps 100 ms after a render all changed the save (262 repeats skipped) (46 stages: |
 | yourtank | ok | 22 | all passed |
 | yourtank-360 | ok | 22 | all passed |
+
+**Deploy (7 Nov, Puti):** new rule, before "deploy" run `fast` only, every push already ran `changed`. BUILD restamped from the clock (2026-11-07T22:01; the p292 stamp 17:00 was a guess). Pass 287 to 292 go to main.
