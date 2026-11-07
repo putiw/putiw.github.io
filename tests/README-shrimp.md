@@ -2972,3 +2972,342 @@ Tests: balance 168 (board game test now needs free time first), academy 10, me 5
 
 
 Deploy 7 Nov (Pass 286): strong cold WIN 7 day 2,531 empire_dictator (was 2,695 at the Pass 281-282 deploy), strong kind WIN 7 day 4,285 question_lucky, average Earth day 7,280; no INSOLVENT or STUCK. Balance 168, academy 10, me 55, cardtap, endcards 50, hard 24, frozen 5 tabs, boardgames, monkey 150 actions on 7 stages at 390 and 360 px pass, spotlight sweep 144 all good. Not run: human, stable, tight.
+
+## Pass 287 (7 Nov): one test runner, three tiers
+
+Game unchanged, no BUILD bump. Review of the test workflow in the project doc `claude/shrimp-test-workflow-7nov.md`: CPU time was never the cost (fast suites 12 s, all three bots under a minute, tight 33 s, layout 90 s), the cost was 46 scripts with their own env vars run one at a time, 400 lines of PASS read per deploy, and suites quietly skipped (at the Pass 286 deploy tight, tapnow, projtabs, fresh, effects, layout and human were not run; tight is the one aimed at her most frequent report).
+
+- `tests/run.cjs`: `fast` (sim suites, about 20 s), `feature` (fast + strong cold, strong kind and average bots + every snapshot suite, about 10 min), `deploy` (feature + spotlights, monkey, human 390 and 360, stable full, tabshots), or suite names (`--list`). It sets every env var, keeps the bot runs in `tests/.runs/` (gitignored) and rebuilds them only when `index.html`, `space.html` or the bot scripts change (`--fresh` forces), prints nothing for a passing suite, the last 80 lines of a failing one, and one table at the end, also written to `tests/.runs/last.md` for the changelog. Bot lines show the WIN / Earth day next to the previous run's. `layout` is a warn with its overflow count, `strong`/`kind`/`avg` fail on INSOLVENT or STUCK, `spotlights` on anything but "all good", `stable` on counted failures.
+- `shrimp-projtabs.cjs` brought up to the Pass 272 layout: skips hidden tabs (Gear folds into Company from 100k kits, its year-5 save has 167k), buys from `#c-mkt` (Market) instead of the hidden `#e-proj`, and says "(row gone)" instead of throwing when the bought row isn't there.
+- AGENTS.md: Token budget and Testing checklist point at the runner; "Before signing off" gets the change contract (every change carries its check: a balance check for a sim rule, a snapshot-at-the-moment check for anything seen, a fails-on-the-old-commit check for a reported bug).
+
+First feature run on 8842a46 (the deployed build), 10 min: strong WIN 2,531 empire_dictator, kind WIN 4,285 question_lucky, average Earth 7,280; balance 168, academy 10, me 55, cardtap, space-search 6, tank1 sim, sound, effects 14/15, space continuation, bot-cards, tight 0, hard 24, frozen 5 tabs, endcards 50, fresh, tank1, yourtank 390 and 360, kitpack, boardgames, land-audio, land-life, taps, ear 14 all pass; layout warn 3 (the hard card "0% AED 0/yr" +14 px at 320, a 2 px chart text at 360/390, same as Pass 273). Two failures on the deployed build, not fixed here (one topic per chat):
+- `tapnow`: 3 of 31 enabled buttons on Market do nothing when tapped 100 ms after a render, nothing covering them: year 8 `proj globalbrand`, year 8 `proj cartoon`, year 12 `camp power` (average bot's saves). Puti's category 3.
+- `projtabs`: on the Market card a bought project row leaves at once (`FRZ` empty, no Done row), so the next row slides under the finger. The Pass 266 rule (a bought row stays greyed in place until a scroll or tab change) holds on `#e-proj` but not on `#c-mkt` since Pass 272. Puti's Pass 286 gear-row ghost tap is the same shape.
+
+Next steps from the doc, in order: card-lag and grey-with-no-reason sweeps; `MOMENTS` snapshots in the bots plus a moment-test helper and tests from the Pass 286 list; one-card-per-thing, numbers-at-the-stage, text lint, `tests/findings.tsv`.
+
+
+## Pass 288 (7 Nov): the two runner bugs, card-lag and grey-with-no-reason sweeps
+
+BUILD 2026-11-07T13:53-p288.
+
+**tapnow (Market buttons doing nothing): the test, not the game.** `globalbrand` and `cartoon` sit in Market's closed More marketing fold, `power`, `p_jingle` and `phones` in the closed Campaign desk fold. Chromium keeps a layout rect for them (y about 1,000 to 1,200 on an 844 px screen), so `getClientRects` and Playwright's `isVisible` count them as on screen, `scrollIntoView` can't reach inside a closed details, and the tap landed below the viewport on nothing. Which ones "failed" changed run to run (4 of 31, 2, 1, 0). No gate, SETTLE or cost check involved: `buyProj` and `deskRun` both pass on those saves. tapnow now taps the fold's summary first, like the player, checks `checkVisibility()` at the tap, and says "off screen at y N" instead of "covered by nothing". Opened, all five work: 31 of 31, three runs.
+
+**projtabs (bought Market row leaves at once): real.** The click handler froze only `#e-proj`. Now a project bought in `#mk-body` calls `frzTap('mk-body')`, the Market body doesn't re-render while `FRZ['mk-body']` is set, and `hdFree`/`tabLeave` clear `cache.mk` so it redraws after a scroll or tab change. Not the gala and not fork options (the gala repeats in place, forks open the after-popup), same as `#e-proj`. The test was also tapping the gala (first enabled row on the year-5 save); it now opens Market's folds by their summaries and buys a one-off project, then checks Done until a scroll (after the 600 ms `TAP_AT` window) and gone after it, and that a gala tap keeps its row in place (skipped on this save, the ministry is bought first). Fails on b219227 ("after the tap {frz:0}"), passes now.
+
+**Card lag** (`tests/lib/cardlag.cjs` in both bots, `tests/shrimp-cardlag.cjs`, suite `cardlag`): every card's day `milestoneConditions` first turned true and the day it showed, limits now (SOON_NOW, CARD_NOW) 1 day, intro 7, chapter and story 30; `introStill` at the card; two cards under 15 s of play (storyClock) apart. Bots close cards the step they queue, so it measures the queue. Findings on this build (not fixed):
+- Story cards 32 to 79 days late on every bot, the same ones each time: `c_feed`/`c_box` (true the same day, the second waits 68 to 79 d), `c_wells`, `c_vet`, `c_jar2`, `c_saturday`, `c_abroad`, `fight_invite`, `ev_paper`, `c_price1`, `c_flood`, `c_budget`. Cause: one story card per pace gap (60 to 150 s of play, 15 to 37 days at 4 s a day), and the first year adds a 30-day gap; cards that come true together queue behind each other. Puti to decide if 30 days is the right limit for stories or the pacing should change.
+- `pump_call1` 26 d and `pump_call2` 35 d late on the strong bot though both are CARD_NOW: worth a look, the call is "I’m selling tomorrow".
+- Under 15 s apart: kind bot `kits` then `kit` 8 s (SOON_NOW gap 4 s by design, Pass 286), `worldtab` then `bulk` 12 s, `mira_teen` then `pain_inbox` 12 s (two story cards), `lastchap` then `win` 0 s (by design); average `c_bonus` then `kindsave` 0 s.
+- No card shown after its reason was gone.
+
+**Grey with no reason** (`tests/shrimp-greyreason.cjs`, suite `greyreason`, strong snapshots and the average bot's years, every tab, folds opened): 217 grey buttons, one with no reason, Sales staff `+ Hire` greyed in a row reading only "− + Hire" (strong kits unlocked and two more saves). 91 dotted titles tapped by position, one opens nothing: hard part `Minister Souna, tank law` (avg year 19). Skips a minus at its floor and saves with the ending page up.
+
+**Every tab taps** (suite `tapall`: tapnow with `TAP_TABS` all, `TAP_ACTS=all`, kits unlocked / years 2, 5, 12, 0.8 s play): 5 of 89 taps did nothing. Tank `food i=2` "no change" (kits unlocked, year 2); year 2 Company `qc-strict` 0 and 2 and `qc-buy water` covered by a `P.mono` line, so the Quality checks buttons sit under text. Not looked into.
+
+Runner: the three suites are in feature; the bot stamp includes `tests/lib/cardlag.cjs`. tapnow and tapall clear a save's spotlight before tapping a tab. Feature is now about 16 min (tapall 5 of it).
+
+Feature run on this index.html (game unchanged after it, only the three new tests patched; 11 min):
+
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | 11s | WIN 2531 empire_dictator |
+| kind | ok | 22s | WIN 4285 question_lucky |
+| avg | ok | 30s | earth 7280 (prev 7280) |
+| balance | ok | 5s | 168 focused balance and migration checks passed |
+| academy | ok | 0s | 10 academy and parallel chapter checks passed |
+| me | ok | 1s | 55 free time, Grandma and ending checks passed |
+| cardtap | ok | 3s | card tap checks passed |
+| space-search | ok | 0s | 6 space search checks passed |
+| tank1-sim | ok | 1s | all tank 1 sim checks passed |
+| sound | ok | 1s | all ok |
+| effects-sim | ok | 0s | 14 action checks passed |
+| space | ok | 11s | PASS Leave Earth, launch, search and land after Earth |
+| bot-cards | ok | 0s |  |
+| tight | ok | 27s | 0 findings |
+| layout | warn | 86s | 3 things overflow |
+| projtabs | ok | 11s | 4 project tab checks passed |
+| tapnow | ok | 134s | PASS 31 taps 100 ms after a render all changed the save (year 5, year 8, year 12, emp prom |
+| cardlag | FAIL | 0s | FAIL card lag over 247 cards in 3 runs: |
+| greyreason | FAIL | 80s | FAIL 1 grey buttons with no reason (of 217 grey seen), 10 dotted titles that open nothing  |
+| tapall | FAIL | 81s | FAIL page.click: Timeout 30000ms exceeded. |
+| frozen | ok | 2s | frozen buttons checked on 5 tabs |
+| hard | ok | 12s | 24 hard part checks passed (milestone hardpart) |
+| endcards | ok | 18s | 50 ending card checks passed |
+| fresh | ok | 3s | all ok |
+| effects | ok | 0s | 15 action checks passed |
+| tank1 | ok | 29s | all tank 1 checks passed |
+| yourtank | ok | 22s | all passed |
+| yourtank-360 | ok | 22s | all passed |
+| kitpack | ok | 5s | kit packing checks passed |
+| boardgames | ok | 22s | board game checks passed |
+| land-audio | ok | 12s | all passed |
+| land-life | ok | 15s | all passed |
+| taps | ok | 12s | all ok |
+| ear | ok | 6s | 14 ear tank checks passed |
+
+Rerun of the patched suites:
+
+Tests (greyreason tapall tapnow, b219227, 2026-11-07 10:24 UTC, 9 min): 5 suites, 2 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| avg | ok | - | cached, game unchanged: earth 7280 |
+| strong | ok | - | cached, game unchanged: WIN 2531 |
+| greyreason | FAIL | 78 | FAIL 1 grey buttons with no reason (of 217 grey seen), 1 dotted titles that open nothing ( |
+| tapall | FAIL | 312 | FAIL 5 of 89 taps did nothing: |
+| tapnow | ok | 137 | PASS 31 taps 100 ms after a render all changed the save (year 5, year 8, year 12, emp prom |
+
+## Pass 289 (7 Nov): faster feature tier, gate check, MOMENTS snapshots, moment tests
+
+Tests only, game unchanged, no BUILD bump. From the project doc `claude/shrimp-handoff-tests-step3-7nov.md`.
+
+**Task A, the feature tier.**
+- `tests/run.cjs` runs suites in a pool (`spawn`), a suite starts once the bots it needs are done, bots first, the table in the old order. `--jobs=N` or `SHRIMP_JOBS`; default 4, or the core count when there are fewer (on this 2-core box 4 at once made tapnow, tapall and greyreason flaky: taps landed late). `--jobs=1` is the old run.
+- tapall: `TAP_ONCE=1` taps each button key once per tab, a key that answered at an earlier stage is skipped, a failed one is tried again. tapnow is out of feature (tier `name`, `node tests/run.cjs tapnow`), tapall covers Kits and Ads.
+- `tests/shrimp-gates.cjs` (suite `gates`, fast tier): on every bot save already in `tests/.runs` (snapshots and moments, one a game week per run, 347 saves), every project `projAvail` shows and every desk offer `deskCan` allows buys on a copy (`buyProj`/`deskRun` true), as saved where affordable and with cash and ✦ topped up. 3,782 checks, 11 to 14 s. Mutation check: a `buyProj` that refuses `careplanfree` fails it. No runs yet: a note, passes.
+- Time, this cloud box (2 cores): feature before 1,016 s (16.9 min, serial, tapall 318 s, tapnow 140 s). After 795 s (13.3 min, 2 at once), and that now includes the moment stages in tapall (588 s, 106 taps on 23 stages against 89 on 4), tight (183 s, was 31) and greyreason (189 s, was 82), plus the five `m-*` suites. tapall is the long pole; on a machine with 4 or more cores expect about 10 min.
+
+**Task B, step 3.**
+- `tests/lib/moments.cjs`, loaded in both bots before cardlag: the run json gets `moments`, a save per event, first time only: `card <key>` (before the bot closes it, so it opens with the card up), `fork <fk>`, `campaign <desk id>`, `film`, `hard open`, `hard goal`, `hard <group>` (first letter for that group), `hard option <id>` (a req that turns true). Bots never buy the land or make games, so `land open` (flat, house, land card answered No, land) and `game draft` / `game checkpoint` (Video games picked once the You page is open, a game started, run to the 100-day decision) are side branches on a copy with their own random numbers (`branch:1`). Bots unchanged: strong WIN 2531, kind 4285, average Earth 7280. About 125 moments a run, run jsons 29 to 60 MB (gitignored).
+- tight (`TIGHT_MOMENTS`, at 390 only), tapall (`TAP_MOMENTS` forks, land, hard open/goal/option; strong's too via `TAP_MRUNS`) and greyreason (`GREY_MOMENTS`, all; a card moment checks every grey choice on the card) read them, each non-card moment on its own tab (`tabMap`).
+- `tests/lib/moment.cjs`: `open({w})`, `load(moment)`, `find(name)`, `tab` (`'me'` is the You page), `tick(days)`, `play`, `text`, `rect`, `rects`, `tapText` (waits past `TAP_AT`/`SETTLE`, finds the target again), `check`, `done`.
+- `tests/moments/` from the Pass 286 list: `cards` (sale, kit, bulk, hatch are SOON_NOW and on screen at the top; bulk only with an open offer, `introStill` false once it's gone; the Shrimp Times card only with the first issue out; all 247 card moments show at the top with buttons inside 390 px, the cycle card under the tank by `msPlace`), `health` (show me selects the sick tank and spotlights Check shrimp or the tank; field guide four rows, one column, 72 px sprites on the left; Done with nothing picked twice says You didn't pick any), `games` (three genres offered; the first pass lands at 20 to 50 and the card shows Waiting, Release, Keep working with the save's quality), `kits` (with packing machines the capacity line sits beside the art, every strong and average snapshot), `you` (no lesson call and no June card without free time in any moment; Check on Grandma without Her years; land open: Tank 1 has the decor and the Grandma's land row with Go). Suites `m-cards`, `m-health`, `m-games`, `m-kits`, `m-you` in feature.
+
+**Pass 288 findings that were the tests.**
+- 5, Minister Souna's dotted title opening nothing: greyreason tapped a point taken right after `scrollIntoView`, and the anchor moved the page back. It now waits 120 ms and finds the title again: 0 of 112 dotted titles open nothing. Also closes help with `#hs-x`, not `hidden=true` (that left `hsFor` set, and a second tap on the same node closed it).
+- 6, the Quality checks half (`qc-strict`, `qc-buy water` covered by `P.mono`): a QC water sheet opened by an earlier tap stayed in the DOM across save loads. tapnow now hides `[role=dialog]` before each render (state-driven sheets come back). With and without `TAP_ONCE` on kits unlocked and year 2, all Company taps answer. Also skips a key while the June board game card is up, like a story card.
+- Still open: 1 to 4, and Tank `food i=1` and `i=2` doing nothing (kits unlocked and year 2).
+
+**New findings from the MOMENTS snapshots** (not fixed, in AGENTS.md Open work Pass 289 as 7 to 9):
+- greyreason: story choices grey with only "Not possible right now" (`dye_offer` "Feed them color food for three weeks", `c_permit` "Hire a firm that knows people"); a fork row whose button says only "Frozen" (the `fish` fork).
+- tight: the four hard part goal descriptions cut at `hard open`/`hard goal` (390), proposal rows "AED 137B to build, 2% of income for 15 years, pays back" cut (Too hot, No water, Can't see letters, 360), the second packing table row cut at the `breeder` fork.
+- tapall: none on the moment stages.
+
+`yourtank` (390 or 360, either one) fails now and then on this box with "flow 91% vs 90%, 8 pieces": it also failed in the serial baseline before any change here, so it isn't the pool. Not looked into.
+
+Tests (feature, 0dcdb13, 2026-11-07 11:53 UTC, 13.3 min, 2 at once): 39 suites, 5 failed, 1 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | - | cached, game unchanged: WIN 2531 |
+| kind | ok | - | cached, game unchanged: WIN 4285 |
+| avg | ok | - | cached, game unchanged: earth 7280 |
+| balance | ok | 11 | 168 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 3 | 55 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 2 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 14 | 3782 gate checks on 347 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| space | ok | 23 | PASS Leave Earth, launch, search and land after Earth |
+| bot-cards | ok | 0 |  |
+| tight | FAIL | 183 | 5 findings |
+| layout | warn | 113 | 3 things overflow |
+| projtabs | ok | 13 | 4 project tab checks passed |
+| cardlag | FAIL | 3 | FAIL card lag over 247 cards in 3 runs: |
+| greyreason | FAIL | 189 | FAIL 5 grey buttons with no reason (of 539 grey seen), 0 dotted titles that open nothing ( |
+| tapall | FAIL | 588 | FAIL 4 of 106 taps did nothing: |
+| m-cards | ok | 44 | PASS 19 cards moment checks |
+| m-health | ok | 9 | PASS 10 health moment checks |
+| m-games | ok | 6 | PASS 22 games moment checks |
+| m-kits | ok | 46 | PASS 283 kits moment checks |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| frozen | ok | 4 | frozen buttons checked on 5 tabs |
+| hard | ok | 15 | 24 hard part checks passed (milestone hardpart) |
+| endcards | ok | 24 | 50 ending card checks passed |
+| fresh | ok | 4 | all ok |
+| effects | ok | 1 | 15 action checks passed |
+| tank1 | ok | 30 | all tank 1 checks passed |
+| yourtank | ok | 24 | all passed |
+| yourtank-360 | FAIL | 24 | FAIL land state lines match the game (Gravel due / flow 91% / Trim due / 1 snail / 8 piece |
+| kitpack | ok | 6 | kit packing checks passed |
+| boardgames | ok | 25 | board game checks passed |
+| land-audio | ok | 13 | all passed |
+| land-life | ok | 16 | all passed |
+| taps | ok | 13 | all ok |
+| ear | ok | 6 | 14 ear tank checks passed |
+
+## Pass 290 (7 Nov): Puti's calls on the Pass 288/289 findings
+
+BUILD 2026-11-07T16:42-p290.
+
+**1. Card timing, reaction or content** (`cardReact`, `CARD_REACT`, `reactPush` in `detectMilestones`). A reaction card goes in the queue the step it comes true, urgent ones (`CARD_NOW`) first, ahead of anything still waiting, no gap. A content card waits the breather (`introGap`, now never under 15 s) and the story pacing as before. Old saves: a reaction card sitting in `wait` or `soon` goes up at once.
+- Reaction (shows at once): `CARD_NOW` (intro, cycle, owntank, broke, kindsave, kindend, gameover, left, me_ill, crash, win, tenyears, health, pump_call1, pump_call2); first sale `sale`, first kit `kit`, babies `hatch`, The first box `kits`, The warehouse `farm`, A million tanks `million`, The hard part `hardpart`, The last chapter `lastchap`; the thing you just bought or built: `ministry`, `station`, `landtime`, tree letters `tree_island/rewild/lastmile/lab/shop`; something your play just opened: Quality checks `qc`, Automate one step `tools`, The World tab `worldtab`; your own choices coming back: the favors `fav_0/1/2`, A logistics investor `wash_offer`, your game out `gm_out`, Tired `me_burnout`, The tank you can hear `ear_ready`, the staff you replaced `bye_pack/sales/mgr/social`, Grandma's land after the house `gp_land`, Grandma's tour money `gp_scam`.
+- Content (waits): Company and Market `market`, Your time `me_intro`, The Shrimp Times `ripple`, Bulk orders `bulk` (a random offer, still first among content, `introStill` drops it if the offer goes), The third floor `jar`, the `ev_*` events, Red dye, The back room, An offer, Shrimpcoin, Something alive, Grandma's games, both lab parties, Milo `nour1-6`, every Mira card (Mira's own story, droppable when stale), A letter from Grandma `gp_net`, The doctor `me_doctor`, the pains, every `c_*` card.
+- cardlag: a reaction card fails if more than 1 day late; a content card never for waiting, only for coming under 15 s after another card; `kits`→`kit` and `lastchap`→`win` whitelisted. A reaction card under 15 s after another prints as a note: this build, every bot `owntank`→`farm` 0 s (one farm build, two cards), and bot-only ones (the bot buys the ministry or a tree the step a card closes).
+
+**2. Pump calls late.** `pump_call1/2` have `story:1`, so `storyWaits` sent them to the story queue before the `CARD_NOW` check ran. Now `cardReact` is checked first. Strong bot: 0 days late (was 26 and 35).
+
+**3. Pairs under 15 s.** Mira→The inbox: the gap could be 10 s (`introStamp` 10 to 35 s), `introGap` is now at least 15 s. The World tab→Bulk orders: bulk is content, it waits the breather. A good year→Out of money: "money left over" now means after the reserve; `c_bonus` asks only with 30 days of net plus `capitalReserve`, and `bonusAmt` never dips into the reserve, so no choice leaves the company broke the next day.
+
+**4. Grey buttons say what's missing.** Story choices: `choiceNeed` tries the choice on copies and says "Needs AED 14B", "Needs 40 kits", "Needs 9.8M influence ✦" or several joined with "and". Costs scale with what you hold (`scM`, `si`), so the amount is the least you need to hold for it to go through (doubled, then halved to about 1%). + Hire: `hireWhy` (Needs the packing tools / Needs 10 kits sold / Needs AED X) in a small line under the buttons (`.hb-why`).
+
+**5.** greyreason accepts "Frozen".
+
+**6. Tank food i=1/i=2: the test.** The food sits in the Feeding fold and the tap works for a player; tapnow's save signature skipped `G.tanks`, so it never saw the change. The signature keeps each tank's `set` now.
+
+**7. Cut descriptions.** Short lines, full text behind the title: the four goals ("Even the ones that said no.", "All but the ones that said no.", "One per home on average. The game ends here.", "Drop the number. The game ends here."), proposal rows (`propCostTxt(...,1)`: "AED 25.5B, 2% of income, 15 yrs, pays back"), Second packing table ("You pack 4 kits/day, each packer adds 8.").
+
+Test changes beyond the sweeps: Pass 132 balance check rewritten for the new rule (kits goes up with the sale, ev_mira waits the gap); cardtap marks its made-up save's true cards as seen (else the sale card follows the kit card at once); projtabs closes the ministry card before changing tab (it now comes at once). `tests/lib/moment.cjs`: `MOMENT_HTML`, `g.cards(days,picks)`, `cache={}` on load.
+
+**Moment tests** (all fail on 732f326 with its runs, `MOMENT_HTML`/`MOMENT_RUNS`, and pass now): `m-cards` (pump_call2 8 d late from the c_bonus pump choice; worldtab→bulk 12 s; mira_teen→pain_inbox 12 s; A good year, all three choices broke three days later; dye_offer and c_permit say "Not possible right now"), `m-kits` (+ Hire row "− + Hire"; packing table cut at 360 and 390), new `m-hard` (goals and proposal rows cut at 360/390), new `m-tank` (food taps; passes on the old build too, the game was right). Not a moment test: "Frozen" (a test rule only).
+
+`tapall` failed once on `moment fork reviews promote revfake: swallowed by SETTLE`, passed on the rerun (125 taps). Not looked into; watch for it.
+
+Feature (db16e9c, before the projtabs fix), then projtabs and tapall again:
+
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | 16 | WIN 2695 (prev 2531) empire_dictator |
+| kind | ok | 29 | WIN 4209 (prev 4285) question_lucky |
+| avg | ok | 35 | earth 7420 (prev 7280) |
+| balance | ok | 5 | 168 focused balance and migration checks passed |
+| academy | ok | 0 | 10 |
+| me | ok | 1 | 55 |
+| cardtap | ok | 3 | |
+| space-search | ok | 0 | |
+| tank1-sim | ok | 1 | |
+| sound | ok | 1 | |
+| effects-sim | ok | 0 | |
+| gates | ok | 7 | 3561 gate checks on 339 saves |
+| space | ok | 12 | |
+| bot-cards | ok | 0 | |
+| tight | ok | 135 | 0 findings |
+| layout | warn | 87 | 3 things overflow (same as before) |
+| projtabs | FAIL → ok | 36 / 12 | ministry card up at once covered the tabs; test closes it now |
+| cardlag | ok | 1 | notes: owntank→farm (react) |
+| greyreason | ok | 161 | 533 grey buttons all say why, 109 dotted titles open |
+| tapall | FAIL → ok | 527 / 523 | revfake SETTLE once; rerun 125 taps all changed |
+| m-cards | ok | 36 | 41 |
+| m-health | ok | 7 | 10 |
+| m-games | ok | 5 | 22 |
+| m-kits | ok | 41 | 291 |
+| m-you | ok | 3 | 9 |
+| m-tank | ok | 12 | 6 |
+| m-hard | ok | 79 | 213 |
+| frozen, hard, endcards, fresh, effects, tank1, yourtank, yourtank-360, kitpack, boardgames, land-audio, land-life, taps, ear | ok | | |
+
+## Pass 291 (7 Nov): a `changed` test tier, bots kept for UI and stamp changes, tapall shorter
+
+Tests only, game unchanged, no BUILD bump. From the project doc `claude/shrimp-handoff-tests-changed-7nov.md`.
+
+**`node tests/run.cjs changed`.** Diffs against the last pushed commit (`@{u}`, or `--base=<ref>`; `--head=<ref>` diffs two commits instead of the working tree; `--dry` prints the picks and stops), runs fast plus only the suites the diff touches, and prints each pick with why. The map is two tables at the top of `tests/run.cjs`:
+- `CH_FILES`, by path: a suite's own file runs that suite on all its tabs (tapnow left out when tapall shares the file), `tests/lib/cardlag.cjs` → cardlag, `tests/lib/moment(s).cjs` → every `m-*`, a bot script → feature, `space.html` → space and space-search, `boardgames.js` → boardgames and m-games, `taps.js` and sounds → taps and land-audio, notes, docs, the runner, build scripts → fast only, an unknown file under `shrimp/` → feature.
+- `CH_AREAS`, inside `index.html`: each changed line is matched by the words of the function or var it sits in, and since a line is often a whole function, by the words that changed (word diff; Pass 288's fix sat in `updateEmpire`, the changed words were `frzTap('mk-body')`). Each area names its suites and the tabs the sweeps look at (tapall `TAP_TABS`, tight `TIGHT_TABS`, greyreason the new `GREY_TABS`, `card` = its card moments). CSS, page markup and the core render helpers run tight, layout and greyreason on every tab. A changed line in the SIM block also runs the three bots, bot-cards and cardlag. A diff of only comments or the BUILD stamp is fast only. A line in no area falls back to feature and names it; on the last 32 commits that touched index.html, 1 falls back (`SLOTH` in Pass 271).
+
+**Bots.** The stamp hashes only what the bots read (the SIM block and the average bot's two slices) with comments, blank lines and BUILD taken out, if the stripped text still compiles (else the raw text). A CSS, UI, comment or stamp change keeps the cached runs; a real sim change rebuilds. `space.html` is out of the stamp: no bot reads it.
+
+**tapall** (measured alone on this 2-core box, same saves): 525 s and 128 taps before, 368 s and 139 taps after. `TAP_TIME=1` prints the time per stage.
+- `year 5` took 78 s and `hard open` 53 s for 0 taps: a story card comes up within the 800 ms play on every key there. tapall now checks for the card right after the play (at hard open the card sat over the hard part's header and 20 buttons had been skipped as "no box", without a word), and stops that tab at that stage after 3 card skips in a row; those keys are tried again at the next stage, as before.
+- A shut `coll` card is opened by its header like the player (Pass 290 lesson), and a button with no box at the tap goes in the notes.
+- No stage cut: every Pass 288 to 290 finding (kits unlocked, year 2, the fork moments) is still on the list. The `revfake`/`shipwarm` "swallowed by SETTLE" came back in 3 of 4 runs today (passed in the feature run below), so it isn't a one-off.
+
+**Proof, three real diffs** (`changed --base=<parent> --head=<commit>`, 2 at once):
+
+| diff | picks | time | caught |
+|---|---|---|---|
+| Pass 288 fix reverted (Pass 287 index.html on 6865e89's tests) | fast + projtabs, tapall, m-kits, kitpack, frozen, tight, layout, greyreason, strong, avg | 4.2 min | projtabs FAIL "(row gone)", the Pass 287 bug; greyreason also flags "+ Hire" (fixed in 290) |
+| Pass 290 (732f326..db16e9c, 19 hunks plus CSS) | 33 suites, every tab | 12.0 min | projtabs FAIL (the ministry card now comes at once and covers the tabs), as in Pass 290 |
+| Pass 290 reverted (Pass 289 index.html on db16e9c's tests) | picks cardlag | cardlag alone 0.7 min | cardlag FAIL pump_call1 26 d, pump_call2 35 d late, mira_teen→pain_inbox 12 s |
+| one CSS line (`.coll>.hd` margin), probe commit | fast + tight, layout, greyreason, bots cached | 4.6 min | (nothing to catch) |
+| BUILD stamp + a comment, probe commit | fast only, bots cached | 0.2 min | |
+
+The cards area now picks projtabs too (Pass 290: a card that comes at once covered the tabs). There is no pure CSS pass in the last 50 commits, hence the probe.
+
+**Tiers.** `fast` after each change, `changed` before a push, `feature` before a deploy and when `changed` falls back, `deploy` before "deploy". Run-header, AGENTS.md Token budget and Testing checklist updated.
+
+Not done: year 5 and hard open still test nothing in tapall (the card), the SETTLE swallow, `yourtank-360` flow 91% vs 90% (failed again below, Pass 289). A big pass with CSS still takes about as long as feature.
+
+Tests (feature, cec2321 + this pass, 2026-11-07 14:38 UTC, 11.0 min, 2 at once): 41 suites, 1 failed, 1 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | 20 | WIN 2695 (prev 2695) empire_dictator |
+| kind | ok | 34 | WIN 4209 (prev 4209) question_lucky |
+| avg | ok | 41 | earth 7420 (prev 7420) |
+| balance | ok | 6 | 168 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 1 | 55 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 7 | 3561 gate checks on 339 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| space | ok | 13 | PASS Leave Earth, launch, search and land after Earth |
+| bot-cards | ok | 0 |  |
+| tight | ok | 149 | 0 findings |
+| layout | warn | 93 | 3 things overflow |
+| projtabs | ok | 13 | 4 project tab checks passed |
+| cardlag | ok | 2 |  avg: reaction cards under 15 s after another (allowed): owntank (react) then farm (react) |
+| greyreason | ok | 168 | PASS (168 s) 535 grey buttons all say why, 109 dotted titles all open, 302 snapshots |
+| tapall | ok | 383 | PASS 139 taps 100 ms after a render all changed the save (235 repeats skipped) (46 stages: |
+| m-cards | ok | 39 | PASS 41 cards moment checks |
+| m-health | ok | 8 | PASS 10 health moment checks |
+| m-games | ok | 5 | PASS 22 games moment checks |
+| m-kits | ok | 42 | PASS 291 kits moment checks |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| m-tank | ok | 11 | PASS 6 tank moment checks |
+| m-hard | ok | 81 | PASS 213 hard moment checks |
+| frozen | ok | 3 | frozen buttons checked on 5 tabs |
+| hard | ok | 13 | 24 hard part checks passed (milestone hardpart) |
+| endcards | ok | 19 | 50 ending card checks passed |
+| fresh | ok | 3 | all ok |
+| effects | ok | 1 | 15 action checks passed |
+| tank1 | ok | 29 | all tank 1 checks passed |
+| yourtank | ok | 22 | all passed |
+| yourtank-360 | FAIL | 23 | FAIL land state lines match the game (Gravel due / flow 91% / Trim due / 1 snail / 8 piece |
+| kitpack | ok | 5 | kit packing checks passed |
+| boardgames | ok | 23 | board game checks passed |
+| land-audio | ok | 13 | all passed |
+| land-life | ok | 16 | all passed |
+| taps | ok | 12 | all ok |
+| ear | ok | 6 | 14 ear tank checks passed |
+
+## Pass 292 (7 Nov): tapall closes story cards, SETTLE checked, land flow on each tank day
+
+From the project doc `claude/shrimp-handoff-tapall-settle-flow-7nov.md`. BUILD `2026-11-07T17:00-p292`.
+
+**1. tapall year 5 and hard open.** A story card came up within the 800 ms play on every key, so both stages tapped nothing. Now, once per stage, tapall plays, lets the cards come, closes them like a player (waits out SETTLE, taps the first plain button, a choice or Next, never "show me"; then Go on on What happened), plays again until a play brings none (4 rounds at most) and taps from that save. A card that still comes on a key is closed the same way, and the button and the save signature are taken again after it. `TAP_TIME=1`, year 5 + hard open alone:
+
+| | year 5 | hard open |
+|---|---|---|
+| before | 15.5 s, 0 taps (cut after 3 cards) | 5.1 s, 0 taps |
+| after | 88.5 s, 35 taps | 55.5 s, 18 taps |
+
+**2. SETTLE on revfake and shipwarm.** I logged each button's page top over 3 s of play on both runs' fork saves: it doesn't move (394, 480). Not a game bug. What I did find in the test: `load` hid the sheets a tap opened but left `TS` (tank sheet) set, and `renderMilestone` holds every card while `TS`/`HC`/`QCR` is set, so at strong fork ship the game sat paused with c_saturday in the queue and nothing on screen. load clears them now. Also the first tab tap after a load sometimes got a pointerdown and no click (year 5 world listed 9 promote keys as world's); load checks `activeTab` and taps again (22 times in a full sweep, cause not found). Two full tapall sweeps at once (the feature run's load): 157 and 158 taps, all passed, no SETTLE swallow.
+
+**3.** owntank then farm, two reaction cards: kept, off the list.
+
+**4. yourtank flow 91% vs 90%.** The land shows the lines the game sends, once a second (`landSend` interval); a tank day is 2.4 s, so the land could show the day before for up to 1 s. `ownClock` now sends to the land on every new tank day. The test reads the game's tank day before and after the land read and reads again if it changed (the check itself is the same). yourtank-360 4 of 4 passed.
+
+Not done: tapall still skips cards at fork careplan and fork data (closeCards finds no button to tap there, not looked at). The repeated tab tap. tapall is slower: 720 s in `changed` (383 s in Pass 291), the card closing and 19 more taps. `feature` not run this pass.
+
+Tests (changed, this pass):
+
+| suite | result | s | note |
+|---|---|---|---|
+| avg | ok | - | cached, game unchanged: earth 7420 |
+| kind | ok | 35 | WIN 4209 question_lucky |
+| strong | ok | - | cached, game unchanged: WIN 2695 |
+| balance | ok | 7 | 168 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 1 | 55 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 6 | 2668 gate checks on 237 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| land-life | ok | 15 | all passed |
+| land-audio | ok | 13 | all passed |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| tapall | ok | 720 | PASS 158 taps 100 ms after a render all changed the save (262 repeats skipped) (46 stages: |
+| yourtank | ok | 22 | all passed |
+| yourtank-360 | ok | 22 | all passed |
+
+**Deploy (7 Nov, Puti):** new rule, before "deploy" run `fast` only, every push already ran `changed`. BUILD restamped from the clock (2026-11-07T22:01; the p292 stamp 17:00 was a guess). Pass 287 to 292 go to main.

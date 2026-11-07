@@ -7,9 +7,14 @@
 //  wrap  a slider value or chip label on two lines
 // TIGHT_RUN=<dir>/run-7.json [TIGHT_W=360,390] [ST="first sale,win"] [TIGHT_TABS=tank,me] node tests/shrimp-tight.cjs   (exit 1 on any finding)
 const {chromium}=require('playwright');const fs=require('fs'),path=require('path');
-const snaps=JSON.parse(fs.readFileSync(process.env.TIGHT_RUN||process.env.ACADEMY_RUN,'utf8')).snapshots;
+const RJ=JSON.parse(fs.readFileSync(process.env.TIGHT_RUN||process.env.ACADEMY_RUN,'utf8')),snaps=RJ.snapshots;
+// Pass 289: TIGHT_MOMENTS=<regex> adds the run's MOMENTS (tests/lib/moments.cjs), card moments left out (the card covers the
+// page), each on its own tab only (tabMap of the moment's tab); TIGHT_MRUNS=<run json,...> adds other runs' moments.
+const MRE=process.env.TIGHT_MOMENTS?new RegExp(process.env.TIGHT_MOMENTS):null,MTAB={},MST=[];
+if(MRE){const add=(rj,tag)=>{for(const [k,v] of Object.entries(rj.moments||{})){if(!v||!v.snap||v.kind==='card'||!v.tab||!MRE.test(k))continue;const nm='moment '+tag+k;snaps[nm]=v.snap;MTAB[nm]=v.tab;MST.push(nm);}};add(RJ,'');
+ for(const f of (process.env.TIGHT_MRUNS||'').split(',').filter(Boolean))add(JSON.parse(fs.readFileSync(f,'utf8')),path.basename(path.dirname(f))+' ');}
 const Ws=(process.env.TIGHT_W||'360,390').split(',').map(Number);
-const stages=(process.env.ST||'first shrimp,first sale,kits unlocked,first farm,10k owners,100k kits,million owners,win').split(',');
+const stages=(process.env.ST||'first shrimp,first sale,kits unlocked,first farm,10k owners,100k kits,million owners,win').split(',').concat(MST);
 const only=process.env.TIGHT_TABS?process.env.TIGHT_TABS.split(','):null;
 const GAP=20;
 const SCAN=`(function(GAP){var out=[];function vis(e){if(!e.getClientRects().length)return false;var cs=getComputedStyle(e);if(cs.visibility==='hidden'||cs.position==='fixed'||cs.position==='absolute')return false;var r=e.getBoundingClientRect();return r.height>0.5&&r.width>0.5;}
@@ -33,11 +38,13 @@ const SCAN=`(function(GAP){var out=[];function vis(e){if(!e.getClientRects().len
  });
  return out;})`;
 (async()=>{const b=await chromium.launch();let all=[];
- for(const W of Ws)for(const sk of stages){if(!snaps[sk])continue;const p=await b.newPage({viewport:{width:W,height:844}});p.on('dialog',d=>d.dismiss());p.on('pageerror',e=>all.push(['error',sk,W,'',e.message]));
+ const MW=+(process.env.TIGHT_MW||390);/* moments at one width, 390 (Puti's phone) */
+ for(const W of Ws)for(const sk of stages){if(!snaps[sk])continue;if(MTAB[sk]&&W!==MW)continue;const p=await b.newPage({viewport:{width:W,height:844}});p.on('dialog',d=>d.dismiss());p.on('pageerror',e=>all.push(['error',sk,W,'',e.message]));
   await p.goto('file://'+path.resolve(__dirname,'../shrimp/index.html'));await p.waitForTimeout(300);
   await p.evaluate(s=>{G=s;migrate(G);G.progress.queue=[];window.spotlight=function(){};window.spotWatch=function(){};try{setSpeed(0)}catch(e){};render();},snaps[sk]);
   let tabs=await p.evaluate(()=>[...document.querySelectorAll('.tabs [data-tab]')].filter(t=>!t.hidden&&t.offsetParent).map(t=>t.dataset.tab).concat(['me']));
   if(only)tabs=tabs.filter(t=>only.includes(t));
+  if(MTAB[sk]){const mt=await p.evaluate(a=>{var f=typeof tabMap==='function'?tabMap:function(x){return x;};return a.map(f);},[MTAB[sk]].concat(tabs));tabs=tabs.filter((t,i)=>mt[i+1]===mt[0]);}
   for(const id of tabs){await p.evaluate(t=>{try{if(t==='me')selectTab('me');else document.querySelector('.tabs [data-tab="'+t+'"]').click();}catch(e){}render();},id);await p.waitForTimeout(120);
    const f=await p.evaluate(SCAN+'('+GAP+')');f.forEach(x=>all.push([x[0],sk,W,id,x[1]+': '+x[2]]));}
   await p.close();}

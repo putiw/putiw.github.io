@@ -44,8 +44,10 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  await p.evaluate(()=>landShow());let f=null;for(let i=0;i<100&&!f;i++){f=p.frames().find(x=>x.url().includes('home.html'));await wait(100);}
  await f.waitForFunction(()=>typeof S!=='undefined'&&S&&S.tanks&&S.tanks[0]&&S.tanks[0].own,null,{timeout:20000});
  await f.evaluate(()=>{S.sel=0;setTab('tank');});await f.waitForFunction(()=>document.querySelector('#tankside [data-k="fw"]'),null,{timeout:10000});await wait(500);
- const lt=await f.evaluate(()=>Array.from(document.querySelectorAll('#toybtns .btn')).map(b=>({n:b.childNodes[1]?b.childNodes[1].textContent.trim():b.textContent,s:(b.querySelector('small')||{}).textContent})));
- const gl=await p.evaluate(()=>{var L=ownLines(G);return L;});
+ // Pass 292: a tank day is 2.4 s, so one can land between the two reads; read again then (the land gets each new day at once now)
+ let lt,gl;for(let k=0;k<4;k++){const d0=await p.evaluate(()=>G.tday);await wait(150);
+  lt=await f.evaluate(()=>Array.from(document.querySelectorAll('#toybtns .btn')).map(b=>({n:b.childNodes[1]?b.childNodes[1].textContent.trim():b.textContent,s:(b.querySelector('small')||{}).textContent})));
+  const g2=await p.evaluate(()=>({L:ownLines(G),d:G.tday}));gl=g2.L;if(g2.d===d0)break;}
  ok(lt.map(x=>x.n).join(',')==='Vacuum,Sponge,Trim,Pests,Aquascape,Glass','land tiles: '+lt.map(x=>x.n).join(', '));
  ok(['vac','sponge','trim','pests','glass'].every((k,i)=>lt[[0,1,2,3,5][i]].s===gl[k]),'land state lines match the game ('+lt.map(x=>x.s).join(' / ')+' vs '+['vac','sponge','trim','pests','glass'].map(k=>gl[k]).join(' / ')+')');
  const lc=await f.evaluate(()=>Array.from(document.querySelectorAll('#tankside .card h2')).map(h=>h.textContent));
