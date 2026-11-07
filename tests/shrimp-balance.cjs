@@ -633,10 +633,11 @@ var g=newGame();g.emp.kitsOpened=1;g.emp.staff.tier=1;g.emp.staff.sales=1;g.mone
 var h=kitHold(g);if(!(h[0]>0))throw Error('Holds for packing');if(doSell(g,T,true,undefined,true,h[0]).normal!==0)throw Error('Nothing sold while packing needs it');if(!(doSell(g,T,true,undefined,true,0).normal>0))throw Error('Sells without a hold');
 g.money=0;if(kitHold(g)[0]!==0)throw Error('No cash, no hold');var k=newGame();if(kitHold(k)[0]!==0)throw Error('No hold before kits');
 `);
-check('Pass 132: cards wait 15 s of play after the last one, urgent ones do not',`
+check('Pass 132/290: content cards wait 15 s of play after the last one, reaction and urgent ones do not',`
 var g=newGame();acknowledgeMilestone(g);g.progress.lastAck=null;g.ps={t:100000};g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;detectMilestones(g);if(g.progress.queue[0]!=='sale')throw Error('First card now');
-acknowledgeMilestone(g);g.ps.t+=5000;detectMilestones(g);if(g.progress.queue.length||g.progress.soon[0]!=='kits')throw Error('Second card waits');
-if(!(g.progress.gap>=10000&&g.progress.gap<=35000))throw Error('Gap 10 to 35 s');g.ps.t+=Math.max(0,g.progress.gap-5000);detectMilestones(g);if(g.progress.queue[0]!=='kits')throw Error('Second card after 20 s');acknowledgeMilestone(g);
+/* Pass 290 (Puti): kits is a reaction card too, it goes up with the sale; a content card (ev_mira) waits the breather */if(g.progress.queue.indexOf('kits')!==1)throw Error('Reaction cards at once: '+g.progress.queue);
+acknowledgeMilestone(g);acknowledgeMilestone(g);g.ps.t+=5000;detectMilestones(g);if(g.progress.queue.length||g.progress.wait[0]!=='ev_mira')throw Error('Content card waits: '+g.progress.queue+' / '+g.progress.wait);
+if(!(introGap(g.progress)>=15000&&introGap(g.progress)<=35000))throw Error('Gap 15 to 35 s');g.ps.t+=Math.max(0,introGap(g.progress)-5000);detectMilestones(g);if(g.progress.queue[0]!=='ev_mira')throw Error('Content card after the gap');acknowledgeMilestone(g);
 g.ps.t+=1000;g.money=-1e6;g.emp.broke=1;var p=g.progress;p.seen.gameover=false;if(CARD_NOW.indexOf('broke')<0||CARD_NOW.indexOf('gameover')<0)throw Error('Urgent cards skip the gap');
 `);
 if(!html.includes('The babies can be sold at 60 days old'))throw Error('Pass 132: waiting note on the Babies card');

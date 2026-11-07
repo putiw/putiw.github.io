@@ -1,7 +1,7 @@
 // Pass 288: grey with no reason (Puti's category 3, claude/shrimp-test-workflow-7nov.md 4C.2). Headless Chromium at 390 px.
 // Every snapshot of the runs in GREY_RUNS (comma list), every tab the save has: closed folds opened (attribute only, no tap),
 // then every disabled or .off button inside a visible card must have a reason in its row: "Needs", "Waiting", "until",
-// "Done", "left", a number, or a ?. Then every dotted title (.qhelp.qt) on screen is tapped once per distinct title and must
+// "Done", "left", "Frozen" (Pass 290, Puti: enough on its own), a number, or a ?. Then every dotted title (.qhelp.qt) on screen is tapped once per distinct title and must
 // open the help sheet or change the page. Reports, doesn't fix. GREY_STAGES narrows the snapshots (a regex on '<run> <snapshot>').
 const {chromium}=require('playwright');const fs=require('fs'),path=require('path');
 const MRE=process.env.GREY_MOMENTS?new RegExp(process.env.GREY_MOMENTS):null;
@@ -21,7 +21,7 @@ const grey={},dots={},dotSeen=new Set();let nb=0,ns=0,nd=0;
    await p.evaluate(([s,card])=>{G=JSON.parse(s);migrate(G);if(!card)G.progress.queue=[];window.spotlight=function(){};speed=0;FRZ={};document.querySelectorAll('[role=dialog]:not(#bg-card):not(#milestone-card)').forEach(function(d){d.hidden=true;});$('after').hidden=true;AFTER_HOLD=null;$('helpsheet').hidden=true;render();},[JSON.stringify(snap),card]);
    if(card){await p.waitForTimeout(120);const r=await p.evaluate(()=>{const out=[];let n=0;const c=$('milestone-card');if(!c||c.hidden)return {n,out,none:1};
      c.querySelectorAll('button').forEach(b=>{if(!(b.disabled||b.classList.contains('off'))||!b.checkVisibility())return;n++;const tx=(b.innerText||'').replace(/\s+/g,' ').trim(),row=(b.parentElement.innerText||'').replace(/\s+/g,' ').trim();
-      if(!/Needs|Waiting|until|left|\d|✦|\?/i.test(tx+' '+row))out.push('milestone-card: "'+tx.slice(0,50)+'"');});return {n,out};});
+      if(!/Needs|Waiting|until|left|Frozen|\d|✦|\?/i.test(tx+' '+row))out.push('milestone-card: "'+tx.slice(0,50)+'"');});return {n,out};});
     nb+=r.n;r.out.forEach(x=>{(grey['card · '+x]=grey['card · '+x]||[]).push(name+' '+st);});continue;}
    let tabs=TABS;if(mo&&mo.tab){const mt=await p.evaluate(a=>{var f=typeof tabMap==='function'?tabMap:function(x){return x;};return a.map(f);},[mo.tab].concat(TABS));tabs=TABS.filter((t,i)=>mt[i+1]===mt[0]);}
    for(const t of tabs){const tb=await p.$('.tabs [data-tab="'+t+'"]');if(!tb||!await tb.isVisible())continue;const unspot=()=>p.evaluate(()=>{if(SPOT)SPOT.ready=1;spotClose();SPOT=null;$('spot').hidden=true;});await unspot();await tb.click({timeout:1500}).catch(()=>tb.evaluate(x=>x.click()));await p.waitForTimeout(150);await unspot();
@@ -30,7 +30,7 @@ const grey={},dots={},dotSeen=new Set();let nb=0,ns=0,nd=0;
      document.querySelectorAll('main .card:not([hidden]) button').forEach(b=>{if(!(b.disabled||b.classList.contains('off'))||!b.checkVisibility())return;if(b.classList.contains('qhelp'))return;n++;
       const row=b.closest('.item,.srow,.pr-row,.hb,.btns,.row,li,tr')||b.parentElement;const tx=(row.innerText||'').replace(/\s+/g,' ').trim();
       const bt=(b.innerText||'').trim();if(bt==='−'||bt==='-')return;/* a minus at its floor */
-      const why=/Needs|Waiting|until|Done|left|Funded|Not this year|Picked|Chosen|Running|\d|\?|✦/i.test(tx)||!!row.querySelector('.qhelp');
+      const why=/Needs|Waiting|until|Done|left|Funded|Not this year|Picked|Chosen|Running|Frozen|\d|\?|✦/i.test(tx)||!!row.querySelector('.qhelp');
       if(!why){const card=b.closest('.card');out.push((card&&card.id||'?')+': "'+(b.innerText||b.getAttribute('aria-label')||'').trim()+'" in "'+tx.slice(0,70)+'"');}});
      return {n,out};});
     nb+=r.n;r.out.forEach(x=>{(grey[t+' · '+x]=grey[t+' · '+x]||[]).push(name+' '+st);});

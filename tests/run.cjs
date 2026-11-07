@@ -46,6 +46,9 @@ const SUITES={
   'm-games':['moments/games.cjs',{},['strong','kind','avg'],'feature'],
   'm-kits':['moments/kits.cjs',{},['strong','avg'],'feature'],
   'm-you':['moments/you.cjs',{},['strong','kind','avg'],'feature'],
+  // Pass 290
+  'm-tank':['moments/tank.cjs',{},['strong','avg'],'feature'],
+  'm-hard':['moments/hard.cjs',{},['strong','kind','avg'],'feature'],
   frozen:['shrimp-frozen.cjs',{HARD_RUN:R.avg},['avg'],'feature'],
   hard:['shrimp-hard.cjs',{HARD_RUN:R.avg},['avg'],'feature'],
   endcards:['shrimp-endcards.cjs',{ACADEMY_RUN:R.strong},['strong'],'feature'],

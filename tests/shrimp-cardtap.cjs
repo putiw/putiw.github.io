@@ -8,6 +8,7 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');
  // a mid-game page with buttons, then a story card on top
  await p.evaluate(()=>{G=newGame();G.name='Test';G.progress.seen.intro=true;G.progress.queue=[];G.tanks[0].had=1;G.tanks[0].cycledAt=0;G.money=5000;G.stats.sold=50;window.spotlight=function(){};G.opt.all=false;render();
   window.PAGE_HITS=0;window.addEventListener('click',function(e){if(!e.target.closest('#milestone-card'))window.PAGE_HITS++;},false);
+  /* Pass 290: reaction cards go up at once, so mark what this made-up save already has as seen, or the sale card follows the kit card */var mc=milestoneConditions(G);for(var mk in mc)if(mc[mk])G.progress.seen[mk]=true;
   G.progress.queue=['kit'];render();});
  await p.waitForTimeout(200);
  const st=await p.evaluate(()=>{var c=document.getElementById('milestone-card'),bt=c.querySelector('[data-act="milestone-next"]'),r=bt.getBoundingClientRect();return {open:!c.hidden,x:r.left+r.width/2,y:r.top+r.height/2,mainInert:[...document.querySelector('main').children].some(x=>x.inert),tabsInert:document.querySelector('.tabs').inert,on:cardShield.on,kids:[...document.querySelector('main').children].map(x=>x.id+':'+x.inert).join(' ')};});

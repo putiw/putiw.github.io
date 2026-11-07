@@ -12,7 +12,7 @@ var CL={first:{},shown:[],drops:{},never:[]};
    if(CL.first[k]!=null&&!seen[k]&&!(p.queue||[]).concat(p.wait||[],p.soon||[]).includes(k)){CL.drops[k]=(CL.drops[k]||0)+1;CL.first[k]=null;}
    if(c[k]&&CL.first[k]==null&&!CL.shown.some(function(s){return s.k===k;}))CL.first[k]=d;});}catch(e){CL.err=String(e);}return r;};
  acknowledgeMilestone=function(G0){var p=G0.progress||{},k=p.queue&&p.queue[0];
-  if(k){var m=MILESTONES[k]||{},kind=SOON_NOW.indexOf(k)>=0||CARD_NOW.indexOf(k)>=0?'now':m.chapter?'chapter':storyWaits(k)?'story':'intro';
+  if(k){var m=MILESTONES[k]||{},react=typeof cardReact==='function'?cardReact(k):SOON_NOW.indexOf(k)>=0||CARD_NOW.indexOf(k)>=0,kind=react?'react':m.chapter?'chapter':storyWaits(k)?'story':'intro';/* Pass 290: react or content (chapter, story, intro) */
    CL.shown.push({k:k,kind:kind,first:CL.first[k]!=null?CL.first[k]:null,day:Math.floor(G0.day),clock:storyClock(G0),still:introStill(G0,k)});CL.first[k]=null;}
   return ack0.apply(this,arguments);};
 })();

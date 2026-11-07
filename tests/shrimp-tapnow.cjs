@@ -28,7 +28,7 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0,nsk
  const unfold=async sel=>{for(let i=0;i<4;i++){const sm=await p.evaluate(sl=>{var b=document.querySelector(sl);if(!b)return null;var d=null;for(var e=b.parentElement;e;e=e.parentElement)if(e.tagName==='DETAILS'&&!e.open)d=e;if(!d)return null;var s=d.querySelector(':scope>summary');s.scrollIntoView({block:'center'});var r=s.getBoundingClientRect();return [r.x+Math.min(40,r.width/2),r.y+r.height/2];},sel);if(!sm)return;await p.mouse.click(sm[0],sm[1]);await p.waitForTimeout(250);}};
  const txt=()=>p.evaluate(()=>document.body.innerText.replace(/\d/g,'0'));
  const SKIP=['tanks','ps','tday','tq','tstep','tAt','savedAt','illClock','illAt'];
- const sig=()=>p.evaluate(S=>JSON.stringify(G,function(k,v){return S.indexOf(k)>=0?undefined:v;}),SKIP);
+ const sig=()=>p.evaluate(S=>JSON.stringify(G,function(k,v){if(k==='tanks'&&Array.isArray(v))return v.map(function(t){return t.set;});/* Pass 290: tank settings count (food, ration), the rest of a tank drifts with play */return S.indexOf(k)>=0?undefined:v;}),SKIP);
  for(const st of STAGES){if(!snaps[st]){console.log('note: no snapshot '+st);continue;}let tabs=TABS;if(MTAB[st]){const mt=await p.evaluate(a=>{var f=typeof tabMap==='function'?tabMap:function(x){return x;};return a.map(f);},[MTAB[st]].concat(TABS));tabs=TABS.filter((t,i)=>mt[i+1]===mt[0]);}
   for(const t of tabs){await load(st,t);if(await p.$eval('.tabs [data-tab="'+t+'"]',b=>b.hidden||!b.getClientRects().length).catch(()=>true))continue;let keys=await list();if(ONCE){const k0=keys.length;keys=keys.filter(k=>!OK[t+' '+k]);nskip+=k0-keys.length;}
   for(const k of keys){await load(st,t);await p.evaluate(s=>{speed=s;},SPEED);await p.waitForTimeout(PLAY);
