@@ -6,6 +6,7 @@ const html=fs.readFileSync(process.env.SHRIMP_GAME_PATH||path.join(__dirname,'..
 let seed=Number(process.env.REVIEW_SEED||7);const initialSeed=seed,M=Object.create(Math);M.random=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);
 const c=vm.createContext({Math:M,console});vm.runInContext(html.split('// ==SIM-START==')[1].split('// ==SIM-END==')[0],c);
 vm.runInContext(require('./shrimp-bot-cards.cjs')(process.env.BOT_HEART!=='cold'),c);
+vm.runInContext(require('./lib/cardlag.cjs'),c);/* Pass 288: card lag recorder */
 vm.runInContext('var document={addEventListener:function(){},querySelector:function(){return null;},getElementById:function(){return null;}};var cache={},lastChips="",lastColSig="",lastChartKey="",lastAlerts="";function toast(){};function big(n){return String(Math.round(n));};function anyHad(){return G.tanks.some(t=>t.had||totalN(t)>=1);}function updateReveal(){'+html.split('function updateReveal(){')[1].split('function applyReveal(){')[0],c);
 vm.runInContext(html.slice(html.indexOf('var PROJ_SHOW='),html.indexOf('var seenNew='))+html.slice(html.indexOf('function projectRank('),html.indexOf('var storySure=null;')),c);
 vm.runInContext('var MTR='+(process.env.MEDIA_TRACE==='1')+',NOMEDIA='+(process.env.NOMEDIA==='1')+';',c);
@@ -92,4 +93,4 @@ for(var day=0;day<8760;day++){mtrace();
 }
 care();var result={trace:trace,events:events,snapshots:snapshots,actions:actions,day:G.day,earth:G.emp.won,sci:sciScore(G),ending:endingPick(G),trees:Object.keys(G.emp.trees||{}),minCash:minCash,waitingMinutes:waitingSeconds/60,visits:visits,final:G};
 `,c,{timeout:180000});
-const out=process.env.REVIEW_OUTPUT||require('os').tmpdir()+'/shrimp-average';fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'run-'+initialSeed+'.json'),JSON.stringify(c.result));console.log(JSON.stringify(c.events,null,2));console.log('RESULT',JSON.stringify({...c.result,snapshots:undefined,actions:undefined,final:undefined}));if(!c.G.emp.won)throw Error('Average-player scenario did not finish Earth within 24 game years');if(c.minCash<=0)throw Error('Average-player scenario exhausted its working cash');
+c.result.cardlag=c.cardlagEnd(c.G);const out=process.env.REVIEW_OUTPUT||require('os').tmpdir()+'/shrimp-average';fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'run-'+initialSeed+'.json'),JSON.stringify(c.result));console.log(JSON.stringify(c.events,null,2));console.log("RESULT",JSON.stringify({...c.result,snapshots:undefined,cardlag:undefined,actions:undefined,final:undefined}));if(!c.G.emp.won)throw Error('Average-player scenario did not finish Earth within 24 game years');if(c.minCash<=0)throw Error('Average-player scenario exhausted its working cash');

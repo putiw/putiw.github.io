@@ -32,6 +32,10 @@ const SUITES={
   layout:['shrimp-layout.cjs',{ACADEMY_RUN:R.strong},['strong'],'feature',{warn:/^(\d+) things overflow/m}],
   projtabs:['shrimp-projtabs.cjs',{HARD_RUN:R.avg},['avg'],'feature'],
   tapnow:['shrimp-tapnow.cjs',{HARD_RUN:R.avg},['avg'],'feature'],
+  // Pass 288 sweeps (claude/shrimp-test-workflow-7nov.md 4C.1 and 4C.2)
+  cardlag:['shrimp-cardlag.cjs',{CARDLAG_RUNS:[R.strong,R.kind,R.avg].join(',')},['strong','kind','avg'],'feature'],
+  greyreason:['shrimp-greyreason.cjs',{GREY_RUNS:[R.strong,R.avg].join(','),GREY_STAGES:'^strong |^avg year'},['strong','avg'],'feature'],
+  tapall:['shrimp-tapnow.cjs',{HARD_RUN:R.avg,TAP_TABS:'tank,up,market,emp,promote,hard,world,research',TAP_ACTS:'all',TAP_STAGES:'kits unlocked,year 2,year 5,year 12',TAP_PLAY:'800'},['avg'],'feature'],
   frozen:['shrimp-frozen.cjs',{HARD_RUN:R.avg},['avg'],'feature'],
   hard:['shrimp-hard.cjs',{HARD_RUN:R.avg},['avg'],'feature'],
   endcards:['shrimp-endcards.cjs',{ACADEMY_RUN:R.strong},['strong'],'feature'],
@@ -61,7 +65,7 @@ if(!args.length){console.log('node tests/run.cjs fast|feature|deploy|<suite>... 
 let names=[];for(const a of args){if(TIERS[a])names.push(...Object.keys(SUITES).filter(n=>TIERS[a].includes(SUITES[n][3])));else if(SUITES[a])names.push(a);else{console.log('no suite '+a+' (--list)');process.exit(2);}}
 names=[...new Set(names)];
 // bots needed by the chosen suites, rebuilt when the game or the bot scripts changed
-const stampNow=()=>crypto.createHash('sha1').update(['shrimp/index.html','shrimp/space.html','tests/shrimp-playthrough.cjs','tests/shrimp-average-playthrough.cjs','tests/shrimp-bot-cards.cjs'].map(f=>fs.readFileSync(path.join(ROOT,f))).join('')).digest('hex').slice(0,12);
+const stampNow=()=>crypto.createHash('sha1').update(['shrimp/index.html','shrimp/space.html','tests/shrimp-playthrough.cjs','tests/shrimp-average-playthrough.cjs','tests/shrimp-bot-cards.cjs','tests/lib/cardlag.cjs'].map(f=>fs.readFileSync(path.join(ROOT,f))).join('')).digest('hex').slice(0,12);
 fs.mkdirSync(RUNS,{recursive:true});let stamp={};try{stamp=JSON.parse(fs.readFileSync(path.join(RUNS,'stamp.json'),'utf8'));}catch(e){}
 const now=stampNow(),fresh=process.argv.includes('--fresh');
 const needBots=new Set(names.flatMap(n=>SUITES[n][2]));for(const n of names)if(SUITES[n][3]==='bot')needBots.add(n);

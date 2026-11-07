@@ -4,6 +4,8 @@
 const {chromium}=require('playwright');const fs=require('fs'),os=require('os');
 const RUN=process.env.HARD_RUN||os.tmpdir()+'/shrimp-average/run-7.json';
 const snaps=JSON.parse(fs.readFileSync(RUN,'utf8')).snapshots,S=snaps[process.env.STAGE||'year 5'];
+/* Pass 288: open Market's closed folds by tapping their summaries, like the player */
+const unfoldMkt=async p=>{for(const sm of await p.$$('#mk-body details:not([open])>summary')){if(await sm.isVisible()){await sm.scrollIntoViewIfNeeded();await sm.click();await p.waitForTimeout(250);}}await p.evaluate(()=>scrollTo(0,0));await p.waitForTimeout(600);};
 const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;const ok=m=>{n++;console.log('PASS',m);};
 (async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
  await p.setContent('<body>'+html+'</body>');await p.waitForTimeout(300);
@@ -14,12 +16,24 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
   ids.forEach(id=>{(where[id]=where[id]||[]).push(t);});}
  const dup=Object.keys(where).filter(k=>new Set(where[k]).size>1);if(dup.length)throw Error('project on two tabs: '+JSON.stringify(dup.map(k=>[k,where[k]])));ok('every project button on one tab: '+Object.keys(where).length+' ids over '+TABS.length+' tabs');
  // buy a project on Market (#c-mkt since Pass 272, was #e-proj on Ads), go to the Lab: the frozen row must not come along
- await p.click('.tabs [data-tab="promote"]');await p.waitForTimeout(700);
- let bt=null;for(const b of await p.$$('#c-mkt .item.ih [data-act="proj"]:not(:disabled)')){if(await b.isVisible()){bt=b;break;}}/* Pass 287: skip rows inside closed folds */if(!bt)throw Error('no visible project to buy on Ads');const pid=await bt.evaluate(b=>b.dataset.id);await bt.click();await p.waitForTimeout(300);
+ await p.click('.tabs [data-tab="promote"]');await p.waitForTimeout(700);await unfoldMkt(p);
+ let bt=null;for(const b of await p.$$('#c-mkt .item.ih [data-act="proj"]:not(:disabled)')){if(await b.isVisible()&&await b.evaluate(x=>x.dataset.id!=='gala'&&x.checkVisibility()&&!PROJ.find(q=>q.id===x.dataset.id).fk)){bt=b;break;}}/* Pass 287: skip rows inside closed folds. Pass 288: and the gala, which repeats and keeps its row (checked below) */if(!bt)throw Error('no visible project to buy on Ads');const pid=await bt.evaluate(b=>b.dataset.id);await bt.scrollIntoViewIfNeeded();await p.waitForTimeout(600);await bt.click();await p.waitForTimeout(300);
  const f1=await p.evaluate(()=>({frz:Object.keys(FRZ).length,lab:(document.querySelector('#c-mkt .item.ih [data-act="proj"]:disabled')||{textContent:'(row gone)'}).textContent}));if(!f1.frz||f1.lab!=='Done')throw Error('after the tap '+JSON.stringify(f1));ok('bought '+pid+': row stays, label Done');
  await p.click('.tabs [data-tab="research"]');await p.waitForTimeout(300);
  const f2=await p.evaluate(id=>({frz:Object.keys(FRZ).length,leak:!!document.querySelector('#c-mkt [data-id="'+id+'"]'),title:document.querySelector('#c-proj h2').textContent}),pid);
  if(f2.frz||f2.leak)throw Error('the bought row followed to the Lab '+JSON.stringify(f2));ok('tab change lets the frozen list go ('+f2.title+' has no '+pid+')');
+ // Pass 288: a scroll lets the Done row go too; and a gala tap keeps the gala row where it was
+ await p.click('.tabs [data-tab="promote"]');await p.waitForTimeout(700);await unfoldMkt(p);
+ let b2=null;for(const b of await p.$$('#c-mkt .item.ih [data-act="proj"]:not(:disabled)')){if(await b.evaluate(x=>x.dataset.id!=='gala'&&x.checkVisibility()&&!PROJ.find(q=>q.id===x.dataset.id).fk)){b2=b;break;}}
+ if(b2){const id2=await b2.evaluate(b=>b.dataset.id);await b2.scrollIntoViewIfNeeded();await p.waitForTimeout(600);await b2.click();await p.waitForTimeout(300);
+  const g1=await p.evaluate(id=>!!document.querySelector('#c-mkt [data-act="proj"][data-id="'+id+'"]:disabled'),id2);if(!g1)throw Error('second buy on Market: no Done row ('+id2+')');await p.waitForTimeout(500);/* scrolls in the first 600 ms after a tap don't count (TAP_AT) */
+  await p.mouse.move(195,400);await p.mouse.wheel(0,40);await p.waitForTimeout(500);
+  const g2=await p.evaluate(id=>({frz:Object.keys(FRZ).length,left:!!document.querySelector('#c-mkt [data-act="proj"][data-id="'+id+'"]')}),id2);if(g2.frz||g2.left)throw Error('a scroll did not let the Done row go '+JSON.stringify(g2));ok('bought '+id2+', Done until a scroll, then gone');}
+ else console.log('skip scroll check (one project to buy on this save)');
+ const gb=await p.$('#c-mkt [data-act="proj"][data-id="gala"]:not(:disabled)');
+ if(gb&&await gb.evaluate(x=>x.checkVisibility())){await gb.scrollIntoViewIfNeeded();await p.waitForTimeout(600);const y0=await gb.evaluate(b=>b.closest('.item').getBoundingClientRect().top);await gb.click();await p.waitForTimeout(300);
+  const y1=await p.evaluate(()=>{var b=document.querySelector('#c-mkt [data-act="proj"][data-id="gala"]');return b?b.closest('.item').getBoundingClientRect().top:null;});if(y1==null||Math.abs(y1-y0)>4)throw Error('the gala row moved on its tap '+JSON.stringify([y0,y1]));ok('gala tap: the gala row stays at '+Math.round(y0)+' px');}
+ else console.log('skip gala check (no gala on this save)');
  // campaign desk: Launch keeps the three-offer height until a tab change, then the slot shrinks
  await p.click('.tabs [data-tab="promote"]');await p.waitForTimeout(700);
  const d0=await p.evaluate(()=>{var o=G.emp.op;if(!o.offer||o.run)return null;var s=document.querySelector('.desk-slot');return s?s.offsetHeight:null;});

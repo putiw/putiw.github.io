@@ -2986,3 +2986,75 @@ First feature run on 8842a46 (the deployed build), 10 min: strong WIN 2,531 empi
 - `projtabs`: on the Market card a bought project row leaves at once (`FRZ` empty, no Done row), so the next row slides under the finger. The Pass 266 rule (a bought row stays greyed in place until a scroll or tab change) holds on `#e-proj` but not on `#c-mkt` since Pass 272. Puti's Pass 286 gear-row ghost tap is the same shape.
 
 Next steps from the doc, in order: card-lag and grey-with-no-reason sweeps; `MOMENTS` snapshots in the bots plus a moment-test helper and tests from the Pass 286 list; one-card-per-thing, numbers-at-the-stage, text lint, `tests/findings.tsv`.
+
+
+## Pass 288 (7 Nov): the two runner bugs, card-lag and grey-with-no-reason sweeps
+
+BUILD 2026-11-07T13:53-p288.
+
+**tapnow (Market buttons doing nothing): the test, not the game.** `globalbrand` and `cartoon` sit in Market's closed More marketing fold, `power`, `p_jingle` and `phones` in the closed Campaign desk fold. Chromium keeps a layout rect for them (y about 1,000 to 1,200 on an 844 px screen), so `getClientRects` and Playwright's `isVisible` count them as on screen, `scrollIntoView` can't reach inside a closed details, and the tap landed below the viewport on nothing. Which ones "failed" changed run to run (4 of 31, 2, 1, 0). No gate, SETTLE or cost check involved: `buyProj` and `deskRun` both pass on those saves. tapnow now taps the fold's summary first, like the player, checks `checkVisibility()` at the tap, and says "off screen at y N" instead of "covered by nothing". Opened, all five work: 31 of 31, three runs.
+
+**projtabs (bought Market row leaves at once): real.** The click handler froze only `#e-proj`. Now a project bought in `#mk-body` calls `frzTap('mk-body')`, the Market body doesn't re-render while `FRZ['mk-body']` is set, and `hdFree`/`tabLeave` clear `cache.mk` so it redraws after a scroll or tab change. Not the gala and not fork options (the gala repeats in place, forks open the after-popup), same as `#e-proj`. The test was also tapping the gala (first enabled row on the year-5 save); it now opens Market's folds by their summaries and buys a one-off project, then checks Done until a scroll (after the 600 ms `TAP_AT` window) and gone after it, and that a gala tap keeps its row in place (skipped on this save, the ministry is bought first). Fails on b219227 ("after the tap {frz:0}"), passes now.
+
+**Card lag** (`tests/lib/cardlag.cjs` in both bots, `tests/shrimp-cardlag.cjs`, suite `cardlag`): every card's day `milestoneConditions` first turned true and the day it showed, limits now (SOON_NOW, CARD_NOW) 1 day, intro 7, chapter and story 30; `introStill` at the card; two cards under 15 s of play (storyClock) apart. Bots close cards the step they queue, so it measures the queue. Findings on this build (not fixed):
+- Story cards 32 to 79 days late on every bot, the same ones each time: `c_feed`/`c_box` (true the same day, the second waits 68 to 79 d), `c_wells`, `c_vet`, `c_jar2`, `c_saturday`, `c_abroad`, `fight_invite`, `ev_paper`, `c_price1`, `c_flood`, `c_budget`. Cause: one story card per pace gap (60 to 150 s of play, 15 to 37 days at 4 s a day), and the first year adds a 30-day gap; cards that come true together queue behind each other. Puti to decide if 30 days is the right limit for stories or the pacing should change.
+- `pump_call1` 26 d and `pump_call2` 35 d late on the strong bot though both are CARD_NOW: worth a look, the call is "I’m selling tomorrow".
+- Under 15 s apart: kind bot `kits` then `kit` 8 s (SOON_NOW gap 4 s by design, Pass 286), `worldtab` then `bulk` 12 s, `mira_teen` then `pain_inbox` 12 s (two story cards), `lastchap` then `win` 0 s (by design); average `c_bonus` then `kindsave` 0 s.
+- No card shown after its reason was gone.
+
+**Grey with no reason** (`tests/shrimp-greyreason.cjs`, suite `greyreason`, strong snapshots and the average bot's years, every tab, folds opened): 217 grey buttons, one with no reason, Sales staff `+ Hire` greyed in a row reading only "− + Hire" (strong kits unlocked and two more saves). 91 dotted titles tapped by position, one opens nothing: hard part `Minister Souna, tank law` (avg year 19). Skips a minus at its floor and saves with the ending page up.
+
+**Every tab taps** (suite `tapall`: tapnow with `TAP_TABS` all, `TAP_ACTS=all`, kits unlocked / years 2, 5, 12, 0.8 s play): 5 of 89 taps did nothing. Tank `food i=2` "no change" (kits unlocked, year 2); year 2 Company `qc-strict` 0 and 2 and `qc-buy water` covered by a `P.mono` line, so the Quality checks buttons sit under text. Not looked into.
+
+Runner: the three suites are in feature; the bot stamp includes `tests/lib/cardlag.cjs`. tapnow and tapall clear a save's spotlight before tapping a tab. Feature is now about 16 min (tapall 5 of it).
+
+Feature run on this index.html (game unchanged after it, only the three new tests patched; 11 min):
+
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | 11s | WIN 2531 empire_dictator |
+| kind | ok | 22s | WIN 4285 question_lucky |
+| avg | ok | 30s | earth 7280 (prev 7280) |
+| balance | ok | 5s | 168 focused balance and migration checks passed |
+| academy | ok | 0s | 10 academy and parallel chapter checks passed |
+| me | ok | 1s | 55 free time, Grandma and ending checks passed |
+| cardtap | ok | 3s | card tap checks passed |
+| space-search | ok | 0s | 6 space search checks passed |
+| tank1-sim | ok | 1s | all tank 1 sim checks passed |
+| sound | ok | 1s | all ok |
+| effects-sim | ok | 0s | 14 action checks passed |
+| space | ok | 11s | PASS Leave Earth, launch, search and land after Earth |
+| bot-cards | ok | 0s |  |
+| tight | ok | 27s | 0 findings |
+| layout | warn | 86s | 3 things overflow |
+| projtabs | ok | 11s | 4 project tab checks passed |
+| tapnow | ok | 134s | PASS 31 taps 100 ms after a render all changed the save (year 5, year 8, year 12, emp prom |
+| cardlag | FAIL | 0s | FAIL card lag over 247 cards in 3 runs: |
+| greyreason | FAIL | 80s | FAIL 1 grey buttons with no reason (of 217 grey seen), 10 dotted titles that open nothing  |
+| tapall | FAIL | 81s | FAIL page.click: Timeout 30000ms exceeded. |
+| frozen | ok | 2s | frozen buttons checked on 5 tabs |
+| hard | ok | 12s | 24 hard part checks passed (milestone hardpart) |
+| endcards | ok | 18s | 50 ending card checks passed |
+| fresh | ok | 3s | all ok |
+| effects | ok | 0s | 15 action checks passed |
+| tank1 | ok | 29s | all tank 1 checks passed |
+| yourtank | ok | 22s | all passed |
+| yourtank-360 | ok | 22s | all passed |
+| kitpack | ok | 5s | kit packing checks passed |
+| boardgames | ok | 22s | board game checks passed |
+| land-audio | ok | 12s | all passed |
+| land-life | ok | 15s | all passed |
+| taps | ok | 12s | all ok |
+| ear | ok | 6s | 14 ear tank checks passed |
+
+Rerun of the patched suites:
+
+Tests (greyreason tapall tapnow, b219227, 2026-11-07 10:24 UTC, 9 min): 5 suites, 2 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| avg | ok | - | cached, game unchanged: earth 7280 |
+| strong | ok | - | cached, game unchanged: WIN 2531 |
+| greyreason | FAIL | 78 | FAIL 1 grey buttons with no reason (of 217 grey seen), 1 dotted titles that open nothing ( |
+| tapall | FAIL | 312 | FAIL 5 of 89 taps did nothing: |
+| tapnow | ok | 137 | PASS 31 taps 100 ms after a render all changed the save (year 5, year 8, year 12, emp prom |
