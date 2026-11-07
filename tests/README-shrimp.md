@@ -2970,3 +2970,5 @@ Tests: boardgames (new source check on the grid size), Chromium geometry at 390 
 
 Tests: balance 168 (board game test now needs free time first), academy 10, me 55 (lesson check flipped), boardgames, cardtap, sound. Browser 390: field guide, zero-pick nudge and text, treat bar, Making kits with a robotic line. Not deployed.
 
+
+Deploy 7 Nov (Pass 286): strong cold WIN 7 day 2,531 empire_dictator (was 2,695 at the Pass 281-282 deploy), strong kind WIN 7 day 4,285 question_lucky, average Earth day 7,280; no INSOLVENT or STUCK. Balance 168, academy 10, me 55, cardtap, endcards 50, hard 24, frozen 5 tabs, boardgames, monkey 150 actions on 7 stages at 390 and 360 px pass, spotlight sweep 144 all good. Not run: human, stable, tight.
