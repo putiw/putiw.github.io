@@ -3338,3 +3338,6 @@ Tests (changed, this pass):
 Tests changed with it: tank1 (no trim due, sponge 108/180 at day 108), balance (wellbeing after 210 days of nothing, OWN_* constant, actNeed strings, pain line `% lower`, fork showAfter string), me (chiller 350).
 
 **Pass 293b (7 Nov):** board game bot thinks 0.5 to 3 s, scaled by how hard the move is (`500+thinkD*2500`, ±15%, never under the real search time). Payouts on hold: the body says why it looks like fraud; the man's option says what he gets (the frozen money goes to his account clean when it clears, he launders his cash through you); ending line to match. BUILD p293b.
+
+Tests (changed, Pass 293, fell back to feature): 41 suites, 40 ok, layout warn (3 overflow, as before). tapall FAIL 1 of 158: `moment fork reviews promote revfake` swallowed by SETTLE, twice in the 2-job run; passes alone (promote only, and all 8 tabs with all stages and the four fork moments, 127 taps). Looks like load timing, not checked on the old commit. Open.
+
