@@ -3311,3 +3311,33 @@ Tests (changed, this pass):
 | yourtank-360 | ok | 22 | all passed |
 
 **Deploy (7 Nov, Puti):** new rule, before "deploy" run `fast` only, every push already ran `changed`. BUILD restamped from the clock (2026-11-07T22:01; the p292 stamp 17:00 was a guess). Pass 287 to 292 go to main.
+
+## Pass 293 (7 Nov, BUILD p293): Puti's 20-item list
+
+1. Grants are Postdoc grants (slider label, section title). A finished grant gives 0 to 3 papers, random (`np`, kept as `r.p` in `g.done`; old done rows read 3). The log and the Finished list say the count.
+2. The growing-pain line was "fix in place in 74 days, orders and breeding run at part speed". Breeding was false (`PAIN_SHIP` only cuts farms while the card waits). Now "Month three, your fix is ready in 74 days. Until then orders run 15% lower." (`painNote`, `bnText`, the bottleneck line, the strip).
+3. The last card sat under the tab bar: body bottom padding was 84 px with no safe area, the bar is about 62 px plus the iPhone home bar. Now `calc(96px + env(safe-area-inset-bottom))`, so a page scrolls all the way and doesn't spring back.
+4. A green card ring (bulk order) showed beside the sticky header: `.top::after` paints the page color out to the screen edges behind the header.
+5. Owners' tanks rows in Shaping the world (`wb`) didn't change on tap when `FRZ['e-proj']` was held by an earlier tap. The tapped row now greys to Done at once (`frzTap`).
+6. Trim is never due and growth never lowers Wellbeing (`ownDue`, `ownWell`, line reads neat/growing). The sponge clogs in 180 tank days (`SPONGE_D`, was `OWN_FULL` 90).
+7. `c_knee` is a reaction card (`CARD_REACT`), so it comes the step Europe opens, before stores go in.
+8. Payouts on hold: plainer body and labels with the time in each label; the little bird line is plum (`.story-bird` color `--s4`).
+9. A fork pick lets go of a held list (`delete FRZ[fzc]`), so the fork goes at once under the What happened popup.
+10. Hardier line label: "the duller red puts off 1% of buyers".
+11. Farm next line names where the permit shows up: "Projects on Company" (or Farm/Gear before 100k) via `tabWord(t)`.
+12. Games card: no held height after Keep working (`gmHold` is a no-op).
+13. Grandma's land: `landPre` fetches home.html 8 s after the land is bought or on offer, so the first open is from cache.
+14. First sale card goes to Gear (`tab:'up'`), as its text says.
+15. Bought Gear rows stayed as Done for good: `UPG_KEEP` was cleared in `selectTab`, which never sees a real tab change (Pass 266). Cleared in `tabLeave` and on scroll (`hdFree`).
+16. Field guide shrimp drawn with rear legs, front legs and antennae, and tail (`fgImg`, not cached before `TVREADY`).
+17. Thermostat chiller AED 350 (`HEAT_COST[2]`).
+18. Question only (Money sheet timing), no change.
+19. Feed and Water don't come back for a new tank that is still getting its feeder and water changer (`actNeed` skips `T.gearDue`).
+20. Board game bot think time capped at 3.7 s (was 4.2 s), `boardgames.js`.
+
+Tests changed with it: tank1 (no trim due, sponge 108/180 at day 108), balance (wellbeing after 210 days of nothing, OWN_* constant, actNeed strings, pain line `% lower`, fork showAfter string), me (chiller 350).
+
+**Pass 293b (7 Nov):** board game bot thinks 0.5 to 3 s, scaled by how hard the move is (`500+thinkD*2500`, ±15%, never under the real search time). Payouts on hold: the body says why it looks like fraud; the man's option says what he gets (the frozen money goes to his account clean when it clears, he launders his cash through you); ending line to match. BUILD p293b.
+
+Tests (changed, Pass 293, fell back to feature): 41 suites, 40 ok, layout warn (3 overflow, as before). tapall FAIL 1 of 158: `moment fork reviews promote revfake` swallowed by SETTLE, twice in the 2-job run; passes alone (promote only, and all 8 tabs with all stages and the four fork moments, 127 taps). Looks like load timing, not checked on the old commit. Open.
+

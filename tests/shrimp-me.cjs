@@ -310,7 +310,7 @@ var k=newGame();k.emp.kitsOpened=1;k.humans=9000;k.money=1e5;k.fin=[{kits:7000}]
 var m=newGame();m.emp.kitsOpened=1;m.humans=1.6e6;m.money=1e7;storyChoose(m,'pain_payout',2);if(!m.emp.shell)throw Error('Shell flag');var r=Math.random;Math.random=function(){return 0;};painDay(m);Math.random=r;if(!frozen(m)||m.emp.frozenWhy!=='shell')throw Error('Shell processors get caught');
 var q=newGame();q.emp.kitsOpened=1;q.humans=9000;q.money=60000;q.fin=[];for(var i=0;i<7;i++)q.fin.push({kits:9000});if(painCost(q,PAINS.pain_heat.ch[0][2],0)>20000+1)throw Error('Decent fix capped at a third of cash '+painCost(q,PAINS.pain_heat.ch[0][2],0));
 var w=newGame();w.emp.kitsOpened=1;w.kits.sold=60;w.money=1e6;if(storesOn(w))throw Error('Stores wait for a boutique or Dubai');w.emp.shops.bout=1;if(!storesOn(w)||!buyStores(w,'auh',1))throw Error('Stores open');if(!closeStores(w,'auh',1)||storeN(w,'auh')!==0)throw Error('Close a store');
-if(HEAT_COST[2]!==450)throw Error('Thermostat chiller costs 450');
+if(HEAT_COST[2]!==350)throw Error('Thermostat chiller costs 350 (Puti 7 Nov)');
 `);
 check('one research system: people in the fields run lab projects, a chiller keeps water changes cool',`
 var g=newGame();g.kits.sold=ACADEMY_AT;g.money=1e8;g.day=400;grantDay(g);if(rlHire(g,'auto','pd')||!grPick(g,0,150)||g.academy.level!==1)throw Error('The first grant starts the lab (Pass 206)');if(!startStudy(g,'automation'))throw Error('Start a project');for(var i=0;i<80;i++)academyDay(g);if(!rd(g,'automation'))throw Error('Project finishes without a grant');if(g.academy.funded!==0)throw Error('No grant days used');

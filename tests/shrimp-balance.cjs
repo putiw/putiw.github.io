@@ -37,7 +37,7 @@ const tradeStart=html.indexOf('id="sellcard"'),hist=html.indexOf('id="trade-colc
 if(!(tradeStart>=marketStart&&tradeStart<hist&&hist<sales&&sales<sellAge&&sellAge<sellAction&&sellAction<price&&price<salesDetails&&salesDetails<marketEnd))throw Error('Trade should combine an independent colony histogram, sales rules, sell action, price and folded sales details in that order');
 if(html.includes('id="rulescard"')||html.includes('id="trade-gradebars"')||html.includes('id="trade-gradeline"')||html.includes('id="trade-berried"'))throw Error('Merged Trade card should retain only the colony histogram from the old Colony panel');
 if(!html.includes("$('sellcard').hidden=lt||!(sh&&(G.stats.born>0||G.stats.sold>0||G.opt.all))"))throw Error('Sales rules should appear as soon as the first shrimp are born');
-if(!html.includes("f.hidden=!sh||!n.feed||emp;w.hidden=!kit||!n.wc||")&&html.includes("se.hidden=!sh||!n.sell||")||!html.includes("feed:G.tanks.some(function(t){return !t.feeder;})")||!html.includes("sell:!(labMode()&&!G.opt.all)"))throw Error('Top Feed, Water and Sell actions should stay until every tank automates them, and Sell until shrimp all go to kits');
+if(!html.includes("f.hidden=!sh||!n.feed||emp;w.hidden=!kit||!n.wc||")&&html.includes("se.hidden=!sh||!n.sell||")||!html.includes("feed:G.tanks.some(function(t){return !t.feeder&&!t.gearDue;})")||!html.includes("sell:!(labMode()&&!G.opt.all)"))throw Error('Top Feed, Water and Sell actions should stay until every tank automates them, and Sell until shrimp all go to kits');
 if(!html.includes("activeTab==='up'&&!G.opt.visitedUp")||!html.includes("g.tab==='up'&&o.visitedUp"))throw Error('Equipment tab guidance dot should be remembered as seen after visiting');
 if(!html.includes("var CARD_GROUP={kits:'k',staff:'k',korder:'k'};"))throw Error('Sales rules and colony toggles should not be coupled by spotlight grouping');
 console.log('PASS Trade combines independent colony/sales toggles; actions persist and Equipment dot clears after visit');
@@ -425,7 +425,7 @@ for(var d=0;d<30;d++){g.day+=1;coinDay(g);}if((C.otrees||0)>0.0002*3*g.humans*30
 var s=readyGame();s.emp.won=1;s.space={v:1,started:true,colonies:{orbit:{n:80}},surveys:{orbit:1},won:0};s.progress.queue=['spaceDream'];s.progress.reviewing=true;s.academy.active={id:'terraform',progress:20};s=migrate(s);
 if(s.space||s.progress.queue.indexOf('spaceDream')>=0||s.progress.reviewing||s.academy.active||earthArchived(s)||!canLeave(s))throw Error('An old Space save goes back to its won company');
 `);
-if(!html.includes('id="after"')||!html.includes("showAfter(slab,stx,aft)")||!html.includes("if(pp&&pp.fk){showAfter(pp.name,pp.d,kindNote());}"))throw Error('Decisions show what happened afterwards, in a popup');
+if(!html.includes('id="after"')||!html.includes("showAfter(slab,stx,aft)")||!html.includes("showAfter(pp.name,pp.d,kindNote());"))throw Error('Decisions show what happened afterwards, in a popup');
 if(!html.includes("var renderInner=render;render=function(){var a=anchorGet();renderInner.apply(this,arguments);anchorFix(a);settleScan();};")||!html.includes('SETTLE_MS=500'))throw Error('The screen holds still under the finger and fresh decisions ignore taps for half a second');
 if(html.includes('.tv-care.own .btn[data-idle]{opacity')||fs.readFileSync(path.join(__dirname,'../shrimp/home.html'),'utf8').includes('.toys .btn[data-idle]{opacity'))throw Error('Job buttons never grey out, do them any time (Puti, 4 Nov)');
 check('own tank keeps 20 shrimp, care builds up only then, Look over from the first shrimp',`
@@ -733,7 +733,7 @@ check('Pass 161/179: own-tank jobs about once a tank month, the tank stays fine 
 var g=ownGame(),T=g.tanks[0],C=careOf(T);T.glass=null;C.mulm=C.sponge=C.grow=0;C.pests=[];for(var d=0;d<30;d++){g.tday++;glassGrow(g,T);careDay(g);}
 var gm=glassMean(T);if(gm<0.1||gm>0.5)throw Error('Pass 246: glass partly green after 30 tank days (full in 75 to 150): '+gm);
 if(ownWell(g).total<50)throw Error('A month of mess still reads Fine: '+ownWell(g).total);
-for(d=0;d<90;d++){g.tday++;glassGrow(g,T);careDay(g);}if(ownWell(g).total>=60)throw Error('Months of nothing shows: '+ownWell(g).total);`);
+for(d=0;d<180;d++){g.tday++;glassGrow(g,T);careDay(g);}if(ownWell(g).total>=60)throw Error("Half a year of nothing shows (Pass 293: sponge 180 tank days, plants never count): "+ownWell(g).total);`);
 check('Pass 161: leaving after the win, without the land too',OWN_SETUP+`
 var g=ownGame();g.emp.won=1;if(!canLeave(g))throw Error('Leaving is offered after the win');
 if(!leaveCompany(g)||!g.left||!landOpen(g))throw Error('Leaving works and brings the land');
@@ -933,7 +933,7 @@ if(!sp.includes("name:'Transit spectroscopy',cost:.2,")||!sp.includes("name:'Orb
 count++;console.log('PASS Pass 175 test costs and fixed panel');
 // Pass 179 (Puti, 31 Oct): Tank 1 on one real-time clock, 3 months from clean to covered, its jobs are the land's. Full checks: tests/shrimp-tank1.cjs
 {const home=require('fs').readFileSync(__dirname+'/../shrimp/home.html','utf8');
-if(!html.includes('var TANK_DAY_MS=2400,TANK_CATCH=30;')||!html.includes('var OWN_DUE=1/3,OWN_FULL=90,OWN_MULM=115;')||!html.includes('stepGame(G,0)||progressionBlocked(G))break;}')||!html.includes("var LAND_JOBS={glass:'glass',vac:'vac',sponge:'sponge',trim:'trim',pest:'pests',scape:'scape'};"))throw Error('Pass 179: Tank 1 runs 2.4 s a tank day at any speed, 90 days to full, jobs on the land');
+if(!html.includes('var TANK_DAY_MS=2400,TANK_CATCH=30;')||!html.includes('var OWN_DUE=1/3,OWN_FULL=90,OWN_MULM=115,SPONGE_D=180;')||!html.includes('stepGame(G,0)||progressionBlocked(G))break;}')||!html.includes("var LAND_JOBS={glass:'glass',vac:'vac',sponge:'sponge',trim:'trim',pest:'pests',scape:'scape'};"))throw Error('Pass 179: Tank 1 runs 2.4 s a tank day at any speed, 90 days to full, jobs on the land');
 if(!home.includes("TOYS.push({id:'glass'")||!home.includes("var busy=jobOpen();")||!home.includes("name==='wipe'"))throw Error('Pass 179: the land has the glass wipe and leaves a job alone');
 count++;console.log('PASS Pass 179 one clock, one tank, slower mess');}
 // Pass 181 (Puti, 1 Nov): no wind on the land, one mute, the land banner never for the win. Full checks: tests/shrimp-land-audio.cjs
@@ -1064,7 +1064,7 @@ storyChoose(g,'gp_land',1);if(gplaceOffer(g)!==true||!buyGplace(g)||!landOpen(g)
 var h=newGame();h.me.on=1;h.money=1e6;h.me.gplace={balcony:1,house:1};storyChoose(h,'gp_land',0);if(gplaceOffer(h)==='wait'&&h.me.landTrip>h.day){}else throw Error('waits during the trip');h.day=h.me.landTrip;landDay(h);if(landOpen(h))throw Error('the trip finds the land, it does not buy it');if(gplaceOffer(h)!==true)throw Error('for sale after the trip');
 `);
 if(!/function renderMilestone\(\)\{[\s\S]{0,400}busyUI\(\)/.test(html)||html.indexOf('LAND.on||LAND.busy')<0||html.indexOf('PL_SHOW')<0)throw Error('No story cards on the land, in a tank job or while planting (Pass 234, Puti)');
-if(!html.includes('return {feed:G.tanks.some(function(t){return !t.feeder;}),wc:G.tanks.some(function(t){return !t.autoWC;}),'))throw Error('Feed and Water go once every tank is automated, no emergency comeback (Pass 244, Puti)');
+if(!html.includes('return {feed:G.tanks.some(function(t){return !t.feeder&&!t.gearDue;}),wc:G.tanks.some(function(t){return !t.autoWC&&!t.gearDue;}),'))throw Error('Feed and Water go once every tank is automated, no emergency comeback (Pass 244, Puti)');
 console.log('PASS Feed and Water leave once every tank is automated');
 check('Pass 248: Sea Cow in old saves, loan shark remembers what it took',`
 var g=newGame();g.me=g.me||{};g.me.hist=['Grandma wrote about Grandpa’s fishing boat. It’s called Maryam, after his mother, and she still pays the harbor fee.','Maryam stayed at the dock all year.'];g.me.gv=3;fixGpText(g);
@@ -1254,7 +1254,7 @@ g.emp.nosale=Math.floor(g.day)+30;if(!/police/.test(salesWhy(g)))throw Error('po
 // the hard part: owners at kitCap means kitDemand 0 and the market-ending line, not a marketing one
 hardOf(g).open=1;g.emp.op.m=1;g.humans=kitCap(g);if(kitDemand(g)!==0)throw Error('demand 0 at the cap');if(salesWhy(g)!=='Everyone who can keep a tank has one')throw Error('cap line: '+salesWhy(g));
 g.emp.hard.open=0;g.humans=kitCap(g);if(salesWhy(g)!=='Everyone who wants a tank has one')throw Error('pre-hard cap line: '+salesWhy(g));
-var P=Object.keys(PAINS)[0];g.humans=1000;g.emp.pains=g.emp.pains||{};g.emp.pains[P]={until:g.day+10};if(painMult(g)>=1||!/part speed/.test(salesWhy(g)))throw Error('pain line: '+salesWhy(g));
+var P=Object.keys(PAINS)[0];g.humans=1000;g.emp.pains=g.emp.pains||{};g.emp.pains[P]={until:g.day+10};if(painMult(g)>=1||!/% lower/.test(salesWhy(g)))throw Error('pain line: '+salesWhy(g));
 `);
 check('Pass 268 item 12: Rewilding, the last mile and the lab are letters only, no story card before; the shop and the island keep theirs',`
 var g=readyGame();g.emp.trees={rewild:1,lastmile:1,lab:1,shop:1,island:1};var o=cards3Cond(g);
