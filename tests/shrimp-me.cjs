@@ -320,6 +320,17 @@ check('farms and shops climb one kind at a time',`
 var g=newGame();g.money=1e9;g.emp.proj.farmlic=1;g.emp.kitsOpened=1;g.kits.sold=500;if(!buyFarm(g,'rack')||!buyFarm(g,'barn'))throw Error('Rack then barn');if(buyFarm(g,'rack'))throw Error('No more racks once you build barns');if(!buyFarm(g,'barn')||!buyFarm(g,'shed'))throw Error('Barns until the next kind');if(buyFarm(g,'barn'))throw Error('Barns close after the first warehouse');
 var h=newGame();h.money=1e8;h.emp.kitsOpened=1;h.kits.sold=2000;if(!buyShop(h,'stall')||!buyShop(h,'pet'))throw Error('Stall then pet corner');if(buyShop(h,'stall'))throw Error('Stalls close');buyShop(h,'bout');if(!storesOn(h)||!buyStores(h,'auh',1))throw Error('Boutique opens mall stores');if(buyShop(h,'bout'))throw Error('Small shops close once mall stores run');
 `);
+check('the first mall store closes the small shops at 35% back, one log line, managers go, old saves too (Pass 295)',`
+var h=newGame();h.money=1e8;h.emp.kitsOpened=1;h.kits.sold=2000;buyShop(h,'stall');buyShop(h,'stall');buyShop(h,'pet');buyShop(h,'bout');h.emp.staff.mgr=2;
+var back=0;[['stall',2],['pet',1],['bout',1]].forEach(function(x){var s=SHOPS.filter(function(y){return y.id===x[0];})[0];for(var k=x[1]-1;k>=0;k--)back+=Math.round(scaledCost(s.cost,k,1.15)*0.35);});
+var m0=h.money,c0=storeBatchCost(h,'auh',1),l0=h.log.length;if(!buyStores(h,'auh',1))throw Error('store');
+if(shopCount(h)!==0||h.emp.leases.length||h.emp.lic)throw Error('small shops still open '+shopCount(h));if(Math.abs(h.money-(m0-c0+back))>1)throw Error('35% back '+(h.money-m0+c0)+' vs '+back);
+var t=h.log.slice(l0).map(function(x){return x.t;}).filter(function(x){return /first mall store/.test(x);});if(t.length!==1||!/2 weekend market stalls, 1 pet shop corner and 1 shrimp boutique closed, AED [0-9,]+ back\. Gema and the other shop manager went with them\./.test(t[0]))throw Error('one line: '+t.join(' | '));
+if(h.emp.staff.mgr!==0||annualRent(h)!==0)throw Error('managers and rent');if(buyShop(h,'stall')||SHOPS.some(function(s){return shopBuyable(h,s);}))throw Error('no small shops after the malls');
+closeStores(h,'auh',1);if(SHOPS.some(function(s){return shopBuyable(h,s);}))throw Error('closing every store does not bring the stalls back');
+var o=newGame();o.money=1e8;o.emp.kitsOpened=1;o.kits.sold=2000;buyShop(o,'stall');buyShop(o,'bout');o.emp.stores={auh:3};var om=o.money;migrate(o);if(shopCount(o)!==0||!(o.money>om)||!o.emp.shopsGone)throw Error('old save closes once');var ol=o.log.length;migrate(o);if(o.log.length!==ol)throw Error('only once');
+var n=newGame();n.money=1e8;n.emp.kitsOpened=1;n.kits.sold=2000;buyShop(n,'stall');migrate(n);if(shopCount(n)!==1)throw Error('no stores, shops stay');
+`);
 check('hours count: work moves orders, hour milestones happen, no business lesson call (Pass 286)',`
 var g=newGame();g.tanks[0].feeder=1;g.tanks[0].autoWC=1;g.kits.sold=Math.max(1,g.kits.sold);personalDay(g);g.me.on=1;var w8=workMult(g);for(var i=0;i<2;i++)addHour(g,'work',1);if(Math.abs(workMult(g)-w8-0.1)>1e-9)throw Error('Two more hours early on: +10% '+workMult(g));
 g.me.hp=80;g.me.bo=0;g.me.hrs={videos:99};g.me.hstep={};var b0=g.emp.beta;g.me.p2=['videos'];lifeDay(g);if(!(g.emp.beta>b0)||g.me.hstep.videos!==1)throw Error('100 video hours do something');
