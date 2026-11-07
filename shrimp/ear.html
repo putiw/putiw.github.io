@@ -1,25 +1,33 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>The tank you can hear</title><style>
 :root{--bg:#efe9dc;--surface:#fbf8f1;--ink:#22201b;--ink-2:#524c3d;--ink-3:#716a57;--line:#dcd2be;--accent:#2d6a4f;--accent-ink:#fff}
 [hidden]{display:none!important}*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "Inter",system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%}
-body{padding:calc(10px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));max-width:480px;margin:0 auto;overflow-x:hidden}
-.top{display:flex;align-items:center;gap:8px;margin-bottom:12px}.top h1{flex:1;font-size:18px;margin:0;text-align:center}
+body{padding:calc(10px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));max-width:480px;margin:0 auto;overflow-x:hidden}
+.top{display:flex;align-items:center;gap:8px;margin-bottom:10px}.top h1{flex:1;font-size:18px;margin:0;text-align:center}
 .top button{min-height:40px;width:auto;min-width:44px;padding:6px 12px;margin:0;border-radius:10px;text-align:center}
 button{font:inherit;font-weight:600;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;min-height:72px;padding:12px 14px;width:100%;text-align:left;margin:0 0 10px;display:block;touch-action:manipulation}
 button.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}button:focus-visible{outline:3px solid #b5651d;outline-offset:2px}
 p{margin:0 0 12px}.muted{color:var(--ink-3);font-size:14px}#st{min-height:1.4em;color:var(--ink-2)}
 #help{position:fixed;inset:0;z-index:5;background:var(--bg);overflow:auto;padding:calc(10px + env(safe-area-inset-top)) 16px 24px}
 #help .in{max-width:480px;margin:0 auto}.snd{min-height:0;padding:10px 12px;margin:0 0 6px}.snd b{display:block}.snd span{display:block;font-weight:400;font-size:14px;color:var(--ink-2)}
+.tsp{min-width:66px}.top h1{font-size:16.5px;white-space:nowrap}
+#pic{width:100%;height:auto;aspect-ratio:233/108;border-radius:10px;background:#000;display:block;margin:0 0 10px;image-rendering:pixelated}
+.acts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 12px}
+.acts button{min-height:52px;margin:0;padding:6px 4px;text-align:center;font-size:14px;line-height:1.2;border-radius:11px}
+#lights{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:0 0 10px}
+#lights button{min-height:36px;margin:0;padding:3px 3px;text-align:center;font-size:12.5px;font-weight:500;line-height:1.15;border-radius:8px;background:#e4ded1;border-color:#e4ded1;color:#5d5747;transition:background .3s,color .3s,border-color .3s}
+#lights button.warm{background:#e9cf9a;border-color:#e9cf9a;color:var(--ink)}
+#lights button.on{background:var(--accent);border-color:var(--accent);color:#fff;transition:none}
+.hint{font-size:13.5px;color:var(--ink-2);margin:0 0 6px}
+@media (prefers-reduced-motion:reduce){#lights button{transition:none}}
 </style></head><body>
-<div class="top"><button id="b-back" aria-label="Back to the game">‹ Back</button><h1>The tank you can hear</h1><button id="b-help" aria-label="Every sound, tap to hear it" aria-expanded="false">?</button></div>
-<p id="day" class="muted" aria-live="off"></p>
-<button id="b-play" aria-pressed="false">Play</button>
-<button class="pri" id="b-feed">Feed</button>
-<button class="pri" id="b-water">Change water</button>
-<button id="b-hear">Hear the tank</button>
-<p>Soft random ticks are shrimp eating. If it hisses or the beep gets fast, feed less and change some water.</p>
+<div class="top"><button id="b-back" aria-label="Back to the game">‹ Back</button><h1>The tank you can hear</h1><span class="tsp"></span></div>
+<p id="day" hidden></p>
+<canvas id="pic" width="466" height="216" aria-label="The tank’s decor in gray: driftwood, stones and plants"></canvas>
+<div class="acts"><button id="b-play" aria-pressed="false">Play</button><button class="pri" id="b-feed">Feed</button><button class="pri" id="b-water">Change water</button><button id="b-hear">Hear the tank</button></div>
+<div id="lights" aria-label="Every sound, tap to hear it"></div>
+<p class="hint">Soft ticks are shrimp eating. If it hisses or the beep gets fast, feed less and change some water.</p>
 <p id="st" role="status" aria-live="polite"></p>
 <button id="again" hidden>Start a new tank</button>
-<div id="help" hidden><div class="in"><div class="top"><button onclick="document.getElementById('b-help').click()" aria-label="Close">‹ Back</button><h1>Every sound</h1><span style="min-width:44px"></span></div><p class="muted">Tap one to hear it.</p><div id="help-list"></div></div></div>
 <script>
 'use strict';
 /* ---------- SOUND: every number you may want to tune by ear ---------- */
@@ -215,7 +223,8 @@ function audio(){
   return A;
 }
 var LIGHTS=[['drop','Fountain'],['plop','Fountain plop'],['beep','Monitor beep'],['hiss','Hiss'],['eatA','Adult eating'],['eatJ','Young eating'],['eatB','Baby eating'],['idle','Sitting still'],['swimS','Swim, short'],['swimL','Swim, long'],['eggs','Eggs (double)'],['molt','Molt'],['moltfail','Failed molt'],['babies','Babies hatch'],['deathB','Death, baby'],['deathA','Death, adult'],['feed','Feeding'],['pour','Water change']],LEL={};
-function lit(k,at,dur){var el=LEL[k];if(!el)return;var d=Math.max(0,((at||0)-(A?A.ctx.currentTime:0))*1000);setTimeout(function(){el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('on')},Math.max(160,(dur||0)*1000))},d)}
+var SHORT={drop:'Filter',beep:'Beep',hiss:'Hiss',feed:'Feeding',pour:'Water change',eatA:'Adult eats',eatJ:'Young eats',eatB:'Baby eats',idle:'Sitting',swimS:'Short swim',swimL:'Long swim',eggs:'Eggs',molt:'Molt',moltfail:'Failed molt',babies:'Babies hatch',deathB:'Baby dies',deathA:'Adult dies','p:wood':'Wood','p:stone':'Stones','p:plant':'Plants'},LORDER=['drop','beep','hiss','feed','pour','eatA','eatJ','eatB','idle','swimS','swimL','eggs','molt','moltfail','babies','deathB','deathA','p:wood','p:stone','p:plant'];/* Pass 295 (Puti): every sound a button on the page, lit while it plays */
+function lit(k,at,dur){if(k==='plop')k='drop';var el=LEL[k];if(!el)return;var d=Math.max(0,((at||0)-(A?A.ctx.currentTime:0))*1000);setTimeout(function(){el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('on')},Math.max(160,(dur||0)*1000))},d)}
 /* the filter sounds; each event at a random time (Poisson), rate × Density. Pitch and Size scale every drop. */
 var FRATE={trickle:3.5,bubbler:30,drip:0.7,rain:45,glug:1.3};
 var FPD={dens:1,pitch:1,size:1,bed:1},FPS={"bubbler":{"dens":1.2,"pitch":1.05,"size":1.35,"bed":0.5}};/* Puti's settings, 5 Nov */
@@ -283,6 +292,10 @@ var PICD={cols:10,secs:10,rows:24,lo:300,hi:3200,tick:1,types:{wood:{snd:'knock'
 var PICS=JSON.parse(JSON.stringify(PICD));(function(pj){PICS=Object.assign(PICS,pj);PICS.types=Object.assign(JSON.parse(JSON.stringify(PICD.types)),pj.types||{});})({"cols":40,"secs":5,"rows":12,"lo":300,"hi":2450,"tick":1,"types":{"wood":{"snd":"bell","oct":0.5,"vol":0.5},"stone":{"snd":"square","oct":1,"vol":0.5},"plant":{"snd":"hum","oct":2,"vol":1}}});
 var PIC_BITS={};(function(){for(var k in PIC_MASK){var b=atob(PIC_MASK[k]),a=new Uint8Array(PIC_W*PIC_H);for(var i=0;i<a.length;i++)a[i]=(b.charCodeAt(i>>3)>>(7-(i&7)))&1;PIC_BITS[k]=a}})();
 /* cell value per type: mean over the cell of 0.2 per layer that covers the pixel */
+function drawPic(c){var cv=$('pic');if(!cv)return;var x=cv.getContext('2d'),W=cv.width,H=cv.height;if(!drawPic.off){var im=x.createImageData(PIC_W,PIC_H);for(var i=0;i<PIC_W*PIC_H;i++){var v=0;PIC_TYPES.forEach(function(T){T[2].forEach(function(L){v+=0.2*PIC_BITS[L][i]})});var g=Math.min(255,Math.round(v*255*2.2));im.data[i*4]=im.data[i*4+1]=im.data[i*4+2]=g;im.data[i*4+3]=255}var off=document.createElement('canvas');off.width=PIC_W;off.height=PIC_H;off.getContext('2d').putImageData(im,0,0);drawPic.off=off}
+ x.imageSmoothingEnabled=false;x.drawImage(drawPic.off,0,0,W,H);var C=PICS.cols;x.strokeStyle='rgba(255,255,255,.14)';x.lineWidth=1;for(var k=1;k<C;k++){var X=Math.round(k*W/C)+0.5;x.beginPath();x.moveTo(X,0);x.lineTo(X,H);x.stroke()}
+ if(c>=0){x.fillStyle='rgba(45,106,79,.38)';x.fillRect(c*W/C,0,W/C,H);x.strokeStyle='#7fd1a6';x.lineWidth=2;x.strokeRect(c*W/C+1,1,W/C-2,H-2);x.lineWidth=1}}/* Pass 295 (Puti): the decor picture on the page, Hear the tank sweeps it left to right */
+function picCol(c,G,solo,dur){drawPic(c);if(c<0)return;PIC_TYPES.forEach(function(T){if(solo&&solo!==T[0])return;var col=G[T[0]][c];if(col&&col.some(function(v){return v>0.002}))lit('p:'+T[0],0,dur)})}
 function picGrid(){var C=PICS.cols,R=PICS.rows,out={};PIC_TYPES.forEach(function(T){var g=[];for(var c=0;c<C;c++){var col=[];var x0=Math.floor(c*PIC_W/C),x1=Math.floor((c+1)*PIC_W/C);for(var r=0;r<R;r++){var y0=Math.floor(r*PIC_H/R),y1=Math.max(y0+1,Math.floor((r+1)*PIC_H/R)),sum=0,n=0;for(var y=y0;y<y1;y++)for(var x=x0;x<x1;x++){n++;T[2].forEach(function(L){sum+=0.2*PIC_BITS[L][y*PIC_W+x]})}col.push(n?sum/n:0)}g.push(col)}out[T[0]]=g});return out}
 SOUND.pic={gain:0.22,tick:0.02};
 SOUND.scan={step:0.55,stagger:0.07,tick:2000,tickGain:0.03,row:[330,520,820],gain:0.12};
@@ -435,7 +448,7 @@ function setTank(on){if(on&&!wake())return;TANK=!!on;var b=document.getElementBy
 function setVol(v){vol=v;if(A)A.master.gain.setTargetAtTime(MUTED?0:SOUND.master*vol,A.ctx.currentTime,0.1)}
 function tankLevel(){if(!A)return;var now=A.ctx.currentTime;A.tank.gain.setTargetAtTime(!TANK||PAUSED||now<soloT?0:1,now,0.15)}
   var PICRUN=null;
-  function picStop(){if(!PICRUN)return;var now=A.ctx.currentTime;PICRUN.osc.forEach(function(o){try{o[1].gain.cancelScheduledValues(now);o[1].gain.setTargetAtTime(0,now,0.03);o[0].stop(now+0.3)}catch(e){}});PICRUN.nodes.forEach(function(n){try{n.disconnect()}catch(e){}});PICRUN.timers.forEach(clearTimeout);PICRUN=null;soloT=0;tankLevel();0}
+  function picStop(){if(!PICRUN)return;var now=A.ctx.currentTime;PICRUN.osc.forEach(function(o){try{o[1].gain.cancelScheduledValues(now);o[1].gain.setTargetAtTime(0,now,0.03);o[0].stop(now+0.3)}catch(e){}});PICRUN.nodes.forEach(function(n){try{n.disconnect()}catch(e){}});PICRUN.timers.forEach(clearTimeout);PICRUN=null;soloT=0;tankLevel();drawPic(-1)}
   /* one cell's sound for a struck timbre */
   function picHit(snd,hz,g,at,dur,out){var ctx=A.ctx,o=ctx.createOscillator(),e=ctx.createGain();o.connect(e);e.connect(out);
     if(snd==='pluck'){o.type='triangle';o.frequency.value=hz;e.gain.setValueAtTime(0,at);e.gain.linearRampToValueAtTime(g*1.6,at+0.004);e.gain.exponentialRampToValueAtTime(0.0005,at+Math.min(dur,0.6));o.start(at);o.stop(at+Math.min(dur,0.6)+0.02)}
@@ -453,8 +466,8 @@ function tankLevel(){if(!A)return;var now=A.ctx.currentTime;A.tank.gain.setTarge
             g.gain.value=0;o.connect(g);o.start(t);o.stop(end+0.3);run.osc.push([o,g]);var any=false;
             for(var c=0;c<C;c++){var val=G[k][c][r];g.gain.setTargetAtTime(val*P.gain,t+c*dur,0.015);if(val>0)any=true}g.gain.setTargetAtTime(0,end,0.03);if(!any){try{o.stop()}catch(e){}}}
         else{for(var c2=0;c2<C;c2++){var v2=G[k][c2][r];if(v2>0.002)picHit(st.snd,hz,v2*P.gain,t+c2*dur,dur,tg)}}}});
-    for(var c3=0;c3<C;c3++){if(PICS.tick){DEMO=true;tone(2400,12,P.tick,t+c3*dur,'sine');DEMO=false}(function(c){run.timers.push(setTimeout(function(){0},Math.max(0,(t+c*dur-ctx.currentTime)*1000)))})(c3)}
-    run.timers.push(setTimeout(function(){if(PICRUN===run){PICRUN=null;0}},(PICS.secs+0.4)*1000))}
+    for(var c3=0;c3<C;c3++){if(PICS.tick){DEMO=true;tone(2400,12,P.tick,t+c3*dur,'sine');DEMO=false}(function(c){run.timers.push(setTimeout(function(){if(PICRUN===run)picCol(c,G,solo,dur+0.05)},Math.max(0,(t+c*dur-ctx.currentTime)*1000)))})(c3)}
+    run.timers.push(setTimeout(function(){if(PICRUN===run){PICRUN=null;drawPic(-1)}},(PICS.secs+0.4)*1000))}
   function demoKey(k){if(!audio())return;var t=A.ctx.currentTime+0.05;
     if(k==='drop'||k==='plop'||k==='hiss'){soloT=0;A.quietUntil=A.ctx.currentTime+5;tankLevel();if(k==='hiss'){var hs=A.ctx.createBufferSource();hs.buffer=A.noise;hs.loop=true;var hp=A.ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=SOUND.hiss.hz;hp.Q.value=SOUND.hiss.q;var hg=A.ctx.createGain();hg.gain.setValueAtTime(0,t);hg.gain.linearRampToValueAtTime(SOUND.hiss.max*0.6,t+0.6);hg.gain.setValueAtTime(SOUND.hiss.max*0.6,t+3);hg.gain.linearRampToValueAtTime(0,t+3.6);hs.connect(hp);hp.connect(hg);hg.connect(A.busD.hiss.g);hs.start(t);hs.stop(t+3.7)}return}
     soloT=t+3.5;tankLevel();DEMO=true;
@@ -483,16 +496,15 @@ function hear(k){if(!wake())return;if(k.indexOf('p:')===0)picPlay(k.slice(2));el
 function line(){if(!S)return;var n=S.shrimp.length;if(n===0){fresh();n=S.shrimp.length;speak('The tank crashed. The shop started it again, 5 shrimp in clean water.');} /* Pass 258: the shop restarts it */$('day').textContent='Day '+(Math.floor(S.day)+1)+', '+n+(n===1?' shrimp':' shrimp');$('again').hidden=n>0}
 function start(){
  if(!load())fresh();S.last=Date.now();lastReal=Date.now();line();
- $('help-list').innerHTML=helpHTML();
+ var lg=$('lights');lg.innerHTML=LORDER.map(function(k){return '<button type="button" data-k="'+k+'">'+SHORT[k]+'</button>'}).join('');lg.querySelectorAll('[data-k]').forEach(function(b){LEL[b.dataset.k]=b});drawPic(-1);
  document.body.addEventListener('pointerdown',wake);document.body.addEventListener('keydown',wake);
  $('b-play').onclick=function(){setTank(!TANK);speak(TANK?'Playing.':'Paused.')};
  $('b-feed').onclick=function(){wake();if(!TANK)setTank(true);doJob('feed');save();speak('Fed.');post({type:'care',k:'feed'})};
  $('b-water').onclick=function(){wake();if(!TANK)setTank(true);doJob('water');S.clog=0;save();speak('A third of the water changed, and the filter rinsed.');post({type:'care',k:'water'})};
  $('b-hear').onclick=function(){if(!wake())return;picPlay(null);speak('Left to right: wood is the bell, stones buzz, plants hum. High is the top of the tank.')};
- $('b-help').onclick=function(){var h=$('help'),on=h.hidden;h.hidden=!on;this.setAttribute('aria-expanded',on)};
  $('b-back').onclick=function(){save();if(A)A.ctx.suspend();post({type:'back'})};
  $('again').onclick=function(){fresh();line();speak('A new tank, 5 shrimp.')};
- $('help-list').onclick=function(e){var b=e.target.closest('[data-k]');if(b)hear(b.dataset.k)};
+ $('lights').onclick=function(e){var b=e.target.closest('[data-k]');if(b){lit(b.dataset.k,0,0.5);hear(b.dataset.k)}};
  setInterval(function(){if(document.hidden||PAUSED){lastReal=Date.now();return}var now=Date.now(),dt=(now-lastReal)/1000;lastReal=now;if(dt<0||dt>5)dt=0.25;advance(dt*24/DAY_S);line();if(Math.random()<0.05)save()},250);
  setInterval(sched,100);
  document.addEventListener('visibilitychange',function(){if(document.hidden){if(A)A.ctx.suspend();if(S)save()}else{lastReal=Date.now();if(A&&!PAUSED)A.ctx.resume()}});
