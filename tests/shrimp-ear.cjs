@@ -21,6 +21,8 @@ const srv=http.createServer((q,r)=>{const f=path.join(root,decodeURIComponent(q.
  ok(!errs.length,'every sound plays with no errors'+(errs.length?': '+errs.slice(0,3).join(' | '):''));
  await p.click('#b-hear');await p.waitForTimeout(1500);ok(await p.evaluate(()=>!!PICRUN),'Hear the tank plays the scan');ok(await p.evaluate(()=>document.querySelectorAll('#lights [data-k^="p:"].on').length>0),'Pass 295: the decor buttons light as the sweep passes');
  await p.click('#lights [data-k="beep"]');await p.waitForTimeout(60);ok(await p.evaluate(()=>document.querySelector('#lights [data-k="beep"]').classList.contains('on')),'Pass 295: a tapped sound lights');
+ ok(await p.evaluate(()=>getComputedStyle(document.querySelector('#lights .on')).backgroundColor!=='rgb(45, 106, 79)'),'Pass 295b: a lit sound is gray, not green');
+ ok(await p.evaluate(()=>{var f=document.getElementById('feedvol');f.value=24;f.dispatchEvent(new Event('input'));return MIX.feed.vol===24&&localStorage.getItem('ear-feedvol')==='24'&&A.busD.feed.g.gain.value>0}),'Pass 295b: the Feed volume bar sets the feed level and keeps it');
  await p.setViewportSize({width:375,height:667});await p.waitForTimeout(200);const fit=await p.evaluate(()=>document.documentElement.scrollHeight);ok(fit<=667,'Pass 295: one screen at 375x667, no scroll ('+fit+')');await p.setViewportSize({width:360,height:740});
  await p.screenshot({path:require('os').tmpdir()+'/ear-360.png'});
  await p.click('#b-back');await p.waitForTimeout(200);ok(await p.evaluate(()=>__msgs.includes('back')&&!!localStorage.getItem('shrimp-ear-v1')),'Back posts back and saves in shrimp-ear-v1');

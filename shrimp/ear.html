@@ -12,11 +12,12 @@ p{margin:0 0 12px}.muted{color:var(--ink-3);font-size:14px}#st{min-height:1.4em;
 .tsp{min-width:66px}.top h1{font-size:16.5px;white-space:nowrap}
 #pic{width:100%;height:auto;aspect-ratio:233/108;border-radius:10px;background:#000;display:block;margin:0 0 10px;image-rendering:pixelated}
 .acts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 12px}
-.acts button{min-height:52px;margin:0;padding:6px 4px;text-align:center;font-size:14px;line-height:1.2;border-radius:11px}
+.acts button{min-height:48px;margin:0;padding:6px 4px;text-align:center;font-size:14px;line-height:1.2;border-radius:11px}
 #lights{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:0 0 10px}
-#lights button{min-height:36px;margin:0;padding:3px 3px;text-align:center;font-size:12.5px;font-weight:500;line-height:1.15;border-radius:8px;background:#e4ded1;border-color:#e4ded1;color:#5d5747;transition:background .3s,color .3s,border-color .3s}
+#lights button{min-height:34px;margin:0;padding:3px 3px;text-align:center;font-size:12.5px;font-weight:500;line-height:1.15;border-radius:8px;background:#e4ded1;border-color:#e4ded1;color:#5d5747;transition:background .3s,color .3s,border-color .3s}
 #lights button.warm{background:#e9cf9a;border-color:#e9cf9a;color:var(--ink)}
-#lights button.on{background:var(--accent);border-color:var(--accent);color:#fff;transition:none}
+#lights button.on{background:#7d776a;border-color:#7d776a;color:#fff;transition:none}
+.vol{display:grid;grid-template-columns:auto 1fr 2.6em;align-items:center;gap:10px;font-size:13.5px;color:var(--ink-2);margin:0 0 8px}.vol input{width:100%;accent-color:var(--accent);margin:0}.vol span{text-align:right;font-variant-numeric:tabular-nums}
 .hint{font-size:13.5px;color:var(--ink-2);margin:0 0 6px}
 @media (prefers-reduced-motion:reduce){#lights button{transition:none}}
 </style></head><body>
@@ -25,6 +26,7 @@ p{margin:0 0 12px}.muted{color:var(--ink-3);font-size:14px}#st{min-height:1.4em;
 <canvas id="pic" width="466" height="216" aria-label="The tank’s decor in gray: driftwood, stones and plants"></canvas>
 <div class="acts"><button id="b-play" aria-pressed="false">Play</button><button class="pri" id="b-feed">Feed</button><button class="pri" id="b-water">Change water</button><button id="b-hear">Hear the tank</button></div>
 <div id="lights" aria-label="Every sound, tap to hear it"></div>
+<label class="vol" for="feedvol">Feed volume<input type="range" id="feedvol" min="0" max="40" step="1"><span id="feedvol-v"></span></label>
 <p class="hint">Soft ticks are shrimp eating. If it hisses or the beep gets fast, feed less and change some water.</p>
 <p id="st" role="status" aria-live="polite"></p>
 <button id="again" hidden>Start a new tank</button>
@@ -308,10 +310,11 @@ function placeSound(k,row,at){var C=SOUND.scan,h=C.row[row],g=C.gain;
 }
 /* per-sound mix: volume (×), softness (0 bright to 1 muffled, a low-pass), speed (how often for sounds that repeat, how fast for one-off sounds) */
 var RATE_K={drop:1,plop:1,beep:1,eatA:1,eatJ:1,eatB:1,idle:1,swimS:1,swimL:1},STRETCH_K={eggs:1,molt:1,moltfail:1,babies:1,deathB:1,deathA:1,feed:1,pour:1};
-var MIX={"molt":{"vol":0.55,"soft":0.75,"speed":1},"deathA":{"vol":2.7,"soft":0,"speed":0.35},"deathB":{"vol":0.9,"speed":0.45,"soft":0.2},"feed":{"vol":6,"soft":0.2},"pour":{"vol":2.1,"soft":0.4,"speed":0.85},"babies":{"vol":3,"speed":0.95},"swimS":{"speed":0.25,"soft":0.6},"swimL":{"speed":0.25,"soft":0.7},"beep":{"vol":0.8,"speed":0.35,"soft":0.7},"hiss":{"soft":0.65,"vol":3},"plop":{"vol":1.45,"soft":0.05,"speed":1.95},"drop":{"soft":0.95,"vol":1.95},"eatA":{"soft":0.45}};
+var MIX={"molt":{"vol":0.55,"soft":0.75,"speed":1},"deathA":{"vol":2.7,"soft":0,"speed":0.35},"deathB":{"vol":0.9,"speed":0.45,"soft":0.2},"feed":{"vol":16,"soft":0.2},"pour":{"vol":2.1,"soft":0.4,"speed":0.85},"babies":{"vol":3,"speed":0.95},"swimS":{"speed":0.25,"soft":0.6},"swimL":{"speed":0.25,"soft":0.7},"beep":{"vol":0.8,"speed":0.35,"soft":0.7},"hiss":{"soft":0.65,"vol":3},"plop":{"vol":1.45,"soft":0.05,"speed":1.95},"drop":{"soft":0.95,"vol":1.95},"eatA":{"soft":0.45}};
 function mixOf(k){var m=MIX[k]||{};return {vol:m.vol==null?1:m.vol,soft:m.soft==null?0:m.soft,speed:m.speed==null?1:m.speed}}
 function softHz(v){return 14000*Math.pow(350/14000,v)}
-function mixBuses(){var ctx=A.ctx;A.busT={};A.busD={};LIGHTS.forEach(function(l){var k=l[0];['T','D'].forEach(function(w){var g=ctx.createGain(),f=ctx.createBiquadFilter();f.type='lowpass';f.Q.value=0.5;g.connect(f);f.connect(w==='T'?A.tank:A.lp);(w==='T'?A.busT:A.busD)[k]={g:g,f:f}})});LIGHTS.forEach(function(l){applyMix(l[0])})}
+var FEED_DIRECT=true;/* Pass 295b (Puti): feed louder; the master compressor held it down, so feed skips it and the Feed volume bar sets it */
+function mixBuses(){var ctx=A.ctx;A.busT={};A.busD={};LIGHTS.forEach(function(l){var k=l[0];['T','D'].forEach(function(w){var g=ctx.createGain(),f=ctx.createBiquadFilter();f.type='lowpass';f.Q.value=0.5;g.connect(f);f.connect(k==='feed'&&FEED_DIRECT?A.master:w==='T'?A.tank:A.lp);(w==='T'?A.busT:A.busD)[k]={g:g,f:f}})});LIGHTS.forEach(function(l){applyMix(l[0])})}
 function applyMix(k){if(!A||!A.busT)return;var m=mixOf(k),now=A.ctx.currentTime;[A.busT[k],A.busD[k]].forEach(function(b){if(!b)return;b.g.gain.setTargetAtTime(m.vol,now,0.05);b.f.frequency.setTargetAtTime(softHz(m.soft),now,0.05)})}
 function saveMix(){try{localStorage.setItem('eartank-mix',JSON.stringify(MIX))}catch(e){}}
 var CUR=null,T0=0;function as(k,t,fn){var pc=CUR,pt=T0;CUR=k;T0=t;try{fn()}finally{CUR=pc;T0=pt}}
@@ -497,6 +500,8 @@ function line(){if(!S)return;var n=S.shrimp.length;if(n===0){fresh();n=S.shrimp.
 function start(){
  if(!load())fresh();S.last=Date.now();lastReal=Date.now();line();
  var lg=$('lights');lg.innerHTML=LORDER.map(function(k){return '<button type="button" data-k="'+k+'">'+SHORT[k]+'</button>'}).join('');lg.querySelectorAll('[data-k]').forEach(function(b){LEL[b.dataset.k]=b});drawPic(-1);
+ var fv=$('feedvol'),fvSet=function(v){MIX.feed=MIX.feed||{};MIX.feed.vol=v;fv.value=v;$('feedvol-v').textContent=Math.round(v/16*100)+'%';applyMix('feed')};var fv0=16;try{var sv=localStorage.getItem('ear-feedvol');if(sv!=null&&!isNaN(+sv))fv0=+sv}catch(e){}fvSet(fv0);/* Pass 295b (Puti): feed louder, and a bar to set it; 100% is the new default */
+ fv.oninput=function(){fvSet(+fv.value);try{localStorage.setItem('ear-feedvol',fv.value)}catch(e){}};fv.onchange=function(){wake();hear('feed')};
  document.body.addEventListener('pointerdown',wake);document.body.addEventListener('keydown',wake);
  $('b-play').onclick=function(){setTank(!TANK);speak(TANK?'Playing.':'Paused.')};
  $('b-feed').onclick=function(){wake();if(!TANK)setTank(true);doJob('feed');save();speak('Fed.');post({type:'care',k:'feed'})};
