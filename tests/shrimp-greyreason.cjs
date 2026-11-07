@@ -7,7 +7,9 @@ const {chromium}=require('playwright');const fs=require('fs'),path=require('path
 const MRE=process.env.GREY_MOMENTS?new RegExp(process.env.GREY_MOMENTS):null;
 const RUNS=(process.env.GREY_RUNS||'').split(',').filter(Boolean),ONLY=process.env.GREY_STAGES?new RegExp(process.env.GREY_STAGES):null;/* regex on '<run> <snapshot>', e.g. '^strong |^avg year' */
 if(!RUNS.length){console.error('FAIL set GREY_RUNS');process.exit(1);}
-const T0=Date.now();const TABS=['tank','up','market','emp','promote','hard','world','research'];
+const T0=Date.now();const TABS0=['tank','up','market','emp','promote','hard','world','research'];
+/* Pass 291: GREY_TABS=<tab,...> (run.cjs changed) checks only those tabs; card moments run only when the list has 'card'. */
+const GT=process.env.GREY_TABS?process.env.GREY_TABS.split(','):null,TABS=GT?TABS0.filter(t=>GT.includes(t)):TABS0,CARDS=!GT||GT.includes('card');
 const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');
 const grey={},dots={},dotSeen=new Set();let nb=0,ns=0,nd=0;
 (async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
@@ -16,7 +18,7 @@ const grey={},dots={},dotSeen=new Set();let nb=0,ns=0,nd=0;
   /* Pass 289: GREY_MOMENTS=<regex> adds the run's MOMENTS: a card moment is checked on its card (every grey choice says why),
      any other on its own tab only */
   const list=Object.keys(snaps).filter(st=>!ONLY||ONLY.test(name+' '+st)).map(st=>[st,snaps[st],null]);
-  if(MRE)for(const [k,v] of Object.entries(rj.moments||{}))if(v&&v.snap&&MRE.test(k))list.push(['moment '+k,v.snap,v]);
+  if(MRE)for(const [k,v] of Object.entries(rj.moments||{}))if(v&&v.snap&&MRE.test(k)&&(CARDS||v.kind!=='card'))list.push(['moment '+k,v.snap,v]);
   for(const [st,snap,mo] of list){ns++;const card=!!(mo&&mo.kind==='card');
    await p.evaluate(([s,card])=>{G=JSON.parse(s);migrate(G);if(!card)G.progress.queue=[];window.spotlight=function(){};speed=0;FRZ={};document.querySelectorAll('[role=dialog]:not(#bg-card):not(#milestone-card)').forEach(function(d){d.hidden=true;});$('after').hidden=true;AFTER_HOLD=null;$('helpsheet').hidden=true;render();},[JSON.stringify(snap),card]);
    if(card){await p.waitForTimeout(120);const r=await p.evaluate(()=>{const out=[];let n=0;const c=$('milestone-card');if(!c||c.hidden)return {n,out,none:1};
@@ -54,4 +56,4 @@ const grey={},dots={},dotSeen=new Set();let nb=0,ns=0,nd=0;
  if(gk.length||dk.length){console.error('FAIL '+gk.length+' grey buttons with no reason (of '+nb+' grey seen), '+dk.length+' dotted titles that open nothing (of '+nd+'), '+ns+' snapshots:');
   gk.forEach(k=>console.error('  grey '+k+'  ['+(grey[k]||[]).length+' snaps, first '+((grey[k]||[])[0]||'')+']'));
   dk.forEach(k=>console.error('  dot  '+k+'  ['+dots[k][0]+']'));await b.close();process.exit(1);}
- console.log('PASS ('+Math.round((Date.now()-T0)/1000)+' s) '+nb+' grey buttons all say why, '+nd+' dotted titles all open, '+ns+' snapshots');await b.close();})().catch(e=>{console.error('FAIL',e.message);process.exit(1);});
+ console.log('PASS ('+Math.round((Date.now()-T0)/1000)+' s) '+nb+' grey buttons all say why, '+nd+' dotted titles all open, '+ns+' snapshots'+(GT?', tabs '+TABS.join(' ')+(CARDS?' and cards':''):''));await b.close();})().catch(e=>{console.error('FAIL',e.message);process.exit(1);});

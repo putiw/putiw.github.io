@@ -3190,3 +3190,80 @@ Feature (db16e9c, before the projtabs fix), then projtabs and tapall again:
 | m-tank | ok | 12 | 6 |
 | m-hard | ok | 79 | 213 |
 | frozen, hard, endcards, fresh, effects, tank1, yourtank, yourtank-360, kitpack, boardgames, land-audio, land-life, taps, ear | ok | | |
+
+## Pass 291 (7 Nov): a `changed` test tier, bots kept for UI and stamp changes, tapall shorter
+
+Tests only, game unchanged, no BUILD bump. From the project doc `claude/shrimp-handoff-tests-changed-7nov.md`.
+
+**`node tests/run.cjs changed`.** Diffs against the last pushed commit (`@{u}`, or `--base=<ref>`; `--head=<ref>` diffs two commits instead of the working tree; `--dry` prints the picks and stops), runs fast plus only the suites the diff touches, and prints each pick with why. The map is two tables at the top of `tests/run.cjs`:
+- `CH_FILES`, by path: a suite's own file runs that suite on all its tabs (tapnow left out when tapall shares the file), `tests/lib/cardlag.cjs` → cardlag, `tests/lib/moment(s).cjs` → every `m-*`, a bot script → feature, `space.html` → space and space-search, `boardgames.js` → boardgames and m-games, `taps.js` and sounds → taps and land-audio, notes, docs, the runner, build scripts → fast only, an unknown file under `shrimp/` → feature.
+- `CH_AREAS`, inside `index.html`: each changed line is matched by the words of the function or var it sits in, and since a line is often a whole function, by the words that changed (word diff; Pass 288's fix sat in `updateEmpire`, the changed words were `frzTap('mk-body')`). Each area names its suites and the tabs the sweeps look at (tapall `TAP_TABS`, tight `TIGHT_TABS`, greyreason the new `GREY_TABS`, `card` = its card moments). CSS, page markup and the core render helpers run tight, layout and greyreason on every tab. A changed line in the SIM block also runs the three bots, bot-cards and cardlag. A diff of only comments or the BUILD stamp is fast only. A line in no area falls back to feature and names it; on the last 32 commits that touched index.html, 1 falls back (`SLOTH` in Pass 271).
+
+**Bots.** The stamp hashes only what the bots read (the SIM block and the average bot's two slices) with comments, blank lines and BUILD taken out, if the stripped text still compiles (else the raw text). A CSS, UI, comment or stamp change keeps the cached runs; a real sim change rebuilds. `space.html` is out of the stamp: no bot reads it.
+
+**tapall** (measured alone on this 2-core box, same saves): 525 s and 128 taps before, 368 s and 139 taps after. `TAP_TIME=1` prints the time per stage.
+- `year 5` took 78 s and `hard open` 53 s for 0 taps: a story card comes up within the 800 ms play on every key there. tapall now checks for the card right after the play (at hard open the card sat over the hard part's header and 20 buttons had been skipped as "no box", without a word), and stops that tab at that stage after 3 card skips in a row; those keys are tried again at the next stage, as before.
+- A shut `coll` card is opened by its header like the player (Pass 290 lesson), and a button with no box at the tap goes in the notes.
+- No stage cut: every Pass 288 to 290 finding (kits unlocked, year 2, the fork moments) is still on the list. The `revfake`/`shipwarm` "swallowed by SETTLE" came back in 3 of 4 runs today (passed in the feature run below), so it isn't a one-off.
+
+**Proof, three real diffs** (`changed --base=<parent> --head=<commit>`, 2 at once):
+
+| diff | picks | time | caught |
+|---|---|---|---|
+| Pass 288 fix reverted (Pass 287 index.html on 6865e89's tests) | fast + projtabs, tapall, m-kits, kitpack, frozen, tight, layout, greyreason, strong, avg | 4.2 min | projtabs FAIL "(row gone)", the Pass 287 bug; greyreason also flags "+ Hire" (fixed in 290) |
+| Pass 290 (732f326..db16e9c, 19 hunks plus CSS) | 33 suites, every tab | 12.0 min | projtabs FAIL (the ministry card now comes at once and covers the tabs), as in Pass 290 |
+| Pass 290 reverted (Pass 289 index.html on db16e9c's tests) | picks cardlag | cardlag alone 0.7 min | cardlag FAIL pump_call1 26 d, pump_call2 35 d late, mira_teen→pain_inbox 12 s |
+| one CSS line (`.coll>.hd` margin), probe commit | fast + tight, layout, greyreason, bots cached | 4.6 min | (nothing to catch) |
+| BUILD stamp + a comment, probe commit | fast only, bots cached | 0.2 min | |
+
+The cards area now picks projtabs too (Pass 290: a card that comes at once covered the tabs). There is no pure CSS pass in the last 50 commits, hence the probe.
+
+**Tiers.** `fast` after each change, `changed` before a push, `feature` before a deploy and when `changed` falls back, `deploy` before "deploy". Run-header, AGENTS.md Token budget and Testing checklist updated.
+
+Not done: year 5 and hard open still test nothing in tapall (the card), the SETTLE swallow, `yourtank-360` flow 91% vs 90% (failed again below, Pass 289). A big pass with CSS still takes about as long as feature.
+
+Tests (feature, cec2321 + this pass, 2026-11-07 14:38 UTC, 11.0 min, 2 at once): 41 suites, 1 failed, 1 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | 20 | WIN 2695 (prev 2695) empire_dictator |
+| kind | ok | 34 | WIN 4209 (prev 4209) question_lucky |
+| avg | ok | 41 | earth 7420 (prev 7420) |
+| balance | ok | 6 | 168 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 1 | 55 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 7 | 3561 gate checks on 339 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| space | ok | 13 | PASS Leave Earth, launch, search and land after Earth |
+| bot-cards | ok | 0 |  |
+| tight | ok | 149 | 0 findings |
+| layout | warn | 93 | 3 things overflow |
+| projtabs | ok | 13 | 4 project tab checks passed |
+| cardlag | ok | 2 |  avg: reaction cards under 15 s after another (allowed): owntank (react) then farm (react) |
+| greyreason | ok | 168 | PASS (168 s) 535 grey buttons all say why, 109 dotted titles all open, 302 snapshots |
+| tapall | ok | 383 | PASS 139 taps 100 ms after a render all changed the save (235 repeats skipped) (46 stages: |
+| m-cards | ok | 39 | PASS 41 cards moment checks |
+| m-health | ok | 8 | PASS 10 health moment checks |
+| m-games | ok | 5 | PASS 22 games moment checks |
+| m-kits | ok | 42 | PASS 291 kits moment checks |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| m-tank | ok | 11 | PASS 6 tank moment checks |
+| m-hard | ok | 81 | PASS 213 hard moment checks |
+| frozen | ok | 3 | frozen buttons checked on 5 tabs |
+| hard | ok | 13 | 24 hard part checks passed (milestone hardpart) |
+| endcards | ok | 19 | 50 ending card checks passed |
+| fresh | ok | 3 | all ok |
+| effects | ok | 1 | 15 action checks passed |
+| tank1 | ok | 29 | all tank 1 checks passed |
+| yourtank | ok | 22 | all passed |
+| yourtank-360 | FAIL | 23 | FAIL land state lines match the game (Gravel due / flow 91% / Trim due / 1 snail / 8 piece |
+| kitpack | ok | 5 | kit packing checks passed |
+| boardgames | ok | 23 | board game checks passed |
+| land-audio | ok | 13 | all passed |
+| land-life | ok | 16 | all passed |
+| taps | ok | 12 | all ok |
+| ear | ok | 6 | 14 ear tank checks passed |
