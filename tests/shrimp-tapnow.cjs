@@ -7,11 +7,17 @@
 // TAP_TABS (default emp,promote) and TAP_ACTS=all (every data-act button; a tap passes if the save or the page text changed)
 // make it the every-tab sweep (run.cjs tapall).
 const {chromium}=require('playwright');const fs=require('fs'),os=require('os');
-const RUN=process.env.HARD_RUN||os.tmpdir()+'/shrimp-average/run-7.json',snaps=JSON.parse(fs.readFileSync(RUN,'utf8')).snapshots;
-const STAGES=(process.env.TAP_STAGES||'year 5,year 8,year 12').split(','),SPEED=+(process.env.TAP_SPEED||4),TABS=(process.env.TAP_TABS||'emp,promote').split(','),ALL=process.env.TAP_ACTS==='all',PLAY=+(process.env.TAP_PLAY||1500);
+const RUN=process.env.HARD_RUN||os.tmpdir()+'/shrimp-average/run-7.json',RJ=JSON.parse(fs.readFileSync(RUN,'utf8')),snaps=RJ.snapshots;
+/* Pass 289: TAP_ONCE=1 taps each button key once per tab (a key that answered at an earlier stage is skipped later; one that
+   failed is tried again). TAP_MOMENTS=<regex> adds the run's MOMENTS (tests/lib/moments.cjs) whose name matches, card moments
+   left out (the card's shield takes taps on purpose), each on its own tab only; TAP_MRUNS=<run json,...> adds other runs' moments. */
+const ONCE=process.env.TAP_ONCE==='1',MRE=process.env.TAP_MOMENTS?new RegExp(process.env.TAP_MOMENTS):null,MTAB={};
+const MSTAGES=[];if(MRE){const add=(rj,tag)=>{for(const [k,v] of Object.entries(rj.moments||{})){if(!v||!v.snap||v.kind==='card'||!v.tab||!MRE.test(k))continue;const nm='moment '+tag+k;snaps[nm]=v.snap;MTAB[nm]=v.tab;MSTAGES.push(nm);}};add(RJ,'');
+ for(const f of (process.env.TAP_MRUNS||'').split(',').filter(Boolean))add(JSON.parse(fs.readFileSync(f,'utf8')),require('path').basename(require('path').dirname(f))+' ');}
+const STAGES=(process.env.TAP_STAGES||'year 5,year 8,year 12').split(',').concat(MSTAGES),SPEED=+(process.env.TAP_SPEED||4),TABS=(process.env.TAP_TABS||'emp,promote').split(','),ALL=process.env.TAP_ACTS==='all',PLAY=+(process.env.TAP_PLAY||1500);
 /* TAP_ACTS=all leaves out buttons that leave the page or wipe the save */const NOT=['reset','sandbox','navigate','earthline','leave-ask','voy-go','voy-launch','voy-fly','ear-go','land-hi','sell-co','milestone-next','story-choice','newsflash','noteflash'];
 const ACTS=['proj','hire','line','wb','camp','ai','movie','region','stores','storefill','shop','qc-strict','dens'];
-const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;const bad=[],gone=[],cards=[];
+const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0,nskip=0;const OK={};const bad=[],gone=[],cards=[];
 (async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
  await p.setContent('<body>'+html+'</body>');await p.waitForTimeout(300);
  /* the 250 ms render interval holds the old render, so mark renders through settleScan, which every render calls last */
@@ -23,7 +29,8 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
  const txt=()=>p.evaluate(()=>document.body.innerText.replace(/\d/g,'0'));
  const SKIP=['tanks','ps','tday','tq','tstep','tAt','savedAt','illClock','illAt'];
  const sig=()=>p.evaluate(S=>JSON.stringify(G,function(k,v){return S.indexOf(k)>=0?undefined:v;}),SKIP);
- for(const st of STAGES){if(!snaps[st]){console.log('note: no snapshot '+st);continue;}for(const t of TABS){await load(st,t);if(await p.$eval('.tabs [data-tab="'+t+'"]',b=>b.hidden||!b.getClientRects().length).catch(()=>true))continue;const keys=await list();
+ for(const st of STAGES){if(!snaps[st]){console.log('note: no snapshot '+st);continue;}let tabs=TABS;if(MTAB[st]){const mt=await p.evaluate(a=>{var f=typeof tabMap==='function'?tabMap:function(x){return x;};return a.map(f);},[MTAB[st]].concat(TABS));tabs=TABS.filter((t,i)=>mt[i+1]===mt[0]);}
+  for(const t of tabs){await load(st,t);if(await p.$eval('.tabs [data-tab="'+t+'"]',b=>b.hidden||!b.getClientRects().length).catch(()=>true))continue;let keys=await list();if(ONCE){const k0=keys.length;keys=keys.filter(k=>!OK[t+' '+k]);nskip+=k0-keys.length;}
   for(const k of keys){await load(st,t);await p.evaluate(s=>{speed=s;},SPEED);await p.waitForTimeout(PLAY);
    const sel='main .card:not([hidden]) button'+k.split('&').map(kv=>{var i=kv.indexOf('=');return '[data-'+kv.slice(0,i).replace(/[A-Z]/g,c=>'-'+c.toLowerCase())+'="'+kv.slice(i+1).replace(/"/g,'\\"')+'"]';}).join('');
    await unfold(sel);await p.evaluate(sl=>{var b=document.querySelector(sl);if(b&&b.getClientRects().length)b.scrollIntoView({block:'center'});},sel);await p.waitForTimeout(300);
@@ -34,7 +41,7 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
    if(await p.evaluate(()=>!$('milestone-card').hidden||!!G.progress.queue.length)){cards.push(st+' '+t+' '+k);continue;}/* a story card came up while playing: its shield takes taps on purpose */
    const cov=await p.evaluate(a=>{var e=document.elementFromPoint(a[1],a[2]),b=document.querySelector(a[0]);return e&&b&&(e===b||b.contains(e))?'':(e?e.tagName+'#'+e.id+'.'+e.className:'nothing, off screen at y '+Math.round(a[2]));},[sel,bx.x+bx.width/2,bx.y+bx.height/2]);
    await p.mouse.click(bx.x+bx.width/2,bx.y+bx.height/2);await p.waitForTimeout(150);const s1=await sig();n++;
-   if(s0===s1&&!(ALL&&t0!==await txt())){const why=cov?'covered by '+cov:await p.evaluate(sl=>{var b=document.querySelector(sl);return b?(b.classList.contains('settling')?'swallowed by SETTLE':b.disabled?'grey now':'no change'):'gone';},sel);bad.push(st+' '+t+' '+k+': '+why);}}}}
+   if(s0!==s1||(ALL&&t0!==await txt()))OK[t+' '+k]=1;else{const why=cov?'covered by '+cov:await p.evaluate(sl=>{var b=document.querySelector(sl);return b?(b.classList.contains('settling')?'swallowed by SETTLE':b.disabled?'grey now':'no change'):'gone';},sel);bad.push(st+' '+t+' '+k+': '+why);}}}}
  if(errs.length)bad.push('page errors: '+errs.join(' | '));
  if(bad.length){console.error('FAIL '+bad.length+' of '+n+' taps did nothing:\n  '+bad.join('\n  '));process.exit(1);}
- if(gone.length)console.log('note: gone after 1.5 s of play, not tapped: '+gone.join(', '));if(cards.length)console.log('note: a story card came up, not tapped: '+cards.join(', '));console.log('PASS '+n+' taps 100 ms after a render all changed the save ('+STAGES.join(', ')+', '+TABS.join(' ')+(ALL?', every button':'')+', speed '+SPEED+')');await b.close();})().catch(e=>{console.error('FAIL',e.message);process.exit(1);});
+ if(gone.length)console.log('note: gone after 1.5 s of play, not tapped: '+gone.join(', '));if(cards.length)console.log('note: a story card came up, not tapped: '+cards.join(', '));console.log('PASS '+n+' taps 100 ms after a render all changed the save'+(ONCE?' ('+nskip+' repeats skipped)':'')+' ('+STAGES.length+' stages: '+STAGES.join(', ').slice(0,300)+', '+TABS.join(' ')+(ALL?', every button':'')+', speed '+SPEED+')');await b.close();})().catch(e=>{console.error('FAIL',e.message);process.exit(1);});
