@@ -3130,3 +3130,63 @@ Tests (feature, 0dcdb13, 2026-11-07 11:53 UTC, 13.3 min, 2 at once): 39 suites, 
 | land-life | ok | 16 | all passed |
 | taps | ok | 13 | all ok |
 | ear | ok | 6 | 14 ear tank checks passed |
+
+## Pass 290 (7 Nov): Puti's calls on the Pass 288/289 findings
+
+BUILD 2026-11-07T16:42-p290.
+
+**1. Card timing, reaction or content** (`cardReact`, `CARD_REACT`, `reactPush` in `detectMilestones`). A reaction card goes in the queue the step it comes true, urgent ones (`CARD_NOW`) first, ahead of anything still waiting, no gap. A content card waits the breather (`introGap`, now never under 15 s) and the story pacing as before. Old saves: a reaction card sitting in `wait` or `soon` goes up at once.
+- Reaction (shows at once): `CARD_NOW` (intro, cycle, owntank, broke, kindsave, kindend, gameover, left, me_ill, crash, win, tenyears, health, pump_call1, pump_call2); first sale `sale`, first kit `kit`, babies `hatch`, The first box `kits`, The warehouse `farm`, A million tanks `million`, The hard part `hardpart`, The last chapter `lastchap`; the thing you just bought or built: `ministry`, `station`, `landtime`, tree letters `tree_island/rewild/lastmile/lab/shop`; something your play just opened: Quality checks `qc`, Automate one step `tools`, The World tab `worldtab`; your own choices coming back: the favors `fav_0/1/2`, A logistics investor `wash_offer`, your game out `gm_out`, Tired `me_burnout`, The tank you can hear `ear_ready`, the staff you replaced `bye_pack/sales/mgr/social`, Grandma's land after the house `gp_land`, Grandma's tour money `gp_scam`.
+- Content (waits): Company and Market `market`, Your time `me_intro`, The Shrimp Times `ripple`, Bulk orders `bulk` (a random offer, still first among content, `introStill` drops it if the offer goes), The third floor `jar`, the `ev_*` events, Red dye, The back room, An offer, Shrimpcoin, Something alive, Grandma's games, both lab parties, Milo `nour1-6`, every Mira card (Mira's own story, droppable when stale), A letter from Grandma `gp_net`, The doctor `me_doctor`, the pains, every `c_*` card.
+- cardlag: a reaction card fails if more than 1 day late; a content card never for waiting, only for coming under 15 s after another card; `kits`→`kit` and `lastchap`→`win` whitelisted. A reaction card under 15 s after another prints as a note: this build, every bot `owntank`→`farm` 0 s (one farm build, two cards), and bot-only ones (the bot buys the ministry or a tree the step a card closes).
+
+**2. Pump calls late.** `pump_call1/2` have `story:1`, so `storyWaits` sent them to the story queue before the `CARD_NOW` check ran. Now `cardReact` is checked first. Strong bot: 0 days late (was 26 and 35).
+
+**3. Pairs under 15 s.** Mira→The inbox: the gap could be 10 s (`introStamp` 10 to 35 s), `introGap` is now at least 15 s. The World tab→Bulk orders: bulk is content, it waits the breather. A good year→Out of money: "money left over" now means after the reserve; `c_bonus` asks only with 30 days of net plus `capitalReserve`, and `bonusAmt` never dips into the reserve, so no choice leaves the company broke the next day.
+
+**4. Grey buttons say what's missing.** Story choices: `choiceNeed` tries the choice on copies and says "Needs AED 14B", "Needs 40 kits", "Needs 9.8M influence ✦" or several joined with "and". Costs scale with what you hold (`scM`, `si`), so the amount is the least you need to hold for it to go through (doubled, then halved to about 1%). + Hire: `hireWhy` (Needs the packing tools / Needs 10 kits sold / Needs AED X) in a small line under the buttons (`.hb-why`).
+
+**5.** greyreason accepts "Frozen".
+
+**6. Tank food i=1/i=2: the test.** The food sits in the Feeding fold and the tap works for a player; tapnow's save signature skipped `G.tanks`, so it never saw the change. The signature keeps each tank's `set` now.
+
+**7. Cut descriptions.** Short lines, full text behind the title: the four goals ("Even the ones that said no.", "All but the ones that said no.", "One per home on average. The game ends here.", "Drop the number. The game ends here."), proposal rows (`propCostTxt(...,1)`: "AED 25.5B, 2% of income, 15 yrs, pays back"), Second packing table ("You pack 4 kits/day, each packer adds 8.").
+
+Test changes beyond the sweeps: Pass 132 balance check rewritten for the new rule (kits goes up with the sale, ev_mira waits the gap); cardtap marks its made-up save's true cards as seen (else the sale card follows the kit card at once); projtabs closes the ministry card before changing tab (it now comes at once). `tests/lib/moment.cjs`: `MOMENT_HTML`, `g.cards(days,picks)`, `cache={}` on load.
+
+**Moment tests** (all fail on 732f326 with its runs, `MOMENT_HTML`/`MOMENT_RUNS`, and pass now): `m-cards` (pump_call2 8 d late from the c_bonus pump choice; worldtab→bulk 12 s; mira_teen→pain_inbox 12 s; A good year, all three choices broke three days later; dye_offer and c_permit say "Not possible right now"), `m-kits` (+ Hire row "− + Hire"; packing table cut at 360 and 390), new `m-hard` (goals and proposal rows cut at 360/390), new `m-tank` (food taps; passes on the old build too, the game was right). Not a moment test: "Frozen" (a test rule only).
+
+`tapall` failed once on `moment fork reviews promote revfake: swallowed by SETTLE`, passed on the rerun (125 taps). Not looked into; watch for it.
+
+Feature (db16e9c, before the projtabs fix), then projtabs and tapall again:
+
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | 16 | WIN 2695 (prev 2531) empire_dictator |
+| kind | ok | 29 | WIN 4209 (prev 4285) question_lucky |
+| avg | ok | 35 | earth 7420 (prev 7280) |
+| balance | ok | 5 | 168 focused balance and migration checks passed |
+| academy | ok | 0 | 10 |
+| me | ok | 1 | 55 |
+| cardtap | ok | 3 | |
+| space-search | ok | 0 | |
+| tank1-sim | ok | 1 | |
+| sound | ok | 1 | |
+| effects-sim | ok | 0 | |
+| gates | ok | 7 | 3561 gate checks on 339 saves |
+| space | ok | 12 | |
+| bot-cards | ok | 0 | |
+| tight | ok | 135 | 0 findings |
+| layout | warn | 87 | 3 things overflow (same as before) |
+| projtabs | FAIL → ok | 36 / 12 | ministry card up at once covered the tabs; test closes it now |
+| cardlag | ok | 1 | notes: owntank→farm (react) |
+| greyreason | ok | 161 | 533 grey buttons all say why, 109 dotted titles open |
+| tapall | FAIL → ok | 527 / 523 | revfake SETTLE once; rerun 125 taps all changed |
+| m-cards | ok | 36 | 41 |
+| m-health | ok | 7 | 10 |
+| m-games | ok | 5 | 22 |
+| m-kits | ok | 41 | 291 |
+| m-you | ok | 3 | 9 |
+| m-tank | ok | 12 | 6 |
+| m-hard | ok | 79 | 213 |
+| frozen, hard, endcards, fresh, effects, tank1, yourtank, yourtank-360, kitpack, boardgames, land-audio, land-life, taps, ear | ok | | |
