@@ -9,16 +9,16 @@ const html=fs.readFileSync(__dirname+'/../shrimp/index.html','utf8');let n=0;con
  await p.setContent('<body>'+html+'</body>');await p.waitForTimeout(300);
  await p.evaluate(s=>{G=s;migrate(G);G.progress.queue=[];window.spotlight=function(){};speed=0;G.money=1e12;G.emp.inf=1e7;G.emp.movie.left=0;render();},S);
  const TABS=['up','promote','emp','world','research'],where={};
- for(const t of TABS){await p.click('.tabs [data-tab="'+t+'"]');await p.waitForTimeout(250);
+ for(const t of TABS){if(await p.$eval('.tabs [data-tab="'+t+'"]',b=>b.hidden).catch(()=>true))continue;/* Pass 287: from 100k kits Gear folds into Company (Pass 272) */await p.click('.tabs [data-tab="'+t+'"]');await p.waitForTimeout(250);
   const ids=await p.evaluate(()=>[...document.querySelectorAll('main .card:not([hidden]) [data-act="proj"],main .card:not([hidden]) [data-act="movie"]')].filter(b=>b.getClientRects().length).map(b=>b.dataset.id||'movie'));
   ids.forEach(id=>{(where[id]=where[id]||[]).push(t);});}
  const dup=Object.keys(where).filter(k=>new Set(where[k]).size>1);if(dup.length)throw Error('project on two tabs: '+JSON.stringify(dup.map(k=>[k,where[k]])));ok('every project button on one tab: '+Object.keys(where).length+' ids over '+TABS.length+' tabs');
- // buy a media project on Ads, go to the Lab: the frozen row must not come along
+ // buy a project on Market (#c-mkt since Pass 272, was #e-proj on Ads), go to the Lab: the frozen row must not come along
  await p.click('.tabs [data-tab="promote"]');await p.waitForTimeout(700);
- const bt=await p.$('#e-proj .item.ih [data-act="proj"]:not(:disabled)');if(!bt)throw Error('no project to buy on Ads');const pid=await bt.evaluate(b=>b.dataset.id);await bt.click();await p.waitForTimeout(300);
- const f1=await p.evaluate(()=>({frz:Object.keys(FRZ).length,lab:document.querySelector('#e-proj .item.ih [data-act="proj"]:disabled').textContent}));if(!f1.frz||f1.lab!=='Done')throw Error('after the tap '+JSON.stringify(f1));ok('bought '+pid+': row stays, label Done');
+ let bt=null;for(const b of await p.$$('#c-mkt .item.ih [data-act="proj"]:not(:disabled)')){if(await b.isVisible()){bt=b;break;}}/* Pass 287: skip rows inside closed folds */if(!bt)throw Error('no visible project to buy on Ads');const pid=await bt.evaluate(b=>b.dataset.id);await bt.click();await p.waitForTimeout(300);
+ const f1=await p.evaluate(()=>({frz:Object.keys(FRZ).length,lab:(document.querySelector('#c-mkt .item.ih [data-act="proj"]:disabled')||{textContent:'(row gone)'}).textContent}));if(!f1.frz||f1.lab!=='Done')throw Error('after the tap '+JSON.stringify(f1));ok('bought '+pid+': row stays, label Done');
  await p.click('.tabs [data-tab="research"]');await p.waitForTimeout(300);
- const f2=await p.evaluate(id=>({frz:Object.keys(FRZ).length,leak:!!document.querySelector('#e-proj [data-id="'+id+'"]'),title:document.querySelector('#c-proj h2').textContent}),pid);
+ const f2=await p.evaluate(id=>({frz:Object.keys(FRZ).length,leak:!!document.querySelector('#c-mkt [data-id="'+id+'"]'),title:document.querySelector('#c-proj h2').textContent}),pid);
  if(f2.frz||f2.leak)throw Error('the bought row followed to the Lab '+JSON.stringify(f2));ok('tab change lets the frozen list go ('+f2.title+' has no '+pid+')');
  // campaign desk: Launch keeps the three-offer height until a tab change, then the slot shrinks
  await p.click('.tabs [data-tab="promote"]');await p.waitForTimeout(700);
