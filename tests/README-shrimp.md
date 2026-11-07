@@ -3336,3 +3336,5 @@ Tests (changed, this pass):
 20. Board game bot think time capped at 3.7 s (was 4.2 s), `boardgames.js`.
 
 Tests changed with it: tank1 (no trim due, sponge 108/180 at day 108), balance (wellbeing after 210 days of nothing, OWN_* constant, actNeed strings, pain line `% lower`, fork showAfter string), me (chiller 350).
+
+**Pass 293b (7 Nov):** board game bot thinks 0.5 to 3 s, scaled by how hard the move is (`500+thinkD*2500`, ±15%, never under the real search time). Payouts on hold: the body says why it looks like fraud; the man's option says what he gets (the frozen money goes to his account clean when it clears, he launders his cash through you); ending line to match. BUILD p293b.
