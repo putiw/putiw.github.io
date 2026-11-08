@@ -3408,3 +3408,15 @@ Tests: balance +1 (drones area, coin cost and preview, planted coins in the book
 Bots: not rerun beyond the changed set (coin cost now average price; bots buy coins only when the price is under 0.7x fair).
 Tests (changed, Pass 299): 31 suites, 29 ok, layout warn 3 (as before). tapall FAIL 1 of 135: `moment fork culls emp act=proj&id=shipcheap` swallowed by SETTLE (the known kind on fork rows, as Pass 297).
 Deployed Pass 299 (8 Nov, BUILD p299). Tests (fast, before deploy): 9 suites, 0 failed.
+
+**Pass 300 (9 Nov, branch only): UX handoff `claude/shrimp-handoff-ux-8nov.md` Part A items 1-8, buttons and labels.**
+1. Enabled `.btn`: 1px ink border at 35% and ink text. Disabled keeps `--off`, no border. Secondaries stay beige, primary stays the one green.
+2. Hand packing: `Bag · AED 102` (step short name and materials), then `Next`, then `Finish`. No price on Finish, materials are paid at the first step.
+3. Trade chip `Use market AED 11.6` (was `Avg AED 11.6`). The hint beside it reads `Grade 92, prime adult`, number first, since the wider chip cut it at 360.
+4. Fund buttons two lines, `Fund` / `USD 150k`, kept in step with the slider (`.gr-amt` in the input handler). `freezeHTML` still turns them to Frozen (it matched `Fund` exactly). `grNextTxt`: `Fund one or both this year. Next cycle in 10 months.`; `it` with one open; only the cycle when none is open or 3 run. Grants still in USD, open for Puti.
+5. `hireWhy`: `Needs AED 913, a week of wages and bills` (rule unchanged).
+6. `waterWorst(T)` beside `gstate`: worst water reading as `NO₃ 52`, `NH₃ 0.50`, `28.3 °C` or `all fine` (pH, KH, GH from `rv('phkh')`). Water test summary uses it (was the volume). Automation header on one tank names the gear (`feeder`, `changer`, `feeder + changer`), two tanks or more keep `N of M tanks`. Header `bills 0/d` hidden while the bill rounds to 0.
+7. `sellWhyNot(G,sh)`: `Sell · ready in 30 d`, `Sell · buyers back in 3 d`. With Feed and Water showing (three buttons, 117 px at 360) the short `Sell · in 30 d`, `Sell · buyers in 3 d`.
+8. Sell card: stock with no buyers `18 ready` / `No buyers left this week` (was `Nothing ready`, `sellAll` dry counts 0 with no demand); nothing sellable and `kitHold` holding some `Spare shrimp go to kits` / `60 breeders stay`; else `Next ready in 30 d`, no buyers line. `nextSell(G)` = {next, kept}.
+Bots: no sim change (cached WIN 3114, kind 4354, avg earth 6664).
+Tests (changed, Pass 300, fell back to feature): 41 suites, 39 ok, layout warn 3 (as before, same on e5215da). tapall FAIL 3 of 147: `shipcheap` swallowed by SETTLE, `pl-open` and `proj-no ev_rival` covered by `#after-b` (the known kinds, Passes 297-299). The first run also caught `frozen`: the two-line Fund label skipped `freezeHTML`, fixed. tight 0 findings, greyreason 478 grey buttons all say why. stable (`STABLE_TABS=up,market`) reported failures, being compared with e5215da.
