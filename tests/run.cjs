@@ -108,7 +108,7 @@ const CH_CORE_SUITES=['tight','layout','greyreason'];
 const CH_AREAS=[
   ['cards','milestone milestones card cards story stories pain pains intro react queue chapter chapters news soon visit choice choices bonus fxc need fork forks bird push',['cardlag','m-cards','bot-cards','cardtap','projtabs'],['card']],/* projtabs: a card that now comes at once covered the tabs (Pass 290) */
   ['hard','hard prop props propose proposal war musk catch catches give',['hard','m-hard','tight'],['hard','world']],
-  ['projects','proj desk camp campaign mk market ad ads promote promo film movie media meme reach offer mkt greenlight wb gala',['projtabs','gates','tapall'],['promote','market','emp']],
+  ['projects','proj desk camp campaign mk market ad ads promote promo film movie media meme reach offer mkt greenlight wb gala mood',['projtabs','gates','tapall'],['promote','market','emp']],
   ['kits','staff hire pack packer packing kit kits emp empire qc line lines auto automation owner owners order orders price consult frame ow co bottleneck',['m-kits','kitpack','tapall'],['emp','up']],
   ['tank','tank tanks feed food ps water salt cull breed baby hatch clean gear equip colony care rules molt wc age table upgrade upgrades mulm upg welfare',['tank1','yourtank','m-tank','tapall'],['tank','up']],
   ['health','health ill sick heal hc fg',['m-health','tapall'],['tank']],
@@ -125,7 +125,7 @@ const CH_AREAS=[
   ['core','header alert alerts notes notice gauge gauges vital vitals overview chart charts after controls init reveal progression busy tab anchor',CH_CORE_SUITES,['all']],
   ['clock','tick rollover',['cardlag','m-cards','m-health','tank1'],[]],
   ['costs','si pi scm pm',['gates','greyreason','tapall','m-cards'],['all']],
-  ['finance','fin finance reserve capital floor',['tapall','greyreason'],['all']],
+  ['finance','fin finance reserve capital floor stat stats stars',['tapall','greyreason'],['all']],
   ['spot','spot spotlight help guide tooltip tooltips',['greyreason','layout'],['all']],
   ['sound','sound audio music sfx chime mute',['taps','land-audio'],[]],
 ];

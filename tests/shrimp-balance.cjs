@@ -574,7 +574,7 @@ var h=newGame(),D=coinOf(h);D.on=1;D.honest=1;D.otrees=2e6;D.ocohorts=[{day:0,n:
 count++;console.log('PASS Pass 118 shrimpcoin launch supply');
 // Pass 119: card headers have no arrow and show the ? only when open; Money sheet behind the header cash
 if(/h2::before\{content:'(▾|)'/.test(html)||!html.includes(".card>.hd h2::before,.card>summary h2::before{content:none!important")||!html.includes("details.card:not([open])>summary>.qhelp{display:none}"))throw Error('Card headers: no arrow, ? only on open cards');
-if(!/<div id="fs-body">\s*(<div class="card" id="excelcard"[\s\S]*?<\/div><\/div>\s*)?<details class="card" id="consultcard"/.test(html)||!html.includes('<details class="card" id="operations-card"')||html.indexOf('id="operations-card"')<html.indexOf('id="finsheet"')||!html.includes('id="wagecard"'))throw Error('Consultants, Operating controls and Wages live in the Money sheet, not Kits');
+if(!/<div id="fs-body">\s*(<div class="card" id="statcard"[\s\S]*?<div id="st-sel"><\/div><\/div>\s*)?(<div class="card" id="excelcard"[\s\S]*?<\/div><\/div>\s*)?<details class="card" id="consultcard"/.test(html)||!html.includes('<details class="card" id="operations-card"')||html.indexOf('id="operations-card"')<html.indexOf('id="finsheet"')||!html.includes('id="wagecard"'))throw Error('Consultants, Operating controls and Wages live in the Money sheet, not Kits');
 if(html.includes("$('business-strip').mhtml")||html.includes("Consultants in Kits"))throw Error('No growth strip, no consultants in Kits');
 count++;console.log('PASS Pass 119 card headers and Money sheet');
 // Pass 120: Kits tab is three cards: Kits, Making kits (packing + quality checks), Kit development; sales staff have their own card in Ads
@@ -1166,7 +1166,7 @@ var g3=JSON.parse(JSON.stringify(g2));delete g3.academy.gr.earV;migrate(g3);if(!
 g.day-=365*GR_YEARS-366;grantDay(g);if(grOf(g).c.some(function(c){return c.ear;}))throw Error('Offered once');
 var h=newGame();h.kits.sold=5000;grantDay(h);var gh=grOf(h);gh.c.forEach(function(c){c.x='s';});h.day+=366;grantDay(h);if(grOf(h).c.some(function(c){return c.ear;}))throw Error('Skipped once, it comes back in the hard part, not as a letter');
 `);
-check('Pass 263: one desk (messages, galas, ad pushes), mood sticks, media reach past a million, a film takes a year',`
+check('Pass 263: one desk (messages, galas, ad pushes), mood fades (Pass 298), media reach past a million, a film takes a year',`
 var g=readyGame();g.kits.sold=MKT_AT;g.money=1e9;g.emp.proj.ministry=1;g.emp.inf=1e6;g.emp.infOn=1;g.emp.op.offer=null;drawOffer(g);var o=g.emp.op;
 if(o.offer.length!==3)throw Error('three offers');var ks=o.offer.map(function(id){return deskItem(id).k;});if(ks.filter(function(k){return k==='camp';}).length!==2||!ks.some(function(k){return k==='gala'||k==='push';}))throw Error('two messages and a gala or push: '+ks);
 o.offer=['calm','g_kids','p_bill'];var m0=g.money,i0=g.emp.inf;if(!deskRun(g,'p_bill'))throw Error('push runs');if(o.offer!==null||!o.run||o.run.left!==15)throw Error('the other two go');if(!(g.money<m0)||g.emp.inf!==i0)throw Error('a push costs money, not stars');
@@ -1175,7 +1175,7 @@ var off=o.offer.slice();for(var i=0;i<30;i++){g.day++;empireDay(g);}if(JSON.stri
 o.offer=['calm','g_kids','p_bill'];var gl=g.emp.gala;if(!deskRun(g,'g_kids')||g.emp.gala!==gl+1||!(g.emp.galaFor.kids>0))throw Error('gala through the desk');
 if(buyProj(g,'gala','water'))throw Error('no gala outside the desk after the ministry');
 for(var i=0;i<10;i++){g.day++;empireDay(g);}o.offer=['calm','g_kids','p_bill'];g.emp.inf=1e8;var ip=campPrice(g);if(ip<1e7)throw Error('a message costs a tenth of the stars: '+ip);if(!deskRun(g,'calm')||g.emp.inf!==1e8-ip)throw Error('message costs stars');
-o.pend=[];o.m=0.8;for(var i=0;i<1000;i++)opinionDay(g);if(Math.abs(o.m-0.8)>1e-9)throw Error('a good mood sticks: '+o.m);o.m=0.2;for(var i=0;i<1000;i++)opinionDay(g);if(!(o.m>0.3&&o.m<0.5))throw Error('a bad mood slowly mends: '+o.m);
+o.pend=[];o.run=null;o.m=0.8;o.bz=0.3;for(var i=0;i<30;i++)opinionDay(g);if(!(o.m>0.6&&o.m<0.7))throw Error('Pass 298: campaign buzz fades over a couple of months: '+o.m);for(var i=0;i<150;i++)opinionDay(g);if(Math.abs(o.m-0.5)>0.01)throw Error('back to the lasting 50%: '+o.m);o.m=0.7;o.bz=0;for(var i=0;i<300;i++)opinionDay(g);if(Math.abs(o.m-0.7)>1e-9)throw Error('mood from what you did stays: '+o.m);o.m=0.2;o.bz=0;for(var i=0;i<1000;i++)opinionDay(g);if(!(o.m>0.3&&o.m<0.5))throw Error('a bad mood slowly mends: '+o.m);moodAdd(g,10,10,1);moodAdd(g,10,10);if(o.pend.filter(function(p){return p.b;}).length!==1)throw Error('buzz is marked');
 var h=newGame();h.emp.op.m=0.5;h.humans=5e5;if(mediaReach(h)!==1)throw Error('no limit under a million');h.humans=1e9;var r0=mediaReach(h);if(!(r0>0.2&&r0<0.3))throw Error('no media at 1B: '+r0);h.emp.op.m=1;if(mediaReach(h)!==1)throw Error('full mood carries it: '+mediaReach(h));
 h.emp.op.m=0.5;h.emp.movie.n=3;if(!(mediaReach(h)>r0*3.5))throw Error('films carry it');h.emp.movie.n=0;h.emp.hard=h.emp.hard||{};h.emp.hard.open=1;if(mediaReach(h)!==1)throw Error('no limit in the hard part');
 h.stores={};if(marketingLevel(h)>STORE_MKT_MAX+50)throw Error('store cap');
@@ -1400,6 +1400,10 @@ if(painMult(g)<1&&!PAINS.pain_heat)throw Error('no packing penalty either');
 g.emp.rawShrimp=1e7;if(!(packCap(g)<kitDemand(g)*0.95))throw Error('test setup: demand above packing '+packCap(g)+' '+kitDemand(g));
 if(!painOpen(g,'pain_pack'))throw Error('orders above packing and shrimp waiting: the card');
 if(!introStill(g,'pain_pack'))throw Error('still true');g.emp.rawShrimp=0;if(introStill(g,'pain_pack'))throw Error('dropped if it stops being true before it shows');
+`);
+check('Pass 297 (Puti): the university computing partnership takes 10% off kit materials',`
+var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;var a=kitMaterials(g);g.emp.proj.college=1;var b=kitMaterials(g);
+if(!(a>0&&Math.abs(b/a-0.9)<0.02))throw Error('materials '+a+' -> '+b);
 `);
 {const tips=','+html.split('var CTL_TIPS={')[1].slice(0,12000);const ids=[...html.matchAll(/<div class="ctl"><label for="s-([A-Za-z0-9]+)"/g)].map(m=>m[1]);const miss=ids.filter(k=>!new RegExp('[,\\s]'+k+":'").test(tips));if(miss.length)throw Error('Pass 294 (Puti): a slider label with a dotted line opens nothing: '+miss.join(','));if(!/<select id="reserve-days"><option value="0">Off<\/option>/.test(html))throw Error('Pass 294: the reserve select has Off');console.log('PASS Pass 294: every slider label ('+ids.length+') has a CTL_TIPS line');count++;}
 console.log(count+' focused balance and migration checks passed');
