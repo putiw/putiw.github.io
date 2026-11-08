@@ -1401,5 +1401,9 @@ g.emp.rawShrimp=1e7;if(!(packCap(g)<kitDemand(g)*0.95))throw Error('test setup: 
 if(!painOpen(g,'pain_pack'))throw Error('orders above packing and shrimp waiting: the card');
 if(!introStill(g,'pain_pack'))throw Error('still true');g.emp.rawShrimp=0;if(introStill(g,'pain_pack'))throw Error('dropped if it stops being true before it shows');
 `);
+check('Pass 297 (Puti): the university computing partnership takes 10% off kit materials',`
+var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;var a=kitMaterials(g);g.emp.proj.college=1;var b=kitMaterials(g);
+if(!(a>0&&Math.abs(b/a-0.9)<0.02))throw Error('materials '+a+' -> '+b);
+`);
 {const tips=','+html.split('var CTL_TIPS={')[1].slice(0,12000);const ids=[...html.matchAll(/<div class="ctl"><label for="s-([A-Za-z0-9]+)"/g)].map(m=>m[1]);const miss=ids.filter(k=>!new RegExp('[,\\s]'+k+":'").test(tips));if(miss.length)throw Error('Pass 294 (Puti): a slider label with a dotted line opens nothing: '+miss.join(','));if(!/<select id="reserve-days"><option value="0">Off<\/option>/.test(html))throw Error('Pass 294: the reserve select has Off');console.log('PASS Pass 294: every slider label ('+ids.length+') has a CTL_TIPS line');count++;}
 console.log(count+' focused balance and migration checks passed');

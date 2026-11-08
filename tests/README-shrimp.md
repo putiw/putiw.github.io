@@ -3383,3 +3383,8 @@ Tests (feature, Pass 295, before deploy): 41 suites, 39 ok, layout warn (3 overf
 
 Bots (seed 7) vs Pass 295: strong 2698, kind 4279, avg earth 6636, no change.
 Tests (changed, Pass 296): 29 suites, 27 ok, layout warn (3 overflow, as before). tight 3 findings, descriptions cut at 360 in World with five lines; six lines, then tight 0 findings. tapall FAIL 1 of 131: `moment fork reviews promote act=proj&id=revfake` swallowed by SETTLE (the known kind).
+
+**Pass 297 (8 Nov, branch only):** Puti: make the university computing partnership worth something late. Late running costs (strong bot, last 30 days at the win): projects 39%, supplies (kit materials) 23%, farms 11%, tax 11%, staff 9%, logistics 7%; at 100k kits on the average bot supplies is 37%. So the partnership now takes 10% off kit materials (`kitMaterials` × 0.9 with `pd(G,'college')`), on top of the camera half price and +1% referrals. Text: "The winning model grades shrimp at the packing table, kit materials 10% cheaper, and the AI counting camera costs half." `projD` drops the camera part once the camera is owned. Balance +1 check.
+Found for the next chat (project doc `claude/shrimp-handoff-stats-meaning-8nov.md`): "Word of mouth +x%" on projects is `E.beta` (referrals per owner per day), not `wordOfMouth(G)` (the 30-100% marketing share), and the same beta effect is also called "Referrals +1 point".
+Bots (seed 7) vs Pass 296: strong 2698 → 2702, kind 4279 → 4256, avg earth 6636 → 6664.
+Tests (changed, Pass 297): 23 suites, 22 ok. tapall FAIL 2 of 122, `revreal` and `wasteclean` swallowed by SETTLE on fork rows (the known kind).
