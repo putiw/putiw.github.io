@@ -3407,3 +3407,4 @@ Tests (changed, Pass 298): 33 suites, 31 ok, layout warn 3 (as before). tapall F
 Tests: balance +1 (drones area, coin cost and preview, planted coins in the book, refEff below beta, refRel).
 Bots: not rerun beyond the changed set (coin cost now average price; bots buy coins only when the price is under 0.7x fair).
 Tests (changed, Pass 299): 31 suites, 29 ok, layout warn 3 (as before). tapall FAIL 1 of 135: `moment fork culls emp act=proj&id=shipcheap` swallowed by SETTLE (the known kind on fork rows, as Pass 297).
+Deployed Pass 299 (8 Nov, BUILD p299). Tests (fast, before deploy): 9 suites, 0 failed.
