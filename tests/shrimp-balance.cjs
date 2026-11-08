@@ -1405,5 +1405,13 @@ check('Pass 297 (Puti): the university computing partnership takes 10% off kit m
 var g=readyGame();g.stats.sold=KIT_UNLOCK;g.emp.kitsOpened=1;var a=kitMaterials(g);g.emp.proj.college=1;var b=kitMaterials(g);
 if(!(a>0&&Math.abs(b/a-0.9)<0.02))throw Error('materials '+a+' -> '+b);
 `);
+check('Pass 299 (Puti 8 Nov): drones in Company projects; a coin buy pays the average price; planted coins in the book; referrals shown as the real rate',`
+var p=PROJ.filter(function(x){return x.id==='drones';})[0];if(projectArea(p)!=='emp')throw Error('drones area '+projectArea(p));
+var g=readyGame();g.humans=1e9;g.money=1e12;var C=coinOf(g);C.on=1;C.coins=4e6;C.treasury=0;C.price=8.8;C.x=Math.log(8.8/12);var F=coinFloat(g),c10=coinCost(g,F*.1);
+if(!(c10>F*.1*8.8&&c10<F*.1*8.8*1.1))throw Error('10% of float costs '+c10);var px=coinPxAfter(g,F*.1),q=coinBuyQ(g,F*.1);if(Math.abs(q-F*.1)>1||Math.abs(C.price-px)>1e-6)throw Error('preview '+px+' vs '+C.price);
+var q2=coinBuy(g,1.02e9);if(!(q2<coinFloat(g)+q2&&q2>0))throw Error('big buy');if(!(C.spent/C.bought<C.price))throw Error('paid the end price for every coin');
+var h=readyGame();var D=coinOf(h);D.on=1;D.trees=1e6;D.coins=6e5;D.treasury=6e5;var b=coinBook(h);if(!(b.bq===6e5&&Math.abs(b.avg-1e6*COIN_TREE/6e5)<1e-6))throw Error('planted book '+JSON.stringify(b));
+var k=readyGame();k.humans=1e6;k.emp.beta=0.13;if(!(refEff(k)<k.emp.beta))throw Error('refEff '+refEff(k));if(refRel(k,'Referrals +1.3%.')!=='Referrals up 10%.')throw Error(refRel(k,'Referrals +1.3%.'));
+`);
 {const tips=','+html.split('var CTL_TIPS={')[1].slice(0,12000);const ids=[...html.matchAll(/<div class="ctl"><label for="s-([A-Za-z0-9]+)"/g)].map(m=>m[1]);const miss=ids.filter(k=>!new RegExp('[,\\s]'+k+":'").test(tips));if(miss.length)throw Error('Pass 294 (Puti): a slider label with a dotted line opens nothing: '+miss.join(','));if(!/<select id="reserve-days"><option value="0">Off<\/option>/.test(html))throw Error('Pass 294: the reserve select has Off');console.log('PASS Pass 294: every slider label ('+ids.length+') has a CTL_TIPS line');count++;}
 console.log(count+' focused balance and migration checks passed');
