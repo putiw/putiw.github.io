@@ -3420,3 +3420,60 @@ Deployed Pass 299 (8 Nov, BUILD p299). Tests (fast, before deploy): 9 suites, 0 
 8. Sell card: stock with no buyers `18 ready` / `No buyers left this week` (was `Nothing ready`, `sellAll` dry counts 0 with no demand); nothing sellable and `kitHold` holding some `Spare shrimp go to kits` / `60 breeders stay`; else `Next ready in 30 d`, no buyers line. `nextSell(G)` = {next, kept}.
 Bots: no sim change (cached WIN 3114, kind 4354, avg earth 6664).
 Tests (changed, Pass 300, fell back to feature): 41 suites, 39 ok, layout warn 3 (as before, same on e5215da). tapall FAIL 3 of 147: `shipcheap` swallowed by SETTLE, `pl-open` and `proj-no ev_rival` covered by `#after-b` (the known kinds, Passes 297-299). The first run also caught `frozen`: the two-line Fund label skipped `freezeHTML`, fixed. tight 0 findings, greyreason 478 grey buttons all say why. stable (`STABLE_TABS=up,market`, avg run): 7 buttons, 61 failures vs 6 and 60 on e5215da. New: `#buycard` header moved 29 px at `first grant` (Trade). The other six (Gear feeder and new tank change the header, Trade `+` and `#btn-match` move 29 px, farm Sell moves 17 px) are on the base too. Left for the next chat.
+
+**Pass 301 (9 Nov, branch only): UX handoff `claude/shrimp-handoff-ux-8nov.md` Part A items 9-18, text snags.**
+9. Farm shrimp reads `45 · Full` at the default (45 is `FW_MID`, changes nothing); `Crowded` only below 45. Label only, no sim number moved (bots unchanged: kind WIN 4354).
+10. Held rows lead with the reason: farms `Crew on the wells, 23 d · 2,000 shrimp/d each ...`, the next region `Crew on the wells, 298 d · 50M people.`
+11. The earth line under the owners bar opens its own help (`earthHelp(G)`, title Owners): quit eating shrimp and mangroves, only the parts shown. The help handler takes `.qhelp,[data-hs]`; the line no longer jumps to World.
+12. First card: `Your birthday, for Grandma’s red envelope`.
+13. Pain notes name the fix bought (`PAIN_FIXN`, two words per option): `Cooled vans ready in 20 d · Permit firm ready in 154 d`; the bottleneck line `· orders 15% lower until then.`; `salesWhy` takes the first.
+14. Your day: Strain is a dotted title (the effect from `lifeDay`: work and dinners over 10 h, sleep under 6, time off, burnout at 100). `You slept until eleven.` dropped from `PICK_NOTE.nothing`. Hour counters with no next step say nothing (`1,908 h so far` gone). Skipped: the Grandma money stepper, Puti chose typed amounts on 8 Nov.
+15. Colony chart: when the sell line is just left of the adult line, `sell 60 d+` is drawn left of its line (end-anchored), or past the adult line if there's no room.
+16. Food and water summary uses `waterWorst`: `Algae wafers · NO₃ 52` / `water fine`.
+17. Header shrimp count in ink (`.nshrimp`).
+18. Gear/Kits cards: `<i>Gear</i>?`, `<i>Kits</i>.`, hatch double space. `sale` covers `tab-up`, and the Gear tab spotlight waits while the sale card is due. Gear group `Filter and automation`; Temperature rows by room (`roomT` > 26 fan, chiller, heater; < 21 heater first); no `Has:` line; Standard tank hidden before a farm until cash is a quarter of it. Trade: `Prices are up/down` hint dropped (the number stays); Buy rows `Solid red · grade ~55`, 90-day adults only in the card ?. Kits: header `27 sold a day`, `Profit AED 496 a kit` (the reach-limit sentence stays when it applies, Pass 125 lock), the Sold/day row and the orders forecast gone (Orders/day is in More numbers); Making kits `7 in stock · up to 8 a day`, body `8 packed today · 675 ready ...`, `AED 106 to pack · 8 shrimp`. Kit extras green for 30 days and none after the first is bought (`wbFresh`, `G.opt.wbSeen`). Ads: `26% of Abu Dhabi know you` (`your regions` past one), Staff header empty until a hire, Regions `10M reachable` with the homes in the body. World Owners' tanks: `Tanks · thriving 9,954 · struggling 101`, `Kit quality 98%`, plain + lines merged on one line, the points sentence in the card ?. Mangroves `Open map` (three rows). Lab `0 funded`, center and fertilizer spelling (ids kept). Skipped: Grandma's place first stays (Puti, Pass 271, locked in balance).
+Stable: the Pass 300 `#buycard` −29 px at `first grant` on Trade does not reproduce (avg run, market and up,market, three runs, also on b19295f). Found on b19295f too: `#e-farms` farm-sell `Sell` → `Tap again, AED x` wraps, 17 px, `first grant` on Gear. Open.
+Tests (changed, fell back to feature): 41 suites, layout warn 3 (as before), tapall 3 of 146 (pl-open and ev_rival under `#after-b`, as in Pass 300), m-kits 2 (the header test expected `N of M packed`; updated to `up to N a day`, rerun ok).
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | 19 | WIN 3114 empire_dictator |
+| kind | ok | 64 | WIN 4354 (prev 4354) question_lucky |
+| avg | ok | 35 | earth 6664 (prev 6664) |
+| balance | ok | 6 | 174 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 1 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 7 | 3313 gate checks on 338 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| space | ok | 10 | PASS Leave Earth, launch, search and land after Earth |
+| bot-cards | ok | 0 |  |
+| tight | ok | 147 | 0 findings |
+| layout | warn | 94 | 3 things overflow |
+| projtabs | ok | 12 | 4 project tab checks passed |
+| cardlag | ok | 1 |  avg: reaction cards under 15 s after another (allowed): owntank (react) then farm (react) |
+| greyreason | ok | 167 | PASS (167 s) 471 grey buttons all say why, 92 dotted titles all open, 292 snapshots |
+| tapall | FAIL | 617 | FAIL 3 of 146 taps did nothing: |
+| m-cards | ok | 39 | PASS 40 cards moment checks |
+| m-health | ok | 7 | PASS 10 health moment checks |
+| m-games | ok | 6 | PASS 22 games moment checks |
+| m-kits | FAIL | 47 | FAIL 2 moment checks (kits): |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| m-tank | ok | 12 | PASS 6 tank moment checks |
+| m-hard | ok | 73 | PASS 163 hard moment checks |
+| frozen | ok | 3 | frozen buttons checked on 5 tabs |
+| hard | ok | 13 | 24 hard part checks passed (milestone hardpart) |
+| endcards | ok | 19 | 50 ending card checks passed |
+| fresh | ok | 3 | all ok |
+| effects | ok | 1 | 15 action checks passed |
+| tank1 | ok | 29 | all tank 1 checks passed |
+| yourtank | ok | 22 | all passed |
+| yourtank-360 | ok | 23 | all passed |
+| kitpack | ok | 5 | kit packing checks passed |
+| boardgames | ok | 22 | board game checks passed |
+| land-audio | ok | 13 | all passed |
+| land-life | ok | 15 | all passed |
+| taps | ok | 12 | all ok |
+| ear | ok | 10 | 22 ear tank checks passed |
