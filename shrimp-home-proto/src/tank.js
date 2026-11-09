@@ -319,7 +319,7 @@ var tankMod={name:'tank',
   // jobs: only the most pressing one glows
   var nd=needs(T),ids=nd.map(function(n){return n.id;}),tray=S.opt.toys==='tray';var show=tray?TOYS.map(function(t){return t.id;}):ids;
   // Pass 180: the job buttons sit in a fixed slot under the tank. Every job this tank can have keeps its place, ones not needed now are invisible, and the job bar takes the same slot.
-  var jb='',any=false;TOYS.forEach(function(t){if(t.own&&!T.own)return;var on=show.indexOf(t.id)>=0,n=nd.find(function(z){return z.id===t.id;});if(on)any=true;jb+='<button class="btn'+(n?' need':'')+(n&&n===nd[0]&&!T.own?' glow':'')+'" data-toy="'+t.id+'"'+(on?'':' data-idle="1"')+'><canvas data-icon="'+t.id+'" width="56" height="44"></canvas>'+t.name+'<small>'+(n?n.t:t.idle(T))+'</small></button>';});
+  var jb='',any=false,ownIll=!!(T.own&&window.OWN_ILL);TOYS.forEach(function(t){if(t.own&&!T.own)return;if(t.id==='scape'&&ownIll)return;if(t.id==='check'&&!ownIll)return;/* Pass 307 (Puti): a sick Tank 1 shows Check shrimp in Aquascape's place, as on the company page */var on=show.indexOf(t.id)>=0||t.id==='check',n=nd.find(function(z){return z.id===t.id;});if(on)any=true;jb+='<button class="btn'+(n?' need':'')+(n&&n===nd[0]&&!T.own?' glow':'')+'" data-toy="'+t.id+'"'+(on?'':' data-idle="1"')+'><canvas data-icon="'+t.id+'" width="56" height="44"></canvas>'+t.name+'<small>'+(n?n.t:t.idle(T))+'</small></button>';});
   var tbx=$('toybtns');if(tbx&&tbx._h!==jb){tbx.innerHTML=jb;tbx._h=jb;tbx.querySelectorAll('canvas[data-icon]').forEach(function(cv){var t=TOYS.find(function(z){return z.id===cv.dataset.icon;});var x=fitCanvas(cv,28,22);cv.style.width='28px';cv.style.height='22px';t.icon(x,28,22);});}
   if($('jobnone'))$('jobnone').hidden=true;
   // wellbeing: one bar and a word; the parts are behind ?
@@ -369,7 +369,7 @@ function bindTv(){var cv=TV.cv,down=null;
     if(b.dataset.cullrole!=null){setCullRole(S.tanks[S.sel],b.dataset.cullrole==='on');return;}
     if(b.dataset.sel!=null){S.sel=+b.dataset.sel;closeBubble();TV.capUntil=0;sfx('click');tankMod.render();}
     else if(b.dataset.newtank!=null){var T=setupTank();if(T){S.sel=S.tanks.length-1;toast(T.name+' is set up and seeded from Grandma’s filter. Net shrimp in another tank to move them here.',3600);sfx('plop');tankMod.render();}}
-    else if(b.dataset.toy){sfx('click');toyStart(b.dataset.toy);}
+    else if(b.dataset.toy==='check'){sfx('click');post({type:'back',check:1});}else if(b.dataset.toy){sfx('click');toyStart(b.dataset.toy);}
     else if(b.dataset.dev==='wild'){var T2=S.tanks[S.sel];var list=[];for(var k=0;k<6;k++)list.push(breedWild());addToTank(T2,list,'stream');toast('6 wild shrimp added to '+T2.name);tvSync(true);tankMod.renderSide();}
     else if(b.dataset.rename!=null)renameTank();});}
 function renameTank(){var T=S.tanks[S.sel];openSheet({title:'Rename',keepTime:true,html:'<input id="rn-in" maxlength="24" style="width:100%;font:15px var(--font-body);padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2)"><div class="btns"><button class="btn primary" id="rn-ok">Save</button></div>',mount:function(el,api){var i=$('rn-in');i.value=T.name;i.focus({preventScroll:true});$('rn-ok').onclick=function(){var v=i.value.replace(/[<>]/g,'').trim();if(v)T.name=v.slice(0,24);api.close();};}});}

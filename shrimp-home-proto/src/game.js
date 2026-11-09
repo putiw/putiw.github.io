@@ -33,7 +33,7 @@ function ownT(){return S.tanks[0]||null;}
 function gOf(i){return Math.round(clamp(phOf(i).grade,0,7)/7*100);}
 function syncOwn(d){if((d.seq||0)<SEQ)return;var T=ownT();if(!T||typeof newInd!=='function'||typeof GEN!=='object')return;T.name='Your tank';T.own=1;
   var busy=jobOpen();   // Pass 179: while a job is open the game's mess doesn't land on the tank, or the job is undone under you; shrimp still sync
-  if(!busy&&report())return;OWN=d;try{ownAge(T,d);}catch(e){}
+  if(!busy&&report())return;OWN=d;window.OWN_ILL=!!d.ill;/* Pass 307: renderSide sits outside this scope */try{ownAge(T,d);}catch(e){}
   var A=Math.min(600,d.adults|0),Y=Math.min(600,d.young|0),N=netList(),
     mine=function(){return T.shrimp.concat(N.filter(function(e){return e.from===T.id;}).map(function(e){return e.ind;}));},ad=function(){return mine().filter(function(i){return i.age>=ADULT_DAYS;});},yo=function(){return mine().filter(function(i){return i.age<ADULT_DAYS;});};
   // shrimp in the net from Your tank still count as in it until they're moved or sold
@@ -165,6 +165,7 @@ if(typeof needs==='function'){var _nd=needs;needs=function(T){if(!T||!T.own||!OW
   if(!T.scape.length)o.push({id:'scape',t:'Empty tank'});OWN.due.forEach(function(k){if(map[k])o.push({id:map[k][0],t:map[k][1]});});return o;};}
 // The glass wipe: the game's glass grid (32 by 16, 0 to 9), wiped with a finger. Before Pass 179 only the company had it.
 var GLS=null,GLD=null;
+TOYS.push({id:'check',name:'Check shrimp',own:1,idle:function(T){return OWN&&OWN.n!=null?OWN.n+' shrimp':'';},icon:function(x,w,h){x.strokeStyle=INK;x.lineWidth=1.8;x.beginPath();x.arc(w*0.42,h*0.42,h*0.26,0,6.283);x.stroke();x.beginPath();x.moveTo(w*0.56,h*0.62);x.lineTo(w*0.8,h*0.9);x.stroke();}});/* Pass 307 */
 TOYS.push({id:'glass',name:'Glass',own:1,idle:function(T){if(!OWN||!OWN.glass)return 'clear';var s=0;for(var i=0;i<OWN.glass.length;i++)s+=+OWN.glass[i];return Math.round(s/(9*OWN.glass.length)*100)+'% green';},
   icon:function(x,w,h){x.strokeStyle=INK;x.lineWidth=1.3;x.strokeRect(w*0.18,h*0.14,w*0.64,h*0.72);x.fillStyle='rgba(96,150,70,.45)';x.fillRect(w*0.2,h*0.16,w*0.6,h*0.68);x.fillStyle='#f6f1e6';x.beginPath();x.ellipse(w*0.46,h*0.5,w*0.16,h*0.22,-0.5,0,6.283);x.fill();}});
 function glassToy(T){var P={last:null,loop:null,did:0};GLS=(OWN.glass||'').split('').map(function(c){return +c||0;});
@@ -228,5 +229,5 @@ document.addEventListener('pointerup',function(){if(FW_DRAG)setTimeout(function(
 (function(){var _rs=tankMod.renderSide;tankMod.renderSide=function(){if(FW_DRAG)return;return _rs.apply(this,arguments);};})();
 
 window.ownFWCard=ownFWCard;
-var FW_SIG='';window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||d.type!=='own'||!OWN||OWN!==d)return;var sg=JSON.stringify([d.fw,d.lines,d.well&&d.well.total,d.due]);if(sg===FW_SIG)return;FW_SIG=sg;if(activeTab==='tank'&&!TOY)tankMod.renderSide();});
+var FW_SIG='';window.addEventListener('message',function(e){var d=e.data;if(!d||!d.game||d.type!=='own'||!OWN||OWN!==d)return;var sg=JSON.stringify([d.fw,d.lines,d.well&&d.well.total,d.due,d.ill,d.n]);if(sg===FW_SIG)return;FW_SIG=sg;if(activeTab==='tank'&&!TOY)tankMod.renderSide();});
 })();
