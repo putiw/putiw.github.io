@@ -599,6 +599,7 @@ Do not report a feature as finished just because its new path works once. Check 
 Trimmed 9 Nov (Pass 306) to open items only. The old list, with every finished pass, is `git show e64de1c:shrimp/AGENTS.md` from line 591, and the changelog.
 
 **Waiting on Puti**
+- Land source in sync (Pass 308): `shrimp-proto` fceaa65 rebuilds the branch's `home.html` exactly. Keep it so: edit `shrimp-home-proto/src` and build, or port the same day.
 - Walls behind Tank 1 on the land (Pass 308): she can't build them. On a fresh land `canPlace` and a real tap both place a wall on the tile behind the tank (probe in Pass 308), and the wall is drawn behind the tank sprite with only its top showing. Ask what the toast said ("It doesn't fit there." means `canPlace`, hall floor and house walls take no built walls) and where her tank stands. Floors under walls fixed the same pass.
 - Hard part greyed options (Pass 307): she saw greyed options with money in hand. Each grey has its reason in the row (`hardWhy`: another workaround running in the group, a research find needed, a dues floor). Ask whether one workaround per group at a time should stay.
 - Making kits layout (Pass 294 item 6): mock sent. Header `6.2k of 20k packed`, sprite + capacity + breakdown/stock line, current line as a normal row, drop Earlier packing tools when automated, one `Older equipment` fold.

@@ -3766,6 +3766,7 @@ changed vs e08ce5c: projtabs, tapall, m-kits, kitpack, tank1, yourtank, m-tank, 
 - "Do nothing" options: The stream survey gets "Say no" (she finds a grant, the count is a year late); Money left over (`c_vet`) gets "Keep it in the company"; A good year (`c_bonus`) gets "Keep it in the company" as a fourth option (the bird option stays index 2). `PUSH` rows extended with `{}`; balance check counts updated (c_bonus 4).
 - Money tab, all-time charts: `endLine`'s x labels only came at even years from the first whole year, so under two years the axis was empty; shared `xTicks` now labels years over 18 months and months under (`mo 6`, `mo 9`). The log floor follows the data (`y0 = floor(log10(min positive))`), so a "Sold a day" line between 20 and 40 is no longer a flat line in the middle of 1 to 100. `statLin` uses the same ticks.
 - Land test hooks added to `LAND.life`: `canPlace`, `placeAt`, `BUILDI`, `mget`.
+- Land source: `shrimp/home.html` is generated and Pass 307 had edited it by hand without porting; this pass ported Pass 307 (Check shrimp tile) and Pass 308 to `shrimp-home-proto/src` on `shrimp-proto` (commit fceaa65), `python3 build.py --game` now reproduces the branch's `home.html` byte for byte.
 - Not done: the stream survey "Say no" has no later consequence beyond the line; the land wall-behind-tank report, pending Puti's answer.
 
 Tests (changed):
