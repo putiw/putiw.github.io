@@ -45,6 +45,26 @@ let fails=0;const ok=(c,m)=>{console.log((c?'ok   ':'FAIL ')+m);if(!c)fails++;};
  const lg=await fr().evaluate(()=>{document.getElementById('lz-log').click();var s=document.getElementById('sheet');return {open:!s.hidden,txt:s.textContent.slice(0,120),sw:document.documentElement.scrollWidth,W:innerWidth};});
  ok(lg.open&&/Birds/.test(lg.txt)&&lg.sw<=lg.W,W+' log opens, no sideways scroll');
  await p.screenshot({path:require('os').tmpdir()+'/land-log-'+W+'.png'});
+ // Pass 308, Pass 309 (Puti): floors go under built walls; a wall of another kind swaps in place for half back; an old big ground edit splits; a corner sits where the wall below it sits
+ const m0=await p.evaluate(()=>G.money);
+ const bw=await fr().evaluate(()=>{var H=LAND.life,L=H.L(),LS=H.LS,B=H.BUILDI,me=L.me,t=H.tileOf(me.x,me.y),o={},x0=null;
+  for(var dy=1;dy<8&&!x0;dy++)for(var dx=-6;dx<3&&!x0;dx++){var ok=1;for(var j=0;j<4&&ok;j++)for(var i=0;i<4&&ok;i++){var g=H.mget(t[0]+dx+i,t[1]+dy+j);if(g!==3&&g!==4)ok=0;else if(!H.canPlace(B['wall-p'],t[0]+dx+i,t[1]+dy+j))ok=0;}if(ok)x0=[t[0]+dx,t[1]+dy];}
+  if(!x0)return {none:1};var x=x0[0],y=x0[1];o.wall=H.placeAt(B['wall-p'],x,y);o.floorCan=H.canPlace(B['g-floor'],x,y);o.floor=H.placeAt(B['g-floor'],x,y);o.g=H.mget(x,y);
+  o.same=H.canPlace(B['wall-p'],x,y);o.canSwap=H.canPlace(B['wall-s'],x,y);o.swap=H.placeAt(B['wall-s'],x,y);var w=LS().objs.filter(function(q){return q.k==='wall'&&q.tx===x&&q.ty===y;});o.n=w.length;o.v=w[0]&&w[0].v;
+  o.pw=B['wall-p'].price;o.ps=B['wall-s'].price;o.pf=B['g-floor'].price;
+  o.fence=H.placeAt(B.fence,x+3,y+3);o.wallOnFence=H.canPlace(B['wall-s'],x+3,y+3);
+  LS().edits=(LS().edits||[]).concat([{k:'g-stone',tx:x+2,ty:y,fw:2,fh:1,prev:[[4,0],[4,0]],price:16}]);o.split=H.placeAt(B['g-floor'],x+2,y);o.ed=LS().edits.filter(function(e){return e.ty===y&&e.tx>=x+2&&e.tx<=x+3;}).map(function(e){return e.k+e.fw;}).join(',');
+  /* a floor at (x+1,y+2), walls on the grass round its left: the corner above takes the side of the wall below it */
+  H.placeAt(B['g-floor'],x+1,y+2);var a=H.mkObj('wall',x,y+1,{v:'p',built:1}),b2=H.mkObj('wall',x,y+2,{v:'p',built:1}),c=H.mkObj('wall',x+1,y+1,{v:'p',built:1});LS().objs.push(a,b2,c);
+  o.below=H.wallSd(b2,H.wallMask(b2));o.corner=H.wallSd(a,H.wallMask(a));return o;});
+ const m1=await p.evaluate(()=>G.money);
+ ok(!bw.none&&bw.wall&&bw.floorCan&&bw.floor&&bw.g===1,W+' Pass 308: a wood deck goes under a built wall '+JSON.stringify(bw));
+ ok(bw.same===false&&bw.canSwap&&bw.swap&&bw.n===1&&bw.v==='s',W+' Pass 309: a stone wall tapped on a plaster wall swaps it in place, one wall left');
+ ok(bw.wallOnFence===false,W+' Pass 309: a wall does not swap a fence');
+ ok(bw.split&&bw.ed==='g-floor1,g-stone1',W+' Pass 309: a two-tile ground edit splits, the floor takes one tile: '+bw.ed);
+ ok(bw.below!==0&&bw.corner===bw.below,W+' Pass 309: the corner stands where the wall below it stands (side '+bw.corner+' / '+bw.below+')');
+ await wait(1300);const m2=await p.evaluate(()=>G.money);
+ ok(Math.abs((m0-m2)-(bw.pw+bw.pf*3+bw.ps-Math.floor(bw.pw/2)+15))<1.5,W+' Pass 309: the swap pays the new wall and gives half the old one back (spent '+Math.round((m0-m2)*10)/10+')');
  ok(!errs.length,W+' no page errors '+errs.slice(0,2).join(' | '));
  await p.close();}
  await b.close();srv.close();console.log(fails?fails+' failed':'all passed');process.exit(fails?1:0);})();

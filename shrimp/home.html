@@ -2422,7 +2422,11 @@ var WALL_H=76,WALL_CAP=12;
 function inG(g){return g===G_FLOOR||g===G_TILE||g===G_HALL;}
 function wallSide(o){var m=M();if(!m)return 0;var c=inG(mget(m,o.tx,o.ty)),l=inG(mget(m,o.tx-1,o.ty)),r=inG(mget(m,o.tx+1,o.ty));
   if(c&&!r&&l)return 1;if(c&&!l&&r)return -1;if(!c&&l&&!r)return -1;if(!c&&r&&!l)return 1;return 0;}
-defObj('wall',{base:60,name:'Wall',keyOf:function(o){var msk=wallMask(o);return 'w'+(o.v||'p')+msk+'s'+((msk&3)===3?0:wallSide(o));},spr:function(o){var msk=wallMask(o),stone=o.v==='s',H=WALL_H,cap=WALL_CAP,pb=new PB(64,64+H+cap),base=64+H+cap-4,sd=(msk&3)===3?0:wallSide(o),cx=32+sd*20;
+/* Pass 309 (Puti): a corner stood in the middle of its tile while the wall running down from it hugged the floor's edge, so the corner stuck out past the join.
+   A corner with no side of its own takes the side of the wall below it, or above it. */
+function wallAtT(x,y){var ob=LS().objs;for(var i=0;i<ob.length;i++){var p=ob[i];if(p.k==='wall'&&p.tx===x&&p.ty===y)return p;}return null;}
+function wallSd(o,msk){if((msk&3)===3)return 0;var s=wallSide(o);if(s||!(msk&12))return s;var ds=[(msk&8)?1:0,(msk&4)?-1:0];for(var i=0;i<2;i++){if(!ds[i])continue;var n=wallAtT(o.tx,o.ty+ds[i]);if(n){var nm=wallMask(n),ns=(nm&3)===3?0:wallSide(n);if(ns)return ns;}}return 0;}
+defObj('wall',{base:60,name:'Wall',keyOf:function(o){var msk=wallMask(o);return 'w'+(o.v||'p')+msk+'s'+wallSd(o,msk);},spr:function(o){var msk=wallMask(o),stone=o.v==='s',H=WALL_H,cap=WALL_CAP,pb=new PB(64,64+H+cap),base=64+H+cap-4,sd=wallSd(o,msk),cx=32+sd*20;
   var F=stone?'#a3a7ad':'#efe8da',F2=stone?'#8f949b':'#ded5c3',FD=stone?'#6d7279':'#b9ad94',C=stone?'#6f747c':'#b8ab92',CD=stone?'#575b62':'#9a8e76';
   var L0=(msk&2)?0:Math.max(0,cx-12),R0=(msk&1)?64:Math.min(64,cx+12);
   var side=(msk&3)||!(msk&12),x0=(msk&2)||(side&&!(msk&1)&&!(msk&2)&&!sd)?0:L0,x1=(msk&1)||(side&&!(msk&1)&&!(msk&2)&&!sd)?64:R0;if(!side){x0=Math.max(0,cx-12);x1=Math.min(64,cx+12);}
@@ -3446,15 +3450,19 @@ function inAnyRoom(x,y){var m=M();return (m.rooms||[]).some(function(r){return x
 function groundEdit(x,y){return (LS().edits||[]).filter(function(e){return x>=e.tx&&x<e.tx+e.fw&&y>=e.ty&&y<e.ty+e.fh;})[0];}
 function canGround(b,x,y){var m=M(),g=mget(m,x,y);if(GROUND_ON.indexOf(g)<0||inAnyRoom(x,y))return false;
   if(g===b.edit&&!(g===G_WATER&&waterKind(x,y)!==W_POND)&&skinAt(x,y)===(b.skin||null))return false;
-  var e=groundEdit(x,y);if(e&&!(e.fw===1&&e.fh===1))return false;
   var o=objAtTile(x,y,true);if(o&&!o.deco){var ob=BUILDI[o.k];if(b.edit===G_WATER||o.k==='bridge'||o.k==='tank'||!ob||!ob.where||ob.where.indexOf(b.edit)<0)return false;}/* Pass 308 (Puti): paint ground under a thing that can stand on it, floors under walls */if(occupied(x,y)&&(b.edit===G_WATER||g===G_WATER))return false;return true;}
+/* Pass 309 (Puti): with a wall or fence picked, a tap on one you built of another kind swaps it in place: half back for the old one, the new price, same tile */
+function swapOf(b,o){return !!(b&&o&&o.built&&(b.k==='wall'||b.k==='fence')&&o.k===b.k&&(o.fw||1)===1&&(o.fh||1)===1&&palKey(o)!==palKey({k:b.k,v:b.o&&b.o.v}));}
 function canPlace(b,ax,ay){if(b.ground)return canGround(b,ax,ay);var sz=itemSize(b),m=M(),flat=OBJ[b.k]&&OBJ[b.k].flat;if(b.max&&objsOf(b.k).length>=b.max)return false;
   for(var y=ay;y<ay+sz[1];y++)for(var x=ax;x<ax+sz[0];x++){var g=mget(m,x,y);if(b.where.indexOf(g)<0)return false;
-    var o=objAtTile(x,y,true);if(o&&!o.deco){var of=OBJ[o.k]&&OBJ[o.k].flat;if(b.edit||flat?true:!of)return false;}
+    var o=objAtTile(x,y,true);if(o&&!o.deco&&!swapOf(b,o)){var of=OBJ[o.k]&&OBJ[o.k].flat;if(b.edit||flat?true:!of)return false;}
     if(b.edit&&edits(x,y))return false;if(!flat&&!b.edit&&occupied(x,y))return false;if(b.edit===G_WATER&&occupied(x,y))return false;}
   return true;}
 function edits(x,y){return (LS().edits||[]).some(function(e){return x>=e.tx&&x<e.tx+e.fw&&y>=e.ty&&y<e.ty+e.fh;});}
-function paintGround(b,x,y,quiet){if(!canGround(b,x,y)){if(!quiet)sfx('nope');return false;}if(!spend(b.price,b.name.toLowerCase()))return false;var m=M(),l=LS(),i=mi(m,x,y),e=groundEdit(x,y),wasW=mget(m,x,y)===G_WATER;
+/* Pass 309: an old ground edit bigger than one tile (saves from before tile painting) becomes one edit a tile, so a floor can go over part of it */
+function splitEdit(e){var l=LS(),n=e.fw*e.fh,out=[],i=0;if(n<=1)return;for(var y=e.ty;y<e.ty+e.fh;y++)for(var x=e.tx;x<e.tx+e.fw;x++){var pv=(e.prev&&e.prev[i])||[mget(M(),x,y),0];i++;out.push({k:e.k,tx:x,ty:y,fw:1,fh:1,prev:[pv],price:Math.round((e.price||0)/n)});}
+  l.edits=(l.edits||[]).filter(function(q){return q!==e;}).concat(out);}
+function paintGround(b,x,y,quiet){if(!canGround(b,x,y)){if(!quiet)sfx('nope');return false;}if(!spend(b.price,b.name.toLowerCase()))return false;var m=M(),l=LS(),i=mi(m,x,y),e=groundEdit(x,y),wasW=mget(m,x,y)===G_WATER;if(e&&!(e.fw===1&&e.fh===1)){splitEdit(e);e=groundEdit(x,y);}
   if(!e){e={k:b.k,tx:x,ty:y,fw:1,fh:1,prev:[[mget(m,x,y),m.gh[i],m.wb?m.wb[i]||0:0,skinAt(x,y)]],price:b.price};(l.edits=l.edits||[]).push(e);}else{e.k=b.k;e.price=b.price;}
   if(b.edit===G_WATER)setWater(m,x,y,W_POND);else{mset(m,x,y,b.edit,b.edit===G_MEADOW?1:0);if(m.wb)m.wb[i]=0;}
   skinSet(x,y,b.skin);
@@ -3467,7 +3475,7 @@ function placeAt(b,ax,ay){if(b.ground){var ok=paintGround(b,ax,ay,false);groundD
   if(b.edit){var prev=[];for(var y=ay;y<ay+sz[1];y++)for(var x=ax;x<ax+sz[0];x++){prev.push([mget(m,x,y),m.gh[mi(m,x,y)]]);if(b.edit===G_WATER)setWater(m,x,y,W_POND);else mset(m,x,y,b.edit,m.gh[mi(m,x,y)]);}
     (l.edits=l.edits||[]).push({k:b.k,tx:ax,ty:ay,fw:sz[0],fh:sz[1],prev:prev,price:b.price});l.objs=l.objs.filter(function(o){return !(o.deco&&o.tx>=ax&&o.tx<ax+sz[0]&&o.ty>=ay&&o.ty<ay+sz[1]);});
     repaintAround(ax,ay,sz[0],sz[1]);if(b.edit===G_WATER)syncAgents();}
-  else{var o={};for(var k in b.o||{})o[k]=b.o[k];o.built=1;var ob=mkObj(b.k,ax,ay,o);if(b.k==='flowers')ob.v=Math.floor(Math.random()*5);l.objs.push(ob);
+  else{var old=objAtTile(ax,ay,true);if(old&&swapOf(b,old)){l.objs=l.objs.filter(function(q){return q!==old;});var bo=BUILDI[palKey(old)]||BUILDI[old.k];earn(Math.floor((bo?bo.price:0)/2),'refund');}var o={};for(var k in b.o||{})o[k]=b.o[k];o.built=1;var ob=mkObj(b.k,ax,ay,o);if(b.k==='flowers')ob.v=Math.floor(Math.random()*5);l.objs.push(ob);
     if(OBJ[b.k].flat)for(var y4=ay;y4<ay+sz[1];y4++)for(var x4=ax;x4<ax+sz[0];x4++)repaintTile(x4,y4);if(b.k==='fence'||b.k==='wall'||b.k==='gate'||b.k==='bridge'){resetSprites();if(b.k==='bridge')for(var yb=ay-1;yb<=ay+1;yb++)for(var xb=ax-1;xb<=ax+1;xb++)repaintTile(xb,yb);}}
   if(b.k==='coop'){L.henPx=undefined;syncAgents();}sfx('thud');puff('dust',(ax+sz[0]/2)*T,(ay+sz[1])*T-8,8,{speed:40,life:0.5});computePass();computeSpots();L.hints=null;L.dirty=true;save();return true;}
 function removeThing(o,e){var l=LS(),m=M();if(o&&o.gm)gmTo(gmSeats()[0]);
@@ -4155,7 +4163,7 @@ function mkSave(){var l=LS(),used={},map=[0],pal=[];for(var i=0;i<MK.px.length;i
 function mkDelete(id){var l=LS();l.made=(l.made||[]).filter(function(q){return q.id!==id;});mkRegister();if(l.pal){delete l.pal['c:'+id];delete l.pal['wall-c:'+id];delete l.pal['fence-c:'+id];}palBuild();resetSprites();save(true);mkClose();sfx('pop');
   var pal=$('lpal');if(pal&&!pal.hidden)renderBuildPal(pal);toast('Deleted.');}
 // test hooks
-window.LAND.life={L:function(){return L;},LS:LS,vegState:vegState,vegTap:vegTap,walkTick:walkTick,openLog:openLog,mkObj:mkObj,tileOf:tileOf,objSprite:objSprite,canPlace:canPlace,placeAt:placeAt,BUILDI:BUILDI,mget:function(x,y){return mget(M(),x,y);}};// Pass 213 test hooks, Pass 308 build hooks
+window.LAND.life={L:function(){return L;},LS:LS,vegState:vegState,vegTap:vegTap,walkTick:walkTick,openLog:openLog,mkObj:mkObj,tileOf:tileOf,objSprite:objSprite,canPlace:canPlace,placeAt:placeAt,BUILDI:BUILDI,resetSprites:resetSprites,wallSd:wallSd,wallMask:wallMask,mget:function(x,y){return mget(M(),x,y);}};// Pass 213 test hooks, Pass 308 build hooks
 window.LAND.mk={ed:function(){return MK;},made:function(){return LS().made;},skin:function(){return LS().skin;},open:mkOpen,
   place:function(id,near){var b=BUILD.filter(function(q){return q.made===id;})[0],me=L.me,t=near||tileOf(me.x,me.y);if(!b)return null;for(var r=0;r<6;r++)for(var dy=-r;dy<=r;dy++)for(var dx=-r;dx<=r;dx++){var a=b.ground?[t[0]+dx,t[1]+dy]:anchorFor(b,t[0]+dx,t[1]+dy);if(canPlace(b,a[0],a[1])&&placeAt(b,a[0],a[1]))return a;}return null;},
   objs:function(){return LS().objs;},use:useObj,me:function(){return L.me;},size:function(){return JSON.stringify(S).length;}};

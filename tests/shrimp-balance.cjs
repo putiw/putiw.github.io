@@ -1423,4 +1423,12 @@ var bad=[];PROPS.forEach(function(o){if(!o.want)bad.push(o.id+' has no want');if
 if(bad.length)throw Error(bad.join('; '));
 `);
 {const ph=html.split('function propHelp(G,o,x){')[1].split('function hardPropsHTML')[0];if(/g\.name/.test(ph))throw Error('Pass 309: the letter ? names the group (g.name) again');if(!/o\.want/.test(ph)||!/o\.works/.test(ph)||!/go missing on the way/.test(ph)||!/Shrimp Times will notice/.test(ph))throw Error('Pass 309: the letter ? lost a part (want, works, the honest line, the Times)');}
+check('Pass 309 (Puti 9-10 Nov): the coin keeps a weekly price history for the All time chart; the pump writes it too',`
+var g=readyGame();g.humans=2e8;g.money=1e12;var C=coinOf(g);coinLaunch(g,1);C.trees=2e6;for(var d=0;d<1000;d++){g.day+=1;coinDay(g);}
+if(C.hist.length!==730)throw Error('daily history is two years: '+C.hist.length);if(!(C.hw&&C.hw.length>=140&&C.hw.length<=144))throw Error('one price a week: '+(C.hw||[]).length);
+if(C.hw.some(function(r,i){return i&&r[0]-C.hw[i-1][0]!==7;}))throw Error('weekly steps');var n0=C.hw.length;pumpStart(g,1e9);for(d=0;d<28;d++){g.day+=1;coinDay(g);}if(C.hw.length!==n0+4)throw Error('the pump days go in the weekly history: '+(C.hw.length-n0));
+var sv=JSON.parse(JSON.stringify(g));delete sv.emp.coin.hw;migrate(sv);sv.day+=1;coinDay(sv);/* an old save without hw just starts one */
+`);
+{const rc=html.split('function renderCoin(){')[1].split('function renderChapters')[0];if(/class="pump"/.test(rc)||/coinChart\(\{hist:PP\.h\}/.test(rc))throw Error('Pass 309 (Puti): the pump replaces the coin card chart again');if(!/coinChart\(G,C\)/.test(rc)||!/pump-kv/.test(rc))throw Error('Pass 309: coin card chart or the pump lines are gone');
+ const cc=html.split('function coinChart(G,C){')[1].split('function plRow')[0];if(/days ago|since the pump/.test(cc)||!/xTicks\(/.test(cc)||!/data-act="coin-rg"/.test(cc)||!/var COIN_RG='all'/.test(html))throw Error('Pass 309 (Puti): coin chart needs the All time / Last 3 months switch, All time first, xTicks labels');}
 console.log(count+' focused balance and migration checks passed');
