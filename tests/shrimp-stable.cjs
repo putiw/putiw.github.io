@@ -66,9 +66,12 @@ async function fresh(b,snap,tab){
       if(a1.ok&&!a1.ov&&Math.abs(a1.t-a0.t)>TOL)add('3 s play ('+a1.cls+')',sk+' / '+tab,'moved '+Math.round(a1.t-a0.t)+' px');
       if(!a1.ov&&Math.abs(a1.h-a0.h)>TOL)add('3 s play header',sk+' / '+tab,'header h '+Math.round(a0.h)+'→'+Math.round(a1.h));}
      await p.close();return;}
-    const before=await p.evaluate(k=>{var el=window.__find(k);if(!el)return null;var r=el.getBoundingClientRect();if(r.top<120||r.bottom>innerHeight-80)scrollTo(0,Math.max(0,scrollY+r.top-innerHeight/2));return true;},k);
+    const before=await p.evaluate(k=>{var el=window.__find(k);if(!el)return null;var r=el.getBoundingClientRect();if(r.top<120||r.bottom>innerHeight-80){scrollTo(0,Math.max(0,scrollY+r.top-innerHeight/2));return 2;}return true;},k);
     if(!before){await p.close();return;}
-    await p.waitForTimeout(60);
+    // Pass 304: a player's scroll ends some time before the tap (anchorGet ignores 400 ms after a scroll), and the finger is on the
+    // button (LAST_PTR); el.click() alone left the anchor on the middle of the screen or off, and buttons below it read as moved
+    await p.waitForTimeout(before===2?450:60);
+    await p.evaluate(k=>{var el=window.__find(k),r=el.getBoundingClientRect();document.dispatchEvent(new PointerEvent('pointerdown',{clientX:r.left+r.width/2,clientY:r.top+r.height/2,bubbles:true}));},k);
     const m0=await p.evaluate(k=>{var el=window.__find(k);window.__el=el;window.__c0=window.__card(el);var a={el:el,top:el.getBoundingClientRect().top,alt:anchorAlts(el)};window.__a=a;return window.__m(el);},k);
     await p.evaluate(()=>{try{window.__el.click();}catch(e){}});
     await p.waitForTimeout(400);

@@ -3611,3 +3611,43 @@ Tests (changed after the final edit, ed457a5 + kordercard line): 15 suites, 0 fa
 | tight | ok | 146 | 0 findings |
 | greyreason | ok | 185 | PASS (184 s) 467 grey buttons all say why, 147 dotted titles all open, 292 snapshots |
 | layout | warn | 92 | 3 things overflow |
+
+**Pass 304 (9 Nov, branch only): the UX handoff leftovers (Puti: "do everything").**
+- Row buttons 36 px, `.item` padding 6 px (were 42 and 8; one rule at the end of the first `<style>`, `.item>.btn`, `.item>button`, `.item>.hb .btn`, `.hbv`). Done rows (30), `.mini`, care, order and tab buttons unchanged. A row is 48 px.
+- Sell summary: after the first sale (`G.stats.sold>0`) it keeps the box and its second line whatever is ready (`.sellsum.empty` only before it). The flat empty line was 37 px, the box 60, so a shrimp coming ready in play, or a price tap that sold nothing, moved everything under it 23 to 29 px: stable `3 s play (sdet)`, `#sellcard +`, `#btn-match`.
+- `tests/shrimp-stable.cjs` presses like a finger: a pointerdown on the button first (anchorGet reads `LAST_PTR`), and 450 ms after its own scroll. The QC `Relaxed` 48 px was the test (el.click() left the anchor at mid screen).
+- `tests/shrimp-heights.cjs`: the card height table (`HEIGHTS=card@stage[@bot][@tab]`, `MOMENT_HTML` for an old build).
+- Open: closing Quality checks (`#qccard` header, avg `first grant`, Company) moves the page 95 px with a mouse tap too. Traced: the page scrolls up 47 px twice in the frames after the toggle, the main floor sits at the view need (695) while it happens, and no scrollBy, scrollTo, scrollIntoView or focus is called. Cause not found.
+- Puti calls left from the UX handoff stay as she made them: Grandma's place first, Grandma money typed, grants in USD.
+Card heights at 390 px, kind seed 7, the card's fold opened, before (c942d54) → after:
+| card | tab | stage | before | after |
+|---|---|---|---|---|
+| equipcard | up | first sale | 702 | 618 |
+| equipcard | up | kits unlocked | 630 | 565 |
+| owncare | tank | first farm | 330 | 330 |
+| c-farms | up | first farm | 376 | 348 |
+| c-farms | up | 10k owners | 410 | 382 |
+| c-farms | emp | 100k kits | 392 | 384 |
+| c-farms | emp | million owners | 310 | 300 |
+| sellcard | market | first sale | 264 | 264 |
+| sellcard | market | kits unlocked | 310 | 310 |
+| c-proj | world | 10k owners | 574 | 539 |
+| c-proj | world | 100k kits | 428 | 403 |
+| c-proj | world | million owners | 402 | 372 |
+| c-proj | emp | 100k kits | 207 | 190 |
+| c-proj | promote | first farm | 170 | 161 |
+| c-proj | research | 100k kits | 412 | 396 |
+| buycard | market | first sale | 291 | 254 |
+| academy-card | research | 10k owners | 320 | 306 |
+| kordercard | emp | million owners | 205 | 205 |
+| kordercard | emp | first farm (avg) | 205 | 205 |
+| colcard | tank | first sale | 222 | 222 |
+| colcard | tank | first farm | 222 | 222 |
+| c-shops | promote | 10k owners | 406 | 387 |
+| c-shops | promote | million owners | 160 | 160 |
+| c-mkt | promote | million owners | 413 | 401 |
+| logcard | tank | first sale | 148 | 148 |
+| logcard | tank | first farm | 165 | 165 |
+| charts | tank | first sale | 378 | 378 |
+stable `STABLE_RUN=tests/.runs/avg/run-7.json STABLE_TABS=up,market,emp,tank STABLE_STAGES="first sale,first farm,first grant"`: 1 failure (`#qccard` header 95 px), was 5 on c942d54.
+Tests (changed, 17 suites): 0 failed after the BUILD stamp fix (balance caught a future stamp), layout warn 3 as before, tight 0, greyreason 471 all say why, tapall 136 taps all changed the save (was 2 fails, `ev_rival` under `#after-b`; not looked at why it passes now).
