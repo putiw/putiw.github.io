@@ -3841,3 +3841,5 @@ changed vs origin/shrimp-prelaunch-fixes: cardlag, m-cards, bot-cards, projtabs,
 | fresh | ok | 3 | all ok |
 | layout | warn | 90 | 3 things overflow |
 
+
+Deployed Pass 308-309 (10 Nov, BUILD p309, main a224ce0). Tests (fast, before deploy): 9 suites, 0 failed.
