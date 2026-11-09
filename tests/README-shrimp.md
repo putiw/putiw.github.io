@@ -3477,3 +3477,79 @@ Tests (changed, fell back to feature): 41 suites, layout warn 3 (as before), tap
 | land-life | ok | 15 | all passed |
 | taps | ok | 12 | all ok |
 | ear | ok | 10 | 22 ear tank checks passed |
+
+**Pass 302 (9 Nov, branch only): UX handoff `claude/shrimp-handoff-ux-8nov.md` Part B items 1-7, the clutter pass, plus the Pass 301 farm-sell jump.**
+1. `equipcard`: Gear rows are title · effect (`UPG` `desc` returns [short, full] while not installed): Auto water changer no line (title says it), Better filter `3× the bacteria`, fan `−1.5 °C in summer`, chiller `Holds the temperature you set`, Mossy rocks `Babies die 40% less`, Driftwood `12% less food`, almond leaves `Breeding +10%`, plants `Nitrate −0.25 ppm a day`. The rest is behind the dotted title (from the card ? text). Height is set by the 42 px buttons, so the gain is the wrapped lines only.
+2. `owncare` Food and water: Food, Treats and Water are one folded row each (`.ocf` details, the game's chevron), the pick or the reading on the line (`Algae wafers`, `none`, `all fine` / `NO₃ 52 · KH 0.8`, only readings out of range), the chips and the seven readings inside. Automation sliders stay open.
+3. `c-farms`: the Farm shrimp bar is gone (the number is the slider's result, `45 · Full` on the line above the slider); Farm feed is one folded row `Farm feed · Pellets`, its help joined to Farm shrimp's (`fw-feedh` with `data-base`). Rows `80 shrimp/d · AED 60/d`, each and upkeep in the card ?.
+   Farm-sell jump (Pass 301): `sellLink` returns the button alone and every caller puts it in itemHTML's extra slot, a line of its own under the text (`.item.ih>.tlink.sell`), farms, Earlier farms, the current packing line and Older equipment. `Tap again, AED x` no longer wraps the line above. stable `STABLE_TABS=up STABLE_STAGES="first grant"` (avg run): 1 failure on 2157def (`#e-farms farm-sell rack moved 17 px`), 0 on this build.
+4. `sellcard`: Sales rules is a fold (`details#trade-sales-rules`), open before the first sale, shut after on each load; the line says `Sales rules · sell at 60 d · 40 breeders` (the Breeders slider's total).
+5. `c-proj`: every non-fork project has an `s:` short line (48 added: `+15% want one`, `Referrals +2%`, `Kit survival +8%` ...), WB items too (`s`), used by `owBuys` (Owners' tanks rows on World, through `refRel`) and `wbRows` (kit extras). Forks unchanged (name and cost only).
+6. `buycard`: rows `Grade ~35` once grades show (after the first sale), the look behind the title; `90-day adults` stays only in the card ?. Sell was already first on Trade after the first sale (UI/UX chat 1 F4).
+7. `academy-card`: `More money doesn’t mean more results.` moved to the card ?; `5 grants open a research center · 0 so far`. Puti (9 Nov): the ear grant row says only `A tank you can hear.`, the 3 years behind the title.
+Card heights at 390 px, kind run seed 7, folds opened (`offsetHeight`), before → after:
+| card | tab | stage | before | after |
+|---|---|---|---|---|
+| equipcard | Gear | first sale | 760 | 702 |
+| equipcard | Gear | kits unlocked | 676 | 630 |
+| owncare | Tank | first farm to win | 403 | 330 |
+| c-farms | Farm | first farm | 477 | 376 |
+| c-farms | Farm | 10k owners | 522 | 410 |
+| c-farms | Company | 100k kits | 469 | 392 |
+| c-farms | Company | million owners | 399 | 310 |
+| sellcard | Trade | first sale | 375 | 264 |
+| sellcard | Trade | kits unlocked | 421 | 310 |
+| sellcard | Trade | first hatch (rules open) | 375 | 384 |
+| c-proj | World | 10k owners | 710 | 574 |
+| c-proj | World | 100k kits | 654 | 428 |
+| c-proj | World | million owners | 568 | 402 |
+| c-proj | Company | 100k kits | 299 | 207 |
+| c-proj | Ads | first farm | 216 | 170 |
+| c-proj | Lab | 100k kits | 445 | 412 |
+| buycard | Trade | first sale | 302 | 291 |
+| academy-card | Lab | 10k owners | 378 | 337 |
+Tests: `tests/moments/kits.cjs` updated (rack row has no `each`, Sell is its own line in the row, not in the p). `tests/run.cjs` research area knows `grants`/`gr` (`grantsHTML` made `changed` fall back).
+Tests (changed, fell back to feature, b38bc74): 41 suites, layout warn 3 (as before), tapall 3 of 148 (`pl-open` and `ev_rival` under `#after-b`, as in Pass 300/301), m-kits 3 (the test, fixed above, rerun ok).
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | 21 | WIN 3114 empire_dictator |
+| kind | ok | 67 | WIN 4354 (prev 4354) question_lucky |
+| avg | ok | 35 | earth 6664 (prev 6664) |
+| balance | ok | 6 | 174 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 1 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 8 | 3313 gate checks on 338 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| space | ok | 13 | PASS Leave Earth, launch, search and land after Earth |
+| bot-cards | ok | 0 |  |
+| tight | ok | 140 | 0 findings |
+| layout | warn | 91 | 3 things overflow |
+| projtabs | ok | 12 | 4 project tab checks passed |
+| cardlag | ok | 1 |  avg: reaction cards under 15 s after another (allowed): owntank (react) then farm (react) |
+| greyreason | ok | 181 | PASS (180 s) 467 grey buttons all say why, 147 dotted titles all open, 292 snapshots |
+| tapall | FAIL | 608 | FAIL 3 of 148 taps did nothing: |
+| m-cards | ok | 38 | PASS 40 cards moment checks |
+| m-health | ok | 8 | PASS 10 health moment checks |
+| m-games | ok | 5 | PASS 22 games moment checks |
+| m-kits | FAIL | 46 | FAIL 3 moment checks (kits): |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| m-tank | ok | 11 | PASS 6 tank moment checks |
+| m-hard | ok | 73 | PASS 163 hard moment checks |
+| frozen | ok | 3 | frozen buttons checked on 5 tabs |
+| hard | ok | 13 | 24 hard part checks passed (milestone hardpart) |
+| endcards | ok | 19 | 50 ending card checks passed |
+| fresh | ok | 3 | all ok |
+| effects | ok | 1 | 15 action checks passed |
+| tank1 | ok | 29 | all tank 1 checks passed |
+| yourtank | ok | 22 | all passed |
+| yourtank-360 | ok | 22 | all passed |
+| kitpack | ok | 5 | kit packing checks passed |
+| boardgames | ok | 22 | board game checks passed |
+| land-audio | ok | 12 | all passed |
+| land-life | ok | 15 | all passed |
+| taps | ok | 12 | all ok |
+| ear | ok | 10 | 22 ear tank checks passed |
