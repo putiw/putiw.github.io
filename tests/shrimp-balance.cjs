@@ -1258,7 +1258,7 @@ if(/Ads|Kits|buy|Build|Add/.test(w0))throw Error('no advice in the line: '+w0);
 g.emp.nosale=Math.floor(g.day)+30;if(!/police/.test(salesWhy(g)))throw Error('police');g.emp.nosale=0;
 // the hard part: owners at kitCap means kitDemand 0 and the market-ending line, not a marketing one
 hardOf(g).open=1;g.emp.op.m=1;g.humans=kitCap(g);if(kitDemand(g)!==0)throw Error('demand 0 at the cap');if(salesWhy(g)!=='Everyone who can keep a tank has one')throw Error('cap line: '+salesWhy(g));
-g.emp.hard.open=0;g.humans=kitCap(g);if(salesWhy(g)!=='Everyone who wants a tank has one')throw Error('pre-hard cap line: '+salesWhy(g));
+g.emp.hard.open=0;g.humans=kitCap(g);if(!/^Everyone who wants a tank has one, \\d+% of people\\. Projects that say more want one raise it$/.test(salesWhy(g)))throw Error('pre-hard cap line: '+salesWhy(g));
 var P=Object.keys(PAINS)[0];g.humans=1000;g.emp.pains=g.emp.pains||{};g.emp.pains[P]={until:g.day+10};if(painMult(g)>=1||!/% lower/.test(salesWhy(g)))throw Error('pain line: '+salesWhy(g));
 `);
 check('Pass 268 item 12: Rewilding, the last mile and the lab are letters only, no story card before; the shop and the island keep theirs',`

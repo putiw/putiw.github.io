@@ -3681,3 +3681,80 @@ changed vs be0d834: tight, layout, greyreason, m-kits (all tabs)
 | layout | warn | 95 | 3 things overflow |
 | greyreason | ok | 183 | PASS (183 s) 473 grey buttons all say why, 149 dotted titles all open, 292 snapshots |
 | m-kits | ok | 52 | PASS 299 kits moment checks |
+
+**Pass 306 (9 Nov, docs only, no BUILD bump): workflow trim.**
+- Why: on 9 Nov about 3 of 7 chat hours went to stable jumps, mostly ones there before the chat, and every chat read the 45 KB Open work plus a growing chain of handoffs.
+- AGENTS.md Token budget: stable narrowed to what a change touches, 20 min per jump, old jumps only when Puti asks; one rolling handoff `claude/shrimp-handoff-current.md`; Open work is open items only; lessons go in Mistakes already made, generic ones marked `(Box)`.
+- Testing checklist 4b: the full stable run only when Puti asks.
+- Open work rewritten, 45 KB → 6 KB, grouped: waiting on Puti, screen jumps, bugs and test gaps, planned, known gaps. Old list: `git show e64de1c:shrimp/AGENTS.md` from line 591.
+
+Tests (fast):
+
+Tests (fast, e64de1c, 2026-11-09 13:33 UTC, 0.1 min, 2 at once): 9 suites, 0 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| balance | ok | 7 | 174 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 0 | 0 gate checks |
+
+**Pass 307 (9 Nov, BUILD p307, branch only): Puti's screenshots list (desk, sales, hard part, land, courses).**
+- Launch did nothing / the Ministry and Studio showed nothing new until a tab change: `frzTap` held `#mk-body` after a project buy (Pass 266 rule), and the held card skipped its re-render, so the running campaign, the desk and the Studio fold were there in the state and not on the page. Buying `ministry` or `studio` no longer holds the list; a Launch or a Greenlight releases it (`delete FRZ['mk-body']`, `cache.mk=null`). The tap anchor keeps the tapped row in place.
+- Media on the new Hard part tab until a tab change: a `coMode`/`mkMode` flip now drops `FRZ` and the cached project, Marketing, store, staff and shop cards (`applyReveal.co/mk`).
+- 0 orders for months with every store open: the cap is `E.ceil` ("Want a tank", 48% in her save), and only projects that say "+n% want one" raise it (the cartoon did, +5%, and sales came back at once). `salesWhy` now says "Everyone who wants a tank has one, 48% of people. Projects that say more want one raise it." Balance check updated.
+- Hard part options: `.hard-ops` had `max-height:216px; overflow-y:auto`; removed, the options flow on the page.
+- Aid slider: an open Aid or Science help follows the slider live (bars rebuilt from `hardLedgerHTML`), and a tap on a route slider no longer closes the help.
+- Science moves people while it runs: `sciReach` gives `SCI_REACH*SCI_PRE*S.p` (9% of water, hot and poor at 100% progress) before it is done, then ramps to 30% over 5 years as before. Help text says so.
+- Your tank jobs hold three real minutes: `CLEAN_MS` 180 s (was 120), `justCleaned` reads it, pests also wait out a fresh clean.
+- Land: a sick Tank 1 swaps Aquascape for Check shrimp on the land too (`o.ill`, `o.n` in `landOwn`; `TOYS` `check`, `window.OWN_ILL`; the tile posts `back` with `check:1`, the company page selects Tank and opens the health check). `tank1`/`yourtank` first failed on `OWN` being scoped to the land's IIFE.
+- Courses: a class of `COURSE_CLASS` (20) every `COURSE_DAYS` (3 years, `A.classes`), was 5 graduates a day; the row says "First class in n years" / "20 graduated, next class in n years". `academy` check updated.
+- Not done: hard part options she saw greyed with money in hand all carry their reason (`hardWhy`: another workaround running, a research find needed); whether one workaround per group should stay is in Open work, waiting on her.
+- Browser checks by hand (dev-hard save): Launch with a held list shows Running at once; a real tap on the Ministry shows the desk at once; `.hard-ops` height = scroll height; Aid help stays open and updates on a slider tap.
+- tapall `ev_rival` under `#after-b` is the known one (Open work). layout 3 overflows, known.
+
+Tests (changed):
+
+Tests (changed, 61cf871, 2026-11-09 16:40 UTC, 11.8 min, 2 at once): 32 suites, 1 failed, 1 warn, 0 skipped.
+
+changed vs e08ce5c: projtabs, tapall, m-kits, kitpack, tank1, yourtank, m-tank, m-you, tight, greyreason, m-health, land-life, land-audio, hard, m-hard, layout, cardlag, m-cards, bot-cards, frozen, strong, kind, avg (all tabs)
+
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | 23 | WIN 3114 empire_dictator |
+| kind | ok | 72 | WIN 4354 question_lucky |
+| avg | ok | - | cached, game unchanged: earth 6664 |
+| balance | ok | 6 | 174 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 8 | 3327 gate checks on 336 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| projtabs | ok | 12 | 4 project tab checks passed |
+| tapall | FAIL | 591 | FAIL 2 of 158 taps did nothing: |
+| m-kits | ok | 50 | PASS 299 kits moment checks |
+| kitpack | ok | 5 | kit packing checks passed |
+| tank1 | ok | 29 | all tank 1 checks passed |
+| yourtank | ok | 22 | all passed |
+| m-tank | ok | 13 | PASS 10 tank moment checks |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| tight | ok | 135 | 0 findings |
+| greyreason | ok | 179 | PASS (179 s) 469 grey buttons all say why, 149 dotted titles all open, 288 snapshots |
+| m-health | ok | 7 | PASS 10 health moment checks |
+| land-life | ok | 15 | all passed |
+| land-audio | ok | 12 | all passed |
+| hard | ok | 13 | 24 hard part checks passed (milestone hardpart) |
+| m-hard | ok | 65 | PASS 143 hard moment checks |
+| layout | warn | 89 | 3 things overflow |
+| cardlag | ok | 1 |  avg: reaction cards under 15 s after another (allowed): owntank (react) then farm (react) |
+| m-cards | ok | 38 | PASS 40 cards moment checks |
+| bot-cards | ok | 0 |  |
+| frozen | ok | 3 | frozen buttons checked on 5 tabs |
