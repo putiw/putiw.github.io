@@ -3686,7 +3686,7 @@ changed vs be0d834: tight, layout, greyreason, m-kits (all tabs)
 - Why: on 9 Nov about 3 of 7 chat hours went to stable jumps, mostly ones there before the chat, and every chat read the 45 KB Open work plus a growing chain of handoffs.
 - AGENTS.md Token budget: stable narrowed to what a change touches, 20 min per jump, old jumps only when Puti asks; one rolling handoff `claude/shrimp-handoff-current.md`; Open work is open items only; lessons go in Mistakes already made, generic ones marked `(Box)`.
 - Testing checklist 4b: the full stable run only when Puti asks.
-- Open work rewritten, 45 KB → 9 KB, grouped: waiting on Puti, screen jumps, bugs and test gaps, planned, known gaps. Old list: `git show e64de1c:shrimp/AGENTS.md` from line 591.
+- Open work rewritten, 45 KB → 6 KB, grouped: waiting on Puti, screen jumps, bugs and test gaps, planned, known gaps. Old list: `git show e64de1c:shrimp/AGENTS.md` from line 591.
 
 Tests (fast):
 
