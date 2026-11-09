@@ -41,5 +41,13 @@ const M=require('../lib/moment.cjs');
  // Pass 295 (Puti): the first mall store closes the small shops, one line, no Earlier shops fold
  {const m=M.snap('strong','first farm')||M.snap('avg','first farm');if(m){await g.load(m,{wait:60});const r=await g.js(()=>{G.money=1e8;G.kits.sold=Math.max(G.kits.sold,2000);G.emp.stores={};G.emp.closed={};G.emp.shopsGone=0;G.emp.shops={stall:3,pet:3,bout:1};G.emp.leases=[];if(!buyStores(G,"auh",1))return null;cache={};render();return {log:G.log.slice(-3).map(x=>x.t).join(' | '),shops:$('c-shops').innerText};});
    if(!r)M.skip('mall store','buyStores refused');else{M.check('one line: "The first mall store opened. Your 3 weekend market stalls, 3 pet shop corners and 1 shrimp boutique closed, AED x back." (Pass 295)',/The first mall store opened\. Your 3 weekend market stalls, 3 pet shop corners and 1 shrimp boutique closed, AED [0-9,]+ back\./.test(r.log),r.log);M.check('no Earlier shops fold (Pass 295)',!/Earlier shops/.test(r.shops),r.shops.slice(0,200));}}}
+ // Pass 305: closing Quality checks moved the page 95 px (applyReveal hid the alert strip every render, renderProgression showed it again, the page was 47 px shorter in between and the scroll got clamped). Fails on be0d834.
+ {const m=M.snap('avg','first grant');if(!m)M.skip('avg first grant qccard','no snapshot');else{const g2=await M.open({w:390});await g2.load(m);await g2.tab('emp');const p=g2.page;/* a fresh page: what earlier checks left (floor, folds) changes where the card sits */
+  if(await g2.js(()=>$('qccard').classList.contains('shut'))){const c=await g2.js(()=>{var r=$('qccard').querySelector('.hd').getBoundingClientRect();return [r.x+r.width/3,r.y+r.height/2];});await p.mouse.click(c[0],c[1]);await p.waitForTimeout(1000);}
+  await g2.js(()=>$('qccard').querySelector('.hd').scrollIntoView({block:'center'}));/* the card sits near the page bottom here, so a page that shrinks for a moment clamps the scroll */await p.waitForTimeout(700);
+  const b=await g2.js(()=>{var r=$('qccard').querySelector('.hd').getBoundingClientRect();return [r.x+r.width/3,r.y+r.height/2,r.top];});
+  await p.mouse.click(b[0],b[1]);await p.waitForTimeout(1500);
+  const r=await g2.js(()=>({top:$('qccard').querySelector('.hd').getBoundingClientRect().top,shut:$('qccard').classList.contains('shut')}));
+  M.check('avg first grant: closing Quality checks keeps its header in place',r.shut&&Math.abs(r.top-b[2])<1,{before:b[2],after:r.top,shut:r.shut});await g2.close();}}
  M.check('no page errors',!g.errs.length,g.errs.slice(0,3).join(' | '));
  await g.close();M.done('kits');})().catch(e=>{console.error('FAIL',e.message);process.exit(1);});

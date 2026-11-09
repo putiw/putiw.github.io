@@ -3651,3 +3651,33 @@ Card heights at 390 px, kind seed 7, the card's fold opened, before (c942d54) â†
 | charts | tank | first sale | 378 | 378 |
 stable `STABLE_RUN=tests/.runs/avg/run-7.json STABLE_TABS=up,market,emp,tank STABLE_STAGES="first sale,first farm,first grant"`: 1 failure (`#qccard` header 95 px), was 5 on c942d54.
 Tests (changed, 17 suites): 0 failed after the BUILD stamp fix (balance caught a future stamp), layout warn 3 as before, tight 0, greyreason 471 all say why, tapall 136 taps all changed the save (was 2 fails, `ev_rival` under `#after-b`; not looked at why it passes now).
+
+**Pass 305 (9 Nov, deployed with 300-304): the Quality checks jump.**
+- Closing Quality checks (`#qccard` header, avg `first grant`, Company) moved the page 95 px. Cause: `applyReveal` set `#astrip` (the business strip, 47 px) hidden on every render and `renderProgression` showed it again on business tabs. In between the page was 47 px shorter, a layout read clamped the scroll at the page bottom, and `floorTrim` then trimmed the floor to the clamped view, so the next render did it again: two 47 px steps. Found by wrapping the `hidden` setter and logging `scrollHeight` per set.
+- Fix: the strip is set in one place, `renderProgression` (`if(!business)$('astrip').hidden=true`). `applyReveal` no longer touches it.
+- Check: `m-kits` closes Quality checks at avg first grant on a fresh page with a mouse tap and asserts the header doesn't move. Fails on be0d834 (643 â†’ 738 px), passes now.
+- stable `STABLE_TABS=emp STABLE_STAGES="first grant"`: 36 clicks, 0 moved (was 1 failure, `#qccard` 95 px).
+
+Tests (changed):
+
+Tests (changed, be0d834, 2026-11-09 12:41 UTC, 4.9 min, 2 at once): 15 suites, 0 failed, 1 warn, 0 skipped.
+
+changed vs be0d834: tight, layout, greyreason, m-kits (all tabs)
+
+| suite | result | s | note |
+|---|---|---|---|
+| avg | ok | - | cached, game unchanged: earth 6664 |
+| strong | ok | - | cached, game unchanged: WIN 3114 |
+| balance | ok | 7 | 174 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 6 | 2540 gate checks on 234 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| tight | ok | 151 | 0 findings |
+| layout | warn | 95 | 3 things overflow |
+| greyreason | ok | 183 | PASS (183 s) 473 grey buttons all say why, 149 dotted titles all open, 292 snapshots |
+| m-kits | ok | 52 | PASS 299 kits moment checks |
