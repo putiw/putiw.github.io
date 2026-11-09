@@ -3681,3 +3681,25 @@ changed vs be0d834: tight, layout, greyreason, m-kits (all tabs)
 | layout | warn | 95 | 3 things overflow |
 | greyreason | ok | 183 | PASS (183 s) 473 grey buttons all say why, 149 dotted titles all open, 292 snapshots |
 | m-kits | ok | 52 | PASS 299 kits moment checks |
+
+**Pass 306 (9 Nov, docs only, no BUILD bump): workflow trim.**
+- Why: on 9 Nov about 3 of 7 chat hours went to stable jumps, mostly ones there before the chat, and every chat read the 45 KB Open work plus a growing chain of handoffs.
+- AGENTS.md Token budget: stable narrowed to what a change touches, 20 min per jump, old jumps only when Puti asks; one rolling handoff `claude/shrimp-handoff-current.md`; Open work is open items only; lessons go in Mistakes already made, generic ones marked `(Box)`.
+- Testing checklist 4b: the full stable run only when Puti asks.
+- Open work rewritten, 45 KB → 9 KB, grouped: waiting on Puti, screen jumps, bugs and test gaps, planned, known gaps. Old list: `git show e64de1c:shrimp/AGENTS.md` from line 591.
+
+Tests (fast):
+
+Tests (fast, e64de1c, 2026-11-09 13:33 UTC, 0.1 min, 2 at once): 9 suites, 0 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| balance | ok | 7 | 174 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 0 | 0 gate checks |
