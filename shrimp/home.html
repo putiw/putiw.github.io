@@ -1358,7 +1358,7 @@ var tankMod={name:'tank',
   // jobs: only the most pressing one glows
   var nd=needs(T),ids=nd.map(function(n){return n.id;}),tray=S.opt.toys==='tray';var show=tray?TOYS.map(function(t){return t.id;}):ids;
   // Pass 180: the job buttons sit in a fixed slot under the tank. Every job this tank can have keeps its place, ones not needed now are invisible, and the job bar takes the same slot.
-  var jb='',any=false,ownIll=!!(T.own&&OWN&&OWN.ill);TOYS.forEach(function(t){if(t.own&&!T.own)return;if(t.id==='scape'&&ownIll)return;if(t.id==='check'&&!ownIll)return;/* Pass 307 (Puti): a sick Tank 1 shows Check shrimp in Aquascape's place, as on the company page */var on=show.indexOf(t.id)>=0||t.id==='check',n=nd.find(function(z){return z.id===t.id;});if(on)any=true;jb+='<button class="btn'+(n?' need':'')+(n&&n===nd[0]&&!T.own?' glow':'')+'" data-toy="'+t.id+'"'+(on?'':' data-idle="1"')+'><canvas data-icon="'+t.id+'" width="56" height="44"></canvas>'+t.name+'<small>'+(n?n.t:t.idle(T))+'</small></button>';});
+  var jb='',any=false,ownIll=!!(T.own&&window.OWN_ILL);TOYS.forEach(function(t){if(t.own&&!T.own)return;if(t.id==='scape'&&ownIll)return;if(t.id==='check'&&!ownIll)return;/* Pass 307 (Puti): a sick Tank 1 shows Check shrimp in Aquascape's place, as on the company page */var on=show.indexOf(t.id)>=0||t.id==='check',n=nd.find(function(z){return z.id===t.id;});if(on)any=true;jb+='<button class="btn'+(n?' need':'')+(n&&n===nd[0]&&!T.own?' glow':'')+'" data-toy="'+t.id+'"'+(on?'':' data-idle="1"')+'><canvas data-icon="'+t.id+'" width="56" height="44"></canvas>'+t.name+'<small>'+(n?n.t:t.idle(T))+'</small></button>';});
   var tbx=$('toybtns');if(tbx&&tbx._h!==jb){tbx.innerHTML=jb;tbx._h=jb;tbx.querySelectorAll('canvas[data-icon]').forEach(function(cv){var t=TOYS.find(function(z){return z.id===cv.dataset.icon;});var x=fitCanvas(cv,28,22);cv.style.width='28px';cv.style.height='22px';t.icon(x,28,22);});}
   if($('jobnone'))$('jobnone').hidden=true;
   // wellbeing: one bar and a word; the parts are behind ?
@@ -4198,7 +4198,7 @@ function ownT(){return S.tanks[0]||null;}
 function gOf(i){return Math.round(clamp(phOf(i).grade,0,7)/7*100);}
 function syncOwn(d){if((d.seq||0)<SEQ)return;var T=ownT();if(!T||typeof newInd!=='function'||typeof GEN!=='object')return;T.name='Your tank';T.own=1;
   var busy=jobOpen();   // Pass 179: while a job is open the game's mess doesn't land on the tank, or the job is undone under you; shrimp still sync
-  if(!busy&&report())return;OWN=d;try{ownAge(T,d);}catch(e){}
+  if(!busy&&report())return;OWN=d;window.OWN_ILL=!!d.ill;/* Pass 307: renderSide sits outside this scope */try{ownAge(T,d);}catch(e){}
   var A=Math.min(600,d.adults|0),Y=Math.min(600,d.young|0),N=netList(),
     mine=function(){return T.shrimp.concat(N.filter(function(e){return e.from===T.id;}).map(function(e){return e.ind;}));},ad=function(){return mine().filter(function(i){return i.age>=ADULT_DAYS;});},yo=function(){return mine().filter(function(i){return i.age<ADULT_DAYS;});};
   // shrimp in the net from Your tank still count as in it until they're moved or sold
