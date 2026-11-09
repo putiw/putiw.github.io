@@ -3773,3 +3773,71 @@ Tests (changed):
 
 
 Tests (changed, 4954cbd, 2026-11-09 18:47 UTC, 13.6 min, 2 at once): 41 suites, 1 failed (tapall ev_rival, known), 1 warn, 0 skipped.
+
+**Pass 309 (10 Nov, BUILD p309): the handoff's To fix list, A letters, B land, C Shrimpcoin card.**
+
+A. Letters in the hard part (Puti: the ? on a letter is not intuitive, every letter).
+- Every letter's ? is rewritten in one order (`propHelp`): who writes and from where, their line, what they want and what it has to do with tanks (`want`), what you pay in words (`propPayTxt`: "You pay AED 9.27B once and 1.5% of your income for as long as you keep it going.", "✦ 5,000 once", "They pay some of it back over the years from what they earn."), what happens if it works in people (`works`, with the years and the count: "If it works, in about 4 years these farmers earn enough to stop being so poor, and some of them buy a tank like yours. About 24M people."), then "Expect some of the money to go missing on the way, it always does." and, only for the pipe, the loan, the solar panels, the lunch and the eye bus, "What they ask is a small part of what clean water for everyone really costs. They find the rest." (`BUILD_SAY`). Cold letters end "The Shrimp Times will notice." The help sheet shows these as short paragraphs.
+- Every `where` reads after the name and says who the person is: "Mo, who farms with his neighbors outside the capital", "Lana, who runs water for a farming county", "Dr David, an eye surgeon at a country hospital". No co-op, board, union, market road, wet country. Cousins (`alt`) rewritten the same way; the shared text uses `{who}` and "they", never he or she.
+- Lines (`line`) say what the thing is: a water pipe to homes with no clean water, a plant that turns sea water into drinking water, solar panels and one small grid for every thirty homes, farmers who sell together, people who look after the old and the sick, cataracts make people blind and one short operation fixes it, a levy (1% on fortunes over a billion). Orbit and the kitchen robot say "Nothing for the tanks. It is a letter."
+- Row names (`t`): water pipe, sea water plant, solar panels, cold store and truck, weekly boat, eye surgery bus, the mechanics' school. The open letter's row title is now `who, t` like the Running rows (the long `where` wrapped to three lines at 360); the `where` is the first line of the ?.
+- News, stop and end lines lost "co-op" and "desal"; Milo's `nour` line says "The new solar grid".
+- Checks: `shrimp-balance` "Pass 309: every letter says who…" (want and works present, no co-op/board/union/desal/market road in a place, no "in <group name>", no dashes, row name 24 characters at most) and a static check that `propHelp` no longer reads `g.name`. `shrimp-hard`'s letter regex follows the new text. Fails on 1fb3e17.
+
+B. Land (source `shrimp-home-proto/src/land.js` on `shrimp-proto` 5983e0a, `python3 build.py --game`).
+1. Floors under walls: not reproduced. The test link's file could not be fetched from here (githack is blocked in this session). On a fresh land with the Pass 308 build a real touch tap with Wood deck picked paints the tile under a built wall, and `canPlace` allows it on all 545 tiles near the house where a wall can stand. A wall covers its whole tile, so what changes on screen is only the grass fringe at its foot. Hardened the one save-dependent refusal from the handoff: a ground edit bigger than one tile now splits into one edit a tile when painted over (`splitEdit`), it used to refuse. Still refused by design: inside the house rooms, under fences and gates, the same ground again.
+2. Walls behind Tank 1 on Birol's phone: nothing changed, no way to see his build from here. Check the Updated line in his ? popup against hers.
+3. Replace in place: with a wall or fence picked, a tap on a built wall or fence of another kind swaps it, half the old price back, the new price paid, same tile (`swapOf`, in `canPlace` and `placeAt`). Same kind: still "It doesn't fit there." Walls that came with the place don't swap. Colours follow the new kind (`palKey`).
+4. Wall corners: a corner tile stood in the middle of its tile while the wall running down from it hugged the floor's edge (`wallSide`), so with walls built on the grass round a floor every corner stuck out 20 px past the join. A corner with no side of its own now takes the side of the wall below it, or above it (`wallSd`). Walls on the floor's last tiles were already right.
+- Checks in `tests/shrimp-land-life.cjs` (360 and 390): deck under a built wall, the swap leaves one stone wall and the money adds up, a wall doesn't swap a fence, a two-tile edit splits, the corner's side equals the side of the wall below. Fails on 1fb3e17 (no hooks, no swap).
+
+C. Shrimpcoin card.
+5. The pump no longer replaces the card. The price chart stays, and the pump is two lines in the numbers ("Pump, you put in", "Pump, worth today · 3.5×" or "Pump, you got out") and one Exit the pump row above Plant by hand.
+6. The price chart has All time / Last 3 months like the Money tab (`COIN_RG`, default All time, `.st-rg mini-seg`, `data-act="coin-rg"`), x labels from `xTicks`, title "Shrimpcoin is up 173% over 2.6 years" or "over the last 3 months". No "N days ago". Sim: `coinHist` writes `C.hist` (two years by day, as before) and `C.hw`, one price a week from now on, thinned past 1,500, so All time reaches further back than two years in games played from this build; old saves show their two years. Bots unchanged (strong 2,914, kind 4,354, average 6,664).
+- Checks: `shrimp-balance` "Pass 309: the coin keeps a weekly price history…" and a static check that `renderCoin` has no `.pump` block and the chart has the switch. Browser probe at 360 and 390: one chart, no `.pump`, the switch changes the title and ticks, no sideways scroll.
+
+Not done: B1 and B2 above. The 3-month chart's ticks read "mo 207.5" like the Money tab's.
+
+Tests (changed, both runs against 1fb3e17). First run on 1345a29 (A only): 34 suites, hard and land-life failed on the test side (the old help regex; the new land checks before the new home.html), both pass now (`node tests/run.cjs hard land-life`: 3 suites, 0 failed). Second run on 93377d2 (A, B, C), tapall is the known `ev_rival` / `pl-open` under `#after-b` at fork science:
+
+Tests (changed, 93377d2, 2026-11-09 21:04 UTC, 12.7 min, 2 at once): 34 suites, 1 failed, 1 warn, 0 skipped.
+
+changed vs origin/shrimp-prelaunch-fixes: cardlag, m-cards, bot-cards, projtabs, hard, m-hard, tight, tapall, m-kits, kitpack, tank1, yourtank, m-tank, m-health, greyreason, land-life, land-audio, m-you, space, endcards, fresh, layout, strong, kind, avg (all tabs)
+
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | 24 | WIN 2914 (prev 2914) empire_dictator |
+| kind | ok | 67 | WIN 4354 (prev 4354) question_lucky |
+| avg | ok | - | cached, game unchanged: earth 6664 |
+| balance | ok | 6 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 7 | 3293 gate checks on 331 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| cardlag | ok | 1 |  avg: reaction cards under 15 s after another (allowed): owntank (react) then farm (react) |
+| m-cards | ok | 40 | PASS 40 cards moment checks |
+| bot-cards | ok | 0 |  |
+| projtabs | ok | 12 | 4 project tab checks passed |
+| hard | ok | 13 | 24 hard part checks passed (milestone hardpart) |
+| m-hard | ok | 65 | PASS 133 hard moment checks |
+| tight | ok | 142 | 0 findings |
+| tapall | FAIL | 630 | FAIL 3 of 145 taps did nothing: |
+| m-kits | ok | 51 | PASS 299 kits moment checks |
+| kitpack | ok | 5 | kit packing checks passed |
+| tank1 | ok | 29 | all tank 1 checks passed |
+| yourtank | ok | 22 | all passed |
+| m-tank | ok | 13 | PASS 10 tank moment checks |
+| m-health | ok | 8 | PASS 10 health moment checks |
+| greyreason | ok | 169 | PASS (168 s) 467 grey buttons all say why, 146 dotted titles all open, 287 snapshots |
+| land-life | ok | 18 | all passed |
+| land-audio | ok | 12 | all passed |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| space | ok | 11 | PASS Leave Earth, launch, search and land after Earth |
+| endcards | ok | 19 | 50 ending card checks passed |
+| fresh | ok | 3 | all ok |
+| layout | warn | 90 | 3 things overflow |
+
