@@ -6968,7 +6968,7 @@ var ANCH=null;
 // Called before and after every render and once a frame. If the page didn't scroll but the thing we watch moved, scroll it back.
 function anchorCheck(){if(typeof document==='undefined'||!document.body||document.hidden)return;
   var busy=(typeof SPOT!=='undefined'&&SPOT&&SPOT.on)||(typeof TVLOCK!=='undefined'&&TVLOCK)||(typeof HC!=='undefined'&&HC);
-  if(!busy&&ANCH&&Math.abs(window.scrollY-ANCH.y)<1){var o=anchorLive(ANCH);if(o){var d=o.el.getBoundingClientRect().top-o.top;if(Math.abs(d)>=1)window.scrollBy(0,d);}}
+  if(!busy&&ANCH&&Math.abs(window.scrollY-ANCH.y)<1){var o=anchorLive(ANCH);if(o){var d=o.el.getBoundingClientRect().top-o.top;if(d>=1){var mx=document.documentElement.scrollHeight-innerHeight,mm=document.querySelector('main');if(mm&&window.scrollY+d>mx){var fh=Math.ceil(mm.getBoundingClientRect().height+window.scrollY+d-mx);if(fh>FLOOR){FLOOR=fh;mm.style.minHeight=fh+'px';}}}/* Pass 302: a short page has no room to scroll down, so the floor grows by what the anchor needs (Buy shrimp under a Sales card that gained a line) */if(Math.abs(d)>=1)window.scrollBy(0,d);}}
   var el=busy?null:anchorPick();ANCH=el?{el:el,top:el.getBoundingClientRect().top,y:window.scrollY,alt:el===ANCH_TAP?anchorAlts(el):null}:null;floorTrim();}
 /* UI/UX chat 1 (6 Nov): taps are anchored too. The tapped button stays put; if it goes, its row; if the row goes, the next row takes the row's place; then the card, then the next card. */
 function anchorAlts(el){var a=[],row=el.closest('.item,.fopt,.hard-now,.hard-g,.story-choices,.ctl,.kv,.btns'),card=el.closest('main .card,main details');

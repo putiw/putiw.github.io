@@ -3508,6 +3508,7 @@ Card heights at 390 px, kind run seed 7, folds opened (`offsetHeight`), before â
 | c-proj | Lab | 100k kits | 445 | 412 |
 | buycard | Trade | first sale | 302 | 291 |
 | academy-card | Lab | 10k owners | 378 | 337 |
+stable `STABLE_TABS=up,market` (avg run, full): 10 buttons, 100 failures. Against 2157def at the flagged stages: new were the four Buy shrimp buttons (14 px) and `3 s play (sdet)` 16 px. Cause: with Sales rules folded the Trade page is short, Buy shrimp sits on the first screen, a buy gives the Sales summary its buyers line and the anchor can't scroll down on a page with no room below (the old build never pressed them, they were off screen). Fix: `anchorCheck` grows the tap floor (`FLOOR`, main min-height) by what the scroll needs; `floorTrim` lets it go as before. After: the Buy shrimp buttons hold. Left: `3 s play (sdet)` 16 px (the summary gains its line during play with the page at the top, same family as the old `3 s play (sellcard)`), and the old ones (`feeder` header, `addtank` header, `#sellcard +`, `#btn-match`).
 Tests: `tests/moments/kits.cjs` updated (rack row has no `each`, Sell is its own line in the row, not in the p). `tests/run.cjs` research area knows `grants`/`gr` (`grantsHTML` made `changed` fall back).
 Tests (changed, fell back to feature, b38bc74): 41 suites, layout warn 3 (as before), tapall 3 of 148 (`pl-open` and `ev_rival` under `#after-b`, as in Pass 300/301), m-kits 3 (the test, fixed above, rerun ok).
 | suite | result | s | note |
