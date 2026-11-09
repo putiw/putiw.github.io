@@ -3554,3 +3554,60 @@ Tests (changed, fell back to feature, b38bc74): 41 suites, layout warn 3 (as bef
 | land-life | ok | 15 | all passed |
 | taps | ok | 12 | all ok |
 | ear | ok | 10 | 22 ear tank checks passed |
+
+**Pass 303 (9 Nov, branch only): UX handoff `claude/shrimp-handoff-ux-8nov.md` Part B items 8-13, the rest of the clutter pass. Part B is done.**
+8. `kordercard` Bulk order: `70 kits at AED 320 (AED 22,400).` then the hint line `26 days to fill. You can make about N spare kits a day for it.` (taken: `N of M set aside. ...`). The share is on the slider, so the `up to 60%` sentence is gone; who wants them, how the share works, putting kits in from stock and what happens if it isn't full are behind ? (`HELP.kordercard`). The state leads the hint line in both states: a first cut (`, 26 days to fill` on line one, `· 0 set aside` after Accept) dropped a line at the top of a short page and stable caught Accept moving 20 px.
+9. `c-kits`: nothing left, A18 (Pass 301) already made it `27 sold a day` in the header and `Profit AED 496 a kit` in the body.
+10. `colcard` Colony: a `coll` card now; the first render with Your tank folds it once (`G.opt.colFold`), the line says `20 shrimp · 0 berried`. Opening it again stays open. Before the farm it's as it was.
+11. `c-shops`: `A store in every fifth mall in your regions.` is `.explain` (card ?); small-shop rows `+3 orders a day · 50% output`, rent behind the title.
+12. `c-mkt`: checked, left as it is (the handoff said so).
+13. `logcard` Recent events: was already hidden until it has an entry (UI/UX chat 1 C5). Now the newest three, the rest under `Earlier (n)` like What happened on You (Mistakes: a log card that shows every entry). `charts` summary `nitrate 5 ppm` stays.
+Card heights at 390 px, kind run seed 7 unless marked, `offsetHeight` with the card's own fold state (Colony after is folded; before it was never folded), before → after:
+| card | tab | stage | before | after |
+|---|---|---|---|---|
+| kordercard | Company | million owners | 251 | 211 |
+| kordercard | Kits | first farm (avg) | 272 | 211 |
+| c-kits | Kits / Market | 10k, million | 169 | 169 |
+| colcard | Tank | first sale | 222 | 222 |
+| colcard | Tank | first farm | 222 | 52 |
+| colcard | Tank | 10k owners | 222 | 52 |
+| c-shops | Ads | 10k owners | 450 | 406 |
+| c-shops | Market | million owners | 181 | 160 |
+| c-mkt | Market | million owners | 413 | 413 |
+| logcard | Tank | first sale | 222 | 148 |
+| logcard | Tank | first farm | 289 | 165 |
+| charts | Tank | first sale | 378 | 378 |
+Moment checks in `tests/moments/tank.cjs` (avg `first farm`: Colony folded with its count, Recent events three plus Earlier, bulk order line; avg `first grant`: small-shop rows without rent). The Colony and log checks fail on 804ac27.
+After Part B: `tight` 0 findings, `greyreason` 467 grey buttons all say why, `layout` warn 3 (as before). stable `STABLE_RUN=tests/.runs/avg/run-7.json STABLE_TABS=up,market,emp,tank STABLE_STAGES="first sale,first farm,first grant"`: 7 failures, 5 on 2157def. Same on both: `#sellcard +` and `#btn-match` −29 px (first farm, market), `#qccard` and the QC strictness buttons (first grant, emp). New against 2157def: `korder-take` −20 px (mine, fixed above, 0 on emp after), `3 s play (sdet)` 29 px (on 804ac27 too, Pass 302's, flagged in chat 4), QC `Relaxed` 48 px (804ac27 has it, the same QC family). Not chased.
+Also: my BUILD `sed` hit the `checkBuild` regex `BUILD='([^']+)'` and the page stopped parsing; fast passed (sim only), every browser suite failed with `migrate is not defined`. Replace the stamp only on the `var toastT` line.
+
+Tests (changed after the final edit, ed457a5 + kordercard line): 15 suites, 0 failed. Earlier `changed` on ed457a5, 26 suites:
+
+| suite | result | s | note |
+|---|---|---|---|
+| avg | ok | - | cached, game unchanged: earth 6664 |
+| kind | ok | - | cached, game unchanged: WIN 4354 |
+| strong | ok | - | cached, game unchanged: WIN 3114 |
+| balance | ok | 6 | 174 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 1 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 8 | 3313 gate checks on 338 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| cardlag | ok | 1 |  avg: reaction cards under 15 s after another (allowed): owntank (react) then farm (react) |
+| m-cards | ok | 41 | PASS 40 cards moment checks |
+| bot-cards | ok | 0 |  |
+| projtabs | ok | 12 | 4 project tab checks passed |
+| tank1 | ok | 30 | all tank 1 checks passed |
+| yourtank | ok | 23 | all passed |
+| m-tank | ok | 13 | PASS 10 tank moment checks |
+| tapall | FAIL | 608 | FAIL 2 of 157 taps did nothing: |
+| m-kits | ok | 48 | PASS 298 kits moment checks |
+| kitpack | ok | 5 | kit packing checks passed |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| tight | ok | 146 | 0 findings |
+| greyreason | ok | 185 | PASS (184 s) 467 grey buttons all say why, 147 dotted titles all open, 292 snapshots |
+| layout | warn | 92 | 3 things overflow |
