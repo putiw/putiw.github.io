@@ -3447,7 +3447,7 @@ function groundEdit(x,y){return (LS().edits||[]).filter(function(e){return x>=e.
 function canGround(b,x,y){var m=M(),g=mget(m,x,y);if(GROUND_ON.indexOf(g)<0||inAnyRoom(x,y))return false;
   if(g===b.edit&&!(g===G_WATER&&waterKind(x,y)!==W_POND)&&skinAt(x,y)===(b.skin||null))return false;
   var e=groundEdit(x,y);if(e&&!(e.fw===1&&e.fh===1))return false;
-  var o=objAtTile(x,y,true);if(o&&!o.deco)return false;if(occupied(x,y)&&(b.edit===G_WATER||g===G_WATER))return false;return true;}
+  var o=objAtTile(x,y,true);if(o&&!o.deco){var ob=BUILDI[o.k];if(b.edit===G_WATER||o.k==='bridge'||o.k==='tank'||!ob||!ob.where||ob.where.indexOf(b.edit)<0)return false;}/* Pass 308 (Puti): paint ground under a thing that can stand on it, floors under walls */if(occupied(x,y)&&(b.edit===G_WATER||g===G_WATER))return false;return true;}
 function canPlace(b,ax,ay){if(b.ground)return canGround(b,ax,ay);var sz=itemSize(b),m=M(),flat=OBJ[b.k]&&OBJ[b.k].flat;if(b.max&&objsOf(b.k).length>=b.max)return false;
   for(var y=ay;y<ay+sz[1];y++)for(var x=ax;x<ax+sz[0];x++){var g=mget(m,x,y);if(b.where.indexOf(g)<0)return false;
     var o=objAtTile(x,y,true);if(o&&!o.deco){var of=OBJ[o.k]&&OBJ[o.k].flat;if(b.edit||flat?true:!of)return false;}
@@ -4155,7 +4155,7 @@ function mkSave(){var l=LS(),used={},map=[0],pal=[];for(var i=0;i<MK.px.length;i
 function mkDelete(id){var l=LS();l.made=(l.made||[]).filter(function(q){return q.id!==id;});mkRegister();if(l.pal){delete l.pal['c:'+id];delete l.pal['wall-c:'+id];delete l.pal['fence-c:'+id];}palBuild();resetSprites();save(true);mkClose();sfx('pop');
   var pal=$('lpal');if(pal&&!pal.hidden)renderBuildPal(pal);toast('Deleted.');}
 // test hooks
-window.LAND.life={L:function(){return L;},LS:LS,vegState:vegState,vegTap:vegTap,walkTick:walkTick,openLog:openLog,mkObj:mkObj,tileOf:tileOf,objSprite:objSprite};// Pass 213 test hooks
+window.LAND.life={L:function(){return L;},LS:LS,vegState:vegState,vegTap:vegTap,walkTick:walkTick,openLog:openLog,mkObj:mkObj,tileOf:tileOf,objSprite:objSprite,canPlace:canPlace,placeAt:placeAt,BUILDI:BUILDI,mget:function(x,y){return mget(M(),x,y);}};// Pass 213 test hooks, Pass 308 build hooks
 window.LAND.mk={ed:function(){return MK;},made:function(){return LS().made;},skin:function(){return LS().skin;},open:mkOpen,
   place:function(id,near){var b=BUILD.filter(function(q){return q.made===id;})[0],me=L.me,t=near||tileOf(me.x,me.y);if(!b)return null;for(var r=0;r<6;r++)for(var dy=-r;dy<=r;dy++)for(var dx=-r;dx<=r;dx++){var a=b.ground?[t[0]+dx,t[1]+dy]:anchorFor(b,t[0]+dx,t[1]+dy);if(canPlace(b,a[0],a[1])&&placeAt(b,a[0],a[1]))return a;}return null;},
   objs:function(){return LS().objs;},use:useObj,me:function(){return L.me;},size:function(){return JSON.stringify(S).length;}};

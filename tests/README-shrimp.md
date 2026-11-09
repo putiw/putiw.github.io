@@ -3758,3 +3758,17 @@ changed vs e08ce5c: projtabs, tapall, m-kits, kitpack, tank1, yourtank, m-tank, 
 | m-cards | ok | 38 | PASS 40 cards moment checks |
 | bot-cards | ok | 0 |  |
 | frozen | ok | 3 | frozen buttons checked on 5 tabs |
+
+**Pass 308 (9 Nov, BUILD p308, branch only): Puti's list (card headers, land build rules, music mix, three "do nothing" options, Money chart axes).**
+- Card headers say the count against its ceiling (Puti: "xx out of xx sold, so the upper limit and the inefficiency are clear"): Kits "12 of 20 orders sold a day" (7-day sold rate against `kitDemand`), Making kits "40 in stock · 8 of 20 packed today" (`E.packed` against `packCap`), Farms "160 of 400 shrimp bred a day" (`prodAvg` against `farmCap*KIT_SHRIMP`); the farms' upkeep moved to the fine line under it, the "why nothing" fine lines stay.
+- Land: ground can be painted under a thing that can stand on that ground (`canGround`, Pass 308 clause): floors under walls, fences, benches. Not under the tank or a bridge, never water. Walls behind Tank 1: `canPlace` and a real tap both place a wall on the tile behind the tank on a fresh land (probe in this pass); the wall is drawn behind the tank sprite and only its top shows. Could not reproduce a refusal; asked Puti what the toast said and where the tank stands.
+- Music (company page): water loop 0.40 → 0.32 (80%), bells 0.16 → 0.096 (60%). The land's own mix (0.34 / 0.06) unchanged.
+- "Do nothing" options: The stream survey gets "Say no" (she finds a grant, the count is a year late); Money left over (`c_vet`) gets "Keep it in the company"; A good year (`c_bonus`) gets "Keep it in the company" as a fourth option (the bird option stays index 2). `PUSH` rows extended with `{}`; balance check counts updated (c_bonus 4).
+- Money tab, all-time charts: `endLine`'s x labels only came at even years from the first whole year, so under two years the axis was empty; shared `xTicks` now labels years over 18 months and months under (`mo 6`, `mo 9`). The log floor follows the data (`y0 = floor(log10(min positive))`), so a "Sold a day" line between 20 and 40 is no longer a flat line in the middle of 1 to 100. `statLin` uses the same ticks.
+- Land test hooks added to `LAND.life`: `canPlace`, `placeAt`, `BUILDI`, `mget`.
+- Not done: the stream survey "Say no" has no later consequence beyond the line; the land wall-behind-tank report, pending Puti's answer.
+
+Tests (changed):
+
+
+Tests (changed, 4954cbd, 2026-11-09 18:47 UTC, 13.6 min, 2 at once): 41 suites, 1 failed (tapall ev_rival, known), 1 warn, 0 skipped.

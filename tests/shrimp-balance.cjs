@@ -1306,8 +1306,8 @@ if(!milestoneConditions(g).market)throw Error('the Company/Market card at MKT_AT
 `);
 check('Pass 274: the little bird options exist, carry the flag, pay more than the rest; the good year amount is the cost',`
 if(MILESTONES.pain_payout.bird!=='payout'||MILESTONES.c_bonus.bird!=='bonus')throw Error('bird flag missing');
-if(PAINS.pain_payout.ch.length!==4||CARDS3.c_bonus.ch.length!==3)throw Error('bird option missing');
-if(PUSH.pain_payout.length!==4||PUSH.c_bonus.length!==3||(PUSH.pain_payout[3].means||0)>=0||(PUSH.c_bonus[2].means||0)>=0)throw Error('bird PUSH');
+if(PAINS.pain_payout.ch.length!==4||CARDS3.c_bonus.ch.length!==4)throw Error('bird option missing');
+if(PUSH.pain_payout.length!==4||PUSH.c_bonus.length!==4||(PUSH.pain_payout[3].means||0)>=0||(PUSH.c_bonus[2].means||0)>=0)throw Error('bird PUSH');
 function pg(){var g=newGame();g.emp.kitsOpened=1;g.humans=1.6e6;g.money=1e7;g.fin=[];for(var i=0;i<7;i++)g.fin.push({kits:9e4});return g;}
 var res=[0,1,2,3].map(function(i){var g=pg(),m0=g.money,l0=(g.emp.later||[]).length,h0=g.emp.heart||0;if(!storyChoose(g,'pain_payout',i))throw Error('payout '+i);return {dm:g.money-m0,d:g.emp.pains.pain_payout.until-g.day,later:(g.emp.later||[]).length-l0,shell:!!g.emp.shell,g:g};});
 var b=res[3];if(b.shell||b.later||b.g.emp.frozen)throw Error('bird payout schedules something');if(b.g.story.bird.payout!==3)throw Error('bird payout not recorded');
