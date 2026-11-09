@@ -826,7 +826,7 @@ if(!(p.r<r0&&Math.abs(p.r/r0-0.905)<0.01))throw Error('reach falls 10% a year af
 if(!fb.me.hist.some(function(x){return /who Lana is/.test(x);}))throw Error('Grandma asks who she is');
 // three in one group share the 7% a year cap
 var c3=readyGame();c3.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};c3.humans=4.1e9;c3.money=1e13;c3.fin=g.fin;var CR=propOf(hardOf(c3));['board','loan','desal'].forEach(function(k){CR.open.push({id:k,day:0,alt:0,grad:0});CR.t[k]=1;if(!propFund(c3,k))throw Error('fund '+k);});for(d=1;d<=365;d++){c3.day=d;hardDay(c3);}
-if(propReach(c3,'water')>BUILD_CAP+1e-9)throw Error('a group grows at most 7% a year: '+propReach(c3,'water'));if(!(rip(c3).log.some(function(x){return /desal plant opens/.test(x.tx);})))throw Error('the cold ones have their news');
+if(propReach(c3,'water')>BUILD_CAP+1e-9)throw Error('a group grows at most 7% a year: '+propReach(c3,'water'));if(!(rip(c3).log.some(function(x){return /sea water plant opens/.test(x.tx);})))throw Error('the cold ones have their news');
 // the levy: needs crews, a country every 6 to 18 months, one in four drops it, at 12 the crews are paid from it
 var lv=readyGame();lv.emp.hard={open:1,goal:'home',picks:{},goalOk:1,day:0};lv.humans=4.1e9;lv.money=1e13;lv.fin=g.fin;lv.emp.inf=1e9;lv.emp.infOn=1;var LH=hardOf(lv),LR=propOf(LH);if(propOK(lv,LH,propDef('levy'),0))throw Error('the levy needs crews to pay');
 LR.open.push({id:'board',day:0,alt:0,grad:0});LR.t.board=1;propFund(lv,'board');if(!propOK(lv,LH,propDef('levy'),0))throw Error('the levy comes once there are crews');LR.open.push({id:'levy',day:0,alt:0,grad:0});LR.t.levy=1;var i0=lv.emp.inf;if(!propFund(lv,'levy'))throw Error('fund the levy');
@@ -863,7 +863,7 @@ VG.ops.forEach(function(o){if(o.k==='work'&&!o.life&&!o.old)throw Error('war wor
 if(!/civil war/.test(VG.body))throw Error('the war sentence');['nour1','nour2','nour3','nour4','nour5','nour6'].forEach(function(k){var mm=MILESTONES[k],t=(mm.bodyFn?mm.bodyFn(v):mm.body)+(mm.opts?JSON.stringify(mm.opts(v)):'');if(/river|rice/.test(t))throw Error('Milo never mentions the river or rice water: '+k);});
 HARD.forEach(function(gg){gg.ops.forEach(function(o){if(/river war/.test(o.end||'')&&!o.old)throw Error('no river war in endings: '+o.id);});});
 if(!/one Musk/.test(muskPct(1e9)+' of one Musk')||muskPct(RICH_USD*USD_AED*0.001)!=='0.1%')throw Error('Musk units: '+muskPct(RICH_USD*USD_AED*0.001));
-var rl=routeLines(fb).concat(routeLines(g));if(!rl.some(function(t){return /water board reached/.test(t)&&/stopped paying/.test(t);})||!rl.some(function(t){return /membrane was/.test(t);}))throw Error('the ending names the people and what you stopped paying for: '+rl.join(' | '));var rl2=routeLines(lv);if(!rl2.some(function(t){return /12 countries signed/.test(t);}))throw Error('the ending counts the levy: '+rl2.join(' | '));
+var rl=routeLines(fb).concat(routeLines(g));if(!rl.some(function(t){return /water pipe reached/.test(t)&&/stopped paying/.test(t);})||!rl.some(function(t){return /membrane was/.test(t);}))throw Error('the ending names the people and what you stopped paying for: '+rl.join(' | '));var rl2=routeLines(lv);if(!rl2.some(function(t){return /12 countries signed/.test(t);}))throw Error('the ending counts the levy: '+rl2.join(' | '));
 `);
 
 check('Pass 168: leaving Earth opens with the hard part and enough science, ends Earth, points buy the ship',`
@@ -1414,4 +1414,13 @@ var h=readyGame();var D=coinOf(h);D.on=1;D.trees=1e6;D.coins=6e5;D.treasury=6e5;
 var k=readyGame();k.humans=1e6;k.emp.beta=0.13;if(!(refEff(k)<k.emp.beta))throw Error('refEff '+refEff(k));if(refRel(k,'Referrals +1.3%.')!=='Referrals up 10%.')throw Error(refRel(k,'Referrals +1.3%.'));
 `);
 {const tips=','+html.split('var CTL_TIPS={')[1].slice(0,12000);const ids=[...html.matchAll(/<div class="ctl"><label for="s-([A-Za-z0-9]+)"/g)].map(m=>m[1]);const miss=ids.filter(k=>!new RegExp('[,\\s]'+k+":'").test(tips));if(miss.length)throw Error('Pass 294 (Puti): a slider label with a dotted line opens nothing: '+miss.join(','));if(!/<select id="reserve-days"><option value="0">Off<\/option>/.test(html))throw Error('Pass 294: the reserve select has Off');console.log('PASS Pass 294: every slider label ('+ids.length+') has a CTL_TIPS line');count++;}
+check('Pass 309 (Puti 9-10 Nov): every letter says who, what they want and what it does in plain words; no group name, no co-op, no jargon place',`
+var bad=[];PROPS.forEach(function(o){if(!o.want)bad.push(o.id+' has no want');if(o.g&&o.r&&!o.sink&&!o.works)bad.push(o.id+' has no works');
+ var names=[[o.who,o.where]].concat(o.alt||[]);names.forEach(function(nw){if(/co-op|market road|wet country|\\bboard\\b|union|desal/i.test(nw[1]))bad.push(o.id+' where: '+nw[1]);});if(!o.t||o.t.length>24)bad.push(o.id+' row name too long: '+o.t);
+ var txt=[o.line,o.want,o.works||'',o.t].join(' ');if(/co-op/i.test(txt)&&!/farmers who sell together/.test(txt))bad.push(o.id+' says co-op');if(/desal\\b/i.test(txt))bad.push(o.id+' says desal');
+ HARD.forEach(function(g){if(txt.toLowerCase().indexOf('in '+g.name.toLowerCase())>=0)bad.push(o.id+' names the group '+g.name);});
+ if(/[\\u2014\\u2013]/.test(txt))bad.push(o.id+' has a dash');});
+if(bad.length)throw Error(bad.join('; '));
+`);
+{const ph=html.split('function propHelp(G,o,x){')[1].split('function hardPropsHTML')[0];if(/g\.name/.test(ph))throw Error('Pass 309: the letter ? names the group (g.name) again');if(!/o\.want/.test(ph)||!/o\.works/.test(ph)||!/go missing on the way/.test(ph)||!/Shrimp Times will notice/.test(ph))throw Error('Pass 309: the letter ? lost a part (want, works, the honest line, the Times)');}
 console.log(count+' focused balance and migration checks passed');
