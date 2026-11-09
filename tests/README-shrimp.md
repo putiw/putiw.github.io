@@ -3408,3 +3408,276 @@ Tests: balance +1 (drones area, coin cost and preview, planted coins in the book
 Bots: not rerun beyond the changed set (coin cost now average price; bots buy coins only when the price is under 0.7x fair).
 Tests (changed, Pass 299): 31 suites, 29 ok, layout warn 3 (as before). tapall FAIL 1 of 135: `moment fork culls emp act=proj&id=shipcheap` swallowed by SETTLE (the known kind on fork rows, as Pass 297).
 Deployed Pass 299 (8 Nov, BUILD p299). Tests (fast, before deploy): 9 suites, 0 failed.
+
+**Pass 300 (9 Nov, branch only): UX handoff `claude/shrimp-handoff-ux-8nov.md` Part A items 1-8, buttons and labels.**
+1. Enabled `.btn`: 1px ink border at 35% and ink text. Disabled keeps `--off`, no border. Secondaries stay beige, primary stays the one green.
+2. Hand packing: `Bag · AED 102` (step short name and materials), then `Next`, then `Finish`. No price on Finish, materials are paid at the first step.
+3. Trade chip `Use market AED 11.6` (was `Avg AED 11.6`). The hint beside it reads `Grade 92, prime adult`, number first, since the wider chip cut it at 360.
+4. Fund buttons two lines, `Fund` / `USD 150k`, kept in step with the slider (`.gr-amt` in the input handler). `freezeHTML` still turns them to Frozen (it matched `Fund` exactly). `grNextTxt`: `Fund one or both this year. Next cycle in 10 months.`; `it` with one open; only the cycle when none is open or 3 run. Grants stay in USD (Puti, 9 Nov).
+5. `hireWhy`: `Needs AED 913, a week of wages and bills` (rule unchanged).
+6. `waterWorst(T)` beside `gstate`: worst water reading as `NO₃ 52`, `NH₃ 0.50`, `28.3 °C` or `all fine` (pH, KH, GH from `rv('phkh')`). Water test summary uses it (was the volume). Automation header on one tank names the gear (`feeder`, `changer`, `feeder + changer`), two tanks or more keep `N of M tanks`. Header `bills 0/d` hidden while the bill rounds to 0.
+7. `sellWhyNot(G,sh)`: `Sell · ready in 30 d`, `Sell · buyers back in 3 d`. With Feed and Water showing (three buttons, 117 px at 360) the short `Sell · in 30 d`, `Sell · buyers in 3 d`.
+8. Sell card: stock with no buyers `18 ready` / `No buyers left this week` (was `Nothing ready`, `sellAll` dry counts 0 with no demand); nothing sellable and `kitHold` holding some `Spare shrimp go to kits` / `60 breeders stay`; else `Next ready in 30 d`, no buyers line. `nextSell(G)` = {next, kept}.
+Bots: no sim change (cached WIN 3114, kind 4354, avg earth 6664).
+Tests (changed, Pass 300, fell back to feature): 41 suites, 39 ok, layout warn 3 (as before, same on e5215da). tapall FAIL 3 of 147: `shipcheap` swallowed by SETTLE, `pl-open` and `proj-no ev_rival` covered by `#after-b` (the known kinds, Passes 297-299). The first run also caught `frozen`: the two-line Fund label skipped `freezeHTML`, fixed. tight 0 findings, greyreason 478 grey buttons all say why. stable (`STABLE_TABS=up,market`, avg run): 7 buttons, 61 failures vs 6 and 60 on e5215da. New: `#buycard` header moved 29 px at `first grant` (Trade). The other six (Gear feeder and new tank change the header, Trade `+` and `#btn-match` move 29 px, farm Sell moves 17 px) are on the base too. Left for the next chat.
+
+**Pass 301 (9 Nov, branch only): UX handoff `claude/shrimp-handoff-ux-8nov.md` Part A items 9-18, text snags.**
+9. Farm shrimp reads `45 · Full` at the default (45 is `FW_MID`, changes nothing); `Crowded` only below 45. Label only, no sim number moved (bots unchanged: kind WIN 4354).
+10. Held rows lead with the reason: farms `Crew on the wells, 23 d · 2,000 shrimp/d each ...`, the next region `Crew on the wells, 298 d · 50M people.`
+11. The earth line under the owners bar opens its own help (`earthHelp(G)`, title Owners): quit eating shrimp and mangroves, only the parts shown. The help handler takes `.qhelp,[data-hs]`; the line no longer jumps to World.
+12. First card: `Your birthday, for Grandma’s red envelope`.
+13. Pain notes name the fix bought (`PAIN_FIXN`, two words per option): `Cooled vans ready in 20 d · Permit firm ready in 154 d`; the bottleneck line `· orders 15% lower until then.`; `salesWhy` takes the first.
+14. Your day: Strain is a dotted title (the effect from `lifeDay`: work and dinners over 10 h, sleep under 6, time off, burnout at 100). `You slept until eleven.` dropped from `PICK_NOTE.nothing`. Hour counters with no next step say nothing (`1,908 h so far` gone). Skipped: the Grandma money stepper, Puti chose typed amounts on 8 Nov.
+15. Colony chart: when the sell line is just left of the adult line, `sell 60 d+` is drawn left of its line (end-anchored), or past the adult line if there's no room.
+16. Food and water summary uses `waterWorst`: `Algae wafers · NO₃ 52` / `water fine`.
+17. Header shrimp count in ink (`.nshrimp`).
+18. Gear/Kits cards: `<i>Gear</i>?`, `<i>Kits</i>.`, hatch double space. `sale` covers `tab-up`, and the Gear tab spotlight waits while the sale card is due. Gear group `Filter and automation`; Temperature rows by room (`roomT` > 26 fan, chiller, heater; < 21 heater first); no `Has:` line; Standard tank hidden before a farm until cash is a quarter of it. Trade: `Prices are up/down` hint dropped (the number stays); Buy rows `Solid red · grade ~55`, 90-day adults only in the card ?. Kits: header `27 sold a day`, `Profit AED 496 a kit` (the reach-limit sentence stays when it applies, Pass 125 lock), the Sold/day row and the orders forecast gone (Orders/day is in More numbers); Making kits `7 in stock · up to 8 a day`, body `8 packed today · 675 ready ...`, `AED 106 to pack · 8 shrimp`. Kit extras green for 30 days and none after the first is bought (`wbFresh`, `G.opt.wbSeen`). Ads: `26% of Abu Dhabi know you` (`your regions` past one), Staff header empty until a hire, Regions `10M reachable` with the homes in the body. World Owners' tanks: `Tanks · thriving 9,954 · struggling 101`, `Kit quality 98%`, plain + lines merged on one line, the points sentence in the card ?. Mangroves `Open map` (three rows). Lab `0 funded`, center and fertilizer spelling (ids kept). Skipped: Grandma's place first stays (Puti, Pass 271, locked in balance).
+Stable: the Pass 300 `#buycard` −29 px at `first grant` on Trade does not reproduce (avg run, market and up,market, three runs, also on b19295f). Found on b19295f too: `#e-farms` farm-sell `Sell` → `Tap again, AED x` wraps, 17 px, `first grant` on Gear. Open.
+Tests (changed, fell back to feature): 41 suites, layout warn 3 (as before), tapall 3 of 146 (pl-open and ev_rival under `#after-b`, as in Pass 300), m-kits 2 (the header test expected `N of M packed`; updated to `up to N a day`, rerun ok).
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | 19 | WIN 3114 empire_dictator |
+| kind | ok | 64 | WIN 4354 (prev 4354) question_lucky |
+| avg | ok | 35 | earth 6664 (prev 6664) |
+| balance | ok | 6 | 174 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 1 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 7 | 3313 gate checks on 338 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| space | ok | 10 | PASS Leave Earth, launch, search and land after Earth |
+| bot-cards | ok | 0 |  |
+| tight | ok | 147 | 0 findings |
+| layout | warn | 94 | 3 things overflow |
+| projtabs | ok | 12 | 4 project tab checks passed |
+| cardlag | ok | 1 |  avg: reaction cards under 15 s after another (allowed): owntank (react) then farm (react) |
+| greyreason | ok | 167 | PASS (167 s) 471 grey buttons all say why, 92 dotted titles all open, 292 snapshots |
+| tapall | FAIL | 617 | FAIL 3 of 146 taps did nothing: |
+| m-cards | ok | 39 | PASS 40 cards moment checks |
+| m-health | ok | 7 | PASS 10 health moment checks |
+| m-games | ok | 6 | PASS 22 games moment checks |
+| m-kits | FAIL | 47 | FAIL 2 moment checks (kits): |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| m-tank | ok | 12 | PASS 6 tank moment checks |
+| m-hard | ok | 73 | PASS 163 hard moment checks |
+| frozen | ok | 3 | frozen buttons checked on 5 tabs |
+| hard | ok | 13 | 24 hard part checks passed (milestone hardpart) |
+| endcards | ok | 19 | 50 ending card checks passed |
+| fresh | ok | 3 | all ok |
+| effects | ok | 1 | 15 action checks passed |
+| tank1 | ok | 29 | all tank 1 checks passed |
+| yourtank | ok | 22 | all passed |
+| yourtank-360 | ok | 23 | all passed |
+| kitpack | ok | 5 | kit packing checks passed |
+| boardgames | ok | 22 | board game checks passed |
+| land-audio | ok | 13 | all passed |
+| land-life | ok | 15 | all passed |
+| taps | ok | 12 | all ok |
+| ear | ok | 10 | 22 ear tank checks passed |
+
+**Pass 302 (9 Nov, branch only): UX handoff `claude/shrimp-handoff-ux-8nov.md` Part B items 1-7, the clutter pass, plus the Pass 301 farm-sell jump.**
+1. `equipcard`: Gear rows are title · effect (`UPG` `desc` returns [short, full] while not installed): Auto water changer no line (title says it), Better filter `3× the bacteria`, fan `−1.5 °C in summer`, chiller `Holds the temperature you set`, Mossy rocks `Babies die 40% less`, Driftwood `12% less food`, almond leaves `Breeding +10%`, plants `Nitrate −0.25 ppm a day`. The rest is behind the dotted title (from the card ? text). Height is set by the 42 px buttons, so the gain is the wrapped lines only.
+2. `owncare` Food and water: Food, Treats and Water are one folded row each (`.ocf` details, the game's chevron), the pick or the reading on the line (`Algae wafers`, `none`, `all fine` / `NO₃ 52 · KH 0.8`, only readings out of range), the chips and the seven readings inside. Automation sliders stay open.
+3. `c-farms`: the Farm shrimp bar is gone (the number is the slider's result, `45 · Full` on the line above the slider); Farm feed is one folded row `Farm feed · Pellets`, its help joined to Farm shrimp's (`fw-feedh` with `data-base`). Rows `80 shrimp/d · AED 60/d`, each and upkeep in the card ?.
+   Farm-sell jump (Pass 301): `sellLink` returns the button alone and every caller puts it in itemHTML's extra slot, a line of its own under the text (`.item.ih>.tlink.sell`), farms, Earlier farms, the current packing line and Older equipment. `Tap again, AED x` no longer wraps the line above. stable `STABLE_TABS=up STABLE_STAGES="first grant"` (avg run): 1 failure on 2157def (`#e-farms farm-sell rack moved 17 px`), 0 on this build.
+4. `sellcard`: Sales rules is a fold (`details#trade-sales-rules`), open before the first sale, shut after on each load; the line says `Sales rules · sell at 60 d · 40 breeders` (the Breeders slider's total).
+5. `c-proj`: every non-fork project has an `s:` short line (48 added: `+15% want one`, `Referrals +2%`, `Kit survival +8%` ...), WB items too (`s`), used by `owBuys` (Owners' tanks rows on World, through `refRel`) and `wbRows` (kit extras). Forks unchanged (name and cost only).
+6. `buycard`: rows `Grade ~35` once grades show (after the first sale), the look behind the title; `90-day adults` stays only in the card ?. Sell was already first on Trade after the first sale (UI/UX chat 1 F4).
+7. `academy-card`: `More money doesn’t mean more results.` moved to the card ?; `5 grants open a research center · 0 so far`. Puti (9 Nov): the ear grant row says only `A tank you can hear.`, the 3 years behind the title.
+Card heights at 390 px, kind run seed 7, folds opened (`offsetHeight`), before → after:
+| card | tab | stage | before | after |
+|---|---|---|---|---|
+| equipcard | Gear | first sale | 760 | 702 |
+| equipcard | Gear | kits unlocked | 676 | 630 |
+| owncare | Tank | first farm to win | 403 | 330 |
+| c-farms | Farm | first farm | 477 | 376 |
+| c-farms | Farm | 10k owners | 522 | 410 |
+| c-farms | Company | 100k kits | 469 | 392 |
+| c-farms | Company | million owners | 399 | 310 |
+| sellcard | Trade | first sale | 375 | 264 |
+| sellcard | Trade | kits unlocked | 421 | 310 |
+| sellcard | Trade | first hatch (rules open) | 375 | 384 |
+| c-proj | World | 10k owners | 710 | 574 |
+| c-proj | World | 100k kits | 654 | 428 |
+| c-proj | World | million owners | 568 | 402 |
+| c-proj | Company | 100k kits | 299 | 207 |
+| c-proj | Ads | first farm | 216 | 170 |
+| c-proj | Lab | 100k kits | 445 | 412 |
+| buycard | Trade | first sale | 302 | 291 |
+| academy-card | Lab | 10k owners | 378 | 337 |
+stable `STABLE_TABS=up,market` (avg run, full): 10 buttons, 100 failures. Against 2157def at the flagged stages: new were the four Buy shrimp buttons (14 px) and `3 s play (sdet)` 16 px. Cause: with Sales rules folded the Trade page is short, Buy shrimp sits on the first screen, a buy gives the Sales summary its buyers line and the anchor can't scroll down on a page with no room below (the old build never pressed them, they were off screen). Fix: `anchorCheck` grows the tap floor (`FLOOR`, main min-height) by what the scroll needs; `floorTrim` lets it go as before. After: the Buy shrimp buttons hold. Left: `3 s play (sdet)` 16 px (the summary gains its line during play with the page at the top, same family as the old `3 s play (sellcard)`), and the old ones (`feeder` header, `addtank` header, `#sellcard +`, `#btn-match`).
+Tests: `tests/moments/kits.cjs` updated (rack row has no `each`, Sell is its own line in the row, not in the p). `tests/run.cjs` research area knows `grants`/`gr` (`grantsHTML` made `changed` fall back).
+Tests (changed, fell back to feature, b38bc74): 41 suites, layout warn 3 (as before), tapall 3 of 148 (`pl-open` and `ev_rival` under `#after-b`, as in Pass 300/301), m-kits 3 (the test, fixed above, rerun ok).
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | 21 | WIN 3114 empire_dictator |
+| kind | ok | 67 | WIN 4354 (prev 4354) question_lucky |
+| avg | ok | 35 | earth 6664 (prev 6664) |
+| balance | ok | 6 | 174 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 1 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 8 | 3313 gate checks on 338 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| space | ok | 13 | PASS Leave Earth, launch, search and land after Earth |
+| bot-cards | ok | 0 |  |
+| tight | ok | 140 | 0 findings |
+| layout | warn | 91 | 3 things overflow |
+| projtabs | ok | 12 | 4 project tab checks passed |
+| cardlag | ok | 1 |  avg: reaction cards under 15 s after another (allowed): owntank (react) then farm (react) |
+| greyreason | ok | 181 | PASS (180 s) 467 grey buttons all say why, 147 dotted titles all open, 292 snapshots |
+| tapall | FAIL | 608 | FAIL 3 of 148 taps did nothing: |
+| m-cards | ok | 38 | PASS 40 cards moment checks |
+| m-health | ok | 8 | PASS 10 health moment checks |
+| m-games | ok | 5 | PASS 22 games moment checks |
+| m-kits | FAIL | 46 | FAIL 3 moment checks (kits): |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| m-tank | ok | 11 | PASS 6 tank moment checks |
+| m-hard | ok | 73 | PASS 163 hard moment checks |
+| frozen | ok | 3 | frozen buttons checked on 5 tabs |
+| hard | ok | 13 | 24 hard part checks passed (milestone hardpart) |
+| endcards | ok | 19 | 50 ending card checks passed |
+| fresh | ok | 3 | all ok |
+| effects | ok | 1 | 15 action checks passed |
+| tank1 | ok | 29 | all tank 1 checks passed |
+| yourtank | ok | 22 | all passed |
+| yourtank-360 | ok | 22 | all passed |
+| kitpack | ok | 5 | kit packing checks passed |
+| boardgames | ok | 22 | board game checks passed |
+| land-audio | ok | 12 | all passed |
+| land-life | ok | 15 | all passed |
+| taps | ok | 12 | all ok |
+| ear | ok | 10 | 22 ear tank checks passed |
+
+**Pass 303 (9 Nov, branch only): UX handoff `claude/shrimp-handoff-ux-8nov.md` Part B items 8-13, the rest of the clutter pass. Part B is done.**
+8. `kordercard` Bulk order: `70 kits at AED 320 (AED 22,400).` then the hint line `26 days to fill. You can make about N spare kits a day for it.` (taken: `N of M set aside. ...`). The share is on the slider, so the `up to 60%` sentence is gone; who wants them, how the share works, putting kits in from stock and what happens if it isn't full are behind ? (`HELP.kordercard`). The state leads the hint line in both states: a first cut (`, 26 days to fill` on line one, `· 0 set aside` after Accept) dropped a line at the top of a short page and stable caught Accept moving 20 px.
+9. `c-kits`: nothing left, A18 (Pass 301) already made it `27 sold a day` in the header and `Profit AED 496 a kit` in the body.
+10. `colcard` Colony: a `coll` card now; the first render with Your tank folds it once (`G.opt.colFold`), the line says `20 shrimp · 0 berried`. Opening it again stays open. Before the farm it's as it was.
+11. `c-shops`: `A store in every fifth mall in your regions.` is `.explain` (card ?); small-shop rows `+3 orders a day · 50% output`, rent behind the title.
+12. `c-mkt`: checked, left as it is (the handoff said so).
+13. `logcard` Recent events: was already hidden until it has an entry (UI/UX chat 1 C5). Now the newest three, the rest under `Earlier (n)` like What happened on You (Mistakes: a log card that shows every entry). `charts` summary `nitrate 5 ppm` stays.
+Card heights at 390 px, kind run seed 7 unless marked, `offsetHeight` with the card's own fold state (Colony after is folded; before it was never folded), before → after:
+| card | tab | stage | before | after |
+|---|---|---|---|---|
+| kordercard | Company | million owners | 251 | 211 |
+| kordercard | Kits | first farm (avg) | 272 | 211 |
+| c-kits | Kits / Market | 10k, million | 169 | 169 |
+| colcard | Tank | first sale | 222 | 222 |
+| colcard | Tank | first farm | 222 | 52 |
+| colcard | Tank | 10k owners | 222 | 52 |
+| c-shops | Ads | 10k owners | 450 | 406 |
+| c-shops | Market | million owners | 181 | 160 |
+| c-mkt | Market | million owners | 413 | 413 |
+| logcard | Tank | first sale | 222 | 148 |
+| logcard | Tank | first farm | 289 | 165 |
+| charts | Tank | first sale | 378 | 378 |
+Moment checks in `tests/moments/tank.cjs` (avg `first farm`: Colony folded with its count, Recent events three plus Earlier, bulk order line; avg `first grant`: small-shop rows without rent). The Colony and log checks fail on 804ac27.
+After Part B: `tight` 0 findings, `greyreason` 467 grey buttons all say why, `layout` warn 3 (as before). stable `STABLE_RUN=tests/.runs/avg/run-7.json STABLE_TABS=up,market,emp,tank STABLE_STAGES="first sale,first farm,first grant"`: 7 failures, 5 on 2157def. Same on both: `#sellcard +` and `#btn-match` −29 px (first farm, market), `#qccard` and the QC strictness buttons (first grant, emp). New against 2157def: `korder-take` −20 px (mine, fixed above, 0 on emp after), `3 s play (sdet)` 29 px (on 804ac27 too, Pass 302's, flagged in chat 4), QC `Relaxed` 48 px (804ac27 has it, the same QC family). Not chased.
+Also: my BUILD `sed` hit the `checkBuild` regex `BUILD='([^']+)'` and the page stopped parsing; fast passed (sim only), every browser suite failed with `migrate is not defined`. Replace the stamp only on the `var toastT` line.
+
+Tests (changed after the final edit, ed457a5 + kordercard line): 15 suites, 0 failed. Earlier `changed` on ed457a5, 26 suites:
+
+| suite | result | s | note |
+|---|---|---|---|
+| avg | ok | - | cached, game unchanged: earth 6664 |
+| kind | ok | - | cached, game unchanged: WIN 4354 |
+| strong | ok | - | cached, game unchanged: WIN 3114 |
+| balance | ok | 6 | 174 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 1 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 8 | 3313 gate checks on 338 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| cardlag | ok | 1 |  avg: reaction cards under 15 s after another (allowed): owntank (react) then farm (react) |
+| m-cards | ok | 41 | PASS 40 cards moment checks |
+| bot-cards | ok | 0 |  |
+| projtabs | ok | 12 | 4 project tab checks passed |
+| tank1 | ok | 30 | all tank 1 checks passed |
+| yourtank | ok | 23 | all passed |
+| m-tank | ok | 13 | PASS 10 tank moment checks |
+| tapall | FAIL | 608 | FAIL 2 of 157 taps did nothing: |
+| m-kits | ok | 48 | PASS 298 kits moment checks |
+| kitpack | ok | 5 | kit packing checks passed |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| tight | ok | 146 | 0 findings |
+| greyreason | ok | 185 | PASS (184 s) 467 grey buttons all say why, 147 dotted titles all open, 292 snapshots |
+| layout | warn | 92 | 3 things overflow |
+
+**Pass 304 (9 Nov, branch only): the UX handoff leftovers (Puti: "do everything").**
+- Row buttons 36 px, `.item` padding 6 px (were 42 and 8; one rule at the end of the first `<style>`, `.item>.btn`, `.item>button`, `.item>.hb .btn`, `.hbv`). Done rows (30), `.mini`, care, order and tab buttons unchanged. A row is 48 px.
+- Sell summary: after the first sale (`G.stats.sold>0`) it keeps the box and its second line whatever is ready (`.sellsum.empty` only before it). The flat empty line was 37 px, the box 60, so a shrimp coming ready in play, or a price tap that sold nothing, moved everything under it 23 to 29 px: stable `3 s play (sdet)`, `#sellcard +`, `#btn-match`.
+- `tests/shrimp-stable.cjs` presses like a finger: a pointerdown on the button first (anchorGet reads `LAST_PTR`), and 450 ms after its own scroll. The QC `Relaxed` 48 px was the test (el.click() left the anchor at mid screen).
+- `tests/shrimp-heights.cjs`: the card height table (`HEIGHTS=card@stage[@bot][@tab]`, `MOMENT_HTML` for an old build).
+- Open: closing Quality checks (`#qccard` header, avg `first grant`, Company) moves the page 95 px with a mouse tap too. Traced: the page scrolls up 47 px twice in the frames after the toggle, the main floor sits at the view need (695) while it happens, and no scrollBy, scrollTo, scrollIntoView or focus is called. Cause not found.
+- Puti calls left from the UX handoff stay as she made them: Grandma's place first, Grandma money typed, grants in USD.
+Card heights at 390 px, kind seed 7, the card's fold opened, before (c942d54) → after:
+| card | tab | stage | before | after |
+|---|---|---|---|---|
+| equipcard | up | first sale | 702 | 618 |
+| equipcard | up | kits unlocked | 630 | 565 |
+| owncare | tank | first farm | 330 | 330 |
+| c-farms | up | first farm | 376 | 348 |
+| c-farms | up | 10k owners | 410 | 382 |
+| c-farms | emp | 100k kits | 392 | 384 |
+| c-farms | emp | million owners | 310 | 300 |
+| sellcard | market | first sale | 264 | 264 |
+| sellcard | market | kits unlocked | 310 | 310 |
+| c-proj | world | 10k owners | 574 | 539 |
+| c-proj | world | 100k kits | 428 | 403 |
+| c-proj | world | million owners | 402 | 372 |
+| c-proj | emp | 100k kits | 207 | 190 |
+| c-proj | promote | first farm | 170 | 161 |
+| c-proj | research | 100k kits | 412 | 396 |
+| buycard | market | first sale | 291 | 254 |
+| academy-card | research | 10k owners | 320 | 306 |
+| kordercard | emp | million owners | 205 | 205 |
+| kordercard | emp | first farm (avg) | 205 | 205 |
+| colcard | tank | first sale | 222 | 222 |
+| colcard | tank | first farm | 222 | 222 |
+| c-shops | promote | 10k owners | 406 | 387 |
+| c-shops | promote | million owners | 160 | 160 |
+| c-mkt | promote | million owners | 413 | 401 |
+| logcard | tank | first sale | 148 | 148 |
+| logcard | tank | first farm | 165 | 165 |
+| charts | tank | first sale | 378 | 378 |
+stable `STABLE_RUN=tests/.runs/avg/run-7.json STABLE_TABS=up,market,emp,tank STABLE_STAGES="first sale,first farm,first grant"`: 1 failure (`#qccard` header 95 px), was 5 on c942d54.
+Tests (changed, 17 suites): 0 failed after the BUILD stamp fix (balance caught a future stamp), layout warn 3 as before, tight 0, greyreason 471 all say why, tapall 136 taps all changed the save (was 2 fails, `ev_rival` under `#after-b`; not looked at why it passes now).
+
+**Pass 305 (9 Nov, deployed with 300-304): the Quality checks jump.**
+- Closing Quality checks (`#qccard` header, avg `first grant`, Company) moved the page 95 px. Cause: `applyReveal` set `#astrip` (the business strip, 47 px) hidden on every render and `renderProgression` showed it again on business tabs. In between the page was 47 px shorter, a layout read clamped the scroll at the page bottom, and `floorTrim` then trimmed the floor to the clamped view, so the next render did it again: two 47 px steps. Found by wrapping the `hidden` setter and logging `scrollHeight` per set.
+- Fix: the strip is set in one place, `renderProgression` (`if(!business)$('astrip').hidden=true`). `applyReveal` no longer touches it.
+- Check: `m-kits` closes Quality checks at avg first grant on a fresh page with a mouse tap and asserts the header doesn't move. Fails on be0d834 (643 → 738 px), passes now.
+- stable `STABLE_TABS=emp STABLE_STAGES="first grant"`: 36 clicks, 0 moved (was 1 failure, `#qccard` 95 px).
+
+Tests (changed):
+
+Tests (changed, be0d834, 2026-11-09 12:41 UTC, 4.9 min, 2 at once): 15 suites, 0 failed, 1 warn, 0 skipped.
+
+changed vs be0d834: tight, layout, greyreason, m-kits (all tabs)
+
+| suite | result | s | note |
+|---|---|---|---|
+| avg | ok | - | cached, game unchanged: earth 6664 |
+| strong | ok | - | cached, game unchanged: WIN 3114 |
+| balance | ok | 7 | 174 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 6 | 2540 gate checks on 234 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| tight | ok | 151 | 0 findings |
+| layout | warn | 95 | 3 things overflow |
+| greyreason | ok | 183 | PASS (183 s) 473 grey buttons all say why, 149 dotted titles all open, 292 snapshots |
+| m-kits | ok | 52 | PASS 299 kits moment checks |

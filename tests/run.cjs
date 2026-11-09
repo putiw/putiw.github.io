@@ -114,7 +114,7 @@ const CH_AREAS=[
   ['health','health ill sick heal hc fg',['m-health','tapall'],['tank']],
   ['frozen','frz frozen freeze',['frozen','projtabs'],['promote','market','emp']],
   ['world','world region regions store stores times ripple farm farms coin pump rm reg opinion',['tight','tapall','greyreason'],['world','emp']],
-  ['research','research lab sci tree trees',['tight','tapall','greyreason','land-life'],['research']],
+  ['research','research lab sci tree trees grants gr',['tight','tapall','greyreason','land-life'],['research']],
   ['land','land grandma garden house pond plant plants pl grass',['land-life','land-audio','m-you'],['me']],
   ['you','me you party mira nour personal week shop shopping crs course away gp gt acts pick act trait traits ev val',['me','m-you','tight'],['me']],
   ['games','game games gomoku reversi bg gm stale',['boardgames','m-games'],[]],
