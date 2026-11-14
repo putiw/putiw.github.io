@@ -21,7 +21,7 @@ const win=snaps.win,mid=snaps['million owners'];
   await load(mid,"G.emp.ended={kind:'sold',day:G.day};G.progress.queue=['gameover'];");await check('gameover sold');
   await load(win,"G.left={day:G.day};G.progress.queue=['left'];");await check('left');
   // the buyout offer: both choices are on screen and Sell ends the game on its ending card
-  await load(mid,"G.progress.queue=['buyout'];");await check('buyout offer');
+  await load(mid,"G.progress.queue=['buyout'];G.progress.mail=['buyout'];G.progress.mailOpen='buyout';");/* v2 M3: the buyout is a letter, opened */await check('buyout offer');
   const tap=async(re)=>{await p.waitForTimeout(650);return p.evaluate(re=>{var bt=[...document.querySelectorAll('#milestone-card button, #after button')].find(x=>new RegExp(re).test(x.textContent)&&x.getClientRects().length);if(!bt)return false;bt.click();render();return true;},re);};
   await tap('Sell for');await tap('Tap again');for(let i=0;i<3;i++){const e=await p.evaluate(()=>!!G.emp.ended);if(e)break;await tap('Got it|OK|Close|Continue');}
   const sold=await p.evaluate(()=>G.emp.ended?G.emp.ended.kind:'not ended');

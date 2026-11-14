@@ -19,7 +19,7 @@ function momRng(s){return function(){s=(s*1664525+1013904223)>>>0;return s/42949
 function momGames(G0){/* the side branch: never touches G0 or the bot's random numbers */
  var mr=Math.random;Math.random=momRng(4242);try{var g2=JSON.parse(JSON.stringify(G0));
   if(!setPick(g2,'games'))return;g2.progress.queue=[];momTake(g2,'game draft',{kind:'game',tab:'me',branch:1});
-  if(!gameStart(g2))return;for(var d=0;d<400&&!(gmOf(g2).cur&&gmOf(g2).cur.w);d++){for(var q=0;q<4;q++){while(g2.progress.queue.length)momAck0(g2);momStep0(g2);}}
+  if(!gameStart(g2))return;for(var d=0;d<400&&!(gmOf(g2).cur&&gmOf(g2).cur.w);d++){for(var q=0;q<4;q++){while(g2.progress.queue.length||typeof mailNext==='function'&&mailNext(g2))momAck0(g2);momStep0(g2);}}
   if(gmOf(g2).cur&&gmOf(g2).cur.w){g2.progress.queue=[];momTake(g2,'game checkpoint',{kind:'game',tab:'me',branch:1});}
  }catch(e){MOM_ERR=String(e);}finally{Math.random=mr;}}
 function momLand(G0){/* bots never buy Grandma's places: a copy buys the flat and the house, answers the land card No (on sale now) and buys the land */

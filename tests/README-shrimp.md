@@ -3953,3 +3953,60 @@ changed vs ?: fell back to feature (no base (no upstream): pass --base=<ref>)
 | land-life | ok | 18 | all passed |
 | taps | ok | 12 | all ok |
 | ear | ok | 10 | 22 ear tank checks passed |
+
+
+## v2 M3 (14 Nov, shrimp-v2, BUILD v2m3): Letters, company problems stop stopping the clock
+
+- Two kinds of card. **Story** stops time as before. **Letter** (`isLetter`: every `PAINS` card plus `LETTERS`) goes to `G.progress.mail` and waits, the clock runs. Letters keep the old pacing: they still travel `p.wait` to `p.queue`, and `mailRoute` (end of `detectMilestones`) lifts them out of the queue the same step. At most `MAIL_MAX` 3 unanswered, later ones wait in `p.mailq`. Arrival is a note banner (`NOTE_KINDS.letter` "A letter", the card's title; a tap goes to the Letters card) and the dot on the Kits/Company tab.
+- `LETTERS` (the plan's list plus my calls by the rule "company, from outside your life"): ev_paper, ev_rival, ev_ai, ev_school, ev_marine, c_survey, c_pricewar, c_strain, c_feed, c_box, c_vet, c_contam, c_wells, c_price1, c_kyoto, c_bare, c_lights, c_flood, c_glass, c_permit, c_cash, c_inspect, c_budget, c_power, c_rivers, c_many, c_blackout, c_prison, c_green, buyout, coin_offer. My calls: ev_paper, ev_ai, ev_school, ev_marine, c_prison, c_green are letters. Kept as story: c_bonus (the little bird, your own money), c_cousin, c_heat, c_jar2, c_letgo, c_fair, c_nydin, c_sleep, the dirty-money line (dye_offer, fight_invite, wash_offer, fav_*), tree_*, stream, nour*, gp_*, pump calls, everything in `CARD_NOW`/`CARD_REACT`.
+- Letters card `#c-mail` under The line (`renderMail`): title, "Today" / "12 d ago", Open. Opening (`mailOpen`) puts the key at the front of the queue with `p.mailOpen`, so the usual card shows with the header LETTER and one more button, Later (`mailLater`: closes it unanswered, time runs again). Answering goes through `storyChoose`/`painPick` as before, `acknowledgeMilestone` takes it out of `mail`. What happened stays. Letters never expire, nothing is picked for the player; an unanswered pain keeps costing orders through `painMult` (no new rule).
+- `migrate`: `mailRoute(G,1)` creates the fields and moves a letter key left in an old save's queue into Letters.
+- Bots and helpers answer letters the day they arrive, same policy (`mailNext` in `shrimp-playthrough`, `shrimp-average-playthrough`, `lib/moment.cjs`, `lib/moments.cjs`). Seed 7 after: strong 2,914, kind 4,354, average 6,664 (all unchanged). `bot-cards` no STUCK.
+- Average run, first farm to a million: 9 cards stop the clock (was 27 story cards in that stretch, 18 are letters now).
+- Tests: `m-v2` M3 block. `shrimp-endcards` opens the buyout as a letter; `shrimp-tapnow` leaves `ln-go` out (navigation, like `navigate`).
+- The run below is before those two test fixes: endcards failed on the buyout (now a letter) and tapall on `ln-go` (card already on screen); both rerun green after. Known: layout 3 overflows.
+
+| suite | result |
+|---|---|
+| strong | ok -  cached, game unchanged: WIN 2914 |
+| kind | ok -  cached, game unchanged: WIN 4354 |
+| avg | ok -  cached, game unchanged: earth 6664 |
+| academy | ok 0s  10 academy and parallel chapter checks passed |
+| me | ok 1s  56 free time, Grandma and ending checks passed |
+| cardtap | ok 3s  card tap checks passed |
+| space-search | ok 0s  6 space search checks passed |
+| tank1-sim | ok 1s  all tank 1 sim checks passed |
+| balance | ok 5s  176 focused balance and migration checks passed |
+| effects-sim | ok 0s  14 action checks passed |
+| sound | ok 1s  all ok |
+| gates | ok 7s  3289 gate checks on 331 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| bot-cards | ok 0s   |
+| space | ok 10s  PASS Leave Earth, launch, search and land after Earth |
+| layout | warn 94s  3 things overflow |
+| projtabs | ok 12s  4 project tab checks passed |
+| cardlag | ok 1s   avg: reaction cards under 15 s after another (allowed): owntank (react) then farm (react) |
+| tight | ok 146s  0 findings |
+| greyreason | ok 164s  PASS (164 s) 465 grey buttons all say why, 147 dotted titles all open, 287 snapshots |
+| m-cards | ok 36s  PASS 40 cards moment checks |
+| m-health | ok 8s  PASS 10 health moment checks |
+| m-games | ok 5s  PASS 22 games moment checks |
+| m-kits | ok 49s  PASS 299 kits moment checks |
+| m-you | ok 4s  PASS 9 you moment checks |
+| m-tank | ok 12s  PASS 10 tank moment checks |
+| m-hard | ok 62s  PASS 133 hard moment checks |
+| m-v2 | ok 20s  PASS 45 v2 moment checks |
+| frozen | ok 3s  frozen buttons checked on 5 tabs |
+| hard | ok 13s  24 hard part checks passed (milestone hardpart) |
+| endcards | FAIL 23s  390 after selling: card hidden |
+| fresh | ok 4s  all ok |
+| effects | ok 0s  15 action checks passed |
+| tank1 | ok 30s  all tank 1 checks passed |
+| yourtank | ok 23s  all passed |
+| yourtank-360 | ok 23s  all passed |
+| kitpack | ok 5s  kit packing checks passed |
+| boardgames | ok 21s  board game checks passed |
+| tapall | FAIL 478s  FAIL 2 of 160 taps did nothing: |
+| land-audio | ok 13s  all passed |
+| land-life | ok 19s  all passed |
+| taps | ok 13s  all ok |
+| ear | ok 10s  22 ear tank checks passed |
