@@ -467,4 +467,25 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
    M.check('v2b 12 the pains (the three with a cheap dodge too) are the table of b7d4af8',r.pains===-1814879247,r.pains);
    M.check('v2b 12 the placeholder art functions are untouched',r.line===-1514927444&&r.homes===-1360199221&&r.ph,r);}
  }
+ // ---- v2b 13: late saves to test with, ?dev=hard and ?dev=mid ----
+ if(on('b13')){
+  const fs=require('fs'),path=require('path'),http=require('http'),dir=path.join(__dirname,'..','..','shrimp');
+  const sw=fs.readFileSync(path.join(dir,'sw.js'),'utf8'),hard=JSON.parse(fs.readFileSync(path.join(dir,'dev-hard.json'),'utf8')),mid=JSON.parse(fs.readFileSync(path.join(dir,'dev-mid.json'),'utf8'));
+  M.check('v2b 13 neither dev file is in sw.js',!/dev-hard|dev-mid/.test(sw));
+  M.check('v2b 13 dev-hard.json is a v2 save (letters and lever state) from before the hard part, under 300 kB',!!hard.progress&&Array.isArray(hard.progress.mail)&&!!hard.lev&&!hard.emp.hard&&fs.statSync(path.join(dir,'dev-hard.json')).size<300*1024,{day:hard.day,mail:hard.progress&&hard.progress.mail});
+  M.check('v2b 13 dev-mid.json is year 7 of the average run under 300 kB',Math.floor(mid.day)===2555&&mid.emp.regions.length>=4&&!mid.emp.hard_open&&fs.statSync(path.join(dir,'dev-mid.json')).size<300*1024,{day:mid.day});
+  const types={'.html':'text/html','.js':'text/javascript','.json':'application/json','.png':'image/png','.mp3':'audio/mpeg','.ico':'image/x-icon','.webmanifest':'application/manifest+json'};
+  const srv=http.createServer((q,s)=>{const u=decodeURIComponent(q.url.split('?')[0]),f=path.join(dir,u==='/'?'index.html':u);if(!f.startsWith(dir)||!fs.existsSync(f)||fs.statSync(f).isDirectory()){s.writeHead(404);s.end();return;}s.writeHead(200,{'content-type':types[path.extname(f)]||'application/octet-stream'});fs.createReadStream(f).pipe(s);});
+  await new Promise(r=>srv.listen(0,'127.0.0.1',r));const port=srv.address().port;
+  for(const [mode,key] of [['mid','universal-shrimp-dev-mid'],['hard','universal-shrimp-dev']]){
+   const cx=await g.page.context().browser().newContext({viewport:{width:390,height:844}}),pg=await cx.newPage(),errs=[];pg.on('pageerror',e=>errs.push(String(e)));
+   await pg.addInitScript(()=>{try{localStorage.setItem('universal-shrimp-v2','REAL');}catch(e){}});
+   await pg.goto('http://127.0.0.1:'+port+'/index.html?dev='+mode,{waitUntil:'load'});await pg.waitForFunction(()=>typeof G!=='undefined'&&G&&G.day>100,null,{timeout:20000}).catch(()=>{});await pg.waitForTimeout(1500);
+   const r=await pg.evaluate(()=>{try{save(true);}catch(e){}return {day:Math.floor(G.day),key:saveKey,real:localStorage.getItem('universal-shrimp-v2'),saved:!!localStorage.getItem(saveKey),q:G.progress.queue[0]||null,hardOpen:!!(G.emp.hard&&G.emp.hard.open),humans:G.humans,map:!$('c-map').hidden||!!document.querySelector('#c-map'),tabs:[...document.querySelectorAll('.tabs [data-tab]')].filter(t=>!t.hidden).length};});
+   if(mode==='mid')M.check('v2b 13 ?dev=mid opens at year 7 under its own save key, the real save untouched',r.day>=2555&&r.day<2600&&r.key===key&&r.real==='REAL'&&r.saved&&!r.hardOpen&&errs.length===0,{r,errs});
+   else{const h=await pg.evaluate(()=>{var p=G.progress,d0=G.day;for(var i=0;i<240&&!(G.emp.hard&&G.emp.hard.open);i++){while(p.queue.length&&p.queue[0]!=='hardpart'){var k=p.queue[0],ch=storyChoices(G,k);if(ch)for(var j=0;j<ch.length;j++)if(storyChoose(G,k,j))break;acknowledgeMilestone(G);}if(p.queue[0]==='hardpart')break;stepGame(G);}render();return {q:p.queue[0]||null,seen:!!p.seen.hardpart,open:!!(G.emp.hard&&G.emp.hard.open),days:Math.round(G.day-d0),humans:G.humans};});
+    M.check('v2b 13 ?dev=hard opens on v2 just before the hard part under its own save key, the hard part opens within 60 days',r.key===key&&r.real==='REAL'&&r.saved&&r.day>5000&&(h.q==='hardpart'||h.seen||h.open)&&h.days<=60&&errs.length===0,{r,h,errs});}
+   await cx.close();}
+  await new Promise(r=>srv.close(r));
+ }
  await g.close();M.done('v2');})();

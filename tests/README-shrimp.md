@@ -4726,3 +4726,30 @@ Tests (fast, c8a7237, 2026-11-14 10:16 UTC, 0.3 min, 2 at once): 9 suites, 0 fai
 | kind | ok | - | cached, game unchanged: WIN 4367 |
 | strong | ok | - | cached, game unchanged: WIN 2476 |
 | m-v2 | ok | 79 | PASS 201 v2 moment checks |
+
+## v2b 13 (14 Nov, shrimp-v2, BUILD 2026-11-14T14:19-v2b): late saves to test with, dev-hard rebuilt and dev-mid
+
+- `shrimp/dev-hard.json` rebuilt from the v2 average run (seed 7, `tests/.runs/avg/run-7.json`): day 5,456, just under the hard part, a v2 save (letters, levers). `?dev=hard` works on v2 again.
+- New `?dev=mid`: the same run's "year 7" snapshot (day 2,555, 3.9M people, 5 regions, farms, the Map, The line, Letters), from `shrimp/dev-mid.json`, written by the same `tests/build-dev-hard.cjs`. Same mechanism (`DEVM`, `devStart`), its own save key `universal-shrimp-dev-mid`; `&speed=40` works on both. The real save is not touched.
+- Neither file is in `sw.js`. Both must come off before a push to main (`git rm --cached shrimp/dev-hard.json shrimp/dev-mid.json` on the deploy commit).
+- Checks: block `b13` serves `shrimp/` over http and opens both links in a real page (the day, the save key, the real save untouched, no page error, the hard part opens within 60 days on `?dev=hard`), plus file size and `sw.js`.
+- No new player text.
+
+Tests (fast, 14fcadf, 2026-11-14 10:19 UTC, 0.3 min, 2 at once): 9 suites, 0 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| balance | ok | 8 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 7 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+
+| avg | ok | - | cached, game unchanged: earth 7308 |
+| kind | ok | - | cached, game unchanged: WIN 4367 |
+| strong | ok | - | cached, game unchanged: WIN 2476 |
+| m-v2 | ok | 84 | PASS 206 v2 moment checks |

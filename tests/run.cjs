@@ -98,7 +98,7 @@ const CH_FILES=[
   [/^shrimp\/region-map\.js$/,{suites:['tight','layout'],tabs:['world']},'world map'],
   [/^shrimp\/ear\.html$/,['ear'],'ear tank page'],
   [/^shrimp\/(sfx\/|.*\.mp3$)/,['taps','land-audio'],'sound files (sound is in fast)'],
-  [/^shrimp\/(sw\.js|manifest\.webmanifest|home\.html|ending-playtest|dev-hard\.json|shots\/|.*\.(png|ico)$)/,'fast','not read by any suite but layout shots'],
+  [/^shrimp\/(sw\.js|manifest\.webmanifest|home\.html|ending-playtest|dev-(hard|mid)\.json|shots\/|.*\.(png|ico)$)/,'fast','not read by any suite but layout shots'],
   [/^shrimp\//,'feature','a file under shrimp/ the map doesn\'t know'],
   [/./,'fast','outside the game'],
 ];
