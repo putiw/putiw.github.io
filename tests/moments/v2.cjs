@@ -327,4 +327,20 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
   {const o=await g.js(()=>{G.progress.mail=['c_prison','c_survey','coin_offer'];cache={};render();var c=$('c-mail'),cr=c.getBoundingClientRect();return [...c.querySelectorAll('.ml-row *')].filter(e=>e.checkVisibility()&&(e.getBoundingClientRect().right>cr.right+0.5||(e.tagName==='P'&&e.scrollWidth>e.clientWidth+1))).length;});M.check('v2b 4 the longest senders fit the row at 360',o===0,o);}
   await g.page.setViewportSize({width:390,height:844});
  }
+ // ---- v2b 5: the price where she looks for it ----
+ if(on('b5')){
+  const vis=()=>g.js(()=>{var e=$('kit-pricego');return e&&e.checkVisibility()?e.innerText.trim():null;});
+  await g.load(A('first kit'));await g.tab('emp');M.check('v2b 5 first 50 kits: the slider is on the Kits card, no price line',await vis()===null&&await g.js(()=>$('kit-pricerow').parentNode.id!=='ln-price'));
+  for(const st of ['first farm','year 7']){await g.load(A(st));
+   const kt=await g.js(()=>{var t=mkMode(G)?'promote':'emp';selectTab(t);['c-kits','c-line'].forEach(function(i){$(i).classList.remove('shut','queued');});if(G.opt.shut){G.opt.shut.kits=false;G.opt.shut.line=false;}G.kitPrice=450;cache={};render();return {t:t,kits:$('c-kits').closest('.panel').id,line:$('c-line').closest('.panel').id};});
+   await g.page.waitForTimeout(200);const t=await vis();
+   M.check('v2b 5 '+st+': the Kits card has one line, Price AED 450',t==='Price AED 450'&&await g.js(()=>$('kit-pricego').closest('.card').id==='c-kits'&&$('kit-pricerow').parentNode.id==='ln-price'),{t,kt});
+   await g.js(()=>{$('kit-pricego').scrollIntoView({block:'center'});});await g.page.waitForTimeout(700);
+   {const b=await g.rect('#kit-pricego');await g.page.mouse.click(b.x+b.w/2,b.y+b.h/2);}await g.page.waitForTimeout(500);
+   const r=await g.js(()=>{var top=document.querySelector('.top').getBoundingClientRect().bottom,s=$('s-kitPrice').getBoundingClientRect();return {tab:activeTab,sl:s.top>=top-1&&s.bottom<=innerHeight&&$('s-kitPrice').checkVisibility(),lineTop:Math.round($('c-line').getBoundingClientRect().top-top)};});
+   M.check('v2b 5 '+st+' ('+(kt.kits===kt.line?'same tab':'other tab')+'): a tap goes to The line, the slider is on screen',r.tab==='emp'&&r.sl,r);}
+  await g.page.setViewportSize({width:360,height:844});await g.load(A('year 7'));
+  {const o=await g.js(()=>{selectTab(mkMode(G)?'promote':'emp');$('c-kits').classList.remove('shut');G.kitPrice=600;cache={};render();var e=$('kit-pricego'),c=$('c-kits').getBoundingClientRect(),r=e.getBoundingClientRect();return {ok:r.right<=c.right+0.5&&r.height<26,t:e.innerText};});M.check('v2b 5 one line at 360',o.ok&&o.t==='Price AED 600',o);}
+  await g.page.setViewportSize({width:390,height:844});
+ }
  await g.close();M.done('v2');})();

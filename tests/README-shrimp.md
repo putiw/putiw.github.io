@@ -4435,3 +4435,28 @@ Tests (fast, 1632042, 2026-11-14 09:04 UTC, 0.3 min, 2 at once): 9 suites, 0 fai
 | kind | ok | 81 | WIN 4367 (prev 4367) question_lucky |
 | strong | ok | 27 | WIN 2476 (prev 2476) empire_dictator |
 | m-v2 | ok | 52 | PASS 149 v2 moment checks |
+
+## v2b 5 (14 Nov, shrimp-v2, BUILD 2026-11-14T13:08-v2b): the price on the Kits card, a tap goes to The line
+
+- The slider stays in The line. The Kits card has one line where the slider used to be, "Price AED 450" (`#kit-pricego`, dotted like every link), shown once the price is free (50 kits). A tap goes to The line: on the same tab it opens the card and scrolls to it, in Company and Market mode it switches from Market to Company first (`lineGo('price')`).
+- Checks: block `b5` (no line in the first 50 kits; the line and its text at first farm and year 7; the tap lands with the slider on screen, same tab and other tab; one line at 360).
+- New text: "Price AED 450", draft.
+
+Tests (fast, 131d4d4, 2026-11-14 09:08 UTC, 0.3 min, 2 at once): 9 suites, 0 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| balance | ok | 8 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 8 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+
+| avg | ok | - | cached, game unchanged: earth 7308 |
+| kind | ok | - | cached, game unchanged: WIN 4367 |
+| strong | ok | - | cached, game unchanged: WIN 2476 |
+| m-v2 | ok | 57 | PASS 155 v2 moment checks |
