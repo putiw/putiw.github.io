@@ -363,4 +363,21 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
    const bad=ph.filter(p=>p.length>46||/[.!,]$/.test(p)||!/^[A-Z]/.test(p)||/—|–/.test(p));
    M.check('v2b 6 every since phrase is short, starts with a capital, no full stop, no dash ('+ph.length+')',ph.length>=25&&bad.length===0,bad);}
  }
+ // ---- v2b 7: that worked, later moves go to the card's ? ----
+ if(on('b7')){
+  await g.load(A('year 2'));
+  {const r=await g.js(()=>{var p=G.progress;G.lev={};G.kits.sold=Math.max(G.kits.sold,60);var step=function(n){for(var i=0;i<n*4;i++){while(p.queue.length){var k=p.queue[0],ch=storyChoices(G,k);if(ch)for(var j=0;j<ch.length;j++)if(storyChoose(G,k,j))break;acknowledgeMilestone(G);}stepGame(G);}};
+     var cntL=function(){return G.log.filter(x=>/^Price \d+\. Orders/.test(x.t)).length;},pr=G.kitPrice;step(2);G.log.length=0;G.kitPrice=pr+60;step(9);var first=G.lev.price.last,l1=cntL();G.log.length=0;G.kitPrice=pr+20;step(9);var second=G.lev.price.last,l2=cntL();G.kitPrice=pr-30;step(9);var third=G.lev.price.last,l3=cntL();
+     cache={};selectTab('emp');render();var card=leverCard('price'),h=helpText($(card)),hk=card==='c-kits'?'':helpText($('c-kits'));return {pr:pr,first:first,second:second,third:third,l1:l1,l2:l2,l3:l3,card:card,inHelp:h.indexOf(third)>=0,old:h.indexOf(second)>=0||h.indexOf(first)>=0,other:hk.indexOf(third)>=0,n:(h.match(/lev-last/g)||[]).length};});
+   M.check('v2b 7 the first move still makes one Recent events line',r.l1===1&&r.first&&r.first.indexOf('Price '+(r.pr+60)+'. ')===0,r);
+   M.check('v2b 7 later moves: nothing in Recent events, the same kind of line kept',r.l2===0&&r.l3===0&&/^Price \d+\. Orders [\d.,kM]+ → [\d.,kM]+ a day\.$/.test(r.third)&&r.third.indexOf('Price '+(r.pr-30)+'. ')===0&&r.second.indexOf('Price '+(r.pr+20)+'. ')===0,r);
+   M.check('v2b 7 the ? of the card with the slider shows the latest one only',r.inHelp&&!r.old&&r.n===1&&!r.other,r);}
+  {await g.js(()=>{var c=$(leverCard('price'));c.classList.remove('shut');cache={};render();c.scrollIntoView({block:'center'});});await g.page.waitForTimeout(700);
+   const b=await g.js(()=>{var q=$(leverCard('price')).querySelector('.hd .qhelp');var r=q&&q.getBoundingClientRect();return r?{x:r.left+r.width/2,y:r.top+r.height/2}:null;});
+   if(b)await g.page.mouse.click(b.x,b.y);await g.page.waitForTimeout(300);
+   const t=await g.js(()=>$('helpsheet').hidden?null:$('hs-b').innerText);M.check('v2b 7 tapping the ? shows the line',!!b&&!!t&&/Price \d+\. Orders/.test(t),t);await g.js(()=>{var x=$('hs-x');if(x)x.click();});}
+  {const r=await g.js(()=>{G.lev={breed:{done:1,last:'Breeders 1 a liter. Shrimp 40 → 55.'},dens:{done:1,last:'Shrimp a rack 80%. Bred 1,200 → 1,050 a day.'},qc:{done:1,last:'Quality checks strict. Sick kits 4% → 2%.'}};return {b:helpText($('sellcard')).indexOf('Breeders 1 a liter')>=0,d:helpText($('c-farms')).indexOf('Shrimp a rack 80%')>=0,q:helpText($('qccard')).indexOf('Quality checks strict')>=0,none:helpText($('c-staff')).indexOf('lev-last')<0};});
+   M.check('v2b 7 Breeders, Shrimp a rack and QC strictness each in their own card\'s ?',r.b&&r.d&&r.q&&r.none,r);}
+  {const r=await g.js(()=>{var s=JSON.parse(JSON.stringify(G));s.lev={price:{done:1}};migrate(s);return !s.lev.price.last;});M.check('v2b 7 an old save with the first line done has no latest line until the next move',r);}
+ }
  await g.close();M.done('v2');})();

@@ -4487,3 +4487,30 @@ Tests (fast, 080df29, 2026-11-14 09:12 UTC, 0.3 min, 2 at once): 9 suites, 0 fai
 | kind | ok | 83 | WIN 4367 (prev 4367) question_lucky |
 | strong | ok | 29 | WIN 2476 (prev 2476) empire_dictator |
 | m-v2 | ok | 56 | PASS 160 v2 moment checks |
+
+## v2b 7 (14 Nov, shrimp-v2, BUILD 2026-11-14T13:16-v2b): that worked, later moves in the card's help
+
+- `leverDay` no longer stops at the first line. The first move of a lever still writes one Recent events line; every move after that makes the same line (setting, before, after), seven days later, kept as `G.lev[k].last` and not logged.
+- The latest line shows in the ? of the card the lever is on (`leverCard`, `leverHelp` in `helpText`): price in The line (or the Kits card while the slider is there), Breeders in the sell card, Shrimp a rack in Farms, strictness in Quality checks. One line per lever, the newest replaces the last.
+- Sim: one saved string per lever, no rule changed.
+- Checks: block `b7` (first line once, later moves silent in Recent events, the ? shows only the newest, a real tap on the ?, each lever in its own card, old saves).
+- No new wording: the line is the first move's line.
+
+Tests (fast, ee3b62b, 2026-11-14 09:16 UTC, 0.3 min, 2 at once): 9 suites, 0 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| balance | ok | 8 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 7 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+
+| avg | ok | 42 | earth 7308 (prev 7308) |
+| kind | ok | 76 | WIN 4367 (prev 4367) question_lucky |
+| strong | ok | 25 | WIN 2476 (prev 2476) empire_dictator |
+| m-v2 | ok | 58 | PASS 166 v2 moment checks |
