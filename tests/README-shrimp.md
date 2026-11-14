@@ -4381,3 +4381,30 @@ Tests (fast, 3fad939, 2026-11-14 08:59 UTC, 0.3 min, 2 at once): 9 suites, 0 fai
 | kind | ok | - | cached, game unchanged: WIN 4367 |
 | strong | ok | - | cached, game unchanged: WIN 2476 |
 | m-v2 | ok | 52 | PASS 135 v2 moment checks |
+
+## v2b 3 (14 Nov, shrimp-v2, BUILD 2026-11-14T13:01-v2b): invitations inside the Grandma card
+
+- The invitation rows (`#me-inv`) are no longer a card of their own above Grandma: they are the first rows inside the Grandma card (`#me-gp`), so that card is always first on the You page (her 6 Nov rule). Kiki's wedding (`c_wedding`) was already one of `INVITES` and sits there with the lab parties, Grandma's game and the play.
+- A folded Grandma card still shows an open invitation (one CSS rule), because the row passes without a message.
+- Spotlight: the invitation's one-time spotlight (`SPOT_INFO['me-inv']`) now rings the Grandma card, from `spotWatch`.
+- Checks: block `b3` (first card, first row, folded card, 360 px); the M8c check reads the new place.
+- No new player text.
+
+Tests (fast, 47e34d8, 2026-11-14 09:01 UTC, 0.2 min, 2 at once): 9 suites, 0 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| balance | ok | 8 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 7 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+
+| avg | ok | - | cached, game unchanged: earth 7308 |
+| kind | ok | - | cached, game unchanged: WIN 4367 |
+| strong | ok | - | cached, game unchanged: WIN 2476 |
+| m-v2 | ok | 52 | PASS 142 v2 moment checks |

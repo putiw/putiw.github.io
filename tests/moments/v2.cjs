@@ -109,7 +109,7 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
   {const r=await g.js(()=>{G.me.on=1;G.me.inv={};var n0=(G.notes&&G.notes.list.length)||0,q0=G.progress.queue.length,ok=inviteOpen(G,'party1');cache={};render();return {ok:ok,note:G.notes.list.length-n0,last:G.notes.list[G.notes.list.length-1].t,q:G.progress.queue.length-q0,ring:$('tb-me').classList.contains('ring')};});
    M.check('M8c an invitation is a note, not a card, and the person button rings',r.ok&&r.note===1&&r.q===0&&r.ring&&/birthday party on Thursday/.test(r.last),r);}
   await g.tab('me');{const row=await g.text('#me-inv')||'';M.check('M8c a row with Go on the You page',/birthday party on Thursday/.test(row)&&/Go/.test(row),row);
-   const top=await g.js(()=>{var cs=[...document.querySelectorAll('#p-me>.card')].filter(c=>c.checkVisibility()).sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top);return cs[0]&&cs[0].id;});M.check('M8c the row is at the top of the You page',top==='me-inv',top);}
+   const top=await g.js(()=>{var cs=[...document.querySelectorAll('#p-me>.card')].filter(c=>c.checkVisibility()).sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top);return cs[0]&&cs[0].id;});M.check('M8c, v2b 3: the Grandma card is first on the You page, the row is inside it',top==='me-gp'&&await g.js(()=>$('me-inv').parentNode.id==='me-gp'),top);}
   await g.tapText('#me-inv button',/^Go$/);await g.page.waitForTimeout(400);
   M.check('M8c Go applies the go answer and shows what happened',await g.js(()=>G.emp.party&&G.emp.party[1]==='go'&&!inviteList(G).length&&afterOpen()));
   await g.load(A('year 2'));
@@ -291,5 +291,21 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
    M.check('v2b 2 the ending line uses the count of ENDINGS (eighteen today)',r.n===18&&r.w==='eighteen'&&r.one.indexOf('One of eighteen endings.')>=0,r);
    const r2=await g.js(()=>{var k='zz_test';ENDINGS[k]={id:k};var w=endCountWord(),o=endOneHTML(G,'empire_good');delete ENDINGS[k];return {w:w,ok:o.indexOf('One of nineteen endings.')>=0};});
    M.check('v2b 2 one more ending in the table and the line says nineteen',r2.w==='nineteen'&&r2.ok,r2);}
+ }
+ // ---- v2b 3: invitations inside the Grandma card ----
+ if(on('b3')){
+  await g.load(A('year 2'));
+  for(const k of ['party1','c_wedding']){
+   const r=await g.js((k)=>{G.me.on=1;G.me.inv={};G.me.inv[k]={d:Math.floor(G.day)};if(G.opt.shut)G.opt.shut.megp=false;$('me-gp').classList.remove('shut');cache={};selectTab('me');render();
+     var cs=[...document.querySelectorAll('#p-me>.card')].filter(c=>c.checkVisibility()).sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top),gp=$('me-gp'),kids=[...gp.children].filter(c=>c.checkVisibility());
+     return {list:inviteList(G),first:cs[0]&&cs[0].id,k0:kids[0]&&kids[0].className,k1:kids[1]&&kids[1].id,txt:$('me-inv').innerText,cards:cs.map(c=>c.id).filter(i=>i==='me-inv').length};},k);
+   M.check('v2b 3 '+k+': the Grandma card is first on the You page',r.first==='me-gp'&&r.cards===0,r);
+   M.check('v2b 3 '+k+': the invitation is the first row inside it, with Go',r.k0==='hd'&&r.k1==='me-inv'&&/Go/.test(r.txt)&&r.list.indexOf(k)>=0,r);}
+  {const r=await g.js(()=>{$('me-gp').classList.add('shut');var a=$('me-inv').checkVisibility(),b=$('me-gplace').checkVisibility()||$('me-send').checkVisibility();$('me-gp').classList.remove('shut');G.me.inv={};cache={};render();return {inv:a,rest:b,gone:$('me-inv').hidden};});
+   M.check('v2b 3 a folded Grandma card still shows an open invitation, nothing else',r.inv&&!r.rest,r);
+   M.check('v2b 3 no invitation: no row',r.gone,r);}
+  await g.page.setViewportSize({width:360,height:844});
+  {const o=await g.js(()=>{G.me.inv={c_wedding:{d:Math.floor(G.day)}};cache={};render();var c=$('me-gp'),cr=c.getBoundingClientRect();return [...$('me-inv').querySelectorAll('*')].filter(e=>e.checkVisibility()&&e.getBoundingClientRect().right>cr.right+0.5).length;});M.check('v2b 3 the row fits at 360',o===0,o);}
+  await g.page.setViewportSize({width:390,height:844});
  }
  await g.close();M.done('v2');})();
