@@ -4641,3 +4641,39 @@ Tests (fast, 848f73d, 2026-11-14 09:58 UTC, 0.3 min, 2 at once): 9 suites, 0 fai
 | kind | ok | - | cached, game unchanged: WIN 4367 |
 | strong | ok | - | cached, game unchanged: WIN 2476 |
 | m-v2 | ok | 62 | PASS 185 v2 moment checks |
+
+## v2b 11 (14 Nov, shrimp-v2, BUILD 2026-11-14T14:10-v2b): Rethink the goal on the ten-year card
+
+- The ten-year card ("You can keep going") has a second button, Rethink the goal. It shows the hard part's four choices in the card (`tenGoalsHTML`, the short lines only: the long ones talk about groups that are not open yet), Back returns. Every home that wants one changes the goal and closes the card; The spreadsheet and Stop counting take two taps and end the game there, as in the hard part.
+- Sim: `tenGoal(G,id)` works only while the ten-year card is up (`hardSetGoal(G,id,ten)`); nothing else can change the goal before the hard part. The choice is kept as `H.ten`; when the hard part opens later it still asks for the goal first, with yours marked. The ending title, body and world line read the goal when it was set at ten years (`H.open||H.ten`). `migrate` leaves such a save alone.
+- A bug found on the way: both click listeners saw the same tap, and the render morphed Back into Got it, so Back closed the card. The three ten-year buttons stop the second listener.
+- Bots (they close the card as before, so nothing moves; table below). Rule: pass.
+
+| bot | seed 7 | seed 11 | seed 23 | mean |
+|---|---|---|---|---|
+| strong cold, before → after | 2,476 → 2,476 | 3,197 → 3,197 | 2,926 → 2,926 | 2,866 → 2,866 |
+| strong kind | 4,367 → 4,367 | 4,324 → 4,324 | 4,358 → 4,358 | 4,350 → 4,350 |
+| average | 7,308 → 7,308 | 7,224 → 7,224 | 7,280 → 7,280 | 7,271 → 7,271 |
+
+Endings on all nine runs unchanged (empire_dictator, question_lucky, network_life).
+- Checks: block `b11` (the two buttons, the four choices, Back, a goal change, the hard part opening later, the two-tap ending and its title, no other way in, 360 px).
+- Not done: the bots never use it, so no bot run covers a game that ends at ten years; the ending page for that case was only checked for its title.
+
+Tests (fast, c0e0f9e, 2026-11-14 10:10 UTC, 0.3 min, 2 at once): 9 suites, 0 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| balance | ok | 8 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 7 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+
+| avg | ok | 45 | earth 7308 (prev 7308) |
+| kind | ok | 81 | WIN 4367 (prev 4367) question_lucky |
+| strong | ok | 27 | WIN 2476 (prev 2476) empire_dictator |
+| m-v2 | ok | 78 | PASS 193 v2 moment checks |

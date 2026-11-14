@@ -419,4 +419,33 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
    M.check('v2b 9 kits still wait for tank 2\'s first baby',r.before===false&&r.after===true&&r.vol>=60,r);
    M.check('v2b 9 moved shrimp carry no clutches into a seeded tank (the tried change is reverted)',r.eggs===0,r);}
  }
+ // ---- v2b 11: Rethink the goal on the ten-year card ----
+ if(on('b11')){
+  const ten=async()=>{await g.load(A('year 7'));await g.js(()=>{var p=G.progress;['queue','wait','soon'].forEach(k=>{if(p[k])p[k].length=0;});delete p.seen.tenyears;G.day=DREAM_DAYS-0.25;G.step=3;stepGame(G);TEN_GOAL=0;cache={};render();});await g.page.waitForTimeout(700);};
+  await ten();
+  {const r=await g.js(()=>({q:G.progress.queue[0],open:hardOpen(G),btns:[...document.querySelectorAll('#milestone-actions button')].map(b=>b.innerText.trim()),body:$('milestone-body').innerText}));
+   M.check('v2b 11 the ten-year card (before the hard part) has Got it and Rethink the goal',r.q==='tenyears'&&!r.open&&r.btns.join('|')==='Got it|Rethink the goal'&&/You can keep going/.test(r.body),r);}
+  await g.tapText('#milestone-actions button',/^Rethink the goal$/);await g.page.waitForTimeout(1000);
+  {const r=await g.js(()=>({t:[...document.querySelectorAll('#milestone-actions .ten-goals .item')].map(e=>e.innerText.replace(/\s+/g,' ').trim()),want:HARD_GOALS.map(x=>x.t),q:G.progress.queue[0],over:[...document.querySelectorAll('#milestone-actions *')].filter(e=>e.checkVisibility()&&e.getBoundingClientRect().right>$('milestone-card').getBoundingClientRect().right+0.5).length}));
+   M.check('v2b 11 it shows the hard part\'s four choices, the current one marked',r.t.length===4&&r.t.every((t,i)=>t.indexOf(r.want[i])===0)&&/Current/.test(r.t[0])&&r.q==='tenyears'&&r.over===0,r);}
+  await g.tapText('#milestone-actions button',/^Back$/);await g.page.waitForTimeout(1000);
+  M.check('v2b 11 Back returns to the card, nothing changed',await g.js(()=>G.progress.queue[0]==='tenyears'&&hardOf(G).goal==='home'&&!!document.querySelector('#milestone-actions [data-act="ten-goal"]')));
+  await g.tapText('#milestone-actions button',/^Rethink the goal$/);await g.page.waitForTimeout(1000);
+  {const b=await g.js(()=>{var e=document.querySelector('#milestone-actions [data-act="ten-pick"][data-id="want"]'),r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2};});await g.page.mouse.click(b.x,b.y);await g.page.waitForTimeout(500);
+   const r=await g.js(()=>({goal:hardOf(G).goal,ten:hardOf(G).ten,q:G.progress.queue.indexOf('tenyears'),won:!!G.emp.won,log:G.log.some(x=>/New goal: every home that wants one/.test(x.t)),seen:!!G.progress.seen.tenyears}));
+   M.check('v2b 11 Every home that wants one: the goal changes, the card closes, the game goes on',r.goal==='want'&&r.ten===1&&r.q<0&&!r.won&&r.log,r);
+   const r2=await g.js(()=>{var s=JSON.parse(JSON.stringify(G));migrate(s);s.humans=HARD_AT+1;hardDay(s);var t=hardTarget(s);migrate(s);return {open:hardOpen(s),goal:s.emp.hard.goal,less:t<WORLD,ask:s.emp.hard.goalOk==null};});
+   M.check('v2b 11 the goal holds when the hard part opens later, and the hard part still asks first',r2.open&&r2.goal==='want'&&r2.less&&r2.ask,r2);}
+  await ten();await g.tapText('#milestone-actions button',/^Rethink the goal$/);await g.page.waitForTimeout(1000);
+  {const tap=async()=>{const b=await g.js(()=>{var e=document.querySelector('#milestone-actions [data-act="ten-pick"][data-id="none"]'),r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2,t:e.innerText.trim()};});await g.page.mouse.click(b.x,b.y);await g.page.waitForTimeout(700);return b.t;};
+   const t1=await tap(),mid=await g.js(()=>({won:!!G.emp.won,t:document.querySelector('#milestone-actions [data-act="ten-pick"][data-id="none"]').innerText.trim()}));const t2=await tap();
+   const r=await g.js(()=>({won:!!G.emp.won,q:G.progress.queue[0],title:$('milestone-title')?$('milestone-title').innerText:'',wt:hardWinTitle(G)}));
+   M.check('v2b 11 Stop counting takes two taps, then the game ends (the last chapter, then the ending) under its own title',t1==='Choose'&&!mid.won&&mid.t==='Tap again'&&r.won&&(r.q==='win'||r.q==='lastchap')&&r.wt==='Stop counting',{t1,mid,t2,r});}
+  await g.load(A('year 7'));
+  {const r=await g.js(()=>{var a=tenGoal(G,'want'),s=JSON.parse(JSON.stringify(G));s.day=DREAM_DAYS+1;s.progress.queue=['c_many'];var b=tenGoal(s,'want');s.progress.queue=['tenyears'];s.day=100;var c=tenGoal(s,'want');return {a:a,b:b,c:c,d:hardSetGoal(G,'want')};});
+   M.check('v2b 11 only from the ten-year card: no other way to change the goal before the hard part',r.a===false&&r.b===false&&r.c===false&&r.d===false,r);}
+  await g.page.setViewportSize({width:360,height:844});await ten();await g.tapText('#milestone-actions button',/^Rethink the goal$/);await g.page.waitForTimeout(1000);
+  {const o=await g.js(()=>{var c=$('milestone-card').getBoundingClientRect();return [...document.querySelectorAll('#milestone-actions *')].filter(e=>e.checkVisibility()&&(e.getBoundingClientRect().right>c.right+0.5||(e.tagName==='BUTTON'&&e.scrollWidth>e.clientWidth+1))).length;});M.check('v2b 11 the four choices fit at 360',o===0,o);}
+  await g.js(()=>{TEN_GOAL=0;});await g.page.setViewportSize({width:390,height:844});
+ }
  await g.close();M.done('v2');})();
