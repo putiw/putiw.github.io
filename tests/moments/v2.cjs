@@ -113,7 +113,7 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
   await g.tapText('#me-inv button',/^Go$/);await g.page.waitForTimeout(400);
   M.check('M8c Go applies the go answer and shows what happened',await g.js(()=>G.emp.party&&G.emp.party[1]==='go'&&!inviteList(G).length&&afterOpen()));
   await g.load(A('year 2'));
-  {const r=await g.js(()=>{G.me.on=1;G.me.inv={};inviteOpen(G,'party1');var it=G.me.inv.party1;it.d=Math.floor(G.day)-GT_CAP-1;var n=G.log.length,q=G.progress.queue.length,nn=G.notes.list.length;inviteDay(G);return {p:G.emp.party&&G.emp.party[1],left:inviteList(G).length,log:G.log.length-n,q:G.progress.queue.length-q,notes:G.notes.list.length-nn};});
+  {const r=await g.js(()=>{G.me.on=1;G.me.inv={};inviteOpen(G,'party1');var it=G.me.inv.party1;it.d=Math.floor(G.day)-GT_CAP-1;var n=G.log.length,q=G.progress.queue.length,nn=G.notes.list.length;inviteDay(G);return {p:G.emp.party&&G.emp.party[1],left:inviteList(G).length,log:G.log.filter(x=>/Cake in the old lab/.test(x.t)).length,q:G.progress.queue.length-q,notes:G.notes.list.length-nn};});
    M.check('M8c the window closing is the busy answer, no card and no message',r.p==='busy'&&!r.left&&!r.log&&!r.q&&!r.notes,r);}
   {const r=await g.js(()=>{G.me.on=0;G.me.inv={};return inviteOpen(G,'party2');});M.check('M8c before the You page opens it stays a card',r===false);}
   // the split
@@ -171,5 +171,44 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
      M.check('M9 hard part: a priced option has the billionaires line, percent computed from its price',r.cost.ht.indexOf('The world’s billionaires hold USD 20.1 trillion between them. This is '+r.cost.pct+' of it.')>=0&&/Forbes billionaires list, March 2026\./.test(r.cost.ht),r.cost);
      M.check('M9 hard part: the Too poor options carry the Oxfam line, attributed',/Oxfam’s estimate to lift 3\.8 billion people above USD 8\.30 a day: USD 1\.65 trillion a year\./.test(r.poor||'')&&/Oxfam, Nov 2025\./.test(r.poor||''),(r.poor||'').slice(-200));
      if(r.free!=null)M.check('M9 hard part: an option with no price and outside Too poor has no fact',!/Outside the game/.test(r.free),r.free.slice(-120));}}else M.skip('M9 hard part','no hard moment');}
+ }
+ // ---- M6: the game answers back ----
+ if(on('m6')){
+  // 1. that worked
+  await g.load(A('year 2'));
+  {const r=await g.js(()=>{var p=G.progress;G.lev={};G.kits.sold=Math.max(G.kits.sold,60);var step=function(n){for(var i=0;i<n*4;i++){while(p.queue.length){var k=p.queue[0],ch=storyChoices(G,k);if(ch)for(var j=0;j<ch.length;j++)if(storyChoose(G,k,j))break;acknowledgeMilestone(G);}stepGame(G);}};
+     step(2);var n0=G.log.length,pr=G.kitPrice;G.kitPrice=pr+60;step(9);var a=G.log.filter(x=>/^Price \d+\. Orders [\d.,kM]+ → [\d.,kM]+ a day\.$/.test(x.t)).map(x=>x.t);G.kitPrice=pr;step(9);var b=G.log.filter(x=>/^Price \d+\. Orders/.test(x.t)).length;return {a:a,b:b,pr:pr+60,done:G.lev.price&&G.lev.price.done};});
+   M.check('M6.1 seven days after the first price move: one line, Price N. Orders a → b a day.',r.a.length===1&&r.a[0].indexOf('Price '+r.pr+'. ')===0&&r.done===1,r);M.check('M6.1 once per lever: a later move says nothing in Recent events',r.b===1,r);}
+  {const r=await g.js(()=>{G.lev={};var s=JSON.parse(JSON.stringify(G));delete s.lev;migrate(s);return !!s.lev&&typeof leverDay==='function'&&Object.keys(LEVERS).join()==='price,breed,dens,qc';});M.check('M6.1 four levers, migrate default',r);}
+  // 2. return address
+  await g.load(A('year 12'));
+  {const r=await g.js(()=>{var s=JSON.parse(JSON.stringify(G));s.money=1e12;s.emp.later=[];delete s.emp.proj.landwet;delete s.emp.proj.landfarm;delete s.emp.proj.landsmall;if(s.emp.no){delete s.emp.no.landwet;}var ok=buyProj(s,'landwet');var it=s.emp.later.filter(x=>/wetland/.test(x.t))[0];if(!it)return {ok:ok};var R=rip(s),n0=R.log.length+((R.pend||[]).length);s.day=it.d+1;laterDay(s);var all=JSON.stringify(R.log.slice(-3))+JSON.stringify(R.pend||[])+JSON.stringify((s.notes||{list:[]}).list.slice(-2));return {ok:ok,sl:it.sl,sd:it.sd,yr:gtDate(it.sd).getUTCFullYear(),hit:all.indexOf('The wetland, the herons move ('+gtDate(it.sd).getUTCFullYear()+'). The birds that used to stop')>=0};});
+   M.check('M6.2 a later bill carries the choice and its year',r.ok&&r.sl==='The wetland, the herons move'&&r.hit,r);}
+  {const r=await g.js(()=>{var s=JSON.parse(JSON.stringify(G));s.money=1e12;s.emp.later=[];s.emp.staff.pack=5;s.emp.staff.lines=1;if(s.emp.byeDone)delete s.emp.byeDone.pack;var ok=storyChoose(s,'bye_pack',1),it=(s.emp.later||[]).filter(x=>/Kiki/.test(x.t))[0];return {ok:ok,sl:it&&it.sl};});
+   M.check('M6.2 a story answer tags its later line, price stripped from the label',r.ok&&r.sl==='Keep her to watch the machines',r);}
+  // 3. the million card
+  {const mm=M.find('card million',['avg','kind','strong']);if(mm){await g.load(mm,{card:true});await g.page.waitForTimeout(300);
+    const r=await g.js(()=>{var M0=G.me,f=G.stats.ownFrom||0,n=M0&&M0.gt?M0.gt.log.filter(x=>x.k==='missed'&&x.d!=null&&x.d>=f).length:0;return {on:!!(M0&&M0.on),n:n,vis:M0?M0.visits|0:0,body:$('milestone-body').innerText};});
+    const want=!r.on?null:r.n>0?'You missed '+r.n+' of her days since the farm. Her years has the dates.':r.vis>0?'You have been to see her '+r.vis+' time'+(r.vis===1?'':'s')+'.':null;
+    M.check('M6.3 the million card ends with what her timeline counted, and only that',want?r.body.trim().endsWith(want):!/You missed|been to see her/.test(r.body),{want,tail:r.body.slice(-90),r:{n:r.n,vis:r.vis,on:r.on}});
+    const off=await g.js(()=>{G.me.on=0;return MILESTONES.million.more(G);});M.check('M6.3 no line before the You page is open',off==='');}else M.skip('M6.3','no card million moment');}
+  // 4. one of sixteen and the readout
+  {const wm=M.snap('kind','win')||M.snap('strong','win');if(wm){await g.load(wm,{card:true});await g.js(()=>{G.progress.queue=['win'];renderMilestone.last=null;render();});await g.page.waitForTimeout(500);
+    const r=await g.js(()=>{var c=$('milestone-card'),one=c.querySelector('.end-one'),rows=[...c.querySelectorAll('.ro-row')],id=endingPick(G),v=traitVals(G),name=c.querySelector('.end-name');
+      return {id:id,one:one?one.innerText:null,after:one&&name&&name.nextElementSibling===one,rows:rows.map(x=>x.dataset.tr+':'+x.querySelector('.ro-a').innerText+'/'+x.querySelector('.ro-b').innerText+':'+x.querySelector('.ro-bar b').style.left),v:v,txt:(c.querySelector('.ro')||{}).innerText||'',n:Object.keys(ENDINGS).length};});
+    const fam=String(r.id).split('_')[0],pair={empire:'Company first, your own people.',network:'Company first, strangers far away.',garden:'Life first, loves living things.',drift:'Life first, your own people.',question:'Curious.'}[fam];
+    M.check('M6.4 under the ending title: One of N endings (N counted from ENDINGS, 18 today), and the pair that picked the family',r.after&&r.one==='One of '+({16:'sixteen',18:'eighteen'}[r.n]||r.n)+' endings. '+pair,r.one);
+    M.check('M6.4 How you played: six rows, a word at each end, no numbers',r.rows.length===6&&r.rows.map(x=>x.split(':')[1]).join(' | ')==='company first/life first | by the book/whatever works | curious/growth first | shrimp are loved/shrimp are stock | strangers far away/your own people | careful/bold'&&!/\d/.test(r.txt),r.rows);
+    const ok=r.rows.every(x=>{const [k,,l]=x.split(':'),val=Math.max(-1,Math.min(1,r.v[k]||0)),pos=Math.round(((k==='risk'?1:-1)*val+1)/2*100);return l===pos+'%';});
+    M.check('M6.4 each dot sits where traitVals puts it',ok,{rows:r.rows,v:r.v});
+    await g.page.setViewportSize({width:360,height:844});await g.page.waitForTimeout(300);const o=await g.js(()=>{var c=$('milestone-card').getBoundingClientRect();return [...document.querySelectorAll('.ro-row span')].filter(e=>e.getBoundingClientRect().right>c.right||e.scrollWidth>e.clientWidth+1).length;});M.check('M6.4 the readout fits at 360',o===0,o);await g.page.setViewportSize({width:390,height:844});}else M.skip('M6.4','no win snapshot');}
+  // 5. where you were
+  await g.load(A('milestone pain_inbox')||A('year 4'));
+  {const r=await g.js(()=>({a:resumeDue(Date.now()-11*60000),b:resumeDue(Date.now()-9*60000),c:resumeDue(0)}));M.check('M6.5 only after more than ten minutes away',r.a&&!r.b&&!r.c,r);}
+  {await g.js(()=>{if(!G.progress.mail.length)G.progress.mail=['pain_inbox'];speed=1;resumeShow();});await g.page.waitForTimeout(700);
+   const t=await g.text('#after')||'',r=await g.js(()=>({day:Math.floor(G.day).toLocaleString('en-US'),homes:homesShown(G).toLocaleString('en-US'),last:G.log.slice(-2).map(x=>x.t.replace(/ · /g,', ').replace(/\s+/g,' ').trim()),mail:G.progress.mail.map(k=>MILESTONES[k].title),sp:speed}));
+   M.check('M6.5 the sheet: the day, the homes count, the last two events, the letters, Carry on',/^Where you were/i.test(t)&&t.indexOf('Day '+r.day)>=0&&t.indexOf(r.homes)>=0&&r.last.every(x=>t.indexOf(x)>=0)&&r.mail.every(x=>t.indexOf(x)>=0)&&/Carry on$/.test(t),{t,r});
+   M.check('M6.5 play waits under it',r.sp===0);
+   await g.page.click('#after-ok');await g.page.waitForTimeout(300);M.check('M6.5 Carry on closes it and the popup is its old self again',await g.js(()=>$('after').hidden&&$('after-ok').textContent==='Go on'&&$('after').querySelector('.scope-label').textContent==='What happened'));}
  }
  await g.close();M.done('v2');})();

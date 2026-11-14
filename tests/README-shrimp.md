@@ -4108,3 +4108,59 @@ Tests: `m-v2` M8 and M9 blocks; `shrimp-balance` and `shrimp-me` updated for the
 | tapall | ok 534s  PASS 145 taps 100 ms after a render all changed the save (157 repeats skipped) (38 stages: |
 | taps | ok 12s  all ok |
 | ear | ok 10s  22 ear tank checks passed |
+
+
+## v2 M6 (14 Nov, shrimp-v2, BUILD v2m6): the game answers back
+
+One commit for the five items and the readout (the plan asked for one each; they share two functions and one test block).
+
+1. **That worked** (`LEVERS`, `leverDay`, `G.lev`, in `dayRollover` after `dealsDay`): seven game days after the player first moves the kit price, Breeders, Shrimp a rack or the QC strictness, one line in Recent events with the number before and after: "Price 450. Orders 1.1 → 2.3 a day.", "Breeders 1 a liter. Shrimp 120 → 164.", "Shrimp a rack 80%. Bred 8,389 → 6,711 a day.", "Quality checks strict. Sick kits 4% → 2%." Once per lever; moving it again inside the week restarts the week with the new setting. Not done: the plan's "later moves show the line only in that card's ?".
+2. **Return address**: every `E.later` item made inside `storyChoose` or a fork's `buyProj` gets `sl` (the answer's label, price stripped) and `sd` (the day); `laterDay` prints "The wetland, the herons move (2031). The birds that used to stop …". The plan's example was a full sentence ("You have shipped Monday to Thursday since 2029"); that cannot be built from a label, so it is label, year, then the old line. No verdict words.
+3. **The million card** (`MILESTONES.million.more`): one line under the body, only from Grandma's timeline: missed days since the farm (`gt.log` entries of kind `missed` dated from `stats.ownFrom`), or the visit count, or nothing (You page not open, nothing counted).
+4. **One of N endings** (`endOneHTML`, `END_PAIR`, `readoutHTML`): under the ending's title, "One of eighteen endings." and the pair that picks the family (Company first, your own people. / Company first, strangers far away. / Life first, loves living things. / Life first, your own people. / Curious.). The plan said sixteen; `ENDINGS` has 18 entries (the sale and the stream world were added after the 16), and the line counts the table. Then "How you played": six rows, a word at each end, a dot from `traitVals`, no numbers, one ink color.
+5. **Where you were** (`resumeDue`, `resumeShow`, `RESUME_MS` ten minutes): on load from a save more than ten minutes old, the What happened popup shows as "Where you were": the day, homes with a tank, the last two Recent events lines, the letters waiting, one button Carry on. Nothing like it existed (there was only the catch-up toast, which stays).
+
+Also: an invitation's silent busy answer now removes its log line even when the log is at its 60-line cap.
+
+Tests: `m-v2` M6 block. Bots unchanged (2,476 / 4,367 / 7,308). Known: layout 3 overflows.
+
+Tests (changed, a825452, 2026-11-14 02:00 UTC, 10.7 min, 2 at once): 34 suites, 0 failed, 1 warn, 0 skipped.
+
+changed vs a825452: m-you, tight, m-kits, kitpack, tapall, fresh, cardlag, m-cards, bot-cards, projtabs, greyreason, m-v2, tank1, yourtank, m-tank, m-health, land-life, boardgames, m-games, endcards, land-audio, layout, strong, kind, avg (all tabs)
+
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | - | cached, game unchanged: WIN 2476 |
+| kind | ok | - | cached, game unchanged: WIN 4367 |
+| avg | ok | - | cached, game unchanged: earth 7308 |
+| balance | ok | 6 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 1 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 6 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| tight | ok | 141 | 0 findings |
+| m-kits | ok | 49 | PASS 308 kits moment checks |
+| kitpack | ok | 5 | kit packing checks passed |
+| tapall | ok | 530 | PASS 146 taps 100 ms after a render all changed the save (157 repeats skipped) (38 stages: |
+| fresh | ok | 3 | all ok |
+| cardlag | ok | 1 |  avg: true but never shown by day 7308: party1 (day 433, dropped), party2 (day 2772, dropp |
+| m-cards | ok | 34 | PASS 40 cards moment checks |
+| bot-cards | ok | 0 |  |
+| projtabs | ok | 9 | 3 project tab checks passed |
+| greyreason | ok | 166 | PASS (166 s) 489 grey buttons all say why, 145 dotted titles all open, 281 snapshots |
+| m-v2 | ok | 37 | PASS 99 v2 moment checks |
+| tank1 | ok | 30 | all tank 1 checks passed |
+| yourtank | ok | 23 | all passed |
+| m-tank | ok | 13 | PASS 9 tank moment checks |
+| m-health | ok | 7 | PASS 10 health moment checks |
+| land-life | ok | 18 | all passed |
+| boardgames | ok | 21 | board game checks passed |
+| m-games | ok | 5 | PASS 22 games moment checks |
+| endcards | ok | 18 | 50 ending card checks passed |
+| land-audio | ok | 13 | all passed |
+| layout | warn | 92 | 3 things overflow |
