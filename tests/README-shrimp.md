@@ -4588,3 +4588,56 @@ changed vs b7d4af8: projtabs, tapall, tank1, yourtank, m-tank, tight, greyreason
 | boardgames | ok | 23 | board game checks passed |
 | m-games | ok | 6 | PASS 22 games moment checks |
 | frozen | ok | 3 | frozen buttons checked on 5 tabs |
+
+## v2b 9 (14 Nov, shrimp-v2, BUILD 2026-11-14T13:58-v2b): kits sooner, two levers tried, nothing kept
+
+Nothing kept. The game is unchanged by this item; the gate on tank 2's first baby, `KIT_UNLOCK` and `KIT_ROOM` stay.
+
+**Why the average bot buys tank 2 on day 315 (all three seeds).** A second tank needs AED 460 in hand: AED 150 for the tank plus AED 310 for its auto feeder and auto water changer (`tankGear`, the 30 Oct rule that a seeded tank is only finished with both). Before that the bot automates Tank 1 from about one shrimp sale a week: fan AED 60 (day 140 to 147), feeder AED 90 (161 to 168), the 40 L tank AED 150 (196 to 203), water changer AED 220 (266 to 273). Its cash is AED 239 on day 15 and AED 489 on day 315. **First baby:** 20 to 22 days after the tank (day 335, 337, 335). Kits open the same day, the first kit is 30 days later (365, 366, 369) because the bot visits every four weeks by then.
+
+**What the next gate is.** With tank 2 sooner, the first baby is no longer the gate: 200 home-bred shrimp sold (`KIT_UNLOCK`, kept on purpose) is reached on about day 309 to 323. So day 280 cannot be reached by tank 2 or the first baby alone.
+
+| tried | avg tank 2 (7 / 11 / 23) | avg kits open | avg first kit | rule |
+|---|---|---|---|---|
+| before | 315 / 315 / 315 | 335 / 337 / 335 | 365 / 366 / 369 | |
+| 1a. tank 2 cheaper, AED 150 → 50 (seed 7 only) | 252 | 323 | 328 | reverted: average seed 7 ending network_life → question_prof |
+| 1b. tank 2 offered sooner: bought with AED 150 in hand, its gear later | 266 / 273 / 315 | 309 / 316 / 335 | 314 / 321 / 369 | reverted: strong three-seed mean −5.7% |
+| 2. shorter wait for the first baby: berried females moved into a seeded tank keep their eggs | 315 / 315 / 315 | | 369 / 368 / 367 | reverted: average seed 23 ending network_life → question_prof |
+
+1b, all nine runs (day of the win, or of Earth for the average bot; endings did not move):
+
+| bot | seed 7 | seed 11 | seed 23 | mean |
+|---|---|---|---|---|
+| strong cold, before → after | 2,476 → 2,476 | 3,197 → 2,710 | 2,926 → 2,926 | 2,866 → 2,704 (−5.7%) |
+| strong kind | 4,367 → 4,367 | 4,324 → 4,324 | 4,358 → 4,358 | 4,350 → 4,350 |
+| average | 7,308 → 7,280 | 7,224 → 7,168 | 7,280 → 7,280 | 7,271 → 7,243 (−0.4%) |
+
+2, all nine runs:
+
+| bot | seed 7 | seed 11 | seed 23 | mean |
+|---|---|---|---|---|
+| strong cold, before → after | 2,476 → 3,002 | 3,197 → 2,979 | 2,926 → 2,661 | 2,866 → 2,881 (+0.5%) |
+| strong kind | 4,367 → 4,342 | 4,324 → 4,356 | 4,358 → 4,340 | 4,350 → 4,346 (−0.1%) |
+| average | 7,308 → 7,280 | 7,224 → 7,224 | 7,280 → 7,196, ending network_life → question_prof | 7,271 → 7,233 (−0.5%) |
+
+- 1b's only move over the rule is strong seed 11 (3,197 → 2,710); the same seed moved 2,860 → 3,197 in M8, it is a noisy seed. By the rule it is still a revert. 1b also breaks the 30 Oct lock in `shrimp-balance` ("a seeded tank needs the feeder and water changer cash too"), so it needs her say anyway.
+- Check: block `b9` (the two gates, the tank price, the gear cash, the first-baby gate and the clutch rule are as before).
+
+Tests (fast, 848f73d, 2026-11-14 09:58 UTC, 0.3 min, 2 at once): 9 suites, 0 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| balance | ok | 7 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 8 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+
+| avg | ok | - | cached, game unchanged: earth 7308 |
+| kind | ok | - | cached, game unchanged: WIN 4367 |
+| strong | ok | - | cached, game unchanged: WIN 2476 |
+| m-v2 | ok | 62 | PASS 185 v2 moment checks |

@@ -408,4 +408,15 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
   {const o=await g.js(()=>{var c=$('c-map'),cr=c.getBoundingClientRect();return [...c.querySelectorAll('.mp-info *')].filter(e=>e.checkVisibility()&&e.getBoundingClientRect().right>cr.right+0.5).length;});M.check('v2b 8 the sheet with shop rows fits at 360',o===0,o);}
   await g.page.setViewportSize({width:390,height:844});
  }
+ // ---- v2b 9: kits sooner was tried and reverted; the gates and prices it touched are as they were ----
+ if(on('b9')){
+  await g.load(A('milestone sale'));
+  {const r=await g.js(()=>{var s=JSON.parse(JSON.stringify(G));s.tanks[0].cycledAt=0;s.stats.sold=500;var o={unlock:KIT_UNLOCK,room:KIT_ROOM,cost:NEW_TANK_COST.join(),gear:tankGear(s)};
+     s.money=150+capitalReserve(s);o.noGear=addTank(s);s.money=150+tankGear(s)+capitalReserve(s);o.withGear=addTank(s);s.stats.t2Born=0;s.tanks.forEach(function(t){t.had=1;if(!t.pop.length)t.pop.push({age:40,n:5,g:50});});s.tanks[0].volTier=1;s.tanks[0].vol=40;o.vol=stockedVol(s);o.before=kitsOpen(s);s.stats.t2Born=5;o.after=kitsOpen(s);
+     var a=newTank(0),b=newTank(1);a.pop=[{age:100,n:30,g:50}];a.clutches=[{due:99,f:5,g:50}];b.seeded=1;b.clutches=[];moveShrimp(s,a,b,10);o.eggs=b.clutches.length;return o;});
+   M.check('v2b 9 KIT_UNLOCK 200, KIT_ROOM 60 and tank prices unchanged',r.unlock===200&&r.room===60&&r.cost==='0,150,150',r);
+   M.check('v2b 9 tank 2 still needs the cash for its feeder and water changer (the tried change is reverted)',r.gear===310&&r.noGear===false&&r.withGear===true,r);
+   M.check('v2b 9 kits still wait for tank 2\'s first baby',r.before===false&&r.after===true&&r.vol>=60,r);
+   M.check('v2b 9 moved shrimp carry no clutches into a seeded tank (the tried change is reverted)',r.eggs===0,r);}
+ }
  await g.close();M.done('v2');})();
