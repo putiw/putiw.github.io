@@ -4460,3 +4460,30 @@ Tests (fast, 131d4d4, 2026-11-14 09:08 UTC, 0.3 min, 2 at once): 9 suites, 0 fai
 | kind | ok | - | cached, game unchanged: WIN 4367 |
 | strong | ok | - | cached, game unchanged: WIN 2476 |
 | m-v2 | ok | 57 | PASS 155 v2 moment checks |
+
+## v2b 6 (14 Nov, shrimp-v2, BUILD 2026-11-14T13:12-v2b): the return address as a sentence
+
+- A choice that makes a later bill can carry a short `since` phrase in its own definition: the 5th argument of `later(G,days,text,fx,since)` in a story answer, `later:{...,since}` or `sc:{...,since}` on a fork project, `sn` on the two direct pushes in `storyChoose` (ev_rival, ev_marine), `BYE_SINCE` next to `BYE_LATER` for the goodbyes. The bill keeps it as `sn` (saved).
+- `laterDay` prints "<since> since 2031. <old line>" when the bill has a phrase, else "label (2031). <old line>" as before, else the old line alone. 29 phrases written, all drafts.
+- No phrase (they keep "label (year)" or nothing): bills from non-fork projects and tree lifelines (never tagged with a choice in M6), and the risk rolls of the dark single projects.
+- Sim: one saved field on later items, no rule changed; the bots rerun below give the same days.
+- Checks: block `b6` (sentence, kept over a save, the fallback, an untagged line unchanged, a story answer carries phrase and label, every phrase short with no full stop or dash); the M6.2 wetland check reads the sentence.
+
+Tests (fast, 080df29, 2026-11-14 09:12 UTC, 0.3 min, 2 at once): 9 suites, 0 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| balance | ok | 9 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 7 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+
+| avg | ok | 43 | earth 7308 (prev 7308) |
+| kind | ok | 83 | WIN 4367 (prev 4367) question_lucky |
+| strong | ok | 29 | WIN 2476 (prev 2476) empire_dictator |
+| m-v2 | ok | 56 | PASS 160 v2 moment checks |

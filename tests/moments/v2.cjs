@@ -182,8 +182,8 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
   {const r=await g.js(()=>{G.lev={};var s=JSON.parse(JSON.stringify(G));delete s.lev;migrate(s);return !!s.lev&&typeof leverDay==='function'&&Object.keys(LEVERS).join()==='price,breed,dens,qc';});M.check('M6.1 four levers, migrate default',r);}
   // 2. return address
   await g.load(A('year 12'));
-  {const r=await g.js(()=>{var s=JSON.parse(JSON.stringify(G));s.money=1e12;s.emp.later=[];delete s.emp.proj.landwet;delete s.emp.proj.landfarm;delete s.emp.proj.landsmall;if(s.emp.no){delete s.emp.no.landwet;}var ok=buyProj(s,'landwet');var it=s.emp.later.filter(x=>/wetland/.test(x.t))[0];if(!it)return {ok:ok};var R=rip(s),n0=R.log.length+((R.pend||[]).length);s.day=it.d+1;laterDay(s);var all=JSON.stringify(R.log.slice(-3))+JSON.stringify(R.pend||[])+JSON.stringify((s.notes||{list:[]}).list.slice(-2));return {ok:ok,sl:it.sl,sd:it.sd,yr:gtDate(it.sd).getUTCFullYear(),hit:all.indexOf('The wetland, the herons move ('+gtDate(it.sd).getUTCFullYear()+'). The birds that used to stop')>=0};});
-   M.check('M6.2 a later bill carries the choice and its year',r.ok&&r.sl==='The wetland, the herons move'&&r.hit,r);}
+  {const r=await g.js(()=>{var s=JSON.parse(JSON.stringify(G));s.money=1e12;s.emp.later=[];delete s.emp.proj.landwet;delete s.emp.proj.landfarm;delete s.emp.proj.landsmall;if(s.emp.no){delete s.emp.no.landwet;}var ok=buyProj(s,'landwet');var it=s.emp.later.filter(x=>/wetland/.test(x.t))[0];if(!it)return {ok:ok};var R=rip(s),n0=R.log.length+((R.pend||[]).length);s.day=it.d+1;laterDay(s);var all=JSON.stringify(R.log.slice(-3))+JSON.stringify(R.pend||[])+JSON.stringify((s.notes||{list:[]}).list.slice(-2));return {ok:ok,sl:it.sl,sd:it.sd,yr:gtDate(it.sd).getUTCFullYear(),hit:all.indexOf('You drained the wetland since '+gtDate(it.sd).getUTCFullYear()+'. The birds that used to stop')>=0};});
+   M.check('M6.2, v2b 6: a later bill carries the choice (a sentence where it has a since phrase) and its year',r.ok&&r.sl==='The wetland, the herons move'&&r.hit,r);}
   {const r=await g.js(()=>{var s=JSON.parse(JSON.stringify(G));s.money=1e12;s.emp.later=[];s.emp.staff.pack=5;s.emp.staff.lines=1;if(s.emp.byeDone)delete s.emp.byeDone.pack;var ok=storyChoose(s,'bye_pack',1),it=(s.emp.later||[]).filter(x=>/Kiki/.test(x.t))[0];return {ok:ok,sl:it&&it.sl};});
    M.check('M6.2 a story answer tags its later line, price stripped from the label',r.ok&&r.sl==='Keep her to watch the machines',r);}
   // 3. the million card
@@ -342,5 +342,25 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
   await g.page.setViewportSize({width:360,height:844});await g.load(A('year 7'));
   {const o=await g.js(()=>{selectTab(mkMode(G)?'promote':'emp');$('c-kits').classList.remove('shut');G.kitPrice=600;cache={};render();var e=$('kit-pricego'),c=$('c-kits').getBoundingClientRect(),r=e.getBoundingClientRect();return {ok:r.right<=c.right+0.5&&r.height<26,t:e.innerText};});M.check('v2b 5 one line at 360',o.ok&&o.t==='Price AED 600',o);}
   await g.page.setViewportSize({width:390,height:844});
+ }
+ // ---- v2b 6: the return address as a sentence ----
+ if(on('b6')){
+  await g.load(A('year 12'));
+  {const r=await g.js(()=>{var s=JSON.parse(JSON.stringify(G));s.money=1e12;s.emp.later=[];var out={};
+     var fire=function(it){var R=rip(s);s.day=it.d+1;var n0=JSON.stringify(R.log)+JSON.stringify(R.pend||[]);laterDay(s);return JSON.stringify(R.log.slice(-4))+JSON.stringify(R.pend||[])+JSON.stringify((s.notes||{list:[]}).list.slice(-3));};
+     /* a story answer with a since phrase */
+     later(s,10,'A shrimp farm’s crew drilled three new wells for the town upriver.',null,'You sent the farm crew to drill');var a=s.emp.later[0];a.sl='Send them';a.sd=Math.floor(s.day);var yr=gtDate(a.sd).getUTCFullYear();s=JSON.parse(JSON.stringify(s));a=s.emp.later[0];out.kept=a.sn;out.a=fire(a).indexOf('You sent the farm crew to drill since '+yr+'. A shrimp farm’s crew drilled three new wells')>=0;
+     /* no phrase written: label (year) */
+     s.emp.later=[{d:Math.floor(s.day)+5,t:'Some line.',sl:'Some label',sd:Math.floor(s.day)}];var y2=gtDate(s.emp.later[0].sd).getUTCFullYear();out.b=fire(s.emp.later[0]).indexOf('Some label ('+y2+'). Some line.')>=0;
+     /* no choice behind it: the old line alone */
+     s.emp.later=[{d:Math.floor(s.day)+5,t:'Lonely line.'}];var o=fire(s.emp.later[0]);out.c=o.indexOf('Lonely line.')>=0&&o.indexOf('). Lonely')<0&&o.indexOf('. Lonely line')<0;return out;});
+   M.check('v2b 6 a choice with a since phrase prints "<since> since <year>. <old line>", kept over a save',r.a&&r.kept==='You sent the farm crew to drill',r);
+   M.check('v2b 6 no phrase written: label (year)',r.b,r);M.check('v2b 6 a line with no choice behind it is unchanged',r.c,r);}
+  {const r=await g.js(()=>{var s=JSON.parse(JSON.stringify(G));s.money=1e12;s.emp.later=[];var c=s.story.choices;delete c.ev_marine;var ok=storyChoose(s,'ev_marine',0),it=s.emp.later.filter(x=>/marine survey is out/.test(x.t))[0];return {ok:ok,sn:it&&it.sn,sl:it&&it.sl};});
+   M.check('v2b 6 a story answer carries its phrase and its label',r.ok&&r.sn==='You sent the marine survey'&&!!r.sl,r);}
+  {const fs=require('fs'),path=require('path'),src=fs.readFileSync(process.env.MOMENT_HTML||path.join(__dirname,'..','..','shrimp','index.html'),'utf8');
+   const ph=[];src.replace(/(?:since|sn):'((?:[^'\\]|\\.)*)'/g,(m,p)=>{ph.push(p);return m;});src.replace(/later\([A-Za-z]+,[^;]*?,'(You[^']*|Your[^']*)'\)/g,(m,p)=>{ph.push(p);return m;});
+   const bad=ph.filter(p=>p.length>46||/[.!,]$/.test(p)||!/^[A-Z]/.test(p)||/—|–/.test(p));
+   M.check('v2b 6 every since phrase is short, starts with a capital, no full stop, no dash ('+ph.length+')',ph.length>=25&&bad.length===0,bad);}
  }
  await g.close();M.done('v2');})();
