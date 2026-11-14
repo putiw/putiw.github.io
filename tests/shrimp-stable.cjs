@@ -15,7 +15,7 @@ const W=390,H=844,TOL=1;
 // Disclosures open something below themselves on purpose (collapsible headers, show/hide toggles): their card may change height,
 // but the page must not scroll and the header must not change. One-off chapter starts change the card once; listed so they show.
 const DISCLOSE=/(^#\w[\w-]* div ")|data-act=(gt-check|earlier-equipment)|act=(gt-check|earlier-equipment)|^#tb-info|summary/;
-const ONEOFF={'rl-hire':'starting the lab turns the field pick into the lab','hard-goal':'picking the first goal opens the hard part','hard-keep':'keeping the goal opens the hard part','hard-sel':'the first group tap opens its options under the grid (Pass 229: no empty slot before a pick; after a reload every tap is the first)','milestone-next':'closing a story card','sandbox':'Keep playing closes the win card','reset':'new game','fork':'answering a question card replaces it with what you picked'};
+const ONEOFF={'ln-go':'v2: a station on The line is a link, the tap scrolls to that station\'s card on purpose (lineGo)','kit-pricego':'v2b 5: Price on the Kits card is a link, the tap scrolls to The line on purpose','rl-hire':'starting the lab turns the field pick into the lab','hard-goal':'picking the first goal opens the hard part','hard-keep':'keeping the goal opens the hard part','hard-sel':'the first group tap opens its options under the grid (Pass 229: no empty slot before a pick; after a reload every tap is the first)','milestone-next':'closing a story card','sandbox':'Keep playing closes the win card','reset':'new game','fork':'answering a question card replaces it with what you picked'};
 const onlyStages=process.env.STABLE_STAGES?process.env.STABLE_STAGES.split(','):null;
 const onlyTabs=process.env.STABLE_TABS?process.env.STABLE_TABS.split(','):null;
 const MAX=+process.env.STABLE_MAX||200;
@@ -79,7 +79,7 @@ async function fresh(b,snap,tab){
      var o=anchorLive(window.__a);m.ad=o?o.el.getBoundingClientRect().top-o.top:null;m.aw=o?(o.el===window.__a.el?'button':(o.el.className||o.el.tagName).toString().slice(0,20)):'';m.nav=!window.__vis(el)||!c||!window.__vis(c);m.overlay=!![].slice.call(document.querySelectorAll('.sheet,.fs,#finsheet,#settings,#after,.modal,[role=dialog]')).filter(window.__vis).length;return m;});
     const where=sk+' / '+tab;const bad=[];
     if(Math.abs(m1.h-m0.h)>TOL)bad.push('header h '+Math.round(m0.h)+'→'+Math.round(m1.h));
-    const disc=DISCLOSE.test(k),one=k.indexOf('fork ')===0?'fork':Object.keys(ONEOFF).find(a=>k.indexOf('act='+a)>=0);
+    const disc=DISCLOSE.test(k),one=k.indexOf('fork ')===0?'fork':Object.keys(ONEOFF).find(a=>k.indexOf('act='+a)>=0||k==='#'+a);
     // at the very top of the page there is nothing above to scroll into: a row that gets a line shorter moves its button up a few px; listed, not failed
     if(!m1.nav&&!m1.overlay&&m1.ad!=null&&Math.abs(m1.ad)>TOL){if(m0.y<1&&m1.y<1&&m1.ad<0&&m1.ad>=-16)allowed[k]='top of page, nothing above to scroll: anchor moved '+Math.round(m1.ad)+' px';else bad.push('anchor('+m1.aw+') moved '+Math.round(m1.ad)+' px');}
     if(!m1.nav&&!disc&&m0.b&&m1.b&&Math.abs(m1.b.x-m0.b.x)>TOL)bad.push('button x '+Math.round(m0.b.x)+'→'+Math.round(m1.b.x));

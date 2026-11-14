@@ -488,4 +488,36 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
    await cx.close();}
   await new Promise(r=>srv.close(r));
  }
+ // ---- v2b 14: spotlights for the new cards. Each fires once, the ring on its card, never two within 15 s ----
+ if(on('b14s')){
+  const cases=[['c-homes','milestone sale','market','c-homes',null],['c-line','first kit','emp','c-line',null],['c-mail','first farm','emp','c-mail',()=>{G.progress.mail=['pain_heat'];G.progress.mailAt={pain_heat:Math.floor(G.day)};}],['c-map','year 7','emp','c-map',null],['me-inv','year 2','me','me-gp',()=>{G.me.on=1;G.me.inv={party1:{d:Math.floor(G.day)}};}]];
+  for(const [id,st,tab,ring,prep] of cases){
+   await g.load(A(st),{spots:true});if(prep)await g.js(prep);
+   /* a bot save has never been drawn: every card is new to it. Mark all of them seen but ours, open the queue, quiet the notes. */
+   await g.js(([id,tab,ring])=>{SPOTQ.length=0;SPOT=null;$('spot').hidden=true;window.__real=window.__real||spotlight;window.__calls=[];spotlight=function(t,text){window.__calls.push({id:t&&t.id,text:text});};selectTab(tab);cache={};var o=G.opt;o.spotSeen=o.spotSeen||{};G.progress.queue.length=0;render();
+     o.cardQueue=[];document.querySelectorAll('.card.queued').forEach(function(c){c.classList.remove('queued');});$(ring).classList.remove('shut');document.querySelectorAll('main .card[id]').forEach(function(c){o.spotSeen[c.id]=1;});document.querySelectorAll('.tabs [data-tab]').forEach(function(t){o.spotSeen['tab-'+t.dataset.tab]=1;});o.spotSeen.finsheet=1;o.spotSeen['tab-co']=1;o.spotSeen['tab-mk']=1;o.pauseTold=1;o.cullTour=1;o.cullGuided=1;delete o.spotSeen[id];
+     if(G.notes)G.notes.seen=G.notes.list.length;$('noteflash').hidden=true;$('newsflash').hidden=true;window.__calls=[];},[id,tab,ring]);
+   const r=await g.js(([id,ring])=>{var out={vis:spotShown($(ring))};for(var i=0;i<4;i++){G.progress.lastAck=null;spotWatch();}out.calls=window.__calls.slice();out.seen=!!G.opt.spotSeen[id];window.__calls=[];for(var j=0;j<4;j++){G.progress.lastAck=null;spotWatch();}out.again=window.__calls.filter(function(c){return c.id===ring;}).length;out.want=SPOT_INFO[id];return out;},[id,ring]);
+   const mine=r.calls.filter(c=>c.id===ring);
+   M.check('v2b 14 spotlight '+id+': fires once on '+ring+' with its line, and not again',r.vis&&mine.length===1&&mine[0].text===r.want&&r.seen&&r.again===0,r);
+   /* the real spotlight on that card: the ring sits on the card, the card is in view, the game is paused */
+   await g.js(([ring])=>{spotlight=window.__real;SPOTQ.length=0;SPOT=null;speed=1;SPOTQ.push({t:$(ring),text:'x',now:1});spotNext();},[ring]);await g.page.waitForTimeout(2300);
+   const p=await g.js(([ring])=>{if(!SPOT||!SPOT.on)return {err:'no ring'};var e=$(ring).getBoundingClientRect(),q=$('spot-ring').getBoundingClientRect(),B=spotBars();return {el:SPOT.el.id,ready:SPOT.ready,dTop:Math.round(q.top-Math.max(e.top-6,B.top+2)),dLeft:Math.round(q.left-(e.left-6)),dW:Math.round(q.width-(e.width+12)),inView:e.top>=B.top-1&&Math.min(e.bottom,B.bot)-e.top>=Math.min(e.height,80),paused:speed===0};},[ring]);
+   M.check('v2b 14 spotlight '+id+': the ring is on its card, the card is in view, time is paused',!p.err&&p.el===ring&&p.ready===1&&Math.abs(p.dTop)<=8&&Math.abs(p.dLeft)<=8&&Math.abs(p.dW)<=16&&p.inView&&p.paused,p);
+   /* closing it starts the 15 s of play before the next new thing */
+   const c=await g.js(([id,ring])=>{SPOT.ready=1;spotClose();SPOTQ.length=0;window.__calls=[];spotlight=function(t,text){window.__calls.push({id:t&&t.id});};var o=G.opt,other=[...document.querySelectorAll('main .card[id]')].filter(function(c){return c.id!==id&&c.id!==ring&&SPOT_INFO[c.id]&&SPOT_QUIET.indexOf(c.id)<0&&spotShown(c)&&!c.closest('.panel[hidden]');})[0];if(!other)return {other:null,ok:introOK()};
+     delete o.spotSeen[other.id];var ok0=introOK();spotWatch();var n0=window.__calls.length,since=storyClock(G)-G.progress.lastAck;G.progress.lastAck=storyClock(G)-Math.max(CARD_GAP,G.progress.gap||0)+500;spotWatch();var n1=window.__calls.length;G.progress.lastAck=storyClock(G)-Math.max(CARD_GAP,G.progress.gap||0)-1;spotWatch();return {other:other.id,ok0:ok0,n0:n0,n1:n1,since:since,gap:Math.max(CARD_GAP,G.progress.gap||0),after:window.__calls.map(function(x){return x.id;})};},[id,ring]);
+   if(c.other)M.check('v2b 14 spotlight '+id+': the next new thing ('+c.other+') waits out the gap of at least 15 s, then comes',c.ok0===false&&c.n0===0&&c.n1===0&&c.gap>=15000&&c.after.length===1&&c.after[0]===c.other,c);
+   else M.check('v2b 14 spotlight '+id+': closing it starts the 15 s gap',c.ok===false,c);
+  }
+  await g.js(()=>{if(SPOT&&SPOT.on){SPOT.ready=1;spotClose();}SPOTQ.length=0;SPOT=null;$('spot').hidden=true;spotlight=function(){};});
+ }
+ // ---- v2b 14: the consultant's forecast on shop rows (.impact) is not cut at 360 or 390 ----
+ if(on('b14i')){
+  for(const w of [360,390]){await g.page.setViewportSize({width:w,height:844});await g.load(A('first farm'));
+   const r=await g.js(()=>{G.emp.consult={until:G.day+500,k:'fix'};selectTab(mkMode(G)||coMode(G)?tabMap('promote'):'promote');document.querySelectorAll('.card.shut').forEach(c=>c.classList.remove('shut'));cache={};render();
+     return [...document.querySelectorAll('#c-shops .impact')].filter(e=>e.checkVisibility()).map(function(e){var cs=getComputedStyle(e),cr=e.closest('.card').getBoundingClientRect(),q=e.getBoundingClientRect();return {cut:e.scrollWidth>e.clientWidth+1||e.scrollHeight>e.clientHeight+1||cs.textOverflow==='ellipsis'&&cs.overflow!=='visible'||cs.webkitLineClamp!=='none',over:q.right>cr.right+0.5,t:e.innerText.length};});});
+   M.check('v2b 14 '+w+': the forecast on a shop row shows whole (wraps under the row, nothing cut)',r.length>=1&&r.every(x=>!x.cut&&!x.over&&x.t>60),r);}
+  await g.page.setViewportSize({width:390,height:844});
+ }
  await g.close();M.done('v2');})();

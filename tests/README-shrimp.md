@@ -4753,3 +4753,32 @@ Tests (fast, 14fcadf, 2026-11-14 10:19 UTC, 0.3 min, 2 at once): 9 suites, 0 fai
 | kind | ok | - | cached, game unchanged: WIN 4367 |
 | strong | ok | - | cached, game unchanged: WIN 2476 |
 | m-v2 | ok | 84 | PASS 206 v2 moment checks |
+
+## v2b 14 (14 Nov, shrimp-v2, BUILD 2026-11-14T14:47-v2b): the checks skipped last night
+
+- **`stable`, narrowed** (Tank, Trade, Kits/Company, You at first kit, first farm, year 7; `STABLE_N=3`): the old build 4c8cb24 358 clicks, 0 moved. v2 380 clicks, 7 moved, all seven the same thing: the links v2 added that scroll on purpose (a station on The line goes to its card, `ln-go`; Price on the Kits card goes to The line, `#kit-pricego`). They are listed in `tests/shrimp-stable.cjs` as deliberate (`ONEOFF`) and the rerun is 380 clicks, 0 failures. No other jump on those tabs and stages, so nothing for Open work.
+- **Spotlights for the new cards** (The line, Letters, Homes, the Map, the invitation row): block `b14s`, 15 checks. For each: `spotWatch` picks it once with its own line and never again; the real spotlight puts the ring on its card (the invitation's ring is on the Grandma card) with the card in view and time paused; after it closes the next new thing waits out the gap (`introGap`, never under 15 s) and then comes. A bot save has never been drawn, so the check marks every other card seen first.
+- **`human` at 390, once**: played to day 350 (first farm) in 280 s, all ok. Its text dump shows the count, The line's numbers, "The picture is your street now." and "Price AED 250" at the right moments.
+- **The consultant's forecast on shop rows (`.impact`)**: not cut at 360 or at 390. It is a full-width line under the row and wraps (5 lines). Nothing moved. Check `b14i`.
+- **yourtank, the land's decor list at 390**: cause found, a test flaw. The land sends each piece's turn rounded to 3 places (`scapePack`); the test compared the land's raw turn at 2 places with the game's. The almond leaf's turn is random, and now and then the raw value and the sent one fell on two sides of a 2-place boundary. Fixed in `tests/shrimp-yourtank.cjs` (the land's value is rounded the same way first). Six runs under load, all pass.
+- **tapall, `paperbuy` swallowed by SETTLE**: cause found, a test flaw. A decision button (fork, story choice, hard part buy) ignores taps for 500 ms after it appears or moves. tapall unfolds the fold, scrolls, waits for a render and taps 150 to 650 ms after the button's guard restarts, so now and then inside it. Fixed in `tests/shrimp-tapnow.cjs`: for a `DECIDE_SEL` button it waits the guard out first (2.5 s at most). `revfake` SETTLE in Open work was the same thing. Confirmed by the `feature` run at the end.
+
+Tests (fast, 5f709cc, 2026-11-14 10:48 UTC, 0.3 min, 2 at once): 9 suites, 0 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| balance | ok | 8 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 9 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+
+| avg | ok | - | cached, game unchanged: earth 7308 |
+| kind | ok | - | cached, game unchanged: WIN 4367 |
+| strong | ok | - | cached, game unchanged: WIN 2476 |
+| m-v2 | ok | 98 | PASS 223 v2 moment checks |
+| yourtank | ok | 24 | all passed |

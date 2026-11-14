@@ -65,7 +65,9 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  // piece list it draws (T.scp, Pass 257; was a picture) and the land's pieces all keep the edit after Back, a reload and the next visit.
  await f.evaluate(()=>{var T=S.tanks[0];T.scape=T.scape.filter(i=>i.k!=='wood');toyStart('scape');});await wait(400);
  await f.evaluate(()=>{var el=[...document.querySelectorAll('[data-add]')].find(b=>b.dataset.add==='rockpile');el.click();TOY.edit('rot');TOY.edit('rot');});await wait(200);
- const pieces=()=>f.evaluate(()=>S.tanks[0].scape.map(i=>i.k+(i.r?'r'+i.r.toFixed(2):'')).sort().join(','));
+ // v2b 14: the land sends a rotation rounded to 3 places (scapePack). Round the land's own value the same way before comparing: the leaf's turn is random,
+ // and about 1 run in 40 the raw value and the sent one fell on two sides of a 2-place boundary (or the raw one was under 0.0005 and read as turned). That was the flaky "same pieces" failure.
+ const pieces=()=>f.evaluate(()=>S.tanks[0].scape.map(i=>{var r=Math.round((i.r||0)*1000)/1000;return i.k+(r?'r'+r.toFixed(2):'');}).sort().join(','));
  const before=await pieces();await f.evaluate(()=>TOY.finish());await wait(2500);
  const g1=await p.evaluate(()=>{var P=G.tanks[0].scp;return {w:G.tanks[0].wood,n:P&&P.s.length,len:P?JSON.stringify(P).length:0,img:!!G.opt.scImg,on:scpOn(G.tanks[0]),k:P&&P.s.map(i=>i[0]+(i[5]?'r'+(+i[5]).toFixed(2):'')).sort().join(',')};});
  ok(g1.w===0&&g1.n>0&&g1.len<20000&&!g1.img&&g1.on,'after the job the game has no driftwood and the land\'s piece list ('+g1.len+' chars, no picture)');
