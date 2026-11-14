@@ -3843,3 +3843,53 @@ changed vs origin/shrimp-prelaunch-fixes: cardlag, m-cards, bot-cards, projtabs,
 
 
 Deployed Pass 308-309 (10 Nov, BUILD p309, main a224ce0). Tests (fast, before deploy): 9 suites, 0 failed.
+
+
+## v2 M1 (14 Nov, branch shrimp-v2, BUILD v2m1): the count, from the first home
+
+Branch `shrimp-v2` from `shrimp-prelaunch-fixes` 4c8cb24. Plan: project docs `claude/shrimp-v2-plan-13nov.md`, `claude/shrimp-v2-choices-14nov.md`. Never merged or deployed by the agent.
+
+Baseline before M1 (seed 7, 4c8cb24): strong cold WIN day 2,914 (empire_dictator), strong kind WIN day 4,354 (question_lucky), average Earth day 6,664.
+
+- `homesShown(G)` (sim, pure): `floor(G.humans)` + you + the third floor if the jar was sold + Mira if she got her jar (`ev_mira` answer 0). `G.humans` is untouched.
+- `#homesline` under the cash: "2 of 8,200,000,000 homes have a shrimp tank" from the first home besides yours, `8.2B` when the long number would be cut, hidden once the goal bar shows (two regions). Shown and hidden through `hdHold`. The goal bar's number is `homesShown` too, so it never steps down at the handover.
+- No spotlight for the line (one line of fact in the header, no card explains it).
+- Test: `tests/moments/v2.cjs` (suite `m-v2`, in `changed` through the new `v2` area in `CH_AREAS`).
+- tapall's 2 failures (`pl-open`, `ev_rival` under `#after-b` at fork science) and layout's 3 overflows are the known ones from Pass 309, same on 4c8cb24.
+
+Tests (changed, 4c8cb24, 2026-11-14 00:07 UTC, 10.9 min, 2 at once): 30 suites, 1 failed, 1 warn, 0 skipped.
+
+changed vs 4c8cb24: cardlag, m-cards, bot-cards, projtabs, m-v2, tight, m-you, tapall, greyreason, m-kits, kitpack, tank1, yourtank, m-tank, space, endcards, fresh, layout, strong, kind, avg (all tabs)
+
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | - | cached, game unchanged: WIN 2914 |
+| kind | ok | - | cached, game unchanged: WIN 4354 |
+| avg | ok | - | cached, game unchanged: earth 6664 |
+| balance | ok | 5 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 1 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 6 | 3293 gate checks on 331 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| cardlag | ok | 1 |  avg: reaction cards under 15 s after another (allowed): owntank (react) then farm (react) |
+| m-cards | ok | 35 | PASS 40 cards moment checks |
+| bot-cards | ok | 0 |  |
+| projtabs | ok | 12 | 4 project tab checks passed |
+| m-v2 | ok | 4 | PASS 8 v2 moment checks |
+| tight | ok | 142 | 0 findings |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| tapall | FAIL | 609 | FAIL 2 of 144 taps did nothing: |
+| greyreason | ok | 162 | PASS (161 s) 465 grey buttons all say why, 147 dotted titles all open, 287 snapshots |
+| m-kits | ok | 48 | PASS 299 kits moment checks |
+| kitpack | ok | 5 | kit packing checks passed |
+| tank1 | ok | 30 | all tank 1 checks passed |
+| yourtank | ok | 23 | all passed |
+| m-tank | ok | 13 | PASS 10 tank moment checks |
+| space | ok | 10 | PASS Leave Earth, launch, search and land after Earth |
+| endcards | ok | 18 | 50 ending card checks passed |
+| fresh | ok | 3 | all ok |
+| layout | warn | 92 | 3 things overflow |

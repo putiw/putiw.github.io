@@ -54,6 +54,8 @@ const SUITES={
   // Pass 290
   'm-tank':['moments/tank.cjs',{},['strong','avg'],'feature'],
   'm-hard':['moments/hard.cjs',{},['strong','kind','avg'],'feature'],
+  // v2 (13-14 Nov): the count, The line, Letters, Homes, the Map, the readout
+  'm-v2':['moments/v2.cjs',{},['strong','kind','avg'],'feature'],
   frozen:['shrimp-frozen.cjs',{HARD_RUN:R.avg},['avg'],'feature'],
   hard:['shrimp-hard.cjs',{HARD_RUN:R.avg},['avg'],'feature'],
   endcards:['shrimp-endcards.cjs',{ACADEMY_RUN:R.strong},['strong'],'feature'],
@@ -80,7 +82,7 @@ const TIERS={fast:['fast'],feature:['fast','bot','feature'],deploy:['fast','bot'
 // ---- Pass 291: the `changed` tier. Two tables, edit them here. ----
 // CH_FILES: a changed path → suites. 'fast' = nothing beyond fast, 'feature' = fall back to feature, 'index' = look inside
 // shrimp/index.html with CH_AREAS, 'script' = the suites whose script is that file. First match wins.
-const M_ALL=['m-cards','m-health','m-games','m-kits','m-you','m-tank','m-hard'];
+const M_ALL=['m-cards','m-health','m-games','m-kits','m-you','m-tank','m-hard','m-v2'];
 const CH_FILES=[
   [/\.md$/,'fast','notes'],
   [/^tests\/run\.cjs$/,'fast','the runner itself'],
@@ -107,6 +109,7 @@ const CH_FILES=[
 const CH_CORE_SUITES=['tight','layout','greyreason'];
 const CH_AREAS=[
   ['cards','milestone milestones card cards story stories pain pains intro react queue chapter chapters news soon visit choice choices bonus fxc need fork forks bird push',['cardlag','m-cards','bot-cards','cardtap','projtabs'],['card']],/* projtabs: a card that now comes at once covered the tabs (Pass 290) */
+  ['v2','homes letter letters mail fact facts readout invite invites split resume',['m-v2','tight','m-cards'],['emp','market','tank','me']],
   ['hard','hard prop props propose proposal war musk catch catches give',['hard','m-hard','tight'],['hard','world']],
   ['projects','proj desk camp campaign mk market ad ads promote promo film movie media meme reach offer mkt greenlight wb gala mood',['projtabs','gates','tapall'],['promote','market','emp']],
   ['kits','staff hire pack packer packing kit kits emp empire qc line lines auto automation owner owners order orders price consult frame ow co bottleneck',['m-kits','kitpack','tapall'],['emp','up']],
