@@ -4331,3 +4331,28 @@ Before-M7 table for the record (same as after M5): seed 7 2,476 / 4,367 / 7,308;
 | land-life | ok 19s  all passed |
 | taps | ok 12s  all ok |
 | ear | ok 10s  22 ear tank checks passed |
+
+## v2b 1 (14 Nov, shrimp-v2, BUILD 2026-11-14T12:56-v2b): one word for the count, people
+
+- `G.humans` counts people, so the header line says people: "2 of 8,200,000,000 people have a shrimp tank" (narrow: "of 8.2B people"). The goal bar already said people. `homesShown` is unchanged.
+- The Homes card keeps its title and its windows; the caption drops the noun ("Your street · 43").
+- Checks: `tests/moments/v2.cjs` block `b1` (line, caption, the bar, no "N homes" in header or card); the M1 and M4 checks read the new strings.
+
+Tests (fast, b7d4af8, 2026-11-14 08:56 UTC, 0.2 min, 2 at once): 9 suites, 0 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| balance | ok | 7 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 8 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+
+| avg | ok | - | cached, game unchanged: earth 7308 |
+| kind | ok | - | cached, game unchanged: WIN 4367 |
+| strong | ok | - | cached, game unchanged: WIN 2476 |
+| m-v2 | ok | 50 | PASS 131 v2 moment checks |

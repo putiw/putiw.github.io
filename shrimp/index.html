@@ -4896,7 +4896,7 @@ function trim(n,d){return String(+Number(n).toFixed(d));}
 (function(){var vv=window.visualViewport,fix=function(){var a=document.activeElement,typing=!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!/^(range|checkbox|radio|button)$/.test(a.type||''));document.body.classList.toggle('kbd',typing&&!!vv&&vv.height<window.innerHeight*0.8);var t=document.querySelector('.tabs');if(t&&t.style.transform)t.style.transform='';};if(vv){vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);}document.addEventListener('focusin',function(){setTimeout(fix,300);});document.addEventListener('focusout',function(){setTimeout(fix,50);setTimeout(fix,400);});})();
 // No browser feel: no pinch or double-tap zoom, no long-press menu outside text fields.
 (function(){var stop=function(e){e.preventDefault();};['gesturestart','gesturechange','gestureend'].forEach(function(k){document.addEventListener(k,stop,{passive:false});});document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});document.addEventListener('contextmenu',function(e){var t=e.target;if(!(t.closest&&t.closest('input,textarea,[contenteditable]')))e.preventDefault();});})();
-var toastT=null,NF=null,BUILD='2026-11-14T06:47-v2';
+var toastT=null,NF=null,BUILD='2026-11-14T12:56-v2b';
 function buildDate(){var m=BUILD.match(/^(\d{4})-(\d\d)-(\d\d)(?:T(\d\d:\d\d))?/);if(!m)return '';return 'Updated '+(+m[3])+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m[2]-1]+' '+m[1]+(m[4]?', '+m[4]+' UAE':'');}
 // Background sound, the same as the shrimp tanks game: water and music, each a loop that fades in and out over itself.
 // Same graph and numbers as there: master 0.82, ambient bus 0.5, water 0.4 (4.8 s fades), music 0.16 (2.2 s fades).
@@ -6803,7 +6803,7 @@ function renderHomes(G){var c=$('c-homes');if(!c)return;var on=homesOn(G),mk=act
  if((G.opt.hnote||1)<s){G.opt.hnote=s;HOMES.zoomAt=now;noteLine(G,'word',HOMES_NOTE[s]);}
  if(HOMES.n&&n>HOMES.n&&HOMES.g===G)HOMES.blinkAt=now;HOMES.n=n;HOMES.scale=s;HOMES.g=G;
  var cv=$('hm-cv'),w=Math.max(60,Math.floor((cv.clientWidth||357)/3));if(cv.width!==w)cv.width=w;
- setT('hm-cap',HOMES_NAME[s]+' · '+n.toLocaleString('en-US')+' homes');homesDraw();
+ setT('hm-cap',HOMES_NAME[s]+' · '+n.toLocaleString('en-US'));/* v2b 1: one word for the count, people; the caption has no noun */homesDraw();
  if(((HOMES.zoomAt&&now-HOMES.zoomAt<0.7)||(HOMES.blinkAt&&now-HOMES.blinkAt<0.7))&&!HOMES.raf){HOMES.raf=1;requestAnimationFrame(homesTick);}}
 /* v2 M3: the Letters card, under The line. Newest last, three shown, older ones folded. */
 function renderMail(G){var c=$('c-mail');if(!c)return;var p=G.progress||{},L=p.mail||[],on=L.length>0&&kitsOpen(G)&&!G.left&&!G.voyage;if(c.parentNode!==$('p-emp'))$('p-emp').appendChild(c);if(c.hidden===on)c.hidden=!on;if(!on)return;
@@ -8156,7 +8156,7 @@ var CARD_HOLD=null,SC_WC=false;
 var AFTER_HOLD=null;
 function earthLine(G,own){var e=earthNums(G),p=[];if(own&&G.humans>=1e6)p.push(hN(Math.floor(G.humans))+' own a tank');if(e.quit>=100)p.push(hN(e.quit)+' quit eating shrimp');var ow=own&&G.humans>=1e6;if(e.trees>=1)p.push(hN(e.trees)+(ow?' mangroves':' mangroves back'));return p.length===1&&ow?'':p.join(' · ');}
 /* Pass 301 (UX A11): the line under the owners bar opens its own help, it said nothing before *//* v2 M1: one line under the cash from the first home you sell to, until the goal bar takes over. Short form when the long number would be cut. */
-function homesLine(G,tg){var el=$('homesline');if(!el)return;var n=homesShown(G),show=n>=2&&!tg&&!G.emp.won&&!G.voyage&&!G.left;el.hidden=hdHold('homes',el,!show,1);if(!show)return;var s=n.toLocaleString('en-US'),h='<b>'+s+'</b> of 8,200,000,000 homes have a shrimp tank';if(el.dataset.h!==h){el.dataset.h=h;el.innerHTML=h;if(el.scrollWidth>el.clientWidth+1)el.innerHTML='<b>'+s+'</b> of 8.2B homes have a shrimp tank';}}
+function homesLine(G,tg){var el=$('homesline');if(!el)return;var n=homesShown(G),show=n>=2&&!tg&&!G.emp.won&&!G.voyage&&!G.left;el.hidden=hdHold('homes',el,!show,1);if(!show)return;var s=n.toLocaleString('en-US'),h='<b>'+s+'</b> of 8,200,000,000 people have a shrimp tank';if(el.dataset.h!==h){el.dataset.h=h;el.innerHTML=h;if(el.scrollWidth>el.clientWidth+1)el.innerHTML='<b>'+s+'</b> of 8.2B people have a shrimp tank';}}
 function earthHelp(G){var e=earthNums(G),t=[];if(e.quit>=100)t.push('Some owners stop eating shrimp once they keep them, a few more each day.');if(e.trees>=1)t.push('Mangroves are trees planted or grown back on old shrimp ponds.');return t.join(' ')+(e.quit>=100?factHTML([[OUT_FACTS.shrimp.text,OUT_FACTS.shrimp]]):'');}
 function earthSeen(G){var R=rip(G),seen=[];for(var i=0;i<R.n;i++)if(RIPPLE[i].big)seen.push(RIPPLE[i].t);return seen;}
 function earthHTML(G){var e=earthNums(G),seen=earthSeen(G);seen=seen.filter(endExcl(endWorldNums(G).concat(gpLines(G)).concat(endingLines(G))));if(e.quit<100&&!seen.length)return '';

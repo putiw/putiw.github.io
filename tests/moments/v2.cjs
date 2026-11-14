@@ -9,7 +9,7 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
   await g.js(()=>{G=newGame();migrate(G);cache={};render();});
   M.check('M1 fresh game: no count line',await hl()===null,await hl());
   await g.load(A('milestone jar'));M.check('M1 before the jar sale: no count line',await hl()===null,await hl());
-  await g.load(A('milestone sale'));M.check('M1 after the jar sale the line reads 2',/^2 of 8,200,000,000 homes have a shrimp tank$/.test(await hl()||''),await hl());
+  await g.load(A('milestone sale'));M.check('M1 after the jar sale the line reads 2',/^2 of 8,200,000,000 people have a shrimp tank$/.test(await hl()||''),await hl());
   await g.load(A('first kit'));{const t=await hl()||'',n=+(t.split(' ')[0].replace(/,/g,''));M.check('M1 first kit: 3 or more',n>=3,t);}
   const h0=await g.rect('header.top');
   await g.load(A('year 4'));const last=await g.js(()=>homesShown(G));
@@ -217,7 +217,7 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
   await g.js(()=>{G=newGame();migrate(G);cache={};render();});M.check('M4 fresh game: no Homes card',await g.rect('#c-homes')===null);
   await g.load(A('milestone sale'));await g.tab('market');await g.page.waitForTimeout(200);
   {const r=await g.js(()=>({n:homesShown(G),lit:HOMES.lit,sc:HOMES.scale,cap:$('hm-cap').innerText,h:$('hm-cv').getBoundingClientRect().height}));
-   M.check('M4 right after the jar sale: Homes at the top of Trade, 2 lit windows, Your building',await first('market')==='c-homes'&&r.n===2&&r.lit===2&&r.sc===1&&r.cap==='Your building · 2 homes'&&Math.abs(r.h-120)<1,r);}
+   M.check('M4 right after the jar sale: Homes at the top of Trade, 2 lit windows, Your building',await first('market')==='c-homes'&&r.n===2&&r.lit===2&&r.sc===1&&r.cap==='Your building · 2'&&Math.abs(r.h-120)<1,r);}
   {const r=await g.js(()=>{var cv=document.createElement('canvas');cv.width=110;cv.height=40;var c=cv.getContext('2d'),a=[];for(var n=1;n<=16;n++){drawHomes(c,1,n,G.hseed,0);var d=c.getImageData(0,0,110,40).data,red=0;for(var i=0;i<d.length;i+=4)if(d[i]===0xbf&&d[i+1]===0x3a&&d[i+2]===0x2b)red++;a.push(red/20);}
      var o=homesOrder(16,G.hseed,[13,5]);return {a:a,o0:o[0],o1:o[1]};});
    M.check('M4 scale 1: lit windows equal the count, 1 to 16 (each window 4 by 5 px)',r.a.every((x,i)=>x===i+1),r.a);M.check('M4 your window first, the third floor next',r.o0===13&&r.o1===5,r);}
@@ -226,7 +226,7 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
   await g.load(A('first kit'));await g.tab('emp');
   {const r=await g.js(()=>{var out={};G.humans=40;render();out.s2={n:homesShown(G),lit:HOMES.lit,sc:HOMES.scale,cap:$('hm-cap').innerText,h:$('hm-cv').getBoundingClientRect().height,note:G.notes.list[G.notes.list.length-1].t};
      G.humans=3;render();out.back={sc:HOMES.scale,lit:HOMES.lit,n:homesShown(G)};G.humans=5000;render();out.s3={sc:HOMES.scale,lit:HOMES.lit,cap:$('hm-cap').innerText,h:$('hm-cv').getBoundingClientRect().height};G.humans=10;render();out.back2=HOMES.scale;return out;});
-   M.check('M4 scale 2 from 17 homes: Your street, lit windows equal the count, one note',r.s2.sc===2&&r.s2.lit===r.s2.n&&r.s2.cap==='Your street · '+r.s2.n+' homes'&&r.s2.note==='The picture is your street now.',r.s2);
+   M.check('M4 scale 2 from 17 homes: Your street, lit windows equal the count, one note',r.s2.sc===2&&r.s2.lit===r.s2.n&&r.s2.cap==='Your street · '+r.s2.n+''&&r.s2.note==='The picture is your street now.',r.s2);
    M.check('M4 the scale never goes back',r.back.sc===2&&r.back.lit===r.back.n&&r.back2===3,r);
    M.check('M4 scale 3 from 201 homes: Abu Dhabi, one lit pixel is 100 homes',r.s3.sc===3&&r.s3.lit===50&&/^Abu Dhabi · /.test(r.s3.cap),r.s3);
    M.check('M4 the canvas height is the same at every scale',Math.abs(r.s2.h-120)<1&&Math.abs(r.s3.h-120)<1);}
@@ -270,5 +270,14 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
   await g.page.setViewportSize({width:360,height:844});await g.js(()=>{cache={};render();});await g.page.waitForTimeout(300);
   {const o=await g.js(()=>{var c=$('c-map'),cr=c.getBoundingClientRect();return [...c.querySelectorAll('.mp-info *,.mp-cap,.hd *')].filter(e=>e.checkVisibility()&&e.getBoundingClientRect().right>cr.right+0.5).length+(document.documentElement.scrollWidth>innerWidth?1:0);});M.check('M5 nothing in the Map card overflows at 360',o===0,o);}
   await g.page.setViewportSize({width:390,height:844});
+ }
+ // ---- v2b 1: one word for the count, people ----
+ if(on('b1')){
+  await g.load(A('first kit'));await g.tab('emp');
+  {const r=await g.js(()=>{G.humans=42;cache={};render();return {line:$('homesline').innerText.replace(/\s+/g,' ').trim(),cap:$('hm-cap').innerText,title:$('c-homes').querySelector('.hd h2').innerText,bar:$('topgoal').querySelector('small').innerText,n:homesShown(G)};});
+   M.check('v2b 1 the header line says people',r.line===r.n.toLocaleString('en-US')+' of 8,200,000,000 people have a shrimp tank',r.line);
+   M.check('v2b 1 the Homes caption has no noun: Your street · N',r.cap==='Your street · '+r.n&&r.title==='Homes',r);
+   M.check('v2b 1 the goal bar says people too',/people have a shrimp tank/.test(r.bar),r.bar);}
+  M.check('v2b 1 no line in the header or the Homes card says N homes',await g.js(()=>!/\d homes\b/.test($('homesline').innerText+$('c-homes').innerText)));
  }
  await g.close();M.done('v2');})();
