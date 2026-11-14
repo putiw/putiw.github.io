@@ -308,4 +308,23 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
   {const o=await g.js(()=>{G.me.inv={c_wedding:{d:Math.floor(G.day)}};cache={};render();var c=$('me-gp'),cr=c.getBoundingClientRect();return [...$('me-inv').querySelectorAll('*')].filter(e=>e.checkVisibility()&&e.getBoundingClientRect().right>cr.right+0.5).length;});M.check('v2b 3 the row fits at 360',o===0,o);}
   await g.page.setViewportSize({width:390,height:844});
  }
+ // ---- v2b 4: letters say who wrote ----
+ if(on('b4')){
+  await g.load(A('first farm'));await g.tab('emp');
+  {const r=await g.js(()=>{var ks=Object.keys(PAINS).concat(LETTERS),key={pain_heat:/courier/,pain_inbox:/messages|answer/,pain_pack:/packers/,pain_moss:/moss supplier/,pain_payout:/payment company/,pain_permit:/ministry/,ev_paper:/local paper/,ev_ai:/delivery startup/,ev_school:/teacher/,ev_marine:/[Mm]arine biologists/,c_survey:/biologist in Taiwan/,c_strain:/farm/,c_feed:/lab/,c_box:/lab/,c_kyoto:/meeting in Kyoto/,c_bare:/lab/,c_glass:/lab/,c_permit:/ministries/,c_cash:/bank/,c_inspect:/inspector/,c_rivers:/river agencies/,c_prison:/shrimp liberation group/,c_green:/engineers/,buyout:/Fishfood Holdings/,coin_offer:/climate fund/};
+    var bad=[],wf=0,nf=[];ks.forEach(function(k){var m=MILESTONES[k],f=mailFrom(k);if(!f){nf.push(k);return;}wf++;var b=typeof m.body==='function'?m.body(G):String(m.body);if(!key[k]||!key[k].test(b)||f.length>26)bad.push(k);});return {bad:bad,wf:wf,nf:nf,story:mailFrom('ev_mira')+mailFrom('c_bonus')};});
+   M.check('v2b 4 every sender is in its own card text and short',r.bad.length===0&&r.wf>=20,r);
+   M.check('v2b 4 cards with no clear sender have none, stories have none',r.nf.length>0&&r.story==='',r.nf);}
+  {const r=await g.js(()=>{var p=G.progress;p.mail=[];p.mailq=[];p.mailAt={};p.queue.length=0;G.notes.list=[];G.notes.seen=0;p.queue.push('pain_heat');mailRoute(G);var a=G.notes.list.slice(-1)[0],la=G.log.slice(-1)[0].t;p.queue.push('c_many');mailRoute(G);var b=G.notes.list.slice(-1)[0];cache={};render();
+     return {a:a,la:la,b:b,rows:[...document.querySelectorAll('#ml-body .ml-row')].map(e=>e.innerText.replace(/\s+/g,' ').trim())};});
+   M.check('v2b 4 the note carries the sender, the log line says it',r.a.k==='letter'&&r.a.f==='the courier'&&/^A letter from the courier: Dead on arrival/.test(r.la),r);
+   M.check('v2b 4 a letter with no clear sender: title only',r.b.k==='letter'&&!r.b.f,r.b);
+   M.check('v2b 4 the Letters row shows the sender under the title',r.rows.some(t=>/^Dead on arrival From the courier · Today Open$/.test(t))&&r.rows.some(t=>/^Too many shrimp Today Open$/.test(t)),r.rows);}
+  {const r=await g.js(()=>{G.notes.seen=0;NOTE_LAST=0;var out=[];for(var i=0;i<2;i++){$('noteflash').hidden=true;$('newsflash').hidden=true;NOTE_LAST=0;if(G.progress)G.progress.lastAck=-1e9;var s0=G.notes.seen;var x=G.notes.list[s0];var e=$('noteflash');e.hidden=false;setT('nt-mast','');e.hidden=true;updateNotes();out.push({seen:G.notes.seen>s0,m:$('nt-mast').innerText});}return out;});
+   const shown=r.filter(x=>x.seen);
+   M.check('v2b 4 banner: A letter from the courier, then A letter',shown.length===2?(/^A letter from the courier$/i.test(shown[0].m)&&/^A letter$/i.test(shown[1].m)):false,r);}
+  await g.page.setViewportSize({width:360,height:844});
+  {const o=await g.js(()=>{G.progress.mail=['c_prison','c_survey','coin_offer'];cache={};render();var c=$('c-mail'),cr=c.getBoundingClientRect();return [...c.querySelectorAll('.ml-row *')].filter(e=>e.checkVisibility()&&(e.getBoundingClientRect().right>cr.right+0.5||(e.tagName==='P'&&e.scrollWidth>e.clientWidth+1))).length;});M.check('v2b 4 the longest senders fit the row at 360',o===0,o);}
+  await g.page.setViewportSize({width:390,height:844});
+ }
  await g.close();M.done('v2');})();

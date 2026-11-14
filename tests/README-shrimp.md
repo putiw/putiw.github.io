@@ -4408,3 +4408,30 @@ Tests (fast, 47e34d8, 2026-11-14 09:01 UTC, 0.2 min, 2 at once): 9 suites, 0 fai
 | kind | ok | - | cached, game unchanged: WIN 4367 |
 | strong | ok | - | cached, game unchanged: WIN 2476 |
 | m-v2 | ok | 52 | PASS 142 v2 moment checks |
+
+## v2b 4 (14 Nov, shrimp-v2, BUILD 2026-11-14T13:04-v2b): letters say who wrote
+
+- Each letter's card has a short sender, `MILESTONES[k].from` (set in one block at the end of the sim, read by `mailFrom(k)`), taken from the card's own text: the courier, your customers, the packers, the moss supplier, the payment company, the ministry, the local paper, a delivery startup, a teacher, the marine biologists, a biologist in Taiwan, the farm, the lab, the meeting in Kyoto, the ministries, the bank, the inspector, the river agencies, a shrimp liberation group, the engineers, Fishfood Holdings, a climate fund (25 letters).
+- Banner masthead: "A letter from the courier" (the note carries `f`). The Letters row shows "From the courier · Today" under the title. Recent events: "A letter from the courier: Dead on arrival".
+- 14 letters have no clear sender in their text and keep the title-only banner: pain_crash, pain_copy, ev_rival, c_pricewar (a rival is what they are about, nobody writes), c_vet, c_contam, c_wells, c_price1, c_lights, c_flood, c_budget, c_power, c_many, c_blackout.
+- Checks: block `b4` (each sender is a word from its own card body, 26 characters at most; note, log line, row, banner; no-sender letter; 360 px).
+- New text: the senders, all drafts, in `claude/shrimp-v2-new-text.md`.
+
+Tests (fast, 1632042, 2026-11-14 09:04 UTC, 0.3 min, 2 at once): 9 suites, 0 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| balance | ok | 8 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 8 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+
+| avg | ok | 45 | earth 7308 (prev 7308) |
+| kind | ok | 81 | WIN 4367 (prev 4367) question_lucky |
+| strong | ok | 27 | WIN 2476 (prev 2476) empire_dictator |
+| m-v2 | ok | 52 | PASS 149 v2 moment checks |
