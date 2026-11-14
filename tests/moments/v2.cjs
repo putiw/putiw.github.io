@@ -280,4 +280,16 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
    M.check('v2b 1 the goal bar says people too',/people have a shrimp tank/.test(r.bar),r.bar);}
   M.check('v2b 1 no line in the header or the Homes card says N homes',await g.js(()=>!/\d homes\b/.test($('homesline').innerText+$('c-homes').innerText)));
  }
+ // ---- v2b 2: the endings count comes from one place ----
+ if(on('b2')){
+  {const fs=require('fs'),path=require('path'),src=fs.readFileSync(process.env.MOMENT_HTML||path.join(__dirname,'..','..','shrimp','index.html'),'utf8');
+   const hits=(src.match(/[^\n]{0,40}\b(16|sixteen|17|seventeen)\s+(possible\s+)?endings[^\n]{0,20}/gi)||[]);
+   M.check('v2b 2 no text in the game file says 16 or sixteen endings',hits.length===0,hits);
+   M.check('v2b 2 the count word is written in one function only',(src.match(/'eighteen'/g)||[]).length===1&&/function endCountWord\(\)/.test(src));}
+  await g.load(A('year 2'));
+  {const r=await g.js(()=>({n:Object.keys(ENDINGS).length,w:endCountWord(),one:endOneHTML(G,'empire_good')}));
+   M.check('v2b 2 the ending line uses the count of ENDINGS (eighteen today)',r.n===18&&r.w==='eighteen'&&r.one.indexOf('One of eighteen endings.')>=0,r);
+   const r2=await g.js(()=>{var k='zz_test';ENDINGS[k]={id:k};var w=endCountWord(),o=endOneHTML(G,'empire_good');delete ENDINGS[k];return {w:w,ok:o.indexOf('One of nineteen endings.')>=0};});
+   M.check('v2b 2 one more ending in the table and the line says nineteen',r2.w==='nineteen'&&r2.ok,r2);}
+ }
  await g.close();M.done('v2');})();

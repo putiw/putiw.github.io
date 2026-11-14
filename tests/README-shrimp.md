@@ -4356,3 +4356,28 @@ Tests (fast, b7d4af8, 2026-11-14 08:56 UTC, 0.2 min, 2 at once): 9 suites, 0 fai
 | kind | ok | - | cached, game unchanged: WIN 4367 |
 | strong | ok | - | cached, game unchanged: WIN 2476 |
 | m-v2 | ok | 50 | PASS 131 v2 moment checks |
+
+## v2b 2 (14 Nov, shrimp-v2, BUILD 2026-11-14T12:59-v2b): the endings count comes from one place
+
+- The game names the number of endings in one place only, the line under the ending title. It now reads `endCountWord()`, counted from `ENDINGS` (eighteen today). A search of `index.html`, `home.html`, `space.html` and `ending-playtest.html` found no other "16" or "sixteen endings" in player text; the two in `AGENTS.md` are reworded.
+- Checks: block `b2` (no "16/sixteen endings" anywhere in the game file, the word table exists once, a nineteenth ending changes the line).
+- No new player text.
+
+Tests (fast, 3fad939, 2026-11-14 08:59 UTC, 0.3 min, 2 at once): 9 suites, 0 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| balance | ok | 8 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 8 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+
+| avg | ok | - | cached, game unchanged: earth 7308 |
+| kind | ok | - | cached, game unchanged: WIN 4367 |
+| strong | ok | - | cached, game unchanged: WIN 2476 |
+| m-v2 | ok | 52 | PASS 135 v2 moment checks |
