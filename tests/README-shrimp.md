@@ -3893,3 +3893,63 @@ changed vs 4c8cb24: cardlag, m-cards, bot-cards, projtabs, m-v2, tight, m-you, t
 | endcards | ok | 18 | 50 ending card checks passed |
 | fresh | ok | 3 | all ok |
 | layout | warn | 92 | 3 things overflow |
+
+
+## v2 M2 (14 Nov, shrimp-v2, BUILD v2m2): The line
+
+- New card `#c-line` "The line", first card on Kits from the first packed kit and first on Company later (`lineOn`, CSS `order:-2` in `#p-emp`). One canvas `#ln-cv` (84 px tall, drawn at 1/3 scale, pixelated; `drawLine`, marked PLACEHOLDER ART): a pile, then Breed, a pile, then Pack, a pile, then Orders, then a home. Piles are 0 to 5 crates (breeders by size; shrimp ready and kits in stock by days of the next step). Dots run along the bottom while the clock runs, more and faster with the rate (`lineTick`, `LN.t`), still when paused, off screen or folded.
+- `lineView(G)`: `{bred, bredCap, breeders, ready, packed, packCap, stock, orders, sold, waiting, crates}` from the same sources as the three card headers. Before the farm, bred is the shrimp reaching packing age that day across the tanks.
+- Under the canvas `#ln-nums`: Bred, Packed, Ordered a day, each a button that goes to its card (`lineGo`, through `finGo`); a tap on the canvas does the same by position.
+- The kit price slider (`#kit-pricerow`) moves into The line once the price is free (50 kits sold). The fixed first-50 price stays on the Kits card with its note. In Company and Market mode this puts the price on Company; the profit line stays on the Kits card.
+- No red, no arrow, no advice. Spotlight `SPOT_INFO['c-line']`, help `HELP['c-line']`.
+- Tests: `m-v2` M2 block (numbers equal the three headers at first farm, 100k kits, year 7; dots stop when paused; collapses; 360). `shrimp-tapnow`: a tap that scrolls the page counts as doing something (the line's steps).
+- Run below is the full `feature` list (no upstream ref yet, so `changed` fell back). tapall: 3 of its 4 failures were the line's step buttons before the tapnow change above, the fourth is the known `pl-open`.
+
+Tests (changed, f6f306c, 2026-11-14 00:24 UTC, 13.1 min, 2 at once): 42 suites, 1 failed, 1 warn, 0 skipped.
+
+changed vs ?: fell back to feature (no base (no upstream): pass --base=<ref>)
+
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | - | cached, game unchanged: WIN 2914 |
+| kind | ok | - | cached, game unchanged: WIN 4354 |
+| avg | ok | - | cached, game unchanged: earth 6664 |
+| balance | ok | 6 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 1 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 7 | 3293 gate checks on 331 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| space | ok | 11 | PASS Leave Earth, launch, search and land after Earth |
+| bot-cards | ok | 0 |  |
+| tight | ok | 152 | 0 findings |
+| layout | warn | 96 | 3 things overflow |
+| projtabs | ok | 12 | 4 project tab checks passed |
+| cardlag | ok | 1 |  avg: reaction cards under 15 s after another (allowed): owntank (react) then farm (react) |
+| greyreason | ok | 164 | PASS (163 s) 467 grey buttons all say why, 146 dotted titles all open, 287 snapshots |
+| tapall | FAIL | 619 | FAIL 4 of 150 taps did nothing: |
+| m-cards | ok | 35 | PASS 40 cards moment checks |
+| m-health | ok | 7 | PASS 10 health moment checks |
+| m-games | ok | 5 | PASS 22 games moment checks |
+| m-kits | ok | 48 | PASS 299 kits moment checks |
+| m-you | ok | 3 | PASS 9 you moment checks |
+| m-tank | ok | 13 | PASS 10 tank moment checks |
+| m-hard | ok | 62 | PASS 133 hard moment checks |
+| m-v2 | ok | 11 | PASS 29 v2 moment checks |
+| frozen | ok | 3 | frozen buttons checked on 5 tabs |
+| hard | ok | 12 | 24 hard part checks passed (milestone hardpart) |
+| endcards | ok | 18 | 50 ending card checks passed |
+| fresh | ok | 4 | all ok |
+| effects | ok | 0 | 15 action checks passed |
+| tank1 | ok | 30 | all tank 1 checks passed |
+| yourtank | ok | 23 | all passed |
+| yourtank-360 | ok | 23 | all passed |
+| kitpack | ok | 5 | kit packing checks passed |
+| boardgames | ok | 20 | board game checks passed |
+| land-audio | ok | 13 | all passed |
+| land-life | ok | 18 | all passed |
+| taps | ok | 12 | all ok |
+| ear | ok | 10 | 22 ear tank checks passed |
