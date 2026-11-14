@@ -4259,3 +4259,75 @@ changed vs 1832c27: cardlag, m-cards, bot-cards, projtabs, m-v2, tight, m-kits, 
 | frozen | ok | 3 | frozen buttons checked on 5 tabs |
 | land-life | ok | 18 | all passed |
 | space | ok | 9 | PASS Leave Earth, launch, search and land after Earth |
+
+
+## v2 M7 (14 Nov, shrimp-v2): the opening, tried, nothing changed
+
+Both halves were tried on a scratch copy and the real tree, neither is in the build. No sim change in this entry.
+
+**1. Kits sooner (target: the average bot's first kit by day 240, now 365). Blocked.** `KIT_UNLOCK` 200 → 100 and `KIT_ROOM` 60 → 40 together change nothing: kits unlock on day 335 and the first kit is packed on day 365 either way (average bot, seed 7). On day 335 the bot has sold 296 shrimp and has 60 L stocked; what it is waiting for is tank 2's first baby (`stats.t2Born` 335), the gate Puti set and the plan says to keep. The bot buys tank 2 between day 249 and 334. So the two constants are not the lever. What would move it: tank 2 sooner (its price, or the bot's and the player's reason to buy it), or a shorter wait for tank 2's first baby. Left for Puti.
+
+**2. The You page later (`meReady` also needs a hire, or the farm). Reverted.** The average bot hires nobody before its farm, so the You page opened on day 903 instead of 371. Days and endings, before → after:
+
+| seed | strong cold | strong kind | average (Earth day, ending) |
+|---|---|---|---|
+| 7 | 2,476 → 2,695 (+8.8%) | 4,367 → 4,415 | 7,308 → 6,944 (−5.0%) |
+| 11 | 3,197 → 2,883 (−9.8%) | 4,324 → 4,331 | 7,224 network_life → 7,224 question_prof |
+| 23 | 2,926 → 2,595 (−11.3%) | 4,358 → 4,328 | 7,280 network_life → 6,748 question_prof (−7.3%) |
+
+Two average-bot endings moved and several days moved more than 5%, so by the plan's rule it is out (`git checkout shrimp/index.html`, bots back to 2,476 / 4,367 / 7,308). `BG_FROM` does not depend on the You page; Grandma's timeline only runs once it is open (`gtDay` returns while `M.on` is false), so opening it later also shifts which of her days can be missed.
+
+Before-M7 table for the record (same as after M5): seed 7 2,476 / 4,367 / 7,308; seed 11 3,197 / 4,324 / 7,224; seed 23 2,926 / 4,358 / 7,280.
+
+
+
+## v2, the end of the night (14 Nov, shrimp-v2, BUILD v2): feature run, AGENTS.md
+
+- `shrimp/AGENTS.md`: a new section "v2 build" (the count, The line, Letters, the choices, For scale, the game answers back, Homes, the map, and the rules each follows), three lessons in Mistakes already made, v2 items at the top of Open work.
+- `node tests/run.cjs feature` below: 42 suites, 2 failed, 1 warn. yourtank failed once at 390 on the land's decor list and passed at 360 in the same run and on a rerun of both; tapall had one tap swallowed by SETTLE (`paperbuy` at `strong fork kids`), the flaky kind already in Open work. No v2 check failed (m-v2: 127). layout's 3 overflows are the old ones.
+- Not deployed, not merged into `shrimp-prelaunch-fixes`.
+
+| suite | result |
+|---|---|
+| strong | ok -  cached, game unchanged: WIN 2476 |
+| kind | ok -  cached, game unchanged: WIN 4367 |
+| avg | ok -  cached, game unchanged: earth 7308 |
+| academy | ok 0s  10 academy and parallel chapter checks passed |
+| me | ok 1s  56 free time, Grandma and ending checks passed |
+| cardtap | ok 3s  card tap checks passed |
+| space-search | ok 0s  6 space search checks passed |
+| tank1-sim | ok 1s  all tank 1 sim checks passed |
+| balance | ok 6s  176 focused balance and migration checks passed |
+| effects-sim | ok 0s  14 action checks passed |
+| sound | ok 1s  all ok |
+| gates | ok 6s  3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| bot-cards | ok 0s   |
+| space | ok 11s  PASS Leave Earth, launch, search and land after Earth |
+| layout | warn 97s  3 things overflow |
+| projtabs | ok 9s  3 project tab checks passed |
+| cardlag | ok 1s   avg: true but never shown by day 7308: party1 (day 433, dropped), party2 (day 2772, dropp |
+| tight | ok 147s  0 findings |
+| greyreason | ok 169s  PASS (169 s) 485 grey buttons all say why, 145 dotted titles all open, 281 snapshots |
+| m-cards | ok 36s  PASS 40 cards moment checks |
+| m-health | ok 8s  PASS 10 health moment checks |
+| m-games | ok 5s  PASS 22 games moment checks |
+| m-kits | ok 50s  PASS 308 kits moment checks |
+| m-you | ok 3s  PASS 9 you moment checks |
+| m-tank | ok 13s  PASS 9 tank moment checks |
+| m-hard | ok 70s  PASS 173 hard moment checks |
+| m-v2 | ok 49s  PASS 127 v2 moment checks |
+| frozen | ok 3s  frozen buttons checked on 5 tabs |
+| hard | ok 13s  24 hard part checks passed (milestone hardpart) |
+| endcards | ok 18s  50 ending card checks passed |
+| fresh | ok 4s  all ok |
+| effects | ok 0s  15 action checks passed |
+| tank1 | ok 30s  all tank 1 checks passed |
+| yourtank | FAIL 23s  FAIL the game's list has the same pieces as the land: leafr0.41,lotus,mossrock,pebble,rock |
+| yourtank-360 | ok 23s  all passed |
+| kitpack | ok 5s  kit packing checks passed |
+| boardgames | ok 21s  board game checks passed |
+| land-audio | ok 13s  all passed |
+| tapall | FAIL 533s  FAIL 1 of 145 taps did nothing: |
+| land-life | ok 19s  all passed |
+| taps | ok 12s  all ok |
+| ear | ok 10s  22 ear tank checks passed |

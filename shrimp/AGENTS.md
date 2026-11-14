@@ -618,6 +618,20 @@ Do not report a feature as finished just because its new path works once. Check 
 
 Trimmed 9 Nov (Pass 306) to open items only. The old list, with every finished pass, is `git show e64de1c:shrimp/AGENTS.md` from line 591, and the changelog.
 
+**v2 build (`shrimp-v2`, 14 Nov): waiting on Puti**
+- Whether v2 replaces the old build at all; nothing is merged. Her list of things to try is in the project doc `claude/shrimp-v2-report.md`.
+- Every line in `claude/shrimp-v2-new-text.md` is a draft for her to rewrite, the ones marked (mine) most of all (fork results, goodbye results, the two new cards' results, spotlights, help texts, the two Homes notes).
+- The count says homes, the goal bar still says people (`#tg-n` and its label). One of them should change.
+- "One of eighteen endings": the plan said sixteen, `ENDINGS` has 18. Her call which number the line says, or whether sold and the stream count.
+- Kits sooner (M7): the gate that holds the first kit is tank 2's first baby, not `KIT_UNLOCK` or `KIT_ROOM`. The You page later (M7): moved two endings and the strong bot by 9 to 11%, reverted. Both need her decision on what to give up.
+- The kit price slider is on Company (in The line) in Company and Market mode, away from Market's Kits card. Move it back if she misses it there.
+- Letters: the banner says "A letter" and the card's title, no sender per card; c_bonus stayed a story card; six letters have a map pin (`LETTER_AT`).
+- Invitations sit above the Grandma card while one is open (her 6 Nov rule put Grandma first; the markup still does).
+- That worked: later moves of a lever say nothing (the plan wanted the line in that card's ?). Return address is "label (year). old line", not a sentence.
+- Map: owners, orders and kits are split over regions by population, so every open region has the same share; real per-region numbers would need the sim. The region sheet links to the Shops card, it has no shop buttons of its own.
+- For scale: whether the line names Elon Musk; the numbers are in `OUT_FACTS` with dates, update them when they age.
+- Not started from the choices doc's last section: changing the goal at the ten-year card; the three pains whose third answer is the cheap dodge.
+
 **Waiting on Puti**
 - Land source in sync (Pass 309): `shrimp-proto` 5983e0a rebuilds the branch's `home.html` exactly. Keep it so: edit `shrimp-home-proto/src` and build, or port the same day.
 - Floors under walls on her phone (Pass 309): not reproduced. On a fresh land a real touch tap with Wood deck picked paints the tile under a built wall, on every tile a wall can stand on (545 tiles probed). A wall covers its whole tile, so the only thing she can see change is the grass fringe at its foot. Still refused by design: inside the house rooms ("Not inside the house."), under fences and gates (their `where` has no floor), the same ground again (no toast). Need the toast text or a screenshot of the spot.
@@ -647,7 +661,9 @@ Trimmed 9 Nov (Pass 306) to open items only. The old list, with every finished p
 - `emp.q` above 0.97 is lowered by every `Math.min(0.97,q+..)` choice (Pass 268 audit).
 - tapall: `ev_rival` / `pl-open` under `#after-b` at `fork science`; skips cards at fork careplan and fork data (closeCards finds no button); a tab tap that gets pointerdown and no click (~22 a sweep, cause not found). `revfake` SETTLE once, flaky?
 - Pass 289 findings 1 to 4 and Tank `food i=1`/`i=2` (see the Pass 288 changelog).
-- layout warns 3 overflows; yourtank flow 91% vs 90% now and then.
+- layout warns 3 overflows; yourtank flow 91% vs 90% now and then. v2 final `feature`: yourtank failed once at 390 on "the game's list has the same pieces as the land" (passed at 360 in the same run and on a rerun), and tapall had `paperbuy` swallowed by SETTLE once at `strong fork kids`. Both read as flaky, cause not looked for.
+- v2: the map's badges and pins are HTML over the sprite and were only looked at in Chromium at 360 and 390; the mask tint uses CSS `mask-image`, check it on her iPhone. `RM.hit` reads the masks through a canvas, fine from https, not from `file://` on every browser.
+- v2: `tight` once flagged the consultant's hiring forecast cut on a packer row (moved behind the title in M8); the same forecast on shop rows (`.impact`) was not looked at.
 - Strong kind bot goes broke after Switch on the hardier line (since Pass 218).
 - Neither bot buys the drones (no AI sales); worth a bot rule.
 - Fund needing a second tap not reproduced in Chromium (Pass 257), check on her iPhone. Ear tank button is company page only and doesn't run while closed.
