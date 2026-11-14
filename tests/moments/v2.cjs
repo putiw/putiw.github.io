@@ -456,4 +456,15 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
    M.check('v2b 10 meReady is byte for byte the function of b7d4af8',r.h===-1245349920,r.h);
    M.check('v2b 10 the You page opens when Tank 1 feeds and changes water itself and a kit is sold, no staff needed',r.a===true&&r.c===false,r);}
  }
+ // ---- v2b 12: left alone ----
+ if(on('b12')){
+  await g.load(A('year 7'));
+  {const r=await g.js(()=>{var h=function(s){var x=5381;for(var i=0;i<s.length;i++)x=((x<<5)+x+s.charCodeAt(i))|0;return x;};var s=JSON.parse(JSON.stringify(G));s.emp.staff.mgr=3;var o=byeOpts(s,'mgr').map(function(x){return x[0];}).join(' | ');
+     return {rich:OUT_FACTS.rich.text,src:OUT_FACTS.rich.src,bonus:isLetter('c_bonus'),split:!!SPLITS.c_bonus,inLetters:LETTERS.indexOf('c_bonus'),gema:o,newest:regionName(s),pains:h(JSON.stringify(PAINS,function(k,v){return typeof v==='function'?v.toString():v;})),line:h(drawLine.toString()),homes:h(drawHomes.toString()),ph:/PLACEHOLDER ART/.test(document.documentElement.innerHTML)};});
+   M.check('v2b 12 the richest person is not named in the line (the name stays in the source)',!/Musk|Elon/.test(r.rich)&&/Musk/.test(r.src),r.rich);
+   M.check('v2b 12 c_bonus is a story card, not a letter',r.bonus===false&&r.inLetters<0&&r.split,r);
+   M.check('v2b 12 Gema\'s region is the newest open one',r.gema.indexOf('Make her head of '+r.newest)>=0,r.gema);
+   M.check('v2b 12 the pains (the three with a cheap dodge too) are the table of b7d4af8',r.pains===-1814879247,r.pains);
+   M.check('v2b 12 the placeholder art functions are untouched',r.line===-1514927444&&r.homes===-1360199221&&r.ph,r);}
+ }
  await g.close();M.done('v2');})();
