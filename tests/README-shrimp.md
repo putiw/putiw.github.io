@@ -4514,3 +4514,29 @@ Tests (fast, ee3b62b, 2026-11-14 09:16 UTC, 0.3 min, 2 at once): 9 suites, 0 fai
 | kind | ok | 76 | WIN 4367 (prev 4367) question_lucky |
 | strong | ok | 25 | WIN 2476 (prev 2476) empire_dictator |
 | m-v2 | ok | 58 | PASS 166 v2 moment checks |
+
+## v2b 8 (14 Nov, shrimp-v2, BUILD 2026-11-14T13:22-v2b): map numbers differ by region, the shop row in the sheet
+
+- Still a view: `mapView` no longer gives every open region the same share. `mapOwners` splits `floor(G.humans)` by population times days open (from `E.regDay`, capped at `MAP_AGE` 1,095 days; home regions with no date count from day 0), so a region open longer is redder and two regions past three years are the same. No region gets more owners than people (the extra goes to the others), and the parts always add up to `floor(G.humans)`. Orders and kits shipped are still split by population. `mapView` changes nothing in the save.
+- The region sheet has that region's own row from the Shops card (`storeRowHTML`, one function now for both places: count, trust, Open or Reopen with the price, or "full") when shops are open (`storesOn`); the UAE sheet has its three rows. The Shops link and Close stay.
+- Checks: block `b8` (the sum at years 4, 7, 12; older redder, same age same share; the cap; the save untouched; the row, its button opens stores, no row before shops; 360 px).
+- No new wording.
+
+Tests (fast, 9231b63, 2026-11-14 09:22 UTC, 0.2 min, 2 at once): 9 suites, 0 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| balance | ok | 8 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 7 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+
+| avg | ok | - | cached, game unchanged: earth 7308 |
+| kind | ok | - | cached, game unchanged: WIN 4367 |
+| strong | ok | - | cached, game unchanged: WIN 2476 |
+| m-v2 | ok | 61 | PASS 181 v2 moment checks |

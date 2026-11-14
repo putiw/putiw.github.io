@@ -380,4 +380,32 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
    M.check('v2b 7 Breeders, Shrimp a rack and QC strictness each in their own card\'s ?',r.b&&r.d&&r.q&&r.none,r);}
   {const r=await g.js(()=>{var s=JSON.parse(JSON.stringify(G));s.lev={price:{done:1}};migrate(s);return !s.lev.price.last;});M.check('v2b 7 an old save with the first line done has no latest line until the next move',r);}
  }
+ // ---- v2b 8: map numbers differ by region, the region's shop row in its sheet ----
+ if(on('b8')){
+  for(const st of ['year 4','year 7','year 12']){await g.load(A(st));
+   const r=await g.js(()=>{var before=JSON.stringify(G),v=mapView(G),same=JSON.stringify(G)===before,ks=Object.keys(v.regs),s=0,over=[];ks.forEach(function(k){s+=v.regs[k].owners;if(v.regs[k].owners>v.regs[k].people||v.regs[k].owners<0)over.push(k);});
+     var now=Math.floor(G.day),rd=G.emp.regDay||{},age=function(k){return Math.min(MAP_AGE,now-(rd[k]!=null?rd[k]:0)+1);},sh=function(k){return v.regs[k].owners/v.regs[k].people;},bad=[];
+     ks.forEach(function(a){ks.forEach(function(b){if(age(a)>age(b)*1.02&&!(sh(a)>sh(b)))bad.push(a+'>'+b);if(age(a)===age(b)&&Math.abs(sh(a)-sh(b))>Math.max(1e-6,2/Math.min(v.regs[a].people,v.regs[b].people)))bad.push(a+'='+b);});});
+     return {same:same,s:s,h:Math.floor(G.humans),over:over,bad:bad,n:ks.length,ages:ks.map(age),sh:ks.map(function(k){return +sh(k).toFixed(5);})};});
+   M.check('v2b 8 '+st+': owners over the regions add up to floor(G.humans)',r.s===r.h&&r.over.length===0,r);
+   M.check('v2b 8 '+st+': a region open longer has a larger share, same age the same share',r.bad.length===0,r);
+   M.check('v2b 8 '+st+': mapView changes nothing in the save',r.same);}
+  await g.load(A('year 4'));
+  {const r=await g.js(()=>{var s=JSON.parse(JSON.stringify(G));s.emp.regions=['auh','dxb','uae','gcc','mena'];s.emp.regDay={dxb:0,uae:0,gcc:0,mena:Math.floor(s.day)-9};s.humans=3e7;var v=mapView(s),t=0;Object.keys(v.regs).forEach(function(k){t+=v.regs[k].owners;});
+     return {t:t,o:Object.keys(v.regs).map(function(k){return [k,v.regs[k].owners,v.regs[k].people];}),capped:v.regs.auh.owners<=v.regs.auh.people&&v.regs.gcc.owners<=v.regs.gcc.people,newer:v.regs.mena.owners/v.regs.mena.people<v.regs.gcc.owners/v.regs.gcc.people,one:(function(){var z=JSON.parse(JSON.stringify(s));z.humans=1;var w=mapView(z),q=0;Object.keys(w.regs).forEach(function(k){q+=w.regs[k].owners;});return q;})()};});
+   M.check('v2b 8 a young big region and old small ones: no region has more owners than people, the sum holds',r.t===3e7&&r.capped&&r.newer&&r.one===1,r);}
+  await g.load(A('year 7'));await g.tab('emp');if(!await g.js(()=>!!window.RMAP))await g.page.addScriptTag({path:require('path').join(__dirname,'..','..','shrimp','region-map.js')});await g.js(()=>{$('c-map').classList.remove('shut');cache={};render();});await g.page.waitForTimeout(700);await g.js(()=>{render();});
+  {const r=await g.js(()=>{var v=mapView(G),mr=mapRegs(v),ids=Object.keys(mr).filter(function(m){return REGIONS.some(function(r){return regOpen(G,r.id)&&mapId(r.id)===m;});}),id=ids[ids.length-1];MAPSEL={id:id,y:40};cache.mapinfo=null;render();var inf=$('mp-info');
+     return {on:storesOn(G),id:id,rows:[...inf.querySelectorAll('.mp-shops .srow')].map(e=>e.innerText.replace(/\s+/g,' ').trim()),regs:REGIONS.filter(function(r){return regOpen(G,r.id)&&mapId(r.id)===id;}).map(function(r){return r.name;}),link:[...inf.querySelectorAll('.btns .btn')].map(e=>e.innerText.trim()),btn:(function(){var b=inf.querySelector('.mp-shops [data-act="stores"]');return b?{r:b.dataset.r,dis:b.disabled}:null;})(),
+       same:(function(){var a=inf.querySelector('.mp-shops .srow'),d=document.createElement('div'),r0=REGIONS.filter(function(r){return regOpen(G,r.id)&&mapId(r.id)===id;})[0];d.innerHTML=storeRowHTML(G,r0);var src=updateEmpire.toString();return !!a&&a.textContent===d.textContent&&src.indexOf('storeRowHTML(G,r)')>=0;})()};});
+   M.check('v2b 8 an open region\'s sheet has its own shop row and still the link to the Shops card',r.on&&r.rows.length===r.regs.length&&r.rows.every((t,i)=>t.indexOf(r.regs[i])===0)&&r.link.indexOf('Shops')>=0&&r.link.indexOf('Close')>=0,r);
+   M.check('v2b 8 the row is the Shops card\'s row for that region',r.same,r);
+   if(r.btn&&!r.btn.dis){const n0=await g.js((id)=>storeN(G,id),r.btn.r);await g.js(()=>{$('mp-info').scrollIntoView({block:'center'});});await g.page.waitForTimeout(800);const b=await g.rect('#mp-info .mp-shops [data-act="stores"]');await g.page.mouse.click(b.x+b.w/2,b.y+b.h/2);await g.page.waitForTimeout(400);
+    const n1=await g.js((id)=>storeN(G,id),r.btn.r);M.check('v2b 8 the Open button in the sheet opens stores in that region',n1>n0,{n0,n1});}
+   else{const ok=await g.js(()=>{var s=JSON.parse(JSON.stringify(G));return typeof storeRowHTML==='function';});M.check('v2b 8 the sheet row has no live button here (full or no cash), row still shown',ok&&r.rows.length>0,r);}}
+  {const r=await g.js(()=>{var s0=G.kits.sold;G.kits.sold=10;MAPSEL={id:'uae',y:40};var h=mapInfoHTML(G,'uae',mapView(G),mapRegs(mapView(G)));G.kits.sold=s0;return h.indexOf('mp-shops')<0;});M.check('v2b 8 no shop row in the sheet before shops are open',r);}
+  await g.page.setViewportSize({width:360,height:844});await g.js(()=>{MAPSEL={id:'uae',y:40};cache={};render();});await g.page.waitForTimeout(300);
+  {const o=await g.js(()=>{var c=$('c-map'),cr=c.getBoundingClientRect();return [...c.querySelectorAll('.mp-info *')].filter(e=>e.checkVisibility()&&e.getBoundingClientRect().right>cr.right+0.5).length;});M.check('v2b 8 the sheet with shop rows fits at 360',o===0,o);}
+  await g.page.setViewportSize({width:390,height:844});
+ }
  await g.close();M.done('v2');})();
