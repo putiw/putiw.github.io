@@ -4782,3 +4782,79 @@ Tests (fast, 5f709cc, 2026-11-14 10:48 UTC, 0.3 min, 2 at once): 9 suites, 0 fai
 | strong | ok | - | cached, game unchanged: WIN 2476 |
 | m-v2 | ok | 98 | PASS 223 v2 moment checks |
 | yourtank | ok | 24 | all passed |
+
+## v2b, the end (14 Nov, shrimp-v2, BUILD 2026-11-14T15:08-v2b): feature run, AGENTS.md
+
+- `node tests/run.cjs feature` once, on b5b2852 (table below): 42 suites, 1 failed, 1 warn. The warn is layout's 3 old overflows. The one red was my own new check from item 14 (`v2b 14 spotlight c-homes`): under load the page's own draw picked the card between two steps of the check and the count was reset. The check now counts from its setup and passes 8 of 8 under load, and `m-v2` passes in full (224 checks, second table). The two old flaky ones (yourtank's decor list, tapall `paperbuy` SETTLE) are green: yourtank and yourtank-360 pass, tapall 0 of its taps did nothing.
+- After the run, one line of help made true: the Map's ? said a region gets its share by population; it now says "by its population and how long it has been open" (v2b 8, draft). `changed` against b5b2852 below.
+- `shrimp/AGENTS.md`: the "v2 build" section has the v2b rules (people, senders, the since phrase, the lever help, the map split, the ten-year goal, what was tried and not kept, the two dev links), three lessons in Mistakes already made, Open work rewritten for what is still her call.
+- Not deployed, not merged. `shrimp-prelaunch-fixes` and main untouched.
+
+Tests (feature, b5b2852, 2026-11-14 11:02 UTC, 12.9 min, 2 at once): 42 suites, 1 failed, 1 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | - | cached, game unchanged: WIN 2476 |
+| kind | ok | - | cached, game unchanged: WIN 4367 |
+| avg | ok | - | cached, game unchanged: earth 7308 |
+| balance | ok | 8 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 8 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| space | ok | 14 | PASS Leave Earth, launch, search and land after Earth |
+| bot-cards | ok | 0 |  |
+| tight | ok | 164 | 0 findings |
+| layout | warn | 105 | 3 things overflow |
+| projtabs | ok | 10 | 3 project tab checks passed |
+| cardlag | ok | 2 |  avg: true but never shown by day 7308: party1 (day 433, dropped), party2 (day 2772, dropp |
+| greyreason | ok | 176 | PASS (176 s) 487 grey buttons all say why, 144 dotted titles all open, 281 snapshots |
+| tapall | ok | 544 | PASS 144 taps 100 ms after a render all changed the save (157 repeats skipped) (38 stages: |
+| m-cards | ok | 40 | PASS 40 cards moment checks |
+| m-health | ok | 8 | PASS 10 health moment checks |
+| m-games | ok | 6 | PASS 22 games moment checks |
+| m-kits | ok | 53 | PASS 308 kits moment checks |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| m-tank | ok | 14 | PASS 9 tank moment checks |
+| m-hard | ok | 71 | PASS 173 hard moment checks |
+| m-v2 | FAIL | 97 | FAIL 1 moment checks (v2): |
+| frozen | ok | 3 | frozen buttons checked on 5 tabs |
+| hard | ok | 14 | 24 hard part checks passed (milestone hardpart) |
+| endcards | ok | 21 | 50 ending card checks passed |
+| fresh | ok | 4 | all ok |
+| effects | ok | 1 | 15 action checks passed |
+| tank1 | ok | 30 | all tank 1 checks passed |
+| yourtank | ok | 24 | all passed |
+| yourtank-360 | ok | 23 | all passed |
+| kitpack | ok | 5 | kit packing checks passed |
+| boardgames | ok | 23 | board game checks passed |
+| land-audio | ok | 13 | all passed |
+| land-life | ok | 19 | all passed |
+| taps | ok | 13 | all ok |
+| ear | ok | 10 | 22 ear tank checks passed |
+
+Tests (changed, b5b2852, 2026-11-14 11:12 UTC, 3.8 min, 2 at once): 15 suites, 0 failed, 1 warn, 0 skipped.
+
+changed vs b5b2852: greyreason, layout, m-v2 (all tabs)
+
+| suite | result | s | note |
+|---|---|---|---|
+| kind | ok | - | cached, game unchanged: WIN 4367 |
+| avg | ok | - | cached, game unchanged: earth 7308 |
+| strong | ok | - | cached, game unchanged: WIN 2476 |
+| balance | ok | 8 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 9 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| greyreason | ok | 183 | PASS (182 s) 487 grey buttons all say why, 144 dotted titles all open, 281 snapshots |
+| layout | warn | 110 | 3 things overflow |
+| m-v2 | ok | 100 | PASS 224 v2 moment checks |
