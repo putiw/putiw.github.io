@@ -21,6 +21,9 @@ var CSS='.rm{overflow:hidden;margin:2px -12px 8px;background:#275d78;position:re
 '.rm .rm-ring{fill:none;stroke:#fff1c4;stroke-width:.45;transform-origin:201.2px 92.1px;animation:rm-hubr 2500ms ease-out infinite}'+
 '.rm .rm-sr{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}'+
 '.rm.paused *{animation-play-state:paused!important}'+
+/* v2 M5: tint by the share of homes with a tank, lane dots by kits shipped, a crate stack at the hub */
+'.rm .rm-tint{position:absolute;inset:0;background:#bf3a2b;-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;pointer-events:none;opacity:0;transition:opacity .6s}.rm .rm-tint[hidden]{display:none}'+
+'.rm .rm-sea{stroke-dasharray:var(--sea-dash,2.8 1.8)}.rm .rm-crate{fill:#a9824f;stroke:#22201b;stroke-width:.3}'+
 '@keyframes rm-travel{from{stroke-dashoffset:4.05}to{stroke-dashoffset:0}}@keyframes rm-sea{from{stroke-dashoffset:4.6}to{stroke-dashoffset:0}}'+
 '@keyframes rm-pulse{0%,100%{opacity:.24}42%,58%{opacity:.025}}@keyframes rm-sweep{from{r:0px}}@keyframes rm-in{from{opacity:0}}'+
 '@keyframes rm-hubr{0%{transform:scale(.8);opacity:1}85%,100%{transform:scale(2.5);opacity:0}}'+
@@ -66,7 +69,25 @@ function mount(host){
   function pause(){host.classList.toggle('paused',document.hidden||!inView);}
   document.addEventListener('visibilitychange',pause);
   if(window.IntersectionObserver)new IntersectionObserver(function(es){inView=es[es.length-1].isIntersecting;pause();}).observe(host);
-  var api={host:host,set:function(ids,animate){var want={};ids.forEach(function(id){if(R[id])want[id]=1;});var added=[];
+  /* v2 M5 */
+  var crates=el('g',{hidden:''});[[0,0],[2.6,0],[1.3,-2.1]].forEach(function(c){crates.appendChild(el('rect',{'class':'rm-crate',x:HUB[0]+3.2+c[0],y:HUB[1]-1+c[1],width:2.3,height:1.9}));});crates.style.display='none';sv.appendChild(crates);
+  var PT={uae:HUB};ORDER.forEach(function(id){var cs=D.countries[id];if(!cs)return;var x=0,y=0;cs.forEach(function(c){x+=c[2];y+=c[3];});PT[id]=[x/cs.length,y/cs.length];});
+  var HIT={},DASH=['0.8 3.8','0.9 1.4','0.9 0.633','0.7 0.45'];
+  function alpha(id,x,y){var h=HIT[id];if(h===undefined){h=null;try{var im=R[id].parts[0];if(im.complete&&im.naturalWidth){var cv=document.createElement('canvas');cv.width=W;cv.height=174;var c=cv.getContext('2d');c.drawImage(im,0,0,W,174);h=c.getImageData(0,0,W,174).data;}}catch(e){h=null;}if(h)HIT[id]=h;else return 0;}
+    x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=174||!h)return 0;return h[(y*W+x)*4+3];}
+  var api={host:host,
+    /* view: {id:{share 0..1, pulse 0..1, ship 0..3}} for open regions, crate: stock over a week of orders */
+    data:function(v,crate){ORDER.forEach(function(id){var r=R[id],d=v&&v[id];if(!r)return;
+        if(!r.tint){var t=document.createElement('div');t.className='rm-tint';t.hidden=true;var u='url('+png(D.artwork[id])+')';t.style.webkitMaskImage=u;t.style.maskImage=u;at.insertBefore(t,sv);r.tint=t;}
+        if(r.tint.hidden===!!d)r.tint.hidden=!d;if(!d)return;var op=String(Math.round(Math.min(.85,.08+.77*Math.sqrt(Math.max(0,Math.min(1,d.share||0))))*1000)/1000);if(r.tint.style.opacity!==op)r.tint.style.opacity=op;
+        var pp=Math.round(D.pulse[id]/(0.6+1.4*Math.max(0,Math.min(1,d.pulse||0))))+'ms';if(r.parts[0].style.getPropertyValue('--pulse-period')!==pp)r.parts[0].style.setProperty('--pulse-period',pp);});
+      sea.forEach(function(s){var lv=0;s.gate.forEach(function(id){if(v&&v[id])lv=Math.max(lv,v[id].ship|0);});var ds=DASH[Math.max(0,Math.min(3,lv))];if(s.g.style.getPropertyValue('--sea-dash')!==ds)s.g.style.setProperty('--sea-dash',ds);});
+      show(crates,!!crate);},
+    /* which region is under a point of the 311x174 sprite; the UAE is a few pixels, so anything near the hub counts */
+    hit:function(x,y){if(Math.hypot(x-HUB[0],y-HUB[1])<4.5)return 'uae';for(var i=0;i<ORDER.length;i++)if(alpha(ORDER[i],x,y)>40)return ORDER[i];
+      for(var rr=1;rr<=2;rr++)for(var j=0;j<ORDER.length;j++){var id=ORDER[j];if(alpha(id,x-rr,y)>40||alpha(id,x+rr,y)>40||alpha(id,x,y-rr)>40||alpha(id,x,y+rr)>40)return id;}return null;},
+    point:function(id){return PT[id]||null;},tintOf:function(id){return R[id]&&R[id].tint&&!R[id].tint.hidden?+R[id].tint.style.opacity:0;},crateOn:function(){return crates.style.display!=='none';},
+    set:function(ids,animate){var want={};ids.forEach(function(id){if(R[id])want[id]=1;});var added=[];
     ORDER.forEach(function(id){var on=!!want[id],r=R[id];if(on===!!open[id])return;if(on)added.push(id);
       r.parts.forEach(function(n){show(n,on);n.classList.remove('entering');});if(r.clip)r.clip.classList.remove('entering');});
     if(animate&&seen)added.forEach(function(id){var r=R[id];r.parts.concat(r.clip?[r.clip]:[]).forEach(function(n){n.getBoundingClientRect&&n.getBoundingClientRect();n.classList.add('entering');});
@@ -78,5 +99,5 @@ function mount(host){
     return added;},
     shown:function(){return Object.keys(open);}};
   return api;}
-window.RMAP={mount:mount,ORDER:ORDER,countries:D.countries,pulse:D.pulse,sea:D.sea};
+window.RMAP={mount:mount,W:W,H:174,ORDER:ORDER,countries:D.countries,pulse:D.pulse,sea:D.sea};
 })();

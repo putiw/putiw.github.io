@@ -235,4 +235,40 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
   await g.page.setViewportSize({width:360,height:844});await g.load(A('first kit'));await g.tab('emp');{const o=await g.js(()=>{var c=$('c-homes'),cr=c.getBoundingClientRect();return [...c.querySelectorAll('*')].filter(e=>e.checkVisibility()&&e.getBoundingClientRect().right>cr.right+0.5).length;});M.check('M4 nothing in Homes overflows at 360',o===0,o);}
   await g.page.setViewportSize({width:390,height:844});
  }
+ // ---- M5: the map ----
+ if(on('m5')){
+  const S=M.run('avg').snapshots,names=Object.keys(S),withUae=names.filter(k=>/^year \d+$/.test(k)&&S[k].emp.regions.indexOf('uae')>=0);
+  const early=withUae[0],late=withUae[Math.min(withUae.length-1,3)];
+  for(const st of [early,late,'year 12']){await g.load(A(st));const r=await g.js(()=>{var v=mapView(G),s=0;Object.keys(v.regs).forEach(k=>{s+=v.regs[k].owners;});var mr=mapRegs(v),s2=0;Object.keys(mr).forEach(k=>{s2+=mr[k].owners;});return {s:s,s2:s2,h:Math.floor(G.humans),n:Object.keys(v.regs).length,open:G.emp.regions.length};});
+   M.check('M5 '+st+': owners over the regions add up to the world count',Math.abs(r.s-r.h)<=1&&Math.abs(r.s2-r.h)<=1&&r.n===r.open,r);}
+  // the script is async: the list until it mounts
+  await g.load(A(late));await g.tab('emp');await g.js(()=>{cache={};render();});
+  {const r=await g.js(()=>({rm:!!window.RMAP,cap:$('mp-cap').innerText,vis:$('c-map').checkVisibility(),first:[...document.querySelectorAll('#p-emp>.card')].filter(c=>c.checkVisibility()).sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top).slice(0,2).map(c=>c.id),reg:$('c-reg').classList.contains('shut'),homes:$('c-homes').hidden}));
+   M.check('M5 before the map script loads the card lists the open regions',!r.rm&&r.vis&&/UAE/.test(r.cap),r);
+   M.check('M5 Map is the first card on the company tab, The line second, Homes gone',r.first.join()==='c-map,c-line'&&r.homes,r.first);
+   M.check('M5 the Regions rows are folded by default',r.reg);}
+  await g.page.addScriptTag({path:require('path').join(__dirname,'..','..','shrimp','region-map.js')});await g.js(()=>{cache={};render();});await g.page.waitForTimeout(700);await g.js(()=>{render();});
+  {const r=await g.js(()=>{var t0=RM.tintOf('uae'),h=G.humans;G.humans=h*6;render();var t1=RM.tintOf('uae');G.humans=h;render();return {t0:t0,t1:t1,shown:RM.shown().length,cap:$('mp-cap').innerText,h:$('rmap').getBoundingClientRect().height};});
+   M.check('M5 mounted: open regions tinted, redder when a larger share has a tank',r.t0>0&&r.t1>r.t0&&r.shown>0&&r.cap===''&&r.h>100,r);}
+  {const r=await g.js(()=>{var out={};(G.fin||[]).slice(-7).forEach(d=>{d._ks=0;});G.kits.stock=0;render();out.badge=[...document.querySelectorAll('#mp-ov .mp-badge')].map(b=>b.innerText);out.crate0=RM.crateOn();G.kits.stock=Math.max(10,kitDemand(G))*8;render();out.badge2=document.querySelectorAll('#mp-ov .mp-badge').length;out.crate1=RM.crateOn();return out;});
+   M.check('M5 orders ahead of kits and no stock: a waiting badge',r.badge.length>=1&&r.badge.every(t=>/^[\d.,]+[kMB]? waiting$/.test(t))&&!r.crate0,r);
+   M.check('M5 stock over a week of orders: no badge, crates at the farm',r.badge2===0&&r.crate1,r);}
+  // tap a region
+  {const pt=await g.js(()=>{$('c-map').scrollIntoView({block:'center'});var id=G.emp.regions.map(mapId).filter(x=>x!=='uae').pop()||'uae',q=RM.point(id),r=$('rmap').getBoundingClientRect();var p=q;if(id!=='uae'){for(var dy=0;dy<12&&RM.hit(p[0],p[1])!==id;dy++){p=[q[0]+(dy%2?dy:-dy),q[1]+(dy>5?2:0)];}}return {id:id,hit:RM.hit(p[0],p[1]),x:r.left+p[0]/RMAP.W*r.width,y:r.top+p[1]/RMAP.H*r.height,sy:scrollY};});
+   await g.page.waitForTimeout(700);const p2=await g.js(([q])=>{var r=$('rmap').getBoundingClientRect();return {x:r.left+q.px*r.width,y:r.top+q.py*r.height,sy:scrollY};},[{px:0,py:0}]);
+   const pos=await g.js(id=>{var q=RM.point(id),p=q;if(id!=='uae'){for(var k=0;k<40&&RM.hit(p[0],p[1])!==id;k++)p=[q[0]+((k%5)-2)*1.5,q[1]+(Math.floor(k/5)-4)*1.5];}var r=$('rmap').getBoundingClientRect();return {x:r.left+p[0]/RMAP.W*r.width,y:r.top+p[1]/RMAP.H*r.height,sy:scrollY,hit:RM.hit(p[0],p[1])};},pt.id);
+   await g.page.mouse.click(pos.x,pos.y);await g.page.waitForTimeout(350);
+   const r=await g.js(()=>{var i=$('mp-info');return {vis:i.checkVisibility(),t:i.innerText.replace(/\s+/g,' '),top:i.getBoundingClientRect().top,sy:scrollY};});
+   M.check('M5 tapping an open region opens its sheet under the tap, the page does not move',pos.hit===pt.id&&r.vis&&/people · [\d.]+% have a tank · [\d.]+% want one · [\d.]+% know you/.test(r.t)&&r.top>=pos.y&&r.top<pos.y+40&&Math.abs(r.sy-pos.sy)<1,{pt,pos,r});
+   await g.tapText('#mp-info button',/^Close$/);await g.page.waitForTimeout(250);M.check('M5 Close shuts the sheet',await g.rect('#mp-info')===null);
+   const nx=await g.js(()=>{var nr=nextRegion(G);if(!nr)return null;var id=mapId(nr.id),q=RM.point(id),p=q;for(var k=0;k<40&&RM.hit(p[0],p[1])!==id;k++)p=[q[0]+((k%5)-2)*1.5,q[1]+(Math.floor(k/5)-4)*1.5];var r=$('rmap').getBoundingClientRect();return {id:id,name:nr.name,x:r.left+p[0]/RMAP.W*r.width,y:r.top+p[1]/RMAP.H*r.height,hit:RM.hit(p[0],p[1])};});
+   if(nx&&nx.hit===nx.id){await g.page.waitForTimeout(650);await g.page.mouse.click(nx.x,nx.y);await g.page.waitForTimeout(350);const t=await g.text('#mp-info')||'',b=await g.js(()=>{var x=document.querySelector('#mp-info button[data-act="region"]');return x?{dis:x.disabled,t:x.innerText}:null;});
+    M.check('M5 a closed region shows its people, Not open, and the Open button with its price (grey says why)',t.indexOf(nx.name)===0&&/people\. Not open\./.test(t)&&!!b&&/^Open · /.test(b.t.replace(/\s+/g,' '))&&(!b.dis||/Needs |Crew on the wells/.test(t)),{t,b});await g.tapText('#mp-info button',/^Close$/);await g.page.waitForTimeout(250);}else M.skip('M5 closed region','every region open or its point not found');}
+  // a pin for a letter with a place
+  {await g.js(()=>{G.progress.queue=[];G.progress.mail=['pain_moss'];G.progress.mailOpen=null;delete G.emp.pains.pain_moss;render();});await g.page.waitForTimeout(700);const pin=await g.rect('#mp-ov .mp-pin');M.check('M5 a letter about a place puts a pin on the map',!!pin,pin);
+   if(pin){await g.page.mouse.click(pin.x+pin.w/2,pin.y+pin.h/2);await g.page.waitForTimeout(400);M.check('M5 tapping the pin opens the letter',await g.js(()=>G.progress.queue[0]==='pain_moss'&&G.progress.mailOpen==='pain_moss'&&!$('milestone-card').hidden));await g.js(()=>{mailLater(G);render();});}}
+  await g.page.setViewportSize({width:360,height:844});await g.js(()=>{cache={};render();});await g.page.waitForTimeout(300);
+  {const o=await g.js(()=>{var c=$('c-map'),cr=c.getBoundingClientRect();return [...c.querySelectorAll('.mp-info *,.mp-cap,.hd *')].filter(e=>e.checkVisibility()&&e.getBoundingClientRect().right>cr.right+0.5).length+(document.documentElement.scrollWidth>innerWidth?1:0);});M.check('M5 nothing in the Map card overflows at 360',o===0,o);}
+  await g.page.setViewportSize({width:390,height:844});
+ }
  await g.close();M.done('v2');})();

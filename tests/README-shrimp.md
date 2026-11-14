@@ -4207,3 +4207,55 @@ changed vs a825452: m-you, tight, m-kits, kitpack, tapall, fresh, cardlag, m-car
 | endcards | ok 17s  50 ending card checks passed |
 | tapall | ok 531s  PASS 145 taps 100 ms after a render all changed the save (157 repeats skipped) (38 stages: |
 | m-health | ok 7s  PASS 10 health moment checks |
+
+
+## v2 M5 (14 Nov, shrimp-v2, BUILD v2m5): the map is the company's playfield
+
+- New card `#c-map` "Map", first on the company tab from the UAE region on (`order:-3`; Homes is gone by then), The line second. `#rmap` moved out of `#c-reg` into it. The Regions card's rows stay as the list view, folded once (`G.opt.regFold`).
+- `mapView(G)`: per open game region `{people, owners, orders, shipped}` plus `short`, `long`, `want`, `known`. The sim keeps no per-region numbers, so the world totals (`G.humans`, `kitDemand`, `rate(_ks)`) are split by population; owners sum to `floor(G.humans)` exactly. `mapRegs(v)` folds Abu Dhabi, Dubai and the rest of the UAE into the sprite's one UAE and adds `share`, `pulse`, `ship`, `waiting`. View only: the sim and the bots do not change.
+- `region-map.js`: `RM.data(view, crate)` (a cherry tint per open region through its mask, opacity 0.08 to 0.85 on the square root of the share; pulse period shortened by the region's share of orders; sea-lane dash pattern by kits shipped, four levels; a crate stack at the hub), `RM.hit(x,y)` (which region is under a point, from the masks' alpha, the UAE by distance to the hub), `RM.point(id)`, `RM.tintOf`, `RM.crateOn`; `RMAP.W/H`. `sw.js` cache name `shrimp-v2`.
+- On the map (`#mp-ov`, HTML over the sprite): "3,095 waiting" badges when orders run more than 10% ahead of kits shipped and there is no stock (at most three, never on top of each other); pins (`LETTER_AT`: pain_heat UAE, pain_moss Southeast Asia, c_rivers Europe, c_kyoto and c_survey East Asia, c_permit South Asia) that open their letter.
+- Tap a region (`mapTap`, `MAPSEL`, `mapInfoHTML`, `#mp-info` under the tap, the page does not scroll): open: "745M people · 13% have a tank · 48% want one · 35% know you", a button to its Shops (or Regions) card, Close. Closed: its people, "Not open.", and for the next region the Open button with the price (the existing `region` action, grey with the reason); for a later one, which region opens first.
+- Before the async script has loaded the card lists the open regions' names.
+- Not done from the plan: per-region shop buttons inside the sheet (it links to the Shops card), `at:` on each letter's own definition (one table, `LETTER_AT`).
+- Also fixed here: The line's steps did not scroll to a card on the same tab (`finGo` only scrolls after a tab change); `lineGo` scrolls itself now. The M2 check had passed because Making kits happened to be on screen.
+- Tests: `m-v2` M5 block (owners add up at three snapshots; the list before the script; tint rises with the share; badge with no stock, crates and no badge with a week of stock; the sheet under the tap with no page move; the closed region's Open button; a pin opens its letter; 360). Bots unchanged (2,476 / 4,367 / 7,308). Known: layout 3 overflows.
+
+Tests (changed, 1832c27, 2026-11-14 02:34 UTC, 11.0 min, 2 at once): 32 suites, 0 failed, 1 warn, 0 skipped.
+
+changed vs 1832c27: cardlag, m-cards, bot-cards, projtabs, m-v2, tight, m-kits, kitpack, tapall, tank1, yourtank, m-tank, greyreason, m-you, boardgames, m-games, layout, frozen, land-life, space, strong, kind, avg (all tabs)
+
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | - | cached, game unchanged: WIN 2476 |
+| kind | ok | - | cached, game unchanged: WIN 4367 |
+| avg | ok | - | cached, game unchanged: earth 7308 |
+| balance | ok | 6 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 1 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 1 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 6 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| cardlag | ok | 1 |  avg: true but never shown by day 7308: party1 (day 433, dropped), party2 (day 2772, dropp |
+| m-cards | ok | 39 | PASS 40 cards moment checks |
+| bot-cards | ok | 0 |  |
+| projtabs | ok | 10 | 3 project tab checks passed |
+| m-v2 | ok | 51 | PASS 127 v2 moment checks |
+| tight | ok | 151 | 0 findings |
+| m-kits | ok | 51 | PASS 308 kits moment checks |
+| kitpack | ok | 6 | kit packing checks passed |
+| tapall | ok | 532 | PASS 145 taps 100 ms after a render all changed the save (157 repeats skipped) (38 stages: |
+| tank1 | ok | 30 | all tank 1 checks passed |
+| yourtank | ok | 23 | all passed |
+| m-tank | ok | 13 | PASS 9 tank moment checks |
+| greyreason | ok | 171 | PASS (171 s) 485 grey buttons all say why, 145 dotted titles all open, 281 snapshots |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| boardgames | ok | 21 | board game checks passed |
+| m-games | ok | 5 | PASS 22 games moment checks |
+| layout | warn | 94 | 3 things overflow |
+| frozen | ok | 3 | frozen buttons checked on 5 tabs |
+| land-life | ok | 18 | all passed |
+| space | ok | 9 | PASS Leave Earth, launch, search and land after Earth |

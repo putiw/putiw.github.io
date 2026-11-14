@@ -3,7 +3,7 @@
 // Pages (html) and scripts (js) go network first, so a new BUILD still arrives when online (3 s, then the kept copy).
 // Everything else comes from the kept copy at once and is refreshed in the background.
 // Query strings (?v=BUILD, ?v=2) are ignored when matching. Bump CACHE only to drop old files.
-var CACHE='shrimp-v1';
+var CACHE='shrimp-v2';/* v2 M5: region-map.js changed */
 var FILES=['./','index.html','home.html','space.html','ear.html','taps.js','boardgames.js','region-map.js','manifest.webmanifest','favicon.ico','icon-32.png','icon-180.png','icon-192.png','icon-512.png',
  'bag.png','catch.png','oxygen.png','seal.png','box.png','extra-moss.png','extra-planted.png','extra-snail.png','extra-wood.png',
  'music.mp3','water.mp3','catch-shrimp-1.mp3','catch-shrimp-2.mp3',
