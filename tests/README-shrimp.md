@@ -4677,3 +4677,28 @@ Tests (fast, c0e0f9e, 2026-11-14 10:10 UTC, 0.3 min, 2 at once): 9 suites, 0 fai
 | kind | ok | 81 | WIN 4367 (prev 4367) question_lucky |
 | strong | ok | 27 | WIN 2476 (prev 2476) empire_dictator |
 | m-v2 | ok | 78 | PASS 193 v2 moment checks |
+
+## v2b 10 (14 Nov, shrimp-v2, BUILD 2026-11-14T14:14-v2b): the You page later left as it is
+
+- Not redone, as asked. `meReady` is unchanged (Tank 1 feeds and changes its own water, and a kit sold or a farm). The M7 try (the You page waits for a hire) stays reverted.
+- Checks: block `b10` (the function is byte for byte the one in b7d4af8; it opens with no staff). Block `b11` gained one check: the ending page builds for a game stopped at the ten-year card and does not say every home has a tank.
+- No game change in this commit.
+
+Tests (fast, 12a439a, 2026-11-14 10:14 UTC, 0.3 min, 2 at once): 9 suites, 0 failed, 0 warn, 0 skipped.
+
+| suite | result | s | note |
+|---|---|---|---|
+| balance | ok | 7 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 8 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+
+| avg | ok | - | cached, game unchanged: earth 7308 |
+| kind | ok | - | cached, game unchanged: WIN 4367 |
+| strong | ok | - | cached, game unchanged: WIN 2476 |
+| m-v2 | ok | 79 | PASS 196 v2 moment checks |

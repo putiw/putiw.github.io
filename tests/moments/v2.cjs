@@ -440,6 +440,7 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
   {const tap=async()=>{const b=await g.js(()=>{var e=document.querySelector('#milestone-actions [data-act="ten-pick"][data-id="none"]'),r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2,t:e.innerText.trim()};});await g.page.mouse.click(b.x,b.y);await g.page.waitForTimeout(700);return b.t;};
    const t1=await tap(),mid=await g.js(()=>({won:!!G.emp.won,t:document.querySelector('#milestone-actions [data-act="ten-pick"][data-id="none"]').innerText.trim()}));const t2=await tap();
    const r=await g.js(()=>({won:!!G.emp.won,q:G.progress.queue[0],title:$('milestone-title')?$('milestone-title').innerText:'',wt:hardWinTitle(G)}));
+   {const e=await g.js(()=>{try{var h=endingHTML(G);return {n:h.length,stop:h.indexOf('You stopped counting')>=0,every:/Every home (on Earth )?has/.test(h)};}catch(x){return {err:String(x)};}});M.check('v2b 11 the ending page builds for a game stopped at ten years and does not say every home has a tank',e.n>500&&!e.every,e);}
    M.check('v2b 11 Stop counting takes two taps, then the game ends (the last chapter, then the ending) under its own title',t1==='Choose'&&!mid.won&&mid.t==='Tap again'&&r.won&&(r.q==='win'||r.q==='lastchap')&&r.wt==='Stop counting',{t1,mid,t2,r});}
   await g.load(A('year 7'));
   {const r=await g.js(()=>{var a=tenGoal(G,'want'),s=JSON.parse(JSON.stringify(G));s.day=DREAM_DAYS+1;s.progress.queue=['c_many'];var b=tenGoal(s,'want');s.progress.queue=['tenyears'];s.day=100;var c=tenGoal(s,'want');return {a:a,b:b,c:c,d:hardSetGoal(G,'want')};});
@@ -447,5 +448,12 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
   await g.page.setViewportSize({width:360,height:844});await ten();await g.tapText('#milestone-actions button',/^Rethink the goal$/);await g.page.waitForTimeout(1000);
   {const o=await g.js(()=>{var c=$('milestone-card').getBoundingClientRect();return [...document.querySelectorAll('#milestone-actions *')].filter(e=>e.checkVisibility()&&(e.getBoundingClientRect().right>c.right+0.5||(e.tagName==='BUTTON'&&e.scrollWidth>e.clientWidth+1))).length;});M.check('v2b 11 the four choices fit at 360',o===0,o);}
   await g.js(()=>{TEN_GOAL=0;});await g.page.setViewportSize({width:390,height:844});
+ }
+ // ---- v2b 10: the You page later is not redone, meReady is as it was ----
+ if(on('b10')){
+  await g.load(A('year 2'));
+  {const r=await g.js(()=>{var h=function(s){var x=5381;for(var i=0;i<s.length;i++)x=((x<<5)+x+s.charCodeAt(i))|0;return x;};var s=JSON.parse(JSON.stringify(G)),t=s.tanks[0];t.feeder=1;t.autoWC=1;s.kits.sold=1;var a=meReady(s);s.kits.sold=0;s.emp.farms={};var b=meReady(s);t.autoWC=0;s.kits.sold=5;var c=meReady(s);return {h:h(meReady.toString()),a:a,b:b||farmBuilt(s),c:c};});
+   M.check('v2b 10 meReady is byte for byte the function of b7d4af8',r.h===-1245349920,r.h);
+   M.check('v2b 10 the You page opens when Tank 1 feeds and changes water itself and a kit is sold, no staff needed',r.a===true&&r.c===false,r);}
  }
  await g.close();M.done('v2');})();
