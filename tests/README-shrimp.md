@@ -4164,3 +4164,46 @@ changed vs a825452: m-you, tight, m-kits, kitpack, tapall, fresh, cardlag, m-car
 | endcards | ok | 18 | 50 ending card checks passed |
 | land-audio | ok | 13 | all passed |
 | layout | warn | 92 | 3 things overflow |
+
+
+## v2 M4 (14 Nov, shrimp-v2, BUILD v2m4): the homes picture, before the map
+
+- Card `#c-homes` "Homes" from the first home besides yours (`homesOn`: `homesShown` 2 or more) until the UAE region opens: first card on Trade while that tab is open, first on Kits otherwise (`renderHomes`, from `renderProgression`; CSS `order:-3` in `#p-emp`, first child in `#p-market`).
+- One canvas, 120 px tall at every scale, drawn at 1/3 scale (`drawHomes(ctx,scale,n,seed,t)`, marked PLACEHOLDER ART, returns the lit count). Scale 1 "Your building": 16 windows, yours on the ground floor, the third floor lights next, then a per-save order. Scale 2 "Your street" from 17 homes: ten buildings, 200 windows. Scale 3 "Abu Dhabi" from 201 homes: a skyline, one red pixel is 100 homes. The newest window blinks for 0.6 s. A change of scale is a 0.6 s zoom-out and one note ("The picture is your street now." / "The picture is Abu Dhabi now."), never a card. The scale never goes back (`G.opt.hscale`). Caption `Your street · 43 homes`.
+- Sim: nothing but the seed (`G.hseed`, set by the view from `G.oseed`, so the bots' random numbers are untouched). `migrate`: `hseed` default, and `G.opt.hnote` at the save's current scale so an old save gets no zoom note.
+- The new cards (line, mail, homes, map) are in `OPEN_ON_REVEAL`: they arrive open, not folded.
+- Tests: `m-v2` M4 block (lit windows equal the count at scale 1 by counting red pixels for 1 to 16, and at scale 2; the scale holds; height 120 at each scale; shown after the jar sale, at kits unlocked, at first kit; gone when the UAE opens; 360). The run below failed one M4 check: the blink hid the newest window when the clock passed to `drawHomes` was behind the blink start; fixed (`t>=HOMES.blinkAt`), green after.
+- Bots unchanged (2,476 / 4,367 / 7,308). Known: layout 3 overflows.
+
+| suite | result |
+|---|---|
+| strong | ok -  cached, game unchanged: WIN 2476 |
+| kind | ok -  cached, game unchanged: WIN 4367 |
+| avg | ok -  cached, game unchanged: earth 7308 |
+| academy | ok 0s  10 academy and parallel chapter checks passed |
+| me | ok 1s  56 free time, Grandma and ending checks passed |
+| cardtap | ok 3s  card tap checks passed |
+| space-search | ok 0s  6 space search checks passed |
+| balance | ok 5s  176 focused balance and migration checks passed |
+| tank1-sim | ok 1s  all tank 1 sim checks passed |
+| effects-sim | ok 0s  14 action checks passed |
+| sound | ok 1s  all ok |
+| cardlag | ok 1s   avg: true but never shown by day 7308: party1 (day 433, dropped), party2 (day 2772, dropp |
+| gates | ok 6s  3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| bot-cards | ok 0s   |
+| projtabs | ok 9s  3 project tab checks passed |
+| m-cards | ok 36s  PASS 40 cards moment checks |
+| m-v2 | FAIL 41s  FAIL 1 moment checks (v2): |
+| fresh | ok 4s  all ok |
+| tight | ok 143s  0 findings |
+| greyreason | ok 168s  PASS (168 s) 489 grey buttons all say why, 145 dotted titles all open, 281 snapshots |
+| tank1 | ok 29s  all tank 1 checks passed |
+| yourtank | ok 23s  all passed |
+| m-tank | ok 12s  PASS 9 tank moment checks |
+| layout | warn 92s  3 things overflow |
+| m-kits | ok 50s  PASS 308 kits moment checks |
+| kitpack | ok 5s  kit packing checks passed |
+| space | ok 9s  PASS Leave Earth, launch, search and land after Earth |
+| endcards | ok 17s  50 ending card checks passed |
+| tapall | ok 531s  PASS 145 taps 100 ms after a render all changed the save (157 repeats skipped) (38 stages: |
+| m-health | ok 7s  PASS 10 health moment checks |

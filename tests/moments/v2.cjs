@@ -25,7 +25,7 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
  if(on('m2')){
   for(const st of ['first farm','100k kits','year 7']){await g.load(A(st));await g.tab('emp');await g.js(()=>{document.querySelectorAll('.card.shut').forEach(c=>c.classList.remove('shut'));cache={};render();});
    const r=await g.js(()=>{var num=s=>{var m=/^\s*([\d.,]+[kMBT]?)/.exec(s||'');return m?m[1]:null;},nb=[...document.querySelectorAll('#ln-nums .ln-b b')].map(b=>b.innerText),k=$('e-kitsum').innerText,km=/of ([\d.,]+[kMBT]?) orders/.exec(k);
-    return {line:nb,farm:num($('e-farmsum').innerText.replace(/^[\d.,kMB]+ farms · /,'')),pack:num($('e-staffsum').innerText.replace(/^[\d.,kMB]+ in stock · /,'')),ord:km?km[1]:null,vis:$('c-line').checkVisibility(),first:[...document.querySelectorAll('#p-emp>.card')].filter(c=>c.checkVisibility()).sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top)[0].id};});
+    return {line:nb,farm:num($('e-farmsum').innerText.replace(/^[\d.,kMB]+ farms · /,'')),pack:num($('e-staffsum').innerText.replace(/^[\d.,kMB]+ in stock · /,'')),ord:km?km[1]:null,vis:$('c-line').checkVisibility(),first:[...document.querySelectorAll('#p-emp>.card')].filter(c=>c.checkVisibility()&&c.id!=='c-homes'&&c.id!=='c-map').sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top)[0].id};});
    M.check('M2 '+st+': The line shows, first card on the tab',r.vis&&r.first==='c-line',r);
    M.check('M2 '+st+': Bred equals the Farms header',r.line[0]===r.farm,r);
    if(r.pack)M.check('M2 '+st+': Packed equals the Making kits header',r.line[1]===r.pack,r);
@@ -67,7 +67,7 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
    M.check('M3 dot on the Kits tab while a letter waits',await g.js(()=>!$('empdot').hidden));
    await g.tab('emp');await g.js(()=>{document.querySelectorAll('.card.shut').forEach(c=>c.classList.remove('shut'));render();});
    const row=await g.text('#c-mail');M.check('M3 Letters card lists the letter with Open',/Dead on arrival/.test(row||'')&&/Open/.test(row||''),row);
-   {const o=await g.js(()=>{var ids=[...document.querySelectorAll('#p-emp>.card')].filter(c=>c.checkVisibility()).sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top).map(c=>c.id);return ids.slice(0,2);});M.check('M3 Letters sits under The line',o[0]==='c-line'&&o[1]==='c-mail',o);}
+   {const o=await g.js(()=>{var ids=[...document.querySelectorAll('#p-emp>.card')].filter(c=>c.checkVisibility()&&c.id!=='c-homes'&&c.id!=='c-map').sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top).map(c=>c.id);return ids.slice(0,2);});M.check('M3 Letters sits under The line',o[0]==='c-line'&&o[1]==='c-mail',o);}
    M.check('M3 no card up while the letter waits',await g.rect('#milestone-card')===null);
    await g.tapText('#c-mail button',/^Open$/);await g.page.waitForTimeout(400);
    const sc=(await g.text('#milestone-scope')||'');M.check('M3 open letter: header LETTER, not time paused',/^letter$/i.test(sc),sc);
@@ -210,5 +210,29 @@ const only=process.env.V2_ONLY?process.env.V2_ONLY.split(','):null,on=k=>!only||
    M.check('M6.5 the sheet: the day, the homes count, the last two events, the letters, Carry on',/^Where you were/i.test(t)&&t.indexOf('Day '+r.day)>=0&&t.indexOf(r.homes)>=0&&r.last.every(x=>t.indexOf(x)>=0)&&r.mail.every(x=>t.indexOf(x)>=0)&&/Carry on$/.test(t),{t,r});
    M.check('M6.5 play waits under it',r.sp===0);
    await g.page.click('#after-ok');await g.page.waitForTimeout(300);M.check('M6.5 Carry on closes it and the popup is its old self again',await g.js(()=>$('after').hidden&&$('after-ok').textContent==='Go on'&&$('after').querySelector('.scope-label').textContent==='What happened'));}
+ }
+ // ---- M4: the homes picture ----
+ if(on('m4')){
+  const first=(t)=>g.js(t=>{var cs=[...document.querySelectorAll('#p-'+t+'>.card')].filter(c=>c.checkVisibility()).sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top);return cs[0]&&cs[0].id;},t);
+  await g.js(()=>{G=newGame();migrate(G);cache={};render();});M.check('M4 fresh game: no Homes card',await g.rect('#c-homes')===null);
+  await g.load(A('milestone sale'));await g.tab('market');await g.page.waitForTimeout(200);
+  {const r=await g.js(()=>({n:homesShown(G),lit:HOMES.lit,sc:HOMES.scale,cap:$('hm-cap').innerText,h:$('hm-cv').getBoundingClientRect().height}));
+   M.check('M4 right after the jar sale: Homes at the top of Trade, 2 lit windows, Your building',await first('market')==='c-homes'&&r.n===2&&r.lit===2&&r.sc===1&&r.cap==='Your building · 2 homes'&&Math.abs(r.h-120)<1,r);}
+  {const r=await g.js(()=>{var cv=document.createElement('canvas');cv.width=110;cv.height=40;var c=cv.getContext('2d'),a=[];for(var n=1;n<=16;n++){drawHomes(c,1,n,G.hseed,0);var d=c.getImageData(0,0,110,40).data,red=0;for(var i=0;i<d.length;i+=4)if(d[i]===0xbf&&d[i+1]===0x3a&&d[i+2]===0x2b)red++;a.push(red/20);}
+     var o=homesOrder(16,G.hseed,[13,5]);return {a:a,o0:o[0],o1:o[1]};});
+   M.check('M4 scale 1: lit windows equal the count, 1 to 16 (each window 4 by 5 px)',r.a.every((x,i)=>x===i+1),r.a);M.check('M4 your window first, the third floor next',r.o0===13&&r.o1===5,r);}
+  for(const st of ['kits unlocked','first kit']){await g.load(A(st));await g.tab('emp');await g.page.waitForTimeout(150);const r=await g.js(()=>({n:homesShown(G),lit:HOMES.lit,sc:HOMES.scale,vis:$('c-homes').checkVisibility(),h:$('hm-cv').getBoundingClientRect().height}));
+   M.check('M4 '+st+': Homes first on Kits, lit windows equal the count',r.vis&&await first('emp')==='c-homes'&&r.lit===r.n&&Math.abs(r.h-120)<1,r);}
+  await g.load(A('first kit'));await g.tab('emp');
+  {const r=await g.js(()=>{var out={};G.humans=40;render();out.s2={n:homesShown(G),lit:HOMES.lit,sc:HOMES.scale,cap:$('hm-cap').innerText,h:$('hm-cv').getBoundingClientRect().height,note:G.notes.list[G.notes.list.length-1].t};
+     G.humans=3;render();out.back={sc:HOMES.scale,lit:HOMES.lit,n:homesShown(G)};G.humans=5000;render();out.s3={sc:HOMES.scale,lit:HOMES.lit,cap:$('hm-cap').innerText,h:$('hm-cv').getBoundingClientRect().height};G.humans=10;render();out.back2=HOMES.scale;return out;});
+   M.check('M4 scale 2 from 17 homes: Your street, lit windows equal the count, one note',r.s2.sc===2&&r.s2.lit===r.s2.n&&r.s2.cap==='Your street · '+r.s2.n+' homes'&&r.s2.note==='The picture is your street now.',r.s2);
+   M.check('M4 the scale never goes back',r.back.sc===2&&r.back.lit===r.back.n&&r.back2===3,r);
+   M.check('M4 scale 3 from 201 homes: Abu Dhabi, one lit pixel is 100 homes',r.s3.sc===3&&r.s3.lit===50&&/^Abu Dhabi · /.test(r.s3.cap),r.s3);
+   M.check('M4 the canvas height is the same at every scale',Math.abs(r.s2.h-120)<1&&Math.abs(r.s3.h-120)<1);}
+  {const h0=(await g.rect('#c-homes')).h;await g.page.click('#c-homes .hd h2');await g.page.waitForTimeout(250);M.check('M4 the card collapses',(await g.rect('#c-homes')).h<h0-80);await g.page.click('#c-homes .hd h2');await g.page.waitForTimeout(200);}
+  await g.load(A('first farm'));await g.tab('emp');{const a=await g.rect('#c-homes');await g.js(()=>{['dxb','uae'].forEach(r=>{if(!regOpen(G,r))G.emp.regions.push(r);});cache={};render();});M.check('M4 once the UAE region is open the Homes card is gone',!!a&&await g.rect('#c-homes')===null&&await g.js(()=>regOpen(G,'uae')));}
+  await g.page.setViewportSize({width:360,height:844});await g.load(A('first kit'));await g.tab('emp');{const o=await g.js(()=>{var c=$('c-homes'),cr=c.getBoundingClientRect();return [...c.querySelectorAll('*')].filter(e=>e.checkVisibility()&&e.getBoundingClientRect().right>cr.right+0.5).length;});M.check('M4 nothing in Homes overflows at 360',o===0,o);}
+  await g.page.setViewportSize({width:390,height:844});
  }
  await g.close();M.done('v2');})();
