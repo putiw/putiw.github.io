@@ -4540,3 +4540,51 @@ Tests (fast, 9231b63, 2026-11-14 09:22 UTC, 0.2 min, 2 at once): 9 suites, 0 fai
 | kind | ok | - | cached, game unchanged: WIN 4367 |
 | strong | ok | - | cached, game unchanged: WIN 2476 |
 | m-v2 | ok | 61 | PASS 181 v2 moment checks |
+
+## v2b push 1 (14 Nov, shrimp-v2): items 1 to 8, `changed` before the push
+
+- `tests/run.cjs`: the v2 area knows `inv`, `lever`, `levers`, `bye` so `changed` no longer falls back to `feature` for `renderInv`, `leverDay`, `byeChoose`.
+- `node tests/run.cjs changed` against b7d4af8: 36 suites, 0 failed, 1 warn (layout's 3 old overflows).
+
+Tests (changed, 1d41295, 2026-11-14 09:35 UTC, 11.7 min, 2 at once): 36 suites, 0 failed, 1 warn, 0 skipped.
+
+changed vs b7d4af8: projtabs, tapall, tank1, yourtank, m-tank, tight, greyreason, m-you, cardlag, m-cards, bot-cards, endcards, fresh, m-v2, layout, m-kits, kitpack, hard, m-hard, land-life, land-audio, boardgames, m-games, frozen, strong, kind, avg (all tabs)
+
+| suite | result | s | note |
+|---|---|---|---|
+| strong | ok | - | cached, game unchanged: WIN 2476 |
+| kind | ok | - | cached, game unchanged: WIN 4367 |
+| avg | ok | - | cached, game unchanged: earth 7308 |
+| balance | ok | 10 | 176 focused balance and migration checks passed |
+| academy | ok | 0 | 10 academy and parallel chapter checks passed |
+| me | ok | 2 | 56 free time, Grandma and ending checks passed |
+| cardtap | ok | 3 | card tap checks passed |
+| space-search | ok | 0 | 6 space search checks passed |
+| tank1-sim | ok | 1 | all tank 1 sim checks passed |
+| sound | ok | 2 | all ok |
+| effects-sim | ok | 0 | 14 action checks passed |
+| gates | ok | 9 | 3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| projtabs | ok | 11 | 3 project tab checks passed |
+| tapall | ok | 537 | PASS 145 taps 100 ms after a render all changed the save (157 repeats skipped) (38 stages: |
+| tank1 | ok | 31 | all tank 1 checks passed |
+| yourtank | ok | 24 | all passed |
+| m-tank | ok | 14 | PASS 9 tank moment checks |
+| tight | ok | 152 | 0 findings |
+| greyreason | ok | 172 | PASS (171 s) 487 grey buttons all say why, 144 dotted titles all open, 281 snapshots |
+| m-you | ok | 4 | PASS 9 you moment checks |
+| cardlag | ok | 1 |  avg: true but never shown by day 7308: party1 (day 433, dropped), party2 (day 2772, dropp |
+| m-cards | ok | 38 | PASS 40 cards moment checks |
+| bot-cards | ok | 0 |  |
+| endcards | ok | 20 | 50 ending card checks passed |
+| fresh | ok | 4 | all ok |
+| m-v2 | ok | 62 | PASS 181 v2 moment checks |
+| layout | warn | 101 | 3 things overflow |
+| m-kits | ok | 52 | PASS 308 kits moment checks |
+| kitpack | ok | 6 | kit packing checks passed |
+| hard | ok | 15 | 24 hard part checks passed (milestone hardpart) |
+| m-hard | ok | 72 | PASS 173 hard moment checks |
+| land-life | ok | 19 | all passed |
+| land-audio | ok | 13 | all passed |
+| boardgames | ok | 23 | board game checks passed |
+| m-games | ok | 6 | PASS 22 games moment checks |
+| frozen | ok | 3 | frozen buttons checked on 5 tabs |

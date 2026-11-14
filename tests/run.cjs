@@ -109,7 +109,7 @@ const CH_FILES=[
 const CH_CORE_SUITES=['tight','layout','greyreason'];
 const CH_AREAS=[
   ['cards','milestone milestones card cards story stories pain pains intro react queue chapter chapters news soon visit choice choices bonus fxc need fork forks bird push',['cardlag','m-cards','bot-cards','cardtap','projtabs'],['card']],/* projtabs: a card that now comes at once covered the tabs (Pass 290) */
-  ['v2','homes letter letters mail fact facts readout invite invites split resume',['m-v2','tight','m-cards'],['emp','market','tank','me']],
+  ['v2','homes letter letters mail fact facts readout invite invites inv split resume lever levers bye',['m-v2','tight','m-cards'],['emp','market','tank','me']],
   ['hard','hard prop props propose proposal war musk catch catches give',['hard','m-hard','tight'],['hard','world']],
   ['projects','proj desk camp campaign mk market ad ads promote promo film movie media meme reach offer mkt greenlight wb gala mood',['projtabs','gates','tapall'],['promote','market','emp']],
   ['kits','staff hire pack packer packing kit kits emp empire qc line lines auto automation owner owners order orders price consult frame ow co bottleneck',['m-kits','kitpack','tapall'],['emp','up']],
