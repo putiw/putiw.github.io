@@ -60,14 +60,14 @@ var h=newGame();h.emp.farms.hatch=1;storyChoose(h,'owntank',0);if(tankGone(h)||!
 `);
 check('packers, salespeople, managers and Nona each get a goodbye card',`
 var g=newGame();var E=g.emp;E.staff.pack=10;E.staff.lines=1;g.money=1e6;if(!milestoneConditions(g).bye_pack)throw Error('Kiki');
-var o=byeOpts(g,'pack');if(o.length!==4||o[1][3]!==10*180*35)throw Error('Six months '+o[1][3]);var m=g.money;if(!storyChoose(g,'bye_pack',1)||E.staff.pack!==0||m-g.money!==63000)throw Error('Bonus');
+var o=byeOpts(g,'pack');if(o.map(function(x){return x[2];}).join()!=='bonus,loop,retrain,let'||o[0][3]!==10*180*35)throw Error('v2 M8d Kiki: her own ask first, Let them go last '+o.map(function(x){return x[2];}));var m=g.money;if(!storyChoose(g,'bye_pack',0)||E.staff.pack!==0||m-g.money!==63000)throw Error('Bonus');
 if(byeReady(g,'pack'))throw Error('Once');
 E.proj.aiconsult=1;E.proj.drones=1;E.staff.sales=4;E.regions=['auh','dxb'];g.money=1e7;goAI(g,'sales');if(!byeReady(g,'sales')||E.bye.sales!==4)throw Error('Luca');
-var so=byeOpts(g,'sales');if(!so.some(function(x){return x[2]==='mgr';}))throw Error('Regional manager with two regions');
-var c0=staffCost(g);storyChoose(g,'bye_sales',so.findIndex(function(x){return x[2]==='mgr';}));if(staffCost(g)-c0!==195)throw Error('Luca salary');
-E.proj.social=1;if(!byeReady(g,'social'))throw Error("Nona");var lo=byeOpts(g,'social');storyChoose(g,'bye_social',3);if(!E.later.some(function(x){return /Nona/.test(x.t);}))throw Error('Later news');
+var so=byeOpts(g,'sales');if(so.map(function(x){return x[2];}).join()!=='list,bonus,study,let')throw Error('v2 M8d Luca: the list, six months, the PhD, let go '+so.map(function(x){return x[2];}));
+if(!storyChoose(g,'bye_sales',0)||!E.lucaList||E.byeDone.sales!=='list')throw Error('v2 M8d Luca takes the list');
+E.proj.social=1;if(!byeReady(g,'social'))throw Error("Nona");var lo=byeOpts(g,'social');if(lo.map(function(x){return x[2];}).join()!=='loop5,study,bonus,let')throw Error('v2 M8d Nona '+lo.map(function(x){return x[2];}));storyChoose(g,'bye_social',1);if(!E.later.some(function(x){return /Nona/.test(x.t);}))throw Error('Later news');
 if(gpLines(g).join(' ').indexOf('Luca')<0)throw Error('Ending line');
-var h=newGame();h.money=0;h.emp.staff.pack=5;h.emp.staff.lines=1;if(storyChoose(h,'bye_pack',1)||!storyChoose(h,'bye_pack',0))throw Error('Letting go always works');
+var h=newGame();h.money=0;h.emp.staff.pack=5;h.emp.staff.lines=1;if(storyChoose(h,'bye_pack',0)||!storyChoose(h,'bye_pack',3))throw Error('Letting go always works');
 var old=newGame();old.emp.staff.pack=5;old.emp.staff.lines=1;old.emp.proj.layoffpack=1;if(byeReady(old,'pack'))throw Error('Old saves that already decided');
 `);
 check('how you play and what you choose pick the ending',`

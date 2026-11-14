@@ -137,8 +137,8 @@ check('shrimp-free ripple fires headlines in order with effects and a retraining
 var g=readyGame();g.humans=5e5;g.kits.sold=2000;g.emp.q=0.9;g.emp.infOn=1;var f0=g.emp.op.m;for(var i=0;i<400;i++){g.day++;rippleDay(g);}
 var R=g.emp.ripple;if(R.n<6||R.log[0].i!==0||R.log[3].i!==3||R.log[4].d<R.log[3].d)throw Error('Headlines out of order');
 for(var k=0;k<12;k++)opinionDay(g);if(!(g.emp.op.m<f0))throw Error('Trawler headline should upset people');
-g.humans=4e9;R.free=2.1e6;rippleDay(g);if(!rippleHas(g,'retrain')||!projAvail(g).some(p=>p.id==='retrain'))throw Error('Retraining not offered');
-g.money=1e6;var before=g.emp.op.m;buyProj(g,'retrain');for(var k=0;k<12;k++)opinionDay(g);if(!(g.emp.op.m>before)||projAvail(g).some(p=>p.id==='harbors'))throw Error('Retraining should help, and close the other answer');
+g.humans=4e9;R.free=2.1e6;rippleDay(g);if(!rippleHas(g,'retrain')||projAvail(g).some(p=>p.id==='retrain'||p.id==='harbors'))throw Error('v2 M8a: the fishing fork is not offered any more (c_fisher asks it)');
+g.money=1e6;if(buyProj(g,'retrain'))throw Error('v2 M8a: a cut fork cannot be bought');
 R.free=3e9;var inf=g.emp.inf;rippleDay(g);if(R.n!==RIPPLE.length||!(g.emp.inf>inf))throw Error('Late ripple incomplete');
 if(regionCost(g,REGIONS[3])>=REGIONS[3].m)throw Error('Typhoon discount missing');
 `);
@@ -339,12 +339,13 @@ storyChoose(g,'ev_mira',2);if(!g.emp.infOn||!(g.emp.inf>0))throw Error('Any Mira
 var old=readyGame();old.emp.infTotal=40;delete old.emp.infOn;old=migrate(JSON.parse(JSON.stringify(old)));if(!old.emp.infOn)throw Error('Old saves keep influence');
 `);
 check('choices: one answer closes the other, cold answers cost heart and pay off',`
-var g=readyGame();g.emp.infOn=1;g.kits.sold=200;g.money=1e6;g.emp.inf=1e4;
-var ids=projAvail(g).map(p=>p.id);if(ids.indexOf('shipwarm')<0||ids.indexOf('shipcheap')<0)throw Error('Both shipping answers offered');
-var m0=kitMaterials(g);if(!buyProj(g,'shipcheap')||buyProj(g,'shipwarm')||projAvail(g).some(p=>p.fk==='ship'))throw Error('One answer per question');
-if(!(g.emp.heart<0)||!(kitMaterials(g)<m0))throw Error('Cheap shipping saves money and costs heart');
+var g=readyGame();g.emp.infOn=1;g.kits.sold=200;g.money=1e6;g.emp.inf=1e4;g.humans=1e6;
+var ids=projAvail(g).map(p=>p.id);if(ids.indexOf('datasell')<0||ids.indexOf('datakeep')<0||ids.indexOf('datasci')<0)throw Error('All three data answers offered');
+if(ids.some(id=>{var p=PROJ.find(x=>x.id===id);return p.fk&&FORK_CUT[p.fk];})||buyProj(g,'shipcheap'))throw Error('v2 M8a: the five doubled forks are not offered and cannot be bought');
+var m0=g.money;if(!buyProj(g,'datasell')||buyProj(g,'datakeep')||buyProj(g,'datasci')||projAvail(g).some(p=>p.fk==='data'))throw Error('One answer per question');
+if(!(g.emp.heart<0)||!(g.money>m0))throw Error('Selling the data pays and costs heart');
 // science is wonder or use, not kind or cold, so it has no heart either way
-Object.keys(FORK_Q).forEach(function(fk){var o=forkOpts(fk);if(o.length<2)throw Error('Question needs two answers: '+fk);if(fk!=='science'&&!o.some(p=>(p.h||0)>0)||!o.some(p=>(p.h||0)<=0))throw Error('Needs a kind and a cold answer: '+fk);});
+Object.keys(FORK_Q).forEach(function(fk){var o=forkOpts(fk);if(o.length<2)throw Error('Question needs two answers: '+fk);var GG={gene:1,land:1,culls:1,filter:1,labname:1};/* v2 M8b: good against good, no heart on either side */if(GG[fk]){if(o.some(p=>(p.h||0)<0))throw Error('v2 M8b: no cold answer on a good-against-good fork: '+fk);return;}if(fk!=='science'&&!o.some(p=>(p.h||0)>0)||!o.some(p=>(p.h||0)<=0))throw Error('Needs a kind and a cold answer: '+fk);});
 PROJ.filter(p=>p.c==='cult'||p.c==='fork').forEach(function(p){if(p.c==='cult'&&!p.t)throw Error('World project without a track: '+p.id);});
 if(!PROJ.some(p=>p.t==='uni'&&p.m>0&&p.i>0)||!PROJ.some(p=>p.t==='pol'&&!p.m&&p.i>0)||!PROJ.some(p=>p.t==='nature'&&p.m>0&&!p.i))throw Error('Costs should mix money and ✦ by item');
 `);

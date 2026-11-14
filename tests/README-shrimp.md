@@ -4010,3 +4010,101 @@ changed vs ?: fell back to feature (no base (no upstream): pass --base=<ref>)
 | land-life | ok 19s  all passed |
 | taps | ok 13s  all ok |
 | ear | ok 10s  22 ear tank checks passed |
+
+
+## v2 M8 and M9 (14 Nov, shrimp-v2, BUILD v2m9): the choices, and "For scale"
+
+One commit for both (M9 went in before M8 was committed, the two could not be pulled apart cleanly). Every new or changed line is in the project doc `claude/shrimp-v2-new-text.md`.
+
+**M8a, the five doubles.** `FORK_CUT` = ship, careplan, layoff, fish, food. `projAvail` and `buyProj` skip them; code and ids stay, a save that answered one keeps its effect. `tests/shrimp-decs.cjs` leaves them out of the decisions list. The "fishing towns are upset with you" line now also clears once `c_fisher` is answered (the fork that cleared it is gone).
+
+**M8b, six forks, good against good** (no heart on any answer, `h:0`): gene (publish / license / keep in the lab, new `genekeep`), land (farmland / wetland / smaller, new `landsmall`: mega hatcheries make 30% fewer shrimp, `farmCap`), culls (schools / fish food / a pond, new `cullpond`: upkeep `farmCap × 1.5` a day in `dealsDay`), filter (cartridges and pods / sponge and recipe; takes the food fork with it: `filtercart` also sets `foodpods`, `filterlast` sets `foodopen`; the survival numbers now follow the new words: cartridges +0.01 design, sponge −0.01 quality and +0.002 referrals), data (sell / keep / the marine biologists, new `datasci`), labname (Grandma / You / the postdoc / the highest bidder, new `labpostdoc`, `labbid`: +60 knowledge).
+
+**M8c, four invitations** (`INVITES`: party1, party2, gp_games, c_wedding; `inviteOpen`, `inviteGo`, `inviteDay`, `inviteList`, `G.me.inv`): a note, the person button rings, a row with Go at the top of the You page (`#me-inv`, moved to the top while one is open; the markup keeps the Grandma card first), a window of a game month or 3 minutes of play, at most 90 days. Go is the card's go answer and shows its old result. The window closing is the busy answer, no card, no note, no log line. Before the You page opens they stay cards. Bots: `INVITE_BOT` in `shrimp-bot-cards.cjs` answers the day it opens, the way they answered the card.
+
+**M8d, four goodbyes** (`byeOpts`): each body ends with their own ask; answers: Kiki bonus/loop/retrain/let, Luca list/bonus/study/let, Gema shop/loop/mgr/let, Nona loop5/study/bonus/let. New effects: `list` (`E.lucaList`: about 1% of orders at cost, in `dealsDay`), `shop` (one store leaves `E.stores`, AED 1 back), `loop5` (AED 12 a day in `E.hil`). Let them go is always last; the cold bot picks the last answer.
+
+**M8e, one split** (`SPLITS`, `splitChoose`, `splitAmt`, `splitHTML`, `SPLIT_ST`): c_bonus (The Aid / People you know / Stays in the company) and c_vet (Friends and family / A vet who learns shrimp / Stays in the company), 25% steps, the third row is what is left, Send it. Money and pushes scale with the share (`G.story.split`). The pump stays its own button on c_bonus. `storyChoose` by index still works (bots, profiles).
+
+**M8f, two things you say:** `c_rich` (cash first passes AED 3.67B, after mira_teen) and `c_was` (within 120 days after the ten-year card closes). No cost, no company effect.
+
+**Pushes** (`PUSH`, `FORK_PUSH`), retuned until `shrimp-balance` (random chooser within ±0.05 on every trait, drive pushes even), `shrimp-profiles` (all targets met) and `bot-cards` (no STUCK) pass. Pairs after: network-drift 111, empire-garden 76, network-garden 76, empire-drift 67, empire-network 41, empire-question 16, network-question 16, garden-drift 15, drift-question 13, garden-question 12 (before: 109, 77, 77, 65, 40, 13, 12, 14, 11, 10).
+
+**M8g, the shape table rebuilt:**
+
+| Shape | Cards | Before | After |
+|---|---|---|---|
+| Decent or profitable, two answers | science, study, paper, welfare, breeder, reviews, kids, waste | 19 | 8 |
+| Someone you know asks for your time, go or stay (a card) | c_kyoto, c_knee, c_play, gp_land, c_abroad, c_nydin, c_survey | 11 | 7 |
+| A company problem: proper fix, bought fix, cheap dodge (now letters) | the eight pain_* | 8 | 8 |
+| Staff replaced by AI, same four answers | | 4 | 0 |
+| Test first or ship now | c_feed, c_box, c_strain, ev_ai | 4 | 4 |
+| Money left over, pick one | | 2 | 0 |
+| Good against good, two to four answers (new) | gene, land, culls, filter, data, labname | | 6 |
+| An invitation with a window (new) | party1, party2, gp_games, c_wedding | | 4 |
+| Staff replaced by AI, each asks for their own thing (new) | bye_pack, bye_sales, bye_mgr, bye_social | | 4 |
+| A split of 100% (new) | c_bonus, c_vet | | 2 |
+| A line you say (new, with c_lie) | c_lie, c_rich, c_was | 1 | 3 |
+
+No shape is over 8. Cheapest answer against cold answer, counted by script on the 84 story and fork decisions that can be applied to a rich test save (cold = the lowest means push when the answers differ on means by 0.1 or more): the cheapest answer is not the cold one in 72 of 84 (86%; 70 of 84 before). 61 of those have no cold answer at all by that measure, so the number says little about kin or care; the target of a third is met either way.
+
+**Bots, before (M3) and after (M8), day of the win / Earth:**
+
+| seed | strong cold | strong kind | average |
+|---|---|---|---|
+| 7 | 2,914 → 2,476 | 4,354 → 4,367 | 6,664 → 7,308 |
+| 11 | 2,860 → 3,197 | 4,325 → 4,324 | 7,224 → 7,224 |
+| 23 | 2,675 → 2,926 | 4,311 → 4,358 | insolvent day 1,428 → 7,280 |
+
+The forks moved (five gone, the filter and culls numbers changed), so single seeds move by up to 15% both ways; the three-seed means are 2,816 → 2,866 and 4,330 → 4,350.
+
+**M9, "For scale"** (`OUT_FACTS`, `FACT_AED` 3.6725, `factPct`, `factSrc`, `factHTML`, `factRich`, `factBill`, `factFin`, `factNotes`; the plan called the table `FACTS`, the sim already has a `FACTS`, the fun facts, and a second one broke `factDay`): five facts, each with text, source, date and link. Money sheet card "Outside the game" from AED 1B (percent from cash); two notes, once each (`G.opt.facts`), at AED 3.67B and AED 31.9B, note kind `fact`; behind the title of every priced hard-part option (percent from the price) and of every Too poor option (Oxfam); in the ? of the header's "quit eating shrimp" line; in the ? of the Mangroves card. Never on a card with answers (notes wait for cards, help sheets are behind the card shield). I checked the five numbers against their sources on 14 Nov: Forbes 1 Nov 2026 USD 869B and March 2026 3,428 / USD 20.1T; Oxfam Nov 2025 USD 1.65T, 3.8B people, USD 8.30; Rethink Priorities 440B (300 to 620B) and 25T (6.5 to 66T); FAO July 2023 31%, 21%, 677,000 and 393,000 ha. All match.
+
+**Also:** the consultant's hiring forecast on staff rows moved behind the title (it was cut at 390 at one snapshot, `tight`). `m-tank`: the bulk-order check skips when no order is open at the snapshot, the shop-row check leaves out the consultant's `.impact` line (both moved because the bot runs moved).
+
+Tests: `m-v2` M8 and M9 blocks; `shrimp-balance` and `shrimp-me` updated for the cut forks, the heart rule on the six forks, and the goodbye order. Run below: m-v2 failed on two M9 note checks (the notes list is capped at 30, the check counted by length); fixed and green after. Known: layout 3 overflows.
+
+| suite | result |
+|---|---|
+| strong | ok -  cached, game unchanged: WIN 2476 |
+| kind | ok -  cached, game unchanged: WIN 4367 |
+| avg | ok -  cached, game unchanged: earth 7308 |
+| academy | ok 0s  10 academy and parallel chapter checks passed |
+| me | ok 1s  56 free time, Grandma and ending checks passed |
+| cardtap | ok 3s  card tap checks passed |
+| space-search | ok 0s  6 space search checks passed |
+| tank1-sim | ok 1s  all tank 1 sim checks passed |
+| balance | ok 6s  176 focused balance and migration checks passed |
+| effects-sim | ok 0s  14 action checks passed |
+| sound | ok 1s  all ok |
+| gates | ok 6s  3142 gate checks on 318 saves passed, buyProj and deskRun agree with projAvail and deskCan |
+| bot-cards | ok 0s   |
+| space | ok 11s  PASS Leave Earth, launch, search and land after Earth |
+| layout | warn 95s  3 things overflow |
+| projtabs | ok 9s  3 project tab checks passed |
+| cardlag | ok 1s   avg: true but never shown by day 7308: party1 (day 433, dropped), party2 (day 2772, dropp |
+| tight | ok 143s  0 findings |
+| greyreason | ok 172s  PASS (171 s) 489 grey buttons all say why, 145 dotted titles all open, 281 snapshots |
+| m-cards | ok 35s  PASS 40 cards moment checks |
+| m-health | ok 7s  PASS 10 health moment checks |
+| m-games | ok 5s  PASS 22 games moment checks |
+| m-kits | ok 50s  PASS 308 kits moment checks |
+| m-you | ok 4s  PASS 9 you moment checks |
+| m-tank | ok 13s  PASS 9 tank moment checks |
+| m-hard | ok 70s  PASS 173 hard moment checks |
+| m-v2 | FAIL 33s  FAIL 2 moment checks (v2): |
+| frozen | ok 3s  frozen buttons checked on 5 tabs |
+| hard | ok 13s  24 hard part checks passed (milestone hardpart) |
+| endcards | ok 18s  50 ending card checks passed |
+| fresh | ok 3s  all ok |
+| effects | ok 0s  15 action checks passed |
+| tank1 | ok 30s  all tank 1 checks passed |
+| yourtank | ok 23s  all passed |
+| yourtank-360 | ok 23s  all passed |
+| kitpack | ok 5s  kit packing checks passed |
+| boardgames | ok 21s  board game checks passed |
+| land-audio | ok 13s  all passed |
+| land-life | ok 18s  all passed |
+| tapall | ok 534s  PASS 145 taps 100 ms after a render all changed the save (157 repeats skipped) (38 stages: |
+| taps | ok 12s  all ok |
+| ear | ok 10s  22 ear tank checks passed |

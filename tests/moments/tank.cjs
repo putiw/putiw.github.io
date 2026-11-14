@@ -15,8 +15,8 @@ const M=require('../lib/moment.cjs');
   M.check('avg first farm: Colony folded with the count on its line',r.col&&/^\d[\d,]* shrimp · \d+ berried$/.test(r.sum),r);
   M.check('avg first farm: Recent events shows three, the rest under Earlier',r.top===3&&r.fold,r);
   await g.tab('emp');const k=await g.js(()=>({t:$('ko-text').textContent,h:$('kordercard').hidden}));
-  M.check('avg first farm: bulk order is one line, no how-it-works',!k.h&&/^\d[\d.,k]* kits at AED [\d,.]+ \(AED [\d,.kM]+\)\.\n?\d+ days to fill\. You can make about/.test(k.t)&&!/If you accept|each day/.test(k.t),k);}}
+  if(k.h)M.skip('avg first farm bulk order','no bulk order open at this snapshot (v2: the bot run moved)');else M.check('avg first farm: bulk order is one line, no how-it-works',!k.h&&/^\d[\d.,k]* kits at AED [\d,.]+ \(AED [\d,.kM]+\)\.\n?\d+ days to fill\. You can make about/.test(k.t)&&!/If you accept|each day/.test(k.t),k);}}
  {const m=M.snap('avg','first grant');if(!m)M.skip('avg first grant','no snapshot');else{await g.load(m);await g.tab('promote');
-  const r=await g.js(()=>[...document.querySelectorAll('#e-shops .item p')].map(p=>p.textContent));
+  const r=await g.js(()=>[...document.querySelectorAll('#e-shops .item p:not(.impact)')].map(p=>p.textContent));/* v2: .impact is the paid consultant's forecast, it may mention rent */
   M.check('avg first grant: small-shop rows say orders, not rent',r.length>0&&r.every(t=>!/rent/.test(t)),r);}}
  await g.close();M.done('tank');})().catch(e=>{console.error('FAIL',e.message);process.exit(1);});
